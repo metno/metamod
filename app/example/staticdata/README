@@ -1,0 +1,5 @@
+This directory contains all static data in the database in the form of XML files.
+
+searchdata.xml     - Contains all static data defining the search categories
+                     and metadata types. It is loaded into the database by
+                     the import_searchdata.pl script in the METAMODBASE module.

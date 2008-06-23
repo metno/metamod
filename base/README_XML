@@ -1,0 +1,154 @@
+XML format for describing datasets
+==================================
+
+Two variants of this XML format exists. One variant describes a
+collection of datasets. The other variant describes a single dataset.
+
+The variant describing a collection of datasets has a 'datacollection'
+element at the topmost level. Within this element are one or more
+dataset elements.
+
+The other variant has a single 'dataset' element at the topmost level.
+
+The attribute 'ownertag' is used in the topmost element in both
+variants. It is a short string for assigning all datasets in a file to 
+one owner. These tags are used in the METAMODSEARCH module which is
+configured to only make visible datasets with ownertags from a
+specified list.
+
+Both variants use a latin-1 character encoding. Templates for the two
+versions are shown below:
+
+   <?xml version="1.0" encoding="ISO-8859-1"?>
+   <datacollection ownertag="...">
+      <dataset>
+      ...
+      </dataset>
+      <dataset>
+      ...
+      </dataset>
+      ...
+   </datacollection>
+
+   <?xml version="1.0" encoding="ISO-8859-1"?>
+   <dataset ownertag="...">
+      ...
+   </dataset>
+
+Dataset element
+---------------
+
+Within a dataset element, the XML file contains a sequence of elements.
+None of these elements have sub-elements, so the XML file is only two 
+or three levels deeep.
+
+None of these elements are mandatory.
+
+General elements within a dataset element
+-------------------------------------------
+
+A dataset element contain elements of the following form:
+
+   <METADATATYPE>...</METADATATYPE>
+
+where METADATATYPE is a metadata type name that must be found in the database
+at the time the XML file is imported. In the database, metadata type names
+are found in the MetadataType table as the value of the MT_name field.
+
+Several instances of the same METADATATYPE element are allowed.
+
+Special elements within a dataset element
+-------------------------------------------
+
+Some elements within a dataset element do not adhere to the general
+description:
+
+'Abstract' element:
+
+   <abstract>
+   ...
+   </abstract>
+
+   The dataset element may contain only one 'abstract' element.
+
+'Quadtree_nodes' element:
+
+   <quadtree_nodes>
+   ...
+   </quadtree_nodes>
+
+   Each line within this element contains a quadtree node. Together, the 
+   quadtree nodes defines the map area on which the map search facility of
+   the METAMODSEARCH module is based.
+
+   The dataset element may contain only one 'quadtree_nodes' element.
+
+'Datacollection_period*' elements:
+
+   <datacollection_period from="..." to="..." />
+
+   The values of the 'from' and 'to' attributes are dates of the form YYYY-MM-DD.
+
+   An alternative way to give these two values are:
+
+   <datacollection_period_from>...</datacollection_period_from>
+   <datacollection_period_to>...</datacollection_period_to>
+
+   If only the datacollection_period_from element is present, the 
+   datacollection_period_to element is arbitrarily set to 2999-01-01.
+   The datacollection_period values are used for the Datacollection 
+   period search in the METAMODSEARCH module.
+
+   The dataset element may only contain one 'datacollection_period' element, or
+   the combination of a 'datacollection_period_from' element and (optionally)
+   a 'datacollection_period_to' element.
+
+Elements used for search purposes
+---------------------------------
+
+All elements are used to populate the MetaData table in the database. In addition,
+some elements are used to update the tables used for searching the database.
+These are the following elements:
+
+variable                - Used for "Topics and variables" search. If the value 
+                          of this element is found in the search structure, the
+                          search tables are updated, so that the dataset will be
+                          found when searching on the variable or any topic that
+                          "includes" the variable.
+
+                          Values of the variable element can have a special form:
+                          "xxx > xxx > ... > HIDDEN". When this is the case, the
+                          variable is not shown in the search interface as an
+                          ordinary variable. But searches for topics conforming
+                          to "xxx > xxx > ..." will find the dataset. The "xxx"s
+                          are elements of GCMD science keywords.
+
+gcmd_keyword            - Also used for "Topics and variables" search. An element
+                          value of "xxx > xxx > ..." taken from the GCMD science 
+                          keywords list is treated as if it was a variable element
+                          value of "xxx > xxx > ... > HIDDEN".
+
+area                    - Used for "Areas" search
+
+activity_type           - Used for "Activity types" search
+
+institution             - Used for "Institutions" search
+
+datacollection_period*  - Used for "Datacollection period" search
+
+quadtree_nodes          - Used for "Map search"
+
+Elements used for setting up links to actual data
+-------------------------------------------------
+
+dataref                 - If the value of a 'dataref' element is recognised as an
+                          URL (starting with 'http://'), the value is presented in
+                          the METAMODSEARCH web interface in a special way. The last
+                          part of the value (corresponding to the regexp:
+                          '([^/]*)\/?$') is presented as a text linked to the given
+                          URL. If the URL ends with '.nc', it is assumed to be an
+                          OPeNDAP link. In that case, an '.html' is appended to the
+                          URL, so it will point to the HTML form-based view of the
+                          netCDF file.
+                          Othervise (no URL), the value is presented in a normal
+                          way.

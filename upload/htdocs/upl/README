@@ -1,0 +1,102 @@
+METAMOD2 upload service
+=======================
+
+INTRODUCTION
+------------
+
+This web application makes it possible for METAMOD2 data providers to upload data files
+(netCDF files) to the central METAMOD2 data repository. In order to do so, the data provider
+must be a registered user of this upload service.
+
+The index.html file contains two forms, one for registered users and one for new users.
+User E-mail addresses are used as basic user identification.
+
+NEW USERS
+
+When filling in the form for new users, the system checks if the submitted E-mail address
+already belongs to any of the registered users. If so, the system assumes the user has
+forgotten the password.  A new password will be created for the user, and an E-mail
+containing this password will be automatically sent to the user's E-mail address.
+
+If the submitted E-mail address is not found among the registered users's addresses, then a
+manual approve action is required from the system administrator. An E-mail is sent
+from the system to the system administrator containing a link, which when activated, will
+create a new user account in the system. This action will also make the system send an E-mail
+telling the user that the application for a new user account has been approved. The E-mail
+will also provide the user with the initial password.
+
+Users must belong to one of the institutions that are found in the INSTITUTION_LIST
+varible in the master_config.txt file.
+The new user select which institution she/he belongs to while filling in the form.
+Each institution is given an acronym. These acronyms are, among other things, used as
+directory names at the topmost level for the directory hierarchy containing the files
+uploaded to the system.
+
+REGISTERED USERS
+
+When filling in the form for registered users, the user must provide correct E-mail address
+and password. The E-mail address must correspond exactly to the one submitted in the
+original application form for new users. In addition, the user may change the password by
+checking a check box in the form, and filling in twice the new password.
+
+When the form for registered users is correctly submitted, the user enters a web application
+for directory administration and file uploads.
+
+
+WEB APPLICATION
+---------------
+
+Apart from the log in page, the web application has two main windows, available as two menu
+items on the left web page column: "Administration" and "File upload".
+
+The administration window allows creation of new directories where uploaded data files
+will be stored on the server. A new directory is created under the main directory for
+the institution that the user belongs to (identified by the institution acronym).
+
+The directory name should be short (max ten characters allowed), and must be unique across
+all institution directories.
+
+Within each directory, only files with names complying to a (directory specific) naming scheme
+are allowed. The user who creates a directory is responsible for setting up a suitable
+naming scheme for it. This is done as part of the directory creation dialogue.
+
+The user who creates a directory will be the owner of that directory, and will have the right to
+upload files to that directory. Other users may also ulpoad files to that directory, but only
+with permission from the directory owner. The directory owner may set up a directory key 
+(a character string) for the directory. This key will act as a password which other users must
+provide while uploading files to the directory. The owner may disclose the key to any other
+user, or publish it to all users. This disclosure of the key must be done by E-mail or by
+other means; it is not a service provided by the METAMOD2 system. If the owner wants to
+withdraw such upload rights, it is allways possible to change the directory key.
+
+
+INTERNAL REPRESENTATION OF USER ACCOUNTS
+----------------------------------------
+
+A user account is represented by a file residing in subdirectory u1 of the the METAMOD2
+webrun directory (given by the value of WEBRUN_DIRECTORY in master_config.txt). The filename
+is composed as follows:
+
+   <normalised E-mail address>.<normalised password>
+
+The normalisation is used for getting rid of characters that may interfere with the use of
+the the filenames in system commands. See the PHP function normstring() in funcs.inc on how
+this is done.
+
+The content of these files is "allmost" XML. What is missing is a start tag and corresponding
+end tag. Three different tags are used:
+
+<heading name="" email="" institution="" telephone="" />
+<dir dirname="" key="" />
+<file name="" size="" status="" errurl="" />
+
+The heading tag occure once at the beginning of a user file.
+
+Each dir tag contains the name of a directory created by the user, together with the
+directory key (which may have empty content).
+
+Each file tag contains the name, size and status of an uploaded file. In addition, an errurl
+attribute may be found that points to an html file with a summary of errors found while 
+"parsing" the uploaded file (see the ../../scripts/upload_monitor.pl script).
+
+As the parsing of a user file is somewhat primitive, each tag must comprise only one line.

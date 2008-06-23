@@ -1,0 +1,5 @@
+Options -Indexes
+AuthType Basic
+AuthName "Password Required"
+AuthUserFile /metno/ipycoord/ipycoordpw
+Require user ipyadm

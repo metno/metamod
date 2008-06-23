@@ -1,0 +1,38 @@
+This is the top directory of the METAMODBASE module. It is part of the
+METAMOD2 software (see ../README).
+
+The METAMODBASE module has the responsibility of managing the METAMOD2 database,
+that can be shared between several METAMOD2 applications. Only one of these
+applications will be using the METAMODBASE module (possibly together with other
+METAMOD2 modules).
+
+An overview of the database tables is found in init/README. The ultimate 
+documentation of these tables are found in the init/createdb.sh script.
+
+The tasks performed by the METAMODBASE module are:
+
+- Initialising the database. This is done by the init/create_and_load_all.sh
+  script which sets up the database tables and load static data into some of the 
+  tables. The actual work is done by two other scripts (activated by
+  init/create_and_load_all.sh):
+
+  init/createdb.sh               Defines all the tables in the database. 
+  
+  scripts/import_searchdata.pl   This script reads an XML file containing all
+                                 the static data in the database. These data
+                                 are loaded into the database.
+
+- Updating the database from XML files. One XML file describes one "dataset", or
+  a collection of datasets. A dataset may also represent data
+  that will be collected some time in the future. Other METAMOD2 modules have the
+  responsibility of creating these XML files. 
+
+  The script import_dataset.pl will read XML files and update the database
+  accordingly. It is intended to run for long periods of time. It mostly
+  sleeps, but wakes up at regular time intervals to check if any new or updated
+  XML files are found in a set of directories given by the value of the IMORTDIRS 
+  variable in the application configuration file (master_config.txt). The
+  import_dataset.pl script will be started and monitored from a daemon, cronjob or 
+  a similar tool.
+
+  The XML format used for dataset import is documented in README_XML

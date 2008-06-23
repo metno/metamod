@@ -1,0 +1,407 @@
+SEARCH APPLICATION
+==================
+
+INTRODUCTION
+------------
+
+This directory is the main workhorse directory of the METAMODSEARCH web search 
+module. All files mentioned below will be found in this directory, if not
+othervise stated.
+
+This directory is the source directory for the application. The files in
+this directory has to be modified and copied to a target directory in order
+to be useful as an operative application. How this is done is described in the
+main README file for the METAMOD2 software (../../../README).
+
+DATABASE
+--------
+
+This application operates against an SQL database (PostgreSQL). The detailed
+content of this database is described in ../../../base/init/README. One table
+in the database is important for the general flow of the web search application:
+
+   Table name:      SearchCategory
+   
+   Columns:         SC_id      - Number identifying a search category
+
+                    SC_type    - Number (1, 2, 3 or 4) giving the search
+                                 category type:
+                                 1:  Basic key search
+                                 2:  Hierarchical key search
+                                 3:  Search based on numerical values
+                                 4:  Geographical search
+
+                    SC_fnc     - Text string containing detailed information
+                                 about the search category. The text string 
+                                 contains name - value pairs like:
+
+                                 <name>: <value>; <name>: <value> ...
+
+                                 Currently, the following alternatives for <name> is
+                                 implemented:
+
+                                 name:   The category name as shown in the user interface
+                                 status: May have the value "hidden", in which case the
+                                         category is not used directly, but indirectly
+                                         through another category. Usually, for each
+                                         hierarchical key category (2) there is one
+                                         hidden basic key category (1) representing the
+                                         bottom level of the hierarchical key category.
+                                 cyclic: Only applicable for rows where SC_type=3. Allowed
+                                         values are "yes" or "no".
+                                 numtype: Only applicable for rows where SC_type=3.
+                                 lower:  Only applicable for rows where SC_type=3.
+                                 upper:  Only applicable for rows where SC_type=3.
+
+BASIC OPERATION
+---------------
+
+The main PHP file which generates pages in the web search application is 
+search.php.  When this file is activated, POST- or GET-data are received
+from the user, with two important variables:
+
+mmSessionId    - This is an integer which gives a unique identification to
+                 each session. Initially, when the user activates the
+                 index.php page, this variable is not set. A new, clean
+                 session is created, and the value of mmSessionId is set
+                 based on the current time. Later, while the session develops,
+                 the value is embedded in the pages sent to the user, so that
+                 the value can be recovered through POST- or GET-data.
+                 The complete session state is saved in a database table
+                 (Sessions) where mmSessionId is used as a key.
+
+mmSubmitButton - This is a text string regulating the main behaviour of
+                 the application. The value depends on user actions when
+                 the user requests a new page, either through an input
+                 element in a form (sent as POST-data), or as GET-data 
+                 appended to the URL submitted by the user when clicking an
+                 ordinary link. It may also be set directly in the PHP
+                 file activated by the user (as described below).
+                 If the value is sent as POST-data it may
+                 either be found directly in the $_POST array using
+                 "mmSubmitButton" as key, or it may be found indirectly
+                 by parsing a key value in the $_POST array starting
+                 with the string "mmSubmitButton_". The rest of this
+                 string is then used as the $mmSubmitButton value.
+
+The main repetitive event sequence can be described in the following way:
+
+- The user sends an URL. If it is index.php, then no POST- or GET-data comes
+  with this URL. Othervise, the URL originates from a page inside this
+  application, which is served to the user in the previous stage of the user
+  session. This URL either comes from an ordinary link containing GET-data,
+  or it comes from a button press in an HTML form together with POST-data.
+
+- Global PHP variables $mmSessionId and $mmSubmitButton is set.
+  Some of the PHP files activated directly by the user will set the value
+  of $mmSubmitButton. Such PHP files are small four-liners as shown below:
+
+  <?php
+     $mmSubmitButton = 'show';
+     include "search.php";
+  ?>
+
+- If not a new session, the session state is fetched from the database based
+  on the mmSessionId variable. The session state tells which search criteria
+  the user has selected up to now, and it may also contain preferences set by
+  the user. A detailed documentation of the session state is found in a 
+  separate section below.
+
+- The $mmSubmitButton values are text strings like <BN>_<CT>, <BN><N>_<CT>
+  or just <BN>. <BN> is a name (button name) containing only letters. <N> is
+  an integer following immediately after <BN>. <CT> is another integer 
+  (category number). The strings are decomposed into three other global
+  variables: $mmButtonName (<BN>), $mmSelectedNum (<N>) and $mmCategoryNum
+  (<CT>). $mmSelectedNum and $mmCategoryNum are set to zero if not found.
+  
+  The $mmButtonName is used as an index into a PHP array ($mmButtons). Each
+  value in this array is itself an array containing (among other things)
+  names of PHP files to be included as part of the current page. For each
+  possible $mmButtonName-value, two such files for inclusion may be found.
+  The first is used for updating the session state, the second is used to
+  fill an auxiliary area (named 'various' below) of the web page presented
+  to the user.
+
+- The main content of a new page to be sent to the user is created by the
+  'normal.php' PHP script. This script displays a heading
+  (logo ?) at the top, and sets up a 2x2 table structure below:
+
+  +----------------+---------------------+
+  | main_menu      | operational_heading |
+  +----------------+---------------------+
+  | selected_items | various             |
+  +----------------+---------------------+
+
+  The 'main_menu' area contains a set of fixed menu anchor tags with links to
+  other modules in the METAMOD2 application. External links can also be
+  included in this menu.
+  
+  The 'operational_heading' area contains a main heading for the application,
+  one or more 'heading_info' text boxes, and an horisontal operational menu.
+  If any error conditions occur (like session timeout), this area will also
+  be used for a 'note' text box explaining the nature of the error.
+
+  The 'selected_items' area shows which search items are currently selected
+  by the user. For each search category, the area also comprise an anchor tag
+  to activate a page for changing the currently selected items for that 
+  category. These anchor tags may be disabled (substituted by similar p-tags)
+  depending on the $mmButtonName value. When these tags are disabled, the
+  horisontal operational menu in the operational_heading area is also 
+  disabled. 
+
+  The 'various' area will have varying content dependent on the $mmButtonName
+  value.
+
+SESSION STATE
+-------------
+
+The session state is a PHP object preserved as serialised string during a user
+session in the Sessions table in the metadata database. 
+
+The object has the following members:
+
+var $logintime            Text string of the form: "YYYY-MM-DD HH:MM:SS"
+
+var $sitems               Array using indices of the form: "category,detail"
+                          where category is a key in the SearchCategory table,
+                          and detail is dependent on the category type.
+
+var $state                Text string describing the current application
+                          state, i.e. which screen is currently shown to
+                          the user.
+
+var $QueryResultOffset    When showing a large table of rows, it will be
+                          splitted up into smaller tables. This variable
+                          represents the row number offset in the large
+                          table corresponding to the current smaller table
+
+Below is a detailed explanation of $sitems, the most complicated variable in
+the session state object.
+
+"Detail" used    
+in index:        Value:
+
+           X     Array indexed by BK_id values. The BK_id indices represents
+                 all selected keywords in table BasicKey for the given search
+                 category. The search category may be a basic key search 
+                 category (1) or it may be an hierarchical key search
+                 category (2). In the latter case, the BK_id's correspond to
+                 the hidden basic key category used as the bottom level of the
+                 hierarchy. The values in this array are all 1 and are ignored.
+
+           Y     Array indexed by HK_id values. The HK_id indices represents
+                 all selected keywords in table HierarchicalKey for the given 
+                 search category. The values in this array are all 1 and are
+                 ignored.
+
+           HK    Array (a) containing a sequence of quadruples: levch, hidden,
+                 id, name.
+                 The first quadruple corresponds to a[0], a[1], a[2] and a[3];
+                 the next quadruple to a[4], a[5], a[6] and a[7] etc. These 
+                 quadruples describe which keywords are currently selected in
+                 the HierarchicalKey table for the given category.
+
+                 levch   - This is a number with two or more decimal digits
+                           representing two different values. The last digit
+                           tells if a checkbox is checked or not. All digits
+                           up to the last is a level in the keyword hierarchy
+                           for the keyword:
+
+                           Level = levch / 10
+                           Checked = levch % 10
+
+                           Level = 1 corresponds to the top level.
+                           Level = 99: The keyword belongs to a BasicKey
+                           table row.
+
+                           Checked = 0: The checkbox is not checked. I.e the
+                           corresponding keyword is not selected.
+                           Checked = 1: checked/selected.
+
+                 hidden  - =1 if the keyword is currently hidden from the
+                           user. =0 othervise. All keywords below a hidden
+                           keyword in the tree structure will also be hidden
+                           from user view (but not necceccarily have the hidden 
+                           field equal to 1).
+
+                 id      - The HK_id value for the HierarchicalKey table row
+                           (if level < 99).  For level =99, id is the
+                           BK_id value for the BasicKey table row.
+
+                 name    - Keyword name (taken from the HierarchicalKey or
+                           the BasicKey table row).
+
+           NI    Array (a) containing pairs of number items: from, to. The
+                 first pair corresponds to a[0] and a[1], the second to
+                 a[2] and a[3] etc. Each pair represents the lower and upper
+                 bounds of an interval, within which a data value can be
+                 found. 
+
+           GA    Array (a) of six numbers representing a rectangular
+                 geographical search area, and at which stage the application
+                 is, regarding the process of defining such an area.
+                 a[0] - Defining stage. =1: only one corner is defined (a[2-3]),
+                        =2: two opposite corners are defined, i.e. the whole
+                        rectangle.
+                 a[1] - Map number. The name of the PNG file used to display
+                        the map must change each time the map is changed.
+                        This number is incremented by 1 for each change, and
+                        is used as a part of the PNG file name to achieve
+                        this change.
+                 a[2-3] Two numbers representing one corner of the rectangle.
+                        The numbers are x and y pixel coordinates as provided
+                        by the user when clicking on the PNG image (set up as
+                        a server side map). (0,0) represents the left upper
+                        corner of the image, and the coordinates are increasing
+                        rightwords and downwords.
+                 a[4-5] Coordinates for the second rectangle-defining corner.
+
+PROGRAM FLOW
+------------
+
+The pages presented to the user are of two different types:
+
+1. The initial page (index.php), or pages showing data or help text.
+   In these pages, the horizontal operational menu and the left vertical menu
+   for selecting search items are all active.
+
+2. Forms for selecting search items and options (these are presented to
+   the user with a deeper blue background). In these pages, the operational menu
+   and the left vertical menu are disabled. The user has to continue by clicking
+   or checking a button within the deeper blue colored form. (Allthough he may leave
+   the search application alltogether by clicking a link in the main menu).
+
+The following four php files are directly linked from the four buttons in the
+operational menu:
+
+show.php       - Activated from the "Show results" menu item.
+cross.php      - Activated from the "Two-way tables" menu item.
+options.php    - Activated from the "Options" menu item.
+help.php       - Activated from the "Help" menu item.
+
+These four files are small four-liners where the $mmSubmitButton variable is
+set and search.php included.
+
+The 'search_item' area on the left hand side contain links directly to search.php.
+The links are differentiated by having different $mmSubmitButton values attached
+as GET data.
+
+Search.php is the central file activated (directly or indirectly) each time a user
+requests a new page.
+
+The following files are included from search.php:
+
+updsession.php   - Initialize a new user session or update the session state.
+                   This file also contains an include sentence to include one of
+                   the following files. These files will update the session state
+                   in different ways, depending on the $mmSubmitButton value
+                   and POST data:
+
+   optsdone.php  - Update options changed by the user.
+   bkdone.php    - Update User-selected Basic Keys
+   bkclear.php   - Clear all user-selected Basic Keys for a specific category
+   hkdone.php    - Update User-selected Hierarchical Keys
+   hkclear.php   - Clear all user-selected Hierarchical Keys for a specific category
+   hkupdate.php  - Update which Hierarchical Keys are shown in the form for selecting
+                   Hierarchical Keys.
+
+normal.php       - Construct a new page for the user. This file contain PHP/html code
+                   to construct the top header, bottom footer and the three areas:
+                   'main_menu', 'operational_heading' and 'selected_items'. In
+                   addition, one of the following PHP files is included to provide the
+                   content of the 'various' area:
+
+   presentation.php  - Contains the presentation of the application to users just
+                       arrived trough index.php.
+   doshow.php        - Presents the search results in a table view where each row
+                       corresponds to a dataset. Activated by the "Show results"
+                       button in the operational menu.
+   dooptions.php     - Shows the options dialogue form where the user may control
+                       which metadata are presented in the different columns in the
+                       search results table, and also which metadata are used to
+                       populate the lables along the horizontal and vertical axes in
+                       the two-way tables. Other preferences may also be set.
+   docross.php       - Presents the search results in a two-way table where two
+                       metadata types controls the lables along the horizontal and
+                       vertical axes. The cells in this table contain dataset counts
+                       for datasets matching metadata found in corresponding labels
+                       along both axes.
+   dohelp.php        - Shows the help text.
+   bk.php            - Shows a dialogue for selecting keywords from a limited
+                       vocabulary taken from the BasicKey table.
+   hk.php            - Shows a dialogue for selecting keywords from a large
+                       vocabulary organized as a tree structure. The user may
+                       expand the tree to reach down to the bottom level. At each
+                       level a node may be selected by checking a checkbox.
+                       Checking a node at one of the upper levels will implicitly
+                       select all nodes at lower levels that are rooted in the
+                       checked node.
+
+GLOBAL VARIABLES
+----------------
+
+$mmButtonName      - Name of button clicked by the user. Taken from the the first part
+                     of the $mmSubmitButton value.
+
+$mmButtons         - Array indexed by $mmButtonName. Each value is itself an array 
+                     containing three elements: 
+                     1. Name of PHP file included from updsession.php
+                     2. Name of PHP file included from normal.php
+                     3. A code that tells if the page that is to be constructed
+                        will contain a form or not (value = "FORM" or "NOFORM").
+                        "FORM" will implicate that the links in the selected_items
+                        area and the operational menu should be disabled.
+
+$mmCategoryFnc     - An array constructed from the SearchCategory database table.
+                     The array keys are constructed from the SC_id and SC_fnc fields
+                     in the database table. The SC_id field is the identification
+                     number for the search category, and the SC_fnc field contains
+                     a list of properties for the catagory. This list has the form:
+                     "nn1: vv1; nn2: vv2 ...". Each nn-string is appended to the
+                     SC_id value to form an array key. The corresponding array value
+                     is the corresponding vv-string.
+
+$mmCategoryName    - The category name taken from the SC_fnc field in the 
+                     SearchCategory database table. (I.e. the value vvv if
+                     the SC_fnc field contains the string: "... name: vvv ...").
+
+$mmCategoryNum     - The category number extracted from the value of $mmSubmitButton.
+                     This number corresponds to the SC_id field in the SearchCategory
+                     database table, and is used to extract fields from this table
+                     via the $mmCategoryFnc array.
+
+$mmCategorytype    - Array containing the SC_type fields in the SearchCategory
+                     database table. Indexed by category number.
+
+$mmColumns         - Array representing all possible columns in the metadata table.
+                     The array is indexed from 0 and up. Each entry contains an
+                     array of strings (also indexed from 0 and up). Entry[0] is
+                     the column identifier. Entry[1] is the column name as shown
+                     in the web interface. Additional entries may be of the form:
+                     "col=N", meaning that this column should appear as the Nth
+                     column in the table shown to the user when the "Show results"
+                     button is pressed. At last, an entry may have the form:
+                     "cross=X", where X is "h", "v" or "no". This entry tells the
+                     system if the column shall be used as a horisontal ("h") axis
+                     in a two-way table, or as a vertical axis ("v"). If X="no",
+                     then the column is not allowed to be used as a horisontal or
+                     vertical axis in a two-way table at all.
+
+$mmDbConnection    - A connection handel to the PostgreSQL database.
+
+$mmError           - Set to a value different from 0 when an error occur.
+
+$mmErrorMessage    - Set to an error message shown to the user if an error occur.
+
+$mmSelectedNum     - Extracted from the value of $mmSubmitButton. It represents
+                     a selection made by the user, and can be used as a key in
+                     the HierarchicalKey database table.
+
+$mmSessionId       - User session identification number. See description in the
+                     BASIC OPERATION section above.
+
+$mmSessionState    - The session state object. See separate description in the 
+                     SESSION STATE section above.
+
+$mmSubmitButton    - Variable controlling the main behaviour of this application.
+                     See the BASIC OPERATION section above.

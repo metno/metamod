@@ -1,0 +1,95 @@
+Tables in the METAMOD2 catalogue
+--------------------------------
+
+DataSet                 - A dataset represents some data that for some reason is
+                          seen as a unit. Datasets are organised in a tree structure
+                          where one dataset may contain other dataset. The 'DS_level'
+                          field tells which level in the tree structure the dataset
+                          belongs to. DS_level = 1 represents the top level.
+                          'DS_parent' points (if found) to the parent dataset.
+                          This method of implementing an hierarchical structure to
+                          the set of datasets is currently not in use. All datasets
+                          are now on level 1.
+
+DataReference           - A data reference contains an identifier ('DR_path') that
+                          uniquely identifies a dataset. This text string is used in
+                          the XML files for loading information into the database.
+                          Each dataset element contain a drpath element used to set
+                          the DR_path value. If a dataset already exists with a given
+                          DR_path value, this dataset is overwritten when an XML
+                          dataset element is loaded into the database with a drpath
+                          value corresponding to the DR_path value.
+                          The corresponding dataset is given by the 'DS_id' field.
+                          Not all datasets have a data reference. Such datasets
+                          are defined through their child datasets.
+
+SearchCategory          - Table defining the search categories by which the database
+                          can be searched. Each entry is characterised by a search
+                          category type (1 - Basic keyword search, 2 - Hierarchical
+                          keyword search, 3 - Numerical scale search and 
+                          4 - Geographical search). Each entry also has a text field
+                          (SC_fnc) that sets som configurable contants governing
+                          the search process.
+
+HierarchicalKey         - Contains keywords organised in a set of tree structures
+                          (forest). Each row represents one keyword ('HK_name') and
+                          one node in a tree. If the node has child nodes, the
+                          keyword is a general term (generalisation of the keywords
+                          in the child nodes).
+
+                          The tree structure is implemented by child nodes having a
+                          'HK_parent' field pointing to the parent node. In addition,
+                          'HK_level' gives the level of the node in the tree. 
+                          HK_level = 1 corresponds to the top level.
+
+BasicKey                - This table holds keywords that are all on the same "level".
+                          I.e, no hierarchical relationship exists between different
+                          entries in this table. But the keywords are divided in 
+                          different groups (or search categories), using the SC_id
+                          field.
+
+HK_Represents_BK        - This relationship is used to create an extra bottom level
+                          on the hierarchical structures found in the
+                          HierarchicalKey table. Entries in the HierarchicalKey
+                          table that have no child nodes, may be related to a set of
+                          BasicKey entries through this relationship.
+
+BK_Describes_DR         - This relationship tells which keywords in the BasicKey
+                          table characterise a given DataReference.
+
+NumberItem              - This table defines an interval on some numeric scale
+                          (including time). Each interval is connected to a search
+                          category (through SC_id) where the details of the numeric
+                          scale is stored. This table also incorporates a 
+                          relationship to the DataReference table through the DR_id
+                          field. I.e each entry describes the interval
+                          for one DataReference and one variable type (like time).
+
+GeographicalArea        - Table representing a set of geographical areas. Each named
+                          by a text string.
+
+GD_Ispartof_GA          - Collections of quadtree identifiers (GD_id's). Each
+                          collection describes the extent of a GeographicalArea.
+                          Not used (for the time being).
+
+GD_Describes_DR         - Collections of quadtree identifiers (GD_id's). Each
+                          collection describes the area covered by a DataReference.
+
+MetadataType            - Table of metadata types found in the database.
+
+Metadata                - Table of all metadata in the database. Each metadata entry
+                          comprise a text string represnting the content of the
+                          metadata (e.g. "Output from the HIRLAM model") and the
+                          metadata type (e.g. "title").
+
+DS_Has_MD               - Relationship tagging metadata onto datasets.
+
+Sessions                - Table holding information on user sessions in the
+                          METAMODSEARCH module. Each table entry has a session
+                          identifier that is remebered between web page
+                          presentations in a user session. State information
+                          describing, among other things, selection criteria for
+                          searching the database, is stored in a sessionstate
+                          field. A timestamp field, set to the last time when the
+                          session was active, is used to invalidate a session when
+                          a timeout limit has been exceeded.

@@ -1,0 +1,180 @@
+netcdf test2_arctic20.200611 {
+dimensions:
+	time = UNLIMITED ; // (1 currently)
+	Xc = 10 ;
+	Yc = 10 ;
+	depth = 1 ;
+	surface = 1 ;
+variables:
+	double time(time) ;
+		time:long_name = "time" ;
+		time:units = "days since 1900-01-01 00:00:00" ;
+		time:axis = "T" ;
+	float Xc(Xc) ;
+		Xc:long_name = "x-coordinate in Cartesian system" ;
+		Xc:standard_name = "Projection X coordinate" ;
+		Xc:units = "1" ;
+		Xc:axis = "X" ;
+	float Yc(Yc) ;
+		Yc:long_name = "y-coordinate in Cartesian system" ;
+		Yc:standard_name = "Projection Y coordinate" ;
+		Yc:units = "1" ;
+		Yc:axis = "Y" ;
+	float longitude(Yc, Xc) ;
+		longitude:long_name = "longtude" ;
+		longitude:standard_name = "longitude" ;
+		longitude:units = "degree_east" ;
+		longitude:x_grid_offset = 0.f ;
+		longitude:y_grid_offset = 0.f ;
+		longitude:valid_min = -180.f ;
+		longitude:valid_max = 180.f ;
+	float latitude(Yc, Xc) ;
+		latitude:long_name = "latitude" ;
+		latitude:standard_name = "latitude" ;
+		latitude:units = "degree_north" ;
+		latitude:x_grid_offset = 0.f ;
+		latitude:y_grid_offset = 0.f ;
+		latitude:valid_min = -90.f ;
+		latitude:valid_max = 90.f ;
+	float depth(depth) ;
+		depth:long_name = "depth" ;
+		depth:standard_name = "depth" ;
+		depth:units = "m" ;
+		depth:positive = "down" ;
+		depth:axis = "Z" ;
+		depth:description = "geopotential level relative to equilibrium surface" ;
+	float surface(surface) ;
+		surface:long_name = "model_surface" ;
+		surface:units = "1" ;
+		surface:axis = "Z" ;
+		surface:description = "ocean surface, or vertically integrated" ;
+	short temperature(time, depth, Yc, Xc) ;
+		temperature:_FillValue = -32767s ;
+		temperature:add_offset = 273.15f ;
+		temperature:scale_factor = 0.01f ;
+		temperature:long_name = "sea_water_temperature" ;
+		temperature:standard_name = "sea_water_temperature" ;
+		temperature:units = "K" ;
+		temperature:x_grid_offset = 0.f ;
+		temperature:y_grid_offset = 0.f ;
+		temperature:cell_method = "time: snapshot" ;
+	short sea_ice_concentration(time, surface, Yc, Xc) ;
+		sea_ice_concentration:_FillValue = -32767s ;
+		sea_ice_concentration:add_offset = 0.f ;
+		sea_ice_concentration:scale_factor = 0.01f ;
+		sea_ice_concentration:long_name = "sea_ice_area_fraction" ;
+		sea_ice_concentration:standard_name = "sea_ice_area_fraction" ;
+		sea_ice_concentration:units = "1e-2" ;
+		sea_ice_concentration:x_grid_offset = 0.f ;
+		sea_ice_concentration:y_grid_offset = 0.f ;
+		sea_ice_concentration:cell_method = "time: snapshot" ;
+		sea_ice_concentration:valid_min = "0" ;
+
+// global attributes:
+		:Conventions = "CF1.0" ;
+		:product_version = "1.0" ;
+		:history = "2006-11-29 creation" ;
+		:grid_projection = "polar_stereographic" ;
+		:westernmost_longitude = -179.9946f ;
+		:easternmost_longitude = 179.9563f ;
+		:southernmost_latitude = 45.2402f ;
+		:northernmost_latitude = 89.90329f ;
+		:metno_grid_no = 903 ;
+		:metno_mapprojection_no = 1 ;
+		:metno_grid_spec = 209.f, 128.5f, 592.5f, 58.f, 60.f, 0.f ;
+		:command = "seqconvert netcdf nc_globaldef_damocles_analysis.txt ut.seq ut.nc 340-8 308-5" ;
+		:title = "Artificial test data" ;
+		:abstract = "This data set contains artificial data with metadata not according to requirements as set up for the EXAMPLE project." ;
+		:topicCategory = "marine data" ;
+		:keywords = "forecast, sea, ice, asimillation" ;
+		:Product_name = "coupled MI-POM, MI-IM model" ;
+		:software_version = "MIPOM v. 23, MI-IM v. 3" ;
+		:area = "Arctic Ocean, Nordic Seas" ;
+		:forecast_type = "nowcast" ;
+		:institution = "IXI International Example Institute" ;
+		:PI_name = "N.N." ;
+		:contact = "egil.storen@met.no" ;
+		:distribution_statement = "open" ;
+		:operational_status = "operational" ;
+		:project_web_site = "http://www.damocles-eu.org/" ;
+		:model_web_site = "http://met.no/english/r_and_d_activities/method/num_mod/mi_pom.html, http://met.no/english/r_and_d_activities/method/num_mod/mi_im.html" ;
+data:
+
+ time = 39020 ;
+
+ Xc = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ;
+
+ Yc = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ;
+
+ longitude =
+  1.044419, 1.178518, 1.313583, 1.449625, 1.586652, 1.724672, 1.863697, 
+    2.003733, 2.144792, 2.286883,
+  2.430015, 2.574197, 2.719441, 2.865755, 3.013149, 3.161634, 3.311219, 
+    3.461916, 3.613733, 3.766682,
+  3.920774, 4.076017, 4.232424, 4.390006, 4.548772, 4.708734, 4.869904, 
+    5.03229, 5.195907, 5.360765,
+  5.526873, 5.694246, 5.862894, 6.032828, 6.204062, 6.376605, 6.550471, 
+    6.725671, 6.902217, 7.080122,
+  7.259398, 7.440059, 7.622113, 7.805576, 7.990461, 8.176778, 8.364542, 
+    8.553764, 8.74446, 8.936639,
+  9.130317, 9.325505, 9.522219, 9.720469, 9.92027, 10.12164, 10.32458, 
+    10.52911, 10.73525, 10.94301,
+  11.1524, 11.36343, 11.57612, 11.79048, 12.00654, 12.22429, 12.44375, 
+    12.66495, 12.88788, 13.11257,
+  13.33903, 13.56727, 13.79731, 14.02916, 14.26283, 14.49835, 14.73571, 
+    14.97494, 15.21605, 15.45905,
+  15.70396, 15.95078, 16.19954, 16.45025, 16.70292, 16.95756, 17.21418, 
+    17.47281, 17.73344, 17.9961,
+  18.2608, 18.52754, 18.79635, 19.06723, 19.3402, 19.61526, 19.89243, 
+    20.17172, 20.45314, 20.7367 ;
+
+ latitude =
+  45.2402, 45.38116, 45.52208, 45.66296, 45.80378, 45.94455, 46.08526, 
+    46.22591, 46.3665, 46.50703,
+  46.64749, 46.78787, 46.92818, 47.06842, 47.20857, 47.34864, 47.48863, 
+    47.62852, 47.76832, 47.90803,
+  48.04763, 48.18713, 48.32652, 48.46581, 48.60498, 48.74403, 48.88296, 
+    49.02176, 49.16044, 49.29898,
+  49.43739, 49.57566, 49.71378, 49.85176, 49.98958, 50.12725, 50.26476, 
+    50.4021, 50.53927, 50.67628,
+  50.8131, 50.94974, 51.0862, 51.22247, 51.35854, 51.49442, 51.63009, 
+    51.76555, 51.90079, 52.03583,
+  52.17064, 52.30521, 52.43956, 52.57367, 52.70754, 52.84116, 52.97453, 
+    53.10763, 53.24047, 53.37305,
+  53.50535, 53.63737, 53.76911, 53.90055, 54.0317, 54.16254, 54.29308, 
+    54.42331, 54.55321, 54.68278,
+  54.81203, 54.94093, 55.06949, 55.1977, 55.32555, 55.45304, 55.58016, 
+    55.7069, 55.83325, 55.95922,
+  56.08479, 56.20995, 56.33471, 56.45904, 56.58295, 56.70643, 56.82947, 
+    56.95206, 57.07419, 57.19587,
+  57.31707, 57.4378, 57.55804, 57.67779, 57.79704, 57.91578, 58.034, 58.1517, 
+    58.26886, 58.38549 ;
+
+ depth = 0 ;
+
+ surface = 0 ;
+
+ temperature =
+  400, 400, 400, 400, 400, 400, 400, 400, 400, 400,
+  400, 400, 400, 400, 400, 400, 400, 400, 400, 400,
+  400, 400, 400, 400, 400, 400, 400, 400, 400, 400,
+  400, 400, 400, 400, 400, 400, 400, 400, 400, 400,
+  400, 400, 400, 400, 400, 400, 400, 400, 400, 400,
+  400, 400, 400, 400, 400, 400, 400, 400, 400, 400,
+  400, 400, 400, 400, 400, 400, 400, 400, 400, 400,
+  400, 400, 400, 400, 400, 400, 400, 400, 400, 400,
+  400, 400, 400, 400, 400, 400, 400, 400, 400, 400,
+  400, 400, 400, 400, 400, 400, 400, 400, 400, 400 ;
+
+ sea_ice_concentration =
+  50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+  50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+  50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+  50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+  50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+  50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+  50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+  50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+  50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+  50, 50, 50, 50, 50, 50, 50, 50, 50, 50 ;
+}
