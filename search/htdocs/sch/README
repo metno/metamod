@@ -20,7 +20,8 @@ This application operates against an SQL database (PostgreSQL). The detailed
 content of this database is described in ../../../base/init/README. One table
 in the database is important for the general flow of the web search application:
 
-   Table name:      SearchCategory
+   Table name: SearchCategory
+   --------------------------
    
    Columns:         SC_id      - Number identifying a search category
 
@@ -237,7 +238,7 @@ in index:        Value:
                  bounds of an interval, within which a data value can be
                  found. 
 
-           GA    Array (a) of six numbers representing a rectangular
+           GA    Array (a) of numbers representing a rectangular
                  geographical search area, and at which stage the application
                  is, regarding the process of defining such an area.
                  a[0] - Defining stage. =1: only one corner is defined (a[2-3]),
@@ -253,8 +254,11 @@ in index:        Value:
                         by the user when clicking on the PNG image (set up as
                         a server side map). (0,0) represents the left upper
                         corner of the image, and the coordinates are increasing
-                        rightwords and downwords.
+                        rightwards and downwards.
                  a[4-5] Coordinates for the second rectangle-defining corner.
+                 a[6] - Number of DR_ids found from element 7 and on
+                 a[7-]  DR_ids representing all datasets in the database that
+                        partly (or in full) cover the rectangular search area
 
 PROGRAM FLOW
 ------------
@@ -304,6 +308,12 @@ updsession.php   - Initialize a new user session or update the session state.
    hkclear.php   - Clear all user-selected Hierarchical Keys for a specific category
    hkupdate.php  - Update which Hierarchical Keys are shown in the form for selecting
                    Hierarchical Keys.
+   nidone.php    - Update search range set by the user for searching in the
+                   NumberItem table.
+   niremove.php  - Remove NumberItem search range.
+   gaupdate.php  - The user has set one corner in a geographical search rectangle.
+   garemove.php  - Remove geographical search rectangle.
+   gadone.php    - The user has finished defining a geographical search rectangle.
 
 normal.php       - Construct a new page for the user. This file contain PHP/html code
                    to construct the top header, bottom footer and the three areas:
@@ -336,6 +346,80 @@ normal.php       - Construct a new page for the user. This file contain PHP/html
                        Checking a node at one of the upper levels will implicitly
                        select all nodes at lower levels that are rooted in the
                        checked node.
+   ni.php            - Shows a dialogue for setting a numerical range for searching
+                       in the NumberItem table.
+   ga.php            - Shows a dialogue with a map for setting corners in a
+                       geographical search rectangle.
+
+Search implementation
+---------------------
+
+The file getdslist.php does the main work of searching the database to get a list
+of datasets satisfying the current search criteria. This file is included both in
+the doshow.php and the docross.php files.
+
+The current search criteria are found in the $sitems array in the session state object
+(explained above). The getdslist.php file convert these criteria into an SQL sentence
+which is executed and delivers two arrays and a comma-separated string of DS_ids
+representing the search result.
+
+The SQL sentence has the following general structure:
+
+   SELECT DR_id, DS_id, DR_path FROM DataReference 
+      WHERE DR_ownertag IN ([==DATASET_TAGS==]) AND
+      <criteria based on search category 1> AND
+      <criteria based on search category 2> AND
+      ...
+      ORDER BY DataReference.DS_id
+
+Lines like "<criteria based on search category N> AND" are empty if no selection
+criteria are set for that search category.
+
+Search categories are of four different types, each of which results in different
+kinds of search criteria:
+
+Type 1 and 2 (basic key search or hierarchical key search) results in the following
+kind of search criteria:
+
+   DR_id IN (SELECT DISTINCT DR_id FROM BK_describes_DR WHERE BK_id IN (...))
+
+   Here (...) is a list of BK_ids.
+   
+   For type 1 (basic key search) this list is constructed from the keys in the
+   array $mmSessionState->sitems['<N>,X'] where <N> is the search category number
+   (SC_id).
+
+   For type 2 (hierarchical key search) this list is constucted in two steps:
+
+   1. First, a list of HK_ids is constructed from the keys of the array
+      $mmSessionState->sitems['<N>,Y']. This list is used to retrieve a list
+      of BK_ids from the database through the relationship HK_Represents_BK.
+
+   2. The list resulting from step 1 is merged with the list constructed from
+      the keys in array $mmSessionState->sitems['<N>,X'] (the same array as used
+      for type 1 categories). The combined list is used in the "(...)" above.
+
+Type 3 search categories (search based on numerical values) results in the 
+following kind of search criteria:
+
+   DR_id IN (SELECT DISTINCT DR_id FROM NumberItem WHERE SC_id = <N> AND
+             NI_from <= <upper> AND NI_to >= <lower>)
+
+   Here <N> is the search category number (SC_id), <upper> is the upper limit
+   of the range set by the web user, and <lower> is the corresponding lower limit.
+   The range set by the web user is found as the two first entries in the array 
+   $mmSessionState->sitems['<N>,NI'].
+
+Type 4 search categories (geographical search) results in the following kind of 
+search criteria:
+
+   DR_id IN (...)
+
+   The list (...) is constructed from the array $mmSessionState->sitems[<N>,GA]
+   where <N> is the search category number (SC_id). From this array, all elements
+   from element 7 (inclusive) are extracted. These elements are all the
+   DR_ids in the database that cover a geographical area that partly (or in full)
+   are within the search rectangle set up by the web user.
 
 GLOBAL VARIABLES
 ----------------
