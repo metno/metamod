@@ -231,7 +231,6 @@ if ($@) {
 if (scalar keys %files_with_error > 0) {
    my $fname = $problem_dir_path . "/files_with_error";
    open (ERRFILES,">$fname");
-   $Data::Dumper::Terse = 1;
    $Data::Dumper::Indent = 0;
    print ERRFILES Dumper(\%files_with_error);
    close (ERRFILES);
@@ -354,17 +353,17 @@ sub read_ftp_events {
    while (<EVENTS>) {
       chomp($_);
       my $line = $_;
+      $line =~ s/^\s+//;
       my @tokens = split(/\s+/,$line);
-      if (scalar @tokens < 3) {
-         die "Too few tokens in ftp event file\n";
-      }
-      my $dataset_name = $tokens[0];
-      $all_ftp_datasets{$dataset_name} = 1;
-      my $wait_minutes = $tokens[1];
-      for (my $ix=2; $ix < scalar @tokens; $ix++) {
-         my $hour = $tokens[$ix];
-         my $eventkey = "$dataset_name $hour";
-         $eventsref->{$eventkey} = $wait_minutes;
+      if (scalar @tokens >= 3) {
+         my $dataset_name = $tokens[0];
+         $all_ftp_datasets{$dataset_name} = 1;
+         my $wait_minutes = $tokens[1];
+         for (my $ix=2; $ix < scalar @tokens; $ix++) {
+            my $hour = $tokens[$ix];
+            my $eventkey = "$dataset_name $hour";
+            $eventsref->{$eventkey} = $wait_minutes;
+         }
       }
    }
    close (EVENTS);
@@ -1066,7 +1065,6 @@ sub revert_XML_history {
 #        Write new XML-history file:
 #      
          open (XMLHISTORY,">$xml_history_filename");
-         $Data::Dumper::Terse = 1;
          $Data::Dumper::Indent = 1;
          print XMLHISTORY Dumper(\@new_xml_history);
          close (XMLHISTORY);
@@ -1117,7 +1115,6 @@ sub update_XML_history {
 #     Write new XML-history file:
 #      
       open (XMLHISTORY,">$xml_history_filename");
-      $Data::Dumper::Terse = 1;
       $Data::Dumper::Indent = 1;
       print XMLHISTORY Dumper(\@new_xml_history);
       close (XMLHISTORY);
