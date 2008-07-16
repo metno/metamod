@@ -430,7 +430,8 @@ sub ftp_process_hour {
 #
 #  Move any file in the ftp upload area not belonging to a dataset to the
 #  $problem_dir_path directory (the actual moving is done in the syserror
-#  routine):
+#  routine). Only move files older than 5 hours. Newer files may be temporary
+#  files waiting to be renamed by the uploading software:
 #
    my @all_files_found = &shcommand_array("find $ftp_dir_path -type f");
    if (scalar @all_files_found == 0 && length($shell_command_error) > 0) {
@@ -443,7 +444,20 @@ sub ftp_process_hour {
          }
          if (!defined($dataset_name) || 
                 scalar grep($dataset_name eq $_, keys %all_ftp_datasets) == 0) {
-            &syserror("SYS","file_with_no_dataset", $filename, "ftp_process_hour", "");
+            my @file_stat = stat($filename);
+            if (scalar @file_stat == 0) {
+               die "Could not stat $filename\n";
+               &syserror("SYS","Could not stat $filename", "", "ftp_process_hour", "");
+            } else {
+#            
+#             Get last modification time of file
+#             (seconds since the epoch)
+#            
+               my $modification_time = &my_time($file_stat[9]);
+               if ($current_epoch_time - $modification_time < 60*60*5) {
+                  &syserror("SYS","file_with_no_dataset", $filename, "ftp_process_hour", "");
+               }
+            }
          }
       }
    }
@@ -888,7 +902,8 @@ sub process_files {
          }
          if ($filepath ne $destination_dir . "/$bname") {
             if (move($filepath,$destination_dir) == 0) {
-               die "Move filepath $filepath to destination_dir. Move did not succeed. Error code: $!\n";
+               &syserror("SYS","Move $filepath to destination_dir did not succeed. Error code: $!",
+                         "", "process_files", "");
             }
          }
       }
@@ -959,7 +974,7 @@ sub process_files {
       }
       foreach my $uploadname (keys %files_to_process) {
          if (unlink($uploadname) == 0) {
-            die "Unlink file $uploadname did not succeed\n";
+            &syserror("SYS","Unlink file $uploadname did not succeed","", "process_files", "");
          }
       }
       &update_XML_history($dataset_name,\@uploaded_basenames,\@existing_basenames);
@@ -975,7 +990,7 @@ sub purge_current_directory {
       if (! exists($files_to_process{$upldname})) {
          if (-e $basename) {
             if (unlink($basename) == 0) {
-               die "Unlink file $basename did not succeed\n";
+               &syserror("SYS","Unlink file $basename did not succeed","", "purge_current_directory", "");
             }
          }
          delete $ref_orignames->{$basename};
@@ -1055,10 +1070,10 @@ sub revert_XML_history {
             print "Dataset $dataset_name : All files for this dataset has to be re-processed\n";
          }
          if (unlink($path_to_xml_file) == 0) {
-            die "Unlink file $path_to_xml_file did not succeed\n";
+            &syserror("SYS","Unlink file $path_to_xml_file did not succeed","", "revert_XML_history", "");
          }
          if (unlink($xml_history_filename) == 0) {
-            die "Unlink file $xml_history_filename did not succeed\n";
+            &syserror("SYS","Unlink file $xml_history_filename did not succeed","", "revert_XML_history", "");
          }
       } else {
 #      
@@ -1075,7 +1090,7 @@ sub revert_XML_history {
    } else {
       &syserror("SYS","no_XML_history_file", "", "revert_XML_history", "");
       if (unlink($path_to_xml_file) == 0) {
-         die "Unlink file $path_to_xml_file did not succeed\n";
+         &syserror("SYS","Unlink file $path_to_xml_file did not succeed","", "revert_XML_history", "");
       }
       return ();
    }
@@ -1107,7 +1122,11 @@ sub update_XML_history {
          $/ = "\n";
          my $ref_xml_history = eval($xml_history);
          close (XMLHISTORY);
-         @new_xml_history = (\@new_element,@$ref_xml_history);
+	 if (defined($ref_xml_history)) {
+            @new_xml_history = (\@new_element,@$ref_xml_history);
+	 } else {
+            @new_xml_history = (\@new_element);
+         }
       } else {
          @new_xml_history = (\@new_element);
       }
@@ -1119,7 +1138,7 @@ sub update_XML_history {
       print XMLHISTORY Dumper(\@new_xml_history);
       close (XMLHISTORY);
    } else {
-      die "XML file $xml_filename not found\n";
+      &syserror("SYS","XML file $xml_filename not found", "", "update_XML_history", "");
    }
 }
 #
@@ -1139,12 +1158,14 @@ sub notify_web_system {
    my %file_sizes = ();
    my $i1 = 0;
    foreach my $fname (@$ref_uploaded_files) {
+      my $basename = $uploaded_basenames[$i1];
       my @filestat = stat($fname);
       if (scalar @filestat == 0) {
-         die "Could not stat $fname\n";
+         &syserror("SYS","Could not stat $fname", "", "notify_web_system", "");
+         $file_sizes{$basename} = 0;
+      } else {
+         $file_sizes{$basename} = $filestat[7];
       }
-      my $basename = $uploaded_basenames[$i1];
-      $file_sizes{$basename} = $filestat[7];
       $i1++;
    }
 #
@@ -1163,7 +1184,10 @@ sub notify_web_system {
 #   
 #     Slurp in the content of a file
 #   
-      unless (-r $userfile) {die "Can not read from file: $userfile\n";}
+      unless (-r $userfile) {
+         &syserror("SYS","Can not read from file: $userfile", "", "notify_web_system", "");
+         next;
+      }
       open (USERFILE,$userfile);
       undef $/;
       my $file_content = <USERFILE>;
@@ -1283,7 +1307,10 @@ sub get_dataset_institution {
 #      
 #        Slurp in the content of a file
 #      
-      unless (-r $filename) {die "Can not read from file: $filename\n";}
+      unless (-r $filename) {
+         &syserror("SYS","Can not read from file: $filename", "", "get_dataset_institution", "");
+         next;
+      }
       open (INPUTFILE,$filename);
       undef $/;
       my $content = <INPUTFILE>;
@@ -1405,7 +1432,7 @@ sub clean_up_problem_dir {
       if (-r $filename) {
          my @file_stat = stat($filename);
          if (scalar @file_stat == 0) {
-            die "Could not stat $filename\n";
+            &syserror("SYS","Could not stat $filename", "", "clean_up_problem_dir", "");
          }
 #            
 #             Get last modification time of file
@@ -1414,7 +1441,7 @@ sub clean_up_problem_dir {
          my $modification_time = &my_time($file_stat[9]);
          if ($current_epoch_time - $modification_time > $age_seconds) {
             if (unlink($filename) == 0) {
-               die "Unlink file $filename did not succeed\n";
+               &syserror("SYS","Unlink file $filename did not succeed", "", "clean_up_problem_dir", "");
             }
          }
          if ($filename =~ /\/([^\/]+)$/) {
