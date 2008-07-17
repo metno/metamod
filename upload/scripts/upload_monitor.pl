@@ -453,6 +453,7 @@ sub ftp_process_hour {
 #             Get last modification time of file
 #             (seconds since the epoch)
 #            
+               my $current_epoch_time = &my_time(); 
                my $modification_time = &my_time($file_stat[9]);
                if ($current_epoch_time - $modification_time < 60*60*5) {
                   &syserror("SYS","file_with_no_dataset", $filename, "ftp_process_hour", "");
