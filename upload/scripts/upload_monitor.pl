@@ -201,19 +201,6 @@ my %files_to_process = ();   # Hash containing, for each uploaded file to
                              # time of that file. This hash is re-
                              # initialized for each new batch of files
                              # to be processed for the same dataset.
-#
-my %files_with_error = ();   # Hash containing one entry for each uploaded
-                             # filename that had errors. The key is the
-                             # name of the file in the problemfiles
-                             # directory, and the value is
-                             # a reference to an array with two members:
-                             # ->[0] The modification time that file had
-                             #       in the upload/ftp upload directory
-                             # ->[1] The original full path of the uploaded
-                             #       file.
-                             # This hash is preserved between each
-                             # repetition of the loop body, and between
-                             # invocations of the whole script.
 my $file_in_error_counter;
 my @user_errors = ();
 #
@@ -227,13 +214,6 @@ if ($@) {
    &syserror("SYS", "ABORTED: " . $@, "", "", "");
 } else {
    &syserror("SYS", "NORMAL TERMINATION", "", "", "");
-}
-if (scalar keys %files_with_error > 0) {
-   my $fname = $problem_dir_path . "/files_with_error";
-   open (ERRFILES,">$fname");
-   $Data::Dumper::Indent = 0;
-   print ERRFILES Dumper(\%files_with_error);
-   close (ERRFILES);
 }
 #
 # ----------------------------------------------------------------------------
@@ -282,19 +262,6 @@ sub main_loop {
 #  $webrun_directory/u1 at the beginning of each repetition of the loop.
 #
    %dataset_institution = ();
-#
-#  Initialize %files_with_error hash from file, if the file is found:
-#
-  my $fname = $problem_dir_path . "/files_with_error";
-  if (-r $fname) {
-     open (ERRFILES,$fname);
-     undef $/;
-     my $htext = <ERRFILES>;
-     $/ = "\n";
-     close (ERRFILES);
-     my $href = eval($htext);
-     %files_with_error = %$href;
-  }
 #
 #  Loop which will continue until the file $path_continue_monitor is no longer
 #  found.
@@ -546,8 +513,7 @@ sub process_files {
    }
    if (! exists($dataset_institution{$dataset_name})) {
       foreach my $uploadname (keys %files_to_process) {
-         my $modification_time = $files_to_process{$uploadname};
-         &move_to_problemdir($uploadname,$modification_time);
+         &move_to_problemdir($uploadname);
       }
       &syserror("SYSUSER","dataset_not_initialized", "", "process_files", "Dataset: $dataset_name");
       return;
@@ -889,8 +855,7 @@ sub process_files {
    if (length($shell_command_error) > 0) {
       &syserror("SYS","digest_nc_fails", "", "process_files", "");
       foreach my $uploadname (keys %files_to_process) {
-         my $modification_time = $files_to_process{$uploadname};
-         &move_to_problemdir($uploadname,$modification_time);
+         &move_to_problemdir($uploadname);
       }
    } else {
 #
@@ -1445,10 +1410,6 @@ sub clean_up_problem_dir {
                &syserror("SYS","Unlink file $filename did not succeed", "", "clean_up_problem_dir", "");
             }
          }
-         if ($filename =~ /\/([^\/]+)$/) {
-            my $basename = $1; # First matching ()-expression
-            delete $files_with_error{$basename};
-         }
       }
    }
 }
@@ -1550,11 +1511,9 @@ sub syserror {
       close (OUT);
       if ($uploadname ne "") {
 #
-#        Move upload file to problem file directory and update the %files_with_error
-#        hash:
+#        Move upload file to problem file directory:
 #
-         my $modification_time = $files_to_process{$uploadname};
-         &move_to_problemdir($uploadname,$modification_time);
+         &move_to_problemdir($uploadname);
       }
    }
    if ($type eq "USER" || $type eq "SYSUSER") {
@@ -1584,15 +1543,19 @@ sub get_date_and_time_string {
 #---------------------------------------------------------------------------------
 #
 sub move_to_problemdir {
-   my ($uploadname,$modification_time) = @_;
+   my ($uploadname) = @_;
    my $baseupldname = $uploadname;
    if ($uploadname =~ /\/([^\/]+)$/) {
       $baseupldname = $1; # First matching ()-expression
    }
 #
-#  Move upload file to problem file directory and update the %files_with_error
-#  hash:
+#  Move upload file to problem file directory:
 #
+   my @file_stat = stat($uploadname);
+   if (scalar @file_stat == 0) {
+      die "In move_to_problemdir: Could not stat $uploadname\n";
+   }
+   my $modification_time = &my_time($file_stat[9]);
    my @ltime = localtime(&my_time());
    my $current_day = $ltime[3]; # 1-31
 
@@ -1602,7 +1565,15 @@ sub move_to_problemdir {
    if (move($uploadname,$destpath) == 0) {
       die "In move_to_problemdir: $uploadname Move did not succeed. Error code: $!\n";
    }
-   $files_with_error{$destname} = [$modification_time,$uploadname];
+#
+#     Write message to files_with_errors log:
+#
+   my $datestring = &get_date_and_time_string($modification_time);
+   my $path = $problem_dir_path . "/files_with_errors";
+   open (OUT,">>$path");
+   print OUT "File: $uploadname modified $datestring copied to $destname\n";
+   close(OUT);
+#
    if (exists($files_to_process{$uploadname})) {
       delete $files_to_process{$uploadname};
    }
