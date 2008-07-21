@@ -184,7 +184,10 @@ if ([==TEST_IMPORT_SPEEDUP==] > 1) {
    $sleeping_seconds = 1;
 }
 my $upload_age_threshold = [==UPLOAD_AGE_THRESHOLD==];
-my %all_ftp_datasets;     # Initialized in sub read_ftp_events
+my %all_ftp_datasets;     # Initialized in sub read_ftp_events. For each dataset
+                          # found in the ftp_events file, this hash contains the
+                          # number of days to keep the files in the repository.
+                          # If this number == 0, the files are kept indefinitely.
 my $days_to_keep_errfiles = 14;
 my $problem_dir_path = $webrun_directory . "/upl/problemfiles";
 my $path_to_syserrors = $webrun_directory . "/upl/syserrors";
@@ -238,13 +241,20 @@ sub main_loop {
 #
 #  The hash is based on a text file containing lines of the following format:
 #
-#  dataset_name wait_minutes hour1 hour2 hour3 ...
+#  dataset_name wait_minutes days_to_keep_files hour1 hour2 hour3 ...
 #
-#     wait_minutes  The minimum age of a new ftp file. If a file has less age
-#                   than this value, the file is left for later processing.
+#     wait_minutes        The minimum age of a new ftp file. If a file has less age
+#                         than this value, the file is left for later processing.
 #
-#     hourN         These numbers (0-23) represents the times during a day where
-#                   checking for new files take place.
+#     days_to_keep_files  Number of days where the files are to remain
+#                         unchanged on the repository. When this period 
+#                         expires, the files will be deleted and substituted
+#                         with files containing only metadata. This is done
+#                         in sub 'clean_up_repository'.
+#                         If this number == 0, the files are kept indefinitely.
+#
+#     hourN               These numbers (0-23) represents the times during a day
+#                         where checking for new files take place.
 #
 #  For each hourN, a hash key is constructed as "dataset_name hourN" and the
 #  corresponding value is set to wait_minutes.
@@ -279,6 +289,7 @@ sub main_loop {
 #  decides it is safe to read the XML files if the hour on the file agrees with the
 #  current hour.
 #
+   &get_dataset_institution(\%dataset_institution);
    my @ltime = localtime(&my_time());
    my $current_day = $ltime[3]; # 1-31
    my $hour_finished = -1;
@@ -289,6 +300,7 @@ sub main_loop {
       my $current_hour = $ltime[2]; # 0-23
       if ($current_day != $newday) {
          &clean_up_problem_dir();
+         &clean_up_repository();
          $file_in_error_counter = 1;
          $hour_finished = -1;
          $current_day = $newday;
@@ -322,11 +334,12 @@ sub read_ftp_events {
       my $line = $_;
       $line =~ s/^\s+//;
       my @tokens = split(/\s+/,$line);
-      if (scalar @tokens >= 3) {
+      if (scalar @tokens >= 4) {
          my $dataset_name = $tokens[0];
-         $all_ftp_datasets{$dataset_name} = 1;
          my $wait_minutes = $tokens[1];
-         for (my $ix=2; $ix < scalar @tokens; $ix++) {
+         my $days_to_keep_files = $tokens[2];
+         $all_ftp_datasets{$dataset_name} = $days_to_keep_files;
+         for (my $ix=3; $ix < scalar @tokens; $ix++) {
             my $hour = $tokens[$ix];
             my $eventkey = "$dataset_name $hour";
             $eventsref->{$eventkey} = $wait_minutes;
@@ -1256,7 +1269,7 @@ sub notify_web_system {
 #
 sub get_dataset_institution {
 #
-# Initialize hash connecting each dataset to a refernce to an array with three
+# Initialize hash connecting each dataset to a reference to an array with three
 # elements:
 #
 # ->[0] Name of institution as found in an <heading> element within the webrun/u1
@@ -1408,6 +1421,72 @@ sub clean_up_problem_dir {
          if ($current_epoch_time - $modification_time > $age_seconds) {
             if (unlink($filename) == 0) {
                &syserror("SYS","Unlink file $filename did not succeed", "", "clean_up_problem_dir", "");
+            }
+         }
+      }
+   }
+}
+#
+#---------------------------------------------------------------------------------
+#
+sub clean_up_repository {
+   my $current_epoch_time = &my_time(); 
+   foreach my $dataset (keys %all_ftp_datasets) {
+      my $days_to_keep_files = $all_ftp_datasets{$dataset};
+      if ($days_to_keep_files > 0) {
+         if (!exists($dataset_institution{$dataset})) {
+            &syserror("SYS","$dataset not in any userfiler", "", "clean_up_repository", "");
+            next;
+         }
+         my $directory = $opendap_directory . "/" . 
+                         $dataset_institution{$dataset}->[0] . "/" . $dataset;
+         my @files = glob($directory . "/" . $dataset . "_*");
+         foreach my $fname (@files) {
+            my @file_stat = stat($fname);
+            if (scalar @file_stat == 0) {
+               &syserror("SYS","Could not stat $fname", "", "clean_up_repository", "");
+               next;
+            }
+#            
+#             Get last modification time of file
+#             (seconds since the epoch)
+#            
+            my $modification_time = &my_time($file_stat[9]);
+            if ($current_epoch_time - $modification_time > 60*60*24*$days_to_keep_files) {
+               my @cdlcontent = &shcommand_array("ncdump -h $fname");
+               if (length($shell_command_error) > 0) {
+                  &syserror("SYS","Could not ncdump -h $fname", "", "clean_up_repository", "");
+                  next;
+               }
+               my $lnum = 0;
+               my $lmax = scalar @cdlcontent;
+               while ($lnum < $lmax) {
+                  if ($cdlcontent[$lnum] eq 'dimensions:') {
+                     last;
+                  }
+                  $lnum++;
+               }
+               $lnum++;
+               while ($lnum < $lmax) {
+                  if ($cdlcontent[$lnum] eq 'variables:') {
+                     last;
+                  }
+                  $cdlcontent[$lnum] =~ s/=\s*\d+\s*;$/= 1 ;/;
+                  $lnum++;
+               }
+               if ($lnum >= $lmax) {
+                  &syserror("SYS","Error while changing CDL content from $fname",
+                            "", "clean_up_repository", "");
+                  next;
+               }
+               open (CDLFILE,">tmp_file.cdl");
+               print CDLFILE join("\n",@cdlcontent);
+               close (CDLFILE);
+               &shcommand_scalar("ncgen tmp_file.cdl -o $fname");
+               if (length($shell_command_error) > 0) {
+                  &syserror("SYS","Could not ncgen tmp_file.cdl -o $fname", "", "clean_up_repository", "");
+                  next;
+               }
             }
          }
       }
