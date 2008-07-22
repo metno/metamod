@@ -2,26 +2,11 @@ Tables in the METAMOD2 catalogue
 --------------------------------
 
 DataSet                 - A dataset represents some data that for some reason is
-                          seen as a unit. Datasets are organised in a tree structure
-                          where one dataset may contain other dataset. The 'DS_level'
-                          field tells which level in the tree structure the dataset
-                          belongs to. DS_level = 1 represents the top level.
-                          'DS_parent' points (if found) to the parent dataset.
-                          This method of implementing an hierarchical structure to
-                          the set of datasets is currently not in use. All datasets
-                          are now on level 1.
-
-DataReference           - A data reference contains an identifier ('DR_path') that
-                          uniquely identifies a dataset. This text string is used in
-                          the XML files for loading information into the database.
-                          Each dataset element contain a drpath element used to set
-                          the DR_path value. If a dataset already exists with a given
-                          DR_path value, this dataset is overwritten when an XML
-                          dataset element is loaded into the database with a drpath
-                          value corresponding to the DR_path value.
-                          The corresponding dataset is given by the 'DS_id' field.
-                          Not all datasets have a data reference. Such datasets
-                          are defined through their child datasets.
+                          seen as a unit. Datasets are organised in two levels
+                          where a main dataset may contain subdatasets. The 'DS_parent'
+                          field tells which level the dataset
+                          belongs to. DS_parent = 0 represents the top level.
+                          For subdatasets, DS_parent points to the parent dataset.
 
 SearchCategory          - Table defining the search categories by which the database
                           can be searched. Each entry is characterised by a search
@@ -65,15 +50,10 @@ NumberItem              - This table defines an interval on some numeric scale
                           field. I.e each entry describes the interval
                           for one DataReference and one variable type (like time).
 
-GeographicalArea        - Table representing a set of geographical areas. Each named
-                          by a text string.
+GeographicalArea        - Table representing geographical areas. Each given by a set
+                          of quadtree nodes.
 
-GD_Ispartof_GA          - Collections of quadtree identifiers (GD_id's). Each
-                          collection describes the extent of a GeographicalArea.
-                          Not used (for the time being).
-
-GD_Describes_DR         - Collections of quadtree identifiers (GD_id's). Each
-                          collection describes the area covered by a DataReference.
+GA_Describes_DS         - Oppgitt GeographicalArea beskriver et DataSet.
 
 MetadataType            - Table of metadata types found in the database.
 

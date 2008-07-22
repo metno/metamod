@@ -10,20 +10,14 @@ $PSQL -a -U admin [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<EOF
 
 CREATE TABLE DataSet (
    DS_id              SERIAL,
-   DS_parent          INTEGER,
-   DS_level           INTEGER       NOT NULL,
+   DS_name            VARCHAR(9999),
+   DS_parent          INTEGER       NOT NULL,
+   DS_status          INTEGER       NOT NULL,
+   DS_datestamp       VARCHAR(9999) NOT NULL,
+   DS_ownertag        VARCHAR(9999) NOT NULL,
    PRIMARY KEY (DS_id)
 );
 GRANT SELECT ON DataSet TO webuser;
-
-CREATE TABLE DataReference (
-   DR_id              SERIAL,
-   DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
-   DR_path            VARCHAR(9999) NOT NULL,
-   DR_ownertag        VARCHAR(9999) NOT NULL,
-   PRIMARY KEY (DR_id)
-);
-GRANT SELECT ON DataReference TO webuser;
 
 CREATE TABLE SearchCategory (
    SC_id              INTEGER       NOT NULL,
@@ -60,42 +54,35 @@ CREATE TABLE HK_Represents_BK (
 );
 GRANT SELECT ON HK_Represents_BK TO webuser;
 
-CREATE TABLE BK_Describes_DR (
+CREATE TABLE BK_Describes_DS (
    BK_id              INTEGER       NOT NULL REFERENCES BasicKey ON DELETE CASCADE,
-   DR_id              INTEGER       NOT NULL REFERENCES DataReference ON DELETE CASCADE,
-   PRIMARY KEY (BK_id, DR_id)
+   DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
+   PRIMARY KEY (BK_id, DS_id)
 );
-GRANT SELECT ON BK_Describes_DR TO webuser;
+GRANT SELECT ON BK_Describes_DS TO webuser;
 
 CREATE TABLE NumberItem (
    SC_id              INTEGER       NOT NULL REFERENCES SearchCategory ON DELETE CASCADE,
    NI_from            INTEGER       NOT NULL,
    NI_to              INTEGER       NOT NULL,
-   DR_id              INTEGER       NOT NULL REFERENCES DataReference ON DELETE CASCADE,
-   PRIMARY KEY (SC_id, NI_from, NI_to, DR_id)
+   DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
+   PRIMARY KEY (SC_id, NI_from, NI_to, DS_id)
 );
 GRANT SELECT ON NumberItem TO webuser;
 
 CREATE TABLE GeographicalArea (
    GA_id              SERIAL,
-   GS_name            VARCHAR(9999) NOT NULL,
-   PRIMARY KEY (GA_id)
-);
-GRANT SELECT ON GeographicalArea TO webuser;
-
-CREATE TABLE GD_Ispartof_GA (
-   GA_id              INTEGER       NOT NULL REFERENCES GeographicalArea ON DELETE CASCADE,
    GD_id              VARCHAR(9999) NOT NULL,
    PRIMARY KEY (GA_id, GD_id)
 );
-GRANT SELECT ON GD_Ispartof_GA TO webuser;
+GRANT SELECT ON GeographicalArea TO webuser;
 
-CREATE TABLE GD_Describes_DR (
-   GD_id              VARCHAR(9999) NOT NULL,
-   DR_id              INTEGER       NOT NULL REFERENCES DataReference ON DELETE CASCADE,
-   PRIMARY KEY (GD_id, DR_id)
+CREATE TABLE GA_Describes_DS (
+   GA_id              INTEGER       NOT NULL,
+   DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
+   PRIMARY KEY (GA_id, DS_id)
 );
-GRANT SELECT ON GD_Describes_DR TO webuser;
+GRANT SELECT ON GA_Describes_DS TO webuser;
 
 CREATE TABLE MetadataType (
    MT_name            VARCHAR(99),
