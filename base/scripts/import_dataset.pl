@@ -285,7 +285,7 @@ sub update_database {
    my $xmlcontent = <XMLINPUT>;
    $/ = "\n"; 
    close (XMLINPUT);
-   my $xmlref = XMLin($xmlcontent, KeyAttr => [], ForceArray => 1);
+   my $xmlref = XMLin($xmlcontent, KeyAttr => [], ForceArray => 1, SuppressEmpty => '');
    my $ownertag = $xmlref->{'ownertag'};
 #   print Dumper($xmlref);
 #   return;
@@ -294,10 +294,10 @@ sub update_database {
 #
    my %references = ();
    my $stm;
-   $stm = $dbh->prepare("SELECT DR_path,DS_id,DR_id FROM DataReference WHERE DR_ownertag = '$ownertag'");
+   $stm = $dbh->prepare("SELECT DS_name,DS_id FROM DataSet WHERE DS_parent = 0 AND DS_ownertag = '$ownertag'");
    $stm->execute();
    while ( my @row = $stm->fetchrow_array ) {
-      $references{$row[0]} = [$row[1],$row[2]];
+      $references{$row[0]} = [$row[1]];
    }
 #
 #  Create hash mapping the correspondence between MetadataType name 
@@ -311,6 +311,11 @@ sub update_database {
       datacollection_period => 8,
       operational_status => 10,
    );
+#
+#  Create the datestamp for the current date:
+#
+   my @timearr = localtime(&my_time());
+   my $datestamp = sprintf('%04d-%02d-%02d',1900+$timearr[5],1+$timearr[4],$timearr[3]);
 #
 #  Create hash with all existing basic keys in the database.
 #  The keys in this hash have the form: 'SC_id:BK_name' and
@@ -361,29 +366,30 @@ sub update_database {
 #  Use "?" as placeholders in the SQL statements:
 #
    my $sql_getkey_DS = $dbh->prepare("SELECT nextval('DataSet_DS_id_seq')");
-#   my $sql_delete_DS = $dbh->prepare("DELETE FROM DataSet WHERE MD_id IN " .
-#           "(SELECT MD_id FROM DS_Has_MD AS r, Metadata as m, MetadataType AS t " .
-#           "WHERE r.MD_id = m.MD_id AND r.DS_id = ? AND " .
-#           "t.MT_name = m.MT_name AND t.MT_share = FALSE)");
-   my $sql_delete_DS = $dbh->prepare("DELETE FROM DataSet WHERE DS_id = ?");
-#   my $sql_delete_MD = $dbh->prepare("DELETE FROM MetaData WHERE DS_id = ?");
+   my $sql_getkey_GA = $dbh->prepare("SELECT nextval('GeographicalArea_GA_id_seq')");
+   my $sql_delete_DS = $dbh->prepare("DELETE FROM DataSet WHERE DS_id = ? OR DS_parent = ?");
+   my $sql_delete_GA = $dbh->prepare(
+      "DELETE FROM GeographicalArea WHERE GA_id IN " .
+      "(SELECT GA_id FROM GA_Describes_DS AS g, DataSet AS d WHERE " .
+      "g.DS_id = d.DS_id AND (d.DS_id = ? OR d.DS_parent = ?))");
    my $sql_insert_DS = $dbh->prepare(
-      "INSERT INTO DataSet (DS_id, DS_parent, DS_level) VALUES (?, ?, ?)");
-   my $sql_getkey_DR = $dbh->prepare("SELECT nextval('DataReference_DR_id_seq')");
-   my $sql_insert_DR = $dbh->prepare(
-      "INSERT INTO DataReference (DR_id, DS_id, DR_path, DR_ownertag) VALUES (?, ?, ?, ?)");
-   my $sql_insert_BKDR = $dbh->prepare(
-      "INSERT INTO BK_Describes_DR (BK_id, DR_id) VALUES (?, ?)");
+      "INSERT INTO DataSet (DS_id, DS_name, DS_parent, DS_status, DS_datestamp, DS_ownertag)" .
+      " VALUES (?, ?, ?, ?, ?, ?)");
+   my $sql_insert_GA = $dbh->prepare("INSERT INTO GeographicalArea (GA_id) VALUES (?)");
+   my $sql_insert_BKDS = $dbh->prepare(
+      "INSERT INTO BK_Describes_DS (BK_id, DS_id) VALUES (?, ?)");
    my $sql_insert_NI = $dbh->prepare(
-      "INSERT INTO NumberItem (SC_id, NI_from, NI_to, DR_id) VALUES (?, ?, ?, ?)");
+      "INSERT INTO NumberItem (SC_id, NI_from, NI_to, DS_id) VALUES (?, ?, ?, ?)");
 #
    my $sql_getkey_MD = $dbh->prepare("SELECT nextval('Metadata_MD_id_seq')");
    my $sql_insert_MD = $dbh->prepare(
       "INSERT INTO Metadata (MD_id, MT_name, MD_content) VALUES (?, ?, ?)");
    my $sql_insert_DSMD = $dbh->prepare(
       "INSERT INTO DS_Has_MD (DS_id, MD_id) VALUES (?, ?)");
-   my $sql_insert_GDDR = $dbh->prepare(
-      "INSERT INTO GD_Describes_DR (GD_id, DR_id) VALUES (?, ?)");
+   my $sql_insert_GAGD = $dbh->prepare(
+      "INSERT INTO GA_Contains_GD (GA_id, GD_id) VALUES (?, ?)");
+   my $sql_insert_GADS = $dbh->prepare(
+      "INSERT INTO GA_Describes_DS (GA_id, DS_id) VALUES (?, ?)");
 #
 # Loop through all datasets rooted in the hash reference $xmlref.
 #
@@ -407,6 +413,9 @@ sub update_database {
       }
       foreach my $name (keys %$ref1) {
          my $ref2 = $ref1->{$name};
+         if ($name ne "ownertag" and ref($ref2) ne "ARRAY") {
+            die '$ref2 is not a reference to ARRAY:' . " $ref2\n";
+         }
          if ($name eq 'abstract') {
             my $mref = [$name,$ref2->[0]];
             push(@metaarray,$mref);
@@ -460,23 +469,19 @@ sub update_database {
       if (exists($references{$drpath})) {
          my $ref3 = $references{$drpath};
          $dsid = $ref3->[0];
-         $drid = $ref3->[1];
 #
-#  Delete existing dataset. This will cascade to DataReference and XX_Describes_DR,
+#  Delete existing dataset and corresponding GeographicalArea (if found).
+#  This will cascade to BK_Describes_DS, GA_Describes_DS, GD_Ispartof_GA
 #  and also DS_Has_MD:
 #
-#         $sql_delete_MD->execute($dsid);
-         $sql_delete_DS->execute($dsid);
+         $sql_delete_GA->execute($dsid,$dsid);
+         $sql_delete_DS->execute($dsid,$dsid);
       } else {
          $sql_getkey_DS->execute();
          my @result = $sql_getkey_DS->fetchrow_array;
          $dsid = $result[0];
-         $sql_getkey_DR->execute();
-         @result = $sql_getkey_DR->fetchrow_array;
-         $drid = $result[0];
       }
-      $sql_insert_DS->execute($dsid,0,1);
-      $sql_insert_DR->execute($drid,$dsid,$drpath,$ownertag);
+      $sql_insert_DS->execute($dsid,$drpath,0,1,$datestamp,$ownertag);
 #
 #  Insert metadata:
 #  Metadata with metadata type name not in the database are ignored.
@@ -494,7 +499,7 @@ sub update_database {
                $mdid = $metadata{$mdkey};
             } else {
                $sql_getkey_MD->execute();
-               @result = $sql_getkey_MD->fetchrow_array;
+               my @result = $sql_getkey_MD->fetchrow_array;
                $mdid = $result[0];
                $sql_insert_MD->execute($mdid,$mtname,$mdcontent);
                $metadata{$mdkey} = $mdid;
@@ -502,7 +507,7 @@ sub update_database {
             $sql_insert_DSMD->execute($dsid,$mdid);
          } elsif (exists($rest_metadatatypes{$mtname})) {
             $sql_getkey_MD->execute();
-            @result = $sql_getkey_MD->fetchrow_array;
+            my @result = $sql_getkey_MD->fetchrow_array;
             $mdid = $result[0];
             $sql_insert_MD->execute($mdid,$mtname,$mdcontent);
             $sql_insert_DSMD->execute($dsid,$mdid);
@@ -517,16 +522,16 @@ sub update_database {
             }
             if (exists($basickeys{$skey})) {
                my $bkid = $basickeys{$skey};
-               $sql_insert_BKDR->execute($bkid,$drid);
+               $sql_insert_BKDS->execute($bkid,$dsid);
                if ($progress_report == 1) {
-                  print " -OK: $bkid,$drid\n";
+                  print " -OK: $bkid,$dsid\n";
                }
             } elsif ($mtname eq 'datacollection_period') {
                my $scid = $searchcategories{$mtname};
                if ($mdcontent =~ /(\d{4,4})-(\d{2,2})-(\d{2,2}) to (\d{4,4})-(\d{2,2})-(\d{2,2})/) {
                   my $from = $1 . $2 . $3;
                   my $to = $4 . $5 . $6;
-                  $sql_insert_NI->execute($scid,$from,$to,$drid);
+                  $sql_insert_NI->execute($scid,$from,$to,$dsid);
                }
             }
          }
@@ -535,12 +540,17 @@ sub update_database {
 #   Insert quadtree nodes:
 #
       if (length($quadtreenodes) > 0) {
+         $sql_getkey_GA->execute();
+         my @result = $sql_getkey_GA->fetchrow_array;
+         my $gaid = $result[0];
+         $sql_insert_GA->execute($gaid);
          my @nodearr = split(/\s+/,$quadtreenodes);
          foreach my $node (@nodearr) {
             if (length($node) > 0) {
-               $sql_insert_GDDR->execute($node,$drid);
+               $sql_insert_GAGD->execute($gaid,$node);
             }
          }
+         $sql_insert_GADS->execute($gaid,$dsid);
       }
    }
 }

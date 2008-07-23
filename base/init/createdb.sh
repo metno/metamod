@@ -13,7 +13,7 @@ CREATE TABLE DataSet (
    DS_name            VARCHAR(9999),
    DS_parent          INTEGER       NOT NULL,
    DS_status          INTEGER       NOT NULL,
-   DS_datestamp       VARCHAR(9999) NOT NULL,
+   DS_datestamp       DATE          NOT NULL,
    DS_ownertag        VARCHAR(9999) NOT NULL,
    PRIMARY KEY (DS_id)
 );
@@ -72,10 +72,17 @@ GRANT SELECT ON NumberItem TO webuser;
 
 CREATE TABLE GeographicalArea (
    GA_id              SERIAL,
+   GA_name            VARCHAR(9999),
+   PRIMARY KEY (GA_id)
+);
+GRANT SELECT ON GeographicalArea TO webuser;
+
+CREATE TABLE GA_Contains_GD (
+   GA_id              INTEGER       NOT NULL REFERENCES GeographicalArea ON DELETE CASCADE,
    GD_id              VARCHAR(9999) NOT NULL,
    PRIMARY KEY (GA_id, GD_id)
 );
-GRANT SELECT ON GeographicalArea TO webuser;
+GRANT SELECT ON GA_Contains_GD TO webuser;
 
 CREATE TABLE GA_Describes_DS (
    GA_id              INTEGER       NOT NULL,
