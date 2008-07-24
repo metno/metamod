@@ -29,8 +29,8 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
-$sqlsentence = "SELECT DR_id, DS_id, DR_path \n" .
-               "   FROM DataReference WHERE DR_ownertag IN ([==DATASET_TAGS==]) AND \n";
+$sqlsentence = "SELECT DS_id, DS_name \n" .
+               "   FROM DataSet WHERE DS_ownertag IN ([==DATASET_TAGS==]) AND \n";
 $j1 = 0;
 #
 # foreach value in an array
@@ -69,8 +69,8 @@ foreach ($mmCategorytype as $category => $type) {
       if ($j1 > 0) {
          $sqlsentence .= "      AND \n";
       }
-      $sqlsentence .= "      DR_id IN (" .
-         " SELECT DISTINCT DR_id FROM BK_describes_DR WHERE BK_id IN (" .
+      $sqlsentence .= "      DS_id IN (" .
+         " SELECT DISTINCT DS_id FROM BK_describes_DS WHERE BK_id IN (" .
          implode(', ',$bkids) . ") )\n";
       $j1++;
    }
@@ -80,8 +80,8 @@ foreach ($mmCategorytype as $category => $type) {
          $sqlsentence .= "      AND \n";
       }
       $bkids = array_keys($mmSessionState->sitems[$s1]);
-      $sqlsentence .= "      DR_id IN (" .
-         " SELECT DISTINCT DR_id FROM NumberItem WHERE SC_id = " .
+      $sqlsentence .= "      DS_id IN (" .
+         " SELECT DISTINCT DS_id FROM NumberItem WHERE SC_id = " .
          $category . " AND NI_from <= " . $mmSessionState->sitems[$s1][1] . " AND " .
          " NI_to >= " . $mmSessionState->sitems[$s1][0] . ")\n";
       $j1++;
@@ -92,7 +92,7 @@ foreach ($mmCategorytype as $category => $type) {
          $sqlsentence .= "      AND \n";
       }
       $drsearch = array_slice($mmSessionState->sitems[$s1],7);
-      $sqlsentence .= "      DR_id IN (" . implode($drsearch,', ') . ")\n";
+      $sqlsentence .= "      DS_id IN (" . implode($drsearch,', ') . ")\n";
       $j1++;
    }
 }
@@ -100,7 +100,7 @@ $dr_paths = array();
 $ds_arr = array();
 $ds_ids = "";
 if ($j1 > 0) {
-   $sqlsentence .= "ORDER BY DataReference.DS_id\n";
+   $sqlsentence .= "ORDER BY DataSet.DS_id\n";
 #   echo '<pre>' .$sqlsentence . '</pre>' . "\n";
    $result1 = pg_query ($mmDbConnection, $sqlsentence);
    if (!$result1) {
@@ -112,12 +112,12 @@ if ($j1 > 0) {
       if ($num > 0) {
          for ($i1=0; $i1 < $num;$i1++) {
             $rowarr = pg_fetch_row($result1,$i1);
-            $dr_paths[$rowarr[1]] = $rowarr[2];
-            $ds_arr[$i1] = $rowarr[1];
+            $dr_paths[$rowarr[0]] = $rowarr[1];
+            $ds_arr[$i1] = $rowarr[0];
             if ($i1 > 0) {
                $ds_ids .= ',';
             }
-            $ds_ids .= $rowarr[1];
+            $ds_ids .= $rowarr[0];
          }
       }
    }

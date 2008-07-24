@@ -103,7 +103,8 @@
          }
       }
       $gdarr = array();
-      $sqlsentence = "SELECT * FROM GD_Describes_DR ORDER BY GD_id\n";
+      $sqlsentence = "SELECT GD_id, DS_id FROM GA_Contains_GD, GA_Describes_DS " .
+                     "WHERE GA_Contains_GD.GA_id = GA_Describes_DS.GA_id ORDER BY GD_id\n";
       $result1 = pg_query ($mmDbConnection, $sqlsentence);
       if (!$result1) {
          mmPutLog(__FILE__ . __LINE__ . " Could not $sqlsentence");
@@ -143,6 +144,7 @@
       sort($drhash);
       return $drhash;
    }
+# ------------- End of function definitions ------------------
    if (! file_exists("maps")) {
       mmPutLog("Error. Directory ./maps not found");
       $mmErrorMessage = "Sorry, internal error";
