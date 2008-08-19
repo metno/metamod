@@ -1,15 +1,18 @@
 README for phpoai2, version 1.8.0
 June 20th, 2005
+Adapted to METAMOD2 by Egil Støren at met.no 2008-08-13
 
 This is an implementation for an OAI-PMH 2.0 Data Provider, written in PHP.
 
 This implementation completely complies to OAI-PMH 2.0, including
 the support of on-the-fly output compression which may significantly
 reduce the amount of data being transfered.
+(No support for compression in this METAMOD2 version)
 
 Database support is supported through PEAR (PHP Extension and
 Application Repository, included in the PHP distribution), so almost
 any popular SQL-database can be used without any changes in the code. 
+(This METAMOD2 version uses the pg_* vendor specific PostgreSQL functions)
 
 The repository can be quite easily configured by just editing 
 oai2/oaidp-config.php, most possible values and options are explained. 
@@ -22,12 +25,14 @@ Requirements:
 		to install PHP.
 	- SQL Database
 	    If you do not have one, try MySQL (http://www.mysql.com)
+            (This METAMOD2 version requires PostgreSQL)
 	- Metadata
 	    The metadata should be stored in your SQL Database. You can 
 		find a simple example table for unqualified Dublin Core in in
 		oai_records.sql.
 	
 Installation:
+(This is mostly irrelevant for the METAMOD2 version)
 
 1. Untar to some place. It will extract to phpoai-1.x/ 
    (tar -zxvf phpoai2-1.x.tar.gz). 

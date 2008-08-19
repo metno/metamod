@@ -24,6 +24,9 @@
 * |                                                                      |
 * | Written by Heinrich Stamerjohanns, May 2002                          |
 * |            stamer@uni-oldenburg.de                                   |
+* |                                                                      |
+* | Adapted to METAMOD2 by Egil Støren, August 2008                      |
+* |            egil.storen@met.no                                        |
 * +----------------------------------------------------------------------+
 */
 //
@@ -96,13 +99,13 @@ $protocolVersion      = '2.0';
 // Currently if $record['deleted'] is set to 'true', $status_deleted is set.
 // Some lines in listidentifiers.php, listrecords.php, getrecords.php  
 // must be changed to fit the condition for your database.
-$deletedRecord        = 'no'; 
+$deletedRecord        = 'transient'; 
 
 // MAY (only one)
 //granularity is days
-//$granularity          = 'YYYY-MM-DD';
+$granularity          = 'YYYY-MM-DD';
 // granularity is seconds
-$granularity          = 'YYYY-MM-DDThh:mm:ssZ';
+// $granularity          = 'YYYY-MM-DDThh:mm:ssZ';
 
 // MUST (only one)
 // the earliest datestamp in your repository,
@@ -125,7 +128,8 @@ $adminEmail			= array('mailto:egil.storen@met.no');
 // and php compiled with libgz). 
 // The client MUST send "Accept-Encoding: gzip" to actually receive 
 // compressed output.
-$compression		= array('gzip');
+//$compression		= array('gzip');
+$compression		= '';
 
 // MUST (only one)
 // should not be changed
@@ -165,12 +169,8 @@ $tokenValid = 24*3600;
 $expirationdatetime = gmstrftime('%Y-%m-%dT%TZ', time()+$tokenValid); 
 
 // define all supported sets in your repository
-$SETS = 	array (
-				// array('setSpec'=>'phdthesis', 'setName'=>'PHD Thesis', 'setDescription'=>'') //,
-				// array('setSpec'=>'math', 'setName'=>'Mathematics') ,
-				// array('setSpec'=>'phys', 'setName'=>'Physics') 
-			);
-
+//$SETS = 	array (); 
+$SETS = 	''; 
 // define all supported metadata formats
 
 //
@@ -210,7 +210,7 @@ $DB_NAME   = 'oaipmh';
 // $DSN = "mysql://$DB_USER:$DB_PASSWD@$DB_HOST/$DB_NAME";
 // Example for Oracle
 // $DSN = "oci8://$DB_USER:$DB_PASSWD@$DB_NAME";
-$DSN = "pgsql://$DB_USER$DB_PASSWD@$DB_HOST/$DB_NAME";
+// $DSN = "pgsql://$DB_USER$DB_PASSWD@$DB_HOST/$DB_NAME";
 # echo $DSN . '<BR />';
 
 // the charset you store your metadata in your database
@@ -224,23 +224,23 @@ $xmlescaped = false;
 // We store multiple entries for one element in a single row 
 // in the database. SQL['split'] ist the delimiter for these entries.
 // If you do not do this, do not define $SQL['split']
-$SQL['split'] = ';';
+// $SQL['split'] = ';';
 
 // the name of the table where your store your metadata
-$SQL['table'] = 'oai_records';
+$SQL['table'] = 'DataSet';
 
 // the name of the column where you store your sequence 
 // (or autoincrement values).
-$SQL['id_column'] = 'serial';
+$SQL['id_column'] = 'DS_id';
 
 // the name of the column where you store the unique identifiers
 // pointing to your item.
 // this is your internal identifier for the item
-$SQL['identifier'] = 'url';
+$SQL['identifier'] = 'DS_name';
 
 // If you want to expand the internal identifier in some way
 // use this (but not for OAI stuff, see next line)
-$idPrefix = '';
+$idPrefix = 'metamod/';
 
 // this is your external (OAI) identifier for the item
 // this will be expanded to
@@ -252,17 +252,19 @@ $oaiprefix = "oai".$delimiter.$repositoryIdentifier.$delimiter.$idPrefix;
 $sampleIdentifier     = $oaiprefix.'anIdentifier';
 
 // the name of the column where you store your datestamps
-$SQL['datestamp'] = 'datestamp';
+$SQL['datestamp'] = 'DS_datestamp';
 
 // the name of the column where you store information whether
 // a record has been deleted. Leave it as it is if you do not use
 // this feature.
-$SQL['deleted'] = 'deleted';
+$SQL['deleted'] = 'DS_status';
 
 // to be able to quickly retrieve the sets to which one item belongs,
 // the setnames are stored for each item
 // the name of the column where you store sets
-$SQL['set'] = 'oai_set';
+// NOTE: This implementation does not support sets. The DS_set element
+// is set to an empty string for all records.
+$SQL['set'] = 'DS_set';
 
 // Here are a couple of queries which might need to be adjusted to 
 // your needs. Normally, if you have correctly named the columns above,
@@ -272,6 +274,15 @@ $SQL['set'] = 'oai_set';
 // all records
 // the useless condition id_column = id_column is just there to ease
 // further extensions to the query, please leave it as it is.
+
+function mmPutLog($string) {
+   $logfile = '[==WEBRUN_DIRECTORY==]' . '/oaipmhlog';
+   $fd = fopen($logfile,"a");
+   fwrite($fd,date("Y-m-d H.i: ") . $string . "\n");
+   fflush($fd);
+   fclose($fd);
+}
+
 function selectallQuery ($id = '')
 {
 	global $SQL;
@@ -284,6 +295,102 @@ function selectallQuery ($id = '')
 	}
 	return $query;
 }
+function getRecords ($id = '', $from = '', $until = '') {
+   global $mmDbConnection;
+   $key_conversion = array(
+                             'title' => 'title',
+                             'institution' => 'institution',
+                             'topic' => 'dc_subject',
+                             'keywords' => 'dc_subject',
+                             'variable' => 'dc_subject',
+                             'topiccategory' => 'dc_subject',
+                             'abstract' => 'dc_description',
+                             'datacollection_period' => 'dc_date',
+                             'dataref' => 'dc_identifier',
+                             'area' => 'dc_coverage',
+                             'distribution_statement' => 'dc_rights'
+                          );
+   $query = 'SELECT DS_id, DS_name, DS_status, DS_datestamp FROM DataSet WHERE ' .
+            'DS_status <= 2 AND DS_ownertag IN ([==DATASET_TAGS==]) ';
+   if ($id != '') {
+      $query .= "AND DS_name = '$id' ";
+   }
+   if ($from != '') {
+      $query .= "AND DS_datestamp >= '$from' ";
+   }
+   if ($until != '') {
+      $query .= "AND DS_datestamp <= '$until' ";
+   }
+   $result1 = pg_query ($mmDbConnection, $query);
+   $dsids = array();
+   $allresults = array();
+   if (!$result1) {
+      mmPutLog(__FILE__ . __LINE__ . " Could not $query");
+      return FALSE;
+   } else {
+      $num = pg_numrows($result1);
+      if ($num > 0) {
+         for ($i1=0; $i1 < $num;$i1++) {
+            $rowarr = pg_fetch_row($result1,$i1);
+            $dsid = $rowarr[0];
+            $dsids[$i1] = $dsid;
+            $allresults[$dsid]['DS_name'] = $rowarr[1];
+            if ($rowarr[2] == 1) {
+               $allresults[$dsid]['DS_status'] = 'false';
+            } else {
+               $allresults[$dsid]['DS_status'] = 'true';
+            }
+            $allresults[$dsid]['DS_datestamp'] = $rowarr[3];
+            $allresults[$dsid]['DS_set'] = '';
+         }
+         $query = "SELECT DS_id, MT_name, MD_content FROM DS_Has_MD, Metadata WHERE " .
+                  "DS_Has_MD.MD_id = Metadata.MD_id AND DS_id IN (" .
+                  implode(', ',$dsids) . ") AND MT_name IN (" .
+                  implode(', ',array_keys($key_conversion)) . " )\n";
+         $result1 = pg_query ($mmDbConnection, $query);
+         if (!$result1) {
+            mmPutLog(__FILE__ . __LINE__ . " Could not $query");
+            return FALSE;
+         } else {
+            $num2 = pg_numrows($result1);
+            if ($num2 > 0) {
+               for ($i1=0; $i1 < $num2;$i1++) {
+                  $rowarr = pg_fetch_row($result1,$i1);
+                  $dsid = $rowarr[0];
+                  $mtname = $rowarr[1];
+                  $dccode = $key_conversion[$mtname];
+                  $mdcontent = $rowarr[2];
+                  if ($mtname == "keywords" or $mtname == "topiccategory") {
+                     foreach (explode(" ",$mdcontent) as $w1) {
+                        if (strlen($w1) > 1) {
+                           $allresults[$dsid][$dccode][] = $w1;
+                        }
+                     }
+                  } elseif ($mtname == "datacollection_period") {
+                     foreach (explode(" to ",$mdcontent) as $w1) {
+                        if (strlen($w1) > 9) {
+                           $allresults[$dsid][$dccode][] = $w1;
+                        }
+                     }
+                  } elseif ($mtname == "area") {
+                     foreach (explode(",",$mdcontent) as $w1) {
+                        $allresults[$dsid][$dccode][] = trim($w1);
+                     }
+                  } elseif ($mtname == "variable") {
+                     if (preg_match('^(.*) > HIDDEN *$',$mdcontent,$matches)) {
+                        $mdcontent = $matches[1];
+                     }
+                     $allresults[$dsid][$dccode][] = $mdcontent;
+                  } else {
+                     $allresults[$dsid][$dccode][] = $mdcontent;
+                  }
+               }
+            }
+         }
+      }
+   }
+   return $allresults;
+}
 
 // this function will return identifier and datestamp for all records
 function idQuery ($id = '')
@@ -291,10 +398,11 @@ function idQuery ($id = '')
 	global $SQL;
 
 	if ($SQL['set'] != '') {
-		$query = 'select '.$SQL['identifier'].','.$SQL['datestamp'].','.$SQL['set'].' FROM '.$SQL['table'].' WHERE ';
+		$query = 'select '.$SQL['identifier'].','.$SQL['datestamp'].','.$SQL['deleted'].','.$SQL['set'].' FROM '.$SQL['table'].' WHERE ';
 	} else {
-		$query = 'select '.$SQL['identifier'].','.$SQL['datestamp'].' FROM '.$SQL['table'].' WHERE ';
+		$query = 'select '.$SQL['identifier'].','.$SQL['datestamp'].','.$SQL['deleted'].' FROM '.$SQL['table'].' WHERE ';
 	}
+        $query .= 'DS_status <= 2 AND DS_ownertag IN ([==DATASET_TAGS==]) AND '
 	
 	if ($id == '') {
 		$query .= $SQL['id_column'].' = '.$SQL['id_column'];

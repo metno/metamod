@@ -1,3 +1,6 @@
+METAMOD2 version (2008-08-13)
+- Adapted to the METAMOD2 PostgreSQL database that uses multiple tables for storing metadata.
+
 Changes in 1.8.0 (June 20th, 2005)
 - add a simple index.php, so one can easily test own data provider.
 - do not expose query errors, introduce switch to show errors for debugging.

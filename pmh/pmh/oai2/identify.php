@@ -24,6 +24,9 @@
 * |                                                                      |
 * | Written by Heinrich Stamerjohanns, May 2002                          |
 * |            stamer@uni-oldenburg.de                                   |
+* |                                                                      |
+* | Adapted to METAMOD2 by Egil Støren, August 2008                      |
+* |            egil.storen@met.no                                        |
 * +----------------------------------------------------------------------+
 */
 //

@@ -24,6 +24,9 @@
 * |                                                                      |
 * | Written by Heinrich Stamerjohanns, May 2002                          |
 * |            stamer@uni-oldenburg.de                                   |
+* |                                                                      |
+* | Adapted to METAMOD2 by Egil Støren, August 2008                      |
+* |            egil.storen@met.no                                        |
 * +----------------------------------------------------------------------+
 */
 //
@@ -70,18 +73,11 @@ if (empty($errors)) {
 		$errors .= oai_error('idDoesNotExist', '', $identifier);
 	}
 
-	$query = selectallQuery($id); 
-	$res = $db->query($query);
+        $res = getRecords($id);
 
-	if (DB::isError($res)) {
-		if ($SHOW_QUERY_ERROR) {
-			echo __FILE__.','.__LINE."<br />";
-			echo "Query: $query<br />\n";
-			die($db->errorNative());
-		} else {
-			$errors .= oai_error('idDoesNotExist', '', $identifier); 
-		}
-	} elseif (!$res->numRows()) {
+	if ($res === FALSE) {
+		$errors .= oai_error('internalDatabaseError', '', $identifier); 
+	} elseif (count($res) == 0) {
 		$errors .= oai_error('idDoesNotExist', '', $identifier); 
 	}
 }
@@ -93,24 +89,9 @@ if ($errors != '') {
 
 $output .= "  <GetRecord>\n";
 
-$num_rows = $res->numRows();
-if (DB::isError($num_rows)) {
-	if ($SHOW_QUERY_ERROR) {
-		echo __FILE__.','.__LINE."<br />";
-		echo "Query: $query<br />\n";
-		die($db->errorNative());
-	}
-}
-if ($num_rows) {
-	$record = $res->fetchRow();
-	if (DB::isError($record)) {
-		if ($SHOW_QUERY_ERROR) {
-			echo __FILE__.','.__LINE."<br />";
-			die($db->errorNative());
-		}
-	}
-	
-	$identifier = $oaiprefix.$record[$SQL['identifier']];;
+$num_rows = count($res);
+foreach ($res as $record) {
+	$identifier = $oaiprefix.$record[$SQL['identifier']];
 
 	$datestamp = formatDatestamp($record[$SQL['datestamp']]); 
 
@@ -146,10 +127,6 @@ if ($num_rows) {
 	$output .= 
 '  </record>'."\n"; 
 } 
-else {
-	// we should never get here
-	oai_error('idDoesNotExist');
-}
 
 // End GetRecord
 $output .= 

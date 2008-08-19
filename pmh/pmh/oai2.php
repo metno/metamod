@@ -24,6 +24,9 @@
 * |                                                                      |
 * | Written by Heinrich Stamerjohanns, May 2002                          |
 * |            stamer@uni-oldenburg.de                                   |
+* |                                                                      |
+* | Adapted to METAMOD2 by Egil Støren, August 2008                      |
+* |            egil.storen@met.no                                        |
 * +----------------------------------------------------------------------+
 */
 //
@@ -78,16 +81,19 @@ foreach($verbs as $val) {
 	unset($$val);
 }
 
-$db = DB::connect($DSN);
-
-if (DB::isError($db)) {
-	die($db->getMessage());
-} else {
-	$db->setFetchMode(DB_FETCHMODE_ASSOC);
+ini_set("track_errors",1);
+$mmDbConnection = @pg_Connect ("dbname=[==DATABASE_NAME==] user=webuser [==PG_CONNECTSTRING_PHP==]");
+if ( !$mmDbConnection ) {
+   mmPutLog("Error. Could not connect to database: $php_errormsg");
+   $errors .= oai_error('serviceUnavailable');
 }
 
 $request = ' <request'.$reqattr.'>'.$MY_URI."</request>\n";
 $request_err = ' <request>'.$MY_URI."</request>\n";
+
+if ($errors != '') {
+	oai_exit();
+}
 
 if (is_array($compression)) {
 	if (in_array('gzip', $compression)

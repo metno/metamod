@@ -24,12 +24,17 @@
 * |                                                                      |
 * | Written by Heinrich Stamerjohanns, May 2002                          |
 * /            stamer@uni-oldenburg.de                                   |
+* |                                                                      |
+* | Adapted to METAMOD2 by Egil Støren, August 2008                      |
+* |            egil.storen@met.no                                        |
 * +----------------------------------------------------------------------+
 */
 //
 // $Id: listrecords.php,v 1.03 2004/07/02 14:24:21 stamer Exp $
 //
 
+$from = '';
+$until = '';
 // parse and check arguments
 foreach($args as $key => $val) {
 
@@ -117,55 +122,34 @@ else {
 		$errors .= oai_error('missingArgument', 'metadataPrefix');
 	}
 
-	$extquery = '';
-
 	if (isset($args['from'])) {
 		if (!checkDateFormat($from)) {
 			$errors .= oai_error('badGranularity', 'from', $from); 
 		}
-		$extquery .= fromQuery($from);
 	}
 
 	if (isset($args['until'])) {
 		if (!checkDateFormat($until)) {
 			$errors .= oai_error('badGranularity', 'until', $until);
 		}
-		$extquery .= untilQuery($until);
 	}
 
-    if (isset($args['set'])) {
-	    if (is_array($SETS)) {
-		    $extquery .= setQuery($set);
-	    } else {
-			$errors .= oai_error('noSetHierarchy'); 
-			oai_exit();
-		}
+        if (isset($args['set'])) {
+		$errors .= oai_error('noSetHierarchy'); 
+		oai_exit();
 	}
 }
 
 if (empty($errors)) {
-	$query = selectallQuery('') . $extquery;
-	$res = $db->query($query);   
-	if (DB::isError($res)) {
-		if ($SHOW_QUERY_ERROR) {
-			echo __FILE__.",". __LINE__."<br />";
-			echo "Query: $query<br />\n";
-			die($db->errorNative());
-		} else {
-			$errors .= oai_error('noRecordsMatch'); 
-		}
-	} else {
-		$num_rows = $res->numRows();
-		if (DB::isError($num_rows)) {
-			if ($SHOW_QUERY_ERROR) {
-				echo __FILE__.",". __LINE__."<br />";
-				die($db->errorNative());
-			} 
-		}
-		if (!$num_rows) {
-			$errors .= oai_error('noRecordsMatch'); 
-		}
-	}
+        $allrecords = getRecords('',$from,$until);
+        if ($allrecords === FALSE) {
+	   $errors .= oai_error('internalDatabaseError'); 
+        } else {
+           $num_rows = count($allrecords);
+           if (!$num_rows) {
+              $errors .= oai_error('noRecordsMatch');
+           }
+        }
 }
 
 // break and clean up on error
@@ -199,20 +183,11 @@ elseif (isset($args['resumptionToken'])) {
 $maxrec = min($num_rows - $deliveredrecords, $MAXRECORDS);
 
 // return records
+$dsidarray = array_keys($allrecords);
 $countrec  = 0;
+$ix = $deliveredrecords;
 while ($countrec++ < $maxrec) {
-	// the second condition is due to a bug in PEAR
-	if ($countrec == 1 && $deliveredrecords) {
-		$record = $res->fetchRow(DB_FETCHMODE_ASSOC, $deliveredrecords); 
-	} else {
-		$record = $res->fetchRow(DB_FETCHMODE_ASSOC);
-	}
-	if (DB::isError($record)) {
-		if ($SHOW_QUERY_ERROR) {
-			echo __FILE__.",". __LINE__."<br />";
-			die($db->errorNative());
-		}
-	}
+        $record = $allrecords[$dsidarray[$ix++]];
 
 	$identifier = $oaiprefix.$record[$SQL['identifier']];
 	$datestamp = formatDatestamp($record[$SQL['datestamp']]);

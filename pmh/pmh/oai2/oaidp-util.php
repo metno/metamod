@@ -24,6 +24,9 @@
 * |                                                                      |
 * | Written by Heinrich Stamerjohanns, May 2002                          |
 * |            stamer@uni-oldenburg.de                                   |
+* |                                                                      |
+* | Adapted to METAMOD2 by Egil Støren, August 2008                      |
+* |            egil.storen@met.no                                        |
 * +----------------------------------------------------------------------+
 */
 //
@@ -103,7 +106,7 @@ function oai_error($code, $argument = '', $value = '')
 			break;
 
 		case 'sameArgument' :
-			$text = 'Do not use them same argument more than once.';
+			$text = 'Do not use the same argument more than once.';
 			$code = 'badArgument';
 			break;
 

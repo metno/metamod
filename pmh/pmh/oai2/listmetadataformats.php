@@ -24,6 +24,9 @@
 * |                                                                      |
 * | Written by Heinrich Stamerjohanns, May 2002                          |
 * |            stamer@uni-oldenburg.de                                   |
+* |                                                                      |
+* | Adapted to METAMOD2 by Egil Støren, August 2008                      |
+* |            egil.storen@met.no                                        |
 * +----------------------------------------------------------------------+
 */
 //
@@ -60,16 +63,11 @@ if (isset($args['identifier'])) {
 	$id = str_replace($oaiprefix, '', $identifier); 
 
 	$query = idQuery($id);
-	$res = $db->query($query);
-	if (DB::isError($res)) {
-		if ($SHOW_QUERY_ERROR) {
-			echo __FILE__.','.__LINE."<br />";
-			echo "Query: $query<br />\n";
-			die($db->errorNative());
-		} else {
-			$errors .= oai_error('idDoesNotExist', 'identifier', $identifier);
-		}
-	} elseif (!$res->numRows()) {
+	$res = pg_query ($mmDbConnection, $query);
+	if (! $res) {
+                mmPutLog(__FILE__ . __LINE__ . " Could not $query");
+	        $errors .= oai_error('idDoesNotExist', 'identifier', $identifier);
+	} elseif (! pg_numrows($res)) {
 		$errors .= oai_error('idDoesNotExist', 'identifier', $identifier);
 	}    
 }

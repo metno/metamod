@@ -24,6 +24,9 @@
 * |                                                                      |
 * | Written by Heinrich Stamerjohanns, May 2002                          |
 * /            stamer@uni-oldenburg.de                                   |
+* |                                                                      |
+* | Adapted to METAMOD2 by Egil Støren, August 2008                      |
+* |            egil.storen@met.no                                        |
 * +----------------------------------------------------------------------+
 */
 //
@@ -48,19 +51,13 @@ $output .= metadataHeader($prefix);
 
 // please change according to your metadata format
 $indent = 6;
-$output .= xmlrecord($record['dc_title'], 'dc:title', '', $indent);
-$output .= xmlrecord($record['dc_creator'],'dc:creator', '', $indent);
+$output .= xmlrecord($record['title'], 'dc:title', '', $indent);
+$output .= xmlrecord($record['institution'],'dc:creator', '', $indent);
 $output .= xmlrecord($record['dc_subject'], 'dc:subject', '', $indent);
 $output .= xmlrecord($record['dc_description'], 'dc:description', '', $indent);
-$output .= xmlrecord($record['dc_publisher'], 'dc:publisher', '', $indent);
-$output .= xmlrecord($record['dc_contributor'], 'dc:contributor', '', $indent);
 $output .= xmlrecord($record['dc_date'], 'dc:date', '', $indent);
-$output .= xmlrecord($record['dc_type'], 'dc:type', '', $indent);
-$output .= xmlrecord($record['dc_format'], 'dc:format', '', $indent);
 $output .= xmlrecord($record['dc_identifier'], 'dc:identifier', '', $indent);
 $output .= xmlrecord($record['dc_source'], 'dc:source', '', $indent);
-$output .= xmlrecord($record['dc_language'], 'dc:language', '', $indent);
-$output .= xmlrecord($record['dc_relation'], 'dc:relation', '', $indent);
 $output .= xmlrecord($record['dc_coverage'], 'dc:coverage', '', $indent);
 $output .= xmlrecord($record['dc_rights'], 'dc:rights', '', $indent);
 

@@ -24,6 +24,9 @@
 * |                                                                      |
 * | Written by Heinrich Stamerjohanns, May 2002                          |
 * |            stamer@uni-oldenburg.de                                   |
+* |                                                                      |
+* | Adapted to METAMOD2 by Egil Støren, August 2008                      |
+* |            egil.storen@met.no                                        |
 * +----------------------------------------------------------------------+
 */
 //
@@ -140,23 +143,12 @@ else {
 
 if (empty($errors)) {
 	$query = idQuery() . $extquery;
-	$res = $db->query($query); 
-	if (DB::isError($res)) {
-		if ($SHOW_QUERY_ERROR) {
-			echo __FILE__.','.__LINE."<br />";
-			echo "Query: $query<br />\n";
-			die($db->errorNative());
-		} else {
-			$errors .= oai_error('noRecordsMatch');
-		}		
+	$res = pg_query($mmDbConnection,$query); 
+	if (! $res) {
+                mmPutLog(__FILE__ . __LINE__ . " Could not $query");
+	        $errors .= oai_error('noRecordsMatch');
 	} else {
-		$num_rows = $res->numRows();  
-		if (DB::isError($num_rows)) {
-			if ($SHOW_QUERY_ERROR) {
-				echo __FILE__.','.__LINE."<br />";
-				die($db->errorNative());
-			}
-		}
+		$num_rows = pg_numrows($res);  
 		if (!$num_rows) {
 			$errors .= oai_error('noRecordsMatch');
 		}
@@ -195,17 +187,16 @@ $maxrec = min($num_rows - $deliveredrecords, $MAXIDS);
 $countrec = 0;
 
 while ($countrec++ < $maxrec) {
-	// the second condition is due to a bug in PEAR
 	if ($countrec == 1 && $deliveredrecords) {
-		$record = $res->fetchRow(DB_FETCHMODE_ASSOC, $deliveredrecords); 
+		$record = pg_fetch_array($res, $deliveredrecords); 
 	} else {
-		$record = $res->fetchRow();
+		$record = pg_fetch_array($res); 
 	}
 
 	$identifier = $oaiprefix.$record[$SQL['identifier']]; 
 	$datestamp = formatDatestamp($record[$SQL['datestamp']]); 
 
-	if (isset($record[$SQL['deleted']]) && ($record[$SQL['deleted']] == 'true') && 
+	if (isset($record[$SQL['deleted']]) && ($record[$SQL['deleted']] == 2) && 
 		($deletedRecord == 'transient' || $deletedRecord == 'persistent')) {
 		$status_deleted = TRUE;
 	} else {
