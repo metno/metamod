@@ -120,7 +120,7 @@ if ($granularity == 'YYYY-MM-DDThh:mm:ss:Z') {
 
 // MUST (multiple)
 // please adjust
-$adminEmail			= array('mailto:egil.storen@met.no'); 
+$adminEmail			= array('mailto:[==OPERATOR_EMAIL==]'); 
 
 // MAY (multiple) 
 // Comment out, if you do not want to use it.
@@ -156,13 +156,13 @@ $show_identifier = false;
 // (verb is ListRecords)
 // If there are more records to deliver
 // a ResumptionToken will be generated.
-$MAXRECORDS = 50;
+$MAXRECORDS = 500;
 
 // maximum mumber of identifiers to deliver
 // (verb is ListIdentifiers)
 // If there are more identifiers to deliver
 // a ResumptionToken will be generated.
-$MAXIDS = 200;
+$MAXIDS = 500;
 
 // After 24 hours resumptionTokens become invalid.
 $tokenValid = 24*3600;
@@ -264,7 +264,7 @@ $SQL['deleted'] = 'DS_status';
 // the name of the column where you store sets
 // NOTE: This implementation does not support sets. The DS_set element
 // is set to an empty string for all records.
-$SQL['set'] = 'DS_set';
+$SQL['set'] = '';
 
 // Here are a couple of queries which might need to be adjusted to 
 // your needs. Normally, if you have correctly named the columns above,
@@ -311,7 +311,7 @@ function getRecords ($id = '', $from = '', $until = '') {
                              'distribution_statement' => 'dc_rights'
                           );
    $query = 'SELECT DS_id, DS_name, DS_status, DS_datestamp FROM DataSet WHERE ' .
-            'DS_status <= 2 AND DS_ownertag IN ([==DATASET_TAGS==]) ';
+            "DS_status <= 2 AND DS_ownertag IN ([==DATASET_TAGS==]) ";
    if ($id != '') {
       $query .= "AND DS_name = '$id' ";
    }
@@ -345,8 +345,8 @@ function getRecords ($id = '', $from = '', $until = '') {
          }
          $query = "SELECT DS_id, MT_name, MD_content FROM DS_Has_MD, Metadata WHERE " .
                   "DS_Has_MD.MD_id = Metadata.MD_id AND DS_id IN (" .
-                  implode(', ',$dsids) . ") AND MT_name IN (" .
-                  implode(', ',array_keys($key_conversion)) . " )\n";
+                  implode(', ',$dsids) . ") AND MT_name IN ('" .
+                  implode("', '",array_keys($key_conversion)) . "' )\n";
          $result1 = pg_query ($mmDbConnection, $query);
          if (!$result1) {
             mmPutLog(__FILE__ . __LINE__ . " Could not $query");
@@ -359,7 +359,7 @@ function getRecords ($id = '', $from = '', $until = '') {
                   $dsid = $rowarr[0];
                   $mtname = $rowarr[1];
                   $dccode = $key_conversion[$mtname];
-                  $mdcontent = $rowarr[2];
+                  $mdcontent = html_entity_decode($rowarr[2]);
                   if ($mtname == "keywords" or $mtname == "topiccategory") {
                      foreach (explode(" ",$mdcontent) as $w1) {
                         if (strlen($w1) > 1) {
@@ -368,7 +368,7 @@ function getRecords ($id = '', $from = '', $until = '') {
                      }
                   } elseif ($mtname == "datacollection_period") {
                      foreach (explode(" to ",$mdcontent) as $w1) {
-                        if (strlen($w1) > 9) {
+                        if (strlen($w1) > 9 and substr($w1,0,4) != '2099') {
                            $allresults[$dsid][$dccode][] = $w1;
                         }
                      }
@@ -377,7 +377,7 @@ function getRecords ($id = '', $from = '', $until = '') {
                         $allresults[$dsid][$dccode][] = trim($w1);
                      }
                   } elseif ($mtname == "variable") {
-                     if (preg_match('^(.*) > HIDDEN *$',$mdcontent,$matches)) {
+                     if (preg_match('/^(.*) > HIDDEN *$/',$mdcontent,$matches)) {
                         $mdcontent = $matches[1];
                      }
                      $allresults[$dsid][$dccode][] = $mdcontent;
@@ -402,7 +402,7 @@ function idQuery ($id = '')
 	} else {
 		$query = 'select '.$SQL['identifier'].','.$SQL['datestamp'].','.$SQL['deleted'].' FROM '.$SQL['table'].' WHERE ';
 	}
-        $query .= 'DS_status <= 2 AND DS_ownertag IN ([==DATASET_TAGS==]) AND '
+        $query .= "DS_status <= 2 AND DS_ownertag IN ([==DATASET_TAGS==]) AND ";
 	
 	if ($id == '') {
 		$query .= $SQL['id_column'].' = '.$SQL['id_column'];

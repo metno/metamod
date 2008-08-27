@@ -115,7 +115,7 @@ foreach ($res as $record) {
 	// use xmlrecord since we include stuff from database;
 	$output .= xmlrecord($identifier, 'identifier', '', 3);
 	$output .= xmlformat($datestamp, 'datestamp', '', 3);
-	if (!$status_deleted) 
+	if (!$status_deleted and $SQL['set'] != '') 
 		$output .= xmlrecord($record[$SQL['set']], 'setSpec', '', 3);
 	$output .= 
 '   </header>'."\n"; 

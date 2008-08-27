@@ -51,15 +51,15 @@ $output .= metadataHeader($prefix);
 
 // please change according to your metadata format
 $indent = 6;
-$output .= xmlrecord($record['title'], 'dc:title', '', $indent);
-$output .= xmlrecord($record['institution'],'dc:creator', '', $indent);
-$output .= xmlrecord($record['dc_subject'], 'dc:subject', '', $indent);
-$output .= xmlrecord($record['dc_description'], 'dc:description', '', $indent);
-$output .= xmlrecord($record['dc_date'], 'dc:date', '', $indent);
-$output .= xmlrecord($record['dc_identifier'], 'dc:identifier', '', $indent);
-$output .= xmlrecord($record['dc_source'], 'dc:source', '', $indent);
-$output .= xmlrecord($record['dc_coverage'], 'dc:coverage', '', $indent);
-$output .= xmlrecord($record['dc_rights'], 'dc:rights', '', $indent);
+$output .= xmlformat($record['title'], 'dc:title', '', $indent);
+$output .= xmlformat($record['institution'],'dc:creator', '', $indent);
+$output .= xmlformat($record['dc_subject'], 'dc:subject', '', $indent);
+$output .= xmlformat($record['dc_description'], 'dc:description', '', $indent);
+$output .= xmlformat($record['dc_date'], 'dc:date', '', $indent);
+$output .= xmlformat($record['dc_identifier'], 'dc:identifier', '', $indent);
+$output .= xmlformat($record['dc_source'], 'dc:source', '', $indent);
+$output .= xmlformat($record['dc_coverage'], 'dc:coverage', '', $indent);
+$output .= xmlformat($record['dc_rights'], 'dc:rights', '', $indent);
 
 
 // Here, no changes need to be done

@@ -188,15 +188,15 @@ $countrec = 0;
 
 while ($countrec++ < $maxrec) {
 	if ($countrec == 1 && $deliveredrecords) {
-		$record = pg_fetch_array($res, $deliveredrecords); 
+		$record = pg_fetch_row($res, $deliveredrecords); 
 	} else {
-		$record = pg_fetch_array($res); 
+		$record = pg_fetch_row($res); 
 	}
 
-	$identifier = $oaiprefix.$record[$SQL['identifier']]; 
-	$datestamp = formatDatestamp($record[$SQL['datestamp']]); 
+	$identifier = $oaiprefix.$record[0]; 
+	$datestamp = formatDatestamp($record[1]); 
 
-	if (isset($record[$SQL['deleted']]) && ($record[$SQL['deleted']] == 2) && 
+	if (isset($record[2]) && ($record[2] == 2) && 
 		($deletedRecord == 'transient' || $deletedRecord == 'persistent')) {
 		$status_deleted = TRUE;
 	} else {
@@ -214,8 +214,8 @@ while ($countrec++ < $maxrec) {
 	// use xmlrecord since we use stuff from database
 	$output .= xmlrecord($identifier, 'identifier', '', 3);
 	$output .= xmlformat($datestamp, 'datestamp', '', 3);
-	if (!$status_deleted) 
-		$output .= xmlrecord($record[$SQL['set']], 'setSpec', '', 3);
+	if (!$status_deleted and $SQL['set'] != '') 
+		$output .= xmlrecord($record[3], 'setSpec', '', 3);
 	$output .=
 '  </header>'."\n"; 
 }

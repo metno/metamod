@@ -33,8 +33,6 @@
 // $Id: listrecords.php,v 1.03 2004/07/02 14:24:21 stamer Exp $
 //
 
-$from = '';
-$until = '';
 // parse and check arguments
 foreach($args as $key => $val) {
 
@@ -86,6 +84,12 @@ foreach($args as $key => $val) {
 		default:
 			$errors .= oai_error('badArgument', $key, $val);
 	}
+}
+if (!isset($from)) {
+   $from = '';
+}
+if (!isset($until)) {
+   $until = '';
 }
 
 
@@ -203,7 +207,7 @@ while ($countrec++ < $maxrec) {
 	$output .= '   <header>'."\n";
 	$output .= xmlformat($identifier, 'identifier', '', 4);
 	$output .= xmlformat($datestamp, 'datestamp', '', 4);
-	if (!$status_deleted) 
+	if (!$status_deleted and $SQL['set'] != '') 
 		// use xmlrecord since we use stuff from database
 		$output .= xmlrecord($record[$SQL['set']], 'setSpec', '', 4);
 

@@ -107,7 +107,7 @@ if (!exists($conf{'TARGET_DIRECTORY'})) {
 my @flistpathes = ();
 my $targetdir = $conf{'TARGET_DIRECTORY'};
 $targetdir = &substituteval($targetdir);
-foreach my $module qw(METAMODBASE METAMODSEARCH METAMODUPLOAD METAMODQUEST) {
+foreach my $module qw(METAMODBASE METAMODSEARCH METAMODUPLOAD METAMODQUEST METAMODPMH) {
    if (exists($conf{$module . '_DIRECTORY'})) {
       my $moduledir = $conf{$module . '_DIRECTORY'};
       $moduledir = &substituteval($moduledir);
