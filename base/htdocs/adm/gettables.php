@@ -42,6 +42,7 @@
 #     Create an empty array
 #   
    $tables = array();
+   $tablesrefs = array();
 #   
 #    foreach value in an array
 #   
@@ -70,6 +71,19 @@
             }
             else {
                $tables[$tablename][] = $rowname;   # Next available integer key
+               if (preg_match ('/REFERENCES\s+(\w+)/',$line,$result3)) {
+                  $referenced = $result3[1];
+                  if (array_key_exists($referenced,$tablesrefs)) {
+                     $tablesrefs[$referenced] .= " $tablename $rowname";
+                  } else {
+                     $tablesrefs[$referenced] = "$tablename $rowname";
+                  }
+                  if (array_key_exists($tablename,$tablesrefs)) {
+                     $tablesrefs[$tablename] .= " $referenced $rowname";
+                  } else {
+                     $tablesrefs[$tablename] = "$referenced $rowname";
+                  }
+               }
             }
          }
       }
