@@ -735,12 +735,21 @@ sub process_files {
       if (length($shell_command_error) > 0) {
          die "file $expandedfile fails: $shell_command_error";
       }
-      if (defined($extention) && $extention eq 'cdl' && index($filetype,"text") >= 0) {
+      if (index($filetype,"text") >= 0) {
+         my $path_to_remove_cr = $target_directory . '/scripts/remove_cr.sh';
+         my $dummy = &shcommand_scalar("$path_to_remove_cr $expandedfile");
+         if (length($shell_command_error) > 0) {
+            &syserror("SYS","remove_cr_failed",$uploadname, "process_files","");
+            $problem_upl_files{$uploadname} = 1;
+            $errors = 1;
+         }
+      }
+      if ($errors == 0 && defined($extention) && $extention eq 'cdl' && index($filetype,"text") >= 0) {
          my $firstline = &shcommand_scalar("head -1 $expandedfile");
          if (length($shell_command_error) > 0) {
             die "head -1 $expandedfile fails: $shell_command_error";
          }
-         if (substr($firstline,0,7) eq "netcdf ") {
+         if ($firstline =~ /^\s*netcdf\s/) {
             my $ncname = substr($expandedfile,0,length($expandedfile) - 3) . 'nc';
             if (scalar grep($_ eq $ncname,@expanded_files) > 0) {
                &syserror("USER","cdlfile_collides_with_ncfile_already_encountered",
