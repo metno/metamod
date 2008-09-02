@@ -12,6 +12,14 @@ echo ""
 echo "------------ Run cload scripts:"
 cd ../staticdata
 ../scripts/import_searchdata.pl searchdata.xml
+cat >t_1 <<EOF
+[==IMPORTDIRS==]
+EOF
+for dir in `cat t_1`; do
+   for fil in `ls -1 $dir`; do
+      ../scripts/import_dataset.pl $dir/$fil
+   done
+done
 # for fil in `ls -1 datasets/*.xml`; do
 #    ../scripts/import_dataset.pl $fil
 # done
