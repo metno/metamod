@@ -53,7 +53,7 @@ $SHOW_QUERY_ERROR = FALSE;
 
 // The content-type the WWW-server delivers back. For debug-puposes, "text/plain" 
 // is easier to view. On a production site you should use "text/xml".
-$CONTENT_TYPE = 'Content-Type: text/plain';
+$CONTENT_TYPE = 'Content-Type: [==PMH_CONTENT_TYPE==]';
 
 // If everything is running ok, you should use this
 // $SHOW_QUERY_ERROR = FALSE;
@@ -74,12 +74,12 @@ require_once('DB.php');
 error_reporting(E_ALL & ~E_NOTICE);
 
 // do not change
-$MY_URI = 'http://'.$_SERVER['SERVER_NAME'].':8080'.$_SERVER['SCRIPT_NAME'];
+$MY_URI = 'http://'.$_SERVER['SERVER_NAME'][==PMH_PORT_NUMBER==].$_SERVER['SCRIPT_NAME'];
 # echo $MY_URI . '<BR />';
 
 // MUST (only one)
 // please adjust
-$repositoryName       = 'Met.no OAI Repository';
+$repositoryName       = '[==PMH_REPOSITORY_NAME==]';
 $baseURL			  = $MY_URI;
 // You can use a static URI as well.
 // $baseURL 			= "http://my.server.org/oai/oai2.php";
@@ -110,7 +110,7 @@ $granularity          = 'YYYY-MM-DD';
 // MUST (only one)
 // the earliest datestamp in your repository,
 // please adjust
-$earliestDatestamp    = '2000-01-01';
+$earliestDatestamp    = '[==PMH_EARLIEST_DATESTAMP==]';
 
 // this is appended if your granularity is seconds.
 // do not change
@@ -141,7 +141,7 @@ $delimiter			= ':';
 // see: http://www.openarchives.org/OAI/2.0/guidelines-oai-identifier.htm
 // Basically use domainname-word.domainname
 // please adjust
-$repositoryIdentifier = 'met.no'; 
+$repositoryIdentifier = '[==PMH_REPOSITORY_IDENTIFIER==]'; 
 
 
 // description is defined in identify.php 
@@ -156,13 +156,13 @@ $show_identifier = false;
 // (verb is ListRecords)
 // If there are more records to deliver
 // a ResumptionToken will be generated.
-$MAXRECORDS = 500;
+$MAXRECORDS = [==PMH_MAXRECORDS==];
 
 // maximum mumber of identifiers to deliver
 // (verb is ListIdentifiers)
 // If there are more identifiers to deliver
 // a ResumptionToken will be generated.
-$MAXIDS = 500;
+$MAXIDS = [==PMH_MAXRECORDS==];
 
 // After 24 hours resumptionTokens become invalid.
 $tokenValid = 24*3600;
