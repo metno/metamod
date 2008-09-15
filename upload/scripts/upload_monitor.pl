@@ -1049,6 +1049,7 @@ sub revert_XML_history {
             push (@new_xml_history,$ref);
          }
       }
+      my @reprocess_basenames = ();
       if (!defined($ref_unaffected_basenames)) {
 #      
 #        All files for this dataset has to be re-processed. Remove XML- and
@@ -1071,9 +1072,8 @@ sub revert_XML_history {
          $Data::Dumper::Indent = 1;
          print XMLHISTORY Dumper(\@new_xml_history);
          close (XMLHISTORY);
+         @reprocess_basenames = &subtract($existing_basenames,$ref_unaffected_basenames);
       }
-      my @reprocess_basenames = &subtract($existing_basenames,$ref_unaffected_basenames);
-      @reprocess_basenames = &subtract(\@reprocess_basenames,$uploaded_basenames);
       return @reprocess_basenames;
    } else {
       &syserror("SYS","no_XML_history_file", "", "revert_XML_history", "");
