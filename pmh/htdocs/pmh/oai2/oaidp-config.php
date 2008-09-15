@@ -69,7 +69,7 @@ $CONTENT_TYPE = 'Content-Type: [==PMH_CONTENT_TYPE==]';
 
 // if there are problems with unknown 'numrows', then make sure
 // to upgrade to a decent PEAR version. 
-require_once('DB.php');
+// require_once('DB.php');
 
 error_reporting(E_ALL & ~E_NOTICE);
 
