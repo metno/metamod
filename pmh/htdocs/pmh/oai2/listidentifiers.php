@@ -124,14 +124,20 @@ else {
 		$extquery .= fromQuery($from);     
 	}
 
-    if (isset($args['until'])) {
+        if (isset($args['until'])) {
 	    if (!checkDateFormat($until)) {
 		    $errors .= oai_error('badGranularity', 'until', $until); 
 	    }
 	    $extquery .= untilQuery($until);
-    }
+        }
 
-    if (isset($args['set'])) {
+        if (isset($args['from']) && isset($args['until'])) {
+            if (!checkDateRange($from,$until)) {
+		    $errors .= oai_error('badDateRange','',"$from > $until"); 
+            }
+        }
+
+        if (isset($args['set'])) {
 	    if (is_array($SETS)) {
 		    $extquery .= setQuery($set);
 	    } else {

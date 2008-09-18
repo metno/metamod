@@ -54,6 +54,11 @@ function oai_error($code, $argument = '', $value = '')
 			$code = 'badArgument';
 			break;
 
+		case 'badDateRange' :
+                        $text = "The from argument is after until ($value).";
+			$code = 'badArgument';
+			break;
+
 		case 'badResumptionToken' :
 			$text = "The resumptionToken '$value' does not exist or has already expired.";
 			break;
@@ -326,6 +331,41 @@ function checkDateFormat($date) {
 	    $message = "Invalid Date Format: $date does not comply to the date format $granularity.";
 	    return 0;
     }
+}
+
+function checkDateRange($from,$until) {
+
+    global $granularity;
+    global $message;
+
+    if ($granularity == 'YYYY-MM-DDThh:mm:ssZ') {
+	$checkstr = '([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})T([0-9]{2}):([0-9]{2}):([0-9]{2})Z$';
+    } else {
+	$checkstr = '([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}$)';
+    }
+    if (! ereg($checkstr, $from, $regsfrom)) {
+	    $message = "Invalid Date Format: $from does not comply to the date format $granularity.";
+	    return 0;
+    }
+    if (! ereg($checkstr, $until, $regsuntil)) {
+	    $message = "Invalid Date Format: $until does not comply to the date format $granularity.";
+	    return 0;
+    }
+    $datefrom = 10000*$regsfrom[1] + 100*$regsfrom[2] + $regsfrom[3];
+    $dateuntil = 10000*$regsuntil[1] + 100*$regsuntil[2] + $regsuntil[3];
+    if ($dateuntil < $datefrom) {
+	    $message = "From parameter ($from) is after until parameter ($until).";
+	    return 0;
+    }
+    if ($dateuntil == $datefrom && $granularity == 'YYYY-MM-DDThh:mm:ssZ') {
+       $timefrom = 100*$regsfrom[4] + $regsfrom[5];
+       $timeuntil = 100*$regsuntil[4] + $regsuntil[5];
+       if ($timeuntil < $timefrom) {
+	    $message = "From parameter ($from) is after until parameter ($until).";
+	    return 0;
+       }
+    }
+    return 1;
 }
 
 function formatDatestamp($datestamp)

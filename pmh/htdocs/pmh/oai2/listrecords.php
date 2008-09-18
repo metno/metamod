@@ -138,6 +138,12 @@ else {
 		}
 	}
 
+        if (isset($args['from']) && isset($args['until'])) {
+            if (!checkDateRange($from,$until)) {
+		    $errors .= oai_error('badArgument','',"$from > $until"); 
+            }
+        }
+
         if (isset($args['set'])) {
 		$errors .= oai_error('noSetHierarchy'); 
 		oai_exit();
