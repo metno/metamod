@@ -327,26 +327,27 @@ sub read_ftp_events {
 #   
    my ($eventsref) = @_;
    my $eventsfile = $webrun_directory . '/ftp_events';
-   unless (-r $eventsfile) {die "Can not read from file: $eventsfile\n";}
-   open (EVENTS,$eventsfile);
-   while (<EVENTS>) {
-      chomp($_);
-      my $line = $_;
-      $line =~ s/^\s+//;
-      my @tokens = split(/\s+/,$line);
-      if (scalar @tokens >= 4) {
-         my $dataset_name = $tokens[0];
-         my $wait_minutes = $tokens[1];
-         my $days_to_keep_files = $tokens[2];
-         $all_ftp_datasets{$dataset_name} = $days_to_keep_files;
-         for (my $ix=3; $ix < scalar @tokens; $ix++) {
-            my $hour = $tokens[$ix];
-            my $eventkey = "$dataset_name $hour";
-            $eventsref->{$eventkey} = $wait_minutes;
+   if (-r $eventsfile) {
+      open (EVENTS,$eventsfile);
+      while (<EVENTS>) {
+         chomp($_);
+         my $line = $_;
+         $line =~ s/^\s+//;
+         my @tokens = split(/\s+/,$line);
+         if (scalar @tokens >= 4) {
+            my $dataset_name = $tokens[0];
+            my $wait_minutes = $tokens[1];
+            my $days_to_keep_files = $tokens[2];
+            $all_ftp_datasets{$dataset_name} = $days_to_keep_files;
+            for (my $ix=3; $ix < scalar @tokens; $ix++) {
+               my $hour = $tokens[$ix];
+               my $eventkey = "$dataset_name $hour";
+               $eventsref->{$eventkey} = $wait_minutes;
+            }
          }
       }
+      close (EVENTS);
    }
-   close (EVENTS);
 }
 #
 # ----------------------------------------------------------------------------
