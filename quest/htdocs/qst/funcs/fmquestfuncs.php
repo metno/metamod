@@ -464,6 +464,16 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
 	if ($mykey == "Submit" || $mykey == "cmd") {
 	    continue;
 	}
+	# escape user-entered values
+	$mykey = htmlspecialchars($mykey);
+    if (is_array($myvalue)) {
+		foreach ($myvalue as $myitem => $singleval) {
+		    $myvalue[$myitem] = htmlspecialchars($singleval);
+		}
+    } else {
+		$myvalue = htmlspecialchars($myvalue);
+    }
+	
 	$myxmlrecord = "";
 	$myhtmlrecord = "";
 	if (is_array($myvalue)) {
@@ -475,7 +485,7 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
 	} else {
 	    $myhtmlrecord = "<b>$mykey</b><br>\n<p>".wordwrap(ereg_replace("\n","<br>\n",$myvalue),70)."</p>\n";
 	    if ($mykey == "abstract") {
-		$myxmlrecord .= "\t<abstract>\n".$myvalue."\n\t</abstract>\n";
+		$myxmlrecord .= "\t<abstract>\n$myvalue\n\t</abstract>\n";
 	    } else {
 		$myxmlrecord .= "\t<$mykey>$myvalue</$mykey>\n";
 	    }
@@ -532,7 +542,8 @@ function fmcheckform($filename) {
     foreach ($mytempl as $line) {
 	if (! ereg('mandatory',$line)) continue;
 	parse_str($line);
-	if (! $_POST[$name]) {
+	# check for string-length, so value 0 returns true
+	if (! strlen($_POST[$name])) {
 	    echo(fmcreateerrmsg("Record ".$name." is mandatory and missing"));
 	    $errors = TRUE;
 	}
@@ -552,6 +563,15 @@ function fmcheckform($filename) {
 	if ($mykey == "Submit" || $mykey == "cmd") {
 	    continue;
 	}
+	# escape user-entered values
+	$mykey = htmlspecialchars($mykey);
+    if (is_array($myvalue)) {
+		foreach ($myvalue as $myitem => $singleval) {
+		    $myvalue[$myitem] = htmlspecialchars($singleval);
+		}
+    } else {
+		$myvalue = htmlspecialchars($myvalue);
+    }
 	echo(fmcreaterecordstart());
 
 	# Check if refeences are valid URLs
