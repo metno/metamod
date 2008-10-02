@@ -102,6 +102,9 @@ if ($_SERVER['SERVER_NAME'] == "tuba.oslo.dnmi.no") {
     $fmquestoutput=$_SERVER['DOCUMENT_ROOT']."/data/ipycoord";
 } else {
     $fmquestoutput="[==QUEST_OUTPUT_DIRECTORY==]";
+    # path to define search-metadata for non-parsable data-formats
+    # those will be loaded automatically to the database
+    $fmuploadoutput="[==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]/";
 }
 $mysender = "[==QUEST_SENDER_ADDRESS==]";
 $myrecipents = "[==QUEST_RECIPIENTS==]";
@@ -114,7 +117,7 @@ require("funcs/fmquestfuncs.php");
 if ($_POST["Submit"] == "Check form") {
     fmcheckform($fmquestconfig);
 } elseif ($_POST["Submit"] == "Write form") {
-    fmprocessform($fmquestoutput,$myokmsg,$mysender,$myrecipents);
+    fmprocessform($fmquestoutput,$fmuploadoutput,$myokmsg,$mysender,$myrecipents);
 } else {
     fmcreateform($fmquestconfig);
 }

@@ -46,7 +46,12 @@ function fmcreateform($filename="myconfig.txt") {
     if (! file_exists($filename)) {
 	echo(fmcreateerrmsg("Could not open configuration file"));
 	return("No form created");
-    } 
+    }
+	# this quest goes defines the metadata for a metamod upload directory
+	# it will be written in the metamod xml directory as $uploadDir.xml
+	# not as md5 hash
+	# TODO: check for password in this case
+    $uploadDir = $_REQUEST["uploadDirectory"];
 
     $mytempl = file($filename);
 
@@ -69,10 +74,15 @@ function fmcreateform($filename="myconfig.txt") {
 	echo(fmparsestr($type,$label,$name,$value,$length,$height,$size,$checked,$exclude,$include));
     }
     echo(fmcreatebr());
-    echo(fmcreatesectionstart(NULL));
-    echo(fmcreatetext("keyphrase","Key phrase (for unique identification)",NULL,25,50));
-    echo(fmcreatesectionend());
-    echo(fmcreatebr());
+    if (strlen($uploadDir) == 0) {
+    	echo(fmcreatesectionstart(NULL));
+    	echo(fmcreatetext("keyphrase","Key phrase (for unique identification)",NULL,25,50));
+   	 	echo(fmcreatesectionend());
+    	echo(fmcreatebr());
+    } else {
+    	echo(fmcreatehidden("uploadDirectory", $uploadDir));
+    	echo(fmcreatehidden("institutionId", $_REQUEST["institutionId"]));
+    }
     echo(fmcreatebutton("Submit","Check form"));
     echo(fmcreatebutton("Reset","Clear form"));
     echo(fmendform());
@@ -83,7 +93,7 @@ function fmcreateform($filename="myconfig.txt") {
 
 function fmstartform() {
 
-    $mystr = "\n<form action=\"".$_SERVER['PHP_SELF']."\" method=\"post\">\n";
+    $mystr = "\n<form action=\"".$_SERVER['SCRIPT_NAME']."\" method=\"post\">\n";
 
     return($mystr);
 }
@@ -438,22 +448,53 @@ function fmcreateerrmsg($mymsg) {
 # Process the information submitted, generate HTML email message and
 # METAMOD XML message locally
 #
-function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
+function fmprocessform($outputdst,$uploadOutputDst,$mystdmsg,$mysender,$myrecipents) {
 
     $mymsg = $mystdmsg;
+	
+	$outputfile = "";
+	if ($_REQUEST["uploadDirectory"]) {
+		if (! is_dir($uploadOutputDst)) {
+     		$mymsg = "Output destination '$uploadOutputDst' was not configured!";
+       		echo(fmcreateerrmsg($mymsg));
+       		return;
+    	}
+		if (! $_REQUEST["institutionId"]) {
+			$mysmg = "information missing during quest metadata configuration, please enter through the admin portal!";
+       		echo(fmcreateerrmsg($mymsg));
+       		return;
+		}
+    	$outputfile = "$uploadOutputDst/".$_REQUEST["uploadDirectory"].".xml";
+    	# automatically set the following parameters
+    	if (! (isset($_REQUEST["drpath"]) && strlen($_REQUEST["drpath"]))) {
+    		if (preg_match ('/\/([^\/]+)$/',$outputdst,$matches1)) {
+       			$drpath = $matches1[1].'/'.$_REQUEST["uploadDirectory"];
+    		}
+    	}
+		if (! (isset($_REQUEST["dataref"]) && strlen($_REQUEST["dataref"]))) {
+			$_POST["dataref"] = "[==OPENDAP_URL==]" . '/' . $_REQUEST["institutionId"] . '/' . $_REQUEST["uploadDirectory"];
+		}
+		# unset parameters which should not be used in xml-generation
+		unset($_POST["institutionId"]);
+		unset($_POST["uploadDirectory"]);
+	} else {
+		if (! is_dir($outputdst)) {
+       		$mymsg = "Output destination could not be configured!";
+       		echo(fmcreateerrmsg($mymsg));
+       		return;
+    	}
 
-    if (! is_dir($outputdst)) {
-       $mymsg = "Output destination could not be configured!";
-       echo(fmcreateerrmsg($mymsg));
-       return;
-    }
-
-    # Create output filename for local storage
-    $md5code = md5($_SERVER["name"].$_POST["email"].$_POST["keyphrase"]);
-    if (preg_match ('/\/([^\/]+)$/',$outputdst,$matches1)) {
-       $drpath = $matches1[1].'/'.$md5code;
-    }
-    $outputfile = "$outputdst/$md5code.xml";
+	    # Create output filename for local storage
+    	$md5code = md5($_SERVER["name"].$_POST["email"].$_POST["keyphrase"]);
+    	if (preg_match ('/\/([^\/]+)$/',$outputdst,$matches1)) {
+       		$drpath = $matches1[1].'/'.$md5code;
+    	}
+    	$outputfile = "$outputdst/$md5code.xml";
+    	if (file_exists($outputfile)) {
+			echo(fmcreateerrmsg("You have submitted information using the same keyphrase before"));
+			return;
+    	}
+	}
 
     # Create HTML code of answer as well as pure text
     $myhtmlcontent = "<html>\n<head>\n</head>\n<body>\n";
@@ -496,17 +537,13 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
     $myhtmlcontent .= "</body>\n</html>\n";
     $myxmlcontent .= "</dataset>\n";
 
-    if (file_exists($outputfile)) {
-	echo(fmcreateerrmsg("You have submitted information using the same keyphrase before"));
-	return;
-    }
     # Removed FILE_TEXT flag. This flag is only available in PHP 6.
     # LOCK_EX|FILE_TEXT -> LOCK_EX
     if (file_put_contents($outputfile, $myxmlcontent,LOCK_EX) == FALSE) {
-	$mymsg="Could not store data, have you submitted this information
-	using the same keyphrase earlier? Sorry for the inconveniece";
-	echo(fmcreateerrmsg($mymsg));
-	return;
+		$mymsg="Could not store data, have you submitted this information
+		using the same keyphrase earlier? Sorry for the inconveniece";
+		echo(fmcreateerrmsg($mymsg));
+		return;
     };
     $mailheader = 'MIME-Version: 1.0' . "\r\n";
     $mailheader .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
@@ -535,10 +572,17 @@ function fmcheckform($filename) {
 
     $mytempl = file($filename);
 
-    if (! $_POST["keyphrase"]) {
-	echo(fmcreateerrmsg("Record "."Key phrase"." is mandatory and missing"));
-	$errors = TRUE;
-    }
+	if (isset($_REQUEST["uploadDirectory"])) {
+		if (! (isset($_REQUEST["institutionId"]) && strlen($_REQUEST["institutionId"]))) {
+			$mysmg = "information missing during quest metadata configuration, please enter through the admin portal!";
+       		echo(fmcreateerrmsg($mymsg));
+       		return;
+		}
+	} elseif ( ! $_POST["keyphrase"]) {
+		echo(fmcreateerrmsg("Record "."Key phrase"." is mandatory and missing"));
+		$errors = TRUE;	
+	}
+
     foreach ($mytempl as $line) {
 	if (! ereg('mandatory',$line)) continue;
 	parse_str($line);
