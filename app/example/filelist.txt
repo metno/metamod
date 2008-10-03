@@ -3,6 +3,7 @@ htdocs/upl/style.css
 htdocs/upl/index.html
 htdocs/style.css
 =htdocs/img/metamod_logo.png
+=htdocs/qst/config/metamod2-meta-config.txt
 etc/conf_digest_nc.xml
 etc/usererrors.conf
 staticdata/searchdata.xml
