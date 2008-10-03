@@ -40,7 +40,6 @@
 <body>
 <div class="mybody">
 [==APP_HEADER_HTML==]
-   <form enctype="multipart/form-data" action="main.php" method="post">
    <table class="main_structure" cellpadding="0" cellspacing="0" width="100%">
       <col width="10%" />
       <col width="90%" />
@@ -118,10 +117,36 @@ END_OF_STRING;
    <p>The following user directories are owned by you:
    &nbsp;&nbsp;
    <span class="dirlist">
-      <?php
-         foreach ($dirinfo as $d1 => $k1) {
-            echo $d1 . " ";
-         }
+    <?php
+         $metadataQuest = "[==QUEST_METADATA_UPLOAD_FORM==]";
+         $userinfo = get_userinfo($filepath);
+    	 if (!array_key_exists("institution",$userinfo)) {
+       		$error = 2;
+       		$nextpage = 1;
+       		mmPutLog('No institution in userinfo');
+       		$errmsg = "Sorry. Internal error";
+    	 } else {
+       		$institution = $userinfo["institution"];
+    	 }
+         
+     	 if (strlen($metadataQuest) > 0) {
+         	foreach ($dirinfo as $d1 => $k1) {
+			$form = <<<EOF
+     <form action="$metadataQuest" method="post">
+      	<fieldset>
+     	 	<input type="hidden" name="institutionId" value="$institution" />
+     	 	<input type="hidden" name="uploadDirectory" value="$d1" />
+			<input type="submit" name="$d1" value="$d1" />
+      	</fieldset>
+     </form>
+EOF;
+			echo $form;
+         	}
+     	 } else {
+         	foreach ($dirinfo as $d1 => $k1) {
+            	echo $d1 . " ";
+         	}
+     	 }
       ?>
    </span>.</p>
    <p>You may create new user directories in the 
@@ -131,6 +156,7 @@ END_OF_STRING;
    ?>
    page.</p>
 
+   <form enctype="multipart/form-data" action="main.php" method="post">
    <p>
       <input type="hidden" name="MAX_FILE_SIZE" value="[==MAX_UPLOAD_SIZE_BYTES==]" />
       <?php
@@ -177,11 +203,11 @@ END_OF_STRING;
          }
       ?>
    </table>
+   </form>
    </div>
          </td>
       </tr>
    </table>
-   </form>
 [==APP_FOOTER_HTML==]
 </div>
 </body>

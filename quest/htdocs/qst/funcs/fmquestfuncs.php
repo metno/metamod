@@ -448,23 +448,24 @@ function fmcreateerrmsg($mymsg) {
 # Process the information submitted, generate HTML email message and
 # METAMOD XML message locally
 #
-function fmprocessform($outputdst,$uploadOutputDst,$mystdmsg,$mysender,$myrecipents) {
+function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
 
     $mymsg = $mystdmsg;
 	
+	if (! is_dir($outputdst)) {
+   		$mymsg = "Output destination could not be configured!";
+   		echo(fmcreateerrmsg($mymsg));
+   		return;
+	}
+
 	$outputfile = "";
 	if ($_REQUEST["uploadDirectory"]) {
-		if (! is_dir($uploadOutputDst)) {
-     		$mymsg = "Output destination '$uploadOutputDst' was not configured!";
-       		echo(fmcreateerrmsg($mymsg));
-       		return;
-    	}
 		if (! $_REQUEST["institutionId"]) {
 			$mysmg = "information missing during quest metadata configuration, please enter through the admin portal!";
        		echo(fmcreateerrmsg($mymsg));
        		return;
 		}
-    	$outputfile = "$uploadOutputDst/".$_REQUEST["uploadDirectory"].".xml";
+    	$outputfile = "$outputdst/".$_REQUEST["uploadDirectory"].".xml";
     	# automatically set the following parameters
     	if (! (isset($_REQUEST["drpath"]) && strlen($_REQUEST["drpath"]))) {
     		if (preg_match ('/\/([^\/]+)$/',$outputdst,$matches1)) {
@@ -478,13 +479,7 @@ function fmprocessform($outputdst,$uploadOutputDst,$mystdmsg,$mysender,$myrecipe
 		unset($_POST["institutionId"]);
 		unset($_POST["uploadDirectory"]);
 	} else {
-		if (! is_dir($outputdst)) {
-       		$mymsg = "Output destination could not be configured!";
-       		echo(fmcreateerrmsg($mymsg));
-       		return;
-    	}
-
-	    # Create output filename for local storage
+	    # Create output filename for local storage using name, email and keyphrase
     	$md5code = md5($_SERVER["name"].$_POST["email"].$_POST["keyphrase"]);
     	if (preg_match ('/\/([^\/]+)$/',$outputdst,$matches1)) {
        		$drpath = $matches1[1].'/'.$md5code;
