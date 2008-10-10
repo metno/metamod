@@ -59,10 +59,39 @@ if (array_key_exists("sqlsentence", $_POST)) {
 ?>
 <h3>Enter SQL sentence to perform:</h3>
 <form action="dosql.php" method="post">
-<textarea name="sqlsentence" rows="15" cols="120">
+<textarea name="sqlsentence" rows="4" cols="120">
 </textarea>
 <input type="submit" value="Submit">
 </form>
+<?php
+   include "gettables.php";
+   echo "<table border=0>\n";
+#
+# foreach key,value pair in an array
+#
+   reset($tables);
+   foreach ($tables as $tablename => $columns) {
+#   
+#    foreach value in an array
+#   
+      echo "<tr><td>$tablename</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+      reset($columns);
+      foreach ($columns as $colname) {
+         echo $colname . " &nbsp;&nbsp;&nbsp;&nbsp;";
+      }
+      echo "</td></tr>\n";
+   }
+   echo "</table>\n";
+?>
+<hr>
+<table border=0>
+<tr><td>select * from</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td>where</td></tr>
+<tr><td>select col1, col2 from tb1</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td>where col1 &gt; 5</td></tr>
+<tr><td>select tbl1.col1, tbl2.col2 from tb1, tb2</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td>where tb1.col1 = 'Extra' and tb1.col2 = tb2.col3</td></tr>
+<tr><td>select col1, col2 from tb1 as a, tb2 as b</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td>where col1 in (1, 2, 3)</td></tr>
+<tr><td>select distinct col1, col2 </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td>where col1 like 'abc%' </td></tr>
+<tr><td>select col1 as x, col2 </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td>order by x</td></tr>
+</table>
 <?php
 }
 ?>
