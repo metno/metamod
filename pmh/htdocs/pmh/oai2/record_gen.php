@@ -113,7 +113,7 @@ $output .= $b1->get();
 
 // Here, no changes need to be done
 $output .=           
-'     </'.$prefix;
+'     </'.$METADATAFORMATS[$prefix]['metadataPrefix'];
 if (isset($METADATAFORMATS[$prefix]['record_prefix'])) {
 	$output .= ':'.$METADATAFORMATS[$prefix]['record_prefix'];
 }

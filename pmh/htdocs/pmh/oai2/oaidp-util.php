@@ -432,9 +432,10 @@ function metadataHeader($prefix)
 	global $XMLSCHEMA;
 
 	$myformat = $METADATAFORMATS[$prefix];
+        $metadataprefix = $myformat['metadataPrefix'];
 
 	$str = 
-	'     <'.$prefix;
+	'     <'.$metadataprefix;
 	if ($myformat['record_prefix']) {
 		$str .= ':'.$myformat['record_prefix'];
 	}

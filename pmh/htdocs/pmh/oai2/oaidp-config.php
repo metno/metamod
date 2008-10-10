@@ -187,7 +187,7 @@ $METADATAFORMATS = 	array (
 					'record_prefix'=>'dc',
 					'record_namespace' => 'http://purl.org/dc/elements/1.1/'
 			                ),
-				'dif' => array('metadataPrefix'=>'dif', 
+				'dif' => array('metadataPrefix'=>'DIF', 
 					'schema'=>'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif_v9.7.1.xsd',
 					'metadataNamespace'=>'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/',
 					'myhandler'=>'record_gen.php',
