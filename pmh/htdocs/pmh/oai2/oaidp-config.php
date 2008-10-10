@@ -180,19 +180,20 @@ $SETS = 	'';
 // [record_namespace] describe the namespace for this prefix
 
 $METADATAFORMATS = 	array (
-						'oai_dc' => array('metadataPrefix'=>'oai_dc', 
-							'schema'=>'http://www.openarchives.org/OAI/2.0/oai_dc.xsd',
-							'metadataNamespace'=>'http://www.openarchives.org/OAI/2.0/oai_dc/',
-							'myhandler'=>'record_dc.php',
-							'record_prefix'=>'dc',
-							'record_namespace' => 'http://purl.org/dc/elements/1.1/'
-						) //,
-						//array('metadataPrefix'=>'olac', 
-						//	'schema'=>'http://www.language-archives.org/OLAC/olac-2.0.xsd',
-						//	'metadataNamespace'=>'http://www.openarchives.org/OLAC/0.2/',
-						//	'handler'=>'record_olac.php'
-						//)
-					);
+				'oai_dc' => array('metadataPrefix'=>'oai_dc', 
+					'schema'=>'http://www.openarchives.org/OAI/2.0/oai_dc.xsd',
+					'metadataNamespace'=>'http://www.openarchives.org/OAI/2.0/oai_dc/',
+					'myhandler'=>'record_gen.php',
+					'record_prefix'=>'dc',
+					'record_namespace' => 'http://purl.org/dc/elements/1.1/'
+			                ),
+				'dif' => array('metadataPrefix'=>'dif', 
+					'schema'=>'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif_v9.7.1.xsd',
+					'metadataNamespace'=>'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/',
+					'myhandler'=>'record_gen.php',
+					'record_namespace' => ''
+			                )
+			);
 
 // 
 // DATABASE SETUP
@@ -297,20 +298,72 @@ function selectallQuery ($id = '')
 }
 function getRecords ($id = '', $from = '', $until = '') {
    global $mmDbConnection;
-   $key_conversion = array(
-                             'title' => 'title',
-                             'institution' => 'institution',
-                             'topic' => 'dc_subject',
-                             'keywords' => 'dc_subject',
-                             'variable' => 'dc_subject',
-                             'topiccategory' => 'dc_subject',
-                             'abstract' => 'dc_description',
-                             'datacollection_period' => 'dc_date',
-                             'dataref' => 'dc_identifier',
-                             'area' => 'dc_coverage',
-                             'distribution_statement' => 'dc_rights'
-                          );
-   $query = 'SELECT DS_id, DS_name, DS_status, DS_datestamp FROM DataSet WHERE ' .
+   global $metadataPrefix;
+   global $key_conversion;
+   if ($metadataPrefix == 'oai_dc') {
+      $key_conversion = array(
+         'title', 'dc:title','',
+         'institution', 'dc:creator','',
+         'topic', 'dc:subject','',
+         'keywords', 'dc:subject','',
+         'variable', 'dc:subject','',
+         'topiccategory', 'dc:subject','',
+         'abstract', 'dc:description','',
+         'dataref', 'dc:identifier','',
+         'datacollection_period', 'dc:coverage','',
+         'area', 'dc:coverage','',
+         'distribution_statement', 'dc:rights',''
+         );
+   } else if ($metadataPrefix == 'dif') {
+      $key_conversion = array(
+         '!DS_name 1', 'Entry_ID', '',
+         'title', 'Entry_Title', '',
+         'PI_name', 'Data_Set_Citation Dataset_Creator', '',
+         'title', 'Data_Set_Citation Dataset_Title', '',
+         'institution', 'Data_Set_Citation Dataset_Publisher', '',
+         'dataref', 'Data_Set_Citation Online_Resource', '',
+         'variable', '*Parameters Category', 'EARTH SCIENCE',
+         'variable 1', 'Parameters Topic', '',
+         'variable 2', 'Parameters Term', '',
+         'variable 3', 'Parameters Variable_Level_1', '',
+         'variable', 'Parameters Detailed_Variable', '',
+         'topiccategory', 'ISO_Topic_Category', '',
+         'keywords', 'Keyword', '',
+         'datacollection_period 1', 'Temporal_Coverage Start_Date', '',
+         'datacollection_period 2', 'Temporal_Coverage Stop_Date', '',
+         'southernmost_latitude', 'Spatial_Coverage Southernmost_Latitude', '',
+         'northernmost_latitude', 'Spatial_Coverage Northernmost_Latitude', '',
+         'westernmost_longitude', 'Spatial_Coverage Westernmost_Longitude', '',
+         'easternmost_longitude', 'Spatial_Coverage Easternmost_Longitude', '',
+         'area 1', '*Location Location_Category', '',
+         'area 2', 'Location Location_Type', '',
+         'area 3', 'Location Location_Subregion1', '',
+         'area 4', 'Location Detailed_Location', '',
+         'latitude_resolution 1', 'Data_Resolution Latitude_Resolution', '',
+         'longitude_resolution 1', 'Data_Resolution Longitude_Resolution', '',
+         '!DS_ownertag 1', 'Project Short_Name', '',
+         'distribution_statement', 'Access_Constraints', '',
+         'institution', 'Originating_Center', '',
+         '', 'Data_Center Data_Center_Name Short_Name', 'met.no',
+         '', 'Data_Center Data_Center_Name Long_Name', 'Norwegian Meteorological Institute',
+         '', 'Data_Center Data_Center_URL', 'http://met.no/',
+         '', 'Data_Center Personnel Role', 'DATA CENTER CONTACT',
+         '', 'Data_Center Personnel First_Name', 'Egil',
+         '', 'Data_Center Personnel Last_Name', 'Støren',
+         '', 'Data_Center Personnel Phone', '+4722963000',
+         '', 'Data_Center Personnel Contact_Address Address', "Norwegian Meteorological Institute\nP.O. Box 43\nBlindern",
+         '', 'Data_Center Personnel Contact_Address City', 'Oslo',
+         '', 'Data_Center Personnel Contact_Address Postal_Code', 'N-0313',
+         '', 'Data_Center Personnel Contact_Address Country', 'Norway',
+         'references', 'Reference', '',
+         'abstract', 'Summary', '',
+         '', 'Metadata_Name', 'CEOS IDN DIF',
+         '', 'Metadata_Version', '9.7',
+         '!DS_datestamp', 'Last_DIF_Revision_Date', '',
+         '', 'Private', 'False',
+      );
+   }
+   $query = 'SELECT DS_id, DS_name, DS_status, DS_datestamp, DS_ownertag FROM DataSet WHERE ' .
             "DS_status <= 2 AND DS_ownertag IN ([==DATASET_TAGS==]) ";
    if ($id != '') {
       $query .= "AND DS_name = '$id' ";
@@ -341,12 +394,23 @@ function getRecords ($id = '', $from = '', $until = '') {
                $allresults[$dsid]['DS_status'] = 'true';
             }
             $allresults[$dsid]['DS_datestamp'] = $rowarr[3];
+            $allresults[$dsid]['DS_ownertag'] = $rowarr[4];
             $allresults[$dsid]['DS_set'] = '';
+         }
+         $mtnames = array();
+         for ($i1=0; $i1 < count($key_conversion); $i1 += 3) {
+            if ($key_conversion[$i1] != '') {
+               $mtparts = explode(" ",$key_conversion[$i1]);
+               $mtstring = $mtparts[0];
+               if (substr($mtstring,0,1) != '!') {
+                  $mtnames[$mtstring] = 1;
+               }
+            }
          }
          $query = "SELECT DS_id, MT_name, MD_content FROM DS_Has_MD, Metadata WHERE " .
                   "DS_Has_MD.MD_id = Metadata.MD_id AND DS_id IN (" .
                   implode(', ',$dsids) . ") AND MT_name IN ('" .
-                  implode("', '",array_keys($key_conversion)) . "' )\n";
+                  implode("', '",array_keys($mtnames)) . "' )\n";
          $result1 = pg_query ($mmDbConnection, $query);
          if (!$result1) {
             mmPutLog(__FILE__ . __LINE__ . " Could not $query");
@@ -358,31 +422,15 @@ function getRecords ($id = '', $from = '', $until = '') {
                   $rowarr = pg_fetch_row($result1,$i1);
                   $dsid = $rowarr[0];
                   $mtname = $rowarr[1];
-                  $dccode = $key_conversion[$mtname];
                   $mdcontent = html_entity_decode($rowarr[2]);
-                  if ($mtname == "keywords" or $mtname == "topiccategory") {
+                  if ($mtname == "keywords") {
                      foreach (explode(" ",$mdcontent) as $w1) {
                         if (strlen($w1) > 1) {
-                           $allresults[$dsid][$dccode][] = $w1;
+                           $allresults[$dsid][$mtname][] = $w1;
                         }
                      }
-                  } elseif ($mtname == "datacollection_period") {
-                     foreach (explode(" to ",$mdcontent) as $w1) {
-                        if (strlen($w1) > 9 and substr($w1,0,4) != '2099') {
-                           $allresults[$dsid][$dccode][] = $w1;
-                        }
-                     }
-                  } elseif ($mtname == "area") {
-                     foreach (explode(",",$mdcontent) as $w1) {
-                        $allresults[$dsid][$dccode][] = trim($w1);
-                     }
-                  } elseif ($mtname == "variable") {
-                     if (preg_match('/^(.*) > HIDDEN *$/',$mdcontent,$matches)) {
-                        $mdcontent = $matches[1];
-                     }
-                     $allresults[$dsid][$dccode][] = $mdcontent;
                   } else {
-                     $allresults[$dsid][$dccode][] = $mdcontent;
+                     $allresults[$dsid][$mtname][] = $mdcontent;
                   }
                }
             }
@@ -398,17 +446,16 @@ function idQuery ($id = '')
 	global $SQL;
 
 	if ($SQL['set'] != '') {
-		$query = 'select '.$SQL['identifier'].','.$SQL['datestamp'].','.$SQL['deleted'].','.$SQL['set'].' FROM '.$SQL['table'].' WHERE ';
+		$query = 'select distinct '.$SQL['identifier'].','.$SQL['datestamp'].','.
+                         $SQL['deleted'].','.$SQL['set'].' FROM '.$SQL['table'];
 	} else {
-		$query = 'select '.$SQL['identifier'].','.$SQL['datestamp'].','.$SQL['deleted'].' FROM '.$SQL['table'].' WHERE ';
+		$query = 'select distinct '.$SQL['identifier'].','.$SQL['datestamp'].','.
+                         $SQL['deleted'].' FROM '.$SQL['table'];
 	}
-        $query .= "DS_status <= 2 AND DS_ownertag IN ([==DATASET_TAGS==]) AND ";
+        $query .= " WHERE DS_status <= 2 AND DS_ownertag IN ([==DATASET_TAGS==])";
 	
-	if ($id == '') {
-		$query .= $SQL['id_column'].' = '.$SQL['id_column'];
-	}
-	else {
-		$query .= $SQL['identifier']." = '$id'";
+	if ($id != '') {
+		$query .= ' AND '.$SQL['identifier']." = '$id'";
 	}
 
 	return $query;

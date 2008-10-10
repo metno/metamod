@@ -40,6 +40,8 @@ $output = '';
 $errors = '';
 
 require_once('oai2/oaidp-util.php');
+require_once('oai2/buildxml.php');
+require_once('oai2/get_exception.php');
 
 // register_globals does not need to be set
 if (!php_is_at_least('4.1.0')) {
@@ -63,7 +65,7 @@ require_once('oai2/oaidp-config.php');
 // and now we make the OAI Repository Explorer really happy
 // I have not found any way to check this for POST requests.
 if (isset($getarr)) {
-	if (count($getarr) != count($args)) {
+	if (count($getarr) > 0 && count($args) > 0 && count($getarr) != count($args)) {
 		$errors .= oai_error('sameArgument');
 	}
 }

@@ -79,6 +79,8 @@ if (empty($errors)) {
 		$errors .= oai_error('internalDatabaseError', '', $identifier); 
 	} elseif (count($res) == 0) {
 		$errors .= oai_error('idDoesNotExist', '', $identifier); 
+	} elseif (count($res) > 1) {
+		$errors .= oai_error('internalDatabaseError', '', $identifier); 
 	}
 }
 
@@ -87,10 +89,8 @@ if ($errors != '') {
 	oai_exit();
 }
 
-$output .= "  <GetRecord>\n";
-
-$num_rows = count($res);
-foreach ($res as $record) {
+foreach ($res as $record) { // Note: Only one record in $res
+        $output .= "  <GetRecord>\n";
 	$identifier = $oaiprefix.$record[$SQL['identifier']];
 
 	$datestamp = formatDatestamp($record[$SQL['datestamp']]); 
@@ -106,17 +106,17 @@ foreach ($res as $record) {
 	$output .= 
 '  <record>'."\n";
 	$output .= 
-'  <header';
+'   <header';
 	if ($status_deleted) {
 		$output .= ' status="deleted"';
 	}  
 	$output .='>'."\n";
 
 	// use xmlrecord since we include stuff from database;
-	$output .= xmlrecord($identifier, 'identifier', '', 3);
-	$output .= xmlformat($datestamp, 'datestamp', '', 3);
+	$output .= xmlrecord($identifier, 'identifier', '', 4);
+	$output .= xmlformat($datestamp, 'datestamp', '', 4);
 	if (!$status_deleted and $SQL['set'] != '') 
-		$output .= xmlrecord($record[$SQL['set']], 'setSpec', '', 3);
+		$output .= xmlrecord($record[$SQL['set']], 'setSpec', '', 4);
 	$output .= 
 '   </header>'."\n"; 
 
@@ -126,9 +126,7 @@ foreach ($res as $record) {
 
 	$output .= 
 '  </record>'."\n"; 
-} 
-
-// End GetRecord
-$output .= 
+        $output .= 
 ' </GetRecord>'."\n"; 
+} 
 ?>

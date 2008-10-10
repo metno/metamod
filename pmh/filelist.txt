@@ -8,3 +8,7 @@ htdocs/pmh/oai2/oaidp-config.php
 htdocs/pmh/oai2/oaidp-util.php
 htdocs/pmh/oai2.php
 htdocs/pmh/oai2/record_dc.php
+htdocs/pmh/oai2/get_exception.php
+htdocs/pmh/oai2/buildxml.php
+htdocs/pmh/oai2/var_topic.php
+htdocs/pmh/oai2/record_gen.php
