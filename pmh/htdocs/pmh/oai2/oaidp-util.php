@@ -439,8 +439,13 @@ function metadataHeader($prefix)
 	if ($myformat['record_prefix']) {
 		$str .= ':'.$myformat['record_prefix'];
 	}
-	$str .= "\n".
-	'       xmlns:'.$prefix.'="'.$myformat['metadataNamespace'].'"'."\n";
+        if ($prefix == 'dif') {
+	   $str .= "\n".
+	   '       xmlns="'.$myformat['metadataNamespace'].'"'."\n";
+        } else {
+	   $str .= "\n".
+	   '       xmlns:'.$prefix.'="'.$myformat['metadataNamespace'].'"'."\n";
+        }
 	if ($myformat['record_prefix'] && $myformat['record_namespace']) {
 		$str .= 
 		'       xmlns:'.$myformat['record_prefix'].'="'.$myformat['record_namespace'].'"'."\n";
