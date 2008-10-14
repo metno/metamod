@@ -34,6 +34,8 @@ METAMODQUEST    Web-based questionnaire for entering metadata into the
                 datatbase. All software for this module are contained in 
                 subdirectory: quest.
 
+METAMODQPMH     OAI-PMH server for metadata harvesting
+
 The modules can be used separately and in combination. An actual usage of
 the software must be the result of an installation process, where the
 modules to be used are chosen. An instance of the installed software,
@@ -128,8 +130,10 @@ DIRECTORY STRUCTURE
 -------------------
 
 The top METAMOD 2.x directory (the directory where this README file resides)
-is divided into one subdirectory for each module (base, search, upload and
-quest). In addition, one subdirectory (app) contains an example application.
+is divided into one subdirectory for each module (base, search, upload, quest
+and pmh). There is also a subdirectory (common) where files used by many
+modules resides. In addition, one subdirectory (app) contains an example
+application.
 
 The module directories shares a common structure. During installation of an
 application, a new directory is created (the target directory), and all module
@@ -196,18 +200,22 @@ will be substituted with the corresponding value when the files are modified and
 moved to the target directory. Such text strings may also be found within 'VALUE'
 strings, and they will be substituted as appropriate.
 
-One variable is mandatory in master_config.txt: TARGET_DIRECTORY. This is the
-directory name of the target directory, the top level of the target directory
-tree.
+Two variables are mandatory in master_config.txt:
+
+TARGET_DIRECTORY      This is the directory name of the target directory, the
+                      top level of the target directory tree.
+SOURCE_DIRECTORY      This is the directory name of the source directory where
+                      this README file resides.
 
 The following variables are used to select the modules that will comprise the
 application. They also identify the absolute path of the source directory for
-each module:
+each module (i.e. they will be subdirectories of the SOURCE_DIRECTORY):
 
 METAMODBASE_DIRECTORY     
 METAMODSEARCH_DIRECTORY 
 METAMODUPLOAD_DIRECTORY 
 METAMODQUEST_DIRECTORY 
+METAMODPMH_DIRECTORY 
 
 If any of these variables are missing, the corresponding modules will not be part
 of the application.
@@ -231,12 +239,16 @@ directory containing the master_config.txt file for the application.
 For each module selected by the configuration file, there is a 'filelist.txt' list
 of files in the corresponding module directory. The installation script will copy
 all the files in these lists to the target directory tree (given by
-TARGET_DIRECTORY in the configuration file). In the same way, files in the 
-application specific 'filelist.txt' file (located in the application directory)
-will be copied to the target directory tree. If any file name collision occur
-between the module file lists and the application file list, the file in the
-application file list is used. Thus, it is possible to substitute any file
-in any module with an application specific file, although this mechanism is 
+TARGET_DIRECTORY in the configuration file). The 'common' subdirectory in the
+source directory will also contain a 'filelist.txt' file. The files in this list,
+and files in the application specific 'filelist.txt' file (located in the
+application directory) will also be copied to the target directory tree.
+
+If any file name collision occur between the module file lists, the common file
+list and/or the application file list, the file in the application file list has
+highest priority. Then comes any file in the module file lists. The common file
+list has lowest priority. Thus, it is possible to substitute any file in any module
+(or in common) with an application specific file, although this mechanism is
 primarily meant for image files, style sheets etc. Name collisions between files
 from different modules are supposed not to occur.
 
@@ -250,8 +262,8 @@ kind of modification. To avoid substitution on such files, the file names must
 be prepended with '=' in 'filelist.txt'.
 
 The file pathes in each 'filelist.txt' file must all be relative to the 
-corresponding top module directory (or the application directory). The copied
-files will keep these relative pathes on the the target directory.
+corresponding top module directory (or the 'common' or application directory).
+The copied files will keep these relative pathes on the the target directory.
 
 MULTIPLE TARGET FILES
 ---------------------

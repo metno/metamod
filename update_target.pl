@@ -107,6 +107,14 @@ if (!exists($conf{'TARGET_DIRECTORY'})) {
 my @flistpathes = ();
 my $targetdir = $conf{'TARGET_DIRECTORY'};
 $targetdir = &substituteval($targetdir);
+if (!exists($conf{'SOURCE_DIRECTORY'})) {
+   die "SOURCE_DIRECTORY is not defined in $configfile";
+}
+my $sourcedir = $conf{'SOURCE_DIRECTORY'};
+$sourcedir = &substituteval($sourcedir);
+if (-r $sourcedir . '/common/filelist.txt') {
+   push (@flistpathes,$sourcedir . '/common/filelist.txt');
+}
 foreach my $module qw(METAMODBASE METAMODSEARCH METAMODUPLOAD METAMODQUEST METAMODPMH) {
    if (exists($conf{$module . '_DIRECTORY'})) {
       my $moduledir = $conf{$module . '_DIRECTORY'};
@@ -253,25 +261,26 @@ sub substituteval {
             $value = $conf{$vname};
             $valuefound = 1;
          }
+         my $reg = "\\[==" . $vname . "==\\]";
          if ($valuefound) {
-            my $reg = "\\[==" . $vname . "==\\]";
 #         
 #           Substitute all occurences of a match:
 #         
             $textline =~ s/$reg/$value/mg;
-            $substituted = 1;
-            $scount++;
          }
          else {
             if (length($ifil) > 0) {
-               print STDERR "WARNING: In $ifil, the following line contains the\n" .
-                         "         [==VARNAME==] construct, but no value is found in $configfile:\n";
+               print STDERR "WARNING: In $ifil, the following line contains [==" . $vname . "==],\n" .
+                            "         but no value for $vname is found in $configfile:\n\n";
             } else {
                print STDERR "WARNING: No value found in $configfile for:\n";
             }
-            print STDERR "         $textline\n\n";
-            $substituted = 0;
+            print STDERR "         $textline\n\n" .
+                         "         An empty string is substituted for [==" . $vname . "==]\n";
+            $textline =~ s/$reg//mg;
          }
+         $substituted = 1;
+         $scount++;
       }
    } while ($substituted == 1 && $scount < 20);
    if ($scount >= 20) {

@@ -3,7 +3,6 @@ init/createdb.sh
 scripts/import_searchdata.pl
 scripts/import_dataset.pl
 scripts/createusers.sh
-htdocs/adm/index.php
 htdocs/adm/highlight.html
 htdocs/adm/highlight.php
 htdocs/adm/gettables.php
