@@ -34,19 +34,32 @@
 
 #
 # read a dataset from an xml file
-# remove the quadtree element and unify the datacollectionperiod
+# unify the datacollection_period
 #
-# return as array["metadata"] = [value1, value2, ...]
+# return array(ownertag, array["metadata"] = [value1, value2, ...])
 # throws DatasetException on error
 #
 function mmReadEssentialDataset($filename) {
-	$ds = mmReadDataset($filename);
-	return $ds;
+	list($ownertag, $ds, $attributes) = mmReadDataset($filename);
+	if (isset($ds["datacollection_period"])) {
+		if (isset($attributes["datacollection_period"])) {
+			if (isset($attributes["datacollection_period"]["from"]) && isset($attributes["datacollection_period"]["to"])) {
+				$ds["datacollection_period_from"] = array($attributes["datacollection_period"]["from"]);
+				$ds["datacollection_period_to"] = array($attributes["datacollection_period"]["to"]);	
+			} else {
+				throw new DatasetException("datacollection_period without attribute 'from' or 'to' in file: $filename");
+			}
+		} else {
+			throw new DatasetException("datacollection_period without attributes in file: $filename");
+		}
+		unset($ds["datacollection_period"]);
+	}
+	return array($ownertag, $ds);
 }
 
 #
 # basic read of the dataset in tag => [value1, value2, ...] pairs
-# return array[][]
+# return array(ownertag, metadata[name] = [values], attribute[metadataName][attrName] = attValue)
 # throws DatasetException on error
 #
 function mmReadDataset($filename) {
@@ -56,33 +69,46 @@ function mmReadDataset($filename) {
 	$dom = new DOMDocument;
 	$dom->load($filename);
 	
-	$output = array();
 	if (! $dom) {
 		throw new DatasetException("error parsing dataset file: '$filename'");
 	}
+	$ownertag = "";
 	$root = $dom->getElementsByTagName('dataset')->item(0);
+	foreach ($root->attributes as $attr) {
+		if ($attr->nodeName == 'ownertag') {
+			$ownertag = $attr->nodeValue;
+		}
+	}
+	if (! strlen($ownertag)) {
+		throw new DatasetException("ownertag not found for dataset in file: '$filename'");
+	}
+	
+	$metadata = array();
+	$attributes = array();	
 	if ($root->hasChildNodes()) {
     	$children = $root->childNodes;
     	for ($i=0;$i<$children->length;$i++) {
         	$child = $children->item($i);
 			if ($child->nodeType == XML_ELEMENT_NODE) {
-				if (! isset($output[$child->nodeName])) {
-					$output[$child->nodeName] = array();					
+				if (! isset($metadata[$child->nodeName])) {
+					$metadata[$child->nodeName] = array();					
 				}
 				if ($child->hasChildNodes()) {
 					$grandChildren = $child->childNodes;
-					$values = array();
 					for ($j=0; $j<$grandChildren->length; $j++) {
 						$valueNode = $grandChildren->item($j);
 						if ($valueNode->nodeType == XML_TEXT_NODE) {
-							$output[$child->nodeName][] = $valueNode->nodeValue;
+							$metadata[$child->nodeName][] = $valueNode->nodeValue;
 						}
 					}
+				}
+				foreach ($child->attributes as $attr) {
+					$attributes[$child->nodeName][$attr->nodeName] = $attr->nodeValue;
 				}
 			}
     	}
 	}
-	return $output;
+	return array($ownertag, $metadata, $attributes);
 }
 
 class DatasetException extends Exception {

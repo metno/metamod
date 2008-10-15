@@ -2,8 +2,8 @@
 readDataset() function - basic test for readDataset
 --FILE--
 <?php
-require_once("../readDataset.php");
-$ds = mmReadEssentialDataset("dataset.xml");
+require_once("../readDataset.inc");
+list($ownertag,$ds) = mmReadEssentialDataset("dataset.xml");
 var_dump($ds);
 ?>
 --EXPECT--

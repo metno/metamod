@@ -37,7 +37,7 @@
 # usage: mm_log(MM_DEBUG, "my message", __FILE__, __LINE__);
 # log-levels are MM_ERROR, MM_WARNING, MM_INFO, MM_DEBUG
 
-$logFile = "[==LOGFILE==]";
+$LogFile = "[==PHPLOGFILE==]";
  
  // availabe log-levels
 define('MM_ERROR','ERROR');
@@ -45,27 +45,36 @@ define('MM_WARNING','WARNING');
 define('MM_INFO','INFO');
 define('MM_DEBUG', 'DEBUG');
 define('MM_NONE', 'NONE');
+define('MM_', 'NONE');
 
-$mmLogLevel[MM_ERROR] = 40;
-$mmLogLevel[MM_WARNING] = 30;
-$mmLogLevel[MM_INFO] = 20;
-$mmLogLevel[MM_DEBUG] = 10;
-$mmLogLevel[MM_NONE] = 0;
+$MMLogLevel[MM_ERROR] = 40;
+$MMLogLevel[MM_WARNING] = 30;
+$MMLogLevel[MM_INFO] = 20;
+$MMLogLevel[MM_DEBUG] = 10;
+$MMLogLevel[MM_NONE] = 0;
 
 // current log-level, change this according to your needs
-define('MM_LOGLEVEL', $mmLogLevel[MM_WARNING]);
+define('MM_LOGLEVEL', $MMLogLevel[MM_[==PHPLOGLEVEL==]]);
+// used for testing
+#define('MM_LOGLEVEL', $MMLogLevel[MM_WARNING]);
+#$LogFile = "testfile";
 
 
 // generic logging function
 function mm_log($level, $message, $file, $line) {
+	global $LogFile, $MMLogLevel;
 	$levelId = 40;
-	if (isset($mmLogLevel[$level])) {
-		$levelId = $mmLogLevel[$level];
+	if (isset($MMLogLevel[$level])) {
+		$levelId = $MMLogLevel[$level];
 	}
     if ($levelId >= MM_LOGLEVEL) {
    		$date = strftime('%c');
-    	$msg = "$level in $file at $line ($date): $message"; 
-		error_log($msg, 3, $logFile);
+    	$msg = "$level in $file at line $line ($date): $message";
+    	if (strlen($LogFile) > 0) { 
+			error_log($msg, 3, $LogFile);
+    	} else {
+    		error_log($msg, 0); // webserver error log
+    	}
     }
 }
  
