@@ -29,6 +29,8 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
+require_once("../funcs/mmLogging.inc");
+require_once("../funcs/readDataset.inc");
 
 function fmquestversion() {
 
@@ -41,7 +43,7 @@ function fmquestversion() {
     return($questversion);
 }
 
-function fmcreateform($filename="myconfig.txt") {
+function fmcreateform($outputdst, $filename="myconfig.txt") {
 
     if (! file_exists($filename)) {
 	echo(fmcreateerrmsg("Could not open configuration file"));
@@ -52,26 +54,33 @@ function fmcreateform($filename="myconfig.txt") {
 	# not as md5 hash
 	# TODO: check for password in this case
     $uploadDir = $_REQUEST["uploadDirectory"];
+    $currentData = array();
+    $ownertag = '';
+	if (strlen($uploadDir) != 0) {
+		$datasetFile = $outputdst . '/' . $uploadDir . ".xml";
+		if (file_exists($datasetFile)) {
+			list($ownertag, $currentData) = mmReadEssentialDataset($datasetFile);
+		}
+	}
 
     $mytempl = file($filename);
 
     echo(fmstartform());
     foreach ($mytempl as $line) {
-
-	if (ereg('^\#',$line)) continue;
-
-	$type = "";
-	$name = "";
-	$label = "";
-	$value = "";
-	$exclude = "";
-	$include = "";
-	$length = 25;
-	$height = 1;
-	$size = 0;
-	$checked = 0;
-	parse_str($line);
-	echo(fmparsestr($type,$label,$name,$value,$length,$height,$size,$checked,$exclude,$include));
+		if (ereg('^\#',$line)) continue;
+		// initialize all possible data from string
+		$type = "";
+		$name = "";
+		$label = "";
+		$value = "";
+		$exclude = "";
+		$include = "";
+		$length = 25;
+		$height = 1;
+		$size = 0;
+		$checked = 0;
+		parse_str($line);
+		echo(fmparsestr($type,$label,$name,$value,$length,$height,$size,$checked,$exclude,$include,$currentData));
     }
     echo(fmcreatebr());
     if (strlen($uploadDir) == 0) {
@@ -102,47 +111,32 @@ function fmendform() {
     return("\n</form>\n");
 }
 
-function fmparsestr($type,$label,$name,$value,$length,$height,$size,$checked,$exclude,$include) {
-
+function fmparsestr($type,$label,$name,$value,$length,$height,$size,$checked,$exclude,$include,$curData) {
      $type = chop($type);
      $name = chop($name);
      $value = chop($value);
 
-    if ($type == "h1") {
-	$mystr = fmcreateh1($value);
-    } else if ($type == "h2") {
-	$mystr = fmcreateh2($value);
-    } else if ($type == "h3") {
-	$mystr = fmcreateh3($value);
-    } else if ($type == "p") {
-	$mystr = fmcreatep($value);
-    } else if ($type == "br") {
-	$mystr = fmcreatebr();
-    } else if ($type == "text") {
-	$mystr = fmcreatetext($name,$label,$value,$length,$size);
-    } else if ($type == "textarea") {
-	$mystr = fmcreatetextarea($name,$label,$value,$length,$height);
-    } else if ($type == "button") {
-	$mystr = fmcreatebutton($name,$value);
-    } else if ($type == "list") {
-	$mystr = fmcreatelist($name,$label,$value);
-    } else if ($type == "radio") {
-	$mystr = fmcreateradio($name,$label,$value,$checked);
-    } else if ($type == "checkbox") {
-	$mystr = fmcreatecheckbox($name,$label,$value,$checked);
-    } else if ($type == "gcmdlist") {
-	$mystr =
-	fmcreategcmdlist($name,$label,$value,$size,$exclude,$include);
-    } else if ($type == "sectionstart") {
-	$mystr = fmcreatesectionstart($value);
-    } else if ($type == "sectionend") {
-	$mystr = fmcreatesectionend();
-    } else if ($type == "recordstart") {
-	$mystr = fmcreaterecordstart();
-    } else if ($type == "recordend") {
-	$mystr = fmcreaterecordend();
-    } else {
-	$mystr = fmcreateerrmsg("Could not decode element [$type]");
+    switch ($type) {
+    	// sectioning tags
+    	case 'h1': $mystr = fmcreateh1($value); break;
+    	case 'h2': $mystr = fmcreateh2($value); break;
+    	case 'h3': $mystr = fmcreateh3($value); break;
+    	case 'p':  $mystr = fmcreatep($value);  break;
+    	case 'br': $mystr = fmcreatebr();       break;
+    	// input tags
+    	case 'text': $mystr = fmcreatetext($name,$label,$value,$length,$size,$curData); break;
+    	case 'textarea': $mystr = fmcreatetextarea($name,$label,$value,$length,$height,$curData); break;
+    	case 'button': $mystr = fmcreatebutton($name,$value,$curData); break;
+    	case 'list': $mystr = fmcreatelist($name,$label,$value,$curData); break;
+    	case 'radio': $mystr = fmcreateradio($name,$label,$value,$checked,$curData); break;
+    	case 'checkbox': $mystr = fmcreatecheckbox($name,$label,$value,$checked,$curData); break;
+    	case 'gcmdlist': $mystr = fmcreategcmdlist($name,$label,$value,$size,$exclude,$include,$curData); break;
+    	// grouping tags
+    	case 'sectionstart': $mystr = fmcreatesectionstart($value); break;
+    	case 'sectionend': $mystr = fmcreatesectionend(); break;
+    	case 'recordstart': $mystr = fmcreaterecordstart(); break;
+    	case 'recordend': $mystr = fmcreaterecordend(); break;
+    	default: $mystr = fmcreateerrmsg("Could not decode element [$type]");
     }
 
     return($mystr);
@@ -172,8 +166,11 @@ function fmcreatebr() {
     return("<br>\n");
 }
 
-function fmcreatetext($myname,$label,$value,$length,$size) {
-
+function fmcreatetext($myname,$label,$value,$length,$size,$curData) {
+	$mname = chop($myname);
+	if (isset($curData[$mname])) {
+		list($value) = $curData[$mname];
+	}
     $mystr = fmcreaterecordstart();
     $mystr .= fmlabelstart().htmlspecialchars($label).fmlabelend();
     $mystr .= fminputstart();
@@ -186,7 +183,13 @@ function fmcreatetext($myname,$label,$value,$length,$size) {
     return($mystr);
 }
 
-function fmcreatetextarea($myname,$label,$value,$length,$height) {
+function fmcreatetextarea($myname,$label,$value,$length,$height,$curData) {
+	$mname = chop($myname);
+	if (isset($curData[$mname])) {
+		foreach ( $curData[$mname] as $row ) {
+			$value .= $row . "\n";
+		}
+   	}
 
     $mystr = fmcreaterecordstart();
     $mystr .= fmlabelstart().htmlspecialchars($label).fmlabelend();
@@ -203,62 +206,46 @@ function fmcreatetextarea($myname,$label,$value,$length,$height) {
 }
 
 function fmcreatehidden($myname,$myvalue) {
-
     $mystr = "<input type=\"hidden\" name=\"$myname\" value=\"$myvalue\">\n";
 
     return($mystr);
 }
 
-function fmcreatebutton($myname,$myvalue) {
-
+function fmcreatebutton($myname,$myvalue,$curData = array()) {
+	$mname = chop($myname);
+	if (isset($curData[$mname])) {
+		list($myvalue) = $curData[$mname];
+	}
     if ($myvalue) {
-	$mystr ="<button name=\"".chop($myname)."\" value=\"".chop($myvalue)."\" type=\"".chop($myname)."\">".chop($myvalue)."</button>\n";
+		$mystr ="<button name=\"".chop($myname)."\" value=\"".chop($myvalue)."\" type=\"".chop($myname)."\">".chop($myvalue)."</button>\n";
     } else {
-	$mystr ="<button name=\"".chop($myname)."\" value=\"".chop($myname)."\" type=\"".chop($myname)."\">".chop($myname)."</button>\n";
+		$mystr ="<button name=\"".chop($myname)."\" value=\"".chop($myname)."\" type=\"".chop($myname)."\">".chop($myname)."</button>\n";
     }
 
     return($mystr);
 }
 
-function fmcreateradio($myname,$label,$mylist,$checked) {
-
-    $rec = 1;
-
+function fmcreateradio($myname,$label,$mylist,$checked,$curData) {
+	// assign curValue from curData
+	$curValue = "";
+	if (isset($curData[$myname])) {
+		list($curValue) = $curData[$myname];
+		$checked = -1; // unset $checked
+	} 
     $myarr = split("\|",chop($mylist));
     $mystr = fmcreaterecordstart();
     $mystr .= fmlabelstart().htmlspecialchars($label).fmlabelend();
     $mystr .= fminputstart();
-    foreach ($myarr as $myrecord) {
-	$mystr .= "<input type=\"radio\" name=\"$myname\" ";
-	if ($checked == $rec) {
-	    $mystr .= "checked ";
-	}
-	$mystr .= "value=\"$myrecord\">";
-	$mystr .= " ".htmlspecialchars($myrecord)."<br>\n";
-	$rec++;
-    }
-    $mystr .= fminputend();
-    $mystr .= fmcreaterecordend();
-
-    return($mystr);
-}
-
-function fmcreatecheckbox($myname,$label,$mylist,$checked) {
-
     $rec = 1;
-
-    $myarr = split("\|",chop($mylist));
-    $mystr = fmcreaterecordstart();
-    $mystr .= fmlabelstart().htmlspecialchars($label).fmlabelend();
-    $mystr .= fminputstart();
     foreach ($myarr as $myrecord) {
-	$mystr .= "<input type=\"checkbox\" name=\"$myname\" ";
-	if ($checked == $rec) {
-	    $mystr .= "checked ";
-	}
-	$mystr .= "value=\"$myrecord\">";
-	$mystr .= " ".htmlspecialchars($myrecord)."<br>\n";
-	$rec++;
+		$mystr .= "<input type=\"radio\" name=\"$myname\" ";
+		if (($checked == $rec) || ($curValue == $myrecord)) {
+	    	$mystr .= "checked=\"checked\" ";
+		}
+		
+		$mystr .= "value=\"$myrecord\">";
+		$mystr .= " ".htmlspecialchars($myrecord)."<br>\n";
+		$rec++;
     }
     $mystr .= fminputend();
     $mystr .= fmcreaterecordend();
@@ -266,24 +253,64 @@ function fmcreatecheckbox($myname,$label,$mylist,$checked) {
     return($mystr);
 }
 
-function fmcreateselect($myname,$label,$mylist,$size,$selected) {
-
-    $rec = 1;
+function fmcreatecheckbox($myname,$label,$mylist,$checked,$curData) {
+	// read curdata, php requires multivalues names to end with [], remove
+	$mname = rtrim($myname, "[]");
+	$curValues = array();
+	if (isset($curData[$mname])) {
+		// unset $checked
+		$checked = -1;
+		foreach ($curData[$mname] as $value) {
+			$curValues[$value] = 1;
+		}
+	}
 
     $myarr = split("\|",chop($mylist));
     $mystr = fmcreaterecordstart();
     $mystr .= fmlabelstart().htmlspecialchars($label).fmlabelend();
     $mystr .= fminputstart();
-##    $mystr .= "<select multiple size=".$size." name=\"".$myname"\">\n";
-    $mystr .= "<select name=\"$myname\" multiple size=".$size.">\n";
+    $rec = 1;
     foreach ($myarr as $myrecord) {
-	$mystr .= "<option value=\"$myrecord\">";
-#	if ($checked == $rec) {
-#	    $mystr .= "checked ";
-#	}
-	$mystr .= " ".htmlspecialchars($myrecord);
-	$mystr .= "</option>\n";
-	$rec++;
+		$mystr .= "<input type=\"checkbox\" name=\"$myname\" ";
+		if (($checked == $rec) || ($curValues[$myrecord])) {
+	    	$mystr .= "checked=\"checked\" ";
+		}
+		$mystr .= "value=\"$myrecord\">";
+		$mystr .= " ".htmlspecialchars($myrecord)."<br>\n";
+		$rec++;
+    }
+    $mystr .= fminputend();
+    $mystr .= fmcreaterecordend();
+
+    return($mystr);
+}
+
+function fmcreateselect($myname,$label,$mylist,$size,$selected,$curData=array()) {
+	// read curdata, php requires multilist names to end with [], remove
+	$mname = rtrim($myname, "[]");
+	$curValues = array();
+	if (isset($curData[$mname])) {
+		foreach ( $curData[$mname] as $value ) {
+			$curValues[$value] = 1;
+		}
+		$selected = -1;
+	}
+
+    $myarr = split("\|",chop($mylist));
+    $mystr = fmcreaterecordstart();
+    $mystr .= fmlabelstart().htmlspecialchars($label).fmlabelend();
+    $mystr .= fminputstart();
+    $mystr .= "<select name=\"$myname\" multiple=\"multiple\" size=".$size.">\n";
+    $rec = 1;
+    foreach ($myarr as $myrecord) {
+		$mystr .= "<option value=\"$myrecord\" ";
+		if (($selected == $rec) or (strlen($curValues[$myrecord]))) {
+			$mystr .= "selected=\"selected\" ";
+		}
+		$mystr .= ">";
+		$mystr .= htmlspecialchars($myrecord);
+		$mystr .= "</option>\n";
+		$rec++;
     }
     $mystr .= "</select>\n";
     $mystr .= fminputend();
@@ -291,7 +318,10 @@ function fmcreateselect($myname,$label,$mylist,$size,$selected) {
     return($mystr);
 }
 
-function fmcreatelist($myname,$label,$mylist) {
+function fmcreatelist($myname,$label,$mylist,$curData) {
+	if (isset($curData[$myname])) {
+		list($curValue) = $curData[$myname];
+	}
 
     $myarr = split("\|",chop($mylist));
 
@@ -300,7 +330,11 @@ function fmcreatelist($myname,$label,$mylist) {
     $mystr .= fminputstart();
     $mystr .= "<select name=\"".htmlspecialchars($myname)."\">\n";
     foreach ($myarr as $myrecord) {
-	$mystr .= "<option>".htmlspecialchars($myrecord)."</option>\n";
+		$mystr .= "<option ";
+		if ($curValue == $myrecord) {
+			$mystr .= "selected=\"selected\" ";
+		}
+		$mystr .= ">".htmlspecialchars($myrecord)."</option>\n";
     }
     $mystr .= "</select>\n";
     $mystr .= fminputend();
@@ -309,37 +343,48 @@ function fmcreatelist($myname,$label,$mylist) {
     return($mystr);
 }
 
-function fmcreategcmdlist($myname,$mylabel,$myvalue,$size,$exclude,$include) {
+function fmcreategcmdlist($myname,$mylabel,$myvalue,$size,$exclude,$include,$curData) {
+	// read curdata, php requires multilist names to end with [], remove
+	$mname = rtrim($myname, "[]");
+	$curValues = array();
+	if (isset($curData[$mname])) {
+		foreach ( $curData[$mname] as $value ) {
+			$curValues[$value] = 1;
+		}
+	}
     $mystr = fmcreaterecordstart();
     $mystr .= fmlabelstart().htmlspecialchars($mylabel).fmlabelend();
     $mystr .= fminputstart();
     #$mystr .= $myvalue;
     if (file_exists($myvalue)) {
-	$myarr = file($myvalue);
+		$myarr = file($myvalue);
     } else {
-	return(fmcreateerrmsg("Could not open ".$myvalue));
+		return(fmcreateerrmsg("Could not open ".$myvalue));
     }
     $myarr = preg_grep('/^#/',$myarr,PREG_GREP_INVERT);
     if (strlen($exclude) > 0) {
-	$mysearcharr = split("\|",rtrim($exclude));
-	foreach ($mysearcharr as $mysearchstr) {
-	    $mysearchstr = "/^".rtrim($mysearchstr)."/";
-	    $myarr = preg_grep($mysearchstr,$myarr,PREG_GREP_INVERT);
-	}
+		$mysearcharr = split("\|",rtrim($exclude));
+		foreach ($mysearcharr as $mysearchstr) {
+	    	$mysearchstr = "/^".rtrim($mysearchstr)."/";
+	    	$myarr = preg_grep($mysearchstr,$myarr,PREG_GREP_INVERT);
+		}
     }
     if (strlen($include) > 0) {
-	$mysearcharr = split("\|",rtrim($include));
-	foreach ($mysearcharr as $mysearchstr) {
+		$mysearcharr = split("\|",rtrim($include));
+		foreach ($mysearcharr as $mysearchstr) {
            $myarr[] = $mysearchstr;
         }
     }
-
     $mystr .= "<select name=\"$myname\" multiple size=".$size.">\n";
     foreach ($myarr as $myrecord) {
-	$mystr .= "<option value=\"$myrecord\">";
-	$mystr .= " ".htmlspecialchars($myrecord);
-	$mystr .= "</option>\n";
-	$rec++;
+    	$myrecord = rtrim($myrecord);
+		$mystr .= "<option value=\"$myrecord\" ";
+		if ($curValues[$myrecord]) {
+			$mystr .= "selected=\"selected\" ";
+		}
+		$mystr .= ">";
+		$mystr .= " ".htmlspecialchars($myrecord);
+		$mystr .= "</option>\n";
     }
     $mystr .= "</select>\n";
     $mystr .= fminputend();
@@ -557,12 +602,12 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
 #
 # Check the contents of the information submitted
 #
-function fmcheckform($filename) {
+function fmcheckform($outputdst, $filename) {
 
     $errors = FALSE;
     if (! file_exists($filename)) {
-	echo(fmcreateerrmsg("Could not open configuration file"));
-	return("No form created");
+		echo(fmcreateerrmsg("Could not open configuration file"));
+		return("No form created");
     } 
 
     $mytempl = file($filename);
@@ -579,19 +624,19 @@ function fmcheckform($filename) {
 	}
 
     foreach ($mytempl as $line) {
-	if (! ereg('mandatory',$line)) continue;
-	parse_str($line);
-	# check for string-length, so value 0 returns true
-	if (! strlen($_POST[$name])) {
-	    echo(fmcreateerrmsg("Record ".$name." is mandatory and missing"));
-	    $errors = TRUE;
-	}
+		if (! ereg('mandatory',$line)) continue;
+		parse_str($line);
+		# check for string-length, so value 0 returns true
+		if (! strlen($_POST[$name])) {
+	    	echo(fmcreateerrmsg("Record ".$name." is mandatory and missing"));
+	    	$errors = TRUE;
+		}
     }
     if ($errors) {
-	echo(fmcreateerrmsg("Please use your browser's back button ".
-	"to correct these problems"));
-	echo(fmquestversion());
-	return;
+		echo(fmcreateerrmsg("Please use your browser's back button ".
+			"to correct these problems"));
+		echo(fmquestversion());
+		return;
     }
 
     echo(fmstartform());
@@ -599,21 +644,21 @@ function fmcheckform($filename) {
     echo(fmcreatemsg("Please check contents and use the back button of the
 		browser to correct any errors."));
     foreach ($_POST as $mykey=>$myvalue) {
-	if ($mykey == "Submit" || $mykey == "cmd") {
-	    continue;
-	}
-	# escape user-entered values
-	$mykey = htmlspecialchars($mykey);
-    if (is_array($myvalue)) {
-		foreach ($myvalue as $myitem => $singleval) {
-		    $myvalue[$myitem] = htmlspecialchars($singleval);
+		if ($mykey == "Submit" || $mykey == "cmd") {
+	    	continue;
 		}
-    } else {
-		$myvalue = htmlspecialchars($myvalue);
-    }
-	echo(fmcreaterecordstart());
+		# escape user-entered values
+		$mykey = htmlspecialchars($mykey);
+    	if (is_array($myvalue)) {
+			foreach ($myvalue as $myitem => $singleval) {
+		    	$myvalue[$myitem] = htmlspecialchars($singleval);
+			}
+    	} else {
+			$myvalue = htmlspecialchars($myvalue);
+    	}
+		echo(fmcreaterecordstart());
 
-	# Check if refeences are valid URLs
+		# Check if refeences are valid URLs
 ##	if ($mykey == "reference") {
 ##	    if (! ereg("http://",$myvalue)) {
 ##		$mytmpstr = "http://".$myvalue;
@@ -623,116 +668,116 @@ function fmcheckform($filename) {
 ##	    }
 ##	}
 
-	# Check that geographical positions are numeric
-	if ($mykey == "northernmost_latitude" || 
-	    $mykey == "southernmost_latitude" ||
-	    $mykey == "easternmost_longitude" ||
-	    $mykey == "westernmost_longitude") {
-	    if (! is_numeric($myvalue)) {
-		$myvalue = "<span style=\"color: red;\">This field ".
-		"should be a decimal number. Please use the ".
-		"back button and correct errors</span>";
-		$errors = TRUE;
-	    } else if (ereg("latitude",$mykey)) {
-		if ($myvalue > 90. || $myvalue < -90.) {
-		    $myvalue .= " <span style=\"color: red;\">The ".
-		    "latitude domain is -90&#176; to 90&#176; North".
-		    "</span>";
-		    $errors = TRUE;
+		# Check that geographical positions are numeric
+		if ($mykey == "northernmost_latitude" || 
+	    	$mykey == "southernmost_latitude" ||
+	   		$mykey == "easternmost_longitude" ||
+	    	$mykey == "westernmost_longitude") {
+	    	if (! is_numeric($myvalue)) {
+				$myvalue = "<span style=\"color: red;\">This field ".
+					"should be a decimal number. Please use the ".
+					"back button and correct errors</span>";
+				$errors = TRUE;
+	    	} else if (ereg("latitude",$mykey)) {
+				if ($myvalue > 90. || $myvalue < -90.) {
+		    		$myvalue .= " <span style=\"color: red;\">The ".
+		    			"latitude domain is -90&#176; to 90&#176; North".
+		    			"</span>";
+		    		$errors = TRUE;
+				}
+	    	} else if (ereg("longitude",$mykey)) {
+				if ($myvalue > 180. || $myvalue < -180.) {
+		    		$myvalue .= " <span style=\"color: red;\">The ".
+		    			"longitude domain is -180&#176; to 90&#176; East".
+		    			"</span>";
+		    		$errors = TRUE;
+				}
+	    	}
+	    	if ($_POST["westernmost_longitude"] > 
+		    	$_POST["easternmost_longitude"]) {
+				$myvalue .= " <span style=\"color: red;\">Western ".
+		    		"limit is East of Eastern limit</span>";
+				$errors = TRUE;
+	    	} else if ($_POST["southernmost_latitude"] >
+		    	$_POST["northernmost_latitude"]) {
+				$myvalue .= " <span style=\"color: red;\">Northern ".
+		    		"limit is South of Southern limit</span>";
+				$errors = TRUE;
+	    	}
 		}
-	    } else if (ereg("longitude",$mykey)) {
-		if ($myvalue > 180. || $myvalue < -180.) {
-		    $myvalue .= " <span style=\"color: red;\">The ".
-		    "longitude domain is -180&#176; to 90&#176; East".
-		    "</span>";
-		    $errors = TRUE;
+
+		# Check that time specifications are of the correct format
+		if ($mykey == "datacollection_period_from" ||
+	    	$mykey == "datacollection_period_to") {
+	    	if (!preg_match("/^\d\d\d\d-\d\d-\d\d \d\d:\d\d \w\w\w/",
+				$myvalue)) {
+				$myvalue = "<span style=\"color: red;\">This field ".
+					"should be of the form YYYY-MM-DD HH:MM UTC, please use ".
+					"the back button and correct errors. If time is not in ".
+					"UTC please specify timezone by the correct three ".
+					"letter abbreviation.</span>";
+				$errors = TRUE;
+	    	}
 		}
-	    }
-	    if ($_POST["westernmost_longitude"] > 
-		    $_POST["easternmost_longitude"]) {
-		$myvalue .= " <span style=\"color: red;\">Western ".
-		    "limit is East of Eastern limit</span>";
-		$errors = TRUE;
-	    } else if ($_POST["southernmost_latitude"] >
-		    $_POST["northernmost_latitude"]) {
-		$myvalue .= " <span style=\"color: red;\">Northern ".
-		    "limit is South of Southern limit</span>";
-		$errors = TRUE;
-	    }
-	}
 
-	# Check that time specifications are of the correct format
-	if ($mykey == "datacollection_period_from" ||
-	    $mykey == "datacollection_period_to") {
-	    if (!preg_match("/^\d\d\d\d-\d\d-\d\d \d\d:\d\d \w\w\w/",
-		$myvalue)) {
-		$myvalue = "<span style=\"color: red;\">This field ".
-		"should be of the form YYYY-MM-DD HH:MM UTC, please use ".
-		"the back button and correct errors. If time is not in ".
-		"UTC please specify timezone by the correct three ".
-		"letter abbreviation.</span>";
-		$errors = TRUE;
-	    }
-	}
-
-	# Check that abstract is not too long
-	if ($mykey == "abstract" ||
-	    $mykey == "description" ||
-	    $mykey == "comment") {
-	    if (strlen($myvalue) > 512) {
-		$myvalue = "<span style=\"color: red;\">This is no ".
-		"contest for the Nobel prize in literature, please ".
-		"use the back button and shorten the text.</span>";
-		$errors = TRUE;
-	    } else {
-		$myvalue = ereg_replace("\n","<br><br>\n",htmlspecialchars($myvalue));
-	    }
-	}
-
-	# Check that history is of the correct format
-	if ($mykey == "history") {
-	    if (!preg_match("/^\d\d\d\d-\d\d-\d\d /", $myvalue)) {
-		$myvalue = "<span style=\"color: red;\">This should ".
-		"be of the form YYYY-MM-DD Creation, Please use the ".
-		"back button and correct the text. </span>";
-		$errors = TRUE;
-	    }
-	}
-
-	# Create the output form for visual inspection by the user
-	#
-	# Label column
-	if ($mykey == "keyphrase") {
-	    echo(fmlabelstart()."Key phrase".fmlabelend());
-	} else {
-	    $searchstr = "/name=".$mykey."/";
-	    $templitem = preg_grep($searchstr,$mytempl);
-	    parse_str(current($templitem));
-	    echo(fmlabelstart().$label.fmlabelend());
-	}
-	# Data column
-	if (is_array($myvalue)) {
-	    echo(fminputstart());
-	    foreach ($myvalue as $singleitem) {
-		echo($singleitem."<br>");
-	    }
-	    echo(fminputend());
-	} else {
-	    echo(fminputstart().$myvalue.fminputend());
-	}
-	echo(fmcreaterecordend());
-
-	# Add hidden elements to transport information to the data dump
-	# function
-	if (!$errors) {
-	    if (is_array($myvalue)) {
-		foreach ($myvalue as $singleitem) {
-		    echo(fmcreatehidden($mykey."[]",$singleitem));
+		# Check that abstract is not too long
+		if ($mykey == "abstract" ||
+	    	$mykey == "description" ||
+	    	$mykey == "comment") {
+	    	if (strlen($myvalue) > 512) {
+				$myvalue = "<span style=\"color: red;\">This is no ".
+					"contest for the Nobel prize in literature, please ".
+					"use the back button and shorten the text.</span>";
+				$errors = TRUE;
+	    	} else {
+				$myvalue = ereg_replace("\n","<br><br>\n",htmlspecialchars($myvalue));
+	    	}
 		}
-	    } else {
-		echo(fmcreatehidden($mykey,$myvalue));
-	    }
-	}
+
+		# Check that history is of the correct format
+		if ($mykey == "history") {
+	    	if (!preg_match("/^\d\d\d\d-\d\d-\d\d /", $myvalue)) {
+				$myvalue = "<span style=\"color: red;\">This should ".
+					"be of the form YYYY-MM-DD Creation, Please use the ".
+					"back button and correct the text. </span>";
+				$errors = TRUE;
+	    	}
+		}
+
+		# Create the output form for visual inspection by the user
+		#
+		# Label column
+		if ($mykey == "keyphrase") {
+	    	echo(fmlabelstart()."Key phrase".fmlabelend());
+		} else {
+	    	$searchstr = "/name=".$mykey."/";
+	    	$templitem = preg_grep($searchstr,$mytempl);
+	    	parse_str(current($templitem));
+	    	echo(fmlabelstart().$label.fmlabelend());
+		}
+		# Data column
+		if (is_array($myvalue)) {
+	    	echo(fminputstart());
+	    	foreach ($myvalue as $singleitem) {
+				echo($singleitem."<br>");
+	    	}
+	    	echo(fminputend());
+		} else {
+	    	echo(fminputstart().$myvalue.fminputend());
+		}
+		echo(fmcreaterecordend());
+
+		# Add hidden elements to transport information to the data dump
+		# function
+		if (!$errors) {
+	    	if (is_array($myvalue)) {
+				foreach ($myvalue as $singleitem) {
+		    		echo(fmcreatehidden($mykey."[]",$singleitem));
+				}
+			} else {
+				echo(fmcreatehidden($mykey,$myvalue));
+	    	}
+		}
     }
     echo(fmcreatesectionend());
     echo(fmcreatebr());

@@ -108,11 +108,11 @@ END_STRING;
 require("funcs/fmquestfuncs.php");
 
 if ($_POST["Submit"] == "Check form") {
-    fmcheckform($fmquestconfig);
+    fmcheckform($fmquestoutput, $fmquestconfig);
 } elseif ($_POST["Submit"] == "Write form") {
     fmprocessform($fmquestoutput,$myokmsg,$mysender,$myrecipents);
 } else {
-    fmcreateform($fmquestconfig);
+    fmcreateform($fmquestoutput, $fmquestconfig);
 }
 ?>
 
