@@ -39,8 +39,7 @@
 # return array(ownertag, array["metadata"] = [value1, value2, ...])
 # throws DatasetException on error
 #
-function mmReadEssentialDataset($filename) {
-	list($ownertag, $ds, $attributes) = mmReadDataset($filename);
+function _mmReadEssentialDataset($ownertag, $ds, $attributes) {
 	if (isset($ds["datacollection_period"])) {
 		if (isset($attributes["datacollection_period"])) {
 			if (isset($attributes["datacollection_period"]["from"]) && isset($attributes["datacollection_period"]["to"])) {
@@ -56,19 +55,34 @@ function mmReadEssentialDataset($filename) {
 	}
 	return array($ownertag, $ds);
 }
+/**
+ * read a dataset from an xml file, unifying the datacollection-period
+ * @param filename
+ * @return array(ownertag, array["metadata"] = [value1, value2, ...])
+ * @throws DatasetException
+ */
+function mmReadEssentialDataset($filename) { 
+	list($ownertag, $ds, $attributes) = mmReadDataset($filename);
+	return _mmReadEssentialDataset($ownertag, $ds, $attributes);
+}
+
+/**
+ * read a dataset from an xml file, unifying the datacollection-period
+ * @param xmlString
+ * @return array(ownertag, array["metadata"] = [value1, value2, ...])
+ * @throws DatasetException
+ */
+function mmReadEssentialDatasetXml($xmlString) {
+	list($ownertag, $ds, $attributes) = mmReadDatasetXml($xmlString);
+	return _mmReadEssentialDataset($ownertag, $ds, $attributes);	
+}
 
 #
 # basic read of the dataset in tag => [value1, value2, ...] pairs
 # return array(ownertag, metadata[name] = [values], attribute[metadataName][attrName] = attValue)
 # throws DatasetException on error
 #
-function mmReadDataset($filename) {
-	if (! file_exists($filename)) {
-		throw new DatasetException("file '$filename' not found");
-	}
-	$dom = new DOMDocument;
-	$dom->load($filename);
-	
+function _mmReadDataset($dom) {
 	if (! $dom) {
 		throw new DatasetException("error parsing dataset file: '$filename'");
 	}
@@ -110,6 +124,32 @@ function mmReadDataset($filename) {
 	}
 	return array($ownertag, $metadata, $attributes);
 }
+
+/**
+  * basic read of the dataset in tag => [value1, value2, ...] pairs
+  * @param filename xml-file
+  * @return array(ownertag, metadata[name] = [values], attribute[metadataName][attrName] = attValue)
+  * @throws DatasetException on error
+  */
+function mmReadDataset($filename) {
+	if (! file_exists($filename)) {
+		throw new DatasetException("file '$filename' not found");
+	}
+	$dom = new DOMDocument;
+	$dom->load($filename);
+	return _mmReadDataset($dom);
+}
+/**
+  * basic read of the dataset in tag => [value1, value2, ...] pairs
+  * @param $xmlString string with xml-content
+  * @return array(ownertag, metadata[name] = [values], attribute[metadataName][attrName] = attValue)
+  * @throws DatasetException on error
+  */
+function mmReadDatasetXml($xmlString) {
+	$dom = new DOMDocument;
+	$dom->loadXML($xmlString);
+	return _mmReadDataset($dom);
+}	
 
 class DatasetException extends Exception {
 	public function __construct($message, $code = 0) {

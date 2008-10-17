@@ -26,7 +26,14 @@
 #  You should have received a copy of the GNU General Public License 
 #  along with METAMOD; if not, write to the Free Software 
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
-#---------------------------------------------------------------------------- 
+#----------------------------------------------------------------------------
+session_start(  );
+/** session-data:
+ *  tempDataset: temporary dataset-information
+ *               - generated on checking
+ *               - read on re-edit
+ *               - deleted after writing dataset to permanent storage in fmprocessform 
+ */
 ?>
 <html>
 
@@ -111,6 +118,8 @@ if ($_POST["Submit"] == "Check form") {
     fmcheckform($fmquestoutput, $fmquestconfig);
 } elseif ($_POST["Submit"] == "Write form") {
     fmprocessform($fmquestoutput,$myokmsg,$mysender,$myrecipents);
+} elseif ($_POST["Submit"] == "Edit form") {
+	fmcreateform($fmquestoutput, $fmquestconfig, true);
 } else {
     fmcreateform($fmquestoutput, $fmquestconfig);
 }

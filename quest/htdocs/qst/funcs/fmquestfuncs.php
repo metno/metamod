@@ -43,11 +43,11 @@ function fmquestversion() {
     return($questversion);
 }
 
-function fmcreateform($outputdst, $filename="myconfig.txt") {
+function fmcreateform($outputdst, $filename, $edit=false) {
 
     if (! file_exists($filename)) {
-	echo(fmcreateerrmsg("Could not open configuration file"));
-	return("No form created");
+		echo(fmcreateerrmsg("Could not open configuration file"));
+		return("No form created");
     }
 	# this quest goes defines the metadata for a metamod upload directory
 	# it will be written in the metamod xml directory as $uploadDir.xml
@@ -56,13 +56,20 @@ function fmcreateform($outputdst, $filename="myconfig.txt") {
     $uploadDir = $_REQUEST["uploadDirectory"];
     $currentData = array();
     $ownertag = '';
-	if (strlen($uploadDir) != 0) {
+    
+    if ($edit) { // read data from session
+    	$xmlString = $_SESSION["tempDataset"];
+    	if (strlen($xmlString) > 0) {
+    		list($ownertag, $currentData) = mmReadEssentialDatasetXml($xmlString);
+    	}
+    } elseif (strlen($uploadDir) != 0) { // read data from file
 		$datasetFile = $outputdst . '/' . $uploadDir . ".xml";
 		if (file_exists($datasetFile)) {
 			list($ownertag, $currentData) = mmReadEssentialDataset($datasetFile);
 		}
 	}
-
+	
+	
     $mytempl = file($filename);
 
     echo(fmstartform());
@@ -81,7 +88,10 @@ function fmcreateform($outputdst, $filename="myconfig.txt") {
 		$checked = 0;
 		parse_str($line);
 		echo(fmparsestr($type,$label,$name,$value,$length,$height,$size,$checked,$exclude,$include,$currentData));
+		$pname = rtrim($name, "[]\n\r");
+		unset($currentData[$pname]); // unset used fields
     }
+    unset($currentData["drpath"]); // drpath will be set automatically
     echo(fmcreatebr());
     if (strlen($uploadDir) == 0) {
     	echo(fmcreatesectionstart(NULL));
@@ -89,8 +99,19 @@ function fmcreateform($outputdst, $filename="myconfig.txt") {
    	 	echo(fmcreatesectionend());
     	echo(fmcreatebr());
     } else {
+    	foreach ( $currentData as $name => $valArray ) {
+       		// add the metadata field currently not used
+       		$pname = $name;
+       		if (count($valArray) > 1) {
+       			$pname .= "[]";
+       		}
+       		foreach ($valArray as $value) {
+       			echo(fmcreatehidden($pname, $value));
+       		}
+		}
     	echo(fmcreatehidden("uploadDirectory", $uploadDir));
     	echo(fmcreatehidden("institutionId", $_REQUEST["institutionId"]));
+    	
     }
     echo(fmcreatebutton("Submit","Check form"));
     echo(fmcreatebutton("Reset","Clear form"));
@@ -489,6 +510,55 @@ function fmcreateerrmsg($mymsg) {
     return($myformattedmsg);
 }
 
+/**
+ * @brief convert the POST array to xml and html
+ * @param addititions array with additional xml rows, right below the root node
+ * @return array($xml, $html)
+ */
+function fmForm2XmlHtml($additions = array()) {
+	$xml = <<<EOF
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<dataset ownertag="[==QUEST_OWNERTAG==]">
+EOF;
+	foreach ($additions as $row) {
+		$xml .= "$row\n";
+	}
+    $html = "<html>\n<head>\n</head>\n<body>\n";
+	
+	foreach ($_POST as $mykey=>$myvalue) {
+		if ($mykey == "Submit" || $mykey == "cmd" || $mykey == "institutionId" || $mykey == "uploadDirectory" || $mykey == "drpath") {
+	    	continue;
+		}
+		# escape user-entered values
+		$mykey = htmlspecialchars($mykey);
+    	if (is_array($myvalue)) {
+			foreach ($myvalue as $myitem => $singleval) {
+		   		$myvalue[$myitem] = htmlspecialchars($singleval);
+			}
+    	} else {
+			$myvalue = htmlspecialchars($myvalue);
+    	}
+	
+		if (is_array($myvalue)) {
+	    	$html .= "<b>$mykey</b><br/>\n";
+	    	foreach ($myvalue as $singleitem) {
+				$xml .= "\t<$mykey>$singleitem</$mykey>\n";
+				$html .= "<p>".wordwrap(ereg_replace("\n","<br />\n",$singleitem."<br />"),70)."</p>\n";
+	    	}
+		} else {
+	    	$html .= "<b>$mykey</b><br />\n<p>".wordwrap(ereg_replace("\n","<br />\n",$myvalue),70)."</p>\n";
+	    	if ($mykey == "abstract") {
+				$xml .= "\t<$mykey>\n$myvalue\n\t</$mykey>\n";
+	    	} else {
+				$xml .= "\t<$mykey>$myvalue</$mykey>\n";
+	    	}
+		}
+    }
+    $html .= "</body>\n</html>\n";
+    $xml .= "</dataset>\n";
+    return array($xml, $html);
+}
+
 #
 # Process the information submitted, generate HTML email message and
 # METAMOD XML message locally
@@ -498,7 +568,7 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
     $mymsg = $mystdmsg;
 	
 	if (! is_dir($outputdst)) {
-   		$mymsg = "Output destination could not be configured!";
+   		$mymsg = "Output destination could not be configured, inform the administrator!";
    		echo(fmcreateerrmsg($mymsg));
    		return;
 	}
@@ -508,6 +578,7 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
 		if (! $_REQUEST["institutionId"]) {
 			$mysmg = "information missing during quest metadata configuration, please enter through the admin portal!";
        		echo(fmcreateerrmsg($mymsg));
+			echo(fmcreatebutton("Submit", "Edit form"));
        		return;
 		}
     	$outputfile = "$outputdst/".$_REQUEST["uploadDirectory"].".xml";
@@ -532,50 +603,12 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
     	$outputfile = "$outputdst/$md5code.xml";
     	if (file_exists($outputfile)) {
 			echo(fmcreateerrmsg("You have submitted information using the same keyphrase before"));
+			echo(fmcreatebutton("Submit", "Edit form"));
 			return;
     	}
 	}
-
-    # Create HTML code of answer as well as pure text
-    $myhtmlcontent = "<html>\n<head>\n</head>\n<body>\n";
-    $myxmlcontent = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-    $myxmlcontent .= "<dataset ownertag=\"[==QUEST_OWNERTAG==]\">\n";
-    $myxmlcontent .= "\t<drpath>$drpath</drpath>\n";
-    foreach ($_POST as $mykey=>$myvalue) {
-	if ($mykey == "Submit" || $mykey == "cmd") {
-	    continue;
-	}
-	# escape user-entered values
-	$mykey = htmlspecialchars($mykey);
-    if (is_array($myvalue)) {
-		foreach ($myvalue as $myitem => $singleval) {
-		    $myvalue[$myitem] = htmlspecialchars($singleval);
-		}
-    } else {
-		$myvalue = htmlspecialchars($myvalue);
-    }
 	
-	$myxmlrecord = "";
-	$myhtmlrecord = "";
-	if (is_array($myvalue)) {
-	    $myhtmlrecord .= "<b>$mykey</b><br>\n";
-	    foreach ($myvalue as $singleitem) {
-		$myxmlrecord .= "\t<$mykey>$singleitem</$mykey>\n";
-		$myhtmlrecord .= "<p>".wordwrap(ereg_replace("\n","<br>\n",$singleitem."<br>"),70)."</p>\n";
-	    }
-	} else {
-	    $myhtmlrecord = "<b>$mykey</b><br>\n<p>".wordwrap(ereg_replace("\n","<br>\n",$myvalue),70)."</p>\n";
-	    if ($mykey == "abstract") {
-		$myxmlrecord .= "\t<abstract>\n$myvalue\n\t</abstract>\n";
-	    } else {
-		$myxmlrecord .= "\t<$mykey>$myvalue</$mykey>\n";
-	    }
-	}
-	$myxmlcontent .= $myxmlrecord;
-	$myhtmlcontent .= $myhtmlrecord;
-    }
-    $myhtmlcontent .= "</body>\n</html>\n";
-    $myxmlcontent .= "</dataset>\n";
+	list($myxmlcontent, $myhtmlcontent) = fmForm2XmlHtml(array("<drpath>$drpath</drpath>"));
 
     # Removed FILE_TEXT flag. This flag is only available in PHP 6.
     # LOCK_EX|FILE_TEXT -> LOCK_EX
@@ -596,6 +629,7 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
     echo(fmcreatemsg($mymsg));
 
     echo(fmquestversion());
+    unset($_SESSION["tempDataset"]);
     return;
 }
 
@@ -603,6 +637,8 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
 # Check the contents of the information submitted
 #
 function fmcheckform($outputdst, $filename) {
+	list($xmlString, $htmlString) = fmForm2XmlHtml();
+	$_SESSION["tempDataset"] = $xmlString; // store the dataset in a session
 
     $errors = FALSE;
     if (! file_exists($filename)) {
@@ -752,8 +788,12 @@ function fmcheckform($outputdst, $filename) {
 		} else {
 	    	$searchstr = "/name=".$mykey."/";
 	    	$templitem = preg_grep($searchstr,$mytempl);
-	    	parse_str(current($templitem));
-	    	echo(fmlabelstart().$label.fmlabelend());
+	    	if (count($templitem) > 0) {
+				parse_str(current($templitem));
+	    		echo(fmlabelstart().$label.fmlabelend());
+	    	} else {
+	    		echo(fmlabelstart().$mykey.fmlabelend());
+	    	}
 		}
 		# Data column
 		if (is_array($myvalue)) {
@@ -770,21 +810,23 @@ function fmcheckform($outputdst, $filename) {
 		# Add hidden elements to transport information to the data dump
 		# function
 		if (!$errors) {
-	    	if (is_array($myvalue)) {
+    		if (is_array($myvalue)) {
 				foreach ($myvalue as $singleitem) {
-		    		echo(fmcreatehidden($mykey."[]",$singleitem));
+	    			echo(fmcreatehidden($mykey."[]",$singleitem));
 				}
 			} else {
 				echo(fmcreatehidden($mykey,$myvalue));
-	    	}
+    		}
 		}
     }
     echo(fmcreatesectionend());
     echo(fmcreatebr());
 
-    echo(fmcreatebutton("Submit","Write form"));
+	if (!$errors) {
+    	echo(fmcreatebutton("Submit","Write form"));
+	}
+	echo(fmcreatebutton("Submit", "Edit form"));
     echo(fmcreatebutton("Submit","Cancel write"));
-    ##echo(fmcreatehidden("cmd","write"));
     echo(fmendform());
 
     echo(fmquestversion());

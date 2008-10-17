@@ -1,12 +1,8 @@
 TODO-list FMQUEST
 =================
 
-Øystein Godøy, METNO/FOU, 21.09.2007 
-
 o Rewrite main program to let all configurable elements (including data
 catalogue, email addresses, data directories etc) be set in the
 configuration file.
 
-o Evaluate the need for use of a PostGRES database.
-
-o Evaluate the need for use of cookies.
+o sync reading/writing of datasets

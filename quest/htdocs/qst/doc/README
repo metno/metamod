@@ -1,20 +1,11 @@
-fmquest
-=======
-
-Øystein Godøy, METNO/FOU, 21.09.2007 
+quest
+=====
 
 Easy and relatively flexible questionnaire generation.
 
-The user edits:
-	o fmquest.php (the main page, add layout and config information)
-	o myconfig.txt (or some other file)
-
-fmquest.php
-===========
-The main page that generates and processes HTML forms. The user can modify
-the name of the configuration file containing the form elements to be
-produced as well as general layout elements (e.g. adding the logo of the
-project in mind, chenging the style sheet included in the HEAD element etc).
+General config should be done through the master_config.txt file
+of the application. The user should add the formular template
+(e.g. myconfig.txt) into the htdocs/qst/config directory of the application.
 
 myconfig.txt
 ============
@@ -43,6 +34,3 @@ Configuration of email sending
 ------------------------------
 See the mail command in the PHP documentation.
 
-More TBW
-
-...
