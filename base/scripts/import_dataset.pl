@@ -281,10 +281,11 @@ sub update_database {
    my $inputfile = $_[0];
    unless (-r $inputfile) {die "Can not read from file: $inputfile\n";}
    open (XMLINPUT,$inputfile);
+   flock(XMLINPUT, LOCK_SH);
    undef $/;
    my $xmlcontent = <XMLINPUT>;
    $/ = "\n"; 
-   close (XMLINPUT);
+   close (XMLINPUT); # also unlocks
    my $xmlref = XMLin($xmlcontent, KeyAttr => [], ForceArray => 1, SuppressEmpty => '');
    my $ownertag = $xmlref->{'ownertag'};
 #   print Dumper($xmlref);

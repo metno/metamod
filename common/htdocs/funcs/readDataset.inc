@@ -135,9 +135,15 @@ function mmReadDataset($filename) {
 	if (! file_exists($filename)) {
 		throw new DatasetException("file '$filename' not found");
 	}
-	$dom = new DOMDocument;
-	$dom->load($filename);
-	return _mmReadDataset($dom);
+	// file_get_contents does not support LOCK_SH, open and read manually
+	$fh = fopen($filename, "r");
+	if (!$fh) {
+		throw new DatasetException("cannot read '$filename'");
+	}
+	flock($fh, LOCK_SH);
+	$xmlString = fread($fh, filesize($filename));
+	fclose($fh); // fclose also unlocks
+	return mmReadDatasetXml($xmlString);
 }
 /**
   * basic read of the dataset in tag => [value1, value2, ...] pairs

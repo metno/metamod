@@ -5,4 +5,3 @@ o Rewrite main program to let all configurable elements (including data
 catalogue, email addresses, data directories etc) be set in the
 configuration file.
 
-o sync reading/writing of datasets

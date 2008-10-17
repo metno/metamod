@@ -35,6 +35,7 @@ use lib qw([==TARGET_DIRECTORY==]/scripts);
 use ncfind;
 use quadtreeuse;
 use Data::Dumper;
+use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 #
 # Check and collect metadata in netCDF files. 
 # ===========================================
@@ -795,10 +796,11 @@ sub parse_all {
 #
    if (-r $xml_metadata_path) {
       open (XMLINPUT,$xml_metadata_path);
+      flock(XMLINPUT, LOCK_SH);
       undef $/;
       my $xmlcontent = <XMLINPUT>;
       $/ = "\n"; 
-      close (XMLINPUT);
+      close (XMLINPUT); # also unlocks
       my $xmlmeta = XMLin($xmlcontent, KeyAttr => [ "name" ], ForceArray => 1);
       foreach my $metakey (keys %$xmlmeta) {
          my $val = $xmlmeta->{$metakey};
@@ -999,8 +1001,9 @@ sub parse_all {
    $xml_output .= "   </quadtree_nodes>\n";
    $xml_output .= "</dataset>\n";
    open (XMLOUT,">$xml_metadata_path");
+   flock (XMLOUT, LOCK_EX);
    print XMLOUT $xml_output;
-   close (XMLOUT);
+   close (XMLOUT); # also unlocks
 #
    if ($CTR_printdump == 1) {
       print "\n----- VARIABLES FOUND -----\n\n";
