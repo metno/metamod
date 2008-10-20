@@ -186,56 +186,23 @@ sub process_xml_loop {
                   $xml_directories{$1} = 1;
                }
             }
-            my $all_xmldirs_ready = 1;
-            foreach my $xmldir (keys %xml_directories) {
-               if ($xmldir =~ /^(.+)\/[^\/]*$/) {
-                  my $parentdir = $1; # First matching ()-expression
-                  my $syncfile = $parentdir . "/timesync";
-#                  
-#              Read the syncfile for the current import file. It contains
-#              one number, the clock hour when the program producing XML files
-#              in this directory last finished its XML producing activities. 
-#              If this clock hour is the same as the current clock hour, it is
-#              safe to import the XML files, since no XML file will be modified
-#              until the next clock hour starts.
-#
-#              If no syncfile exists, the directory will be accepted unconditionally
-#               
-                  if (-r $syncfile) {
-                     open (SYNC,$syncfile);
-                     undef $/;
-                     my $scontent = <SYNC>;
-                     $/ = "\n"; 
-                     close (SYNC);
-                     chomp($scontent);
-                     if ($progress_report == 1) {
-                        print "    Check if time is right: $hour == $scontent\n";
-                     }
-                     if ($hour != $scontent) {
-                        $all_xmldirs_ready = 0;
-                     }
-                  }
-               }
-            }
-            if ($all_xmldirs_ready == 1) { # Syncfile OK for all XML directories:
 #         
 #           Touch the $path_to_import_updated file to prepare for the next
 #           turn of the loop:
 #         
-               `touch --reference=$path_to_import_updated_new $path_to_import_updated`;
+            `touch --reference=$path_to_import_updated_new $path_to_import_updated`;
 #
-               foreach my $xmlfile (@files_to_consume) {
-                  eval {
-                     &update_database($xmlfile);
-                  };
-                  if (defined($@) && $@) {
-                     $dbh->rollback or die $dbh->errstr;
-                     my $stm = $dbh->{"Statement"};
-                     &write_to_log("$xmlfile database error: $@\n   Statement: $stm");
-                  } else {
-                     $dbh->commit or die $dbh->errstr;
-                     &write_to_log("$xmlfile successfully imported");
-                  }
+            foreach my $xmlfile (@files_to_consume) {
+               eval {
+                  &update_database($xmlfile);
+               };
+               if (defined($@) && $@) {
+                  $dbh->rollback or die $dbh->errstr;
+                  my $stm = $dbh->{"Statement"};
+                  &write_to_log("$xmlfile database error: $@\n   Statement: $stm");
+               } else {
+                  $dbh->commit or die $dbh->errstr;
+                  &write_to_log("$xmlfile successfully imported");
                }
             }
          }

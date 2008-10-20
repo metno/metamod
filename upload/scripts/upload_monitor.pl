@@ -178,7 +178,6 @@ my $target_directory = '[==TARGET_DIRECTORY==]';
 my $opendap_directory = '[==OPENDAP_DIRECTORY==]';
 my $opendap_url = '[==OPENDAP_URL==]';
 my $path_continue_monitor = $webrun_directory . "/upl/CONTINUE_UPLOAD_MONITOR";
-my $path_to_timesync = $webrun_directory . "/XML/timesync";
 my $sleeping_seconds = 60;
 if ([==TEST_IMPORT_SPEEDUP==] > 1) {
    $sleeping_seconds = 1;
@@ -283,11 +282,7 @@ sub main_loop {
 #
 #  After processing, the routine will wait until the system clock arrives at
 #  a new fresh hour. Then the loop repeats, and new processing will eventually
-#  be perfomed. Just after processing, the current hour will be written
-#  to the file $path_to_timesync. This timestamp will be used by the METAMODBASE
-#  routine that loads the XML files into the database. It reads this file, and
-#  decides it is safe to read the XML files if the hour on the file agrees with the
-#  current hour.
+#  be perfomed. 
 #
    &get_dataset_institution(\%dataset_institution);
    my @ltime = localtime(&my_time());
@@ -311,9 +306,6 @@ sub main_loop {
          &web_process_uploaded();
          @ltime = localtime(&my_time());
          $hour_finished = $ltime[2]; # 0-23
-         open (TIMESYNC,">$path_to_timesync");
-         print TIMESYNC $hour_finished . "\n";
-         close (TIMESYNC);
       }
       sleep($sleeping_seconds);
    }
