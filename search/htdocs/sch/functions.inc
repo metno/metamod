@@ -45,8 +45,22 @@ class SessionState {
 
    var $QueryResultOffset;  // When showing a large table of rows, it will be
                             // splitted up into smaller tables. This variable
-			    // represents the row number offset in the large
-			    // table corresponding to the current smaller table
+			    			// represents the row number offset in the large
+			    			// table corresponding to the current smaller table
+   /**
+    * count occurences of $category in $sitems
+    * @param $category "category,detail" with category as key in SearchCategory table
+    * @return count of $sitem[$category], or 0 if unset
+    */		    			
+   function countItems ( $category ) {
+   		if ( isset($this->sitems) && 
+   		     is_array($this->sitems[$category]) ) {
+   			return count($this->sitems[$category]);	
+   		} else {
+   			return 0;
+   		}
+   }
+			   
 }
 
 function mmEndSession() {
@@ -413,7 +427,7 @@ function mmBreakLine($string, $breaklength, $breakchars) {
 }
 
 function mmShowSelectedHK($category) {
-   global $mmSessionState;
+   global $mmSessionState, $mmError;
 
    $name = mmGetCategoryFncValue($category,"name");
    echo mmAnchor("search.php?mmSubmitButton=hkstart_$category",$name,"search") . "\n";

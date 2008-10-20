@@ -56,7 +56,7 @@ if (!isset($mmSessionId)) {
 }
 $timeofday = gettimeofday ();
 $timeof_idle_reject = $timeofday['sec'] - 60*60*24;
-$sqlsentence = "DELETE FROM Sessions WHERE accesstime < $timeof_idle_reject";
+$sqlsentence = "DELETE FROM Sessions WHERE CAST(accesstime AS INTEGER) < $timeof_idle_reject";
 $result = pg_query ($mmDbConnection, $sqlsentence);
 if (!$result) {
    mmPutLog(__FILE__ . __LINE__ . " Could not $sqlsentence");

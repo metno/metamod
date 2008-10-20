@@ -39,9 +39,7 @@
 </head>
 <body>
 <div class="mybody">
-   <a href="http://www.damocles-eu.org/">
-      <img src="[==LOCAL_URL==]/img/damocles-header.gif" style="clear:left;border: none;" />
-   </a>
+[==APP_HEADER_HTML==]
    <table class="main_structure" cellpadding="0" cellspacing="0">
       <col width="10%" />
       <col width="90%" />

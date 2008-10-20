@@ -39,7 +39,7 @@ reset($mmCategorytype);
 foreach ($mmCategorytype as $category => $type) {
    $bkids_from_hk = array();
    $s1 = $category . ',Y';
-   if (count($mmSessionState->sitems[$s1]) > 0) {
+   if ($mmSessionState->countItems($s1) > 0) {
       $hkids = array_keys($mmSessionState->sitems[$s1]);
       $sql1 = "SELECT DISTINCT BK_id FROM HK_Represents_BK WHERE HK_id IN (" .
          implode(', ',$hkids) . ")\n";
@@ -60,7 +60,7 @@ foreach ($mmCategorytype as $category => $type) {
    }
    $bkids_from_bk = array();
    $s1 = $category . ',X';
-   if (count($mmSessionState->sitems[$s1]) > 0) {
+   if ($mmSessionState->countItems($s1) > 0) {
       $bkids_from_bk = array_keys($mmSessionState->sitems[$s1]);
    }
    $bkids = array_merge($bkids_from_hk,$bkids_from_bk);
@@ -75,7 +75,7 @@ foreach ($mmCategorytype as $category => $type) {
       $j1++;
    }
    $s1 = $category . ',NI';
-   if (count($mmSessionState->sitems[$s1]) > 0) {
+   if ($mmSessionState->countItems($s1) > 0) {
       if ($j1 > 0) {
          $sqlsentence .= "      AND \n";
       }
@@ -87,7 +87,7 @@ foreach ($mmCategorytype as $category => $type) {
       $j1++;
    }
    $s1 = $category . ',GA';
-   if (count($mmSessionState->sitems[$s1]) > 7) {
+   if ($mmSessionState->countItems($s1) > 7) {
       if ($j1 > 0) {
          $sqlsentence .= "      AND \n";
       }

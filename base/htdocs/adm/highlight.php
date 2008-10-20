@@ -32,6 +32,7 @@
 <head>
 </head><body>
 <?php
+	$filename = $_POST["filename"];
    echo "<h2>$filename:</h2>\n";
    show_source("../$filename");
 ?>
