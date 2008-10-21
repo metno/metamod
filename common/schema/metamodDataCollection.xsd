@@ -4,20 +4,27 @@
 
     <?xml version="1.0"?>
 
-    <dataset
-       xmlns="http://www.met.no/metamod2/dataset/"
+    <datacollection
+       xmlns="http://www.met.no/metamod2/dataCollection/"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.met.no/metamod2/dataset/ matamodDataset.xsd">
+       xsi:schemaLocation="http://www.met.no/metamod2/dataset/ matamodDataCollection.xsd">
     ...
-    </dataset>
+    </datacollection>
 
 -->
 <schema
   xmlns='http://www.w3.org/2001/XMLSchema'
   targetNamespace='http://www.met.no/metamod2/dataset/'
   xmlns:t='http://www.met.no/metamod2/dataset/'>
+       <!-- OLD SCHEMA, dont use, use metamodDataCollection2.xsd instead -->
       
-    <complexType name='Dataset'>
+      <complexType name="DataCollection">
+          <choice minOccurs='0' maxOccurs="unbounded">
+              <element ref='t:dataset' />
+          </choice>
+      </complexType>
+      
+      <complexType name='Dataset'>
         <choice minOccurs='0' maxOccurs="unbounded">
             <element ref='t:keywords'/>
             <element ref='t:variable'/>
@@ -45,6 +52,7 @@
         </choice>
         <attribute name='ownertag' type='string' use='required'/>
     </complexType>
+
     <simpleType name='Latitude'>
         <restriction base="decimal">
             <minInclusive value="-90"/>
@@ -63,8 +71,9 @@
     </complexType>
     <complexType mixed='true' name='QuadtreeNode'>
     </complexType>
-
-    <element name='dataset' type='t:Dataset' />
+    
+    <element name='datacollection' type='t:DataCollection' />    
+    <element name='dataset' type='t:Dataset' />    
     <element name='keywords' type='string' />
     <element name='variable' type='string'/>
     <element name='area' type='string' />

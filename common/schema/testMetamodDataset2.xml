@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+    Document   : testMetatmodDataset.xml
+    Created on : September 26, 2008, 12:58 PM
+    Author     : heikok
+    Description:
+        Purpose of the document follows.
+        
+    Check document with i.e.
+    xmllint -schema metamodDataset.xsd -noout testMetamodDataset.xml
+-->
+<dataset xmlns="http://www.met.no/schema/metamod/dataset2/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.met.no/schema/metamod/dataset2/ metamodDataset2.xsd">
+    <info status="active" ownertag="test" creationDate="2008-10-21T09:50:00Z" drpath="" />
+    <datacollection_period to="2008-10-21" from="2001-01-01"/>
+    <quadtree_nodes>17
+    345
+    45</quadtree_nodes>
+    <metadata name="area">Atlantic</metadata>
+    <metadata name="topic">Biodata</metadata>
+</dataset>

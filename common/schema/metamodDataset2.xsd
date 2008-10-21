@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    An example how to use this DTD from your XML document:
+
+    <?xml version="1.0"?>
+
+    <dataset
+       xmlns="http://www.met.no/metamod2/dataset/"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.met.no/schema/metamod2/ matamodDataset.xsd">
+    ...
+    </dataset>
+
+-->
+<schema
+  xmlns='http://www.w3.org/2001/XMLSchema'
+  targetNamespace='http://www.met.no/schema/metamod/dataset2/'
+  xmlns:t='http://www.met.no/schema/metamod/dataset2/'>
+      
+    <complexType name='Dataset'>
+        <sequence>
+            <element ref='t:info'/>
+            <element ref='t:datacollection_period' minOccurs='0' maxOccurs='1'/>
+            <element ref='t:quadtree_nodes' minOccurs='0' maxOccurs='1'/>
+            <element ref='t:metadata' minOccurs='0' maxOccurs='unbounded'/>
+        </sequence>
+    </complexType>
+    <complexType name='Info'>
+        <attribute name='status' type='string' use='required' />
+        <attribute name='ownertag' type='string' use='required' />
+        <attribute name='creationDate' type='dateTime' use='required' />
+        <attribute name='drpath' type='string' use='required' />
+    </complexType>
+    <complexType name='Period'>
+        <attribute name='to' type='date' use='required'/>
+        <attribute name='from' type='date' use='required'/>
+    </complexType>
+    <complexType name='QuadtreeNode'>
+        <simpleContent>
+            <extension base="string" />
+        </simpleContent>
+    </complexType>
+    <complexType name='MetaData'>
+        <simpleContent>
+            <extension base="string">
+                <attribute name='name' type='string' use='required' />
+            </extension>
+        </simpleContent>
+    </complexType>
+
+    <element name='dataset' type='t:Dataset' />
+    <element name='info' type='t:Info' />
+    <element name='datacollection_period' type='t:Period'/>
+    <element name='quadtree_nodes' type='t:QuadtreeNode' />
+    <element name='metadata' type='t:MetaData' />
+</schema>
