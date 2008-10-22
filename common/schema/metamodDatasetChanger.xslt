@@ -25,7 +25,7 @@
 			<xsl:attribute name="schemaLocation" namespace="http://www.w3.org/2001/XMLSchema-instance">http://www.met.no/schema/metamod/dataset2/ metamodDataset2.xsd</xsl:attribute>
         	<xsl:element name="info">
           		<xsl:attribute name="status">active</xsl:attribute>
-          		<xsl:attribute name="creationDate">YYYY-MM-DDTHH:MM:SSZ</xsl:attribute>
+          		<xsl:attribute name="creationDate">2008-10-01T00:00:00Z</xsl:attribute>
           		<xsl:attribute name="ownertag"><xsl:value-of select="@ownertag"/></xsl:attribute>
           		<xsl:attribute name="drpath"><xsl:value-of select="/dataset/drpath"/></xsl:attribute>
         	</xsl:element>
