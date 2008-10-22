@@ -16,27 +16,26 @@
     <xsl:output method="xml" indent="yes" encoding="iso8859-1"/>
     
     <xsl:template match="/">
+    	<xsl:processing-instruction name="xml-stylesheet">href="dataset2View.xsl" type="text/xsl"</xsl:processing-instruction>
         <xsl:apply-templates select="dataset"/>
     </xsl:template>
 
     <xsl:template match="dataset">
-        <dataset xmlns="http://www.met.no/schema/metamod/dataset2/"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://www.met.no/schema/metamod/dataset2/ metamodDataset2.xsd">
-        <xsl:element name="info">
-          <xsl:attribute name="status">active</xsl:attribute>
-          <xsl:attribute name="creationDate">YYYY-MM-DDTHH:MM:SSZ</xsl:attribute>
-          <xsl:attribute name="ownertag"><xsl:value-of select="@ownertag"/></xsl:attribute>
-          <xsl:attribute name="drpath"><xsl:value-of select="/dataset/drpath"/></xsl:attribute>
-        </xsl:element>
-        <xsl:apply-templates select="datacollection_period" />
-        <xsl:apply-templates select="datacollection_period_from"/>
-        <xsl:apply-templates select="quadtree_nodes"/>
-        <xsl:for-each select="*[not(self::datacollection_period|self::dataset|self::datacollection_period_from|self::datacollection_period_to|self::datacollection_period|self::drpath|self::quadtree_nodes)]">
-           <xsl:call-template name="metadata"/>
-        </xsl:for-each>
-        </dataset>
-    
+		<xsl:element name="dataset" xmlns="http://www.met.no/schema/metamod/dataset2/">
+			<xsl:attribute name="schemaLocation" namespace="http://www.w3.org/2001/XMLSchema-instance">http://www.met.no/schema/metamod/dataset2/ metamodDataset2.xsd</xsl:attribute>
+        	<xsl:element name="info">
+          		<xsl:attribute name="status">active</xsl:attribute>
+          		<xsl:attribute name="creationDate">YYYY-MM-DDTHH:MM:SSZ</xsl:attribute>
+          		<xsl:attribute name="ownertag"><xsl:value-of select="@ownertag"/></xsl:attribute>
+          		<xsl:attribute name="drpath"><xsl:value-of select="/dataset/drpath"/></xsl:attribute>
+        	</xsl:element>
+        	<xsl:apply-templates select="datacollection_period" />
+        	<xsl:apply-templates select="datacollection_period_from"/>
+        	<xsl:apply-templates select="quadtree_nodes"/>
+        	<xsl:for-each select="*[not(self::datacollection_period|self::dataset|self::datacollection_period_from|self::datacollection_period_to|self::datacollection_period|self::drpath|self::quadtree_nodes)]">
+           		<xsl:call-template name="metadata"/>
+        	</xsl:for-each>
+		</xsl:element>    
     </xsl:template>
 
     <xsl:template match="datacollection_period">
