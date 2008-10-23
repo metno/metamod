@@ -95,7 +95,7 @@ function fmcreateform($outputdst, $filename, $edit=false) {
     echo(fmcreatebr());
     if (strlen($uploadDir) == 0) {
     	echo(fmcreatesectionstart(NULL));
-    	echo(fmcreatetext("keyphrase","Key phrase (for unique identification)",NULL,25,50));
+    	echo(fmcreatetext("keyphrase","Key phrase (for unique identification)",NULL,25,50, $currentData));
    	 	echo(fmcreatesectionend());
     	echo(fmcreatebr());
     } else {
