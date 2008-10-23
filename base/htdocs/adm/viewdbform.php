@@ -42,7 +42,7 @@
 #   
 #    foreach value in an array
 #   
-      echo "<tr><td><b>$tablename</b></td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+      echo "<tr><th style=\"text-align: left\"><a href=\"viewdb.php?dbtable=$tablename\">$tablename</a></th><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
       reset($columns);
       foreach ($columns as $colname) {
          echo $colname . " &nbsp;&nbsp;&nbsp;&nbsp;";
@@ -51,14 +51,4 @@
    }
    echo "</table>\n";
 ?>
-<br><br>
-<form action="viewdb.php" method="POST">
-<table>
-<tr>
-<td>Name of table:</td>
-<td><input name="dbtable" size="30"></td>
-<td><input type="submit" name="send" value="OK"></td>
-</tr>
-</table>
-</form>
 </body></html>
