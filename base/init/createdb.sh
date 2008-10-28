@@ -10,7 +10,7 @@ $PSQL -a -U admin [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<EOF
 
 CREATE TABLE DataSet (
    DS_id              SERIAL,
-   DS_name            VARCHAR(9999),
+   DS_name            VARCHAR(9999) UNIQUE NOT NULL,
    DS_parent          INTEGER       NOT NULL,
    DS_status          INTEGER       NOT NULL,
    DS_datestamp       DATE          NOT NULL,
