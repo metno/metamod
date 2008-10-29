@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<?xml-stylesheet href="dataset2View.xsl" type="text/xsl"?><dataset xmlns="http://www.met.no/schema/metamod/dataset2/" xmlns:ns_1="http://www.w3.org/2001/XMLSchema-instance" ns_1:schemaLocation="http://www.met.no/schema/metamod/dataset2/ metamodDataset2.xsd">
+  <info status="active" creationDate="2008-10-01T00:00:00Z" ownertag="test" drpath=""/>
+  <metadata xmlns="" name="metadata">mvalue</metadata>
+  <metadata xmlns="" name="metadata2">m2value</metadata>
+</dataset>
