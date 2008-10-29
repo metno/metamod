@@ -801,25 +801,58 @@ sub parse_all {
       my $xmlcontent = <XMLINPUT>;
       $/ = "\n"; 
       close (XMLINPUT); # also unlocks
-      my $xmlmeta = XMLin($xmlcontent, KeyAttr => [ "name" ], ForceArray => 1);
-      foreach my $metakey (keys %$xmlmeta) {
-         my $val = $xmlmeta->{$metakey};
-         if ($metakey ne "datacollection_period" && $metakey ne "ownertag") {
-            $metadata{$metakey} = [];
+      # choosing id, since name (default) might not be unique in dataset2
+      my $xmlmeta = XMLin($xmlcontent, KeyAttr => "id", ForceArray => 1);       
+      if ($xmlmeta{info}) { # dataset2
+         $info = delete $xmlmeta{info};
+         $info = $info->[0]; # remove array
+         $metadata{drpath} = [$info->{drpath}];
+         $metadata{creationDate} = [$info->{creationDate}];
+         $metadata{status} = [$info->{status}];
+         # $metadata{ownertag} = [$info->{ownertag}]; # don't use ownertag, this is command-line argument to program!!!
+         if (exists $xmlmeta{datacollection_period}) {
+	    $period = $xmlmeta{datacollection_period}->[0];
+            $metadata{start_date} = [$period->{from}];    
+            $metadata{stop_date} = [$period->{to}];    
+	 }
+         if (exists $xmlmeta{quadtree_nodes}) {
+            $sval = $xmlmeta{quadtree_nodes}->[0];
+            $sval =~ s/^\s*\n//; # remove empty lines at beginning or end
+            $sval =~ s/^\n\s*//;
+            $metadata{quadtree_nodes} = [$sval];
          }
-         if (ref($val) eq "ARRAY") {
-            if ($metakey eq "datacollection_period") {
-               my $xval = $val->[0];
-               $metadata{'start_date'} = [$xval->{'from'}];
-               $metadata{'stop_date'} = [$xval->{'to'}];
-            } elsif ($metakey eq "abstract" || $metakey eq "quadtree_nodes") {
-               my $sval = $val->[0];
-               $sval =~ s/^\s*\n//;
-               $sval =~ s/\n\s*$//;
-               $metadata{$metakey} = [$sval];
-            } else {
-               foreach my $key1 (@$val) {
-                  push (@{$metadata{$metakey}}, $key1);
+         if (exists $xmlmeta{metadata}) {
+            foreach my $hash (@{ $xmlmeta{metadata} }) {
+               if ($hash->{name} eq 'abstract') {
+                  $sval = $hash->{content};
+                  $sval =~ s/^\s*\n//; # remove empty lines at beginning or end
+                  $sval =~ s/^\n\s*//;
+                  $metadata{abstract} = [$sval];
+               } else {
+                  push @{ $metadata{$hash->{name}} }, $hash->{content};
+               }
+            }
+         }
+      } else { # old dataset
+         foreach my $metakey (keys %$xmlmeta) {
+            my $val = $xmlmeta->{$metakey};
+            if ($metakey ne "datacollection_period" && $metakey ne "ownertag") {
+               $metadata{$metakey} = [];
+            }
+            if (ref($val) eq "ARRAY") {
+               if ($metakey eq "datacollection_period") {
+                  my $xval = $val->[0];
+                  $metadata{'start_date'} = [$xval->{'from'}];
+                  $metadata{'stop_date'} = [$xval->{'to'}];
+               } elsif ($metakey eq "abstract" || $metakey eq "quadtree_nodes") {
+                  my $sval = $val->[0];
+                  $sval =~ s/^\s*\n//;
+                  $sval =~ s/\n\s*$//;
+                  $metadata{$metakey} = [$sval];
+               } else {
+                  foreach my $key1 (@$val) {
+                     push (@{$metadata{$metakey}}, $key1);
+                  }
                }
             }
          }
@@ -958,10 +991,32 @@ sub parse_all {
 #
 #  Prepare output to the XML file:
 #
-   my $xml_output = '<?xml version="1.0" encoding="ISO-8859-1"?>' . "\n";
+   my $drpath = delete $metadata{drpath};
+   $drpath = (ref $drpath eq 'ARRAY') ? $drpath->[0] : $drpath;
+   # the following might exist
+   my $status = exists $metadata{status} ? (delete $metadata{status})->[0] : 'active';
+   my $creationDate;
+   if (exists $metadata{creationDate}) {
+      $creationDate = (delete $metadata{creationDate})->[0];
+   } else {
+      my ($sec,$min,$hour,$mday,$mon,$year) = gmtime(time);
+      $mon++;
+      $year += 1900;
+      $creationDate = sprintf("%04d-%02d-%02dT%02d:%02d:%02dZ",$year,$mon,$mday,$hour,$min,$sec);
+   }
+   my $xml_output = <<EOXML;
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="dataset2View.xsl" type="text/xsl"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset2/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.met.no/schema/metamod/dataset2/ metamodDataset2.xsd">
+   <info status="$status" ownertag="$ownertag" creationDate="$creationDate" drpath="$drpath" />
+EOXML
    $xml_output .= '<dataset ownertag="' . $ownertag . '">' . "\n";
    my $start_date = "";
    my $stop_date = "";
+   # temporary string for metadata-tags, which need to come after info, datacollection_period, quadtree_nodes
+   my $metadata_output = "";
    foreach my $attname (keys %metadata) {
       my $refval = $metadata{$attname};
       if (ref($refval) ne "ARRAY") {
@@ -969,9 +1024,9 @@ sub parse_all {
       }
       if ($attname eq 'abstract') {
          my $abstract = &convert_to_htmlentities($refval->[0],\%html_conversions);
-         $xml_output .= '   <' . $attname . '>' . "\n";
-         $xml_output .= $abstract . "\n";
-         $xml_output .= '   </' . $attname . '>' . "\n";
+         $metadata_output .= '   <metadata name="' . $attname . '">' . "\n";
+         $metadata_output .= $abstract . "\n";
+         $metadata_output .= '   </metadata>' . "\n";
       } elsif ($attname eq 'start_date' && exists($refval->[0]) && defined($refval->[0])) {
          $start_date = $refval->[0];
       } elsif ($attname eq 'stop_date' && exists($refval->[0]) && defined($refval->[0])) {
@@ -980,7 +1035,7 @@ sub parse_all {
          foreach my $attval (@$refval) {
             if (defined($attval)) {
                my $newattval = &convert_to_htmlentities($attval,\%html_conversions);
-               $xml_output .= '   <' . $attname . '>' . $newattval . '</' . $attname . '>' . "\n";
+               $metadata_output .= '   <metadata name="' . $attname . '">' . $newattval . '</metadata>' . "\n";
             }
          }
       }
@@ -999,6 +1054,7 @@ sub parse_all {
       $xml_output .= $node . "\n";
    }
    $xml_output .= "   </quadtree_nodes>\n";
+   $xml_output .= $metadata_output;
    $xml_output .= "</dataset>\n";
    open (XMLOUT,">$xml_metadata_path");
    flock (XMLOUT, LOCK_EX);
