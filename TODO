@@ -24,3 +24,8 @@ Update of Datasets (assigned to Heiko)
 * digest_nc.pl to write dataset2
 * import_dataset.pl to read dataset2; import_dataset.pl to have converters from other datasets
 
+
+TODO (assigned to Heiko, just for synchronization)
+==================================================
+* test digest_nc.pl
+
