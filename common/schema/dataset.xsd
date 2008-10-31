@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    An example how to use this DTD from your XML document:
+
+    <?xml version="1.0" encoding="iso8859-1" ?>
+    <?xml-stylesheet href="https://wiki.met.no/_media/metamod/dataset.xsl" type="text/xsl"?>
+    <dataset
+       xmlns="http://www.met.no/schema/metamod/dataset"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+      <info name="DAMOC/test" 
+            status="active" 
+            ownertag="DAM"
+            creationDate="2008-10-31T14:30:00Z"
+            metadataFormat="MM2" />
+      <quadtree_nodes>
+      1
+      11
+      113
+      </quadtree_nodes>
+    </dataset>
+
+-->
+<schema
+  xmlns='http://www.w3.org/2001/XMLSchema'
+  targetNamespace='http://www.met.no/schema/metamod/dataset'
+  xmlns:t='http://www.met.no/schema/metamod/dataset'>
+      
+    <complexType name='Dataset'>
+        <sequence>
+            <element ref='t:info'/>
+            <element ref='t:quadtree_nodes' minOccurs='0' maxOccurs='1'/>
+        </sequence>
+    </complexType>
+    <complexType name='Info'>
+        <attribute name='name' type='string' use='required' />
+        <attribute name='status' use='required'>
+            <simpleType>
+                <restriction base="string">
+                    <enumeration value="active"/>
+                    <enumeration value="deleted"/>
+                </restriction>
+            </simpleType>
+        </attribute>                
+        <attribute name='ownertag' type='string' use='required' />
+        <attribute name='creationDate' type='dateTime' use='required' />
+        <attribute name='metadataFormat' type='string' />
+    </complexType>
+    <complexType name='QuadtreeNode'>
+        <simpleContent>
+            <extension base="string" />
+        </simpleContent>
+    </complexType>
+
+    <element name='dataset' type='t:Dataset' />
+    <element name='info' type='t:Info' />
+    <element name='quadtree_nodes' type='t:QuadtreeNode' />
+</schema>
