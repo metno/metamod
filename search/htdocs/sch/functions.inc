@@ -54,7 +54,7 @@ class SessionState {
     */		    			
    function countItems ( $category ) {
    		if ( isset($this->sitems) && 
-   		     is_array($this->sitems[$category]) ) {
+   		     array_key_exists($category,$this->sitems)) {
    			return count($this->sitems[$category]);	
    		} else {
    			return 0;
