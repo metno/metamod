@@ -22,7 +22,6 @@ htdocs/adm/show_users.php
 scripts/digest_nc.pl
 scripts/ncfind.pm
 scripts/print_usererrors.pl
-scripts/quadtreeuse.pm
 scripts/upload_monitor.pl
 scripts/show_time_now.pl
 scripts/remove_cr.sh
