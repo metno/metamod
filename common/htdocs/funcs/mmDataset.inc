@@ -35,58 +35,100 @@
 <?php
 // TODO: switch to using DOM
 require_once("mmLogging.inc");
-class MM_Dataset2 {
-	private $dom; // root-node of the dataset
-	private $xpath;
-	private $namespace = "http://www.met.no/schema/metamod/dataset2/";
+class MM_Dataset {
+	private $domDS; // root-node of the dataset
+	private $domMM2; // root-node of the MM2
+	private $xpathDS;
+	private $xpathMM2;
+	private $namespaceDS = "http://www.met.no/schema/metamod/dataset";
+	private $namespaceMM2 = "http://www.met.no/schema/metamod/MM2";
 	
 	
 	/**
 	 * construct a MM_Dataset2
 	 * 
-	 * @param $input The input can be "", then a new dataset will be created (default);
-	 *               input can be a DOMNode, then that node will be the source for the dataset
-	 *               if (input_is_data), input is assumed to be an xml-string
-	 *               otherwise, input is assumed to be a filename
+	 * @param $inputDS The input can be "", then a new dataset will be created (default);
+	 *                 input can be a DOMNode, then that node will be the source for the dataset
+	 *                 if (input_is_data), input is assumed to be an xml-string
+	 *                 otherwise, input is assumed to be a filename
+	 * @param $inputMM corresponding metadata, should be given in the same way
 	 * @param $input_is_data set true if input is a xml-string rather than a filename
 	 * @throw MM_Dataset2Exception
 	 */
-	function __construct($input = "", $input_is_data = false) {
-		if (!$input) {
-			$data =
-'<?xml version="1.0" encoding="iso8859-1"?>
-<?xml-stylesheet href="dataset2View.xsl" type="text/xsl"?>
-<dataset xmlns="http://www.met.no/schema/metamod/dataset2/" 
-         xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance"
-         ns1:schemaLocation="http://www.met.no/schema/metamod/dataset2/ metamodDataset2.xsd">
-  <info status="active" creationDate="1970-01-01T00:00:00Z" ownertag="" drpath=""/>
+	function __construct($inputDS = "", $inputMM2 = "", $input_is_data = false) {
+			$dataDS =
+'<?xml version="1.0" encoding="iso8859-1" ?>
+<?xml-stylesheet href="https://wiki.met.no/_media/metamod/dataset.xsl" type="text/xsl"?>
+<dataset
+   xmlns="http://www.met.no/schema/metamod/dataset"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.met.no/schema/metamod/dataset dataset.xsd">
+  <info name="" status="active" creationDate="1970-01-01T00:00:00Z" ownertag="" metadataFormat="MM2"/>
 </dataset>';
-		} elseif (is_object($input) && ($input instanceof DOMNode)) {
-			$data = DOMDocument::saveXML($input);
+			$dataMM2 =
+'<?xml version="1.0" encoding="iso8859-1"?>
+<?xml-stylesheet href="https://wiki.met.no/_media/metamod/dataset.xsl" type="text/xsl"?>
+<MM2
+   xmlns="http://www.met.no/schema/metamod/MM2"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 MM2.xsd">
+</MM2>';
+		if (!$inputDS) {
+			// use defaults
+		} elseif (is_object($inputDS) && ($inputDS instanceof DOMNode)) {
+			$dataDS = DOMDocument::saveXML($inputDS);
+			if (is_object($inputMM2) && ($inputMM2 instanceof DOMNode)) {
+				$dataMM2 = DOMDocument::saveXML($inputMM2);
+			} else {
+				throw new MM_DatasetException("inputDS is DOMNode, but inputMM2 is not");
+			}
 		} elseif ($input_is_data) {
-			$data = $input;
+			$dataDS = $inputDS;
+			$dataMM2 = $inputMM2;
 		} else {
-			if (! file_exists($input)) {
-				throw new MM_Dataset2Exception("file '$input' not found");
+			if (! file_exists($inputDS)) {
+				throw new MM_DatasetException("dataset-file '$inputDS' not found");
+			}
+			if (! file_exists($inputMM2)) {
+				throw new MM_DatasetException("metadata-file '$inputMM2' not found");
 			}
 			// file_get_contents does not support LOCK_SH, open and read manually
-			$fh = fopen($input, "r");
-			if (!$fh) {
-				throw new MM_DatasetException("cannot read '$input'");
+			$dsfh = fopen($inputDS, "r");
+			if (!$dsfh) {
+				throw new MM_DatasetException("cannot read dataset-file '$inputDS'");
 			}
-			flock($fh, LOCK_SH);
-			$data = fread($fh, filesize($input));
-			fclose($fh); // fclose also unlocks
+			flock($dsfh, LOCK_SH);
+			$mmfh = fopen($inputMM2, "r");
+			if (!$mmfh) {
+				throw new MM_DatasetException("cannot read metadata-file '$inputMM2'");
+			}
+			flock($mmfh, LOCK_SH);
+
+			$dataDS = fread($dsfh, filesize($inputDS));
+			$dataMM2 = fread($mmfh, filesize($inputMM2));
+			
+			fclose($mmfh); // close and unlock mm2
+			fclose($dsfh); // fclose and unlock ds
 		}
-		$this->dom = new DOMDocument();		
-		if (!$this->dom->loadXML($data)) {
-			mm_log(MM_ERROR, "unable to parse xml-string wit '$data'", __FILE__, __LINE__);
-			throw new MM_Dataset2Exception("unable to construct dataset2 with '$data'");
+		$this->domDS = new DOMDocument();
+		if (!$this->domDS->loadXML($dataDS)) {
+			mm_log(MM_ERROR, "unable to parse xml-string wit '$dataDS'", __FILE__, __LINE__);
+			throw new MM_DatasetException("unable to construct dataset with '$dataDS'");
 		}
-		$this->xpath = new DomXPath($this->dom);
-		$this->xpath->registerNamespace('d', $this->namespace);
-		if ($this->xpath->query('/d:dataset/d:info')->length != 1) {
-			throw new MM_Dataset2Exception("failed to open xml: not a dataset2 document");
+		$this->domMM2 = new DOMDocument();		
+		if (!$this->domMM2->loadXML($dataMM2)) {
+			mm_log(MM_ERROR, "unable to parse xml-string wit '$dataMM2'", __FILE__, __LINE__);
+			throw new MM_DatasetException("unable to construct metadata with '$dataMM2'");
+		}
+		$this->xpathDS = new DomXPath($this->domDS);
+		$this->xpathDS->registerNamespace('d', $this->namespaceDS);
+		if ($this->xpathDS->query('/d:dataset/d:info')->length != 1) {
+			throw new MM_DatasetException("failed to open xml: not a dataset document");
+		}
+		$this->xpathMM2 = new DomXPath($this->domMM2);
+		$this->xpathMM2->registerNamespace('m', $this->namespaceMM2);
+		if ($this->xpathMM2->query('/m:MM2')->length != 1) {
+			throw new MM_DatasetException("failed to open xml: not a metadata document");
 		}
 	}
 
@@ -97,7 +139,7 @@ class MM_Dataset2 {
 	 */
 	function getInfo() {
 		$retVal = array();
-		$info = $this->xpath->query('/d:dataset/d:info')->item(0);
+		$info = $this->xpathDS->query('/d:dataset/d:info')->item(0);
 		foreach ($info->attributes as $attr) {
 			$retVal[$attr->name] = $attr->value;
 		}
@@ -110,7 +152,7 @@ class MM_Dataset2 {
 	 */
 	function addInfo(array $info) {
 		$info = array_merge($this->getInfo(), $info);
-		$dinfo = $this->xpath->query("/d:dataset/d:info")->item(0);
+		$dinfo = $this->xpathDS->query("/d:dataset/d:info")->item(0);
 		foreach ($info as $name => $val) {
 			$dinfo->setAttribute($name, $val);
 		}
@@ -124,7 +166,7 @@ class MM_Dataset2 {
 	 */
 	function getMetadata() {
 		$retVal = array();
-		foreach ($this->xpath->query('/d:dataset/d:metadata') as $mdata) {
+		foreach ($this->xpathMM2->query('/m:MM2/m:metadata') as $mdata) {
 			$value = "";
 			foreach ($mdata->childNodes as $child) {
 				if ($child->nodeType == XML_TEXT_NODE) {
@@ -142,12 +184,12 @@ class MM_Dataset2 {
 	 * @param $metadata array with (name => [value]) pairs. value should be an array with values
 	 */
 	function addMetadata($metadata) {
-		$node = $this->xpath->query('/d:dataset')->item(0);
+		$node = $this->xpathMM2->query('/m:MM2')->item(0);
 		foreach ($metadata as $name => $values) {
 			foreach ($values as $value) {
-				$el = $this->dom->createElementNS($this->namespace,'metadata');
+				$el = $this->domMM2->createElementNS($this->namespaceMM2,'metadata');
 				$el->setAttribute("name", $name);
-				$txt = $this->dom->createTextNode($value);
+				$txt = $this->domMM2->createTextNode($value);
 				$el->appendChild($txt);
 				$node->appendChild($el);
 			}
@@ -161,57 +203,10 @@ class MM_Dataset2 {
 	 */
 	function removeMetadata($names) {
 		foreach ($names as $name) {
-			foreach ($this->xpath->query("/d:dataset/d:metadata[@name='$name']") as $node) {
+			foreach ($this->xpathMM2->query("/m:MM2/m:metadata[@name='$name']") as $node) {
 				$node->parentNode->removeChild($node);
 			}
 		}
-	}
-	/**
-	 * Retrieve datasetcollection_period from and to values.
-	 * @return array(from, to), returns empty array if tag not found 
-	 */
-	function getPeriod() {
-		$nodelist = $this->xpath->query("/d:dataset/d:datacollection_period");
-		if ($nodelist->length == 1) {
-			$node = $nodelist->item(0);
-			$from = $node->getAttribute("from");
-			$to = $node->getAttribute("to");
-			return array($from, $to);
-		}
-		return array();
-	}
-	/**
-	 * Set/overwrite the datacollection_period.
-	 * @param $from time as string YYYY-MM-DDTHH:MM:SSZ, deletes datacollection_period if $to is not set
-	 * @param $to time as string YYYY-MM-DDTHH:MM:SSZ
-	 * @return array(oldFrom, oldTo) or array() if not existing
-	 */
-	function setPeriod($from, $to) {
-		$oldVals = $this->getPeriod();
-		if (count($oldVals) > 0) {
-			// delete old item
-			foreach ($this->xpath->query("/d:dataset/d:datacollection_period") as $node) {
-				$node->parentNode->removeChild($node);
-			}
-		}
-		$ds = $this->xpath->query("/d:dataset")->item(0);
-		if ($from) {
-			$period = $this->dom->createElementNS($this->namespace,'datacollection_period');
-			$period->setAttribute('to', $to);
-			$period->setAttribute('from', $from);
-			$nodelist = $this->xpath->query("/d:dataset/*");
-			$inserted = false;
-			foreach ($nodelist as $node) {
-				if ($node->nodeName != 'info' ) {
-					$ds->insertBefore($period, $node);
-					$inserted = true;
-				}
-			}
-			if (!$inserted) {
-				$ds->appendChild($period);
-			}
-		}
-		return $oldVals;
 	}
 
 	/**
@@ -221,7 +216,7 @@ class MM_Dataset2 {
 	 */
 	function getQuadtree() {
 		$retVal = array();
-		$nodelist = $this->xpath->query("/d:dataset/d:quadtree_nodes");
+		$nodelist = $this->xpathDS->query("/d:dataset/d:quadtree_nodes");
 		if ($nodelist->length == 1) {
 			$quadStr = "";
 			foreach ($nodelist->item(0)->childNodes as $child) {
@@ -242,20 +237,20 @@ class MM_Dataset2 {
 		$oldVals = $this->getQuadtree();
 		if (count($oldVals) > 0) {
 			// delete old item
-			foreach ($this->xpath->query("/d:dataset/d:quadtree_nodes") as $node) {
+			foreach ($this->xpathDS->query("/d:dataset/d:quadtree_nodes") as $node) {
 				$node->parentNode->removeChild($node);
 			}
 		}
-		$ds = $this->xpath->query("/d:dataset")->item(0);
+		$ds = $this->xpathDS->query("/d:dataset")->item(0);
 		if (count($quadtreeNodes)) {
 			$nodeStr = "";
 			foreach ($quadtreeNodes as $quadNode) {
 				$nodeStr .= "$quadNode\n";
 			}
-			$quadtreeNode = $this->dom->createElementNS($this->namespace,'quadtree_nodes');
-			$quadtreeNode->appendChild($this->dom->createTextNode($nodeStr));
+			$quadtreeNode = $this->domDS->createElementNS($this->namespaceDS,'quadtree_nodes');
+			$quadtreeNode->appendChild($this->domDS->createTextNode($nodeStr));
 
-			$nodelist = $this->xpath->query("/d:dataset/*");
+			$nodelist = $this->xpathDS->query("/d:dataset/*");
 			$inserted = false;
 			foreach ($nodelist as $node) {
 				if ($node->nodeName != 'info' && $node->nodeName != 'datacollection_period') {
@@ -272,16 +267,25 @@ class MM_Dataset2 {
 	}
 
 	/**
+	 * get a xml string of this dataset
+	 * @return xml
+	 */
+	function getDS_XML() {
+		return $this->domDS->saveXML();
+	}
+
+	/**
 	 * get a xml string of this metadata
 	 * @return xml
 	 */
-	function getXML() {
-		return $this->dom->saveXML();
+	function getMM2_XML() {
+		return $this->domMM2->saveXML();
 	}
+
 	
 }
 
-class MM_Dataset2Exception extends Exception {
+class MM_DatasetException extends Exception {
 	public function __construct($message, $code = 0) {
     	// make sure everything is assigned properly
    		parent::__construct($message, $code);
@@ -292,7 +296,7 @@ class MM_Dataset2Exception extends Exception {
   	}
   	// static exception_handler for default exception handling
   	public static function exception_handler($exception) {
-    	throw new DatasetException($exception);
+    	throw new MM_DatasetException($exception);
   	}
 }
 ?>

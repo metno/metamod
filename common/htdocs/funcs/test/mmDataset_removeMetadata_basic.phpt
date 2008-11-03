@@ -1,0 +1,16 @@
+--TEST--
+MM_Dataset removeMetadata function - basic test for MM_Dataset removeMetadata
+--FILE--
+<?php
+require_once("../mmDataset.inc");
+$ds2 = new MM_Dataset();
+$ds2->addMetadata(array("hallo" => array("world")));
+$ds2->removeMetadata(array("hallo"));
+var_dump($ds2->getMM2_XML());
+?>
+--EXPECT--
+string(310) "<?xml version="1.0" encoding="iso8859-1"?>
+<?xml-stylesheet href="https://wiki.met.no/_media/metamod/dataset.xsl" type="text/xsl"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 MM2.xsd">
+</MM2>
+"

@@ -1,4 +1,4 @@
 htdocs/adm/index.php
 htdocs/funcs/mmLogging.inc
-htdocs/funcs/readDataset.inc
-schema/metamodDataset2.xsd
+=htdocs/funcs/readDataset.inc
+=htdocs/funcs/mmDataset.inc
