@@ -30,7 +30,7 @@
 ?>
 <?php
 require_once("../funcs/mmLogging.inc");
-require_once("../funcs/readDataset.inc");
+require_once("../funcs/mmDataset.inc");
 
 function fmquestversion() {
 
@@ -54,21 +54,23 @@ function fmcreateform($outputdst, $filename, $edit=false) {
 	# not as md5 hash
 	# TODO: check for password in this case
     $uploadDir = $_REQUEST["uploadDirectory"];
-    $currentData = array();
-    $ownertag = '';
     
     if ($edit) { // read data from session
-    	$xmlString = $_SESSION["tempDataset"];
-    	if (strlen($xmlString) > 0) {
-    		list($ownertag, $currentData) = mmReadEssentialDatasetXml($xmlString);
+    	$xmlStringDS = $_SESSION["tempDataset"];
+    	$xmlStringMM2 = $_SESSION["tempMM2"];
+    	if (strlen($xmlStringDS) > 0) {
+    		$ds = new MM_Dataset($xmlStringDS, $xmlStringMM2, true);
     	}
     } elseif (strlen($uploadDir) != 0) { // read data from file
-		$datasetFile = $outputdst . '/' . $uploadDir . ".xml";
+		$datasetFile = $outputdst . '/' . $uploadDir . ".xmd";
+		$metadataFile = $outputdst . '/' . $uploadDir . ".xml";
 		if (file_exists($datasetFile)) {
-			list($ownertag, $currentData) = mmReadEssentialDataset($datasetFile);
+			$ds = new MM_Dataset($datasetFile, $metadataFile);
 		}
 	}
-	
+	if ($ds) {
+		$currentData = fmDataset2ArrayData($ds);
+	}
 	
     $mytempl = file($filename);
 
@@ -370,7 +372,7 @@ function fmcreategcmdlist($myname,$mylabel,$myvalue,$size,$exclude,$include,$cur
 	$curValues = array();
 	if (isset($curData[$mname])) {
 		foreach ( $curData[$mname] as $value ) {
-			$curValues[$value] = 1;
+			$curValues[$value] = true;
 		}
 	}
     $mystr = fmcreaterecordstart();
@@ -400,7 +402,7 @@ function fmcreategcmdlist($myname,$mylabel,$myvalue,$size,$exclude,$include,$cur
     foreach ($myarr as $myrecord) {
     	$myrecord = rtrim($myrecord);
 		$mystr .= "<option value=\"$myrecord\" ";
-		if ($curValues[$myrecord]) {
+		if ($curValues[htmlspecialchars($myrecord)]) {
 			$mystr .= "selected=\"selected\" ";
 		}
 		$mystr .= ">";
@@ -510,21 +512,64 @@ function fmcreateerrmsg($mymsg) {
     return($myformattedmsg);
 }
 
-/**
- * @brief convert the POST array to xml and html
- * @param addititions array with additional xml rows, right below the root node
- * @return array($xml, $html)
- */
-function fmForm2XmlHtml($additions = array()) {
-	$xml = <<<EOF
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<dataset ownertag="[==QUEST_OWNERTAG==]">
-EOF;
-	foreach ($additions as $row) {
-		$xml .= "$row\n";
+function fmDataset2ArrayData(MM_Dataset $ds) {
+	$currentData = $ds->getMetadata();
+	$info = $ds->getInfo();
+	if (isset($info["name"])) {
+		$currentData["drpath"] = array($info["name"]);
 	}
-    $html = "<html>\n<head>\n</head>\n<body>\n";
+	$tags = array("creationDate", "status", "metadataFormat", "ownertag");
+	foreach ( $tags as $t ) {
+		if (isset($info[$t])) {
+			$currentData[$t] = array($info[$t]);
+		}
+	}
+	if (count($ds->getQuadtree())) {
+		$currentData["quadtree_nodes"] = $ds->getQuadtree();
+	}
 	
+	return $currentData;
+}
+
+/**
+ * @brief convert the POST array to the MM_Dataset and a html representation
+ * @param $ds a MM_Dataset with possibly prefilled data. New data will be added
+ * @return $html
+ */
+function fmForm2XmlHtml(MM_Dataset $ds) {
+	$specialTags = array(
+		"name" => true,
+		"drpath" => true, # alias for name
+		"creationDate" => true,
+		"ownertag" => true,
+		"status" => true,
+		"metadataFormat" => true,
+		"quadtree_nodes" => true
+	);
+	
+	// handle the info tags
+	foreach ( $specialTags as $st => $value ) {
+		$info = $ds->getInfo();
+    	if (isset($_POST[$st])) {
+    		if ($st != "quadtree_nodes") {
+    			if ($st == "drpath") {
+    				$info["name"] = htmlspecialchars($_POST[$st]);
+    			} else {
+    				$info[$st] = htmlspecialchars($_POST[$st]);
+    			}
+    		}
+    	}   
+	}
+	$info["ownertag"] = "[==QUEST_OWNERTAG==]"; // hard-coded ownertag
+	$ds->addInfo($info);
+	// handle quadtree
+	if (isset($_POST["quadtree_nodes"])) {
+		$nodes = preg_split("/\s+/", $_POST["quadtree_nodes"], -1, PREG_SPLIT_NO_EMPTY);
+		$ds->setQuadtree($nodes);
+	}
+	
+	// handle other metadata
+    $html = "<html>\n<head>\n</head>\n<body>\n";
 	foreach ($_POST as $mykey=>$myvalue) {
 		if ($mykey == "Submit" || $mykey == "cmd" || $mykey == "institutionId" || $mykey == "uploadDirectory" || $mykey == "drpath") {
 	    	continue;
@@ -540,23 +585,23 @@ EOF;
     	}
 	
 		if (is_array($myvalue)) {
+    		if (! isset($specialTags[$mykey])) {
+    			$ds->addMetadata(array($mykey => $myvalue));
+    		}			
 	    	$html .= "<b>$mykey</b><br/>\n";
 	    	foreach ($myvalue as $singleitem) {
-				$xml .= "\t<$mykey>$singleitem</$mykey>\n";
 				$html .= "<p>".wordwrap(ereg_replace("\n","<br />\n",$singleitem."<br />"),70)."</p>\n";
 	    	}
 		} else {
+			if (! isset($specialTags[$mykey])) {
+				$ds->addMetadata(array($mykey => array($myvalue)));
+			}
 	    	$html .= "<b>$mykey</b><br />\n<p>".wordwrap(ereg_replace("\n","<br />\n",$myvalue),70)."</p>\n";
-	    	if ($mykey == "abstract") {
-				$xml .= "\t<$mykey>\n$myvalue\n\t</$mykey>\n";
-	    	} else {
-				$xml .= "\t<$mykey>$myvalue</$mykey>\n";
-	    	}
 		}
     }
     $html .= "</body>\n</html>\n";
-    $xml .= "</dataset>\n";
-    return array($xml, $html);
+
+    return $html;
 }
 
 #
@@ -573,7 +618,7 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
    		return;
 	}
 
-	$outputfile = "";
+	$outputfileBase = "";
 	if ($_REQUEST["uploadDirectory"]) {
 		if (! $_REQUEST["institutionId"]) {
 			$mysmg = "information missing during quest metadata configuration, please enter through the admin portal!";
@@ -581,7 +626,7 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
 			echo(fmcreatebutton("Submit", "Edit form"));
        		return;
 		}
-    	$outputfile = "$outputdst/".$_REQUEST["uploadDirectory"].".xml";
+    	$outputfileBase = "$outputdst/".$_REQUEST["uploadDirectory"];
     	# automatically set the following parameters
     	if (! (isset($_REQUEST["drpath"]) && strlen($_REQUEST["drpath"]))) {
     		if (preg_match ('/\/([^\/]+)$/',$outputdst,$matches1)) {
@@ -600,24 +645,19 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
     	if (preg_match ('/\/([^\/]+)$/',$outputdst,$matches1)) {
        		$drpath = $matches1[1].'/'.$md5code;
     	}
-    	$outputfile = "$outputdst/$md5code.xml";
-    	if (file_exists($outputfile)) {
+    	$outputfileBase = "$outputdst/$md5code";
+    	if (file_exists($outputfileBase.".xml")) {
 			echo(fmcreateerrmsg("You have submitted information using the same keyphrase before"));
 			echo(fmcreatebutton("Submit", "Edit form"));
 			return;
     	}
 	}
 	
-	list($myxmlcontent, $myhtmlcontent) = fmForm2XmlHtml(array("<drpath>$drpath</drpath>"));
+	$ds = new MM_Dataset();
+	$myhtmlcontent = fmForm2XmlHtml($ds);
+	$ds->addInfo(array("name" => $drpath));
+	$ds->write($outputfileBase);
 
-    # Removed FILE_TEXT flag. This flag is only available in PHP 6.
-    # LOCK_EX|FILE_TEXT -> LOCK_EX
-    if (file_put_contents($outputfile, $myxmlcontent,LOCK_EX) == FALSE) {
-		$mymsg="Could not store data, have you submitted this information
-		using the same keyphrase earlier? Sorry for the inconveniece";
-		echo(fmcreateerrmsg($mymsg));
-		return;
-    };
     $mailheader = 'MIME-Version: 1.0' . "\r\n";
     $mailheader .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
     $mailheader .= 'From: '.$mysender. "\r\n" .
@@ -630,6 +670,7 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
 
     echo(fmquestversion());
     unset($_SESSION["tempDataset"]);
+    unset($_SESSION["tempMM2"]);
     return;
 }
 
@@ -637,8 +678,10 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
 # Check the contents of the information submitted
 #
 function fmcheckform($outputdst, $filename) {
-	list($xmlString, $htmlString) = fmForm2XmlHtml();
-	$_SESSION["tempDataset"] = $xmlString; // store the dataset in a session
+	$ds = new MM_Dataset();
+	$htmlString = fmForm2XmlHtml($ds);
+	$_SESSION["tempDataset"] = $ds->getDS_XML(); // store the dataset in a session
+	$_SESSION["tempMM2"] = $ds->getMM2_XML(); // store the dataset in a session
 
     $errors = FALSE;
     if (! file_exists($filename)) {
@@ -686,11 +729,14 @@ function fmcheckform($outputdst, $filename) {
 		# escape user-entered values
 		$mykey = htmlspecialchars($mykey);
     	if (is_array($myvalue)) {
+    		$myHiddenValue = array();
 			foreach ($myvalue as $myitem => $singleval) {
 		    	$myvalue[$myitem] = htmlspecialchars($singleval);
+		    	$myHiddenValue[$myitem] = $myvalue[$myitem]; 
 			}
     	} else {
 			$myvalue = htmlspecialchars($myvalue);
+			$myHiddenValue = $myvalue; # not modified value
     	}
 		echo(fmcreaterecordstart());
 
@@ -766,7 +812,7 @@ function fmcheckform($outputdst, $filename) {
 					"use the back button and shorten the text.</span>";
 				$errors = TRUE;
 	    	} else {
-				$myvalue = ereg_replace("\n","<br><br>\n",htmlspecialchars($myvalue));
+				$myvalue = ereg_replace("\n","<br><br>\n",$myvalue);
 	    	}
 		}
 
@@ -810,12 +856,12 @@ function fmcheckform($outputdst, $filename) {
 		# Add hidden elements to transport information to the data dump
 		# function
 		if (!$errors) {
-    		if (is_array($myvalue)) {
-				foreach ($myvalue as $singleitem) {
+    		if (is_array($myHiddenValue)) {
+				foreach ($myHiddenValue as $singleitem) {
 	    			echo(fmcreatehidden($mykey."[]",$singleitem));
 				}
 			} else {
-				echo(fmcreatehidden($mykey,$myvalue));
+				echo(fmcreatehidden($mykey,$myHiddenValue));
     		}
 		}
     }

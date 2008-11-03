@@ -56,6 +56,7 @@ class MM_Dataset {
 	 * @throw MM_Dataset2Exception
 	 */
 	function __construct($inputDS = "", $inputMM2 = "", $input_is_data = false) {
+			$sDate = gmstrftime("%Y-%m-%dT%H-%M-%SZ");
 			$dataDS =
 '<?xml version="1.0" encoding="iso8859-1" ?>
 <?xml-stylesheet href="https://wiki.met.no/_media/metamod/dataset.xsl" type="text/xsl"?>
@@ -63,7 +64,7 @@ class MM_Dataset {
    xmlns="http://www.met.no/schema/metamod/dataset"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://www.met.no/schema/metamod/dataset dataset.xsd">
-  <info name="" status="active" creationDate="1970-01-01T00:00:00Z" ownertag="" metadataFormat="MM2"/>
+  <info name="" status="active" creationDate="'.$sDate.'" ownertag="" metadataFormat="MM2"/>
 </dataset>';
 			$dataMM2 =
 '<?xml version="1.0" encoding="iso8859-1"?>
@@ -282,7 +283,39 @@ class MM_Dataset {
 		return $this->domMM2->saveXML();
 	}
 
-	
+	/**
+	 * write the dataset (with flock-locking) to the output Basename.
+	 * The MM2 metadata will be written to $outputBasename.xml
+	 * The dataset will be written to $outputBasename.xmd
+	 * 
+	 * @param $outputBasename Path to the output-files without appendix .xml or .xmd
+	 * @throws MM_DatasetException if file or lock has problems 
+	 * 
+	 */
+	function write($outputBasename) {
+		$dsfh = fopen($outputBasename . ".xmd", "w");
+		if (!$dsfh) {
+			throw new MM_DatasetException("cannot write dataset-file '$outputBasename.xmd'");
+		}
+		if (!flock($dsfh, LOCK_EX)) {
+			throw new MM_DatasetExeption("cannot lock dataset-file '$outputBasename.xmd'");
+		}
+		$mm2fh = fopen($outputBasename . ".xml", "w");
+		if (!$mm2fh) {
+			throw new MM_DatasetException("cannot write metadata-file '$outputBasename.xml'");
+		}
+		if (!flock($mm2fh, LOCK_EX)) {
+			flock($dsfh, LOCK_UN);
+			throw new MM_DatasetExeption("cannot lock metadata-file '$outputBasename.xml'");			
+		}
+
+		fwrite($dsfh, $this->getDS_XML());
+		fwrite($mm2fh, $this->getMM2_XML());
+
+		// fclose include unlock
+		fclose($mm2fh);
+		fclose($dsfh);
+	}
 }
 
 class MM_DatasetException extends Exception {
