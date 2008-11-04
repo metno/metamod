@@ -2,4 +2,9 @@ htdocs/adm/index.php
 htdocs/funcs/mmLogging.inc
 =htdocs/funcs/readDataset.inc
 =htdocs/funcs/mmDataset.inc
-scripts/quadtreeuse.pm
+=schema/oldDataset2Dataset.xslt
+=schema/oldDataset2MM2.xslt
+lib/Metamod/DatasetTransformer.pm
+lib/Metamod/DatasetTransformer/MM2.pm
+lib/Metamod/DatasetTransformer/OldDataset.pm
+lib/quadtreeuse.pm
