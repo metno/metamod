@@ -12,13 +12,13 @@
     <xsl:output method="xml" indent="yes" encoding="iso8859-1"/>
     
     <xsl:template match="/">
-    	<xsl:processing-instruction name="xml-stylesheet">href="https://wiki.met.no/_media/metamod/dataset.xsl" type="text/xsl"</xsl:processing-instruction>
+    	<xsl:processing-instruction name="xml-stylesheet">href="dataset.xsl" type="text/xsl"</xsl:processing-instruction>
         <xsl:apply-templates select="dataset"/>
     </xsl:template>
 
     <xsl:template match="dataset">
 		<xsl:element name="MM2" xmlns="http://www.met.no/schema/metamod/MM2">
-			<xsl:attribute name="schemaLocation" namespace="http://www.w3.org/2001/XMLSchema-instance">http://www.met.no/schema/metamod/MM2 MM2.xsd</xsl:attribute>
+			<xsl:attribute name="schemaLocation" namespace="http://www.w3.org/2001/XMLSchema-instance">http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd</xsl:attribute>
         	<xsl:apply-templates select="datacollection_period" />
         	<!--  quadtree_nodes now in dataset, not in metadata -->
         	<xsl:for-each select="*[not(self::dataset|self::datacollection_period|self::drpath|self::quadtree_nodes)]">

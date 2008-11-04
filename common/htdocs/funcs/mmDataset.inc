@@ -59,20 +59,20 @@ class MM_Dataset {
 			$sDate = gmstrftime("%Y-%m-%dT%H-%M-%SZ");
 			$dataDS =
 '<?xml version="1.0" encoding="iso8859-1" ?>
-<?xml-stylesheet href="https://wiki.met.no/_media/metamod/dataset.xsl" type="text/xsl"?>
+<?xml-stylesheet href="dataset.xsl" type="text/xsl"?>
 <dataset
    xmlns="http://www.met.no/schema/metamod/dataset"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://www.met.no/schema/metamod/dataset dataset.xsd">
+   xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
   <info name="" status="active" creationDate="'.$sDate.'" ownertag="" metadataFormat="MM2"/>
 </dataset>';
 			$dataMM2 =
 '<?xml version="1.0" encoding="iso8859-1"?>
-<?xml-stylesheet href="https://wiki.met.no/_media/metamod/dataset.xsl" type="text/xsl"?>
+<?xml-stylesheet href="MM2.xsl" type="text/xsl"?>
 <MM2
    xmlns="http://www.met.no/schema/metamod/MM2"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 MM2.xsd">
+   xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
 </MM2>';
 		if (!$inputDS) {
 			// use defaults

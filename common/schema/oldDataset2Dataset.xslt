@@ -14,13 +14,13 @@
     <xsl:output method="xml" indent="yes" encoding="iso8859-1"/>
     
     <xsl:template match="/">
-    	<xsl:processing-instruction name="xml-stylesheet">href="https://wiki.met.no/_media/metamod/dataset.xsl" type="text/xsl"</xsl:processing-instruction>
+    	<xsl:processing-instruction name="xml-stylesheet">href="dataset.xsl" type="text/xsl"</xsl:processing-instruction>
         <xsl:apply-templates select="dataset"/>
     </xsl:template>
 
     <xsl:template match="dataset">
 		<xsl:element name="dataset" xmlns="http://www.met.no/schema/metamod/dataset">
-			<xsl:attribute name="schemaLocation" namespace="http://www.w3.org/2001/XMLSchema-instance">http://www.met.no/schema/metamod/dataset2/ metamodDataset2.xsd</xsl:attribute>
+			<xsl:attribute name="schemaLocation" namespace="http://www.w3.org/2001/XMLSchema-instance">http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd</xsl:attribute>
         	<xsl:element name="info">
           		<xsl:attribute name="name"><xsl:value-of select="/dataset/drpath"/></xsl:attribute>
           		<xsl:attribute name="status">active</xsl:attribute>
