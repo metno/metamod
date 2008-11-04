@@ -3,8 +3,8 @@
 <!--
     Author     : heikok
     Description: Transformation of an old dataset to the aktual dataset-format
-                 Postprocessing needed: The creationDate info cannot be set
-		                        automatically!
+                 Postprocessing needed: The creationDate and status cannot be set
+		                        automatically. Using some defaults.
 		    
 		Try i.e.
 		    xsltproc -o newDataset.xml oldDataset2Dataset.xslt oldDataset.xml
