@@ -51,18 +51,25 @@ DEPENDENCIES
 This software depends on the following external software which is not part
 of the METAMOD 2.x distribution:
 
-- Linux operating system. METAMOD 2.x might work on other UNIX-like operating
-  systems, but this is not tested.
-
 - PostgreSQL database system. Tested on version 8.1
 
 - Apache 2.x web server with PHP 5.x installed
 
-- Perl v5.8 with the following Perl modules:
-  File::Copy, File::Path, XML::Simple, Data::Dumper, DBI, POSIX, warnings,
-  Geo::Proj4, Fcntl, Mail::Mailer, PDL, PDL::Char, PDL::NetCDF, integer
+- libxml and libxslt library from xmlsoft.org
 
-- NetCDF software: ncdump and ncgen
+- Proj4 library (http://proj.maptools.org)
+
+- NetCDF software 3.x (x >= 5): libnetcdf, ncdump and ncgen (METAMODUPLOAD)
+
+- PHP 5.x with libxml, libxslt and libpsql installed
+
+- Perl v5.8 with the following Perl modules:
+  XML::Simple, XML::LibXML, XML::LibXSLT, DBI, DBD::Pg
+  Geo::Proj4, Mail::Mailer, PDL, PDL::Char, PDL::NetCDF
+
+- METAMOD 2.x has been developed and tested using Fedora and Debian Linux,
+  but should work on most operating systems supporting the mentioned libraries
+
 
 SYSTEM OVERVIEW
 ---------------
