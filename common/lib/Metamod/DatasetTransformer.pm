@@ -4,8 +4,9 @@ use 5.6.0;
 use strict;
 use warnings;
 use Fcntl ':flock'; # import LOCK_* constants
+use File::Spec;
 
-our $VERSION = 0.1;
+our $VERSION = 0.2;
 
 sub new {
     die "'new' not implemented yet: new(\$dataStr)\n";
@@ -45,7 +46,32 @@ sub getFileContent {
     close($ml) if $xmlFile;
     close($md) if $xmdFile;
     return ($xmdStr, $xmlStr);
-        
+}
+
+sub getPlugins {
+    my $classPath = __PACKAGE__;
+    $classPath = File::Spec->catfile(split '::', $classPath);
+    $classPath .= '.pm';
+    my $fullClassPath = $INC{$classPath};
+    my $basePluginPath = $fullClassPath;
+    $basePluginPath =~ s/\.pm$//;
+    my $d;
+    opendir $d, $basePluginPath;
+    my @files = grep {/\.pm$/ && -f File::Spec->catfile($basePluginPath,$_)} readdir $d;
+    closedir $d;
+    
+    my @plugins;
+    foreach my $file (@files) {
+        my $plugin = __PACKAGE__ . "::$file";
+        $plugin =~ s/\.pm$//;
+        eval "require $plugin";
+        if ($@) {
+            warn "cannot load module $plugin: $@";
+            next;
+        }
+        push @plugins, $plugin;
+    }
+    return @plugins;
 }
 
 sub test {
@@ -74,7 +100,7 @@ Metamod::DatasetTransformer - interface to transform datasets
   my $implX = new Metamod::DatasetTransfomer::ImplX($xmdStr, $xmlStr);
   my $datasetStr;
   if ($implX->test) {
-      $datasetObj = $implX->transform;
+      my ($dsDoc, $mm2Doc) = $implX->transform;
   }
 
 =head1 DESCRIPTION
@@ -94,6 +120,12 @@ files doesn't exist. In that case, the content is undef. This function will die 
 occur, i.e. filename is not readable (but exists) or flock fails.
 
 Return: ($xmdContent, $xmlContent)
+
+=item getPlugins
+
+load and return list of plugins
+
+Return: @array = (Metamod::DatasetTransformer::Impl1, Metamod::DatasetTransformer::Impl2, ...)
 
 =back
 
@@ -125,10 +157,6 @@ return ($datasetDoc, $mm2Doc)
 return a string describing the original format
 
 =back
-
-=head1 VERSION
-
-0.1
 
 =head1 AUTHOR
 
