@@ -5,10 +5,6 @@ use 5.6.0;
 use strict;
 use warnings;
 use Carp qw(carp croak);
-use XML::LibXML;
-use XML::LibXSLT;
-
-our $DEBUG = 0;
 
 our $VERSION = 0.1;
 
@@ -33,17 +29,16 @@ sub test {
     my $self = shift;
 
     if (!$self->{dsDoc}) { # start initializing
-        my $parser = XML::LibXML->new();
         eval {
-            $self->{dsDoc} = $parser->parse_string($self->{xmdStr});
-            $self->{mm2Doc} = $parser->parse_string($self->{xmlStr});
+            $self->{dsDoc} = $self->XMLParser->parse_string($self->{xmdStr}) if $self->{xmdStr};
+            $self->{mm2Doc} = $self->XMLParser->parse_string($self->{xmlStr}) if $self->{xmlStr};
         }; # do nothing on error, doc stays empty
-        if ($DEBUG && $@) {
+        if ($self->DEBUG && $@) {
             warn "$@\n";
         }
     }
     unless ($self->{dsDoc} && $self->{mm2Doc}) {
-        warn "not both documents initialized" if $DEBUG;
+        warn "not both documents initialized" if $self->DEBUG;
         return 0;
     }
 
@@ -57,7 +52,7 @@ sub test {
         my $nodeList = $xpc->findnodes('/d:dataset/d:info/@ownertag', $root);
         if ($nodeList->size() == 1) {
             $success++;
-        } elsif ($DEBUG) {
+        } elsif ($self->DEBUG) {
             warn "could not find /d:dataset/d:info/\@ownertag\n";
         }
     }
@@ -66,7 +61,7 @@ sub test {
         my $nodeList = $xpc->findnodes('/m:MM2', $root);
         if ($nodeList->size() == 1) {
             $success++;
-        } elsif ($DEBUG) {
+        } elsif ($self->DEBUG) {
            warn "could not find /m:MM2\n";
         }
     }

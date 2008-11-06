@@ -25,7 +25,7 @@ is($obj2->test, 0, "test invalid file");
 
 
 my ($xmdStr2, $xmlStr2) = Metamod::DatasetTransformer::getFileContent("exampleMM2");
-my $obj3 = new Metamod::DatasetTransformer::OldDataset($xmdStr2, $xmlStr2, 'dsXslt' => $xsltDS );
+my $obj3 = new Metamod::DatasetTransformer::OldDataset($xmdStr2, $xmlStr2, 'dsXslt' => $xsltDS, 'mm2Xslt' => $xsltMM2  );
 isa_ok($obj3, 'Metamod::DatasetTransformer::OldDataset');
 is($obj3->test, 0, "test dataset2 file");
 eval {

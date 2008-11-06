@@ -29,8 +29,9 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
 #---------------------------------------------------------------------------- 
 #
-# use strict;
-use XML::Simple qw(:strict);
+use strict;
+use lib qw(../lib);
+use Metamod::Dataset;
 use Data::Dumper;
 use DBI;
 #
@@ -73,7 +74,7 @@ if (scalar @ARGV == 1) {
 #
 my $dbname = "[==DATABASE_NAME==]";
 my $user = "admin";
-local $dbh = DBI->connect("dbi:Pg:dbname=" . $dbname . " [==PG_CONNECTSTRING_PERL==]", $user, "");
+my $dbh = DBI->connect("dbi:Pg:dbname=" . $dbname . " [==PG_CONNECTSTRING_PERL==]", $user, "");
 #
 #  Use full transaction mode. The changes has to be committed or rolled back:
 #
@@ -159,7 +160,7 @@ sub process_xml_loop {
             $xmldir1 =~ s/^ *//g;
             $xmldir1 =~ s/ *$//g;
             if (-d $xmldir1) {
-               my @newfiles = glob("$xmldir1/*");
+               my @newfiles = glob("$xmldir1/*.xm[ld]");
                foreach my $file (@newfiles) {
 #                  
 #                   Check if the file is modified after the 
@@ -192,11 +193,15 @@ sub process_xml_loop {
 #         
             `touch --reference=$path_to_import_updated_new $path_to_import_updated`;
 #
-            foreach my $xmlfile (@files_to_consume) {
+            # generate a list of unique basenames,
+            # i.e. file.xml and file.xmd will only processed once
+            my %uniqueBaseFiles;
+            map {my $f = $_; $f =~ s^\.\w*$^^; $uniqueBaseFiles{$f}++} @files_to_consume;
+            foreach my $xmlfile (keys %uniqueBaseFiles) {
                eval {
                   &update_database($xmlfile);
                };
-               if (defined($@) && $@) {
+               if ($@) {
                   $dbh->rollback or die $dbh->errstr;
                   my $stm = $dbh->{"Statement"};
                   &write_to_log("$xmlfile database error: $@\n   Statement: $stm");
@@ -242,21 +247,17 @@ sub write_to_log {
 }
 # ------------------------------------------------------------------
 sub update_database {
+   my ($inputBaseFile) = @_;
 #
-#  Convert input XML file to a hash (using XML::Simple):
+#  Read input XML file-pair:
 #
-   my $inputfile = $_[0];
-   unless (-r $inputfile) {die "Can not read from file: $inputfile\n";}
-   open (XMLINPUT,$inputfile);
-   flock(XMLINPUT, LOCK_SH);
-   undef $/;
-   my $xmlcontent = <XMLINPUT>;
-   $/ = "\n"; 
-   close (XMLINPUT); # also unlocks
-   my $xmlref = XMLin($xmlcontent, KeyAttr => [], ForceArray => 1, SuppressEmpty => '');
-   my $ownertag = $xmlref->{'ownertag'};
-#   print Dumper($xmlref);
-#   return;
+   my $ds = Metamod::Dataset->newFromFile($inputBaseFile);
+   unless ($ds) {
+      die "cannot initialize dataset for $inputBaseFile";
+   }
+   my %info = $ds->getInfo;
+   my $ownertag = $info{ownertag};
+
 #
 #  Create hash with existing references in the database:
 #
@@ -358,40 +359,23 @@ sub update_database {
       "INSERT INTO GA_Contains_GD (GA_id, GD_id) VALUES (?, ?)");
    my $sql_insert_GADS = $dbh->prepare(
       "INSERT INTO GA_Describes_DS (GA_id, DS_id) VALUES (?, ?)");
-#
-# Loop through all datasets rooted in the hash reference $xmlref.
-#
-   my $datasetref;
-   if (exists($xmlref->{'dataset'})) {
-      $datasetref = $xmlref->{'dataset'};
-   } else {
-      $datasetref = [$xmlref];
-   }
-   foreach my $ref1 (@$datasetref) {
-      my $drpath;
+   {
+      my %metadata = $ds->getMetadata;
+      my @quadtreenodes = $ds->getQuadtree;
+      my $drpath = $info{name};
       my $period_from;
       my $period_to;
-      my $quadtreenodes = "";
       my @metaarray = ();
       my @searcharray = ();
-      if (exists($ref1->{'drpath'})) {
-         $drpath = $ref1->{'drpath'}->[0];
-      } else {
+      unless (defined $drpath) {
          die "Dataset with no drpath";
       }
-      foreach my $name (keys %$ref1) {
-         my $ref2 = $ref1->{$name};
-         if ($name ne "ownertag" and ref($ref2) ne "ARRAY") {
-            die '$ref2 is not a reference to ARRAY:' . " $ref2\n";
-         }
+      
+      foreach my $name (keys %metadata) {
+         my $ref2 = $metadata{$name};
          if ($name eq 'abstract') {
             my $mref = [$name,$ref2->[0]];
             push(@metaarray,$mref);
-         } elsif ($name eq 'quadtree_nodes') {
-            $quadtreenodes = $ref2->[0];
-         } elsif ($name eq 'datacollection_period') {
-            $period_from = $ref2->[0]->{'from'};
-            $period_to = $ref2->[0]->{'to'};
          } elsif ($name eq 'datacollection_period_from') {
             $period_from = $ref2->[0];
             if ($period_from =~ /(\d\d\d\d-\d\d-\d\d)/) {
@@ -420,7 +404,7 @@ sub update_database {
                my $mref = ['area',$area];
                push(@metaarray,$mref);
             }
-         } elsif ($name ne 'ownertag') {
+         } else {
             foreach my $str1 (@$ref2) {
                my $mref = [$name,$str1];
                push(@metaarray,$mref);
@@ -507,13 +491,12 @@ sub update_database {
 #
 #   Insert quadtree nodes:
 #
-      if (length($quadtreenodes) > 0) {
+      if (@quadtreenodes > 0) {
          $sql_getkey_GA->execute();
          my @result = $sql_getkey_GA->fetchrow_array;
          my $gaid = $result[0];
          $sql_insert_GA->execute($gaid);
-         my @nodearr = split(/\s+/,$quadtreenodes);
-         foreach my $node (@nodearr) {
+         foreach my $node (@quadtreenodes) {
             if (length($node) > 0) {
                $sql_insert_GAGD->execute($gaid,$node);
             }

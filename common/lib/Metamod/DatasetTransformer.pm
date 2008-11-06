@@ -5,8 +5,15 @@ use strict;
 use warnings;
 use Fcntl ':flock'; # import LOCK_* constants
 use File::Spec;
+use XML::LibXML;
+use XML::LibXSLT;
 
-our $VERSION = 0.2;
+our $VERSION = 0.3;
+use constant DEBUG => 0;
+
+# single parser
+use constant XMLParser => new XML::LibXML();
+use constant XSLTParser => new XML::LibXSLT();
 
 sub new {
     die "'new' not implemented yet: new(\$dataStr)\n";
@@ -18,7 +25,7 @@ sub getBasename {
         # called as function, not method
         $file = $self; 
     }
-    $file =~ s/\.\w+$//;
+    $file =~ s/\.xm[dl]$//;
     return $file;
 }
 
@@ -26,11 +33,13 @@ sub getFileContent {
     my ($self, $file) = @_;
     unless (__PACKAGE__->isa($self) or (defined ref($self) and ref($self) eq __PACKAGE__)) {
         # called as function, not method
-        $file = $self; 
+        $file = $self;
+        $self = __PACKAGE__;
     }
-    $file =~ s/\.\w+$//;
+    $file = $self->getBasename($file);
     my $xmdFile = "$file.xmd" if -f "$file.xmd";
     my $xmlFile = "$file.xml" if -f "$file.xml";
+    warn "Base + xml + xmd: $file : $xmdFile : $xmlFile" if $self->DEBUG;
     my ($md, $ml);
     if ($xmdFile) {
         open $md, $xmdFile or die "cannot read $xmdFile: $!\n";
@@ -108,6 +117,16 @@ Metamod::DatasetTransformer - interface to transform datasets
 =head1 FUNCTIONS
 
 =over 4
+
+=item XMLParser
+
+Return: the xml parser as L<XML::LibXML> singleton. Use this parser to make sure, that the
+parser doesn't go out of scope. (To prevent XML::LibXML warnings when deregistering nodes from the parser.)
+
+=item XSLTParser
+
+Return: the xml parser as L<XML::LibXML> singleton. Use this parser to make sure, that the
+parser doesn't go out of scope. (To prevent XML::LibXML warnings when deregistering nodes from the parser.)
 
 =item getBasename($filename)
 

@@ -34,7 +34,7 @@ sub new {
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
 </MM2>';
-    my $parser = new XML::LibXML;
+    my $parser = Metamod::DatasetTransformer->XMLParser;
     my $docDS = $parser->parse_string($dataDS);
     my $docMM2 = $parser->parse_string($dataMM2);
     return $class->_initSelf('MM2', $docDS, $docMM2);

@@ -4,8 +4,6 @@ use base qw(Metamod::DatasetTransformer);
 use strict;
 use warnings;
 use Carp qw(carp croak);
-use XML::LibXML;
-use XML::LibXSLT;
 
 use 5.6.0;
 
@@ -23,13 +21,11 @@ sub new {
         croak ("new " . __PACKAGE__ . " needs argument (package, file), got: @_\n");
     }
     my ($class, $xmdStr, $xmlStr, %options) = @_;
-    my $parser = XML::LibXML->new();
     my $self = {xmdStr => $xmdStr,
                 xmlStr => $xmlStr,
                 oldDoc => undef, # init by test
                 dsXslt => $options{dsXslt} || $XSLT_FILE_DS,
                 mm2Xslt => $options{mm2Xslt} || $XSLT_FILE_MM2,
-                parser => $parser,
                };
     return bless $self, $class;
 }
@@ -38,12 +34,16 @@ sub test {
     my $self = shift;
     # test on xml-file of xmlStr
     unless ($self->{xmlStr}) {
+        warn "no data" if ($self->DEBUG);
         return 0; # no data
     }
     unless ($self->{oldDoc}) {
         eval {
-            $self->{oldDoc} = $self->{parser}->parse_string($self->{xmlStr});
+            $self->{oldDoc} = $self->XMLParser->parse_string($self->{xmlStr});
         }; # do nothing on error, $doc stays empty
+        if ($@ && $self->DEBUG) {
+            warn "$@\n";
+        }
     }
     return 0 unless $self->{oldDoc}; # $doc not initialized
     
@@ -52,6 +52,8 @@ sub test {
     my $nodeList = $root->findnodes('/dataset/@ownertag');
     if ($nodeList->size() == 1) {
         return 1;
+    } elsif ($self->DEBUG) {
+        warn "found ".$nodeList->size." nodes with /dataset/\@ownertag\n";
     }
     return 0;
 }
@@ -59,16 +61,20 @@ sub test {
 sub transform {
     my $self = shift;
     croak("Cannot run transform if test fails\n") unless $self->test;
-    my $xslt = new XML::LibXSLT();
     
-    my $styleDoc = $self->{parser}->parse_file($self->{mm2Xslt});    
-    my $stylesheet = $xslt->parse_stylesheet($styleDoc);
-    my $mm2Doc = $stylesheet->transform($self->{oldDoc});
+    my $mm2Doc;
+    {
+        my $styleDoc = $self->XMLParser->parse_file($self->{mm2Xslt});    
+        my $stylesheet = $self->XSLTParser->parse_stylesheet($styleDoc);
+        $mm2Doc = $stylesheet->transform($self->{oldDoc});
+    }
     
-    $styleDoc = $self->{parser}->parse_file($self->{dsXslt});
-    $stylesheet = $xslt->parse_stylesheet($styleDoc);
-    my $dsDoc = $stylesheet->transform($self->{oldDoc});
-
+    my $dsDoc;
+    {
+        my $styleDoc = $self->XMLParser->parse_file($self->{dsXslt});
+        my $stylesheet = $self->XSLTParser->parse_stylesheet($styleDoc);
+        $dsDoc = $stylesheet->transform($self->{oldDoc});
+    }
     return ($dsDoc, $mm2Doc);
 }
 
