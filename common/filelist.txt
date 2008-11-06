@@ -7,4 +7,5 @@ htdocs/funcs/mmLogging.inc
 lib/Metamod/DatasetTransformer.pm
 lib/Metamod/DatasetTransformer/MM2.pm
 lib/Metamod/DatasetTransformer/OldDataset.pm
+lib/Metamod/Dataset.pm
 lib/quadtreeuse.pm
