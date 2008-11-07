@@ -35,7 +35,7 @@
 <body>
 <pre>
 <?php
-   $path_to_syserrors = "[==WEBRUN_DIRECTORY==]/upl/syserrors";
+   $path_to_syserrors = "[==WEBRUN_DIRECTORY==]/syserrors";
    $syserrors = file_get_contents($path_to_syserrors);
    echo $syserrors;
 ?>

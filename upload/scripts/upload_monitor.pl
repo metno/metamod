@@ -32,6 +32,7 @@
 use strict;
 use File::Copy;
 use File::Path;
+use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 use Data::Dumper;
 use Mail::Mailer;
 $| = 1;
@@ -189,7 +190,7 @@ my %all_ftp_datasets;     # Initialized in sub read_ftp_events. For each dataset
                           # If this number == 0, the files are kept indefinitely.
 my $days_to_keep_errfiles = 14;
 my $problem_dir_path = $webrun_directory . "/upl/problemfiles";
-my $path_to_syserrors = $webrun_directory . "/upl/syserrors";
+my $path_to_syserrors = $webrun_directory . "/syserrors";
 my $path_to_shell_error = $webrun_directory . "/upl/shell_command_error";
 # my $path_to_shell_log = $webrun_directory . "/upl/shell_log";
 my $local_url = '[==LOCAL_URL==]';
@@ -1578,6 +1579,7 @@ sub syserror {
 #     Write message to error log:
 #
       open (OUT,">>$path_to_syserrors");
+      flock (OUT, LOCK_EX);
       print OUT "-------- $type $datestring IN: $where\n" .
                 "         $errmsg\n";
       if ($uploadname ne "") {

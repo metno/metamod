@@ -31,7 +31,7 @@
 #
 use strict;
 use LWP::UserAgent;
-use lib qw([==TARGET_DIRECTORY==]/scripts);
+use lib qw([==TARGET_DIRECTORY==]/lib);
 use quadtreeuse;
 use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 # use encoding 'utf8';
@@ -79,6 +79,7 @@ my $continue_oai_harvest = '[==WEBRUN_DIRECTORY==]/CONTINUE_OAI_HARVEST';
 my $xmldirectory = '[==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]/';
 my $applicationid = '[==APPLICATION_ID==]';
 my $status_file = '[==WEBRUN_DIRECTORY==]/oai_harvest_status';
+my $path_to_syserrors = '[==WEBRUN_DIRECTORY==]/syserrors';
 my $xmd_dataset_header = '<?xml version="1.0" encoding="UTF-8" ?>' . "\n" .
                  '<dataset xmlns="http://www.met.no/metamod2/dataset/"' . "\n" .
                  '   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' . "\n" .
@@ -126,7 +127,6 @@ if ($@) {
 sub do_harvest {
    my $previous_day = -1;
    while (-e $continue_oai_harvest) {
-      if (0) {
       my @ltime = localtime(&my_time());
       my $newday = $ltime[3]; # 1-31
       my $current_hour = $ltime[2];
@@ -140,7 +140,6 @@ sub do_harvest {
          next;
       }
       $previous_day = $newday;
-      }
 #      
 #       foreach key,value pair in a hash
 #      
@@ -179,7 +178,8 @@ sub do_harvest {
          if ($getrequest->is_success) {
             $content_from_get = $getrequest->content;
          } else {
-            die "GET did not succeed: " . $getrequest->status_line . "\n";
+            &syserror("","GET did not succeed: " . $getrequest->status_line);
+            next;
          }
          print "GET request returned " . length($content_from_get) . " bytes\n";
 #
@@ -237,7 +237,8 @@ sub process_DIF_records {
       $xml_header = $1; # First matching ()-expression
    }
    else {
-      die("No XML header");
+      &syserror("CONTENT","No XML header");
+      return;
    }
    while (1) {
 #   
@@ -261,7 +262,8 @@ sub process_DIF_records {
 #   
       $j1 = index($content_from_get,'<identifier>');
       if ($j1 < 0) {
-         die("No identifier");
+         &syserror("CONTENT","No identifier");
+         return;
       }
       $content_from_get = substr($content_from_get,$j1+12);
       print substr($content_from_get,0,50) . "\n";
@@ -269,7 +271,8 @@ sub process_DIF_records {
       if ($content_from_get =~ /^([^<]+)/) {
          $identifier = &trim($1); # First matching ()-expression
       } else {
-         die("No identifier 2");
+         &syserror("CONTENT","Empty identifier");
+         return;
       }
       print "Identifier: $identifier\n";
       my $base_filename;
@@ -285,7 +288,8 @@ sub process_DIF_records {
          $dsname = $applicationid . '/' . $ownertag . '_' . $localid;
       }
       else {
-         die("Wrong identifier format");
+         &syserror("","Wrong identifier format: ".$identifier);
+         return;
       }
 #
 #     Update the two XML files with metadata for this dataset (.xmd and .xml):
@@ -309,12 +313,12 @@ sub process_DIF_records {
 #      
          $j1 = index($content_from_get,'<metadata>');
          if ($j1 < 0) {
-            die("No metadata element");
+            &syserror("CONTENT","No metadata element");
          }
          $content_from_get = substr($content_from_get,$j1+10);
          $j1 = index($content_from_get,'<');
          if ($j1 < 0) {
-            die("No DIF element");
+            &syserror("CONTENT","No DIF element");
          }
          $content_from_get = substr($content_from_get,$j1);
 #      
@@ -325,7 +329,7 @@ sub process_DIF_records {
             $maintag = $1; # First matching ()-expression
          }
          else {
-            die("No maintag");
+            &syserror("CONTENT","No maintag");
          }
          print "maintag: $maintag\n";
 #      
@@ -333,7 +337,7 @@ sub process_DIF_records {
 #      
          $j1 = index($content_from_get,'</'.$maintag.'>');
          if ($j1 < 0) {
-            die("No closing $maintag tag");
+            &syserror("CONTENT","No closing $maintag tag");
          }
          my $xmlbody = substr($content_from_get,0,$j1 + length($maintag) + 3);
 #      
@@ -504,3 +508,32 @@ sub trim {
    $string =~ s/\s*$//m;
    return $string;
 }
+#
+#---------------------------------------------------------------------------------
+#
+sub syserror {
+   my ($type,$errmsg) = @_;
+#
+#  Find current time
+#
+   my @ta = localtime();
+   my $year = 1900 + $ta[5];
+   my $mon = $ta[4] + 1; # 1-12
+   my $mday = $ta[3]; # 1-31
+   my $hour = $ta[2]; # 0-23
+   my $min = $ta[1]; # 0-59
+   my $datestring = sprintf ('%04d-%02d-%02d %02d:%02d',$year,$mon,$mday,$hour,$min);
+#
+#
+#     Write message to error log:
+#
+   open (OUT,">>$path_to_syserrors");
+   flock (OUT, LOCK_EX);
+   print OUT "-------- HARVESTER $datestring:\n" .
+             "         $errmsg\n";
+   if ($type eq "CONTENT") {
+      print OUT "         The first 60 characters of \$content_from_get:\n";
+      print OUT substr($content_from_get,0,60);
+      print OUT "\n";
+   }
+};
