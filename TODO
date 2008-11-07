@@ -13,19 +13,5 @@ General tasks for Metamod2
 * using single metadata-configuration for quest and upload
   * using another config (but connected) for digest_nc.pl to extract metadata
     from nc-files
-* cleanup datacollection_period and datacollection_period_from/_to
 * concentrate on one scripting language, avoid the other
 * use centralised logging, i.e. log4php or simply mmLogging.php
-
-Update of Datasets (assigned to Heiko)
-=====================================
-* generate module to read a dataset2 from the database
-* qst to read from database/write to disk
-* digest_nc.pl to write dataset2
-* import_dataset.pl to read dataset2; import_dataset.pl to have converters from other datasets
-
-
-TODO (assigned to Heiko, just for synchronization)
-==================================================
-* test digest_nc.pl
-
