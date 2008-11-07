@@ -1,7 +1,40 @@
 #!/usr/bin/perl -w
+#
+#---------------------------------------------------------------------------- 
+#  METAMOD - Web portal for metadata search and upload 
+# 
+#  Copyright (C) 2008 met.no 
+# 
+#  Contact information: 
+#  Norwegian Meteorological Institute 
+#  Box 43 Blindern 
+#  0313 OSLO 
+#  NORWAY 
+#  email: egil.storen@met.no 
+#   
+#  This file is part of METAMOD 
+# 
+#  METAMOD is free software; you can redistribute it and/or modify 
+#  it under the terms of the GNU General Public License as published by 
+#  the Free Software Foundation; either version 2 of the License, or 
+#  (at your option) any later version. 
+# 
+#  METAMOD is distributed in the hope that it will be useful, 
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+#  GNU General Public License for more details. 
+#   
+#  You should have received a copy of the GNU General Public License 
+#  along with METAMOD; if not, write to the Free Software 
+#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
+#---------------------------------------------------------------------------- 
+#
 use strict;
 use LWP::UserAgent;
+use lib qw([==TARGET_DIRECTORY==]/scripts);
+use quadtreeuse;
 use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
+# use encoding 'utf8';
 #
 #  OAI-PMH Harvester
 #  =================
@@ -82,7 +115,7 @@ eval {
 };
 #
 #  Check error string returned from eval
-#  If not empty, an error ha occured
+#  If not empty, an error has occured
 #
 if ($@) {
    warn $@;
@@ -93,16 +126,20 @@ if ($@) {
 sub do_harvest {
    my $previous_day = -1;
    while (-e $continue_oai_harvest) {
+      if (0) {
       my @ltime = localtime(&my_time());
       my $newday = $ltime[3]; # 1-31
       my $current_hour = $ltime[2];
+#      print "$previous_day $newday $current_hour\n";
       if ($newday == $previous_day || $current_hour < [==HARVEST_HOUR==]) {
          if ([==TEST_IMPORT_SPEEDUP==] <= 1) {
             sleep(15*60);
-         } else 
+         } else {
             sleep(1);
          }
          next;
+      }
+      $previous_day = $newday;
       }
 #      
 #       foreach key,value pair in a hash
@@ -111,6 +148,7 @@ sub do_harvest {
 #
 #       Open file for reading (with shared lock)
 #
+        print "harvesting $ownertag $url\n";
         my $status_content = "";
         if (-r $status_file) {
            open (STATUS,$status_file);
@@ -121,6 +159,8 @@ sub do_harvest {
            close (STATUS); # Also unlocks
         }
         my $date_last_upd;
+        print "Status content:\n\n";
+        print $status_content . "\n";
         my $j1 = index($status_content,$url);
         if ($j1 >= 0) {
            $j1 += length($url) + 1;
@@ -134,23 +174,18 @@ sub do_harvest {
 #          Send GET request 
 #          and receive response object in $getrequest:
 #         
+         print "Send GET request: $urlsent\n";
          my $getrequest = $useragent->get($urlsent);
          if ($getrequest->is_success) {
             $content_from_get = $getrequest->content;
          } else {
             die "GET did not succeed: " . $getrequest->status_line . "\n";
          }
-#         
-#           Check if expression matches RE:
-#         
-         my $xml_header;
-         if ($content_from_get =~ /^(<\?[^>]*\?>)/) {
-            $xml_header = $1; # First matching ()-expression
-         }
-         else {
-            die("No XML header");
-         }
-         &process_DIF_records();
+         print "GET request returned " . length($content_from_get) . " bytes\n";
+#
+#        Process DIF records:
+#
+         &process_DIF_records($ownertag);
 #
 #        Update the status file:
 #
@@ -164,55 +199,79 @@ sub do_harvest {
             open (STATUS,">$status_file");
             $status_content = "";
          }
-         my $j1 = index($status_content,$url);
+         my $j2 = index($status_content,$url);
+         print "j2 = $j2\n";
+         print "length of url = " . length($url) . "\n";
          my $new_status_content;
-         if ($j1 >= 0) {
-            $new_status_content = substr($status_content,0,$j1);
-            $new_status_content .= substr($status_content,$j1+length($url)+12);
+         if ($j2 >= 0) {
+            $new_status_content = substr($status_content,0,$j2);
+            $new_status_content .= substr($status_content,$j2+length($url)+12);
+            print "new_status_content 1 =\n" . $new_status_content . "\n";
+         } else {
+            $new_status_content = $status_content;
          }
          {
             my @utctime = gmtime(&my_time());
             my $year = 1900 + $utctime[5];
             my $mon = $utctime[4]; # 0-11
             my $mday = $utctime[3]; # 1-31
-            my $updated = sprintf('%04d-%02d-%02d',$year,$mon,$mday);
+            my $updated = sprintf('%04d-%02d-%02d',$year,$mon+1,$mday);
             $new_status_content .= $url . ' ' . $updated . "\n";
+            print "new_status_content 2 =\n" . $new_status_content . "\n";
          }
-         print STATUS $status_content;
+         seek(STATUS,0,0);
+         print STATUS $new_status_content;
          close (STATUS);
       }
+      sleep(10);
    }
 }
 #
 #-----------------------------------------------------------------------
 #
 sub process_DIF_records {
+   my ($ownertag) = @_;
+   print "--- Process DIF records:\n";
+   my $xml_header;
+   if ($content_from_get =~ /^(<\?[^>]*\?>)/) {
+      $xml_header = $1; # First matching ()-expression
+   }
+   else {
+      die("No XML header");
+   }
    while (1) {
 #   
 #     Finished if no more header elements:
 #   
-      if ($content_from_get !~ /^.*?<\w*:?header/) {
+      my $j1 = index($content_from_get,'<header');
+      if ($j1 < 0) {
+         print "finished DIF records\n";
          last;
       }
 #   
 #     Extract header status:
 #   
-      $content_from_get =~ s/^.*?<\w*:?header *//mg;
+      $content_from_get = substr($content_from_get,$j1+7);
       my $status = "active";
-      if ($content_from_get =~ /^status="([^"]+)"/) {
+      if ($content_from_get =~ /^\s*status="([^"]+)"/) {
          $status = $1; # First matching ()-expression
       }
 #   
 #     Extract identifier:
 #   
-      $content_from_get =~ s/^.*?<\w*:?identifier>//mg;
-      my $identifier;
-      if ($content_from_get =~ /^([^<]+)/) {
-         $identifier = $1; # First matching ()-expression
-      }
-      else {
+      $j1 = index($content_from_get,'<identifier>');
+      if ($j1 < 0) {
          die("No identifier");
       }
+      $content_from_get = substr($content_from_get,$j1+12);
+      print substr($content_from_get,0,50) . "\n";
+      my $identifier;
+      if ($content_from_get =~ /^([^<]+)/) {
+         $identifier = &trim($1); # First matching ()-expression
+      } else {
+         die("No identifier 2");
+      }
+      print "Identifier: $identifier\n";
       my $base_filename;
       my $dsname;
 #   
@@ -235,6 +294,7 @@ sub process_DIF_records {
 #
 #        Delete the .xml file and set status = "deleted" in the .xmd file:
 #
+         print "Write new $base_filename.xmd and delete $base_filename.xml\n";
          open (XMD,">$base_filename.xmd");
          flock (XMD, LOCK_EX);
          print XMD $xmd_dataset_header;
@@ -247,7 +307,16 @@ sub process_DIF_records {
 #      
 #        Remove from beginning of $content_from_get until the first "<DIF ...>" tag:
 #      
-         $content_from_get =~ s/^.*?<\w*:?metadata>[^<]*</</mg;
+         $j1 = index($content_from_get,'<metadata>');
+         if ($j1 < 0) {
+            die("No metadata element");
+         }
+         $content_from_get = substr($content_from_get,$j1+10);
+         $j1 = index($content_from_get,'<');
+         if ($j1 < 0) {
+            die("No DIF element");
+         }
+         $content_from_get = substr($content_from_get,$j1);
 #      
 #        Extract the tag name ("DIF" or "xxx:DIF"):
 #      
@@ -258,21 +327,24 @@ sub process_DIF_records {
          else {
             die("No maintag");
          }
+         print "maintag: $maintag\n";
 #      
 #        Extract the whole DIF element:
 #      
-         my $xmlbody;
-         my $rex_body = '^(<' . $maintag .'.*?<\/' . $maintag . '>)';
-         if ($content_from_get =~ /$rex_body/) {
-            $xmlbody = $1; # First matching ()-expression
+         $j1 = index($content_from_get,'</'.$maintag.'>');
+         if ($j1 < 0) {
+            die("No closing $maintag tag");
          }
-         else {
-            die("No xmlbody");
-         }
+         my $xmlbody = substr($content_from_get,0,$j1 + length($maintag) + 3);
+#      
+#        Remove the DIF element from the content variable:
+#      
+         $content_from_get = substr($content_from_get,$j1 + length($maintag) + 3);
 #
 #        Read/write existsing .xmd-file (with exclusive lock):
 #
          my $xmd_content;
+         print "Open $base_filename.xmd for update\n";
          if (-e $base_filename . '.xmd') {
             open (XMD,"+<$base_filename.xmd");
             flock (XMD, LOCK_EX);
@@ -291,7 +363,9 @@ sub process_DIF_records {
             my $year = 1900 + $utctime[5];
             my $mon = $utctime[4]; # 0-11
             my $mday = $utctime[3]; # 1-31
-            $creationdate = sprintf('%04d-%02d-%02d',$year,$mon,$mday);
+            my $hour = $utctime[2]; # 0-23
+            my $minute = $utctime[1]; # 0-59
+            $creationdate = sprintf('%04d-%02d-%02dT%02d:%02dZ',$year,$mon,$mday,$hour,$minute);
          }
          print XMD $xmd_dataset_header;
          print XMD ' <info status="active"'."\n".'  ownertag="'.$ownertag.'"'."\n".
@@ -310,31 +384,33 @@ sub process_DIF_records {
 #        Extract geographical bounding box:
 #
          my %bounding_box = ();
+         my $bounding_count = 0;
          foreach my $eltname ('Southernmost_Latitude', 'Northernmost_Latitude',
                               'Westernmost_Longitude', 'Easternmost_Longitude') {
             my $rex = '<' . $eltname . '>([^<]+)</' . $eltname . '>';
-            if ($xmlbody =~ /$rex/) {
+            if ($xmlbody =~ /$rex/m) {
                $bounding_box{$eltname} = $1;
-            } else {
-               die("No $eltname");
+               $bounding_count++;
             }
          }
-         my @latitudes = ($bounding_box{'Southernmost_Latitude'},
+         if ($bounding_count == 4) {
+            my @latitudes = ($bounding_box{'Southernmost_Latitude'},
                           $bounding_box{'Southernmost_Latitude'},
                           $bounding_box{'Northernmost_Latitude'},
                           $bounding_box{'Northernmost_Latitude'},
                           $bounding_box{'Southernmost_Latitude'});
-         my @longitudes = ($bounding_box{'Easternmost_Longitude'},
+            my @longitudes = ($bounding_box{'Easternmost_Longitude'},
                            $bounding_box{'Westernmost_Longitude'},
                            $bounding_box{'Westernmost_Longitude'},
                            $bounding_box{'Easternmost_Longitude'},
                            $bounding_box{'Easternmost_Longitude'});
-         $quadtreeuse_object->add_lonlats("area",\@longitudes,\@latitudes);
-         print XMD " <quadtree>\n" .
-         foreach my $node ($quadtreeuse_object->get_nodes()) {
-            print XMD "  $node\n";
+            $quadtreeuse_object->add_lonlats("area",\@longitudes,\@latitudes);
+            print XMD " <quadtree>\n";
+            foreach my $node ($quadtreeuse_object->get_nodes()) {
+               print XMD "  $node\n";
+            }
+            print XMD " </quadtree>\n";
          }
-         print XMD " </quadtree>\n" .
          print XMD $xmd_dataset_footer;
          close (XMD);
 #
@@ -342,14 +418,25 @@ sub process_DIF_records {
 #
 #        Write .xml file with content equal to the DIF element:
 #
-         open (DIF,">$base_filename.xml");
-         flock (DIF, LOCK_EX);
-         print DIF $xmlbody;
-         close (DIF);
-#      
-#        Remove the DIF element from the content variable:
-#      
-         $content_from_get =~ s/$rex_body//mg;
+         print "Write $base_filename.xml\n";
+         {
+#
+#           The DIF XML may contain real UTF-8 characters. The following
+#           "use encoding 'utf8';" statement seems to be a declaration that
+#           the perl variables in this script have values already encoded in
+#           UTF-8. Accordingly no extra encoding step is used when the variables
+#           are written to a file. If this statement is not used, the output
+#           files will be encoded in UTF-8 two times, creating nonsence.
+#           Note that this statement must be at this lowest scoping level.
+#           If used at higher levels, the statement will infuence the length
+#           function (returning lengthes in UTF-8 characters and not bytes).
+#
+            use encoding 'utf8';
+            open (DIF,">$base_filename.xml");
+            flock (DIF, LOCK_EX);
+            print DIF $xml_header . "\n" . $xmlbody;
+            close (DIF);
+         }
       }
    }
 }
@@ -369,7 +456,7 @@ sub makesane {
 #      
 #        Create a string using printf-compatible format:
 #      
-      $convertions{$special} = sprintf('%02x',$special);
+      $convertions{$special} = sprintf('%02x',ord($special));
    }
 #   
 #     Length of string
@@ -408,3 +495,12 @@ sub my_time {
       return $basistime + ($realtime - $basistime)*$scaling;
    }
 };
+#
+#-----------------------------------------------------------------------
+#
+sub trim {
+   my ($string) = @_;
+   $string =~ s/^\s*//m;
+   $string =~ s/\s*$//m;
+   return $string;
+}

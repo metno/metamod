@@ -31,7 +31,7 @@
 #
 use strict;
 use XML::Simple qw(:strict);
-use lib qw([==TARGET_DIRECTORY==]/scripts);
+use lib qw([==TARGET_DIRECTORY==]/lib);
 use ncfind;
 use quadtreeuse;
 use Data::Dumper;
