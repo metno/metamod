@@ -293,14 +293,14 @@ class MM_Dataset {
 	 * 
 	 */
 	function write($outputBasename) {
-		$dsfh = fopen($outputBasename . ".xmd", "w");
+		$dsfh = fopen($outputBasename . ".xmd", "a");
 		if (!$dsfh) {
 			throw new MM_DatasetException("cannot write dataset-file '$outputBasename.xmd'");
 		}
 		if (!flock($dsfh, LOCK_EX)) {
 			throw new MM_DatasetExeption("cannot lock dataset-file '$outputBasename.xmd'");
 		}
-		$mm2fh = fopen($outputBasename . ".xml", "w");
+		$mm2fh = fopen($outputBasename . ".xml", "a");
 		if (!$mm2fh) {
 			throw new MM_DatasetException("cannot write metadata-file '$outputBasename.xml'");
 		}
@@ -308,6 +308,14 @@ class MM_Dataset {
 			flock($dsfh, LOCK_UN);
 			throw new MM_DatasetExeption("cannot lock metadata-file '$outputBasename.xml'");			
 		}
+		if (!ftruncate($dsfh, 0)) {
+			throw new MM_DatasetException("cannot truncate dataset-file '$outputBasename.xmd'");
+		}
+		if (!ftruncate($mm2fh, 0)) {
+			throw new MM_DatasetException("cannot truncate metadata-file '$outputBasename.xml'");
+		}
+		fseek($dsfh, 0);
+		fseek($mm2fh, 0);
 
 		fwrite($dsfh, $this->getDS_XML());
 		fwrite($mm2fh, $this->getMM2_XML());

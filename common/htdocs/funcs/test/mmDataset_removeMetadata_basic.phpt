@@ -9,8 +9,8 @@ $ds2->removeMetadata(array("hallo"));
 var_dump($ds2->getMM2_XML());
 ?>
 --EXPECT--
-string(310) "<?xml version="1.0" encoding="iso8859-1"?>
-<?xml-stylesheet href="https://wiki.met.no/_media/metamod/dataset.xsl" type="text/xsl"?>
-<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 MM2.xsd">
+string(306) "<?xml version="1.0" encoding="iso8859-1"?>
+<?xml-stylesheet href="MM2.xsl" type="text/xsl"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
 </MM2>
 "

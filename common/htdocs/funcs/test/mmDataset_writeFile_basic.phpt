@@ -5,8 +5,16 @@ MM_Dataset getInfo function - basic test for MM_Dataset
 require_once("../mmDataset.inc");
 $ds = new MM_Dataset();
 $ds->addInfo(array('creationDate' => '1970-01-01T00:00:00Z'));
+$ds->write("test");
+
+$ds = new MM_Dataset("test.xmd", "test.xml");
 $info = $ds->getInfo();
 var_dump($info);
+?>
+--CLEAN--
+<?php
+      unlink("test.xmd");
+      unlink("test.xml");
 ?>
 --EXPECT--
 array(5) {
