@@ -30,7 +30,7 @@
 #---------------------------------------------------------------------------- 
 #
 use strict;
-use lib qw(../lib);
+use lib qw([==TARGET_DIRECTORY==]/scripts [==TARGET_DIRECTORY==]/lib);
 use Metamod::Dataset;
 use Data::Dumper;
 use DBI;
