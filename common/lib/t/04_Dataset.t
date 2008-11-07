@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use lib "..";
-use Test::More tests => 16;
+use Test::More tests => 20;
 
 use Data::Dumper qw(Dumper);
 
@@ -47,3 +47,11 @@ ok(eq_array(\@oldVals, []), "removeMetadataName, really gone");
 my $oldDs = newFromFile Metamod::Dataset('oldDataset.xml', 'dsXslt' => $xsltDS, 'mm2Xslt' => $xsltMM2);
 isa_ok($oldDs, 'Metamod::Dataset');
 is($oldDs->originalFormat, 'OldDataset', "old dataset: orignal format");
+%metadata = $oldDs->getMetadata;
+is (scalar keys %metadata, 2, "reading old datasets metadata");
+
+my $newDs = newFromFile Metamod::Dataset('exampleMM2.xml');
+isa_ok($newDs, 'Metamod::Dataset');
+is($newDs->originalFormat, 'MM2', "MM2 dataset: orignal format");
+%metadata = $newDs->getMetadata;
+is (scalar keys %metadata, 1, "reading MM2 datasets metadata");

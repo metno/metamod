@@ -16,7 +16,7 @@ our $NamespaceMM2 = 'http://www.met.no/schema/metamod/MM2';
 
 sub new {
     my ($class, %options) = @_;
-    my $sDate = POSIX::strftime("%Y-%m-%dT%H-%M-%SZ", gmtime());
+    my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime());
     my $dataDS =
 '<?xml version="1.0" encoding="iso8859-1" ?>
 <?xml-stylesheet href="dataset.xsl" type="text/xsl"?>
@@ -186,6 +186,13 @@ sub addMetadata {
     }
 }
 
+sub removeMetadata {
+    my ($self) = @_;
+    foreach my $n ($self->{xpath}->findnodes('/m:MM2/m:metadata', $self->{docMM2})) {
+        $n->parentNode->removeChild($n);
+    }
+}
+
 sub removeMetadataName {
     my ($self, $name) = @_;
     my @oldValues;
@@ -218,7 +225,7 @@ Metamod::Dataset - working with Metamod datasets
   $ds = new Metamod::Dataset();
   %info = ('name' => 'NEW/Name',
               'ownertag' => 'DAM');
-  $ds->addInfo(\%info);
+  $ds->setInfo(\%info);
   %metadata = ('datacollection_period_from' => '2008-11-05',
                   'abstract' => 'This is model data');
   $ds->addMetadata(\%metadata);
@@ -283,7 +290,7 @@ read the info elements (name, ownertag, status, metadataFormat, creationDate) fr
 
 Return: %info
 
-=item addInfo(\%info)
+=item setInfo(\%info)
 
 add or overwrite info elements to the dataset
 
@@ -312,6 +319,12 @@ Return; %metadata with ($name => [$val1, $val2, $val3, ...])
 =item addMetadata(\%metadata)
 
 add metadata from a hashref of the form ($name => [$val1, $val2, $val3, ...])
+
+Return: undef
+
+=item removeMetadata
+
+remove all metadata
 
 Return: undef
 

@@ -28,11 +28,11 @@
     </xsl:template>
 
     <xsl:template match="datacollection_period">
-        <xsl:element name="datacollection_period_from">
+        <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
            <xsl:attribute name="name">datacollection_period_from</xsl:attribute>
            <xsl:value-of select="@from"/>
         </xsl:element>
-        <xsl:element name="datacollection_period_to">
+        <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
            <xsl:attribute name="name">datacollection_period_to</xsl:attribute>
            <xsl:value-of select="@to"/>
         </xsl:element>
@@ -40,7 +40,7 @@
 
     
     <xsl:template name="metadata">
-        <xsl:element name="metadata">
+        <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
             <xsl:attribute name="name"><xsl:value-of select="name()"/></xsl:attribute>
             <xsl:value-of select="."/>
         </xsl:element>

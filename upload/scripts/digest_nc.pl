@@ -30,8 +30,9 @@
 #---------------------------------------------------------------------------- 
 #
 use strict;
+use lib qw([==TARGET_DIRECTORY==]/scripts [==TARGET_DIRECTORY==]/lib);
 use XML::Simple qw(:strict);
-use lib qw([==TARGET_DIRECTORY==]/lib);
+use Metamod::Dataset;
 use ncfind;
 use quadtreeuse;
 use Data::Dumper;
@@ -788,80 +789,24 @@ sub parse_all {
 #  array element will end up as the value of a "name" attribute in an XML
 #  element having the %metadata key as element identifier.
 #
-   my %metadata = ();
+    my $ds = new Metamod::Dataset(); # initialize new one, might be overwritten by existing one
 #
 #  First, check if there already exist an XML metadata file with name
 #  $xml_metadata_path. In this case, initialize the %metadata hash with metadata
 #  from this file:
 #
    if (-r $xml_metadata_path) {
-      open (XMLINPUT,$xml_metadata_path);
-      flock(XMLINPUT, LOCK_SH);
-      undef $/;
-      my $xmlcontent = <XMLINPUT>;
-      $/ = "\n"; 
-      close (XMLINPUT); # also unlocks
-      # choosing id, since name (default) might not be unique in dataset2
-      my $xmlmeta = XMLin($xmlcontent, KeyAttr => "id", ForceArray => 1);       
-      if ($xmlmeta{info}) { # dataset2
-         $info = delete $xmlmeta{info};
-         $info = $info->[0]; # remove array
-         $metadata{drpath} = [$info->{drpath}];
-         $metadata{creationDate} = [$info->{creationDate}];
-         $metadata{status} = [$info->{status}];
-         # $metadata{ownertag} = [$info->{ownertag}]; # don't use ownertag, this is command-line argument to program!!!
-         if (exists $xmlmeta{datacollection_period}) {
-	    $period = $xmlmeta{datacollection_period}->[0];
-            $metadata{start_date} = [$period->{from}];    
-            $metadata{stop_date} = [$period->{to}];    
-	 }
-         if (exists $xmlmeta{quadtree_nodes}) {
-            $sval = $xmlmeta{quadtree_nodes}->[0];
-            $sval =~ s/^\s*\n//; # remove empty lines at beginning or end
-            $sval =~ s/^\n\s*//;
-            $metadata{quadtree_nodes} = [$sval];
-         }
-         if (exists $xmlmeta{metadata}) {
-            foreach my $hash (@{ $xmlmeta{metadata} }) {
-               if ($hash->{name} eq 'abstract') {
-                  $sval = $hash->{content};
-                  $sval =~ s/^\s*\n//; # remove empty lines at beginning or end
-                  $sval =~ s/^\n\s*//;
-                  $metadata{abstract} = [$sval];
-               } else {
-                  push @{ $metadata{$hash->{name}} }, $hash->{content};
-               }
-            }
-         }
-      } else { # old dataset
-         foreach my $metakey (keys %$xmlmeta) {
-            my $val = $xmlmeta->{$metakey};
-            if ($metakey ne "datacollection_period" && $metakey ne "ownertag") {
-               $metadata{$metakey} = [];
-            }
-            if (ref($val) eq "ARRAY") {
-               if ($metakey eq "datacollection_period") {
-                  my $xval = $val->[0];
-                  $metadata{'start_date'} = [$xval->{'from'}];
-                  $metadata{'stop_date'} = [$xval->{'to'}];
-               } elsif ($metakey eq "abstract" || $metakey eq "quadtree_nodes") {
-                  my $sval = $val->[0];
-                  $sval =~ s/^\s*\n//;
-                  $sval =~ s/\n\s*$//;
-                  $metadata{$metakey} = [$sval];
-               } else {
-                  foreach my $key1 (@$val) {
-                     push (@{$metadata{$metakey}}, $key1);
-                  }
-               }
-            }
-         }
-      }
+      $ds = Metamod::Dataset->newFromFile($xml_metadata_path);
+      die "cannot read dataset $xml_metadata_path: $!\n" unless $ds;
       if ($CTR_printdump == 1) {
          print "\n----- METADATA FROM EXISTING XML FILE -----\n\n";
-         print Dumper(\%metadata);
+         my %metadata = $ds->getMetadata;
+         my %info = $ds->getInfo;
+         print Dumper(\%info, \%metadata);
       }
    }
+   my %metadata = $ds->getMetadata;
+   my %info = $ds->getInfo;
 #
 #  Ensure the URL to the data is included in the metadata, and also
 #  that the metadata contains the identification string for the dataset (drpath):
@@ -874,14 +819,16 @@ sub parse_all {
    } else {
       $metadata{"dataref"} = [$dataref];
    }
-   if (!exists($metadata{"drpath"})) {
+   if (length($info{"name"}) == 0) {
       if ($xml_metadata_path =~ /\/([^\/]+\/[^\/]+)\.(xml|XML)$/) {
-         my $drpath = $1; # First matching ()-expression
-         $metadata{"drpath"} = [$drpath];
+         my $name = $1; # First matching ()-expression
+         $info{"name"} = [$name];
       } else {
-         die "Not able to construct drpath from $xml_metadata_path";
+         die "Not able to construct dataset-name from $xml_metadata_path";
       }
    }
+   $info{ownertag} = $ownertag;
+
 #
 #  Populate the %metadata hash with values from the netCDF files.
 #
@@ -980,86 +927,46 @@ sub parse_all {
 #  Place the list of variable names into the %metadata hash:
 #
    $metadata{"variable"} = [keys %variablename];
-#
-#  Set up a conversion table (hash) for 
-#  converting characters >159 to HTML entities:
-#
-   my %html_conversions = ();
-   for (my $jnum=160; $jnum < 256; $jnum++) {
-      $html_conversions{chr($jnum)} = '&#' . $jnum . ';';
-   }
+
 #
 #  Prepare output to the XML file:
 #
-   my $drpath = delete $metadata{drpath};
-   $drpath = (ref $drpath eq 'ARRAY') ? $drpath->[0] : $drpath;
-   # the following might exist
-   my $status = exists $metadata{status} ? (delete $metadata{status})->[0] : 'active';
-   my $creationDate;
-   if (exists $metadata{creationDate}) {
-      $creationDate = (delete $metadata{creationDate})->[0];
-   } else {
-      my ($sec,$min,$hour,$mday,$mon,$year) = gmtime(time);
-      $mon++;
-      $year += 1900;
-      $creationDate = sprintf("%04d-%02d-%02dT%02d:%02d:%02dZ",$year,$mon,$mday,$hour,$min,$sec);
-   }
-   my $xml_output = <<EOXML;
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<?xml-stylesheet href="dataset2View.xsl" type="text/xsl"?>
-<dataset xmlns="http://www.met.no/schema/metamod/dataset2/"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://www.met.no/schema/metamod/dataset2/ metamodDataset2.xsd">
-   <info status="$status" ownertag="$ownertag" creationDate="$creationDate" drpath="$drpath" />
-EOXML
-   $xml_output .= '<dataset ownertag="' . $ownertag . '">' . "\n";
+   # clear all metadata from the dataset
+   $ds->removeMetadata;
+   
+   # the following might exist in metadata instead of the info
+   $info{status} = (delete $metadata{status})->[0] if exists $metadata{status};
+   $info{creationDate} = (delete $metadata{creationDate})->[0] if exists $metadata{creationDate};
+   $ds->setInfo(\%info);
+   
+   # start and stop date might need special handling
+   # all other metadata will be added as is
    my $start_date = "";
    my $stop_date = "";
-   # temporary string for metadata-tags, which need to come after info, datacollection_period, quadtree_nodes
-   my $metadata_output = "";
    foreach my $attname (keys %metadata) {
       my $refval = $metadata{$attname};
       if (ref($refval) ne "ARRAY") {
          die 'parse_all: ref($refval) ne "ARRAY" in %metadata';
       }
-      if ($attname eq 'abstract') {
-         my $abstract = &convert_to_htmlentities($refval->[0],\%html_conversions);
-         $metadata_output .= '   <metadata name="' . $attname . '">' . "\n";
-         $metadata_output .= $abstract . "\n";
-         $metadata_output .= '   </metadata>' . "\n";
-      } elsif ($attname eq 'start_date' && exists($refval->[0]) && defined($refval->[0])) {
+      if ($attname eq 'start_date' && exists($refval->[0]) && defined($refval->[0])) {
          $start_date = $refval->[0];
       } elsif ($attname eq 'stop_date' && exists($refval->[0]) && defined($refval->[0])) {
          $stop_date = $refval->[0];
       } elsif ($attname ne 'quadtree_nodes') {
-         foreach my $attval (@$refval) {
-            if (defined($attval)) {
-               my $newattval = &convert_to_htmlentities($attval,\%html_conversions);
-               $metadata_output .= '   <metadata name="' . $attname . '">' . $newattval . '</metadata>' . "\n";
-            }
-         }
+         $ds->addMetadata({$attname => $refval});
       }
    }
    if (length($start_date) > 0 && length($stop_date) > 0) {
-      $xml_output .= '   <datacollection_period from="' . substr($start_date,0,10) .
-                   '" to="' . substr($stop_date,0,10) . '" />' . "\n";
+      $ds->addMetadata({datacollection_period_from => [substr($start_date,0,10)],
+                        datacollection_period_to => [substr($stop_date,0,10)]});
    }
 #
 #  Find QuadTree-nodes from latitude,longitude coordinates, and merge
 #  with existing nodes if found in the previous version of the XML file:
 #
-   $xml_output .= "   <quadtree_nodes>\n";
    my @nodes = get_quadtree_nodes(\%all_variables, \%all_globatts, \%metadata);
-   foreach my $node (@nodes) {
-      $xml_output .= $node . "\n";
-   }
-   $xml_output .= "   </quadtree_nodes>\n";
-   $xml_output .= $metadata_output;
-   $xml_output .= "</dataset>\n";
-   open (XMLOUT,">$xml_metadata_path");
-   flock (XMLOUT, LOCK_EX);
-   print XMLOUT $xml_output;
-   close (XMLOUT); # also unlocks
+   $ds->setQuadtree(\@nodes);
+   $ds->writeToFile($xml_metadata_path);
 #
    if ($CTR_printdump == 1) {
       print "\n----- VARIABLES FOUND -----\n\n";

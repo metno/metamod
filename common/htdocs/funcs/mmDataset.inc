@@ -56,7 +56,7 @@ class MM_Dataset {
 	 * @throw MM_Dataset2Exception
 	 */
 	function __construct($inputDS = "", $inputMM2 = "", $input_is_data = false) {
-			$sDate = gmstrftime("%Y-%m-%dT%H-%M-%SZ");
+			$sDate = gmstrftime("%Y-%m-%dT%H:%M:%SZ");
 			$dataDS =
 '<?xml version="1.0" encoding="iso8859-1" ?>
 <?xml-stylesheet href="dataset.xsl" type="text/xsl"?>
