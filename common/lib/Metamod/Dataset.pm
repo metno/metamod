@@ -3,12 +3,12 @@ package Metamod::Dataset;
 use 5.6.0;
 use strict;
 use warnings;
-use Fcntl ':flock'; # import LOCK_* constants
+use Fcntl qw(:DEFAULT :flock); # import LOCK_* constants
 use POSIX qw();
 use XML::LibXML();
 use Metamod::DatasetTransformer;
 
-our $VERSION = 0.1;
+our $VERSION = 0.2;
 
 our $NamespaceDS = 'http://www.met.no/schema/metamod/dataset';
 our $NamespaceMM2 = 'http://www.met.no/schema/metamod/MM2';
@@ -77,10 +77,13 @@ sub writeToFile {
     $fileBase = Metamod::DatasetTransformer::getBasename($fileBase);
 
     my ($xmlF, $xmdF);
-    open $xmdF, ">$fileBase.xmd" or die "cannot write $fileBase.xmd: $!\n";
+    # use sysopen, flock, truncate instead of open ">file" (see perlopentut)
+    sysopen($xmdF, "$fileBase.xmd", O_WRONLY | O_CREAT) or die "cannot write $fileBase.xmd: $!\n";
     flock ($xmdF, LOCK_EX) or die "cannot lock $fileBase.xmd: $!\n";
-    open $xmlF, ">$fileBase.xml" or die "cannot write $fileBase.xml: $!\n";
+    sysopen($xmlF, "$fileBase.xml", O_WRONLY | O_CREAT) or die "cannot write $fileBase.xml: $!\n";
     flock ($xmlF, LOCK_EX) or die "cannot lock $fileBase.xml: $!\n";
+    truncate($xmdF, 0) or die "can't truncate $fileBase.xmd: $!\n";
+    truncate($xmlF, 0) or die "can't truncate $fileBase.xml: $!\n";
     print $xmdF $self->getDS_XML;
     print $xmlF $self->getMM2_XML;
     close $xmlF;
