@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use lib "..";
-use Test::More tests => 20;
+use Test::More tests => 25;
 
 use Data::Dumper qw(Dumper);
 
@@ -11,10 +11,17 @@ use Data::Dumper qw(Dumper);
 my $xsltDS = "../../schema/oldDataset2Dataset.xslt";
 my $xsltMM2 = "../../schema/oldDataset2MM2.xslt";
 
-
+BEGIN {use_ok('Metamod::ForeignDataset')};
 BEGIN {use_ok('Metamod::Dataset');}
 
+# short test of ForeignDataset, most tests in submodule Dataset
+my $fds = Metamod::ForeignDataset->newFromFile('oldDataset.xml', ('format' => 'oldDataset'));
+isa_ok($fds, 'Metamod::ForeignDataset');
+ok($fds->getMETA_XML, "getMETA_XML");
+is($fds->originalFormat, 'oldDataset');
+
 my $ds = new Metamod::Dataset;
+isa_ok($ds, 'Metamod::ForeignDataset');
 isa_ok($ds, 'Metamod::Dataset');
 is($ds->originalFormat, 'MM2', "orignal format");
 

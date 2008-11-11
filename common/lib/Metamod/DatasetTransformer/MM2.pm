@@ -5,8 +5,9 @@ use 5.6.0;
 use strict;
 use warnings;
 use Carp qw(carp croak);
+use UNIVERSAL qw( );
 
-our $VERSION = 0.1;
+our $VERSION = 0.2;
 
 sub originalFormat {
     return "MM2";
@@ -16,11 +17,19 @@ sub new {
     if (@_ < 3 or (scalar @_ % 2 != 1)) {
         croak ("new " . __PACKAGE__ . " needs argument (package, xmdStr, xmlStr), got: @_\n");
     }
-    my ($class, $xmdStr, $xmlStr, %options) = @_; # %options not used yet
+    my ($class, $xmd, $xml, %options) = @_; # %options not used yet
+    my ($xmdStr, $xmlStr, $mm2Doc, $dsDoc);
+    if (UNIVERSAL::isa($xmd, 'XML::LibXML::Node') and UNIVERSAL::isa($xml, 'XML::LibXML::Node')) {
+        $dsDoc = $xmd;
+        $mm2Doc = $xml;
+    } else {
+        $xmdStr = $xmd;
+        $xmlStr = $xml;
+    }
     my $self = {xmdStr => $xmdStr,
                 xmlStr => $xmlStr,
-                mm2Doc => undef, # init in test
-                dsDoc => undef, # init in test
+                mm2Doc => $mm2Doc, # init in test, unless given as doc
+                dsDoc =>  $dsDoc,  # init in test, unless given as doc
                };
     return bless $self, $class;
 }
@@ -103,6 +112,10 @@ For inherited options see L<Metamod::DatasetTransformer>, only differences are m
 
 =over 4
 
+=item new($xmdStr, $xmlStr, [%options])
+
+In addition to the default initialization by strings, this implementation also allows
+initialization by L<XML::LibXML::Node>s.
 
 =back
 

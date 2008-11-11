@@ -7,6 +7,7 @@ use Fcntl ':flock'; # import LOCK_* constants
 use File::Spec;
 use XML::LibXML;
 use XML::LibXSLT;
+use UNIVERSAL;
 
 our $VERSION = 0.3;
 use constant DEBUG => 0;
@@ -21,7 +22,7 @@ sub new {
 
 sub getBasename {
     my ($self, $file) = @_;
-    unless (__PACKAGE__->isa($self) or (defined ref($self) and ref($self) eq __PACKAGE__)) {
+    unless (UNIVERSAL::isa($self, __PACKAGE__)) {
         # called as function, not method
         $file = $self; 
     }
@@ -31,7 +32,7 @@ sub getBasename {
 
 sub getFileContent {
     my ($self, $file) = @_;
-    unless (__PACKAGE__->isa($self) or (defined ref($self) and ref($self) eq __PACKAGE__)) {
+    unless (UNIVERSAL::isa($self, __PACKAGE__)) {
         # called as function, not method
         $file = $self;
         $self = __PACKAGE__;

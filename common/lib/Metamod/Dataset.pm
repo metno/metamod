@@ -1,43 +1,48 @@
 package Metamod::Dataset;
+use base qw(Metamod::ForeignDataset);
 
-use 5.6.0;
 use strict;
 use warnings;
-use Fcntl qw(:DEFAULT :flock); # import LOCK_* constants
-use POSIX qw();
-use XML::LibXML();
 use Metamod::DatasetTransformer;
+use Metamod::DatasetTransformer::MM2;
 
-our $VERSION = 0.2;
+our $VERSION = 0.3;
 
-our $NamespaceDS = 'http://www.met.no/schema/metamod/dataset';
-our $NamespaceMM2 = 'http://www.met.no/schema/metamod/MM2';
-
-
-sub new {
-    my ($class, %options) = @_;
-    my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime());
-    my $dataDS =
-'<?xml version="1.0" encoding="iso8859-1" ?>
-<?xml-stylesheet href="dataset.xsl" type="text/xsl"?>
-<dataset
-   xmlns="http://www.met.no/schema/metamod/dataset"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
-  <info name="" status="active" creationDate="'.$sDate.'" ownertag="" metadataFormat="MM2"/>
-</dataset>';
-	my $dataMM2 =
-'<?xml version="1.0" encoding="iso8859-1"?>
+use constant NAMESPACE_MM2 => 'http://www.met.no/schema/metamod/MM2';
+use constant MM2 => <<'EOT';
+<?xml version="1.0" encoding="iso8859-1"?>
 <?xml-stylesheet href="MM2.xsl" type="text/xsl"?>
 <MM2
    xmlns="http://www.met.no/schema/metamod/MM2"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
-</MM2>';
+</MM2>
+EOT
+sub new {
+    my ($class, %options) = @_;
+    my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime());
+    my $dataDS = $class->DATASET;
+    $dataDS =~ s/\Q1970-01-01T00:00:00Z\E/$sDate/g;
+    $dataDS =~ s/metadataFormat=""/metadataFormat="MM2"/g;
+	my $dataMM2 = $class->MM2;
+    return $class->newFromDoc($dataMM2, $dataDS, %options);
+}
+
+sub newFromDoc {
+    my ($class, $foreign, $dataset, %options) = @_;
+    die "no metadata" unless $foreign;
+    unless ($dataset) {
+        my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime());
+        my $dataset = $class->DATASET;
+        $dataset =~ s/\Q1970-01-01T00:00:00Z\E/$sDate/g;
+        $dataset =~ s/metadataFormat=""/metadataFormat="MM2"/g;
+    }
     my $parser = Metamod::DatasetTransformer->XMLParser;
-    my $docDS = $parser->parse_string($dataDS);
-    my $docMM2 = $parser->parse_string($dataMM2);
-    return $class->_initSelf('MM2', $docDS, $docMM2);
+    my $docDS = UNIVERSAL::isa($dataset, 'XML::LibXML::Node') ? $dataset : $parser->parse_string($dataset);
+    my $docMETA = UNIVERSAL::isa($foreign, 'XML::LibXML::Node') ? $foreign : $parser->parse_string($foreign);
+    my $mdmm2 = new Metamod::DatasetTransformer::MM2($docDS, $docMETA, %options);
+    die "not MM2 metadata" unless $mdmm2->test;
+    return $class->_initSelf('MM2', $docDS, $docMETA, %options);
 }
 
 sub newFromFile {
@@ -56,113 +61,16 @@ sub newFromFile {
 }
 
 sub _initSelf {
-    my ($class, $orgFormat, $docDS, $docMM2, %options) = @_;
-    die "undefined docDS, cannot init\n" unless $docDS;
-    die "undefined docMM2, cannot init\n" unless $docMM2;
-    my $xpc = XML::LibXML::XPathContext->new();
-    $xpc->registerNs('d', $NamespaceDS);
-    $xpc->registerNs('m', $NamespaceMM2);
-    my $self = {
-                xpath => $xpc,
-                docDS => $docDS,
-                docMM2 => $docMM2,
-                originalFormat => $orgFormat,
-               };
-    return bless $self, $class;
-}
-
-
-sub writeToFile {
-    my ($self, $fileBase) = @_;
-    $fileBase = Metamod::DatasetTransformer::getBasename($fileBase);
-
-    my ($xmlF, $xmdF);
-    # use sysopen, flock, truncate instead of open ">file" (see perlopentut)
-    sysopen($xmdF, "$fileBase.xmd", O_WRONLY | O_CREAT) or die "cannot write $fileBase.xmd: $!\n";
-    flock ($xmdF, LOCK_EX) or die "cannot lock $fileBase.xmd: $!\n";
-    sysopen($xmlF, "$fileBase.xml", O_WRONLY | O_CREAT) or die "cannot write $fileBase.xml: $!\n";
-    flock ($xmlF, LOCK_EX) or die "cannot lock $fileBase.xml: $!\n";
-    truncate($xmdF, 0) or die "can't truncate $fileBase.xmd: $!\n";
-    truncate($xmlF, 0) or die "can't truncate $fileBase.xml: $!\n";
-    print $xmdF $self->getDS_XML;
-    print $xmlF $self->getMM2_XML;
-    close $xmlF;
-    close $xmdF;
-    
-    return 1;
-}
-
-sub getDS_XML {
-    my ($self) = @_;
-    return $self->{docDS}->toString();
-}
-
-sub getMM2_XML {
-    my ($self) = @_;
-    return $self->{docMM2}->toString();
-}
-
-
-sub getInfo {
-    my ($self) = @_;
-    my %retVal;
-    my $info = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docDS})->item(0);
-    foreach my $attr ($info->attributes) {
-        $retVal{$attr->name} = $attr->value;
-    }
-    return %retVal;
-}
-
-sub setInfo {
-    my ($self, $infoRef) = @_;
-    my %info = ($self->getInfo, %$infoRef);
-    my $info = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docDS})->item(0);
-    while (my ($name, $val) = each %info) {
-        $info->setAttribute($name, $val);
-    }
-    return undef;
-}
-
-sub originalFormat {
-    my ($self) = @_;
-    return $self->{originalFormat};
-}
-
-sub getQuadtree {
-    my ($self) = @_;
-    my @retVal;
-    my ($q) = $self->{xpath}->findnodes('/d:dataset/d:quadtree_nodes', $self->{docDS});
-    if ($q) {
-        foreach my $child ($q->childNodes) {
-            if ($child->nodeType == XML::LibXML::XML_TEXT_NODE) {
-                push @retVal, split ' ', $child->nodeValue;
-            }
-        }
-    }
-    @retVal = map {s/^\s+//; s/\s+$//; $_;} @retVal; # trim
-    return @retVal;
-}
-
-sub setQuadtree {
-    my ($self, $quadRef) = @_;
-    my @oldQuadtree = $self->getQuadtree;
-    foreach my $node ($self->{xpath}->findnodes('/d:dataset/d:quadtree_nodes', $self->{docDS})) {
-        # remove old value
-        $node->parentNode->removeChild($node);
-    }
-    if (@$quadRef > 0) {
-        my $valStr = join "\n", @$quadRef;
-        my $qEl = $self->{docDS}->createElementNS($NamespaceDS,'quadtree_nodes');
-        $qEl->appendChild($self->{docDS}->createTextNode($valStr));
-        $self->{docDS}->documentElement->appendChild($qEl);
-    }
-    return @oldQuadtree;
+    my ($class, @args) = @_;
+    my $self = $class->SUPER::_initSelf(@args);
+    $self->{xpath}->registerNs('m', $self->NAMESPACE_MM2);
+    return $self;
 }
 
 sub getMetadata {
     my ($self) = @_;
     my %metadata;
-    foreach my $n ($self->{xpath}->findnodes('/m:MM2/m:metadata', $self->{docMM2})) {
+    foreach my $n ($self->{xpath}->findnodes('/m:MM2/m:metadata', $self->{docMETA})) {
         my $value = "";
         foreach my $child ($n->childNodes) {
     		if ($child->nodeType == XML::LibXML::XML_TEXT_NODE) {
@@ -178,17 +86,17 @@ sub addMetadata {
     my ($self, $metaRef) = @_;
     foreach my $name (keys %$metaRef) {
         foreach my $val (@{ $metaRef->{$name} }) {
-            my $el = $self->{docMM2}->createElementNS($NamespaceMM2, 'metadata');
+            my $el = $self->{docMETA}->createElementNS($self->NAMESPACE_MM2, 'metadata');
             $el->setAttribute('name', $name);
-            $el->appendChild($self->{docMM2}->createTextNode($val));
-            $self->{docMM2}->documentElement->appendChild($el);
+            $el->appendChild($self->{docMETA}->createTextNode($val));
+            $self->{docMETA}->documentElement->appendChild($el);
         }
     }
 }
 
 sub removeMetadata {
     my ($self) = @_;
-    foreach my $n ($self->{xpath}->findnodes('/m:MM2/m:metadata', $self->{docMM2})) {
+    foreach my $n ($self->{xpath}->findnodes('/m:MM2/m:metadata', $self->{docMETA})) {
         $n->parentNode->removeChild($n);
     }
 }
@@ -196,7 +104,7 @@ sub removeMetadata {
 sub removeMetadataName {
     my ($self, $name) = @_;
     my @oldValues;
-    foreach my $n ($self->{xpath}->findnodes('/m:MM2/m:metadata[@name=\''.$name."']", $self->{docMM2})) {
+    foreach my $n ($self->{xpath}->findnodes('/m:MM2/m:metadata[@name=\''.$name."']", $self->{docMETA})) {
         my $value = "";
         foreach my $child ($n->childNodes) {
     		if ($child->nodeType == XML::LibXML::XML_TEXT_NODE) {
@@ -209,6 +117,12 @@ sub removeMetadataName {
        
     return @oldValues;
 }
+
+sub getMM2_XML {
+    my ($self) = @_;
+    return $self->getMETA_XML;
+}
+
 
 1;
 __END__
@@ -242,6 +156,8 @@ Metamod::Dataset - working with Metamod datasets
 
 The Metamod::Dataset package give a convenient way to work with the xml-files describing
 default datasets consisting of meta-metadata (dataset.xmd files) and metadata (MM2.xml) files.
+The Metamod::Dataset is also a L<Metamod::ForeignDataset>, so functions described there are also
+valid.
 
 =head1 FUNCTIONS
 
@@ -263,6 +179,10 @@ else is empty
 
 Return: $dataset object
 
+=item newFromDoc($mm2Doc, [$xmdDoc, %options])
+
+read a dataset from a document or xml/xmd string.
+
 =item newFromFile($basename)
 
 read a dataset from a file. The file may or may not end with .xml or .xmd. The file will be read
@@ -271,42 +191,39 @@ can be read.
 
 Return: $dataset object
 
+
 =item writeToFile($basename)
 
-write the current content to $basename.xml and $basename.xmd (appendixes will be truncated). This might
-overwrite an existing file! Dies on error.
+see L<Metamod::ForeignDataset>
 
 =item getDS_XML
 
-Return: xml-string of dataset
+see L<Metamod::ForeignDataset>
 
 =item getMM2_XML
 
+see L<Metamod::ForeignDataset::getMETA_XML>
 Return: xml-string of MM2
 
 =item getInfo()
 
-read the info elements (name, ownertag, status, metadataFormat, creationDate) from the dataset
-
-Return: %info
+see L<Metamod::ForeignDataset>
 
 =item setInfo(\%info)
 
-add or overwrite info elements to the dataset
-
-Return: undef
+see L<Metamod::ForeignDataset>
 
 =item originalFormat()
 
-Return: string describing the original format
+see L<Metamod::ForeignDataset>
 
 =item getQuadtree()
 
-Return: array with quadtree_nodes
+see L<Metamod::ForeignDataset>
 
 =item setQuadtree(\@quadtree_nodes)
 
-set the @quadtree_nodes as dataset-quadtree-nodes
+see L<Metamod::ForeignDataset>
 
 Return: @oldQuadtree_nodes
 

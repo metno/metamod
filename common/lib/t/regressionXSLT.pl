@@ -2,7 +2,7 @@
 # this program detects a 'XML::LibXML: unregistering node, while no nodes have been registered?' found
 # on Fedora Core 5 with XML::LibXML 1.66 and XML::LibXSLT 1.62.
 # not found on debian 3.1 with XML::LibXML 1.58 and XML::LibXSLT 1.57
-
+# not found on ubuntu 7.10 XML 1.63 /  XSLT 1.59
 use strict;
 use warnings;
 use XML::LibXML;
