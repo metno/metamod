@@ -711,166 +711,155 @@ function fmcheckform($outputdst, $filename) {
 	    	$errors = TRUE;
 		}
     }
-    if ($errors) {
-		echo(fmcreateerrmsg("Please use your browser's back button ".
-			"to correct these problems"));
-		echo(fmquestversion());
-		return;
-    }
-
     echo(fmstartform());
-    echo(fmcreatesectionstart(NULL));
-    echo(fmcreatemsg("Please check contents and use the back button of the
-		browser to correct any errors."));
-    foreach ($_POST as $mykey=>$myvalue) {
-		if ($mykey == "Submit" || $mykey == "cmd") {
-	    	continue;
-		}
-		# escape user-entered values
-		$mykey = htmlspecialchars($mykey);
-    	if (is_array($myvalue)) {
-    		$myHiddenValue = array();
-			foreach ($myvalue as $myitem => $singleval) {
-		    	$myvalue[$myitem] = htmlspecialchars($singleval);
-		    	$myHiddenValue[$myitem] = $myvalue[$myitem]; 
+    if ($errors) {
+		echo(fmcreateerrmsg("Please use the Edit button ".
+			"to correct these problems"));
+    } else {
+	    echo(fmcreatesectionstart(NULL));
+    	echo(fmcreatemsg("Please check contents and use the Edit button" .
+    			" to correct any errors."));
+    	foreach ($_POST as $mykey=>$myvalue) {
+			if ($mykey == "Submit" || $mykey == "cmd") {
+	    		continue;
 			}
-    	} else {
-			$myvalue = htmlspecialchars($myvalue);
-			$myHiddenValue = $myvalue; # not modified value
-    	}
-		echo(fmcreaterecordstart());
-
-		# Check if refeences are valid URLs
-##	if ($mykey == "reference") {
-##	    if (! ereg("http://",$myvalue)) {
-##		$mytmpstr = "http://".$myvalue;
-##		if (@get_headers($mytmpstr)) {
-##		    $myvalue = "http://".$myvalue;
-##		}
-##	    }
-##	}
-
-		# Check that geographical positions are numeric
-		if ($mykey == "northernmost_latitude" || 
-	    	$mykey == "southernmost_latitude" ||
-	   		$mykey == "easternmost_longitude" ||
-	    	$mykey == "westernmost_longitude") {
-	    	if (! is_numeric($myvalue)) {
-				$myvalue = "<span style=\"color: red;\">This field ".
-					"should be a decimal number. Please use the ".
-					"back button and correct errors</span>";
-				$errors = TRUE;
-	    	} else if (ereg("latitude",$mykey)) {
-				if ($myvalue > 90. || $myvalue < -90.) {
-		    		$myvalue .= " <span style=\"color: red;\">The ".
-		    			"latitude domain is -90&#176; to 90&#176; North".
-		    			"</span>";
-		    		$errors = TRUE;
+			# escape user-entered values
+			$mykey = htmlspecialchars($mykey);
+    		if (is_array($myvalue)) {
+    			$myHiddenValue = array();
+				foreach ($myvalue as $myitem => $singleval) {
+		    		$myvalue[$myitem] = htmlspecialchars($singleval);
+		    		$myHiddenValue[$myitem] = $myvalue[$myitem]; 
 				}
-	    	} else if (ereg("longitude",$mykey)) {
-				if ($myvalue > 180. || $myvalue < -180.) {
-		    		$myvalue .= " <span style=\"color: red;\">The ".
-		    			"longitude domain is -180&#176; to 90&#176; East".
-		    			"</span>";
-		    		$errors = TRUE;
-				}
-	    	}
-	    	if ($_POST["westernmost_longitude"] > 
-		    	$_POST["easternmost_longitude"]) {
-				$myvalue .= " <span style=\"color: red;\">Western ".
-		    		"limit is East of Eastern limit</span>";
-				$errors = TRUE;
-	    	} else if ($_POST["southernmost_latitude"] >
-		    	$_POST["northernmost_latitude"]) {
-				$myvalue .= " <span style=\"color: red;\">Northern ".
-		    		"limit is South of Southern limit</span>";
-				$errors = TRUE;
-	    	}
-		}
-
-		# Check that time specifications are of the correct format
-		if ($mykey == "datacollection_period_from" ||
-	    	$mykey == "datacollection_period_to") {
-	    	if (!preg_match("/^\d\d\d\d-\d\d-\d\d \d\d:\d\d \w\w\w/",
-				$myvalue)) {
-				$myvalue = "<span style=\"color: red;\">This field ".
-					"should be of the form YYYY-MM-DD HH:MM UTC, please use ".
-					"the back button and correct errors. If time is not in ".
-					"UTC please specify timezone by the correct three ".
-					"letter abbreviation.</span>";
-				$errors = TRUE;
-	    	}
-		}
-
-		# Check that abstract is not too long
-		if ($mykey == "abstract" ||
-	    	$mykey == "description" ||
-	    	$mykey == "comment") {
-	    	if (strlen($myvalue) > 512) {
-				$myvalue = "<span style=\"color: red;\">This is no ".
-					"contest for the Nobel prize in literature, please ".
-					"use the back button and shorten the text.</span>";
-				$errors = TRUE;
-	    	} else {
-				$myvalue = ereg_replace("\n","<br><br>\n",$myvalue);
-	    	}
-		}
-
-		# Check that history is of the correct format
-		if ($mykey == "history") {
-	    	if (!preg_match("/^\d\d\d\d-\d\d-\d\d /", $myvalue)) {
-				$myvalue = "<span style=\"color: red;\">This should ".
-					"be of the form YYYY-MM-DD Creation, Please use the ".
-					"back button and correct the text. </span>";
-				$errors = TRUE;
-	    	}
-		}
-
-		# Create the output form for visual inspection by the user
-		#
-		# Label column
-		if ($mykey == "keyphrase") {
-	    	echo(fmlabelstart()."Key phrase".fmlabelend());
-		} else {
-	    	$searchstr = "/name=".$mykey."/";
-	    	$templitem = preg_grep($searchstr,$mytempl);
-	    	if (count($templitem) > 0) {
-				parse_str(current($templitem));
-	    		echo(fmlabelstart().$label.fmlabelend());
-	    	} else {
-	    		echo(fmlabelstart().$mykey.fmlabelend());
-	    	}
-		}
-		# Data column
-		if (is_array($myvalue)) {
-	    	echo(fminputstart());
-	    	foreach ($myvalue as $singleitem) {
-				echo($singleitem."<br>");
-	    	}
-	    	echo(fminputend());
-		} else {
-	    	echo(fminputstart().$myvalue.fminputend());
-		}
-		echo(fmcreaterecordend());
-
-		# Add hidden elements to transport information to the data dump
-		# function
-		if (!$errors) {
-    		if (is_array($myHiddenValue)) {
-				foreach ($myHiddenValue as $singleitem) {
-	    			echo(fmcreatehidden($mykey."[]",$singleitem));
-				}
-			} else {
-				echo(fmcreatehidden($mykey,$myHiddenValue));
+    		} else {
+				$myvalue = htmlspecialchars($myvalue);
+				$myHiddenValue = $myvalue; # not modified value
     		}
+			echo(fmcreaterecordstart());
+
+			# Check that geographical positions are numeric
+			if ($mykey == "northernmost_latitude" || 
+	    		$mykey == "southernmost_latitude" ||
+		   		$mykey == "easternmost_longitude" ||
+		    	$mykey == "westernmost_longitude") {
+	    		if (! is_numeric($myvalue)) {
+					$myvalue = "<span style=\"color: red;\">This field ".
+						"should be a decimal number. Please use the ".
+						"Edit button and correct errors</span>";
+					$errors = TRUE;
+	    		} else if (ereg("latitude",$mykey)) {
+					if ($myvalue > 90. || $myvalue < -90.) {
+		    			$myvalue .= " <span style=\"color: red;\">The ".
+		    				"latitude domain is -90&#176; to 90&#176; North".
+		    				"</span>";
+			    		$errors = TRUE;
+					}
+	    		} else if (ereg("longitude",$mykey)) {
+					if ($myvalue > 180. || $myvalue < -180.) {
+		    			$myvalue .= " <span style=\"color: red;\">The ".
+		    				"longitude domain is -180&#176; to 90&#176; East".
+		    				"</span>";
+			    		$errors = TRUE;
+					}
+	    		}
+	    		if ($_POST["westernmost_longitude"] > 
+			    	$_POST["easternmost_longitude"]) {
+					$myvalue .= " <span style=\"color: red;\">Western ".
+			    		"limit is East of Eastern limit</span>";
+					$errors = TRUE;
+		    	} else if ($_POST["southernmost_latitude"] >
+			    	$_POST["northernmost_latitude"]) {
+					$myvalue .= " <span style=\"color: red;\">Northern ".
+		    			"limit is South of Southern limit</span>";
+					$errors = TRUE;
+		    	}
+			}
+
+			# Check that time specifications are of the correct format
+			if ($mykey == "datacollection_period_from" ||
+	    		$mykey == "datacollection_period_to") {
+	    		if (!preg_match("/^\d\d\d\d-\d\d-\d\d \d\d:\d\d \w\w\w/",
+					$myvalue)) {
+					$myvalue = "<span style=\"color: red;\">This field ".
+						"should be of the form YYYY-MM-DD HH:MM UTC, please use ".
+						"the Edit button and correct errors. If time is not in ".
+						"UTC please specify timezone by the correct three ".
+						"letter abbreviation.</span>";
+					$errors = TRUE;
+		    	}
+			}
+
+			# Check that abstract is not too long
+			if ($mykey == "abstract" ||
+	    		$mykey == "description" ||
+	    		$mykey == "comment") {
+		    	if (strlen($myvalue) > 512) {
+					$myvalue = "<span style=\"color: red;\">This is no ".
+						"contest for the Nobel prize in literature, please ".
+						"use the Edit button and shorten the text.</span>";
+					$errors = TRUE;
+		    	} else {
+					$myvalue = ereg_replace("\n","<br><br>\n",$myvalue);
+	    		}
+			}
+
+			# Check that history is of the correct format
+			if ($mykey == "history") {
+	    		if (!preg_match("/^\d\d\d\d-\d\d-\d\d /", $myvalue)) {
+					$myvalue = "<span style=\"color: red;\">This should ".
+						"be of the form YYYY-MM-DD Creation, Please use the ".
+						"Edit button and correct the text. </span>";
+					$errors = TRUE;
+	    		}
+			}
+
+			# Create the output form for visual inspection by the user
+			#
+			# Label column
+			if ($mykey == "keyphrase") {
+		    	echo(fmlabelstart()."Key phrase".fmlabelend());
+			} else {
+	    		$searchstr = "/name=".$mykey."/";
+		    	$templitem = preg_grep($searchstr,$mytempl);
+		    	if (count($templitem) > 0) {
+					parse_str(current($templitem));
+	    			echo(fmlabelstart().$label.fmlabelend());
+		    	} else {
+		    		echo(fmlabelstart().$mykey.fmlabelend());
+	    		}
+			}
+			# Data column
+			if (is_array($myvalue)) {
+		    	echo(fminputstart());
+		    	foreach ($myvalue as $singleitem) {
+					echo($singleitem."<br>");
+	    		}
+		    	echo(fminputend());
+			} else {
+	    		echo(fminputstart().$myvalue.fminputend());
+			}
+			echo(fmcreaterecordend());
+
+			# Add hidden elements to transport information to the data dump
+			# function
+			if (!$errors) {
+    			if (is_array($myHiddenValue)) {
+					foreach ($myHiddenValue as $singleitem) {
+	    				echo(fmcreatehidden($mykey."[]",$singleitem));
+					}
+				} else {
+					echo(fmcreatehidden($mykey,$myHiddenValue));
+    			}
+			}
+    	}
+	    echo(fmcreatesectionend());
+    	echo(fmcreatebr());
+		if (!$errors) {
+    		echo(fmcreatebutton("Submit","Write form"));
 		}
     }
-    echo(fmcreatesectionend());
-    echo(fmcreatebr());
 
-	if (!$errors) {
-    	echo(fmcreatebutton("Submit","Write form"));
-	}
+
 	echo(fmcreatebutton("Submit", "Edit form"));
     echo(fmcreatebutton("Submit","Cancel write"));
     echo(fmendform());
