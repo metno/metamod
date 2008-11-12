@@ -705,10 +705,21 @@ function fmcheckform($outputdst, $filename) {
     foreach ($mytempl as $line) {
 		if (! ereg('mandatory',$line)) continue;
 		parse_str($line);
-		# check for string-length, so value 0 returns true
-		if (! strlen($_POST[$name])) {
-	    	echo(fmcreateerrmsg("Record ".$name." is mandatory and missing"));
-	    	$errors = TRUE;
+		if ($name) { # name from $line
+			$pName = rtrim($name, "[]"); // phpName for arrays
+			if ($pName != $name) {
+				# array
+				if (!(array_key_exists($pName,$_POST) && is_array($_POST[$pName]) && (count ($_POST[$pName]) > 0))) {
+					echo(fmcreateerrmsg("Record ".$pName." is mandatory and missing"));
+	    			$errors = TRUE;
+				}
+			} else {
+				# check for string-length, so value 0 returns true
+				if (! strlen($_POST[$name])) {
+	    			echo(fmcreateerrmsg("Record ".$name." is mandatory and missing"));
+	    			$errors = TRUE;
+				}
+			}
 		}
     }
     echo(fmstartform());
