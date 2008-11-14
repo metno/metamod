@@ -79,13 +79,24 @@ sub writeToFile {
 
 sub getDS_XML {
     my ($self) = @_;
-    return $self->{docDS}->toString();
+    return $self->{docDS}->toString(1);
 }
 
 sub getMETA_XML {
     my ($self) = @_;
-    return $self->{docMETA}->toString();
+    return $self->{docMETA}->toString(1);
 }
+
+sub getDS_DOC {
+    my ($self) = @_;
+    return $self->{docDS};
+}
+
+sub getMETA_DOC {
+    my ($self) = @_;
+    return $self->{docMETA};
+}
+
 
 
 sub getInfo {
@@ -217,6 +228,19 @@ Return: xml-string of dataset
 =item getMETA_XML
 
 Return: xml-string of MM2
+
+=item getDS_DOC
+
+Get the internal state of the dataset document, use with greatest caution.
+
+Return: XML::LibXML::Node of dataset
+
+=item getMETA_DOC
+
+Get the internal state of the dataset document, use with greatest caution.
+
+Return: XML::LibXML::Node of MM2
+
 
 =item getInfo()
 

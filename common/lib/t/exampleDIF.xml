@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : difTest.xml
+    Created on : November 12, 2008, 1:22 PM
+    Author     : heikok
+    Description:
+        Purpose of the document follows.
+-->
+
+<DIF xmlns="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/" xmlns:dif="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/ http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif_v9.7.1.xsd">
+  <Entry_ID>eçäø€</Entry_ID>
+  <Entry_Title>Polar Ozone and Aerosol Measurement III (POAM III) Data at NRL</Entry_Title>
+  <Data_Set_Citation>
+    <Dataset_Creator>POAM Science Team</Dataset_Creator>
+    <Dataset_Title>Polar Ozone and Aerosol Measurement III (POAM III) Data</Dataset_Title>
+    <Dataset_Release_Date>1998</Dataset_Release_Date>
+    <Dataset_Release_Place>Washington, D.C.</Dataset_Release_Place>
+    <Dataset_Publisher>Naval Research Laboratory</Dataset_Publisher>
+    <Online_Resource>http://wvms.nrl.navy.mil/POAM/</Online_Resource>
+  </Data_Set_Citation>
+  <Parameters>
+    <Category>EARTH SCIENCE</Category>
+    <Topic>ATMOSPHERE</Topic>
+    <Term>ATMOSPHERIC CHEMISTRY</Term>
+    <Variable_Level_1>OXYGEN COMPOUNDS</Variable_Level_1>
+    <Variable_Level_2>OZONE</Variable_Level_2>
+  </Parameters>
+  <Parameters>
+    <Category>EARTH SCIENCE</Category>
+    <Topic>ATMOSPHERE</Topic>
+    <Term>AIR QUALITY</Term>
+    <Variable_Level_1>NITROGEN OXIDES</Variable_Level_1>
+  </Parameters>
+  <Parameters>
+    <Category>EARTH SCIENCE</Category>
+    <Topic>ATMOSPHERE</Topic>
+    <Term>ATMOSPHERIC CHEMISTRY</Term>
+    <Variable_Level_1>NITROGEN COMPOUNDS</Variable_Level_1>
+    <Variable_Level_2>NITROGEN OXIDES</Variable_Level_2>
+  </Parameters>
+  <Parameters>
+    <Category>EARTH SCIENCE</Category>
+    <Topic>ATMOSPHERE</Topic>
+    <Term>AEROSOLS</Term>
+    <Variable_Level_1>AEROSOL EXTINCTION</Variable_Level_1>
+  </Parameters>
+  <Parameters>
+    <Category>EARTH SCIENCE</Category>
+    <Topic>ATMOSPHERE</Topic>
+    <Term>ATMOSPHERIC TEMPERATURE</Term>
+    <Variable_Level_1>TEMPERATURE PROFILES</Variable_Level_1>
+  </Parameters>
+  <Parameters>
+    <Category>EARTH SCIENCE</Category>
+    <Topic>ATMOSPHERE</Topic>
+    <Term>ATMOSPHERIC PRESSURE</Term>
+    <Variable_Level_1>ATMOSPHERIC PRESSURE MEASUREMENTS</Variable_Level_1>
+  </Parameters>
+  <Parameters>
+    <Category>EARTH SCIENCE</Category>
+    <Topic>ATMOSPHERE</Topic>
+    <Term>ATMOSPHERIC WINDS</Term>
+    <Variable_Level_1>VORTICITY</Variable_Level_1>
+    <Detailed_Variable>POTENTIAL VORTICITY</Detailed_Variable>
+  </Parameters>
+  <Parameters>
+    <Category>EARTH SCIENCE</Category>
+    <Topic>ATMOSPHERE</Topic>
+    <Term>ATMOSPHERIC WATER VAPOR</Term>
+    <Variable_Level_1>WATER VAPOR</Variable_Level_1>
+  </Parameters>
+  <Parameters>
+    <Category>EARTH SCIENCE</Category>
+    <Topic>ATMOSPHERE</Topic>
+    <Term>ATMOSPHERIC WATER VAPOR</Term>
+    <Variable_Level_1>WATER VAPOR PROFILES</Variable_Level_1>
+  </Parameters>
+  <Parameters>
+    <Category>EARTH SCIENCE</Category>
+    <Topic>ATMOSPHERE</Topic>
+    <Term>ATMOSPHERIC WATER VAPOR</Term>
+    <Variable_Level_1>HUMIDITY</Variable_Level_1>
+  </Parameters>
+  <ISO_Topic_Category>CLIMATOLOGY/METEOROLOGY/ATMOSPHERE</ISO_Topic_Category>
+  <ISO_Topic_Category>ENVIRONMENT</ISO_Topic_Category>
+  <Keyword>O3</Keyword>
+  <Keyword>NO2</Keyword>
+  <Keyword>UKMO</Keyword>
+  <Keyword>ozone concentration</Keyword>
+  <Keyword>ozone hole</Keyword>
+  <Keyword>ozone depletion</Keyword>
+  <Keyword>aerosol extinction</Keyword>
+  <Keyword>H2O</Keyword>
+  <Keyword>potential vorticity</Keyword>
+  <Keyword>polar stratospheric clouds</Keyword>
+  <Keyword>polar mesospheric clouds</Keyword>
+  <Sensor_Name>
+    <Short_Name>POAM III</Short_Name>
+    <Long_Name>Polar Ozone and Aerosol Measurement III</Long_Name>
+  </Sensor_Name>
+  <Source_Name>
+    <Short_Name>SPOT-4</Short_Name>
+    <Long_Name>Systeme Probatoire Pour l'Observation de la Terre-4</Long_Name>
+  </Source_Name>
+  <Temporal_Coverage>
+    <Start_Date>1998-04-22</Start_Date>
+  </Temporal_Coverage>
+  <Data_Set_Progress>IN WORK</Data_Set_Progress>
+  <Spatial_Coverage>
+    <Southernmost_Latitude>-90.0</Southernmost_Latitude>
+    <Northernmost_Latitude>-50.0</Northernmost_Latitude>
+    <Westernmost_Longitude>-180.0</Westernmost_Longitude>
+    <Easternmost_Longitude>180.0</Easternmost_Longitude>
+  </Spatial_Coverage>
+  <Spatial_Coverage>
+    <Southernmost_Latitude>50.0</Southernmost_Latitude>
+    <Northernmost_Latitude>90.0</Northernmost_Latitude>
+    <Westernmost_Longitude>-180.0</Westernmost_Longitude>
+    <Easternmost_Longitude>180.0</Easternmost_Longitude>
+  </Spatial_Coverage>
+  <Location>
+    <Location_Category>GEOGRAPHIC REGION</Location_Category>
+    <Location_Type>NORTHERN HEMISPHERE</Location_Type>
+  </Location>
+  <Location>
+    <Location_Category>GEOGRAPHIC REGION</Location_Category>
+    <Location_Type>SOUTHERN HEMISPHERE</Location_Type>
+  </Location>
+  <Location>
+    <Location_Category>CONTINENT</Location_Category>
+    <Location_Type>ANTARCTICA</Location_Type>
+  </Location>
+  <Location>
+    <Location_Category>GEOGRAPHIC REGION</Location_Category>
+    <Location_Type>ARCTIC</Location_Type>
+  </Location>
+  <Location>
+    <Location_Category>GEOGRAPHIC REGION</Location_Category>
+    <Location_Type>POLAR</Location_Type>
+  </Location>
+  <Project>
+    <Short_Name>SOLVE</Short_Name>
+    <Long_Name>SAGE III Ozone Loss and Validation Experiment</Long_Name>
+  </Project>
+  <Project>
+    <Short_Name>SOLVE II</Short_Name>
+    <Long_Name>SAGE III Ozone Loss and Validation Experiment II</Long_Name>
+  </Project>
+  <Access_Constraints>
+      Data is currently only available through NRL by request.
+   </Access_Constraints>
+  <Data_Set_Language>English</Data_Set_Language>
+  <Originating_Center>NRL</Originating_Center>
+  <Data_Center>
+    <Data_Center_Name>
+      <Short_Name>DOD/USNAVY/NRL/RSD</Short_Name>
+      <Long_Name>Remote Sensing Division, Naval Research Laboratory, U.S. Navy, U.S. Department of Defense</Long_Name>
+    </Data_Center_Name>
+    <Data_Center_URL>http://rsd-www.nrl.navy.mil/</Data_Center_URL>
+    <Personnel>
+      <Role>DATA CENTER CONTACT</Role>
+      <Last_Name>POAM SCIENCE TEAM</Last_Name>
+      <Contact_Address>
+        <Address>Naval Research Laboratory</Address>
+        <Address>4555 Overlook Avenue</Address>
+        <City>Washington</City>
+        <Province_or_State>D.C.</Province_or_State>
+        <Postal_Code>20375-5351</Postal_Code>
+        <Country>USA</Country>
+      </Contact_Address>
+    </Personnel>
+  </Data_Center>
+  <Distribution>
+    <Distribution_Format>ascii, HDF, IDL</Distribution_Format>
+    <Fees>None</Fees>
+  </Distribution>
+  <Reference>
+      Hoppel, K.W., R. Bevilacqua, G. Nedoluha, C. Deniel, Frank, Lefevre, J. Lumpe,
+      M. Fromm, C. Randall, J. Rosenfield, M. Rex, J., ÒPOAM III observations of
+      Arctic ozone loss for the 1999/2000 winterÓ,  Geophys. Res., 107(D20), 8262,
+      doi:10.1029/2001JD000476, 2002.
+      
+      C.E. Randall, J.D. Lumpe, R.M. Bevilacqua, K.W. Hoppel, E.P. Shettle, D.W.
+      Rusch,
+      L.L. Gordley, K. Kreher, K. Pfeilsticker, H. Boesch, G. Toon, F. Goutail, and
+      J.-P. Pommereau, J., "Validation of POAM III NO2 Measurements",  Geophys. Res.,
+      107(D20), 4432, doi:10.1029/2001JD001520, 2002.
+      
+      Bevilacqua, R.M., M. D. Fromm, J. M. Alfred,  J. S. Hornstein, G. E. Nedoluha,
+      K.W. Hoppel, J. D. Lumpe, C. E. Randall, and E. P. Shettle, J.  , ÒObservations
+      and analysis of PSCs detected by POAM III during the 1999/2000 northern
+      hemisphere winterÓ, Geophys. Res., 107(D20), 8281, doi:10.1029/2001JD000477,
+      2002.
+      
+      M. Rex, Salawitch, R. J., Harris, N. R. P., von der Gathen, P., Braathen, G.
+      O.,Schulz, A., Deckelman, H., Chipperfield, M., Sinnhuber, B. M., Reimer, E.,
+      Alfier, R., Bevilacqua, R., Hoppel, K., Fromm, M., Lumpe, J., Kalmann, H.,
+      KleinbÓhl, A., Bremer, H., von KÓnig, M., Kazi, K., Toohey, D., VÓmel, H.,
+      Richard, E., Aikin, K., Jost, H., Greenblatt, J. B., Loewenstein, M., Podolske,
+      J. R., Webster, C. R., Flesch, G. J., Scott, D. C., Herman, R. L., Elkins, J.
+      W., Ray, E. A., Moore, F. L., Hurst, D. F., Romashkin, P., Toon, G. C., Sen,
+      B., Margitan, J. J., Wennberg, P., Neuber, R., Allart, M., Bojkov, R. B.,
+      Claude, H., Davies, J., Davies, W., De Backer, H., Dier, H., Dorokhov, V.,
+      Fast, H., Kondo, Y., KyrÓ, E., Litynska, Z., Mikkelsen, I. S., Molyneux, M. J.,
+      Moran, E., Nagai, T., Nakane, H., Parrondo, C., Ravegnani, F., Skrivankova, P.,
+      Viatte, P., Yushkov, V.., J., "Chemical depletion of Arctic ozone in winter
+      1999/2000",  Geophys. Res., 107(D20), 8276, doi:10.1029/2001JD000533, 2002.
+      
+      Nedoluha, G. E., R. M. Bevilacqua, and K. W. Hoppel, J. ÒPOAM III measurements
+      of dehydration in the Antarctic and comparisons with the ArcticÓ,  Geophys.
+      Res., 107(D20), 8290, doi:10.1029/2001JD001184, 2002.
+      
+      G.E.. Nedoluha, R.M. Bevilacqua, K.W. Hoppel, J.D. Lumpe, H. Smit, J. , "POAM
+      III measurements of water vapor in the upper troposphere and lowermost
+      stratosphere",  Geophys. Res., 107(D10), 4103, doi:10.1029/2001JD000793, 2002. 
+      
+      Randall, C.E., R.M. Bevilacqua, J.D. Lumpe and K.W. Hoppel, J. , ÒValidation of
+      POAM III Aerosols:  Comparison to SAGE II and HALOEÓ,  Geophys. Res., 106,
+      27,525-27,536, 2001.
+      
+      G.E. Nedoluha, R.M. Bevilacqua, K.W. Hoppel, M. Daehler, E.P. Shettle,  J.S.
+      Hornstein, M.D. Fromm, J.D. Lumpe, J.E. Rosenfield, , "POAM III measurements of
+      dehydration in the Antarctic lower stratosphere",  Geophys. Res. Lett., 27,
+      1683-1686, 2000.
+      
+      R.L. Lucke, D. Korwan, R.M. Bevilacqua, J.S. Hornstein, E.P. Shettle, D.T.
+      Chen, M. Daehler, J.D. Lumpe, M.D. Fromm, D. Debrestian, B. Neff, M. Squire, G.
+      KÓnig-Langlo, &amp; J. Davies, J.  , "The Polar Ozone and Aerosol Measurement (POAM
+      III) Instrument and Early Validation Results", Geophys. Res., 104,
+      18,785-18,799, 1999.
+      
+      Additional publications are available from
+      http://wvms.nrl.navy.mil/POAM/publish.html
+   </Reference>
+  <Summary>
+       The Polar Ozone and Aerosol Measurement III (POAM III) instrument is similar
+      to POAM II, and is designed to extend the POAM II data in time. POAM III is
+      carried by the SPOT-4 spacecraft sponsored by the Centre National d'Etudes
+      Spatiales (CNES), the French Space Agency and was launched in 1998.
+      
+      The POAM III retrieval version 2 includes the following profile data:
+      (1) Ozone concentration, 5-60 km
+      (2) NO2 concentration, 20-40 km
+      (3) Aerosol extinction at 1018 nm, 10-30 km
+      (4) Water Vapor, 5-45 km
+      (5) UKMO temperature, pressure, and potential vorticity, 0-60 km
+      
+      The ancillary profiles of temperature, pressure, and potential vorticity from
+      the UK Meteorological Office (UKMO) have been interpolated to the location and
+      time of the POAM III measurements. The MSISE-90 model has been used to extend
+      these profiles above the top UKMO pressure level. The time span for the data is
+      April 22, 1998 to present.
+      
+      The data are distributed by NRL and can be obtained in several formats,
+      including ascii format, HDF, and IDL save files. Data requests and questions
+      can be made by email  to mailto:karl.hoppel@nrl.navy.mil
+   </Summary>
+  <Related_URL>
+    <URL_Content_Type>
+      <Type>GET DATA</Type>
+    </URL_Content_Type>
+    <URL>http://wvms.nrl.navy.mil/POAM/data/data.html</URL>
+    <Description>
+         Access to information and availability of POAM III data products
+      </Description>
+  </Related_URL>
+  <Related_URL>
+    <URL_Content_Type>
+      <Type>VIEW PROJECT HOME PAGE</Type>
+    </URL_Content_Type>
+    <URL>http://wvms.nrl.navy.mil/POAM/</URL>
+    <Description>
+         Access to POAM documentation
+      </Description>
+  </Related_URL>
+  <IDN_Node>
+    <Short_Name>USA/NASA</Short_Name>
+  </IDN_Node>
+  <IDN_Node>
+    <Short_Name>AMD</Short_Name>
+  </IDN_Node>
+  <IDN_Node>
+    <Short_Name>CEOS</Short_Name>
+  </IDN_Node>
+  <Originating_Metadata_Node>GCMD</Originating_Metadata_Node>
+  <Metadata_Name>CEOS IDN DIF</Metadata_Name>
+  <Metadata_Version>VERSION 9.7</Metadata_Version>
+  <DIF_Creation_Date>2008-11-12</DIF_Creation_Date>
+  <Last_DIF_Revision_Date>2008-06-02</Last_DIF_Revision_Date>
+</DIF>

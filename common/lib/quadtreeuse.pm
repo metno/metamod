@@ -31,11 +31,10 @@ package quadtreeuse;
 #
 require 0.01;
 use POSIX;
-[==USE_LOCAL_PERL_LIB==]use lib qw([==LOCAL_PERL_LIB==]);
 use strict;
 use warnings;
 use Geo::Proj4;
-$quadtreeuse::VERSION = 0.01;
+our $VERSION = 0.01;
 #
 #  Constructor function: new
 #
