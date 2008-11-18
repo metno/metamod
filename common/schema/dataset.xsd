@@ -44,6 +44,7 @@
         </attribute>                
         <attribute name='ownertag' type='string' use='required' />
         <attribute name='creationDate' type='dateTime' use='required' />
+        <attribute name='datestamp' type='dateTime' use='required' />
         <attribute name='metadataFormat' type='string' />
     </complexType>
     <complexType name='QuadtreeNode'>

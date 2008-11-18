@@ -18,7 +18,7 @@ use constant DATASET => << 'EOT';
    xmlns="http://www.met.no/schema/metamod/dataset"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
-  <info name="" status="active" creationDate="1970-01-01T00:00:00Z" ownertag="" metadataFormat=""/>
+  <info name="" status="active" creationDate="1970-01-01T00:00:00Z" datestamp="1970-01-01T00:00:00Z" ownertag="" metadataFormat=""/>
 </dataset>
 EOT
 
@@ -28,7 +28,11 @@ sub newFromDoc {
     my ($class, $foreign, $dataset, %options) = @_;
     die "no metadata" unless $foreign;
     my $parser = Metamod::DatasetTransformer->XMLParser;
-    $dataset = $class->DATASET() unless $dataset;
+    unless ($dataset) {
+        $dataset = $class->DATASET();
+        my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime());
+        $dataset =~ s/\Q1970-01-01T00:00:00Z\E/$sDate/g; # changes datestamp and creationDate
+    }
     my $docDS = UNIVERSAL::isa($dataset, 'XML::LibXML::Node') ? $dataset : $parser->parse_string($dataset);
     my $docMETA = UNIVERSAL::isa($foreign, 'XML::LibXML::Node') ? $foreign : $parser->parse_string($foreign);
     my $format = exists $options{format} ? delete $options{format} : 'unknown';

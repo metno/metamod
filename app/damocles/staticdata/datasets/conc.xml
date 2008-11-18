@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<dataset ownertag="DAM">
+   <dataref>http://mersea.met.no:8080/thredds/catalog/data/seaice/conc/</dataref>
+   <drpath>DAMOC/conc</drpath>
+   <field_type>daily</field_type>
+   <Conventions>CF-1.0</Conventions>
+   <datacollection_period from="2006-05-01" to="2099-01-01" />
+   <area>Northern Hemisphere</area>
+   <northernmost_latitude>89.9347</northernmost_latitude>
+   <contact>osisaf-manager@met.no</contact>
+   <operational_status>Operational</operational_status>
+   <product_version>2.1</product_version>
+   <westernmost_longitude>-180</westernmost_longitude>
+   <references>OSI SAF Sea Ice Product Manual, Andersen S., Breivik L.A., Eastwood S., God&#248;y &#216;., Lind M., Porcires M., Schyberg H., v3.2, October 2005. http://www.osi-saf.org</references>
+   <spatial_resolution>10.0km</spatial_resolution>
+   <software_version>3.2</software_version>
+   <easternmost_longitude>179.926</easternmost_longitude>
+   <title>Total Sea Ice Concentration from EUMETSAT OSI SAF</title>
+   <southernmost_latitude>31.0883</southernmost_latitude>
+   <institution>met.no Norwegian Meteorological Institute</institution>
+   <activity_type>Space borne instrument</activity_type>
+   <variable>ice_concentration</variable>
+   <variable>Cryosphere > Sea Ice > Sea Ice Concentration > HIDDEN</variable>
+   <variable>Oceans > Sea Ice > Sea Ice Concentration > HIDDEN</variable>
+   <quadtree_nodes>
+1
+2
+3
+4
+   </quadtree_nodes>
+</dataset>

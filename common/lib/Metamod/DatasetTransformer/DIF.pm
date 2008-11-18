@@ -149,9 +149,11 @@ sub transform {
                 my $qtu = new quadtreeuse(90, 0, 3667387.2, 7, "+proj=stere +lat_0=90 +datum=WGS84");
                 if (defined $sLat[$i] && defined $nLat[$i] && defined $wLon[$i] && defined $eLon[$i]) {
                     print STDERR "WARNING: currently not adding quadtreenodes for $eLon[$i], $wLon[$i], $sLat[$i], $nLat[$i]\nadding takes to long\n";
-                    #$qtu->add_lonlats("area",
-                    #                  [$eLon[$i], $wLon[$i], $wLon[$i], $eLon[$i], $eLon[$i]],
-                    #                  [$sLat[$i], $sLat[$i], $nLat[$i], $nLat[$i], $sLat[$i]]);
+                    if ($sLat[$i] > -90) {
+                    $qtu->add_lonlats("area",
+                                      [$eLon[$i], $wLon[$i], $wLon[$i], $eLon[$i], $eLon[$i]],
+                                      [$sLat[$i], $sLat[$i], $nLat[$i], $nLat[$i], $sLat[$i]]);
+                    }
                     push @nodes, $qtu->get_nodes;
                 }
             }

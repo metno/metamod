@@ -1,0 +1,1717 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<datacollection ownertag="DAM">
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/catalog/data/AWI/MSM0204CTD/" />
+      <drpath name="DAMOC/MSM0204CTD" />
+      <topiccategory name="oceans" />
+      <instrument_type name="CTD-Seabird SBE911+" />
+      <datacollection_period from="2006-08-20" to="2006-09-11" />
+      <title name="MSM02/04 cruise" />
+      <activity_type name="Cruise" />
+      <institution name="AWI Alfred Wegener Institute for Polar and Marine Research" />
+      <keywords name="CTD" />
+      <keywords name="conductivity" />
+      <keywords name="pressure" />
+      <keywords name="salinity" />
+      <keywords name="temperature" />
+      <abstract>
+CTD data. Conductivity, pressure, salinity and temperature
+      </abstract>
+      <quadtree_nodes>
+3242434
+4131123
+4131134
+4131141
+4131142
+4131143
+4131312
+4131313
+4131314
+4131323
+32424224
+32424242
+32424243
+32424244
+32424321
+32424323
+32424412
+32424413
+32424414
+32424421
+32424431
+41311124
+41311142
+41311144
+41311213
+41311214
+41311241
+41311243
+41311244
+41311324
+41311332
+41311334
+41311441
+41313112
+41313113
+41313114
+41313211
+41313213
+41313243
+41313322
+41313411
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/dodsC/data/UiB/GFI/GFI_S1M10801.nc" />
+      <drpath name="DAMOC/GFI/GFI_S1M10801.nc" />
+      <topiccategory name="oceans" />
+      <northernmost_latitude name="62.8333333333" />
+      <contact name="orvik@gfi.uib.no" />
+      <PI_name name="Kjell Arild Orvik" />
+      <keywords name="oceanography velocity salinity temperature pressure" />
+      <westernmost_longitude name="4.29" />
+      <references name="http://www.gfi.uib.no/" />
+      <Platform_name name="GFI Rig S1" />
+      <Conventions name="CF-1.0" />
+      <history name="2007-05-11 Created" />
+      <distribution_statement name="Free" />
+      <product_name name="Mooring data" />
+      <area name="Norwegian Sea" />
+      <easternmost_longitude name="4.29" />
+      <abstract>
+Moored rig at Svin&oslash;y observing current and some other parameters 
+      </abstract>
+      <title name="Svin&oslash;y mooring S1" />
+      <southernmost_latitude name="62.8333333333" />
+      <institution name="UiB University of Bergen" />
+      <datacollection_period from="2006-10-02" to="2007-03-21" />
+      <variable name="direction_of_sea_water_velocity" />
+      <variable name="sea_water_speed" />
+      <variable name="eastward_sea_water_velocity" />
+      <variable name="northward_sea_water_velocity" />
+      <quadtree_nodes>
+43314133
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/dodsC/data/UiB/GFI/GFI_S1M10983.nc" />
+      <drpath name="DAMOC/GFI/GFI_S1M10983.nc" />
+      <topiccategory name="oceans" />
+      <northernmost_latitude name="62.8333333333" />
+      <contact name="orvik@gfi.uib.no" />
+      <PI_name name="Kjell Arild Orvik" />
+      <keywords name="oceanography velocity salinity temperature pressure" />
+      <westernmost_longitude name="4.29" />
+      <references name="http://www.gfi.uib.no/" />
+      <Platform_name name="GFI Rig S1" />
+      <Conventions name="CF-1.0" />
+      <history name="2007-05-11 Created" />
+      <distribution_statement name="Free" />
+      <product_name name="Mooring data" />
+      <area name="Norwegian Sea" />
+      <easternmost_longitude name="4.29" />
+      <southernmost_latitude name="62.8333333333" />
+      <abstract>
+Moored rig at Svin&oslash;y observing current and some other parameters 
+      </abstract>
+      <title name="Svin&oslash;y mooring S1" />
+      <institution name="UiB University of Bergen" />
+      <datacollection_period from="2006-10-02" to="2006-10-31" />
+      <variable name="direction_of_sea_water_velocity" />
+      <variable name="sea_water_pressure" />
+      <variable name="sea_water_salinity" />
+      <variable name="sea_water_speed" />
+      <variable name="eastward_sea_water_velocity" />
+      <variable name="northward_sea_water_velocity" />
+      <quadtree_nodes>
+43314133
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/dodsC/data/UiB/GFI/GFI_S1M11247.nc" />
+      <drpath name="DAMOC/GFI/GFI_S1M11247.nc" />
+      <topiccategory name="oceans" />
+      <northernmost_latitude name="62.8333333333" />
+      <contact name="orvik@gfi.uib.no" />
+      <PI_name name="Kjell Arild Orvik" />
+      <keywords name="oceanography velocity salinity temperature pressure" />
+      <westernmost_longitude name="4.29" />
+      <references name="http://www.gfi.uib.no/" />
+      <Platform_name name="GFI Rig S1" />
+      <Conventions name="CF-1.0" />
+      <history name="2007-05-11 Created" />
+      <distribution_statement name="Free" />
+      <product_name name="Mooring data" />
+      <area name="Norwegian Sea" />
+      <easternmost_longitude name="4.29" />
+      <southernmost_latitude name="62.8333333333" />
+      <abstract>
+Moored rig at Svin&oslash;y observing current and some other parameters 
+      </abstract>
+      <title name="Svin&oslash;y mooring S1" />
+      <institution name="UiB University of Bergen" />
+      <datacollection_period from="2006-10-02" to="2007-03-21" />
+      <variable name="direction_of_sea_water_velocity" />
+      <variable name="sea_water_pressure" />
+      <variable name="sea_water_salinity" />
+      <variable name="sea_water_speed" />
+      <variable name="eastward_sea_water_velocity" />
+      <variable name="northward_sea_water_velocity" />
+      <quadtree_nodes>
+43314133
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/dodsC/data/UiB/GFI/GFI_S1M12347.nc" />
+      <drpath name="DAMOC/GFI/GFI_S1M12347.nc" />
+      <topiccategory name="oceans" />
+      <northernmost_latitude name="62.8333333333" />
+      <contact name="orvik@gfi.uib.no" />
+      <PI_name name="Kjell Arild Orvik" />
+      <keywords name="oceanography velocity salinity temperature pressure" />
+      <westernmost_longitude name="4.29" />
+      <references name="http://www.gfi.uib.no/" />
+      <Platform_name name="GFI Rig S1" />
+      <Conventions name="CF-1.0" />
+      <history name="2007-05-11 Created" />
+      <distribution_statement name="Free" />
+      <product_name name="Mooring data" />
+      <area name="Norwegian Sea" />
+      <easternmost_longitude name="4.29" />
+      <southernmost_latitude name="62.8333333333" />
+      <abstract>
+Moored rig at Svin&oslash;y observing current and some other parameters 
+      </abstract>
+      <title name="Svin&oslash;y mooring S1" />
+      <institution name="UiB University of Bergen" />
+      <datacollection_period from="2006-10-02" to="2007-03-21" />
+      <variable name="direction_of_sea_water_velocity" />
+      <variable name="sea_water_pressure" />
+      <variable name="sea_water_salinity" />
+      <variable name="sea_water_speed" />
+      <variable name="eastward_sea_water_velocity" />
+      <variable name="northward_sea_water_velocity" />
+      <quadtree_nodes>
+43314133
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/dodsC/data/met.no/metno/metno_arctic20.200609.nc" />
+      <drpath name="DAMOC/metno/metno_arctic20.200609.nc" />
+      <topiccategory name="oceans" />
+      <area name="Arctic Ocean" />
+      <area name="Nordic Seas" />
+      <forecast_range name="0029-days forecast" />
+      <northernmost_latitude name="89.9033" />
+      <contact name="jens.debernard@met.no" />
+      <references name="http://met.no/english/r_and_d_activities/method/num_mod/mi_pom.html, http://met.no/english/r_and_d_activities/method/num_mod/mi_im.html" />
+      <operational_status name="Operational" />
+      <PI_name name="Jens Debernard" />
+      <product_version name="1.0" />
+      <forecast_type name="nowcast" />
+      <keywords name="forecast" />
+      <keywords name="sea" />
+      <keywords name="ice" />
+      <keywords name="asimillation" />
+      <westernmost_longitude name="-179.995" />
+      <Conventions name="CF-1.0" />
+      <history name="2006-11-29 creation" />
+      <grid_projection name="polar_stereographic" />
+      <distribution_statement name="Free" />
+      <product_name name="coupled MI-POM, MI-IM model" />
+      <software_version name="MIPOM v. 23, MI-IM v. 3" />
+      <easternmost_longitude name="179.956" />
+      <abstract>
+This data set contains ice concentration (fraction of ice), and sea surface 
+temperature analysis from the met.no operational coupled ice-ocean model 
+Arctic-20. Each file contains one month of daily analysis valid at 00 GMT. The 
+quality of this data set will vary due to model upgrades, and should therefore 
+in the long term, improve with time. New model-versions are tested 
+semi-operationally before they are included in this data set. 
+      </abstract>
+      <title name="met.no DAMOCLES sea ice operational ice concentration and sst" />
+      <southernmost_latitude name="45.2402" />
+      <institution name="met.no Norwegian Meteorological Institute" />
+      <datacollection_period from="2006-09-01" to="2006-09-30" />
+      <variable name="sea_ice_area_fraction" />
+      <variable name="sea_water_temperature" />
+      <quadtree_nodes>
+1
+2
+3
+4
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/dodsC/data/met.no/metno/metno_arctic20.200610.nc" />
+      <drpath name="DAMOC/metno/metno_arctic20.200610.nc" />
+      <topiccategory name="oceans" />
+      <area name="Arctic Ocean" />
+      <area name="Nordic Seas" />
+      <forecast_range name="0030-days forecast" />
+      <northernmost_latitude name="89.9033" />
+      <contact name="jens.debernard@met.no" />
+      <references name="http://met.no/english/r_and_d_activities/method/num_mod/mi_pom.html, http://met.no/english/r_and_d_activities/method/num_mod/mi_im.html" />
+      <operational_status name="operational" />
+      <PI_name name="Jens Debernard" />
+      <product_version name="1.0" />
+      <forecast_type name="nowcast" />
+      <keywords name="forecast" />
+      <keywords name="sea" />
+      <keywords name="ice" />
+      <keywords name="asimillation" />
+      <westernmost_longitude name="-179.995" />
+      <Conventions name="CF-1.0" />
+      <history name="2006-11-29 creation" />
+      <grid_projection name="polar_stereographic" />
+      <distribution_statement name="Free" />
+      <product_name name="coupled MI-POM, MI-IM model" />
+      <software_version name="MIPOM v. 23, MI-IM v. 3" />
+      <easternmost_longitude name="179.956" />
+      <abstract>
+This data set contains ice concentration (fraction of ice), and sea surface 
+temperature analysis from the met.no operational coupled ice-ocean model 
+Arctic-20. Each file contains one month of daily analysis valid at 00 GMT. The 
+quality of this data set will vary due to model upgrades, and should therefore 
+in the long term, improve with time. New model-versions are tested 
+semi-operationally before they are included in this data set. 
+      </abstract>
+      <title name="met.no DAMOCLES sea ice operational ice concentration and sst" />
+      <southernmost_latitude name="45.2402" />
+      <institution name="met.no Norwegian Meteorological Institute" />
+      <datacollection_period from="2006-10-01" to="2006-10-31" />
+      <variable name="sea_ice_area_fraction" />
+      <variable name="sea_water_temperature" />
+      <quadtree_nodes>
+1
+2
+3
+4
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/dodsC/data/met.no/metno/metno_arctic20.200611.nc" />
+      <drpath name="DAMOC/metno/metno_arctic20.200611.nc" />
+      <topiccategory name="oceans" />
+      <area name="Arctic Ocean" />
+      <area name="Nordic Seas" />
+      <forecast_range name="0027-days forecast" />
+      <northernmost_latitude name="89.9033" />
+      <contact name="jens.debernard@met.no" />
+      <references name="http://met.no/english/r_and_d_activities/method/num_mod/mi_pom.html, http://met.no/english/r_and_d_activities/method/num_mod/mi_im.html" />
+      <operational_status name="operational" />
+      <PI_name name="Jens Debernard" />
+      <product_version name="1.0" />
+      <forecast_type name="nowcast" />
+      <keywords name="forecast" />
+      <keywords name="sea" />
+      <keywords name="ice" />
+      <keywords name="asimillation" />
+      <westernmost_longitude name="-179.995" />
+      <Conventions name="CF-1.0" />
+      <history name="2006-11-29 creation" />
+      <grid_projection name="polar_stereographic" />
+      <distribution_statement name="Free" />
+      <product_name name="coupled MI-POM, MI-IM model" />
+      <software_version name="MIPOM v. 23, MI-IM v. 3" />
+      <easternmost_longitude name="179.956" />
+      <abstract>
+This data set contains ice concentration (fraction of ice), and sea surface 
+temperature analysis from the met.no operational coupled ice-ocean model 
+Arctic-20. Each file contains one month of daily analysis valid at 00 GMT. The 
+quality of this data set will vary due to model upgrades, and should therefore 
+in the long term, improve with time. New model-versions are tested 
+semi-operationally before they are included in this data set. 
+      </abstract>
+      <title name="met.no DAMOCLES sea ice operational ice concentration and sst" />
+      <southernmost_latitude name="45.2402" />
+      <institution name="met.no Norwegian Meteorological Institute" />
+      <datacollection_period from="2006-11-01" to="2006-11-28" />
+      <variable name="sea_ice_area_fraction" />
+      <variable name="sea_water_temperature" />
+      <quadtree_nodes>
+1
+2
+3
+4
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/catalog/data/met.no/icesst/" />
+      <drpath name="DAMOC/icesst" />
+      <topiccategory name="oceans" />
+      <area name="Arctic Ocean" />
+      <area name="Nordic Seas" />
+      <northernmost_latitude name="89.9033" />
+      <contact name="jens.debernard@met.no" />
+      <references name="http://met.no/english/r_and_d_activities/method/num_mod/mi_pom.html, http://met.no/english/r_and_d_activities/method/num_mod/mi_im.html" />
+      <operational_status name="operational" />
+      <PI_name name="Jens Debernard" />
+      <product_version name="1.0" />
+      <forecast_type name="nowcast" />
+      <keywords name="forecast" />
+      <keywords name="sea" />
+      <keywords name="ice" />
+      <keywords name="asimillation" />
+      <westernmost_longitude name="-179.995" />
+      <Conventions name="CF-1.0" />
+      <history name="2007-05-24 creation" />
+      <grid_projection name="polar_stereographic" />
+      <distribution_statement name="Free" />
+      <product_name name="coupled MI-POM, MI-IM model" />
+      <software_version name="MIPOM v. 23, MI-IM v. 3" />
+      <easternmost_longitude name="179.956" />
+      <southernmost_latitude name="45.2402" />
+      <title name="met.no DAMOCLES sea ice operational ice concentration and sst" />
+      <abstract>
+This data set contains ice concentration (fraction of ice), and sea surface 
+temperature analysis from the met.no operational coupled ice-ocean model 
+Arctic-20. Each file contains one month of daily analysis valid at 00 GMT. The 
+quality of this data set will vary due to model upgrades, and should therefore 
+in the long term, improve with time. New model-versions are tested 
+semi-operationally before they are included in this data set. 
+      </abstract>
+      <institution name="met.no Norwegian Meteorological Institute" />
+      <datacollection_period from="2007-01-01" to="2007-01-31" />
+      <variable name="sea_ice_area_fraction" />
+      <variable name="sea_water_temperature" />
+      <quadtree_nodes>
+1
+2
+3
+4
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/catalog/data/IOPAS/ocCTDar06/" />
+      <drpath name="DAMOC/ocCTDar06" />
+      <contact name="ocl@iopan.gda.pl" />
+      <history name="2006-07-19 creation 2007-04-30 revision" />
+      <operational_status name="operational" />
+      <PI_name name="Ocean Circulation Laboratory" />
+      <keywords name="Greenland Sea" />
+      <keywords name="Ocean Temperature" />
+      <keywords name="Salinity/Density" />
+      <title name="IO PAS CTD data file" />
+      <quality_index name="1" />
+      <references name="http://seabird.com" />
+      <topiccategory name="oceans" />
+      <distribution_statement name="Restricted to Damocles" />
+      <product_version name="1.0" />
+      <Platform_name name="R/V Oceania" />
+      <Conventions name="CF-1.0" />
+      <datacollection_period from="2006-06-20" to="2006-07-18" />
+      <activity_type name="Cruise" />
+      <abstract>
+IO PAS CTD data file from Arctic Cruise with R/V Oceania performed in summer 2006
+      </abstract>
+      <product_name name="Oceania CTD data 2006" />
+      <area name="Greenland Sea" />
+      <institution name="IOPAN Instytut Oceanologii, Polska Akademia Nauk" />
+      <software_version name="CTD Seabird SBE911plus, Seasave Win32 V 5.30b" />
+      <variable name="sea_water_electrical_conductivity" />
+      <variable name="sea_water_potential_temperature" />
+      <variable name="sea_water_pressure" />
+      <variable name="sea_water_salinity" />
+      <variable name="sea_water_sigma_theta" />
+      <variable name="sea_water_temperature" />
+      <quadtree_nodes>
+4131141
+4131434
+4133241
+4134113
+4134341
+32424244
+41311141
+41311143
+41311144
+41311322
+41311324
+41311423
+41311424
+41311431
+41311432
+41311434
+41311442
+41311443
+41311444
+41313124
+41313133
+41313134
+41313143
+41313144
+41313212
+41313213
+41313214
+41313221
+41313222
+41313224
+41313231
+41313233
+41313234
+41313242
+41313243
+41313244
+41313311
+41313312
+41313314
+41313332
+41313341
+41313342
+41313412
+41313423
+41313424
+41313431
+41313432
+41313441
+41314313
+41314314
+41314332
+41314334
+41331123
+41331124
+41331141
+41331142
+41331144
+41331213
+41331214
+41331221
+41331222
+41331223
+41331322
+41331411
+41331412
+41331421
+41331422
+41332111
+41332112
+41332134
+41332143
+41332144
+41332232
+41332233
+41332234
+41332241
+41332243
+41332244
+41332311
+41332312
+41332324
+41332421
+41332422
+41332423
+41333241
+41333242
+41333243
+41333412
+41333414
+41333421
+41333432
+41333434
+41334114
+41334123
+41334124
+41334131
+41334132
+41334213
+41334214
+41334221
+41334222
+41334223
+41334334
+41334343
+41334344
+41334433
+41334434
+41334441
+41334442
+41334443
+41341114
+41341141
+41341311
+41341313
+41341314
+41341332
+41341334
+41341343
+41343111
+41343112
+41343121
+41343122
+41343124
+41343231
+41343233
+41343323
+41343324
+41343331
+41343332
+41343341
+41343432
+41343441
+41343443
+43111212
+43111221
+43111222
+43112111
+43112112
+43121221
+43121222
+43121224
+43121242
+43121244
+43122133
+43122311
+43122313
+43122314
+43122332
+43122334
+43122343
+43124121
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://mersea.met.no:8080/thredds/catalog/data/seaice/conc/" />
+      <drpath name="DAMOC/conc" />
+      <field_type name="daily" />
+      <Conventions name="CF-1.0" />
+      <datacollection_period from="2006-05-01" to="2099-01-01" />
+      <area name="Northern Hemisphere" />
+      <northernmost_latitude name="89.9347" />
+      <contact name="osisaf-manager@met.no" />
+      <operational_status name="operational" />
+      <product_version name="2.1" />
+      <westernmost_longitude name="-180" />
+      <references name="OSI SAF Sea Ice Product Manual, Andersen S., Breivik L.A., Eastwood S., God&oslash;y &Oslash;., Lind M., Porcires M., Schyberg H., v3.2, October 2005. http://www.osi-saf.org" />
+      <spatial_resolution name="10.0km" />
+      <software_version name="3.2" />
+      <easternmost_longitude name="179.926" />
+      <title name="Total Sea Ice Concentration from EUMETSAT OSI SAF" />
+      <southernmost_latitude name="31.0883" />
+      <institution name="met.no Norwegian Meteorological Institute" />
+      <activity_type name="Space borne instrument" />
+      <variable name="ice_concentration" />
+      <variable name="Cryosphere > Sea Ice > Sea Ice Concentration > HIDDEN" />
+      <variable name="Oceans > Sea Ice > Sea Ice Concentration > HIDDEN" />
+      <quadtree_nodes>
+1
+2
+3
+4
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://mersea.met.no:8080/thredds/catalog/data/seaice/type/" />
+      <drpath name="DAMOC/type" />
+      <field_type name="daily" />
+      <Conventions name="CF-1.0" />
+      <datacollection_period from="2006-05-01" to="2099-01-01" />
+      <area name="Northern Hemisphere" />
+      <northernmost_latitude name="89.9347" />
+      <contact name="osisaf-manager@met.no" />
+      <operational_status name="operational" />
+      <product_version name="2.1" />
+      <westernmost_longitude name="-180" />
+      <references name="OSI SAF Sea Ice Product Manual, Andersen S., Breivik L.A., Eastwood S., God&oslash;y &Oslash;., Lind M., Porcires M., Schyberg H., v3.2, October 2005. http://www.osi-saf.org" />
+      <spatial_resolution name="10.0km" />
+      <software_version name="3.2" />
+      <easternmost_longitude name="179.926" />
+      <title name="Sea Ice Type from EUMETSAT OSI SAF" />
+      <southernmost_latitude name="31.0883" />
+      <institution name="met.no Norwegian Meteorological Institute" />
+      <activity_type name="Space borne instrument" />
+      <variable name="ice_type" />
+      <variable name="Cryosphere > Sea Ice > Ice Types > HIDDEN" />
+      <variable name="Oceans > Sea Ice > Ice Types > HIDDEN" />
+      <quadtree_nodes>
+1
+2
+3
+4
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://mersea.met.no:8080/thredds/catalog/data/seaice/edge/" />
+      <drpath name="DAMOC/edge" />
+      <field_type name="daily" />
+      <Conventions name="CF-1.0" />
+      <datacollection_period from="2006-05-01" to="2099-01-01" />
+      <area name="Northern Hemisphere" />
+      <northernmost_latitude name="89.9347" />
+      <contact name="osisaf-manager@met.no" />
+      <operational_status name="operational" />
+      <product_version name="2.1" />
+      <westernmost_longitude name="-180" />
+      <references name="OSI SAF Sea Ice Product Manual, Andersen S., Breivik L.A., Eastwood S., God&oslash;y &Oslash;., Lind M., Porcires M., Schyberg H., v3.2, October 2005. http://www.osi-saf.org" />
+      <spatial_resolution name="10.0km" />
+      <software_version name="3.2" />
+      <easternmost_longitude name="179.926" />
+      <title name="Sea Ice Edge from EUMETSAT OSI SAF" />
+      <southernmost_latitude name="31.0883" />
+      <institution name="met.no Norwegian Meteorological Institute" />
+      <activity_type name="Space borne instrument" />
+      <variable name="ice_edge" />
+      <variable name="Cryosphere > Sea Ice > Ice Edges > HIDDEN" />
+      <variable name="Oceans > Sea Ice > Ice Edges > HIDDEN" />
+      <quadtree_nodes>
+1
+2
+3
+4
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/catalog/data/DMI/icedriftC4/" />
+      <drpath name="DAMOC/icedriftC4" />
+      <area name="Arctic Ocean" />
+      <contact name="gd@dmi.dk" />
+      <topiccategory name="oceans" />
+      <PI_name name="Gorm Dybkjaer" />
+      <keywords name="Ice drift" />
+      <keywords name="Arctic" />
+      <keywords name="IR" />
+      <keywords name="VIS" />
+      <keywords name="AVHRR" />
+      <keywords name="MCC" />
+      <westernmost_longitude name="-178.51" />
+      <northernmost_latitude name="90" />
+      <Platform_name name="AVHRR" />
+      <activity_type name="Space borne instrument" />
+      <project_name name="DAMOCLES" />
+      <Conventions name="CF-1.0" />
+      <history name="2007-10-25 creation" />
+      <distribution_statement name="Free" />
+      <easternmost_longitude name="179.635" />
+      <southernmost_latitude name="56.0234" />
+      <abstract>
+A 9 month ice drift data set based on VIS and IR data 
+      </abstract>
+      <title name="Ice drift in Greenland seas" />
+      <product_name name="Ice drift" />
+      <institution name="DMI Danish Meteorological Institute" />
+      <datacollection_period from="2005-05-10" to="2006-02-10" />
+      <variable name="Cryosphere > Sea Ice > Sea Ice Motion > HIDDEN" />
+      <variable name="Oceans > Sea Ice > Sea Ice Motion > HIDDEN" />
+      <variable name="Ice displacement" />
+      <quadtree_nodes>
+1441
+1443
+3142
+3213
+4113
+13244
+13441
+14114
+14131
+14132
+14141
+14143
+14144
+14233
+14312
+14313
+14321
+14322
+14324
+14331
+14341
+14342
+14421
+14423
+14424
+14441
+14442
+14443
+23331
+23334
+31114
+31121
+31131
+31132
+31231
+31244
+31342
+31431
+31432
+31441
+32113
+32114
+32212
+32214
+32221
+32223
+32224
+32241
+32242
+32244
+32311
+32422
+32423
+32424
+32441
+32442
+34212
+34213
+41112
+41113
+41114
+41311
+132424
+134143
+134144
+134234
+134243
+134244
+134321
+134322
+134421
+134422
+134433
+134434
+134443
+134444
+141134
+141233
+141234
+141331
+141341
+141342
+141344
+141423
+141424
+142313
+142314
+142323
+142341
+142343
+142344
+142433
+143113
+143114
+143144
+143232
+143233
+143234
+143322
+143324
+143331
+143333
+143342
+143344
+143431
+143432
+143441
+143442
+143444
+144223
+144441
+144442
+144443
+233133
+233323
+233331
+233332
+233334
+233433
+311124
+311134
+311231
+311232
+311244
+311341
+311411
+311412
+311413
+311422
+311441
+311443
+311444
+312122
+312123
+312124
+312133
+312134
+312143
+312144
+312211
+312212
+312213
+312321
+312322
+312323
+312331
+312332
+312341
+312422
+312423
+312424
+312434
+313214
+313221
+313223
+313232
+313233
+313234
+313243
+313322
+313411
+313414
+313431
+313432
+314114
+314132
+314133
+314134
+314143
+314144
+314421
+321111
+321113
+321121
+321123
+321231
+321233
+321234
+321243
+321421
+322111
+322112
+322114
+322132
+322134
+322221
+322223
+322224
+322312
+322321
+322322
+322432
+322434
+323121
+323131
+324213
+324214
+324322
+324324
+324334
+324342
+324343
+324344
+324431
+324432
+324433
+324441
+332244
+332341
+332422
+341133
+341134
+341142
+341143
+341144
+341231
+341233
+341234
+341242
+341243
+341244
+341312
+341321
+341322
+341411
+341412
+341414
+341421
+341422
+342112
+342114
+342141
+342143
+342211
+342213
+342311
+342312
+411112
+411113
+411114
+411211
+411213
+411231
+411233
+411411
+411413
+411431
+411433
+413121
+413122
+413123
+413131
+413133
+413211
+413322
+413324
+413411
+413413
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/catalog/data/DMI/icedriftC2/" />
+      <drpath name="DAMOC/icedriftC2" />
+      <abstract>
+A 9 month ice drift data set based on VIS and IR data 
+      </abstract>
+      <activity_type name="Space borne instrument" />
+      <area name="Arctic Ocean" />
+      <contact name="gd@dmi.dk" />
+      <Conventions name="CF-1.0" />
+      <datacollection_period from="2005-05-10" to="2005-09-01" />
+      <distribution_statement name="Free" />
+      <easternmost_longitude name="179.585" />
+      <history name="2007-10-29 creation" />
+      <institution name="DMI Danish Meteorological Institute" />
+      <keywords name="Arctic" />
+      <keywords name="AVHRR" />
+      <keywords name="Ice drift" />
+      <keywords name="IR" />
+      <keywords name="MCC" />
+      <keywords name="VIS" />
+      <northernmost_latitude name="88.1978" />
+      <PI_name name="Gorm Dybkjaer" />
+      <Platform_name name="AVHRR" />
+      <product_name name="Ice drift" />
+      <project_name name="DAMOCLES" />
+      <southernmost_latitude name="55.7894" />
+      <title name="Ice drift in Greenland seas" />
+      <topiccategory name="oceans" />
+      <westernmost_longitude name="-178.51" />
+      <variable name="Cryosphere > Sea Ice > Sea Ice Motion > HIDDEN" />
+      <variable name="Oceans > Sea Ice > Sea Ice Motion > HIDDEN" />
+      <variable name="Ice displacement" />
+      <quadtree_nodes>
+1441
+1443
+3142
+3213
+4113
+14143
+14144
+14233
+14322
+14324
+14342
+14423
+14441
+14442
+14443
+31114
+31121
+31131
+31132
+31141
+31142
+31231
+31244
+31323
+31341
+32114
+32212
+32214
+32221
+32223
+32224
+32242
+32244
+32311
+32422
+32423
+32424
+32441
+34141
+34212
+34213
+41112
+41113
+41114
+41123
+41141
+41143
+41311
+41321
+41322
+41323
+132424
+132441
+132442
+132444
+133434
+134234
+134243
+134411
+134412
+134414
+134421
+134433
+134434
+134443
+141313
+141321
+141323
+141324
+141331
+141341
+141342
+141344
+141413
+141414
+141423
+141424
+142313
+142314
+142341
+142343
+142344
+142433
+143114
+143121
+143122
+143123
+143131
+143132
+143134
+143144
+143211
+143212
+143214
+143232
+143233
+143234
+143311
+143312
+143314
+143322
+143324
+143333
+143342
+143344
+143411
+143412
+143414
+143431
+143432
+143441
+143442
+143444
+144211
+144213
+144214
+144241
+144243
+144244
+144441
+144442
+144443
+233311
+233313
+233314
+233331
+233332
+233334
+233341
+233343
+233344
+311124
+311134
+311231
+311233
+311234
+311244
+311331
+311341
+311432
+311441
+311443
+312122
+312123
+312124
+312133
+312134
+312143
+312144
+312211
+312212
+312213
+312321
+312323
+312331
+312332
+312341
+312422
+312424
+312434
+313144
+313212
+313214
+313221
+313223
+313241
+313243
+313244
+313322
+313344
+313421
+313422
+313423
+313431
+313432
+313433
+314133
+314134
+314143
+314144
+314311
+314312
+314321
+314322
+314411
+314412
+321121
+321123
+321131
+321133
+321134
+321231
+321233
+321234
+321243
+321421
+322111
+322112
+322114
+322132
+322134
+322221
+322223
+322224
+322321
+322322
+322411
+322412
+322414
+322432
+322434
+323121
+323122
+323131
+324214
+324324
+324342
+324343
+324344
+324421
+324422
+324423
+324431
+324432
+324433
+332132
+341133
+341134
+341143
+341144
+341231
+341233
+341234
+341242
+341243
+341244
+341312
+341321
+341322
+341421
+341422
+342112
+342114
+342141
+342142
+342143
+342211
+342311
+342312
+411112
+411113
+411114
+411211
+411213
+411214
+411243
+411244
+411421
+411423
+411441
+411443
+411444
+412313
+412332
+413121
+413122
+413123
+413131
+413241
+413242
+413243
+413321
+413322
+413324
+413411
+413412
+413413
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/catalog/data/met.no/synop/" />
+      <drpath name="DAMOC/synop" />
+      <area name="Barents Sea" />
+      <area name="Greenland Sea" />
+      <quadtree_nodes>
+41343124
+41323443
+34223231
+      </quadtree_nodes>
+      <northernmost_latitude name="76.5" />
+      <contact name="o.godoy@met.no" />
+      <topiccategory name="climatologyMeteorologyAtmosphere" />
+      <PI_name name="&Oslash;ystein God&oslash;y" />
+      <keywords name="Atmospheric Observation Temperature Humidity Clouds Pressure Precipitation Wind SYNOP" />
+      <westernmost_longitude name="-8.6667" />
+      <activity_type name="Land station" />
+      <project_name name="IPY/Damocles/iAOOS" />
+      <Conventions name="CF-1.0" />
+      <history name="2007-11-16 Created" />
+      <distribution_statement name="Free" />
+      <easternmost_longitude name="25.0667" />
+      <abstract>
+Quality controlled synoptic meteorological measurements performed by the 
+Norwegian Meteorological Institute. Data are extracted from the public available 
+database http://eklima.met.no/. 
+      </abstract>
+      <title name="SYNOP data from BJ&Oslash;RN&Oslash;YA, JAN MAYEN and HOPEN" />
+      <southernmost_latitude name="70.9333" />
+      <institution name="met.no Norwegian Meteorological Institute" />
+      <product_name name="SYNOP" />
+      <datacollection_period from="2005-09-01" to="2007-11-16" />
+      <variable name="wind_speed" />
+      <variable name="wind_from_direction" />
+      <variable name="relative_humidity" />
+      <variable name="air_temperature" />
+      <variable name="air_pressure_at_sea_level" />
+      <variable name="Atmosphere > Atmospheric Pressure > Surface Pressure > HIDDEN" />
+      <variable name="Atmosphere > Atmospheric Temperature > Surface Air Temperature > HIDDEN" />
+      <variable name="Atmosphere > Atmospheric Water Vapor > Humidity > HIDDEN" />
+      <variable name="Atmosphere > Clouds > Cloud Types > HIDDEN" />
+      <variable name="Atmosphere > Clouds > Cloud Amount/Frequency > HIDDEN" />
+      <variable name="Atmosphere > Precipitation > Precipitation Amount > HIDDEN" />
+      <variable name="Atmosphere > Atmospheric Winds > Surface Winds > HIDDEN" />
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/catalog/data/DTU/optimal/" />
+      <drpath name="DAMOC/optimal" />
+      <area name="Arctic Ocean" />
+      <northernmost_latitude name="90" />
+      <contact name="rs@space.dtu.dk" />
+      <topiccategory name="oceans" />
+      <PI_name name="Roberto Saldo" />
+      <keywords name="Cryosphere Ice Atmosphere" />
+      <westernmost_longitude name="-180" />
+      <activity_type name="Space borne instrument" />
+      <project_name name="DAMOCLES" />
+      <Conventions name="CF-1.0" />
+      <history name="2007-11-26 creation" />
+      <distribution_statement name="Free" />
+      <easternmost_longitude name="180" />
+      <southernmost_latitude name="30.9435" />
+      <abstract>
+Ice, ocean and atmosphere parameters retrieved from AMSR-E passive microwave 
+measurements by optimal estimation. 
+      </abstract>
+      <title name="Optimal estimated parameters from AMSR-E data" />
+      <product_name name="OptimalAMSR" />
+      <institution name="DTU Technical University of Denmark" />
+      <datacollection_period from="2005-12-01" to="2007-11-26" />
+      <variable name="Cryosphere > Sea Ice > Sea Ice Concentration > HIDDEN" />
+      <variable name="Oceans > Sea Ice > Sea Ice Concentration > HIDDEN" />
+      <variable name="Atmosphere > Clouds > Cloud Liquid Water/Ice > HIDDEN" />
+      <variable name="Oceans > Sea Ice > Ice Temperature > HIDDEN" />
+      <variable name="Cryosphere > Sea Ice > Ice Temperature > HIDDEN" />
+      <variable name="Oceans > Ocean Temperature > Sea Surface Temperature > HIDDEN" />
+      <variable name="Atmosphere > Atmospheric Water Vapor > Condensation > HIDDEN" />
+      <variable name="Atmosphere > Atmospheric Winds > Surface Winds > HIDDEN" />
+      <quadtree_nodes>
+1
+2
+3
+4
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/catalog/data/IOPAS/oceania/" />
+      <drpath name="DAMOC/oceania" />
+      <Conventions name="CF-1.0" />
+      <topiccategory name="oceans" />
+      <area name="Greenland Sea" />
+      <area name="Barents Sea" />
+      <northernmost_latitude name="79.831" />
+      <contact name="ilona_g@iopan.gda.pl" />
+      <operational_status name="operational" />
+      <PI_name name="Ilona Goszczko" />
+      <product_version name="1.0" />
+      <keywords name="Oceanography Pressure Temperature Coductivity Salinity" />
+      <westernmost_longitude name="0.044" />
+      <references name="http://seabird.com" />
+      <references name="http://www.iopan.gda.pl" />
+      <activity_type name="Cruise" />
+      <project_name name="Damocles, AREX 2007" />
+      <history name="2007-07-22 creation" />
+      <distribution_statement name="Restricted to Damocles" />
+      <quality_index name="1" />
+      <software_version name="CTD Seabird SBE911plus, Seasave Win32 V 7.12" />
+      <easternmost_longitude name="20.004" />
+      <southernmost_latitude name="70.5" />
+      <abstract>
+IO PAS CTD data file from Arctic Cruise with R/V Oceania performed in summer 
+2007 
+      </abstract>
+      <title name="IO PAS CTD data file" />
+      <Platform_name name="R/V Oceania" />
+      <product_name name="oceania_ctd_ar07" />
+      <institution name="IOPAN Instytut Oceanologii, Polska Akademia Nauk" />
+      <datacollection_period from="2007-06-19" to="2007-07-22" />
+      <variable name="sea_water_electrical_conductivity" />
+      <variable name="sea_water_temperature" />
+      <variable name="sea_water_salinity" />
+      <variable name="sea_water_pressure" />
+      <quadtree_nodes>
+4133
+41313
+41314
+43111
+43112
+43121
+413123
+413411
+413413
+413431
+413433
+413434
+431131
+431132
+431141
+431142
+4131133
+4131134
+4131143
+4131144
+4131241
+4131243
+4131244
+4132313
+4132331
+4132333
+4134143
+4134321
+4134323
+4311331
+4311332
+4311341
+4312211
+4312213
+4312231
+4312233
+4312234
+4312311
+4312312
+4312321
+4312322
+4312411
+4312412
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/catalog/data/SU/aoe/" />
+      <drpath name="DAMOC/aoe" />
+      <product_name name="AOE-2001 dataset" />
+      <area name="Arctic Ocean" />
+      <northernmost_latitude name="90" />
+      <contact name="michaelt@misu.su.se" />
+      <topiccategory name="climatologyMeteorologyAtmosphere" />
+      <PI_name name="Michael Tjernstrom" />
+      <keywords name="Polar" />
+      <keywords name="Troposphere" />
+      <keywords name="Meteorological Observation" />
+      <keywords name="Measurement" />
+      <keywords name="Atmospheric Boundary Layer" />
+      <keywords name="Clouds" />
+      <keywords name="Remote Sensing" />
+      <keywords name="Soundings" />
+      <keywords name="Temperature" />
+      <keywords name="Humidity" />
+      <keywords name="Wind" />
+      <keywords name="Pressure" />
+      <keywords name="Turbulence" />
+      <keywords name="Radiation" />
+      <keywords name="Visibility" />
+      <westernmost_longitude name="-10" />
+      <activity_type name="Cruise" />
+      <project_name name="AOE-2001" />
+      <Conventions name="CF-1.0" />
+      <history name="2007-11-23 creation" />
+      <distribution_statement name="Free" />
+      <easternmost_longitude name="120" />
+      <title name="Arctic Ocean Experiment 2001 AOE-2001." />
+      <southernmost_latitude name="79" />
+      <datacollection_period from="2001-07-05" to="2001-08-21" />
+      <abstract>
+Arctic Ocean Experiment 2001 AOE-2001 was an icebreaker based field experiment 
+with a target on the formation of low clouds in the central Arctic summer during 
+July and August 2001. A main portion of the 2-moth experiment was a 3-week ice 
+drift from 89 to 88 degN. Main components of the meteorology part of the 
+experiment were surface-based remote- sensing observations, general meteorology 
+observations (weather staion and soundings) and boundary-layer observations on 
+the ice. For a complete review of the experiment and a full list of instruments, 
+see Tjernstr&ouml;m et al. 2004 ("The summertime Arctic atmosphere: Meteorological 
+measurements during the Arctic Ocean Experiment (AOE-2001)" in Bulletin of the 
+American Meteorological Society, 85, 1305 - 1321, and its on-line supplement 
+"Experimental equipment: A supplement to The summertime Arctic atmosphere: 
+Meteorological measurements during the Arctic Ocean Experiment (AOE-2001)"). 
+Observations included in the dataset:
+      Observations from 2D-wind sonic anemometer on the mast of Oden during AOE-2001. Beware of flow distortion from the ship.
+      One-hour averaged cloud base observations from cloud base lidar and cloud radar during AOE-2001
+      Instant cloud-top observations from S-band cloud radar operating in two modes, a low-range high-resolution and a high-range low-resolution mode, respectively, obtained during AOE-2001. The presented data is the highest cloud top altitude observed.
+      Various meteorological observations from a mast placed on an ice-floe during AOE-2001
+      Turbulence statistics from sonic anemometer at 15 meters on the mast averaged over 15 minute obtained during AOE-2001
+      Turbulence statistics from sonic anemometer at 5 meters on the mast averaged over 15 minute obtained during AOE-2001
+      Various meteorological observations from Odens weather station situated at 35 metres ASL during AOE-2001. Winds may be subject to considerable flow distortion. Precipitation is in arbitrary units.
+      One-hour averaged precipitation from present-weather-sensor, which measures no. of precip particles falling past the sensor, during AOE-2001
+      Wind profile data from 915 MHz profiler on foredeck of Oden obtained during AOE-2001
+      Atmospheric baloon sounding data obtained during AOE-2001. The observations are interpolated to a fixed grid for plotting purposes.
+      Measurements from the high range of the S-band cloud radar obtained during AOE-2001. The variables presented are radar reflectivity and hydro-meteor fall velocity.
+      Measurements from the low range of the S-band cloud radar obtained during AOE-2001. The variables presented are radar reflectivity and hydro-meteor fall velocity.
+      Temperature profiles measured by a scanning radiometer obtained during AOE-2001.
+      Measurements from the sodar obtained during AOE-2001. Note that the altitude for each record varies in time.
+      Observations 5 metres AGL from mobile ISSF PAM station 1 during AOE-2001.
+      Turbulence observations 5 metres AGL from mobile ISSF PAM station 1 during AOE-2001.
+      Observations 5 metres AGL from mobile ISSF PAM station 2 during AOE-2001.
+      Turbulence observations 5 metres AGL from mobile ISSF PAM station 1 during AOE-2001.
+      Observations 5 metres AGL from mobile ISSF PAM station 3 during AOE-2001.
+      Turbulence observations 5 metres AGL from mobile ISSF PAM station 1 during AOE-2001.
+      One-hour averaged visibility observations from back-scatter sensor during AOE-2001.
+      </abstract>
+      <institution name="SU Stockholm University" />
+      <variable name="air_potential_temperature" />
+      <variable name="air_pressure" />
+      <variable name="air_temperature" />
+      <variable name="cloud_area_fraction" />
+      <variable name="cloud_base_altitude" />
+      <variable name="cloud_top_altitude" />
+      <variable name="dew_point_temperature" />
+      <variable name="downward_eastward_momentum_flux_in_air" />
+      <variable name="downward_heat_flux_in_air" />
+      <variable name="downward_northward_momentum_flux_in_air" />
+      <variable name="downward_water_vapor_flux_in_air_due_to_diffusion" />
+      <variable name="downwelling_longwave_flux_in_air" />
+      <variable name="downwelling_shortwave_flux_in_air" />
+      <variable name="eastward_wind" />
+      <variable name="magnitude_of_surface_downward_stress" />
+      <variable name="net_downward_longwave_flux_in_air" />
+      <variable name="net_downward_shortwave_flux_in_air" />
+      <variable name="northward_wind" />
+      <variable name="precipitation" />
+      <variable name="precipitation_flux" />
+      <variable name="Radar Reflectivity" />
+      <variable name="relative_humidity" />
+      <variable name="specific_humidity" />
+      <variable name="square_of_air_temperature" />
+      <variable name="square_of_eastward_wind" />
+      <variable name="square_of_northward_wind" />
+      <variable name="square_of_upward_air_velocity" />
+      <variable name="upward_air_velocity" />
+      <variable name="upwelling_longwave_flux_in_air" />
+      <variable name="upwelling_shortwave_flux_in_air" />
+      <variable name="visibility_in_air" />
+      <variable name="wind_from_direction" />
+      <variable name="wind_speed" />
+      <quadtree_nodes>
+23333
+41134
+144444
+233314
+322222
+322224
+322242
+411111
+411112
+411113
+411121
+411123
+411131
+411133
+411141
+411143
+411311
+411312
+411314
+411321
+411322
+411324
+411332
+411433
+413114
+413121
+413122
+413123
+413132
+413211
+413212
+413214
+413223
+413232
+413241
+413243
+413421
+413423
+413441
+413443
+431212
+431214
+431221
+431232
+431234
+431344
+431411
+431412
+431413
+431431
+431433
+433122
+433124
+433141
+433142
+433143
+433321
+433323
+433341
+433343
+433344
+433433
+433434
+433443
+      </quadtree_nodes>
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/catalog/data/DTU/gmmicemov/" />
+      <drpath name="DAMOC/gmmicemov" />
+      <area name="Arctic Ocean" />
+      <datacollection_period from="2005-11-28" to="2007-12-31" />
+      <northernmost_latitude name="86.9499969482422" />
+      <contact name="rs@space.dtu.dk" />
+      <topiccategory name="oceans" />
+      <PI_name name="Roberto Saldo" />
+      <keywords name="Ice" />
+      <westernmost_longitude name="-180.0" />
+      <activity_type name="Space borne instrument" />
+      <project_name name="DAMOCLES" />
+      <Conventions name="CF-1.0" />
+      <distribution_statement name="Free" />
+      <easternmost_longitude name="180.0" />
+      <abstract>
+Envisat ASAR GMM derived 3 day ice movement 
+      </abstract>
+      <southernmost_latitude name="-78.7249984741211" />
+      <title name="GMM ice movement" />
+      <product_name name="GMM icemovement" />
+      <institution name="DTU Technical University of Denmark" />
+      <quadtree_nodes>
+1
+2
+3
+4
+      </quadtree_nodes>
+      <variable name="Cryosphere > Sea Ice > Sea Ice Motion > HIDDEN" />
+      <variable name="Oceans > Sea Ice > Sea Ice Motion > HIDDEN" />
+   </dataset>
+   <dataset>
+      <dataref name="http://damocles.met.no:8080/thredds/catalog/data/AWI/ark22/" />
+      <drpath name="DAMOC/ark22" />
+      <area name="Arctic Ocean" />
+      <northernmost_latitude name="89." />
+      <contact name="Andreas.Wisotzki@awi.de" />
+      <topiccategory name="oceans" />
+      <PI_name name="Andreas Wisotzki" />
+      <westernmost_longitude name="26." />
+      <Platform_name name="R/V Polarstern" />
+      <distribution_statement name="Data restriction: for DAMOCLES partners only" />
+      <software_version name="Seabird: SeasaveWin32, Version 5.37d, SBE Data Processing, Version 5.37e" />
+      <easternmost_longitude name="-135." />
+      <southernmost_latitude name="72." />
+      <institution name="AWI Alfred Wegener Institute for Polar and Marine Research" />
+      <product_name name="CTD temperature, salinity, dissolved oxygen and light transmission at 191 stations in the Arctic Ocean" />
+      <abstract>
+CTD temperature, salinity, dissolved oxygen and light transmission at 191 stations in the Arctic Ocean
+      </abstract>
+      <datacollection_period from="2007-07-29" to="2007-10-06" />
+      <variable name="sea_water_dissolved_oxygen" />
+      <variable name="sea_water_temperature" />
+      <variable name="sea_water_light_transmission" />
+      <variable name="sea_water_salinity" />
+      <quadtree_nodes>
+144233
+144234
+144243
+144244
+144411
+144414
+144423
+144424
+233244
+233311
+233312
+233323
+233331
+233332
+233334
+233343
+233344
+233414
+233421
+233432
+233433
+233434
+234113
+234114
+234121
+234122
+234123
+234131
+234211
+411212
+411221
+411222
+411231
+411234
+411241
+411242
+411243
+411322
+411324
+411431
+411433
+411434
+412111
+413221
+413241
+413242
+413244
+413444
+414133
+414311
+      </quadtree_nodes>
+   </dataset>
+</datacollection>

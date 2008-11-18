@@ -1,0 +1,101 @@
+Application of the METAMOD2 software for the DAMOCLES project.
+==============================================================
+
+This application may either be installed on ice, for testing purposes,
+or on the damocles machine (virtual machine on day) for the production
+version.
+
+For testing the production installation on ice, run the script:
+
+test_20_on_ice.sh         This script ensures that the softlink 
+                          master_config.txt points to ice20.master_config.txt,
+                          and runs the update_target.pl script from the 
+                          ~/egil/m2/2.0 directory. This will update/copy the
+                          software to the TARGET_DIRECTORY found in 
+                          ice20.master_config.txt.
+
+For testing the unstable trunk version on ice, run the script:
+
+test_trunk_on_ice.sh      Sets master_config.txt to point to ice.master_config.txt
+                          and runs the update_target.pl script from the 
+                          trunk directory.
+
+For production installation on damocles/day, run the script:
+
+export_20_to_day.sh       This script will create a tar file of a special
+                          version of the ~/egil/m2/2.0 directory. This special
+                          version will contain this directory as an app/damocles
+                          subdirectory. Instructions for further steps to
+                          install on damocles/day will be written to stdout.
+
+For installing a test database on damocles/day, using damocles_r2 as database
+name and webrun_r2 as webrun directory, run the following script:
+
+export_trunk_to_day.sh    This script will create a tar file of a special
+                          version of the trunk directory. This special version
+                          will contain this directory as an app/damocles
+                          subdirectory. Instructions for further steps to
+                          install on damocles/day will be written to stdout.
+
+Other files in this directory:
+______________________________
+
+ext.master_config.txt     Configuration file for the production version on
+                          damocles/day.
+
+ext_r2.master_config.txt  Configuration file for the test database on damocles/day.
+
+ice20.master_config.txt   Configuration file for testing the production version
+                          on ice.
+
+ice.master_config.txt     Configuration file for the unstable (trunk) version on ice.
+
+master_config.txt         Symlink to one of the master config files.
+
+filelist.txt              File list of application specific files used in the
+                          application.
+
+install.sh                Installation script to be run on damocles/day. This
+                          script does various initialisations specific for
+                          the damocles/day version, and runs the
+                          update_target.pl script.
+
+install_r2.sh             Installation script for the test database (based on trunk)
+                          to be run on damocles/day.
+
+prepare_runtime_env.sh    General script for setting up a runtime environment
+                          for the application. Can be used both on ice and
+                          damocles/day. The script must be copied to the
+                          target directory (by the update_target.pl script)
+                          before it can run. It is only neccessary to run
+                          this script on a fresh installation of the
+                          application. Normal updates do not require this
+                          script to be run. Some overlap exists between this
+                          script and the install.sh script.
+
+split_datacollection.pl   Ad hoc script to split an XML file with many
+                          datasets into separate XML files with one dataset
+                          in each file.
+
+start_services.sh         Script to start the two "daemons" responsible for 
+                          importing metadata from netCDF files into the
+                          database (upload_monitor.pl and import_dataset.pl).
+                          Must be run from the target directory after
+                          installation (i.e after update_target.pl).
+
+stop_services.sh          Stops the two metadata importing "daemons" in an
+                          orderly fashion.
+
+testperl.pl               Perl script to test if all needed Perl modules are
+                          available.
+
+Directories:
+------------
+
+etc                       Configuration files for the METAMODUPLOAD module
+
+htdocs                    Mostly style sheets and images
+
+scripts                   Script for testing on ice
+
+staticdata                XML files for filling the database with initial content.

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<dataset ownertag="DAM">
+   <dataref>http://damocles.met.no:8080/thredds/catalog/data/DTU/optimal/</dataref>
+   <drpath>DAMOC/optimal</drpath>
+   <area>Arctic Ocean</area>
+   <northernmost_latitude>90</northernmost_latitude>
+   <contact>rs@space.dtu.dk</contact>
+   <topiccategory>oceans</topiccategory>
+   <PI_name>Roberto Saldo</PI_name>
+   <keywords>Cryosphere Ice Atmosphere</keywords>
+   <westernmost_longitude>-180</westernmost_longitude>
+   <activity_type>Space borne instrument</activity_type>
+   <project_name>DAMOCLES</project_name>
+   <Conventions>CF-1.0</Conventions>
+   <history>2007-11-26 creation</history>
+   <distribution_statement>Free</distribution_statement>
+   <easternmost_longitude>180</easternmost_longitude>
+   <southernmost_latitude>30.9435</southernmost_latitude>
+   <abstract>
+Ice, ocean and atmosphere parameters retrieved from AMSR-E passive microwave 
+measurements by optimal estimation. 
+   </abstract>
+   <title>Optimal estimated parameters from AMSR-E data</title>
+   <product_name>OptimalAMSR</product_name>
+   <institution>DTU Technical University of Denmark</institution>
+   <datacollection_period from="2005-12-01" to="2007-11-26" />
+   <variable>Cryosphere > Sea Ice > Sea Ice Concentration > HIDDEN</variable>
+   <variable>Oceans > Sea Ice > Sea Ice Concentration > HIDDEN</variable>
+   <variable>Atmosphere > Clouds > Cloud Liquid Water/Ice > HIDDEN</variable>
+   <variable>Oceans > Sea Ice > Ice Temperature > HIDDEN</variable>
+   <variable>Cryosphere > Sea Ice > Ice Temperature > HIDDEN</variable>
+   <variable>Oceans > Ocean Temperature > Sea Surface Temperature > HIDDEN</variable>
+   <variable>Atmosphere > Atmospheric Water Vapor > Condensation > HIDDEN</variable>
+   <variable>Atmosphere > Atmospheric Winds > Surface Winds > HIDDEN</variable>
+   <quadtree_nodes>
+1
+2
+3
+4
+   </quadtree_nodes>
+</dataset>

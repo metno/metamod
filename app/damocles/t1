@@ -1,0 +1,78 @@
+#!/bin/sh
+if [ -d /metno/damocles/r2/htdocs/adm ]; then
+#
+#  Set up .htaccess files:
+#
+   if [ ! -f /metno/damocles/r2/htdocs/adm/.htaccess ]; then
+      if [ '' != '' ]; then
+         cat >/metno/damocles/r2/htdocs/adm/.htaccess <<EOF
+AuthType Basic
+AuthName "Password Required"
+AuthUserFile 
+Require user 
+Order Deny,Allow
+Deny from all
+Allow from dnmi.no
+Satisfy all
+EOF
+      else
+         cat >/metno/damocles/r2/htdocs/adm/.htaccess <<EOF
+AuthType Basic
+AuthName "Domain required"
+Order Deny,Allow
+Deny from all
+Allow from dnmi.no
+EOF
+      fi
+   fi
+fi
+#
+#  Initialise webrun directory:
+#
+mkdir -p /metno/damocles/webrun_r2
+if [ -d /metno/damocles/r2/htdocs/upl ]; then
+   mkdir -p /metno/damocles/webrun_r2/u0
+   mkdir -p /metno/damocles/webrun_r2/u1
+   mkdir -p /metno/damocles/webrun_r2/u2
+   mkdir -p /metno/damocles/webrun_r2/upl
+   mkdir -p /metno/damocles/webrun_r2/upl/problemfiles
+   mkdir -p /metno/damocles/webrun_r2/upl/uerr
+   cd /metno/damocles/r2/htdocs/upl
+   rm -f uerr
+   ln -s /metno/damocles/webrun_r2/upl/uerr
+   if [ ! -f /metno/damocles/webrun_r2/ftp_events ]; then
+      cat >/metno/damocles/webrun_r2/ftp_events <<EOF
+[==FTP_EVENTS_INITIAL_CONTENT==]
+EOF
+   fi
+fi
+if [ -d /metno/damocles/r2/htdocs/sch ]; then
+#
+#  Initialise maps directory:
+#
+   rm -rf /metno/damocles/webrun_r2/maps
+   mkdir /metno/damocles/webrun_r2/maps
+   cp /metno/damocles/r2/htdocs/img/orig.png /metno/damocles/webrun_r2/maps
+fi
+if [ -d /metno/damocles/r2/htdocs/upl -o -d /metno/damocles/r2/htdocs/qst ]; then
+#
+#  Initialise XML directory:
+#
+   mkdir -p /metno/damocles/webrun_r2/XML/DAMOC
+   mkdir -p /metno/damocles/webrun_r2/XML/history
+fi
+#
+if [ -d /metno/damocles/r2/htdocs/upl ]; then
+#
+#  Initialize upload and OPeNDAP directories:
+#
+   mkdir -p [==UPLOAD_DIRECTORY==]
+   mkdir -p [==UPLOAD_FTP_DIRECTORY==]
+   mkdir -p [==OPENDAP_DIRECTORY==]
+   if [ ! -f [==OPENDAP_DIRECTORY==]/.htaccess ]; then
+      cat >[==OPENDAP_DIRECTORY==]/.htaccess <<EOF
+Order Deny,Allow
+Deny from all
+EOF
+   fi
+fi

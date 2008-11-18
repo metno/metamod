@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<dataset ownertag="DAM">
+   <dataref>http://damocles.met.no:8080/thredds/dodsC/data/met.no/metno/metno_arctic20.200609.nc</dataref>
+   <drpath>DAMOC/metno_arctic20.200609.xml</drpath>
+   <topiccategory>oceans</topiccategory>
+   <area>Arctic Ocean</area>
+   <area>Nordic Seas</area>
+   <forecast_range>0029-days forecast</forecast_range>
+   <northernmost_latitude>89.9033</northernmost_latitude>
+   <contact>jens.debernard@met.no</contact>
+   <references>http://met.no/english/r_and_d_activities/method/num_mod/mi_pom.html, http://met.no/english/r_and_d_activities/method/num_mod/mi_im.html</references>
+   <operational_status>Operational</operational_status>
+   <PI_name>Jens Debernard</PI_name>
+   <product_version>1.0</product_version>
+   <forecast_type>nowcast</forecast_type>
+   <keywords>forecast</keywords>
+   <keywords>sea</keywords>
+   <keywords>ice</keywords>
+   <keywords>asimillation</keywords>
+   <westernmost_longitude>-179.995</westernmost_longitude>
+   <Conventions>CF-1.0</Conventions>
+   <history>2006-11-29 creation</history>
+   <grid_projection>polar_stereographic</grid_projection>
+   <distribution_statement>Free</distribution_statement>
+   <product_name>coupled MI-POM, MI-IM model</product_name>
+   <software_version>MIPOM v. 23, MI-IM v. 3</software_version>
+   <easternmost_longitude>179.956</easternmost_longitude>
+   <abstract>
+This data set contains ice concentration (fraction of ice), and sea surface 
+temperature analysis from the met.no operational coupled ice-ocean model 
+Arctic-20. Each file contains one month of daily analysis valid at 00 GMT. The 
+quality of this data set will vary due to model upgrades, and should therefore 
+in the long term, improve with time. New model-versions are tested 
+semi-operationally before they are included in this data set. 
+   </abstract>
+   <title>met.no DAMOCLES sea ice operational ice concentration and sst</title>
+   <southernmost_latitude>45.2402</southernmost_latitude>
+   <institution>met.no Norwegian Meteorological Institute</institution>
+   <datacollection_period from="2006-09-01" to="2006-09-30" />
+   <variable>sea_ice_area_fraction</variable>
+   <variable>sea_water_temperature</variable>
+   <quadtree_nodes>
+1
+2
+3
+4
+   </quadtree_nodes>
+</dataset>

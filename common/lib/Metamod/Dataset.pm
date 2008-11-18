@@ -22,7 +22,7 @@ sub new {
     my ($class, %options) = @_;
     my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime());
     my $dataDS = $class->DATASET;
-    $dataDS =~ s/\Q1970-01-01T00:00:00Z\E/$sDate/g;
+    $dataDS =~ s/\Q1970-01-01T00:00:00Z\E/$sDate/g; # changes datestamp and creationDate
     $dataDS =~ s/metadataFormat=""/metadataFormat="MM2"/g;
 	my $dataMM2 = $class->MM2;
     return $class->newFromDoc($dataMM2, $dataDS, %options);
@@ -34,7 +34,7 @@ sub newFromDoc {
     unless ($dataset) {
         my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime());
         my $dataset = $class->DATASET;
-        $dataset =~ s/\Q1970-01-01T00:00:00Z\E/$sDate/g;
+        $dataset =~ s/\Q1970-01-01T00:00:00Z\E/$sDate/g; # changes datestamp and creationDate
         $dataset =~ s/metadataFormat=""/metadataFormat="MM2"/g;
     }
     my $parser = Metamod::DatasetTransformer->XMLParser;

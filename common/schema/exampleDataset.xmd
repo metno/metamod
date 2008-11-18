@@ -8,6 +8,7 @@
         status="active" 
         ownertag="DAM"
         creationDate="2008-10-31T14:30:00Z"
+        datestamp="2008-10-31T14:30:00Z"
         metadataFormat="MM2" />
   <quadtree_nodes>
   1

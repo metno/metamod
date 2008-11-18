@@ -1,0 +1,30 @@
+Directory for the DOKIPY project. Used as an application directory for METAMOD 2.x
+
+NOTE: DOKIPY does not use its own database. This application must accordingly operate
+together with an application that use the METAMODBASE module (i.e. damocles).
+
+Directory content:
+
+export_to_day.sh          Old script for copying files to dokipy@damocles
+
+ext.master_config.txt     Master config file used on dokipy@damocles. Probably out-dated.
+
+filelist.txt              Files in this directory (and subdirectories) that are part of
+                          the DOKIPY application.
+
+htdocs                    Directory for the main PHP scripts and METAMODQUEST
+                          configuration files.
+
+ice.master_config.txt     Master config file used on ice. Works with trunk.
+
+install.sh                Installation script for the dokipy@damocles installation.
+                          To be run on dokipy@damocles when the files have been copied
+                          to dokipy@damocles.
+
+master_config.txt         Just a sym-link to the master config file that is tested.
+
+prepare_runtime_env.sh    A portable installation script doing some of the work of
+                          install.sh (and some more). Imported from the damocles
+                          application. Not yet used in dokipy.
+
+test_on_ice.sh            Script for installing a test version on ice. Uses trunk.

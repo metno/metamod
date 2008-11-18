@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<dataset ownertag="DAM">
+   <dataref>http://damocles.met.no:8080/thredds/catalog/data/IOPAS/oceania/</dataref>
+   <drpath>DAMOC/oceania</drpath>
+   <Conventions>CF-1.0</Conventions>
+   <topiccategory>oceans</topiccategory>
+   <area>Greenland Sea</area>
+   <area>Barents Sea</area>
+   <northernmost_latitude>79.831</northernmost_latitude>
+   <contact>ilona_g@iopan.gda.pl</contact>
+   <operational_status>Operational</operational_status>
+   <PI_name>Ilona Goszczko</PI_name>
+   <product_version>1.0</product_version>
+   <keywords>Oceanography Pressure Temperature Coductivity Salinity</keywords>
+   <westernmost_longitude>0.044</westernmost_longitude>
+   <references>http://seabird.com</references>
+   <references>http://www.iopan.gda.pl</references>
+   <activity_type>Cruise</activity_type>
+   <project_name>Damocles, AREX 2007</project_name>
+   <history>2007-07-22 creation</history>
+   <distribution_statement>Restricted to Damocles</distribution_statement>
+   <quality_index>1</quality_index>
+   <software_version>CTD Seabird SBE911plus, Seasave Win32 V 7.12</software_version>
+   <easternmost_longitude>20.004</easternmost_longitude>
+   <southernmost_latitude>70.5</southernmost_latitude>
+   <abstract>
+IO PAS CTD data file from Arctic Cruise with R/V Oceania performed in summer 
+2007 
+   </abstract>
+   <title>IO PAS CTD data file</title>
+   <Platform_name>R/V Oceania</Platform_name>
+   <product_name>oceania_ctd_ar07</product_name>
+   <institution>IOPAN Instytut Oceanologii, Polska Akademia Nauk</institution>
+   <datacollection_period from="2007-06-19" to="2007-07-22" />
+   <variable>sea_water_electrical_conductivity</variable>
+   <variable>sea_water_temperature</variable>
+   <variable>sea_water_salinity</variable>
+   <variable>sea_water_pressure</variable>
+   <quadtree_nodes>
+4133
+41313
+41314
+43111
+43112
+43121
+413123
+413411
+413413
+413431
+413433
+413434
+431131
+431132
+431141
+431142
+4131133
+4131134
+4131143
+4131144
+4131241
+4131243
+4131244
+4132313
+4132331
+4132333
+4134143
+4134321
+4134323
+4311331
+4311332
+4311341
+4312211
+4312213
+4312231
+4312233
+4312234
+4312311
+4312312
+4312321
+4312322
+4312411
+4312412
+   </quadtree_nodes>
+</dataset>

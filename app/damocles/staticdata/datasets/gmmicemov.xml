@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<dataset ownertag="DAM">
+   <dataref>http://damocles.met.no:8080/thredds/catalog/data/DTU/gmmicemov/</dataref>
+   <drpath>DAMOC/gmmicemov</drpath>
+   <area>Arctic Ocean</area>
+   <datacollection_period from="2005-11-28" to="2007-12-31" />
+   <northernmost_latitude>86.9499969482422</northernmost_latitude>
+   <contact>rs@space.dtu.dk</contact>
+   <topiccategory>oceans</topiccategory>
+   <PI_name>Roberto Saldo</PI_name>
+   <keywords>Ice</keywords>
+   <westernmost_longitude>-180.0</westernmost_longitude>
+   <activity_type>Space borne instrument</activity_type>
+   <project_name>DAMOCLES</project_name>
+   <Conventions>CF-1.0</Conventions>
+   <distribution_statement>Free</distribution_statement>
+   <easternmost_longitude>180.0</easternmost_longitude>
+   <abstract>
+Envisat ASAR GMM derived 3 day ice movement 
+   </abstract>
+   <southernmost_latitude>-78.7249984741211</southernmost_latitude>
+   <title>GMM ice movement</title>
+   <product_name>GMM icemovement</product_name>
+   <institution>DTU Technical University of Denmark</institution>
+   <quadtree_nodes>
+1
+2
+3
+4
+   </quadtree_nodes>
+   <variable>Cryosphere > Sea Ice > Sea Ice Motion > HIDDEN</variable>
+   <variable>Oceans > Sea Ice > Sea Ice Motion > HIDDEN</variable>
+</dataset>

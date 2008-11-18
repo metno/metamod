@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<dataset ownertag="DAM">
+   <dataref>http://damocles.met.no:8080/thredds/catalog/data/AWI/MSM0204CTD/</dataref>
+   <drpath>DAMOC/MSM0204CTD</drpath>
+   <topiccategory>oceans</topiccategory>
+   <instrument_type>CTD-Seabird SBE911+</instrument_type>
+   <datacollection_period from="2006-08-20" to="2006-09-11" />
+   <title>MSM02/04 cruise</title>
+   <activity_type>Cruise</activity_type>
+   <institution>AWI Alfred Wegener Institute for Polar and Marine Research</institution>
+   <keywords>CTD</keywords>
+   <keywords>conductivity</keywords>
+   <keywords>pressure</keywords>
+   <keywords>salinity</keywords>
+   <keywords>temperature</keywords>
+   <abstract>
+CTD data. Conductivity, pressure, salinity and temperature
+   </abstract>
+   <quadtree_nodes>
+3242434
+4131123
+4131134
+4131141
+4131142
+4131143
+4131312
+4131313
+4131314
+4131323
+32424224
+32424242
+32424243
+32424244
+32424321
+32424323
+32424412
+32424413
+32424414
+32424421
+32424431
+41311124
+41311142
+41311144
+41311213
+41311214
+41311241
+41311243
+41311244
+41311324
+41311332
+41311334
+41311441
+41313112
+41313113
+41313114
+41313211
+41313213
+41313243
+41313322
+41313411
+   </quadtree_nodes>
+</dataset>

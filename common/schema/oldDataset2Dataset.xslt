@@ -25,6 +25,7 @@
           		<xsl:attribute name="name"><xsl:value-of select="/dataset/drpath"/></xsl:attribute>
           		<xsl:attribute name="status">active</xsl:attribute>
           		<xsl:attribute name="creationDate">2008-10-01T00:00:00Z</xsl:attribute>
+          		<xsl:attribute name="datestamp">2008-10-01T00:00:00Z</xsl:attribute>
           		<xsl:attribute name="ownertag"><xsl:value-of select="@ownertag"/></xsl:attribute>
           		<xsl:attribute name="metadataFormat">MM2</xsl:attribute>
         	</xsl:element>

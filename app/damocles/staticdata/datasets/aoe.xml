@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<dataset ownertag="DAM">
+   <dataref>http://damocles.met.no:8080/thredds/catalog/data/SU/aoe/</dataref>
+   <drpath>DAMOC/aoe</drpath>
+   <product_name>AOE-2001 dataset</product_name>
+   <area>Arctic Ocean</area>
+   <northernmost_latitude>90</northernmost_latitude>
+   <contact>michaelt@misu.su.se</contact>
+   <topiccategory>climatologyMeteorologyAtmosphere</topiccategory>
+   <PI_name>Michael Tjernstrom</PI_name>
+   <keywords>Polar</keywords>
+   <keywords>Troposphere</keywords>
+   <keywords>Meteorological Observation</keywords>
+   <keywords>Measurement</keywords>
+   <keywords>Atmospheric Boundary Layer</keywords>
+   <keywords>Clouds</keywords>
+   <keywords>Remote Sensing</keywords>
+   <keywords>Soundings</keywords>
+   <keywords>Temperature</keywords>
+   <keywords>Humidity</keywords>
+   <keywords>Wind</keywords>
+   <keywords>Pressure</keywords>
+   <keywords>Turbulence</keywords>
+   <keywords>Radiation</keywords>
+   <keywords>Visibility</keywords>
+   <westernmost_longitude>-10</westernmost_longitude>
+   <activity_type>Cruise</activity_type>
+   <project_name>AOE-2001</project_name>
+   <Conventions>CF-1.0</Conventions>
+   <history>2007-11-23 creation</history>
+   <distribution_statement>Free</distribution_statement>
+   <easternmost_longitude>120</easternmost_longitude>
+   <title>Arctic Ocean Experiment 2001 AOE-2001.</title>
+   <southernmost_latitude>79</southernmost_latitude>
+   <datacollection_period from="2001-07-05" to="2001-08-21" />
+   <abstract>
+Arctic Ocean Experiment 2001 AOE-2001 was an icebreaker based field experiment 
+with a target on the formation of low clouds in the central Arctic summer during 
+July and August 2001. A main portion of the 2-moth experiment was a 3-week ice 
+drift from 89 to 88 degN. Main components of the meteorology part of the 
+experiment were surface-based remote- sensing observations, general meteorology 
+observations (weather staion and soundings) and boundary-layer observations on 
+the ice. For a complete review of the experiment and a full list of instruments, 
+see Tjernstr&#246;m et al. 2004 ("The summertime Arctic atmosphere: Meteorological 
+measurements during the Arctic Ocean Experiment (AOE-2001)" in Bulletin of the 
+American Meteorological Society, 85, 1305 - 1321, and its on-line supplement 
+"Experimental equipment: A supplement to The summertime Arctic atmosphere: 
+Meteorological measurements during the Arctic Ocean Experiment (AOE-2001)"). 
+Observations included in the dataset:
+   Observations from 2D-wind sonic anemometer on the mast of Oden during AOE-2001. Beware of flow distortion from the ship.
+   One-hour averaged cloud base observations from cloud base lidar and cloud radar during AOE-2001
+   Instant cloud-top observations from S-band cloud radar operating in two modes, a low-range high-resolution and a high-range low-resolution mode, respectively, obtained during AOE-2001. The presented data is the highest cloud top altitude observed.
+   Various meteorological observations from a mast placed on an ice-floe during AOE-2001
+   Turbulence statistics from sonic anemometer at 15 meters on the mast averaged over 15 minute obtained during AOE-2001
+   Turbulence statistics from sonic anemometer at 5 meters on the mast averaged over 15 minute obtained during AOE-2001
+   Various meteorological observations from Odens weather station situated at 35 metres ASL during AOE-2001. Winds may be subject to considerable flow distortion. Precipitation is in arbitrary units.
+   One-hour averaged precipitation from present-weather-sensor, which measures no. of precip particles falling past the sensor, during AOE-2001
+   Wind profile data from 915 MHz profiler on foredeck of Oden obtained during AOE-2001
+   Atmospheric baloon sounding data obtained during AOE-2001. The observations are interpolated to a fixed grid for plotting purposes.
+   Measurements from the high range of the S-band cloud radar obtained during AOE-2001. The variables presented are radar reflectivity and hydro-meteor fall velocity.
+   Measurements from the low range of the S-band cloud radar obtained during AOE-2001. The variables presented are radar reflectivity and hydro-meteor fall velocity.
+   Temperature profiles measured by a scanning radiometer obtained during AOE-2001.
+   Measurements from the sodar obtained during AOE-2001. Note that the altitude for each record varies in time.
+   Observations 5 metres AGL from mobile ISSF PAM station 1 during AOE-2001.
+   Turbulence observations 5 metres AGL from mobile ISSF PAM station 1 during AOE-2001.
+   Observations 5 metres AGL from mobile ISSF PAM station 2 during AOE-2001.
+   Turbulence observations 5 metres AGL from mobile ISSF PAM station 1 during AOE-2001.
+   Observations 5 metres AGL from mobile ISSF PAM station 3 during AOE-2001.
+   Turbulence observations 5 metres AGL from mobile ISSF PAM station 1 during AOE-2001.
+   One-hour averaged visibility observations from back-scatter sensor during AOE-2001.
+   </abstract>
+   <institution>SU Stockholm University</institution>
+   <variable>air_potential_temperature</variable>
+   <variable>air_pressure</variable>
+   <variable>air_temperature</variable>
+   <variable>cloud_area_fraction</variable>
+   <variable>cloud_base_altitude</variable>
+   <variable>cloud_top_altitude</variable>
+   <variable>dew_point_temperature</variable>
+   <variable>downward_eastward_momentum_flux_in_air</variable>
+   <variable>downward_heat_flux_in_air</variable>
+   <variable>downward_northward_momentum_flux_in_air</variable>
+   <variable>downward_water_vapor_flux_in_air_due_to_diffusion</variable>
+   <variable>downwelling_longwave_flux_in_air</variable>
+   <variable>downwelling_shortwave_flux_in_air</variable>
+   <variable>eastward_wind</variable>
+   <variable>magnitude_of_surface_downward_stress</variable>
+   <variable>net_downward_longwave_flux_in_air</variable>
+   <variable>net_downward_shortwave_flux_in_air</variable>
+   <variable>northward_wind</variable>
+   <variable>precipitation</variable>
+   <variable>precipitation_flux</variable>
+   <variable>Radar Reflectivity</variable>
+   <variable>relative_humidity</variable>
+   <variable>specific_humidity</variable>
+   <variable>square_of_air_temperature</variable>
+   <variable>square_of_eastward_wind</variable>
+   <variable>square_of_northward_wind</variable>
+   <variable>square_of_upward_air_velocity</variable>
+   <variable>upward_air_velocity</variable>
+   <variable>upwelling_longwave_flux_in_air</variable>
+   <variable>upwelling_shortwave_flux_in_air</variable>
+   <variable>visibility_in_air</variable>
+   <variable>wind_from_direction</variable>
+   <variable>wind_speed</variable>
+   <quadtree_nodes>
+23333
+41134
+144444
+233314
+322222
+322224
+322242
+411111
+411112
+411113
+411121
+411123
+411131
+411133
+411141
+411143
+411311
+411312
+411314
+411321
+411322
+411324
+411332
+411433
+413114
+413121
+413122
+413123
+413132
+413211
+413212
+413214
+413223
+413232
+413241
+413243
+413421
+413423
+413441
+413443
+431212
+431214
+431221
+431232
+431234
+431344
+431411
+431412
+431413
+431431
+431433
+433122
+433124
+433141
+433142
+433143
+433321
+433323
+433341
+433343
+433344
+433433
+433434
+433443
+   </quadtree_nodes>
+</dataset>

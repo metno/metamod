@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<dataset ownertag="DAM">
+   <dataref>http://damocles.met.no:8080/thredds/catalog/data/AWI/ark22/</dataref>
+   <drpath>DAMOC/ark22</drpath>
+   <area>Arctic Ocean</area>
+   <northernmost_latitude>89.</northernmost_latitude>
+   <contact>Andreas.Wisotzki@awi.de</contact>
+   <topiccategory>oceans</topiccategory>
+   <PI_name>Andreas Wisotzki</PI_name>
+   <westernmost_longitude>26.</westernmost_longitude>
+   <Platform_name>R/V Polarstern</Platform_name>
+   <distribution_statement>Data restriction: for DAMOCLES partners only</distribution_statement>
+   <software_version>Seabird: SeasaveWin32, Version 5.37d, SBE Data Processing, Version 5.37e</software_version>
+   <easternmost_longitude>-135.</easternmost_longitude>
+   <southernmost_latitude>72.</southernmost_latitude>
+   <institution>AWI Alfred Wegener Institute for Polar and Marine Research</institution>
+   <product_name>CTD temperature, salinity, dissolved oxygen and light transmission at 191 stations in the Arctic Ocean</product_name>
+   <abstract>
+CTD temperature, salinity, dissolved oxygen and light transmission at 191 stations in the Arctic Ocean
+   </abstract>
+   <datacollection_period from="2007-07-29" to="2007-10-06" />
+   <variable>sea_water_dissolved_oxygen</variable>
+   <variable>sea_water_temperature</variable>
+   <variable>sea_water_light_transmission</variable>
+   <variable>sea_water_salinity</variable>
+   <quadtree_nodes>
+144233
+144234
+144243
+144244
+144411
+144414
+144423
+144424
+233244
+233311
+233312
+233323
+233331
+233332
+233334
+233343
+233344
+233414
+233421
+233432
+233433
+233434
+234113
+234114
+234121
+234122
+234123
+234131
+234211
+411212
+411221
+411222
+411231
+411234
+411241
+411242
+411243
+411322
+411324
+411431
+411433
+411434
+412111
+413221
+413241
+413242
+413244
+413444
+414133
+414311
+   </quadtree_nodes>
+</dataset>

@@ -1,0 +1,678 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<datacollection ownertag="DAM">
+   <dataset>
+      <institution>UiB University of Bergen</institution>
+      <contact>Ilker.Fer@gfi.uib.no</contact>
+      <dataref>UiB-1 (planned activity)</dataref>
+      <drpath>DAMOC/UiB_1</drpath>
+      <activity_type>Moored instrument</activity_type>
+      <variable>Oceans > Ocean Circulation > Ocean Currents > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Water Temperature > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Conductivity > HIDDEN</variable>
+      <datacollection_period from="2006-01-01" to="2009-12-31" />
+      <abstract>
+Data from two trawl-proof bottom-mounted RDI-ADCPs (Acoustic Doppler Current Profiler) equipped with
+SeaBird MicroCat conductivity and temperature recorders at the bottom.
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>AWI Alfred Wegener Institute for Polar and Marine Research</institution>
+      <contact>abeszczynska@awi-bremerhaven.de</contact>
+      <dataref>AWI-1 (planned activity)</dataref>
+      <drpath>DAMOC/AWI_1</drpath>
+      <activity_type>Cruise</activity_type>
+      <variable>Oceans > Ocean Optics > Attenuation/Transmission > HIDDEN</variable>
+      <variable>Oceans > Ocean Pressure > Water Pressure > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Potential Temperature > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Conductivity > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Potential Density > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Salinity > HIDDEN</variable>
+      <datacollection_period from="2005-07-01" to="2009-09-01" />
+      <area>Fram Strait</area>
+      <abstract>
+CTD section across Fram Strait at 78deg50min N (along the moored array) performed on annual basis in
+summer/autumn
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>AWI Alfred Wegener Institute for Polar and Marine Research</institution>
+      <contact>abeszczynska@awi-bremerhaven.de</contact>
+      <dataref>AWI-2 (planned activity)</dataref>
+      <drpath>DAMOC/AWI_2</drpath>
+      <activity_type>Moored instrument</activity_type>
+      <variable>Oceans > Ocean Circulation > Ocean Currents > HIDDEN</variable>
+      <variable>Oceans > Ocean Heat Budget > Heat Flux > HIDDEN</variable>
+      <variable>Oceans > Ocean Pressure > Water Pressure > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Water Temperature > HIDDEN</variable>
+      <datacollection_period from="2005-09-01" to="2009-09-01" />
+      <area>Fram Strait</area>
+      <abstract>
+The array of 12 deep moorings across Fram Strait at 78deg50min N operated on annual basis
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>met.no Norwegian Meteorological Institute</institution>
+      <contact>c.mauritzen@met.no</contact>
+      <dataref>met.no-1 (planned activity)</dataref>
+      <drpath>DAMOC/met.no_1</drpath>
+      <activity_type>Moored instrument</activity_type>
+      <variable>Oceans > Ocean Circulation > Ocean Currents > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Water Masses > HIDDEN</variable>
+      <variable>Oceans > Ocean Heat Budget > Advection > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Potential Temperature > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Salinity > HIDDEN</variable>
+      <datacollection_period from="2006-09-01" to="2008-09-01" />
+      <area>Central Arctic</area>
+      <abstract>
+Bottom-anchored profiler. Will be deployed by Kapitan Dranitsyn September 2006 at 32W on the continental
+slope
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>AWI Alfred Wegener Institute for Polar and Marine Research</institution>
+      <contact>cluepkes@awi-bremerhaven.de</contact>
+      <dataref>AWI-3 (planned activity)</dataref>
+      <drpath>DAMOC/AWI_3</drpath>
+      <activity_type>aircraft</activity_type>
+      <variable>Atmosphere > Atmospheric Pressure > Atmospheric Pressure Measurements > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Air Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Dew Point Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Potential Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Water Vapor > Humidity > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Winds > Flight Level Winds > HIDDEN</variable>
+      <datacollection_period from="1993-04-03" to="1993-04-03" />
+      <area>Fram Strait</area>
+      <abstract>
+Data of drop sondes released from an aircraft during cold-air
+outbreaks over the Fram Strait (4 March
+1993).
+The 7 profiles of temperature, humidity and wind are available as a function of distance to the
+pack ice edge. Details can
+be found in Luepkes and Schluenzen 1996, Boundary-Layer Meteorology, 79,107-130
+
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>SMHI Swedish Meteorological and Hydrological Institute</institution>
+      <dataref>SMHI-1 (planned activity)</dataref>
+      <drpath>DAMOC/SMHI_1</drpath>
+      <activity_type>Model run</activity_type>
+      <variable>Atmosphere > Atmospheric Pressure > Sea Level Pressure > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Radiation > Incoming Solar Radiation > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Radiation > Longwave Radiation > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Radiation > Net Radiation > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Radiation > Outgoing Longwave Radiation > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Radiation > Radiative Flux > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Radiation > Shortwave Radiation > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Air Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Surface Air Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Water Vapor > Humidity > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Winds > Surface Winds > HIDDEN</variable>
+      <variable>Atmosphere > Clouds > Cloud Amount/Frequency > HIDDEN</variable>
+      <variable>Atmosphere > Precipitation > Rain > HIDDEN</variable>
+      <variable>Atmosphere > Precipitation > Snow > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Heat Flux > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Depth/Thickness > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Extent > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Temperature > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Sea Ice Concentration > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Snow Depth > HIDDEN</variable>
+      <variable>Oceans > Ocean Heat Budget > Heat Flux > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Potential Temperature > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Sea Surface Temperature > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Salinity > HIDDEN</variable>
+      <datacollection_period from="1958-01-01" to="2008-12-31" />
+      <area>Greenland Sea</area>
+      <area>Iceland Sea</area>
+      <area>Norwegian Sea</area>
+      <area>Fram Strait</area>
+      <area>Denmark Strait</area>
+      <area>Laptev Sea</area>
+      <area>Kara Sea</area>
+      <area>Central Arctic</area>
+      <area>Beufort Sea</area>
+      <area>Chukchi Sea</area>
+      <area>East Siberian Sea</area>
+      <area>White Sea</area>
+      <abstract>
+WP4 uses different kind of models. Climate models will at least provide monthly mean data. NWP models
+will provide data with 3-6 h intervall.
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>UdS Universit&#233; de Savoie</institution>
+      <contact>dmars@univ-savoie.fr</contact>
+      <dataref>UdS-1 (planned activity)</dataref>
+      <drpath>DAMOC/UdS_1</drpath>
+      <activity_type>field_experiment</activity_type>
+      <variable>Cryosphere > Sea Ice > Ice Deformation > HIDDEN</variable>
+      <datacollection_period from="2007-03-15" to="2008-03-15" />
+      <area>Central Arctic</area>
+      <abstract>
+seismic field experiment for measuring fracturing and
+deformation of the sea-ice for 1 year at small
+spatial scale
+(ie meters to kilometers).
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>NPI Norwegian Polar Institute</institution>
+      <contact>edmond.hansen@npolar.no</contact>
+      <dataref>NPI-1 (planned activity)</dataref>
+      <drpath>DAMOC/NPI_1</drpath>
+      <activity_type>Cruise</activity_type>
+      <variable>Oceans > Ocean Circulation > Water Masses > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Ocean Mixed Layer > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Potential Temperature > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Water Temperature > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Density > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Salinity > HIDDEN</variable>
+      <area>Fram Strait</area>
+      <abstract>
+Annual cruises with RV Lance
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>NPI Norwegian Polar Institute</institution>
+      <contact>gerland@npolar.no</contact>
+      <dataref>NPI-2 (planned activity)</dataref>
+      <drpath>DAMOC/NPI_2</drpath>
+      <activity_type>ice_station</activity_type>
+      <variable>Atmosphere > Atmospheric Radiation > Albedo > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Depth/Thickness > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Growth/Melt > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Types > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Reflectance > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Snow Depth > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Snow Melt > HIDDEN</variable>
+      <variable>Cryosphere > Snow/Ice > Albedo > HIDDEN</variable>
+      <variable>Cryosphere > Snow/Ice > Depth Hoar > HIDDEN</variable>
+      <variable>Cryosphere > Snow/Ice > Freeze/Thaw > HIDDEN</variable>
+      <variable>Cryosphere > Snow/Ice > Ice Growth/Melt > HIDDEN</variable>
+      <variable>Cryosphere > Snow/Ice > Snow Density > HIDDEN</variable>
+      <variable>Cryosphere > Snow/Ice > Snow Depth > HIDDEN</variable>
+      <variable>Cryosphere > Snow/Ice > Snow Melt > HIDDEN</variable>
+      <variable>Cryosphere > Snow/Ice > Snow Stratigraphy > HIDDEN</variable>
+      <variable>Cryosphere > Snow/Ice > Snow/Ice Temperature > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Heat Flux > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Temperature > HIDDEN</variable>
+      <variable>Spectral Engineering > Infrared Wavelengths > Infrared Radiance > HIDDEN</variable>
+      <variable>Spectral Engineering > Visible Wavelengths > Visible Radiance > HIDDEN</variable>
+      <datacollection_period from="2007-04-01" to="2008-08-31" />
+      <area>Fram Strait</area>
+      <area>Central Arctic</area>
+      <abstract>
+3 radiometers for irradiance measurements (incoming, surface-reflected and ice transmitted)
+snow structure
+and physics measurements
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>IPF International Polar Foundation</institution>
+      <contact>gg@polarfoundation.org</contact>
+      <dataref>IPF-1 (planned activity)</dataref>
+      <drpath>DAMOC/IPF_1</drpath>
+      <activity_type>exhibition</activity_type>
+      <abstract>
+No observational data collection.
+Data display activity
+End user
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>NERSC Nansen Environmental and Remote Sensing Center</institution>
+      <contact>hanne.sagen@nersc.no</contact>
+      <institution>FORTH Foundation for research and Technology</institution>
+      <institution>NAXYS Naxys AS</institution>
+      <dataref>NERSC/FORTH/NAXYS-1 (planned activity)</dataref>
+      <drpath>DAMOC/NERSC_FORTH_NAXYS_1</drpath>
+      <activity_type>Moored instrument</activity_type>
+      <variable>Oceans > Ocean Acoustics > Acoustic Tomography > HIDDEN</variable>
+      <datacollection_period from="2008-01-01" to="2009-12-31" />
+      <area>Fram Strait</area>
+      <abstract>
+Acoustic Data from the Tomography array will be collected from 2008. Two low frequency sources, one on
+each side of the Fram Strait, will transmit sound at a center freqeuncy of 250 Hz and a band width of
+100 Hz. A vertical array with upto 16 hydrophones will record the arriving signal. Thereafter the data
+will go through pre-processing (detection og arrival peaks, estimation of traveltimes ect) before it
+goes into inversion algorithms and assimilation schemes. We expect to provide averaged profiles of temperature
+between the source and receiver pairs with increasing accuracy with depth.
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>FIMR Finnish Institute of Marine Research</institution>
+      <contact>jari.haapala@fimr.fi</contact>
+      <dataref>FIMR-1 (planned activity)</dataref>
+      <drpath>DAMOC/FIMR_1</drpath>
+      <activity_type>Model run</activity_type>
+      <variable>Cryosphere > Sea Ice > Heat Flux > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Deformation > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Depth/Thickness > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Edges > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Extent > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Floes > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Growth/Melt > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Roughness > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Temperature > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Types > HIDDEN</variable>
+      <abstract>
+Long term hindcast simulations of the Arctic Ocean with the multi-category sea-ice model
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>UPMC Universit&#233; Pierre et Marie Curie</institution>
+      <contact>jga@lodyc.jussieu.fr</contact>
+      <dataref>UPMC-1 (planned activity)</dataref>
+      <drpath>DAMOC/UPMC_1</drpath>
+      <activity_type>Float</activity_type>
+      <variable>Cryosphere > Sea Ice > Ice Depth/Thickness > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Ocean Currents > HIDDEN</variable>
+      <variable>Spectral Engineering > Infrared Wavelengths > Brightness Temperature > HIDDEN</variable>
+      <datacollection_period from="2007-09-15" to="2008-08-15" />
+      <area>Central Arctic</area>
+      <abstract>
+Isobaric floats equipped with ULS for measuring sea-ice drafts
+Profiling floats for measuring CTD between
+surface and 1000m depth.
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>DTU Technical University of Denmark</institution>
+      <contact>ltp@oersted.dtu.dk</contact>
+      <dataref>DTU-1 (planned activity)</dataref>
+      <drpath>DAMOC/DTU_1</drpath>
+      <activity_type>Space borne instrument</activity_type>
+      <variable>Cryosphere > Sea Ice > Sea Ice Motion > HIDDEN</variable>
+      <datacollection_period from="2004-12-01" to="2009-11-30" />
+      <area>Laptev Sea</area>
+      <area>Kara Sea</area>
+      <area>Central Arctic</area>
+      <area>Beufort Sea</area>
+      <area>Chukchi Sea</area>
+      <area>East Siberian Sea</area>
+      <abstract>
+3-day ice drift from ENVISAT ASAR GMM and WSM data. Data are available within hours of acquisition.
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>OASYS O.A.Sys - Ocean Atmosphere Systems</institution>
+      <contact>michael@oasys-research.de</contact>
+      <institution>FastOpt FastOpt</institution>
+      <dataref>OASys/FastOpt-1 (planned activity)</dataref>
+      <drpath>DAMOC/OASys_FastOpt_1</drpath>
+      <activity_type>Model run</activity_type>
+      <variable>Oceans > Ocean Circulation > Advection > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Buoy Position > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Diffusion > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Fresh Water Flux > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Gyres > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Ocean Currents > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Ocean Mixed Layer > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Thermohaline Circulation > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Water Masses > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Wind-driven Circulation > HIDDEN</variable>
+      <variable>Oceans > Ocean Heat Budget > Heat Flux > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Ocean Mixed Layer > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Potential Temperature > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Sea Surface Temperature > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Density > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Halocline > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Potential Density > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Salinity > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Salt Transport > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Heat Flux > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Depth/Thickness > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Extent > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Growth/Melt > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Temperature > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Sea Ice Age > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Sea Ice Concentration > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Sea Ice Motion > HIDDEN</variable>
+      <abstract>
+NAOSIM stands for 'North Atlantic/Arctic Ice Ocean Model'
+
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>SU Stockholm University</institution>
+      <contact>michaelt@misu.su.se</contact>
+      <dataref>SU-1 (planned activity)</dataref>
+      <drpath>DAMOC/SU_1</drpath>
+      <activity_type>Cruise</activity_type>
+      <variable>Atmosphere > Aerosols > Aerosol Particle Properties > HIDDEN</variable>
+      <variable>Atmosphere > Aerosols > Cloud Condensation Nuclei > HIDDEN</variable>
+      <variable>Atmosphere > Aerosols > Nitrate Particles > HIDDEN</variable>
+      <variable>Atmosphere > Aerosols > Organic Particles > HIDDEN</variable>
+      <variable>Atmosphere > Aerosols > Particulate Matter > HIDDEN</variable>
+      <variable>Atmosphere > Aerosols > Sulfate Particles > HIDDEN</variable>
+      <variable>Atmosphere > Altitude > Planetary Boundary Layer Height > HIDDEN</variable>
+      <variable>Atmosphere > Altitude > Tropopause > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Chemistry > Trace Gases/Trace Species > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Chemistry/Nitrogen Compounds > Ammonia > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Chemistry/Nitrogen Compounds > Nitric Acid > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Chemistry/Nitrogen Compounds > Nitric Oxide > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Chemistry/Nitrogen Compounds > Nitrogen Dioxide > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Chemistry/Nitrogen Compounds > Nitrogen Oxides > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Chemistry/Nitrogen Compounds > Nitrous Oxide > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Chemistry/Oxygen Compounds > Ozone > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Chemistry/Sulfur Compounds > Dimethyl Sulfide > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Chemistry/Sulfur Compounds > Sulfur Dioxide > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Chemistry/Sulfur Compounds > Sulfur Oxides > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Phenomena > Fog > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Pressure > Atmospheric Pressure Measurements > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Pressure > Gravity Wave > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Pressure > Oscillations > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Pressure > Planetary Boundary Layer Height > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Pressure > Sea Level Pressure > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Radiation > Incoming Solar Radiation > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Radiation > Longwave Radiation > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Radiation > Net Radiation > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Radiation > Outgoing Longwave Radiation > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Radiation > Shortwave Radiation > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Air Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Atmospheric Stability > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Boundary Layer Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Dew Point Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Inversion Height > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Maximum/Minimum Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Potential Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Skin Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Surface Air Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Temperature Profiles > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Virtual Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Water Vapor > Dew Point Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Water Vapor > Evaporation > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Water Vapor > Humidity > HIDDEN</variable>
+      <variable>Atmospheric Water Vapor > Water Vapor</variable>
+      <variable>Atmospheric Water Vapor > Water Vapor Profiles</variable>
+      <variable>Atmosphere > Atmospheric Winds > Boundary Layer Winds > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Winds > Surface Winds > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Winds > Turbulence > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Winds > Wind Profiles > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Winds > Wind Shear > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Winds > Wind Stress > HIDDEN</variable>
+      <variable>Atmosphere > Clouds > Cloud Amount/Frequency > HIDDEN</variable>
+      <variable>Atmosphere > Clouds > Cloud Base Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Clouds > Cloud Ceiling > HIDDEN</variable>
+      <variable>Atmosphere > Clouds > Cloud Condensation Nuclei > HIDDEN</variable>
+      <variable>Atmosphere > Clouds > Cloud Height > HIDDEN</variable>
+      <variable>Atmosphere > Clouds > Cloud Liquid Water/Ice > HIDDEN</variable>
+      <variable>Atmosphere > Clouds > Cloud Vertical Distribution > HIDDEN</variable>
+      <variable>Atmosphere > Clouds > Droplet Concentration/Size > HIDDEN</variable>
+      <variable>Atmosphere > Precipitation > Droplet Size > HIDDEN</variable>
+      <variable>Atmosphere > Precipitation > Hydrometeors > HIDDEN</variable>
+      <variable>Atmosphere > Precipitation > Precipitation Amount > HIDDEN</variable>
+      <variable>Atmosphere > Precipitation > Precipitation Rate > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Depth/Thickness > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Roughness > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Ice Temperature > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Leads > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Reflectance > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Salinity > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Sea Ice Motion > HIDDEN</variable>
+      <variable>Cryosphere > Snow/Ice > Albedo > HIDDEN</variable>
+      <variable>Cryosphere > Snow/Ice > Ice Depth/Thickness > HIDDEN</variable>
+      <variable>Cryosphere > Snow/Ice > Ice Motion > HIDDEN</variable>
+      <variable>Cryosphere > Snow/Ice > Ice Velocity > HIDDEN</variable>
+      <variable>Cryosphere > Snow/Ice > Snow Depth > HIDDEN</variable>
+      <variable>Cryosphere > Snow/Ice > Snow/Ice Temperature > HIDDEN</variable>
+      <variable>Hydrosphere > Water Quality/Water Chemistry > Chlorophyll > HIDDEN</variable>
+      <variable>Hydrosphere > Water Quality/Water Chemistry > Conductivity > HIDDEN</variable>
+      <variable>Hydrosphere > Water Quality/Water Chemistry > Dissolved Gases > HIDDEN</variable>
+      <variable>Hydrosphere > Water Quality/Water Chemistry > Organic Matter > HIDDEN</variable>
+      <variable>Hydrosphere > Water Quality/Water Chemistry > Water Temperature > HIDDEN</variable>
+      <variable>Oceans > Marine Biology > Marine Microbiota > HIDDEN</variable>
+      <variable>Oceans > Ocean Chemistry > Biogeochemical Cycles > HIDDEN</variable>
+      <variable>Oceans > Ocean Chemistry > Chlorophyll > HIDDEN</variable>
+      <variable>Oceans > Ocean Chemistry > Dissolved Gases > HIDDEN</variable>
+      <variable>Oceans > Ocean Chemistry > Inorganic Carbon > HIDDEN</variable>
+      <variable>Oceans > Ocean Chemistry > Inorganic Matter > HIDDEN</variable>
+      <variable>Oceans > Ocean Chemistry > Organic Carbon > HIDDEN</variable>
+      <variable>Oceans > Ocean Chemistry > Phosphate > HIDDEN</variable>
+      <variable>Oceans > Ocean Chemistry > Silicate > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Turbulence > HIDDEN</variable>
+      <variable>Oceans > Ocean Heat Budget > Convection > HIDDEN</variable>
+      <variable>Oceans > Ocean Heat Budget > Diffusion > HIDDEN</variable>
+      <variable>Oceans > Ocean Heat Budget > Heat Flux > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Ocean Mixed Layer > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Potential Temperature > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Sea Surface Temperature > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Thermocline > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Water Temperature > HIDDEN</variable>
+      <variable>Oceans > Ocean Winds > Surface Winds > HIDDEN</variable>
+      <variable>Oceans > Ocean Winds > Turbulence > HIDDEN</variable>
+      <variable>Oceans > Ocean Winds > Wind Shear > HIDDEN</variable>
+      <variable>Oceans > Ocean Winds > Wind Stress > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Conductivity > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Density > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Halocline > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Pycnocline > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Salinity > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Heat Flux > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Sea Ice Concentration > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Snow Depth > HIDDEN</variable>
+      <variable>Spectral Engineering > Microwave > Microwave Radiance > HIDDEN</variable>
+      <variable>Spectral Engineering > Platform Characteristics > Airspeed/Ground Speed > HIDDEN</variable>
+      <variable>Spectral Engineering > Platform Characteristics > Attitude Characteristics > HIDDEN</variable>
+      <variable>Spectral Engineering > Radar > Doppler Velocity > HIDDEN</variable>
+      <variable>Spectral Engineering > Radar > Radar Backscatter > HIDDEN</variable>
+      <variable>Spectral Engineering > Radar > Radar Reflectivity > HIDDEN</variable>
+      <datacollection_period from="2008-06-01" to="2008-09-30" />
+      <area>Central Arctic</area>
+      <abstract>
+ASCOS is a multi-month Arctic field experiment based on the Swedish icebreaker Oden, planned for the
+summer of 2008.
+
+The ultimate objective is to understand processes that are poorly described in current
+climate models, in order to reduce the large uncertainty in projections of future Arctic climate.
+
+ASCOS
+will improve our understanding of processes that control the evolution of clouds over the Arctic pack
+ice area, with an integrated study from the sea-ice interface to the cloud-topped boundary layer. The
+necessary interdisciplinary scientific approach will include marine biochemistry, aerosol and cloud chemistry/physics,
+and meteorology.ASCOS will concentrate on an ice-drift operation when Oden will be moored to an ice floe,
+starting near the North Pole and drifting passively during the biologically most active period and into
+autumn freeze-up conditions, roughly July through September. Ground-based remote sensing by NOAA/ETL
+and ARM (Mobile Unit) will provide continuous measurements of boundary-layer and cloud structure, while
+in-situ instruments and vertical profiling will provide detailed process-oriented information on boundary
+layer dynamics, atmospheric aerosol/cloud evolution and ocean/ice biochemistry. Instruments will be deployed
+both onboard Oden and on the ice. Detailed aerosol-cloud profiling will be conducted with instrument
+payloads deployed by helicopter from Oden.
+
+The aims of ASCOS are:
+* To determine the atmospheric
+processes that control boundary layer clouds north of 80 degrees N.
+* To determine the evolution of cloud condensation
+(CCN) and ice forming nuclei (IFN).
+* To determine the role of boundary-layer turbulence and surface
+properties for the exchange of heat, water, momentum and aerosols between the ocean/ice/air interface
+and with the troposphere.
+* To determine the role of marine biochemical processes for CCN and IFN formation,
+with emphasis on the open lead surface microlayer.
+* To test and implement reliable satellite algorithms
+for area-covering climate monitoring.
+* To provide a high-Arctic mirror-station of intense atmospheric
+measurements that for a limited time will sample data similar to monitoring stations around the rim of
+the Arctic Ocean, for example at Barrow and Alert/Eureka.
+* To contribute to the data archive over the
+central Arctic Ocean collected during IPY.
+* To provide a comprehensive data set on the high Arctic
+climate system, for developing and testing of integrated climate models.
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>UoL Arctic Centre University of Lapland</institution>
+      <contact>monica.tennberg@ulapland.fi</contact>
+      <dataref>UoL-1 (planned activity)</dataref>
+      <drpath>DAMOC/UoL_1</drpath>
+      <activity_type>investigation</activity_type>
+      <abstract>
+social impacts
+
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>FIMR Finnish Institute of Marine Research</institution>
+      <contact>rudels@fimr.fi</contact>
+      <dataref>FIMR-2 (planned activity)</dataref>
+      <drpath>DAMOC/FIMR_2</drpath>
+      <activity_type>Cruise</activity_type>
+      <variable>Oceans > Ocean Circulation > Advection > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Convection > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Diffusion > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Eddies > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Fresh Water Flux > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Fronts > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Gyres > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Ocean Currents > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Ocean Mixed Layer > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Thermohaline Circulation > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Turbulence > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Upwelling/Downwelling > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Vorticity > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Water Masses > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Wind-driven Circulation > HIDDEN</variable>
+      <variable>Oceans > Ocean Heat Budget > Advection > HIDDEN</variable>
+      <variable>Oceans > Ocean Heat Budget > Convection > HIDDEN</variable>
+      <variable>Oceans > Ocean Heat Budget > Diffusion > HIDDEN</variable>
+      <variable>Oceans > Ocean Heat Budget > Evaporation > HIDDEN</variable>
+      <variable>Oceans > Ocean Heat Budget > Heat Flux > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Ocean Mixed Layer > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Thermocline > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Halocline > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Potential Density > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Pycnocline > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Polynyas > HIDDEN</variable>
+      <datacollection_period from="2006-04-01" to="2009-11-30" />
+      <area>Greenland Sea</area>
+      <area>Iceland Sea</area>
+      <area>Norwegian Sea</area>
+      <area>Fram Strait</area>
+      <area>Denmark Strait</area>
+      <area>Central Arctic</area>
+      <abstract>
+Aranda, Oden
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>DMI Danish Meteorological Institute</institution>
+      <contact>san@dmi.dk</contact>
+      <institution>met.no Norwegian Meteorological Institute</institution>
+      <dataref>DMI/met.no-1 (planned activity)</dataref>
+      <drpath>DAMOC/DMI_met.no_1</drpath>
+      <activity_type>Space borne instrument</activity_type>
+      <variable>Cryosphere > Sea Ice > Ice Edges > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Sea Ice Concentration > HIDDEN</variable>
+      <datacollection_period from="1987-07-01" to="2007-12-31" />
+      <area>Greenland Sea</area>
+      <area>Iceland Sea</area>
+      <area>Norwegian Sea</area>
+      <area>Fram Strait</area>
+      <area>Denmark Strait</area>
+      <area>Laptev Sea</area>
+      <area>Kara Sea</area>
+      <area>Central Arctic</area>
+      <area>Beufort Sea</area>
+      <area>Chukchi Sea</area>
+      <area>East Siberian Sea</area>
+      <area>White Sea</area>
+      <abstract>
+Sea ice concentration and edge dataset based on reanalyzed SSM/I data.
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>DMI Danish Meteorological Institute</institution>
+      <contact>san@dmi.dk</contact>
+      <dataref>DMI-1 (planned activity)</dataref>
+      <drpath>DAMOC/DMI_1</drpath>
+      <activity_type>Space borne instrument</activity_type>
+      <variable>Cryosphere > Sea Ice > Sea Ice Motion > HIDDEN</variable>
+      <datacollection_period from="2005-06-01" to="2009-01-01" />
+      <area>Greenland Sea</area>
+      <area>Iceland Sea</area>
+      <area>Norwegian Sea</area>
+      <area>Fram Strait</area>
+      <area>Denmark Strait</area>
+      <area>Laptev Sea</area>
+      <area>Kara Sea</area>
+      <area>Central Arctic</area>
+      <area>Beufort Sea</area>
+      <area>Chukchi Sea</area>
+      <area>East Siberian Sea</area>
+      <area>White Sea</area>
+      <abstract>
+Sea ice motion derived from VIS-IR satellite observations
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>DNSC Danish National Space Center</institution>
+      <contact>sha@spacecenter</contact>
+      <dataref>DNSC-1 (planned activity)</dataref>
+      <drpath>DAMOC/DNSC_1</drpath>
+      <activity_type>aircraft</activity_type>
+      <variable>Cryosphere > Sea Ice > Ice Depth/Thickness > HIDDEN</variable>
+      <variable>Cryosphere > Sea Ice > Snow Depth > HIDDEN</variable>
+      <variable>Cryosphere > Snow/Ice > Ice Velocity > HIDDEN</variable>
+      <datacollection_period from="2007-04-01" to="2008-04-30" />
+      <area>Fram Strait</area>
+      <area>Central Arctic</area>
+      <abstract>
+Twin Otter DHC-6
+      </abstract>
+   </dataset>
+   <dataset>
+      <institution>IOPAN Instytut Oceanologii, Polska Akademia Nauk</institution>
+      <contact>wpeter@iopan.gda.pl</contact>
+      <dataref>IOPAN-1 (planned activity)</dataref>
+      <drpath>DAMOC/IOPAN_1</drpath>
+      <activity_type>Cruise</activity_type>
+      <variable>Atmosphere > Aerosols > Aerosol Optical Depth/Thickness > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Pressure > Atmospheric Pressure Measurements > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Radiation > Heat Flux > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Air Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Temperature > Dew Point Temperature > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Water Vapor > Humidity > HIDDEN</variable>
+      <variable>Atmosphere > Atmospheric Winds > Surface Winds > HIDDEN</variable>
+      <variable>Atmosphere > Clouds > Cloud Amount/Frequency > HIDDEN</variable>
+      <variable>Atmosphere > Clouds > Cloud Types > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Advection > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Convection > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Diffusion > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Eddies > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Fresh Water Flux > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Fronts > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Gyres > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Ocean Currents > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Ocean Mixed Layer > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Thermohaline Circulation > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Upwelling/Downwelling > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Water Masses > HIDDEN</variable>
+      <variable>Oceans > Ocean Circulation > Wind-driven Circulation > HIDDEN</variable>
+      <variable>Oceans > Ocean Heat Budget > Advection > HIDDEN</variable>
+      <variable>Oceans > Ocean Heat Budget > Heat Flux > HIDDEN</variable>
+      <variable>Oceans > Ocean Pressure > Sea Level Pressure > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Ocean Mixed Layer > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Potential Temperature > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Sea Surface Temperature > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Thermocline > HIDDEN</variable>
+      <variable>Oceans > Ocean Temperature > Water Temperature > HIDDEN</variable>
+      <variable>Oceans > Ocean Waves > Sea State > HIDDEN</variable>
+      <variable>Oceans > Ocean Winds > Convergence/Divergence > HIDDEN</variable>
+      <variable>Oceans > Ocean Winds > Surface Winds > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Conductivity > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Density > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Halocline > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Potential Density > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Pycnocline > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Salinity > HIDDEN</variable>
+      <variable>Oceans > Salinity/Density > Salt Transport > HIDDEN</variable>
+      <datacollection_period from="2006-06-19" to="2006-07-20" />
+      <area>Greenland Sea</area>
+      <area>Norwegian Sea</area>
+      <area>Fram Strait</area>
+      <area>Laptev Sea</area>
+      <abstract>
+r/v 'OCEANIA'
+      </abstract>
+   </dataset>
+</datacollection>

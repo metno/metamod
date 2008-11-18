@@ -29,7 +29,7 @@
         <div title="Status">
         <table>
             <tr><th>Name</th><th>Status</th><th>Creation-Date</th><th>Owner-Tag</th><th>Metadata-Format</th></tr>
-            <tr><td><xsl:value-of select="@name"/></td><td><xsl:value-of select="@status"/></td><td><xsl:value-of select="@creationDate"/></td><td><xsl:value-of select="@ownertag"/></td><td><xsl:value-of select="@metadataFormat"/></td></tr>
+            <tr><td><xsl:value-of select="@name"/></td><td><xsl:value-of select="@status"/></td><td><xsl:value-of select="@creationDate"/></td><td><xsl:value-of select="@datestamp"/></td><td><xsl:value-of select="@ownertag"/></td><td><xsl:value-of select="@metadataFormat"/></td></tr>
         </table>
         </div>
     </xsl:template>
