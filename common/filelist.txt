@@ -4,9 +4,12 @@ htdocs/funcs/mmLogging.inc
 =htdocs/funcs/mmDataset.inc
 =schema/oldDataset2Dataset.xslt
 =schema/oldDataset2MM2.xslt
+=schema/dif2dataset.xslt
+=schema/dif2MM2.xslt
 lib/Metamod/DatasetTransformer.pm
 lib/Metamod/DatasetTransformer/MM2.pm
 lib/Metamod/DatasetTransformer/OldDataset.pm
+lib/Metamod/DatasetTransformer/DIF.pm
 lib/Metamod/Dataset.pm
 lib/Metamod/ForeignDataset.pm
 lib/quadtreeuse.pm
