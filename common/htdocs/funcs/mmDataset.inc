@@ -64,7 +64,7 @@ class MM_Dataset {
    xmlns="http://www.met.no/schema/metamod/dataset"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
-  <info name="" status="active" creationDate="'.$sDate.'" ownertag="" metadataFormat="MM2"/>
+  <info name="" status="active" creationDate="'.$sDate.'" datestamp="'.$sDate.'" ownertag="" metadataFormat="MM2"/>
 </dataset>';
 			$dataMM2 =
 '<?xml version="1.0" encoding="iso8859-1"?>
