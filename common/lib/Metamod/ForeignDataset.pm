@@ -97,7 +97,7 @@ sub getDS_DOC {
     my ($self) = @_;
     my $doc = $self->{docDS};
     my $out = new XML::LibXML::Document($doc->version, $doc->encoding);
-    $out->setDocumentElement($doc->cloneNode(1));
+    $out->setDocumentElement($doc->getDocumentElement->cloneNode(1));
     return $out;
 }
 
@@ -105,7 +105,7 @@ sub getMETA_DOC {
     my ($self) = @_;
     my $doc = $self->{docMETA};
     my $out = new XML::LibXML::Document($doc->version, $doc->encoding);
-    $out->setDocumentElement($doc->cloneNode(1));
+    $out->setDocumentElement($doc->getDocumentElement->cloneNode(1));
     return $out;
 }
 
