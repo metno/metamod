@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use lib "..";
-use Test::More tests => 25;
+use Test::More tests => 27;
 
 use Data::Dumper qw(Dumper);
 
@@ -45,6 +45,16 @@ $ds->addMetadata(\%metadata);
 my %newMeta = $ds->getMetadata;
 ok(exists $newMeta{'abc'}, "write and get metadata, name");
 ok(eq_array($newMeta{'abc'}, \@metaVals), "write and get metadata, values");
+
+my $dsClone = $ds->getDS_DOC;
+my $mmClone = $ds->getMETA_DOC;
+my $dsc = Metamod::Dataset->newFromDoc($mmClone, $dsClone);
+my %oldHash = $ds->getInfo;
+my %newHash = $dsc->getInfo;
+ok(eq_hash(\%oldHash, \%newHash), "compare clone with ds");
+%oldHash = $ds->getMetadata;
+%newHash = $dsc->getMetadata;
+ok(eq_hash(\%oldHash, \%newHash), "compare clone with ds, metadata");
 
 my @oldVals = $ds->removeMetadataName('abc');
 ok(eq_array(\@oldVals, \@metaVals), "removeMetadataName, oldValues");
