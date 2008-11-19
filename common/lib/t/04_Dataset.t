@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use lib "..";
-use Test::More tests => 27;
+use Test::More tests => 29;
 
 use Data::Dumper qw(Dumper);
 
@@ -66,9 +66,12 @@ isa_ok($oldDs, 'Metamod::Dataset');
 is($oldDs->originalFormat, 'OldDataset', "old dataset: orignal format");
 %metadata = $oldDs->getMetadata;
 is (scalar keys %metadata, 2, "reading old datasets metadata");
+@quadTree = $oldDs->getQuadtree;
+is (scalar @quadTree, 4, "quadtree of old dataset");
 
 my $newDs = newFromFile Metamod::Dataset('exampleMM2.xml');
 isa_ok($newDs, 'Metamod::Dataset');
 is($newDs->originalFormat, 'MM2', "MM2 dataset: orignal format");
 %metadata = $newDs->getMetadata;
 is (scalar keys %metadata, 1, "reading MM2 datasets metadata");
+is (scalar $newDs->getQuadtree, 3, "reading quadtree of exampleMM2");

@@ -21,7 +21,7 @@
     <xsl:template match="dataset">
 		<xsl:element name="dataset" xmlns="http://www.met.no/schema/metamod/dataset">
 			<xsl:attribute name="schemaLocation" namespace="http://www.w3.org/2001/XMLSchema-instance">http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd</xsl:attribute>
-        	<xsl:element name="info">
+        	<xsl:element name="info" xmlns="http://www.met.no/schema/metamod/dataset">
           		<xsl:attribute name="name"><xsl:value-of select="/dataset/drpath"/></xsl:attribute>
           		<xsl:attribute name="status">active</xsl:attribute>
           		<xsl:attribute name="creationDate">2008-10-01T00:00:00Z</xsl:attribute>
@@ -34,7 +34,7 @@
     </xsl:template>
 
     <xsl:template match="quadtree_nodes">
-        <xsl:element name="quadtree_nodes">
+        <xsl:element name="quadtree_nodes" xmlns="http://www.met.no/schema/metamod/dataset">
            <xsl:value-of select="."/>
         </xsl:element>
     </xsl:template>

@@ -1,4 +1,10 @@
 <dataset ownertag='test'>
 <metadata>mvalue</metadata>
 <metadata2>m2value</metadata2>
+   <quadtree_nodes>
+1
+2
+3
+4
+   </quadtree_nodes>
 </dataset>
