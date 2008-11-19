@@ -256,18 +256,7 @@ sub update_database {
       die "cannot initialize dataset for $inputBaseFile";
    }
    my %info = $ds->getInfo;
-   my $ownertag = $info{ownertag};
 
-#
-#  Create hash with existing references in the database:
-#
-   my %references = ();
-   my $stm;
-   $stm = $dbh->prepare("SELECT DS_name,DS_id FROM DataSet WHERE DS_parent = 0 AND DS_ownertag = '$ownertag'");
-   $stm->execute();
-   while ( my @row = $stm->fetchrow_array ) {
-      $references{$row[0]} = [$row[1]];
-   }
 #
 #  Create hash mapping the correspondence between MetadataType name 
 #  and SearchCategory
@@ -291,7 +280,7 @@ sub update_database {
 #  the values are the corresponding 'BK_id's.
 #
    my %basickeys = ();
-   $stm = $dbh->prepare("SELECT BK_id,SC_id,BK_name FROM BasicKey");
+   my $stm = $dbh->prepare("SELECT BK_id,SC_id,BK_name FROM BasicKey");
    $stm->execute();
    while ( my @row = $stm->fetchrow_array ) {
       my $key = $row[1] . ':' . $row[2];
@@ -362,13 +351,12 @@ sub update_database {
    {
       my %metadata = $ds->getMetadata;
       my @quadtreenodes = $ds->getQuadtree;
-      my $drpath = $info{name};
       my $period_from;
       my $period_to;
       my @metaarray = ();
       my @searcharray = ();
-      unless (defined $drpath) {
-         die "Dataset with no drpath";
+      unless ($info{name}) {
+         die "Dataset with no drpath/name";
       }
       
       foreach my $name (keys %metadata) {
@@ -416,11 +404,15 @@ sub update_database {
          my $mref = ['datacollection_period',$period];
          push(@metaarray,$mref);
       }
+
+      my $stm = $dbh->prepare("SELECT DS_id FROM DataSet ".
+                              " WHERE DS_parent = 0 AND DS_ownertag = ? and DS_name = ?");
+      $stm->execute($info{ownertag}, $info{name});
       my $dsid;
-      my $drid;
-      if (exists($references{$drpath})) {
-         my $ref3 = $references{$drpath};
-         $dsid = $ref3->[0];
+      while (my @row = $stm->fetchrow_array) {
+         $dsid = $row[0];
+      }
+      if (defined $dsid) {
 #
 #  Delete existing dataset and corresponding GeographicalArea (if found).
 #  This will cascade to BK_Describes_DS, GA_Describes_DS, GD_Ispartof_GA
@@ -433,7 +425,7 @@ sub update_database {
          my @result = $sql_getkey_DS->fetchrow_array;
          $dsid = $result[0];
       }
-      $sql_insert_DS->execute($dsid,$drpath,0,1,$datestamp,$ownertag);
+      $sql_insert_DS->execute($dsid,$info{name},0,1,$datestamp,$info{ownertag});
 #
 #  Insert metadata:
 #  Metadata with metadata type name not in the database are ignored.
