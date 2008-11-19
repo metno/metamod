@@ -1,4 +1,6 @@
 package Metamod::ForeignDataset;
+our $VERSION = 0.2;
+
 
 use strict;
 use warnings;
@@ -33,8 +35,8 @@ sub newFromDoc {
         my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime());
         $dataset =~ s/\Q1970-01-01T00:00:00Z\E/$sDate/g; # changes datestamp and creationDate
     }
-    my $docDS = UNIVERSAL::isa($dataset, 'XML::LibXML::Node') ? $dataset : $parser->parse_string($dataset);
-    my $docMETA = UNIVERSAL::isa($foreign, 'XML::LibXML::Node') ? $foreign : $parser->parse_string($foreign);
+    my $docDS = UNIVERSAL::isa($dataset, 'XML::LibXML::Document') ? $dataset : $parser->parse_string($dataset);
+    my $docMETA = UNIVERSAL::isa($foreign, 'XML::LibXML::Document') ? $foreign : $parser->parse_string($foreign);
     my $format = exists $options{format} ? delete $options{format} : 'unknown';
     return $class->_initSelf($format, $docDS, $docMETA, %options);
 }
@@ -93,12 +95,18 @@ sub getMETA_XML {
 
 sub getDS_DOC {
     my ($self) = @_;
-    return $self->{docDS};
+    my $doc = $self->{docDS};
+    my $out = new XML::LibXML::Document($doc->version, $doc->encoding);
+    $out->setDocumentElement($doc->cloneNode(1));
+    return $out;
 }
 
 sub getMETA_DOC {
     my ($self) = @_;
-    return $self->{docMETA};
+    my $doc = $self->{docMETA};
+    my $out = new XML::LibXML::Document($doc->version, $doc->encoding);
+    $out->setDocumentElement($doc->cloneNode(1));
+    return $out;
 }
 
 
@@ -203,7 +211,7 @@ These methods need to be implemented by the extending modules.
 
 =item newFromDoc($foreign, [$dataset, %options])
 
-Create a dataset from L<XML::LibXML> node or xml-string. The foreign-(metadata) document needs to be set. If $dataset is empty, new dataset information will be created.
+Create a dataset from L<XML::LibXML::Document> or xml-string. The foreign-(metadata) document needs to be set. If $dataset is empty, new dataset information will be created.
 In that case the creationDate-info will be set to currentDate, status-info is active, everything
 else is empty.
 
@@ -227,23 +235,23 @@ overwrite an existing file! Dies on error.
 
 =item getDS_XML
 
-Return: xml-string of dataset
+Return: xml-string of dataset as byte stream in the original document encoding
 
 =item getMETA_XML
 
-Return: xml-string of MM2
+Return: xml-string of MM2 as byte stream in the original document encoding
 
 =item getDS_DOC
 
-Get the internal state of the dataset document, use with greatest caution.
+Get a clone of the internal metadata document.
 
-Return: XML::LibXML::Node of dataset
+Return: XML::LibXML::Document of dataset
 
 =item getMETA_DOC
 
-Get the internal state of the dataset document, use with greatest caution.
+Get a clone of the internal metadata document.
 
-Return: XML::LibXML::Node of MM2
+Return: XML::LibXML::Document of the metadata
 
 
 =item getInfo()

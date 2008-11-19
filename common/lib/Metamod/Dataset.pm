@@ -1,12 +1,11 @@
 package Metamod::Dataset;
 use base qw(Metamod::ForeignDataset);
+our $VERSION = 0.4;
 
 use strict;
 use warnings;
 use Metamod::DatasetTransformer;
 use Metamod::DatasetTransformer::MM2;
-
-our $VERSION = 0.3;
 
 use constant NAMESPACE_MM2 => 'http://www.met.no/schema/metamod/MM2';
 use constant MM2 => <<'EOT';
@@ -38,8 +37,8 @@ sub newFromDoc {
         $dataset =~ s/metadataFormat=""/metadataFormat="MM2"/g;
     }
     my $parser = Metamod::DatasetTransformer->XMLParser;
-    my $docDS = UNIVERSAL::isa($dataset, 'XML::LibXML::Node') ? $dataset : $parser->parse_string($dataset);
-    my $docMETA = UNIVERSAL::isa($foreign, 'XML::LibXML::Node') ? $foreign : $parser->parse_string($foreign);
+    my $docDS = UNIVERSAL::isa($dataset, 'XML::LibXML::Document') ? $dataset : $parser->parse_string($dataset);
+    my $docMETA = UNIVERSAL::isa($foreign, 'XML::LibXML::Document') ? $foreign : $parser->parse_string($foreign);
     my $mdmm2 = new Metamod::DatasetTransformer::MM2($docDS, $docMETA, %options);
     die "not MM2 metadata" unless $mdmm2->test;
     return $class->_initSelf('MM2', $docDS, $docMETA, %options);
@@ -181,7 +180,7 @@ Return: $dataset object
 
 =item newFromDoc($mm2Doc, [$xmdDoc, %options])
 
-read a dataset from a document or xml/xmd string.
+read a dataset from a L<XML::LibXML::Document> or xml/xmd string.
 
 =item newFromFile($basename)
 
