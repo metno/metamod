@@ -80,6 +80,8 @@ my $xmldirectory = '[==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]/';
 my $applicationid = '[==APPLICATION_ID==]';
 my $status_file = '[==WEBRUN_DIRECTORY==]/oai_harvest_status';
 my $path_to_syserrors = '[==WEBRUN_DIRECTORY==]/syserrors';
+my $progress_report = [==TEST_IMPORT_PROGRESS_REPORT==]; # If == 1, prints what's
+                                                         # going on to STDOUT
 my $xmd_dataset_header = '<?xml version="1.0" encoding="UTF-8" ?>' . "\n" .
                  '<dataset xmlns="http://www.met.no/metamod2/dataset/"' . "\n" .
                  '   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' . "\n" .
@@ -130,7 +132,6 @@ sub do_harvest {
       my @ltime = localtime(&my_time());
       my $newday = $ltime[3]; # 1-31
       my $current_hour = $ltime[2];
-#      print "$previous_day $newday $current_hour\n";
       if ($newday == $previous_day || $current_hour < [==HARVEST_HOUR==]) {
          if ([==TEST_IMPORT_SPEEDUP==] <= 1) {
             sleep(15*60);
@@ -147,7 +148,9 @@ sub do_harvest {
 #
 #       Open file for reading (with shared lock)
 #
-        print "harvesting $ownertag $url\n";
+        if ($progress_report == 1) {
+           print "harvesting $ownertag $url\n";
+        }
         my $status_content = "";
         if (-r $status_file) {
            open (STATUS,$status_file);
@@ -158,8 +161,10 @@ sub do_harvest {
            close (STATUS); # Also unlocks
         }
         my $date_last_upd;
-        print "Status content:\n\n";
-        print $status_content . "\n";
+        if ($progress_report == 1) {
+           print "Status content:\n\n";
+           print $status_content . "\n";
+        }
         my $j1 = index($status_content,$url);
         if ($j1 >= 0) {
            $j1 += length($url) + 1;
@@ -173,7 +178,9 @@ sub do_harvest {
 #          Send GET request 
 #          and receive response object in $getrequest:
 #         
-         print "Send GET request: $urlsent\n";
+        if ($progress_report == 1) {
+            print "Send GET request: $urlsent\n";
+         }
          my $getrequest = $useragent->get($urlsent);
          if ($getrequest->is_success) {
             $content_from_get = $getrequest->content;
@@ -181,7 +188,9 @@ sub do_harvest {
             &syserror("","GET did not succeed: " . $getrequest->status_line);
             next;
          }
-         print "GET request returned " . length($content_from_get) . " bytes\n";
+        if ($progress_report == 1) {
+            print "GET request returned " . length($content_from_get) . " bytes\n";
+         }
 #
 #        Process DIF records:
 #
@@ -200,13 +209,14 @@ sub do_harvest {
             $status_content = "";
          }
          my $j2 = index($status_content,$url);
-         print "j2 = $j2\n";
-         print "length of url = " . length($url) . "\n";
+         if ($progress_report == 1) {
+            print "j2 = $j2\n";
+            print "length of url = " . length($url) . "\n";
+         }
          my $new_status_content;
          if ($j2 >= 0) {
             $new_status_content = substr($status_content,0,$j2);
             $new_status_content .= substr($status_content,$j2+length($url)+12);
-            print "new_status_content 1 =\n" . $new_status_content . "\n";
          } else {
             $new_status_content = $status_content;
          }
@@ -217,7 +227,6 @@ sub do_harvest {
             my $mday = $utctime[3]; # 1-31
             my $updated = sprintf('%04d-%02d-%02d',$year,$mon+1,$mday);
             $new_status_content .= $url . ' ' . $updated . "\n";
-            print "new_status_content 2 =\n" . $new_status_content . "\n";
          }
          seek(STATUS,0,0);
          print STATUS $new_status_content;
@@ -231,7 +240,9 @@ sub do_harvest {
 #
 sub process_DIF_records {
    my ($ownertag) = @_;
-   print "--- Process DIF records:\n";
+   if ($progress_report == 1) {
+      print "--- Process DIF records:\n";
+   }
    my $xml_header;
    if ($content_from_get =~ /^(<\?[^>]*\?>)/) {
       $xml_header = $1; # First matching ()-expression
@@ -246,7 +257,9 @@ sub process_DIF_records {
 #   
       my $j1 = index($content_from_get,'<header');
       if ($j1 < 0) {
-         print "finished DIF records\n";
+         if ($progress_report == 1) {
+            print "finished DIF records\n";
+         }
          last;
       }
 #   
@@ -266,7 +279,6 @@ sub process_DIF_records {
          return;
       }
       $content_from_get = substr($content_from_get,$j1+12);
-      print substr($content_from_get,0,50) . "\n";
       my $identifier;
       if ($content_from_get =~ /^([^<]+)/) {
          $identifier = &trim($1); # First matching ()-expression
@@ -274,7 +286,9 @@ sub process_DIF_records {
          &syserror("CONTENT","Empty identifier");
          return;
       }
-      print "Identifier: $identifier\n";
+      if ($progress_report == 1) {
+         print "Identifier: $identifier\n";
+      }
       my $base_filename;
       my $dsname;
 #   
@@ -298,7 +312,9 @@ sub process_DIF_records {
 #
 #        Delete the .xml file and set status = "deleted" in the .xmd file:
 #
-         print "Write new $base_filename.xmd and delete $base_filename.xml\n";
+         if ($progress_report == 1) {
+            print "Write new $base_filename.xmd and delete $base_filename.xml\n";
+         }
          open (XMD,">$base_filename.xmd");
          flock (XMD, LOCK_EX);
          print XMD $xmd_dataset_header;
@@ -331,7 +347,9 @@ sub process_DIF_records {
          else {
             &syserror("CONTENT","No maintag");
          }
-         print "maintag: $maintag\n";
+         if ($progress_report == 1) {
+            print "maintag: $maintag\n";
+         }
 #      
 #        Extract the whole DIF element:
 #      
@@ -348,7 +366,9 @@ sub process_DIF_records {
 #        Read/write existsing .xmd-file (with exclusive lock):
 #
          my $xmd_content;
-         print "Open $base_filename.xmd for update\n";
+         if ($progress_report == 1) {
+            print "Open $base_filename.xmd for update\n";
+         }
          if (-e $base_filename . '.xmd') {
             open (XMD,"+<$base_filename.xmd");
             flock (XMD, LOCK_EX);
@@ -422,7 +442,9 @@ sub process_DIF_records {
 #
 #        Write .xml file with content equal to the DIF element:
 #
-         print "Write $base_filename.xml\n";
+         if ($progress_report == 1) {
+            print "Write $base_filename.xml\n";
+         }
          {
 #
 #           The DIF XML may contain real UTF-8 characters. The following
