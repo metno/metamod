@@ -4,7 +4,7 @@ PSQL=[==PSQL==]
 CREATEDB=[==CREATEDB==]
 DROPDB=[==DROPDB==]
 $DROPDB -U admin [==PG_CONNECTSTRING_SHELL==] $DBNAME
-$CREATEDB -U admin [==PG_CONNECTSTRING_SHELL==] $DBNAME
+$CREATEDB -E UTF-8 -U admin [==PG_CONNECTSTRING_SHELL==] $DBNAME
 echo "----------------- Database $DBNAME created ------------------"
 $PSQL -a -U admin [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<EOF
 
