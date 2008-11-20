@@ -1303,6 +1303,10 @@ sub parse_file {
    my $ncfindobj = ncfind->new($fpath);
    foreach my $attname ($ncfindobj->globatt_names()) {
       my $attval = $ncfindobj->globatt_value($attname);
+#
+#        Normalise. Convert sequences of spaces and tabs to one space:
+#
+      $attval =~ s/[ \t][ \t]+/ /mg;
       my $attname1 = $attname;
       if (exists($RH_attribute_aliases{$attname})) {
          $attname1 = $RH_attribute_aliases{$attname};
@@ -1334,6 +1338,10 @@ sub parse_file {
       }
       foreach my $attname ($ncfindobj->att_names($varname)) {
          my $attval = $ncfindobj->att_value($varname,$attname);
+#
+#           Normalise. Convert sequences of spaces and tabs to one space:
+#
+         $attval =~ s/[ \t][ \t]+/ /mg;
          my $attname1 = $attname;
          if (exists($RH_attribute_aliases{$attname})) {
             $attname1 = $RH_attribute_aliases{$attname};

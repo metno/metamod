@@ -1326,7 +1326,7 @@ sub get_dataset_institution {
 #        Collect all matches into an array
 #        (no substrings allowed in REGEXP)
 #      
-      my @datasets = ($content =~ /<dir dirname=\"\w+\"/mg);
+      my @datasets = ($content =~ /<dir dirname=\"[^\"]+\"/mg);
       for (my $ix=0; $ix < scalar @datasets; $ix++) {
          $datasets[$ix] =~ s/<dir dirname=\"//mg;
          $datasets[$ix] =~ s/\"//mg;
