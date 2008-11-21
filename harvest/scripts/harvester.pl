@@ -33,6 +33,10 @@ use strict;
 use LWP::UserAgent;
 use lib qw([==TARGET_DIRECTORY==]/lib);
 use quadtreeuse;
+use XML::LibXML;
+use Metamod::Dataset;
+use Metamod::ForeignDataset;
+use Metamod::DatasetTransformer::DIF;
 use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 # use encoding 'utf8';
 #
@@ -92,6 +96,28 @@ my $xmd_dataset_footer = '</dataset>';
 #  the mapping between ownertags and source URLs:
 #
 my $harvest_sources = '[==OAI_HARVEST_SOURCES==]';
+my $harvest_schema;
+{
+   my $harvest_validation_schema = '[==OAI_HARVEST_VALIDATION_SCHEMA==]';
+   $harvest_schema = XML::LibXML::Schema->new( location => $harvest_validation_schema )
+      if $harvest_validation_schema;
+}
+
+if (@ARGV == 2) {
+   # run for input file rather than source-harvesting
+   my ($ownertag, $file) = @ARGV;
+   open my $f, $file or die "Cannot read $file: $!\n";
+   local $/ = undef;
+   my $content_from_get = <$f>;
+   close $f;
+   process_DIF_records($ownertag, $content_from_get);
+   exit(0); # do not continue
+} elsif (@ARGV > 0) {
+   print STDERR "usage: harvester.pl\ntest-usage: harvester.pl OWNERTAG FILE\n";
+   exit(1);
+}
+
+
 my @arr_harvest_sources = split(/\n/,$harvest_sources);
 my %hash_harvest_sources = ();
 foreach my $hsource (@arr_harvest_sources) {
@@ -102,10 +128,6 @@ foreach my $hsource (@arr_harvest_sources) {
 # Create new user agent
 #
 my $useragent = LWP::UserAgent->new;
-#
-# Global variable to receive content from get requests:
-#
-my $content_from_get = ();
 #
 #  Evaluate block to catch runtime errors
 #  (including "die()")
@@ -148,53 +170,54 @@ sub do_harvest {
 #
 #       Open file for reading (with shared lock)
 #
-        if ($progress_report == 1) {
-           print "harvesting $ownertag $url\n";
-        }
-        my $status_content = "";
-        if (-r $status_file) {
-           open (STATUS,$status_file);
-           flock(STATUS, LOCK_SH);
-           undef $/;
-           $status_content = <STATUS>;
-           $/ = "\n"; 
-           close (STATUS); # Also unlocks
-        }
-        my $date_last_upd;
-        if ($progress_report == 1) {
-           print "Status content:\n\n";
-           print $status_content . "\n";
-        }
-        my $j1 = index($status_content,$url);
-        if ($j1 >= 0) {
-           $j1 += length($url) + 1;
-           $date_last_upd = substr($status_content,$j1,10);
-        }
-        my $urlsent = $url . '?verb=ListRecords&metadataPrefix=dif';
-        if (defined($date_last_upd)) {
-           $urlsent .= '&from=' . $date_last_upd;
-        }
+         if ($progress_report == 1) {
+            print "harvesting $ownertag $url\n";
+         }
+         my $status_content = "";
+         if (-r $status_file) {
+            open (STATUS,$status_file);
+            flock(STATUS, LOCK_SH);
+            undef $/;
+            $status_content = <STATUS>;
+            $/ = "\n"; 
+            close (STATUS); # Also unlocks
+         }
+         my $date_last_upd;
+         if ($progress_report == 1) {
+            print "Status content:\n\n";
+            print $status_content . "\n";
+         }
+         my $j1 = index($status_content,$url);
+         if ($j1 >= 0) {
+            $j1 += length($url) + 1;
+            $date_last_upd = substr($status_content,$j1,10);
+         }
+         my $urlsent = $url . '?verb=ListRecords&metadataPrefix=dif';
+         if (defined($date_last_upd)) {
+            $urlsent .= '&from=' . $date_last_upd;
+         }
 #         
 #          Send GET request 
 #          and receive response object in $getrequest:
 #         
-        if ($progress_report == 1) {
+         if ($progress_report == 1) {
             print "Send GET request: $urlsent\n";
          }
          my $getrequest = $useragent->get($urlsent);
+         my $content_from_get;
          if ($getrequest->is_success) {
-            $content_from_get = $getrequest->content;
+            $content_from_get = $getrequest->decoded_content;
          } else {
-            &syserror("","GET did not succeed: " . $getrequest->status_line);
+            &syserror("","GET did not succeed: " . $getrequest->status_line, $content_from_get);
             next;
          }
-        if ($progress_report == 1) {
+         if ($progress_report == 1) {
             print "GET request returned " . length($content_from_get) . " bytes\n";
          }
 #
 #        Process DIF records:
 #
-         &process_DIF_records($ownertag);
+         &process_DIF_records($ownertag, $content_from_get);
 #
 #        Update the status file:
 #
@@ -239,231 +262,95 @@ sub do_harvest {
 #-----------------------------------------------------------------------
 #
 sub process_DIF_records {
-   my ($ownertag) = @_;
+   my ($ownertag, $content_from_get) = @_;
    if ($progress_report == 1) {
       print "--- Process DIF records:\n";
    }
-   my $xml_header;
-   if ($content_from_get =~ /^(<\?[^>]*\?>)/) {
-      $xml_header = $1; # First matching ()-expression
-   }
-   else {
-      &syserror("CONTENT","No XML header");
+   my $parser = new XML::LibXML();
+   my $oaiDoc;
+   eval {
+      $oaiDoc = $parser->parse_string($content_from_get);
+      print "successfully parsed content\n" if ($progress_report == 1);
+      if ($harvest_schema) {
+         print "validating ..." if ($progress_report == 1);
+         $harvest_schema->validate($oaiDoc);
+         print "successfully validated content\n" if ($progress_report == 1);
+      }
+   }; if ($@) {
+      &syserror("CONTENT", "error with content: $@", $content_from_get);
       return;
    }
-   while (1) {
-#   
-#     Finished if no more header elements:
-#   
-      my $j1 = index($content_from_get,'<header');
-      if ($j1 < 0) {
-         if ($progress_report == 1) {
-            print "finished DIF records\n";
-         }
-         last;
+   my $xpath = XML::LibXML::XPathContext->new();
+   $xpath->registerNs('oai', 'http://www.openarchives.org/OAI/2.0/');
+   
+   my @records = $xpath->findnodes("/oai:OAI-PMH/oai:ListRecords/oai:record", $oaiDoc);
+   print "found ", scalar @records, " records\n" if $progress_report;
+   my $i;
+   foreach my $record (@records) {
+      $i++;
+      my $identifier = eval { trim($xpath->findnodes("oai:header/oai:identifier", $record)->item(0)->textContent); };
+      if ($@ or (!$identifier)) {
+         &syserror("CONTENT","No identifier in record $i: $@", $record->toString);
+         return;
       }
-#   
-#     Extract header status:
-#   
-      $content_from_get = substr($content_from_get,$j1+7);
+      print "Identifier: $identifier\n" if $progress_report;
+      my $datestamp;
+      eval { $datestamp = $xpath->findnodes("oai:header/oai:datestamp", $record)->item(0)->textContent };
+      if ($@) {
+         &syserror("CONTENT","No datestamp: $@", $record->toString);
+         return;
+      }
+      #optional status
+      my @statusNodes = $xpath->findnodes("oai:header/oai:status", $record);
       my $status = "active";
-      if ($content_from_get =~ /^\s*status="([^"]+)"/) {
-         $status = $1; # First matching ()-expression
+      if (@statusNodes > 0) {
+         $status  = $statusNodes[0]->textContent;
       }
-#   
-#     Extract identifier:
-#   
-      $j1 = index($content_from_get,'<identifier>');
-      if ($j1 < 0) {
-         &syserror("CONTENT","No identifier");
-         return;
-      }
-      $content_from_get = substr($content_from_get,$j1+12);
-      my $identifier;
-      if ($content_from_get =~ /^([^<]+)/) {
-         $identifier = &trim($1); # First matching ()-expression
-      } else {
-         &syserror("CONTENT","Empty identifier");
-         return;
-      }
-      if ($progress_report == 1) {
-         print "Identifier: $identifier\n";
-      }
-      my $base_filename;
-      my $dsname;
+      
 #   
 #     Construct dataset name and filename from identifier:
 #   
+      my $base_filename;
+      my $dsname;
       if ($identifier =~ /^[^:]*:([^:]+):(.*$)/) {
          my $namespaceid = $1; # First matching ()-expression
          my $localid = $2;
          my $localid_sane = &makesane($localid);
          $base_filename = $xmldirectory . $ownertag . '_' . $localid_sane;
          $dsname = $applicationid . '/' . $ownertag . '_' . $localid;
-      }
-      else {
-         &syserror("","Wrong identifier format: ".$identifier);
+      } else {
+         &syserror("","Wrong identifier format: ".$identifier, $record->toString);
          return;
       }
+
 #
-#     Update the two XML files with metadata for this dataset (.xmd and .xml):
+#     parse metadata
 #
+      my $fds; # Metamod::ForeignDataset
       if ($status eq "deleted") {
-#
-#        Delete the .xml file and set status = "deleted" in the .xmd file:
-#
-         if ($progress_report == 1) {
-            print "Write new $base_filename.xmd and delete $base_filename.xml\n";
-         }
-         open (XMD,">$base_filename.xmd");
-         flock (XMD, LOCK_EX);
-         print XMD $xmd_dataset_header;
-         print XMD '   <info status="deleted" ownertag="'.$ownertag.'" name="'.$dsname.'" />'."\n";
-         print XMD $xmd_dataset_footer;
-         close (XMD);
-         unlink($base_filename . '.xml');
-      }
-      else {
-#      
-#        Remove from beginning of $content_from_get until the first "<DIF ...>" tag:
-#      
-         $j1 = index($content_from_get,'<metadata>');
-         if ($j1 < 0) {
-            &syserror("CONTENT","No metadata element");
-         }
-         $content_from_get = substr($content_from_get,$j1+10);
-         $j1 = index($content_from_get,'<');
-         if ($j1 < 0) {
-            &syserror("CONTENT","No DIF element");
-         }
-         $content_from_get = substr($content_from_get,$j1);
-#      
-#        Extract the tag name ("DIF" or "xxx:DIF"):
-#      
-         my $maintag;
-         if ($content_from_get =~ /^<([a-zA-Z0-9_:-]+)/) {
-            $maintag = $1; # First matching ()-expression
-         }
-         else {
-            &syserror("CONTENT","No maintag");
-         }
-         if ($progress_report == 1) {
-            print "maintag: $maintag\n";
-         }
-#      
-#        Extract the whole DIF element:
-#      
-         $j1 = index($content_from_get,'</'.$maintag.'>');
-         if ($j1 < 0) {
-            &syserror("CONTENT","No closing $maintag tag");
-         }
-         my $xmlbody = substr($content_from_get,0,$j1 + length($maintag) + 3);
-#      
-#        Remove the DIF element from the content variable:
-#      
-         $content_from_get = substr($content_from_get,$j1 + length($maintag) + 3);
-#
-#        Read/write existsing .xmd-file (with exclusive lock):
-#
-         my $xmd_content;
-         if ($progress_report == 1) {
-            print "Open $base_filename.xmd for update\n";
-         }
-         if (-e $base_filename . '.xmd') {
-            open (XMD,"+<$base_filename.xmd");
-            flock (XMD, LOCK_EX);
-            undef $/;
-            $xmd_content = <XMD>;
-            $/ = "\n"; 
-         } else {
-            open (XMD,">$base_filename.xmd");
-            $xmd_content = "";
-         }
-         my $creationdate;
-         if ($xmd_content =~ /creationDate="([^"]+)"/m) {
-            $creationdate = $1; # First matching ()-expression
-         } else {
-            my @utctime = gmtime(&my_time());
-            my $year = 1900 + $utctime[5];
-            my $mon = $utctime[4]; # 0-11
-            my $mday = $utctime[3]; # 1-31
-            my $hour = $utctime[2]; # 0-23
-            my $minute = $utctime[1]; # 0-59
-            $creationdate = sprintf('%04d-%02d-%02dT%02d:%02dZ',$year,$mon,$mday,$hour,$minute);
-         }
-         print XMD $xmd_dataset_header;
-         print XMD ' <info status="active"'."\n".'  ownertag="'.$ownertag.'"'."\n".
-                   '  creationDate="'.$creationdate.'"'."\n".'  metadataFormat="DIF"'."\n".
-                   '  name="'.$dsname.'" />'."\n";
-#
-#        Initialize Quadtreeuse object:
-#
-         my $QT_lat = 90.0;
-         my $QT_lon = 0.0;
-         my $QT_r = 3667387.2;
-         my $QT_depth = 7;
-         my $QT_proj = "+proj=stere +lat_0=90 +datum=WGS84";
-         my $quadtreeuse_object = quadtreeuse->new($QT_lat,$QT_lon,$QT_r,$QT_depth,$QT_proj);
-#      
-#        Extract geographical bounding box:
-#
-         my %bounding_box = ();
-         my $bounding_count = 0;
-         foreach my $eltname ('Southernmost_Latitude', 'Northernmost_Latitude',
-                              'Westernmost_Longitude', 'Easternmost_Longitude') {
-            my $rex = '<' . $eltname . '>([^<]+)</' . $eltname . '>';
-            if ($xmlbody =~ /$rex/m) {
-               $bounding_box{$eltname} = $1;
-               $bounding_count++;
-            }
-         }
-         if ($bounding_count == 4) {
-            my @latitudes = ($bounding_box{'Southernmost_Latitude'},
-                          $bounding_box{'Southernmost_Latitude'},
-                          $bounding_box{'Northernmost_Latitude'},
-                          $bounding_box{'Northernmost_Latitude'},
-                          $bounding_box{'Southernmost_Latitude'});
-            my @longitudes = ($bounding_box{'Easternmost_Longitude'},
-                           $bounding_box{'Westernmost_Longitude'},
-                           $bounding_box{'Westernmost_Longitude'},
-                           $bounding_box{'Easternmost_Longitude'},
-                           $bounding_box{'Easternmost_Longitude'});
-            $quadtreeuse_object->add_lonlats("area",\@longitudes,\@latitudes);
-            print XMD " <quadtree>\n";
-            foreach my $node ($quadtreeuse_object->get_nodes()) {
-               print XMD "  $node\n";
-            }
-            print XMD " </quadtree>\n";
-         }
-         print XMD $xmd_dataset_footer;
-         close (XMD);
-#
-#        Finished writing .xmd file
-#
-#        Write .xml file with content equal to the DIF element:
-#
-         if ($progress_report == 1) {
-            print "Write $base_filename.xml\n";
-         }
-         {
-#
-#           The DIF XML may contain real UTF-8 characters. The following
-#           "use encoding 'utf8';" statement seems to be a declaration that
-#           the perl variables in this script have values already encoded in
-#           UTF-8. Accordingly no extra encoding step is used when the variables
-#           are written to a file. If this statement is not used, the output
-#           files will be encoded in UTF-8 two times, creating nonsence.
-#           Note that this statement must be at this lowest scoping level.
-#           If used at higher levels, the statement will infuence the length
-#           function (returning lengthes in UTF-8 characters and not bytes).
-#
-            use encoding 'utf8';
-            open (DIF,">$base_filename.xml");
-            flock (DIF, LOCK_EX);
-            print DIF $xml_header . "\n" . $xmlbody;
-            close (DIF);
+         my $nullDoc = new XML::LibXML::Document($oaiDoc->version, $oaiDoc->encoding);
+         $fds = Metamod::ForeignDataset->newFromDoc($nullDoc);
+      } else {
+         eval {
+            # get the dif-node, this is the first (and only) element-node of metadata
+            my @difNodes = map {$_->nodeType == XML_ELEMENT_NODE ? $_ : ();} 
+               $xpath->findnodes("oai:metadata", $record)->item(0)->childNodes;
+            my $difDoc = new XML::LibXML::Document($oaiDoc->version, $oaiDoc->encoding);
+            $difDoc->setDocumentElement($difNodes[0]);
+            my $datasetTransformer = new Metamod::DatasetTransformer::DIF("", $difDoc->toString);
+            my ($dsDoc, $mmDoc) = $datasetTransformer->transform;
+            # only storing the dataset information from the transformed document
+            # storing metadata in original dif format
+            $fds = Metamod::ForeignDataset->newFromDoc($difDoc, $dsDoc);
+         }; if ($@) {
+            &syserror("CONTENT","No DIF element in record $i: $@", $record->toString);
+            return;
          }
       }
+      # TODO: set status, datestamp, creationdate, ...
+      $fds->setInfo({status => $status, ownertag => $ownertag, name => $dsname, datestamp => $datestamp});
+      print "Write $base_filename.xm[ld]\n" if ($progress_report == 1);
+      $fds->writeToFile($base_filename);
    }
 }
 #
@@ -534,7 +421,7 @@ sub trim {
 #---------------------------------------------------------------------------------
 #
 sub syserror {
-   my ($type,$errmsg) = @_;
+   my ($type,$errmsg, $content_from_get) = @_;
 #
 #  Find current time
 #
@@ -553,9 +440,9 @@ sub syserror {
    flock (OUT, LOCK_EX);
    print OUT "-------- HARVESTER $datestring:\n" .
              "         $errmsg\n";
-   if ($type eq "CONTENT") {
-      print OUT "         The first 60 characters of \$content_from_get:\n";
-      print OUT substr($content_from_get,0,60);
+   if ($type eq "CONTENT" && defined $content_from_get) {
+      print OUT "         The first 200 characters of \$content_from_get:\n";
+      print OUT substr($content_from_get,0,200);
       print OUT "\n";
    }
 };
