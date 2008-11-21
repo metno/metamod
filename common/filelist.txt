@@ -6,6 +6,7 @@ htdocs/funcs/mmLogging.inc
 =schema/oldDataset2MM2.xslt
 =schema/dif2dataset.xslt
 =schema/dif2MM2.xslt
+=schema/OAI-PMH.xsd
 lib/Metamod/DatasetTransformer.pm
 lib/Metamod/DatasetTransformer/MM2.pm
 lib/Metamod/DatasetTransformer/OldDataset.pm
