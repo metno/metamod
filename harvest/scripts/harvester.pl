@@ -86,11 +86,6 @@ my $status_file = '[==WEBRUN_DIRECTORY==]/oai_harvest_status';
 my $path_to_syserrors = '[==WEBRUN_DIRECTORY==]/syserrors';
 my $progress_report = [==TEST_IMPORT_PROGRESS_REPORT==]; # If == 1, prints what's
                                                          # going on to STDOUT
-my $xmd_dataset_header = '<?xml version="1.0" encoding="UTF-8" ?>' . "\n" .
-                 '<dataset xmlns="http://www.met.no/metamod2/dataset/"' . "\n" .
-                 '   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' . "\n" .
-                 '   xsi:schemaLocation="http://www.met.no/schema/metamod2/ matamodDataset.xsd">' . "\n";
-my $xmd_dataset_footer = '</dataset>';
 #
 #  Set up the source URLs from which harvesting should be done, and also
 #  the mapping between ownertags and source URLs:
@@ -121,6 +116,7 @@ if (@ARGV == 2) {
 my @arr_harvest_sources = split(/\n/,$harvest_sources);
 my %hash_harvest_sources = ();
 foreach my $hsource (@arr_harvest_sources) {
+   next if $hsource =~ /^\s*$/; # possible empty line
    my ($ownertag,$url) = ($hsource =~ /\S+/g);
    $hash_harvest_sources{$ownertag} = $url;
 }
