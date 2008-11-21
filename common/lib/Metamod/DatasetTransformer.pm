@@ -50,6 +50,9 @@ sub getFileContent {
         open $ml, $xmlFile or die "cannot read $xmlFile: $!\n";
         flock $ml, LOCK_SH or die "cannot lock $xmlFile: $!\n";
     }
+    binmode $md if $md; # drop all PerlIO layers possibly created by a use open pragma
+    binmode $ml if $ml;
+
     local $/ = undef;
     my $xmdStr = <$md> if $xmdFile;
     my $xmlStr = <$ml> if $xmlFile;

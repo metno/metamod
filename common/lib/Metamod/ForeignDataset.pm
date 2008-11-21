@@ -75,6 +75,8 @@ sub writeToFile {
     flock ($xmlF, LOCK_EX) or die "cannot lock $fileBase.xml: $!\n";
     truncate($xmdF, 0) or die "can't truncate $fileBase.xmd: $!\n";
     truncate($xmlF, 0) or die "can't truncate $fileBase.xml: $!\n";
+    binmode $xmdF; # drop all PerlIO layers possibly created by a use open pragma
+    binmode $xmlF;
     print $xmdF $self->getDS_XML;
     print $xmlF $self->getMETA_XML;
     close $xmlF;
