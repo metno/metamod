@@ -319,7 +319,7 @@ sub add_lonlats {
      }
      if (defined($prev)) {
         if ($coverage eq "area") {
-           push(@points,$points[0]);
+           push(@points,$points[0]) if @points;
         }
         $self->_addpoints($gridref,\@points,$ydelta);
      }
