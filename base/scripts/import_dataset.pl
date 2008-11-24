@@ -34,6 +34,7 @@ use lib qw([==TARGET_DIRECTORY==]/scripts [==TARGET_DIRECTORY==]/lib);
 use Metamod::Dataset;
 use Data::Dumper;
 use DBI;
+use File::Spec qw();
 #
 #  Import datasets from XML files into the database.
 #
@@ -331,8 +332,8 @@ sub update_database {
       "(SELECT GA_id FROM GA_Describes_DS AS g, DataSet AS d WHERE " .
       "g.DS_id = d.DS_id AND (d.DS_id = ? OR d.DS_parent = ?))");
    my $sql_insert_DS = $dbh->prepare(
-      "INSERT INTO DataSet (DS_id, DS_name, DS_parent, DS_status, DS_datestamp, DS_ownertag)" .
-      " VALUES (?, ?, ?, ?, ?, ?)");
+      "INSERT INTO DataSet (DS_id, DS_name, DS_parent, DS_status, DS_datestamp, DS_ownertag, DS_creationDate, DS_metadataFormat, DS_filePath)" .
+      " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
    my $sql_insert_GA = $dbh->prepare("INSERT INTO GeographicalArea (GA_id) VALUES (?)");
    my $sql_insert_BKDS = $dbh->prepare(
       "INSERT INTO BK_Describes_DS (BK_id, DS_id) VALUES (?, ?)");
@@ -425,7 +426,7 @@ sub update_database {
          my @result = $sql_getkey_DS->fetchrow_array;
          $dsid = $result[0];
       }
-      $sql_insert_DS->execute($dsid,$info{name},0,1,$datestamp,$info{ownertag});
+      $sql_insert_DS->execute($dsid,$info{name},0,1,$datestamp,$info{ownertag}, $info{creationDate}, $info{metadataFormat}, File::Spec->rel2abs($inputBaseFile));
 #
 #  Insert metadata:
 #  Metadata with metadata type name not in the database are ignored.
@@ -448,7 +449,10 @@ sub update_database {
                $sql_insert_MD->execute($mdid,$mtname,$mdcontent);
                $metadata{$mdkey} = $mdid;
             }
-            $sql_insert_DSMD->execute($dsid,$mdid);
+            eval { $sql_insert_DSMD->execute($dsid,$mdid); };
+            if ($@) {
+               die "Duplicated shared metadata ($mdkey): $@";
+            }
          } elsif (exists($rest_metadatatypes{$mtname})) {
             $sql_getkey_MD->execute();
             my @result = $sql_getkey_MD->fetchrow_array;

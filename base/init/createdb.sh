@@ -13,8 +13,11 @@ CREATE TABLE DataSet (
    DS_name            VARCHAR(9999) UNIQUE NOT NULL,
    DS_parent          INTEGER       NOT NULL,
    DS_status          INTEGER       NOT NULL,
-   DS_datestamp       DATE          NOT NULL,
+   DS_datestamp       TIMESTAMP     NOT NULL,
    DS_ownertag        VARCHAR(9999) NOT NULL,
+   DS_creationDate    TIMESTAMP     NOT NULL,
+   DS_metadataFormat  VARCHAR(128),
+   DS_filePath        VARCHAR(1024),
    PRIMARY KEY (DS_id)
 );
 GRANT SELECT ON DataSet TO webuser;
