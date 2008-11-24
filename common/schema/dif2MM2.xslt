@@ -63,22 +63,6 @@ version="1.0">
     </xsl:template>
 
 
-    <xsl:template match="dif:Data_Set_Citation/dif:Dataset_Title">
-        <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
-            <xsl:attribute name="name">title</xsl:attribute>
-            <xsl:value-of select="." />
-        </xsl:element>
-    </xsl:template>
-
-
-    <xsl:template match="dif:Data_Set_Citation/dif:Dataset_Publisher">
-        <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
-            <xsl:attribute name="name">institution</xsl:attribute>
-            <xsl:value-of select="." />
-        </xsl:element>
-    </xsl:template>
-
-
     <xsl:template match="dif:Data_Set_Citation/dif:Online_Resource">
         <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
             <xsl:attribute name="name">dataref</xsl:attribute>
