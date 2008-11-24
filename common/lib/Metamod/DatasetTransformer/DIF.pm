@@ -10,7 +10,7 @@ use quadtreeuse;
 use 5.6.0;
 
 
-our $VERSION = 0.1;
+our $VERSION = 0.2;
 our $XSLT_FILE_MM2 = "[==SOURCE_DIRECTORY==]/common/schema/dif2MM2.xslt";
 our $XSLT_FILE_DS = "[==SOURCE_DIRECTORY==]/common/schema/dif2dataset.xslt";
 
@@ -121,14 +121,20 @@ sub transform {
         my %info = $ds->getInfo;
         $info{name} =~ s^_^/^g;
         $info{ownertag} = 'DAM' if ($info{ownertag} eq 'DAMOCLES');
-        unless ($info{creationDate}) {
-            $info{creationDate} = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime());
-        }
-        if (length $info{creationDate} == 10) {
-            $info{creationDate} .= 'T00:00:00Z';
-        }
-        if (length $info{creationDate} != 20) {
-            warn "creationDate $info{creationDate} not in format YYYY-MM-DDTHH:MM:SSZ\n";
+        foreach my $date (qw(timestamp creationDate)) { # timestamp is reference for other dates if not existing
+            unless ($info{$date}) {
+                if ($date eq 'timestamp') {
+                    $info{$date} = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime());
+                } else {
+                    $info{$date} = $info{timestamp};
+                }
+            }
+            if (length $info{$date} == 10) {
+                $info{$date} .= 'T00:00:00Z';
+            }
+            if (length $info{$date} != 20) {
+                warn "$date". $info{$date}." not in format YYYY-MM-DDTHH:MM:SSZ\n";
+            }
         }
         $ds->setInfo(\%info);
         

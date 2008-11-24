@@ -24,8 +24,8 @@ version="1.0">
             <xsl:element name="info">
                 <xsl:attribute name="name"><xsl:value-of select="dif:Entry_ID"/></xsl:attribute>
                 <xsl:attribute name="status">active</xsl:attribute>
-                <xsl:attribute name="creationDate"><xsl:value-of select="dif:DIF_Creation_Date"/>T00:00:00Z</xsl:attribute>
-                <xsl:attribute name="datestamp"><xsl:value-of select="dif:Last_DIF_Revision_Date"/>T00:00:00Z</xsl:attribute>
+                <xsl:attribute name="creationDate"><xsl:value-of select="dif:DIF_Creation_Date"/></xsl:attribute>
+                <xsl:attribute name="datestamp"><xsl:value-of select="dif:Last_DIF_Revision_Date"/></xsl:attribute>
                 <xsl:attribute name="ownertag"><xsl:value-of select="dif:Project/dif:Short_Name"/></xsl:attribute>
                 <xsl:attribute name="metadataFormat">DIF</xsl:attribute>
             </xsl:element>
