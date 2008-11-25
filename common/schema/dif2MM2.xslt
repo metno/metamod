@@ -73,7 +73,12 @@ version="1.0">
     <xsl:template match="dif:Parameters">
         <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
             <xsl:attribute name="name">variable</xsl:attribute>
-            <xsl:value-of select="dif:Category" /> &gt; <xsl:value-of select="dif:Topic" /> &gt; <xsl:value-of select="dif:Term" /><xsl:if test="dif:Variable_Level_1"> &gt;  <xsl:value-of select="dif:Variable_Level_1" /></xsl:if>
+            <xsl:choose>
+               <xsl:when test="dif:Detailed_Variable"><xsl:value-of select="dif:Detailed_Variable" /></xsl:when>
+               <xsl:otherwise>
+                  <xsl:value-of select="dif:Category" /> &gt; <xsl:value-of select="dif:Topic" /> &gt; <xsl:value-of select="dif:Term" /><xsl:if test="dif:Variable_Level_1"> &gt;  <xsl:value-of select="dif:Variable_Level_1" /></xsl:if>
+               </xsl:otherwise>
+            </xsl:choose>
         </xsl:element>        
     </xsl:template>
 
@@ -150,34 +155,16 @@ version="1.0">
     <xsl:template match="dif:Location">
         <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
             <xsl:attribute name="name">area</xsl:attribute>
-            <xsl:value-of select="dif:Location_Category"/><xsl:if test="dif:Location_Type"> &gt; <xsl:value-of select="dif:Location_Type" /></xsl:if><xsl:if test="dif:Location_Subregion1"> &gt; <xsl:value-of select="dif:Location_Subregion1" /></xsl:if><xsl:if test="dif:Location_Subregion2"> &gt; <xsl:value-of select="dif:Location_Subregion2" /></xsl:if><xsl:if test="dif:Location_Subregion3"> &gt; <xsl:value-of select="dif:Location_Subregion3" /></xsl:if><xsl:if test="dif:Variable_Level_1"> &gt; <xsl:value-of select="dif:Variable_Level_1" /></xsl:if><xsl:if test="dif:Detailed_Location"> &gt; <xsl:value-of select="Detailed_Location" /></xsl:if>
+            <xsl:choose>
+            <xsl:when test="dif:Detailed_Location">
+               <xsl:value-of select="dif:Detailed_Location"/>
+            </xsl:when>
+            <xsl:otherwise>
+               <xsl:value-of select="dif:Location_Category"/><xsl:if test="dif:Location_Type"> &gt; <xsl:value-of select="dif:Location_Type" /></xsl:if><xsl:if test="dif:Location_Subregion1"> &gt; <xsl:value-of select="dif:Location_Subregion1" /></xsl:if><xsl:if test="dif:Location_Subregion2"> &gt; <xsl:value-of select="dif:Location_Subregion2" /></xsl:if><xsl:if test="dif:Location_Subregion3"> &gt; <xsl:value-of select="dif:Location_Subregion3" /></xsl:if>
+            </xsl:otherwise>
+            </xsl:choose>
         </xsl:element>
     </xsl:template>
-
-    <xsl:template match="dif:Location/dif:Location_Category">
-        <!-- ignore, used by Location -->
-    </xsl:template>
-
-
-    <xsl:template match="dif:Location/dif:Location_Type">
-        <!-- ignore, used by Location -->
-    </xsl:template>
-
-
-    <xsl:template match="dif:Location/dif:Location_Subregion2">
-        <!-- ignore, used by Location -->
-    </xsl:template>
-
-
-    <xsl:template match="dif:Location/dif:Location_Subregion3">
-        <!-- ignore, used by Location -->
-    </xsl:template>
-
-
-    <xsl:template match="dif:Location/dif:Detailed_Location">
-        <!-- ignore, used by Location -->
-    </xsl:template>
-
 
     <xsl:template match="dif:Data_Resolution/dif:Latitude_Resolution">
         <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
