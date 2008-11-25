@@ -16,7 +16,7 @@ cat >t_1 <<EOF
 [==IMPORTDIRS==]
 EOF
 for dir in `cat t_1`; do
-   for fil in `ls -1 $dir`; do
+   for fil in `ls -1 $dir/*.xm[ld]`; do
       ../scripts/import_dataset.pl $dir/$fil
    done
 done
