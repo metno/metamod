@@ -10,7 +10,7 @@ use quadtreeuse;
 use 5.6.0;
 
 
-our $VERSION = 0.2;
+our $VERSION = 0.3;
 our $XSLT_FILE_MM2 = "[==SOURCE_DIRECTORY==]/common/schema/dif2MM2.xslt";
 our $XSLT_FILE_DS = "[==SOURCE_DIRECTORY==]/common/schema/dif2dataset.xslt";
 
@@ -142,28 +142,28 @@ sub transform {
         my %metadata = $ds->getMetadata;
         my ($south, $north, $east, $west) = qw(southernmost_latitude northernmost_latitude 
                                                easternmost_longitude westernmost_longitude);
-        if (exists $metadata{$south} &&
-            exists $metadata{$north} &&
-            exists $metadata{$west} &&
-            exists $metadata{$east}) {
-            my @sLat = @{ $metadata{$south} };
-            my @nLat = @{ $metadata{$north} };
-            my @wLon = @{ $metadata{$west} };
-            my @eLon = @{ $metadata{$east} };
+        if (exists $metadata{bounding_box}) {
+            my @bbs = @{ $metadata{bounding_box} };
             my @nodes;
-            for (my $i = 0; $i < @sLat; $i++) {
+            foreach my $bb (@bbs) {
+                # bounding_box consists of 4 degree values
+                my @bounding_box = split ',', $bb;
+                if (@bounding_box != 4) {
+                    warn "wrong defined bounding_box: $bb\n";
+                }
+                my ($eLon, $sLat, $wLon, $nLat) = @bounding_box;
                 my $qtu = new quadtreeuse(90, 0, 3667387.2, 7, "+proj=stere +lat_0=90 +datum=WGS84");
-                if (defined $sLat[$i] && defined $nLat[$i] && defined $wLon[$i] && defined $eLon[$i]) {
-                    if ($sLat[$i] <= -90) {
-                        if ($nLat[$i] <= -89.9) {
+                if (defined $sLat && defined $nLat && defined $wLon && defined $eLon) {
+                    if ($sLat <= -90) {
+                        if ($nLat <= -89.9) {
                             warn "cannot build northern polar-stereographic quadtree on southpole\n";
                         } else {
-                            $sLat[$i] = 89.9;
+                            $sLat = 89.9;
                         }
                     }
                     $qtu->add_lonlats("area",
-                                      [$eLon[$i], $wLon[$i], $wLon[$i], $eLon[$i], $eLon[$i]],
-                                      [$sLat[$i], $sLat[$i], $nLat[$i], $nLat[$i], $sLat[$i]]);
+                                      [$eLon, $wLon, $wLon, $eLon, $eLon],
+                                      [$sLat, $sLat, $nLat, $nLat, $sLat]);
                     push @nodes, $qtu->get_nodes;
                 }
             }

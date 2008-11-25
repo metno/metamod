@@ -749,41 +749,54 @@ function fmcheckform($outputdst, $filename) {
 			echo(fmcreaterecordstart());
 
 			# Check that geographical positions are numeric
-			if ($mykey == "northernmost_latitude" || 
-	    		$mykey == "southernmost_latitude" ||
-		   		$mykey == "easternmost_longitude" ||
-		    	$mykey == "westernmost_longitude") {
-	    		if (! is_numeric($myvalue)) {
+			if ($mykey == "bounding_box") {
+				$parts = explode(',', $myvalue);
+	    		if (! count($parts) == 4) {
+	    			$myvalue = "<span style=\"color: red;\">This field ".
+						"should consist of four a decimal numbers, separated by comma. ".
+						"Please use the ".
+						"Edit button and correct errors</span>";
+	    		} else if (! (is_numeric($parts[0]) && is_numeric($parts[1]) && is_numeric($parts[2]) && is_numeric($parts[3]))) {
 					$myvalue = "<span style=\"color: red;\">This field ".
 						"should be a decimal number. Please use the ".
 						"Edit button and correct errors</span>";
 					$errors = TRUE;
-	    		} else if (ereg("latitude",$mykey)) {
-					if ($myvalue > 90. || $myvalue < -90.) {
+	    		} else {
+					if ($parts[1] > 90. || $parts[1] < -90.) {
 		    			$myvalue .= " <span style=\"color: red;\">The ".
-		    				"latitude domain is -90&#176; to 90&#176; North".
+		    				"southern latitude domain is -90&#176; to 90&#176; North".
 		    				"</span>";
 			    		$errors = TRUE;
 					}
-	    		} else if (ereg("longitude",$mykey)) {
-					if ($myvalue > 180. || $myvalue < -180.) {
+					if ($parts[3] > 90. || $parts[3] < -90.) {
 		    			$myvalue .= " <span style=\"color: red;\">The ".
-		    				"longitude domain is -180&#176; to 90&#176; East".
+		    				"northern latitude domain is -90&#176; to 90&#176; North".
 		    				"</span>";
 			    		$errors = TRUE;
 					}
+					if ($parts[0] > 180. || $parts[0] < -180.) {
+		    			$myvalue .= " <span style=\"color: red;\">The ".
+		    				"eastern longitude domain is -180&#176; to 90&#176; East".
+		    				"</span>";
+			    		$errors = TRUE;
+					}
+					if ($parts[2] > 180. || $parts[2] < -180.) {
+		    			$myvalue .= " <span style=\"color: red;\">The ".
+		    				"western longitude domain is -180&#176; to 90&#176; East".
+		    				"</span>";
+			    		$errors = TRUE;
+					}
+	    			if ($parts[2] >	$parts[0]) {
+						$myvalue .= " <span style=\"color: red;\">Western ".
+			    			"limit is East of Eastern limit</span>";
+						$errors = TRUE;
+	    			}
+					if ($parts[1] > $parts[3]) {
+						$myvalue .= " <span style=\"color: red;\">Northern ".
+		    				"limit is South of Southern limit</span>";
+						$errors = TRUE;
+		    		}
 	    		}
-	    		if ($_POST["westernmost_longitude"] > 
-			    	$_POST["easternmost_longitude"]) {
-					$myvalue .= " <span style=\"color: red;\">Western ".
-			    		"limit is East of Eastern limit</span>";
-					$errors = TRUE;
-		    	} else if ($_POST["southernmost_latitude"] >
-			    	$_POST["northernmost_latitude"]) {
-					$myvalue .= " <span style=\"color: red;\">Northern ".
-		    			"limit is South of Southern limit</span>";
-					$errors = TRUE;
-		    	}
 			}
 
 			# Check that time specifications are of the correct format

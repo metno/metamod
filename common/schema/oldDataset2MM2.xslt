@@ -20,8 +20,10 @@
 		<xsl:element name="MM2" xmlns="http://www.met.no/schema/metamod/MM2">
 			<xsl:attribute name="schemaLocation" namespace="http://www.w3.org/2001/XMLSchema-instance">http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd</xsl:attribute>
         	<xsl:apply-templates select="datacollection_period" />
-        	<!--  quadtree_nodes now in dataset, not in metadata -->
-        	<xsl:for-each select="*[not(self::dataset|self::datacollection_period|self::drpath|self::quadtree_nodes)]">
+        	<!-- select the bounding box if one of the borders is found -->
+			<xsl:apply-templates select="easternmost_longitude" /> 
+        	<!--  quadtree_nodes in dataset, not in metadata -->
+        	<xsl:for-each select="*[not(self::dataset|self::datacollection_period|self::drpath|self::quadtree_nodes|self::northernmost_latitude|self::southernmost_latitude|self::easternmost_longitude|self::westernmost_longitude)]">
            		<xsl:call-template name="metadata"/>
         	</xsl:for-each>
 		</xsl:element>    
@@ -35,6 +37,13 @@
         <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
            <xsl:attribute name="name">datacollection_period_to</xsl:attribute>
            <xsl:value-of select="@to"/>
+        </xsl:element>
+    </xsl:template>
+    
+    <xsl:template match="easternmost_longitude">
+        <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
+           <xsl:attribute name="name">bounding_box</xsl:attribute>
+           <xsl:value-of select="."/>,<xsl:value-of select="/dataset/southernmost_latitude"/>,<xsl:value-of select="/dataset/westernmost_longitude"/>,<xsl:value-of select="/dataset/northernmost_latitude"/>
         </xsl:element>
     </xsl:template>
 

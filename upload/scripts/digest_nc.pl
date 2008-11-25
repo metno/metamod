@@ -700,9 +700,9 @@ sub hloop {
          if (length($path) > 0) {
             $newpath = $path . '/' . $hkey;
          }
-         if ($CTR_printconf) {print substr($manyspaces,0,3*$level)};
+         if ($CTR_printconf) {print STDERR substr($manyspaces,0,3*$level)};
          if (ref($refvalnew)) {
-            if ($CTR_printconf) {print $hkey . ":\n"};
+            if ($CTR_printconf) {print STDERR $hkey . ":\n"};
 #         
 #       If the hash keyword is also found in %$subrhash, call the subroutine
 #       identified by that hash:
@@ -716,7 +716,7 @@ sub hloop {
 
             &hloop($refvalnew,$level+1,$newpath,$subrhash);
          } else {
-            if ($CTR_printconf) {print $hkey . ":   " . $refvalnew . "\n"};
+            if ($CTR_printconf) {print STDERR $hkey . ":   " . $refvalnew . "\n"};
          }
       }
    } elsif (ref($refval) eq "ARRAY") {
@@ -728,8 +728,8 @@ sub hloop {
       my $i1 = 0;
       foreach my $refvalnew (@$refval) {
          my $newpath = $path . '/' . $i1;
-         if ($CTR_printconf) {print substr($manyspaces,0,3*$level)};
-         if ($CTR_printconf) {print $i1 . ":\n"};
+         if ($CTR_printconf) {print STDERR substr($manyspaces,0,3*$level)};
+         if ($CTR_printconf) {print STDERR $i1 . ":\n"};
 #
 #       Recursive call to hloop for array elements:
 #
@@ -737,8 +737,8 @@ sub hloop {
          $i1++;
       }
    } elsif (ref($refval) eq "SCALAR") {
-      if ($CTR_printconf) {print substr($manyspaces,0,3*$level)};
-      if ($CTR_printconf) {print ${$refval} . "\n"};
+      if ($CTR_printconf) {print STDERR substr($manyspaces,0,3*$level)};
+      if ($CTR_printconf) {print STDERR ${$refval} . "\n"};
    }
    return;
 };
@@ -799,10 +799,10 @@ sub parse_all {
       $ds = Metamod::Dataset->newFromFile($xml_metadata_path);
       die "cannot read dataset $xml_metadata_path: $!\n" unless $ds;
       if ($CTR_printdump == 1) {
-         print "\n----- METADATA FROM EXISTING XML FILE -----\n\n";
+         print STDERR "\n----- METADATA FROM EXISTING XML FILE -----\n\n";
          my %metadata = $ds->getMetadata;
          my %info = $ds->getInfo;
-         print Dumper(\%info, \%metadata);
+         print STDERR Dumper(\%info, \%metadata);
       }
    }
    my %metadata = $ds->getMetadata;
@@ -819,10 +819,10 @@ sub parse_all {
    } else {
       $metadata{"dataref"} = [$dataref];
    }
-   if (length($info{"name"}) == 0) {
+   if (!$info{"name"}) {
       if ($xml_metadata_path =~ /\/([^\/]+\/[^\/]+)\.(xml|XML)$/) {
          my $name = $1; # First matching ()-expression
-         $info{"name"} = [$name];
+         $info{"name"} = $name;
       } else {
          die "Not able to construct dataset-name from $xml_metadata_path";
       }
@@ -855,7 +855,7 @@ sub parse_all {
          if (exists($ref_aggr->{"rule"})) {
             my $rule = $ref_aggr->{"rule"};
             if ($CTR_printdump == 1) {
-               print "\n----- Attribute, Rule: $attname, $rule\n";
+               print STDERR "\n----- Attribute, Rule: $attname, $rule\n";
             }
             if ("$rule" =~ m/^all_should_be_equal/) {
                &rule_all_equal($rule, $attname, $ref_aggr, \%all_globatts, \%metadata);
@@ -873,6 +873,7 @@ sub parse_all {
          }
       }
    }
+
 #
 #  Initialize the %variablename hash with variable names from the
 #  existing XML file:
@@ -939,41 +940,44 @@ sub parse_all {
    $info{creationDate} = (delete $metadata{creationDate})->[0] if exists $metadata{creationDate};
    $ds->setInfo(\%info);
    
-   # start and stop date might need special handling
-   # all other metadata will be added as is
-   my $start_date = "";
-   my $stop_date = "";
-   foreach my $attname (keys %metadata) {
-      my $refval = $metadata{$attname};
-      if (ref($refval) ne "ARRAY") {
-         die 'parse_all: ref($refval) ne "ARRAY" in %metadata';
-      }
-      if ($attname eq 'start_date' && exists($refval->[0]) && defined($refval->[0])) {
-         $start_date = $refval->[0];
-      } elsif ($attname eq 'stop_date' && exists($refval->[0]) && defined($refval->[0])) {
-         $stop_date = $refval->[0];
-      } elsif ($attname ne 'quadtree_nodes') {
-         $ds->addMetadata({$attname => $refval});
-      }
-   }
-   if (length($start_date) > 0 && length($stop_date) > 0) {
-      $ds->addMetadata({datacollection_period_from => [substr($start_date,0,10)],
-                        datacollection_period_to => [substr($stop_date,0,10)]});
-   }
-#
-#  Find QuadTree-nodes from latitude,longitude coordinates, and merge
-#  with existing nodes if found in the previous version of the XML file:
-#
+   #
+   #  Find QuadTree-nodes from latitude,longitude coordinates, and merge
+   #  with existing nodes if found in the previous version of the XML file:
+   #
    my @nodes = get_quadtree_nodes(\%all_variables, \%all_globatts, \%metadata);
    $ds->setQuadtree(\@nodes);
+   delete $metadata{quadtree_nodes};
+
+   # start and stop date need special handling
+   my $start_date = (delete $metadata{start_date})->[0] if exists $metadata{start_date};
+   if ($start_date) {
+      $metadata{datacollection_period_from} = [substr($start_date,0,10)];
+   }
+   my $stop_date = (delete $metadata{stop_date})->[0] if exists $metadata{stop_date};
+   if ($stop_date) {
+      $metadata{datacollection_period_to} = [substr($stop_date,0,10)];
+   }
+   # using bounding_box instead of *_latitude, *_longitude
+   my $south = (delete $metadata{southernmost_latitude})->[0] if exists $metadata{southernmost_latitude};
+   my $north = (delete $metadata{northernmost_latitude})->[0] if exists $metadata{northernmost_latitude};
+   my $east = (delete $metadata{easternmost_longitude})->[0] if exists $metadata{easternmost_longitude};
+   my $west = (delete $metadata{westernmost_longitude})->[0] if exists $metadata{westernmost_longitude};
+   if (defined $south and defined $north and defined $east and defined $west) {
+      $metadata{bounding_box} = ["$east,$south,$west,$north"];
+   }
+   
+   # add all metadata
+   $ds->addMetadata(\%metadata);
+
+   # write the file
    $ds->writeToFile($xml_metadata_path);
-#
+
    if ($CTR_printdump == 1) {
-      print "\n----- VARIABLES FOUND -----\n\n";
-      print Dumper(\%all_variables);
-      print "\n\n----- GLOBAL ATTRIBUTES FOUND -----\n\n";
-      print Dumper(\%all_globatts);
-      print "\n\n=================================================\n";
+      print STDERR "\n----- VARIABLES FOUND -----\n\n";
+      print STDERR Dumper(\%all_variables);
+      print STDERR "\n\n----- GLOBAL ATTRIBUTES FOUND -----\n\n";
+      print STDERR Dumper(\%all_globatts);
+      print STDERR "\n\n=================================================\n";
    }
 };
 #
@@ -1318,9 +1322,9 @@ sub parse_file {
       $foundglobatts{$attname1} = $attval;
       if ($CTR_printnc) {
          if ($attname eq $attname1) {
-            print "Global attribute: $attname = $attval\n";
+            print STDERR "Global attribute: $attname = $attval\n";
          } else {
-            print "Global attribute: $attname ($attname1) = $attval\n";
+            print STDERR "Global attribute: $attname ($attname1) = $attval\n";
          }
       }
    }
@@ -1353,9 +1357,9 @@ sub parse_file {
          $foundvars{$varname}->{"attributes"}->{$attname1} = $attval;
          if ($CTR_printnc) {
             if ($attname eq $attname1) {
-               print "Variable attribute: $varname:$attname = $attval\n";
+               print STDERR "Variable attribute: $varname:$attname = $attval\n";
             } else {
-               print "Variable attribute: $varname:$attname ($attname1) = $attval\n";
+               print STDERR "Variable attribute: $varname:$attname ($attname1) = $attval\n";
             }
          }
          if ($attname1 eq "standard_name") {
@@ -1647,10 +1651,10 @@ sub parse_file {
       $foundglobatts{$attname} = [@values_array];
    }
    if ($CTR_printdump == 1) {
-      print "----- Content of global lists: -----\n";
-      print Dumper(\%LSH_globlists);
-      print "----- Content of global switches: -----\n";
-      print Dumper(\%LSH_globswitches);
+      print STDERR "----- Content of global lists: -----\n";
+      print STDERR Dumper(\%LSH_globlists);
+      print STDERR "----- Content of global switches: -----\n";
+      print STDERR Dumper(\%LSH_globswitches);
    }
 #
 #   Check that all mandatory global attributes are present:

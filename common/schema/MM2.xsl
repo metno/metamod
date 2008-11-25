@@ -6,7 +6,7 @@
     Description: representation of MM2.xml files in browser
 -->
 
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:d="http://www.met.no/schema/metamod/dataset2/"  version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:d="http://www.met.no/schema/metamod/MM2"  version="1.0">
     <xsl:output method="html"/>
 
     <!-- TODO customize transformation rules 
@@ -20,7 +20,7 @@
             <body>
                 <h1>Content of MM2 dataset</h1>
                 <table>
-                <xsl:apply-templates select="/d:dataset/d:metadata">
+                <xsl:apply-templates select="/d:MM2/d:metadata">
                     <xsl:sort select="@name"/>
                 </xsl:apply-templates>
                 </table>

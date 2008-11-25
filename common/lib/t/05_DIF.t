@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use lib "..";
-use Test::More tests => 10;
+use Test::More tests => 12;
 
 BEGIN {use_ok('Metamod::DatasetTransformer::DIF');}
 
@@ -18,8 +18,9 @@ isa_ok($obj, 'Metamod::DatasetTransformer::DIF');
 ok($obj->test, "test correct file");
 my ($dsDoc, $mm2Doc) = $obj->transform;
 isa_ok($dsDoc, 'XML::LibXML::Document');
-#use Metamod::Dataset;
-#my $ds = newFromDoc Metamod::Dataset($mm2Doc, $dsDoc);
+require_ok "Metamod::Dataset";
+my $ds = newFromDoc Metamod::Dataset($mm2Doc, $dsDoc);
+is(scalar $ds->getQuadtree, 48, "getting quadtree");
 #$ds->writeToFile("testDatasetOut$$");
 
 my $obj2 = new Metamod::DatasetTransformer::DIF('bla', 'blub', 'dsXslt' => $xsltDS );

@@ -54,6 +54,14 @@ function get_exception($mtname, $exception, $value) {
          }
       }
    }
+   elseif ($mtname == "bounding_box") {
+   	  $parts = explode(',', $value);
+   	  return "<Southernmost_Latitude>$parts[1]</Southernmost_Latitude>" .
+   	  		"<Northernmost_Latitude>$parts[3]</Northernmost_Latitude>" .
+   	  		"<Westernmost_Longitude>$parts[2]</Westernmost_Longitude>" .
+   	  		"<Easternmost_Longitude>$parts[0]</Easternmost_Longitude>";
+
+   }
    elseif ($mtname == "latitude_resolution" || $mtname == "longitude_resolution") {
       if ($exception == 1) {
          return "$value degrees";

@@ -139,36 +139,12 @@ version="1.0">
     </xsl:template>
 
 
-    <xsl:template match="dif:Spatial_Coverage/dif:Southernmost_Latitude">
-        <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
-            <xsl:attribute name="name">southernmost_latitude</xsl:attribute>
-            <xsl:value-of select="." />
+	<xsl:template match="dif:Spatial_Coverage">
+		<xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
+            <xsl:attribute name="name">bounding_box</xsl:attribute>
+            <xsl:value-of select="dif:Easternmost_Longitude" />,<xsl:value-of select="dif:Southernmost_Latitude" />,<xsl:value-of select="dif:Westernmost_Longitude" />,<xsl:value-of select="dif:Northernmost_Latitude" />
         </xsl:element>
-    </xsl:template>
-
-
-    <xsl:template match="dif:Spatial_Coverage/dif:Northernmost_Latitude">
-        <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
-            <xsl:attribute name="name">northernmost_latitude</xsl:attribute>
-            <xsl:value-of select="." />
-        </xsl:element>
-    </xsl:template>
-
-
-    <xsl:template match="dif:Spatial_Coverage/dif:Westernmost_Longitude">
-        <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
-            <xsl:attribute name="name">westernmost_longitude</xsl:attribute>
-            <xsl:value-of select="." />
-        </xsl:element>
-    </xsl:template>
-
-
-    <xsl:template match="dif:Spatial_Coverage/dif:Easternmost_Longitude">
-        <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
-            <xsl:attribute name="name">easternmost_longitude</xsl:attribute>
-            <xsl:value-of select="." />
-        </xsl:element>
-    </xsl:template>
+	</xsl:template>
 
 
     <xsl:template match="dif:Location">
