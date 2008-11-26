@@ -76,17 +76,16 @@ for ($i1=0; $i1 <= $keycount; $i1 += 3) {
             foreach ($prev_keys as $keyrecord) {
                list($exception,$path,$const) = $keyrecord;
                if ($const != '') {
-                  $outlist[] = array($path,$const);
+                  $outlist[] = array($path,htmlspecialchars($const));
                } else if ($exception != 0) {
                   $val = get_exception($prev_mtname,$exception,$value);
                   if ($val !== FALSE) {
                      $outlist[] = array($path,$val);
                   } else {
-                     $outlist = array();
-                     break;
+				     // simply skip this entry, go to the next
                   }
                } else {
-                  $outlist[] = array($path,$value);
+                  $outlist[] = array($path,htmlspecialchars($value));
                }
             }
             reset($outlist);

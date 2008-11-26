@@ -30,11 +30,22 @@
 function get_exception($mtname, $exception, $value) {
    include 'var_topic.php'; // Includes arrays $topics and $areas
    if ($mtname == 'variable') {
+   	  $detail = $value;
       if (array_key_exists($value, $topics)) {
          $parts = explode(" > ",$topics[$value][0]);
-         if ($exception <= count($parts)) {
-            return $parts[$exception - 1];
-         }
+      } else { // gcmd-string keywords, splitted by >, appended '> HIDDEN' at the end
+      	$parts = preg_split('/\s*>\s*/', $value, -1, PREG_SPLIT_NO_EMPTY);
+      	$last = array_pop($parts);
+      	if ($last != 'HIDDEN') {
+      		array_push($parts, $last);
+      	}
+      	$detail = join(' > ', $parts);
+      	$detail = FALSE;
+      }
+      if ($exception < 0) {
+      	 return $detail;
+      } elseif ($exception <= count($parts)) {
+         return $parts[$exception - 1];
       }
    }
    elseif ($mtname == "datacollection_period") {
@@ -44,22 +55,33 @@ function get_exception($mtname, $exception, $value) {
       }
    }
    elseif ($mtname == "area") {
+   	  $detail = $value;
       if (array_key_exists($value, $areas)) {
          $parts = explode(" > ",$areas[$value]);
-         if ($exception <= count($parts)) {
-            return $parts[$exception - 1];
+         if (in_array($value, $parts)) {
+         	$detail = FALSE;
          }
-         elseif ($exception == 4 && !in_array($value, $parts)) {
-            return $value;
-         }
+      } else {
+      	 $parts = preg_split('/\s*>\s*/', $value, -1, PREG_SPLIT_NO_EMPTY);
+		 if (count($parts) <= 3) {
+		 	$detail = FALSE;
+		 } else {
+		 	echo "XXXX";
+		    $detail = join(' > ', array_slice($parts, 3)); # only giving parts 1-3 as exceptions
+		 }
+      }
+      if ($exception < 0) {
+      	  return $detail;
+      } elseif ($exception <= count($parts)) {
+          return $parts[$exception - 1];
       }
    }
    elseif ($mtname == "bounding_box") {
    	  $parts = explode(',', $value);
-   	  return "<Southernmost_Latitude>$parts[1]</Southernmost_Latitude>" .
-   	  		"<Northernmost_Latitude>$parts[3]</Northernmost_Latitude>" .
-   	  		"<Westernmost_Longitude>$parts[2]</Westernmost_Longitude>" .
-   	  		"<Easternmost_Longitude>$parts[0]</Easternmost_Longitude>";
+   	  return "<Southernmost_Latitude>".htmlspecialchars($parts[1])."</Southernmost_Latitude>" .
+   	  		"<Northernmost_Latitude>".htmlspecialchars($parts[3])."</Northernmost_Latitude>" .
+   	  		"<Westernmost_Longitude>".htmlspecialchars($parts[2])."</Westernmost_Longitude>" .
+   	  		"<Easternmost_Longitude>".htmlspecialchars($parts[0])."</Easternmost_Longitude>";
 
    }
    elseif ($mtname == "latitude_resolution" || $mtname == "longitude_resolution") {
