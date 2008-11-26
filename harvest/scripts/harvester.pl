@@ -273,6 +273,7 @@ sub process_DIF_records {
          print "successfully validated content\n" if ($progress_report == 1);
       }
    }; if ($@) {
+      print STDERR "error in parsing: $@\n";
       &syserror("CONTENT", "error with content: $@", $content_from_get);
       return;
    }
