@@ -68,6 +68,7 @@ function fmcreateform($outputdst, $filename, $edit=false) {
 			$ds = new MM_Dataset($datasetFile, $metadataFile);
 		}
 	}
+	$currentData = array();
 	if ($ds) {
 		$currentData = fmDataset2ArrayData($ds);
 	}
@@ -541,6 +542,7 @@ function fmForm2XmlHtml(MM_Dataset $ds) {
 		"name" => true,
 		"drpath" => true, # alias for name
 		"creationDate" => true,
+		"datestamp" => true,
 		"ownertag" => true,
 		"status" => true,
 		"metadataFormat" => true,
@@ -548,8 +550,8 @@ function fmForm2XmlHtml(MM_Dataset $ds) {
 	);
 	
 	// handle the info tags
+	$info = $ds->getInfo();
 	foreach ( $specialTags as $st => $value ) {
-		$info = $ds->getInfo();
     	if (isset($_POST[$st])) {
     		if ($st != "quadtree_nodes") {
     			if ($st == "drpath") {
@@ -655,6 +657,16 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
 	
 	$ds = new MM_Dataset();
 	$myhtmlcontent = fmForm2XmlHtml($ds);
+	{	# get old creationDate
+		$datasetFile = $outputdst . '/' . $uploadDir . ".xmd";
+		$metadataFile = $outputdst . '/' . $uploadDir . ".xml";
+		if (file_exists($datasetFile)) {
+			$oldDs = new MM_Dataset($datasetFile, $metadataFile);
+			$oldInfo = $oldDS->getInfo;
+			# set creationDate of old file
+			$ds->addInfo(array("creationDate" => $oldInfo["creationDate"]));
+		}
+	}
 	$ds->addInfo(array("name" => $drpath));
 	$ds->write($outputfileBase);
 
@@ -691,9 +703,10 @@ function fmcheckform($outputdst, $filename) {
 
     $mytempl = file($filename);
 
+	$uploadDir = "";
 	if (isset($_REQUEST["uploadDirectory"])) {
 		if (! (isset($_REQUEST["institutionId"]) && strlen($_REQUEST["institutionId"]))) {
-			$mysmg = "information missing during quest metadata configuration, please enter through the admin portal!";
+			$mysmg = "information missing during quest metadata configuration, please enter through the upload portal!";
        		echo(fmcreateerrmsg($mymsg));
        		return;
 		}
@@ -723,6 +736,12 @@ function fmcheckform($outputdst, $filename) {
 		}
     }
     echo(fmstartform());
+    if (strlen($uploadDir) != 0) {
+		echo(fmcreatehidden("uploadDirectory", $uploadDir));
+    	echo(fmcreatehidden("institutionId", $_REQUEST["institutionId"]));
+	}
+	
+    
     if ($errors) {
 		echo(fmcreateerrmsg("Please use the Edit button ".
 			"to correct these problems"));
@@ -882,7 +901,6 @@ function fmcheckform($outputdst, $filename) {
     		echo(fmcreatebutton("Submit","Write form"));
 		}
     }
-
 
 	echo(fmcreatebutton("Submit", "Edit form"));
     echo(fmcreatebutton("Submit","Cancel write"));
