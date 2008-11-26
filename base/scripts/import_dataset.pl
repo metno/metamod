@@ -343,6 +343,8 @@ sub update_database {
    my $sql_getkey_MD = $dbh->prepare("SELECT nextval('Metadata_MD_id_seq')");
    my $sql_insert_MD = $dbh->prepare(
       "INSERT INTO Metadata (MD_id, MT_name, MD_content) VALUES (?, ?, ?)");
+   my $sql_selectCount_DSMD = $dbh->prepare(
+      "SELECT COUNT(*) FROM DS_Has_MD WHERE DS_id = ? AND MD_id = ?");
    my $sql_insert_DSMD = $dbh->prepare(
       "INSERT INTO DS_Has_MD (DS_id, MD_id) VALUES (?, ?)");
    my $sql_insert_GAGD = $dbh->prepare(
@@ -449,9 +451,12 @@ sub update_database {
                $sql_insert_MD->execute($mdid,$mtname,$mdcontent);
                $metadata{$mdkey} = $mdid;
             }
-            eval { $sql_insert_DSMD->execute($dsid,$mdid); };
-            if ($@) {
-               die "Duplicated shared metadata ($mdkey): $@";
+            $sql_selectCount_DSMD->execute($dsid, $mdid);
+            my $count = $sql_selectCount_DSMD->fetchall_arrayref()->[0][0];
+            if ($count == 0) {
+               $sql_insert_DSMD->execute($dsid,$mdid);
+            } else {
+               write_to_log("duplicate metadata: $mdkey");
             }
          } elsif (exists($rest_metadatatypes{$mtname})) {
             $sql_getkey_MD->execute();
