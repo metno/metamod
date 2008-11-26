@@ -356,10 +356,11 @@ function getRecords ($id = '', $from = '', $until = '') {
          '', 'Metadata_Name', 'CEOS IDN DIF',
          '', 'Metadata_Version', '9.7',
          '!DS_datestamp', 'Last_DIF_Revision_Date', '',
+         '!DS_creationDate', 'DIF_Creation_Date', '',
          '', 'Private', 'False',
       );
    }
-   $query = 'SELECT DS_id, DS_name, DS_status, DS_datestamp, DS_ownertag FROM DataSet WHERE ' .
+   $query = 'SELECT DS_id, DS_name, DS_status, DS_datestamp, DS_creationDate, DS_ownertag FROM DataSet WHERE ' .
             "DS_status <= 2 AND DS_ownertag IN ([==DATASET_TAGS==]) ";
    if ($id != '') {
       $query .= "AND DS_name = '$id' ";
@@ -389,8 +390,9 @@ function getRecords ($id = '', $from = '', $until = '') {
             } else {
                $allresults[$dsid]['DS_status'] = 'true';
             }
-            $allresults[$dsid]['DS_datestamp'] = $rowarr[3];
-            $allresults[$dsid]['DS_ownertag'] = $rowarr[4];
+            $allresults[$dsid]['DS_datestamp'] = substr($rowarr[3], 0, 10);
+            $allresults[$dsid]['DS_creationDate'] = substr($rowarr[4], 0, 10);
+            $allresults[$dsid]['DS_ownertag'] = $rowarr[5];
             $allresults[$dsid]['DS_set'] = '';
          }
          $mtnames = array();
