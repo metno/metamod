@@ -1,9 +1,0 @@
-=htdocs/img/ipy-logo.gif
-=htdocs/img/ipy_panorama_small.png
-=htdocs/img/ipydis_background.jpg
-htdocs/sch/style.css
-htdocs/sch/dohelp.php
-htdocs/style.css
-htdocs/index.php
-=htdocs/qst/config/dokipy-config.txt
-=htdocs/qst/config/metamod2-meta-config.txt
