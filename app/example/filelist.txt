@@ -1,0 +1,16 @@
+htdocs/sch/style.css
+htdocs/upl/style.css
+htdocs/upl/index.html
+htdocs/style.css
+=htdocs/img/metamod_logo.png
+=htdocs/qst/config/metamod2-meta-config.txt
+etc/conf_digest_nc.xml
+etc/usererrors.conf
+staticdata/searchdata.xml
+start_services.sh
+stop_services.sh
+prepare_runtime_env.sh
+testdata/test2_synop_99710.cdl
+testdata/test1_arctic20.200611.cdl
+testdata/test2_arctic20.200611.cdl
+testdata/test1_synop_99710.cdl

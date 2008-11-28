@@ -1,0 +1,55 @@
+netcdf test2_synop_99710 {
+dimensions:
+	time = 20 ;
+	station = 1 ;
+variables:
+	float latitude(station) ;
+		latitude:long_name = "latitude" ;
+		latitude:standard_name = "latitude" ;
+		latitude:units = "degree north" ;
+	float longitude(station) ;
+		longitude:long_name = "longitude" ;
+		longitude:standard_name = "longitude" ;
+		longitude:units = "degree east" ;
+	int time(time) ;
+		time:long_name = "Time (seconds)" ;
+		time:standard_name = "time" ;
+		time:units = "seconds since 1970-01-01 00:00:00" ;
+		time:axis = "T" ;
+	float TA(time) ;
+		TA:long_name = "air_temperature" ;
+		TA:standard_name = "air_temperature" ;
+		TA:_FillValue = -999.f ;
+
+// global attributes:
+		:title = "Artificial dataset with erroneous metadata" ;
+		:institution = "ASI Another Similar Institute" ;
+		:contact = "o.godoy@met.no" ;
+		:PI_name = "Øystein Godøy" ;
+		:Conventions = "CF-1.0" ;
+		:activity_type = "Landbased station" ;
+		:topiccategory = "ClimatologyMeteorologyAtmosphere" ;
+		:project_name = "IPY/Damocles/iAOOS" ;
+		:area = "Barents Sea, Greenland Sea" ;
+		:product_name = "SYNOP" ;
+		:distribution_statement = "Free" ;
+		:history = "2007-11-10 Created" ;
+		:northernmost_latitude = 74.5167f ;
+		:westernmost_longitude = 19.0167f ;
+		:easternmost_longitude = 19.0167f ;
+		:start_date = "2005-09-01 00:00:00 UTC" ;
+		:stop_date = "2007-11-10 00:00:00 UTC" ;
+data:
+
+ latitude = 74.5167 ;
+
+ longitude = 19.0167 ;
+
+ time = 1125532800, 1125536400, 1125540000, 1125543600, 1125547200, 
+    1125550800, 1125554400, 1125558000, 1125561600, 1125565200, 1125568800, 
+    1125572400, 1125576000, 1125579600, 1125583200, 1125586800, 1125590400, 
+    1125594000, 1125597600, 1125601200 ;
+
+ TA = 5.6, 6.5, 7.1, 7.7, 8.1, 8.1, 7.8, 9.6, 6.9, 10.5, 9.3, 10.2, 7.3, 8.6, 
+    8.3, 8.2, 8.2, 8.1, 8, 7.7 ;
+}

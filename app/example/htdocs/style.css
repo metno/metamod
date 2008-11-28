@@ -1,0 +1,124 @@
+body {
+   background: #d1e0e1;
+   margin: 1em 0px;
+   padding: 0px;
+   position: auto;
+   font-family: arial, verdana, sans-serif;
+   text-align: center;
+}
+.mybody {
+   width: 901px;
+   margin: 18px auto;
+   background: #ffffff;
+   position: auto;
+   display: inline-table;
+   text-align: left;
+}
+.myfooter {
+   background-image: url([==LOCAL_URL==]/img/damocles-footer.gif);
+   background-repeat: no-repeat;
+   clear: both;
+   height: 42px;
+   display: block;
+}
+.main_structure {
+   border-left: 3px solid white;
+   border-right: 3px solid white;
+   padding: 0px;
+   background: white;
+}
+.main_menu {
+   height: 100px;
+   width: 180px;
+   border-left: 0px;
+   border-top: 0px;
+   border-right: 0px;
+   margin: 0px;
+   padding: 0px;
+}
+.mm_item {
+   display: block;
+   padding-left: 2px;
+   padding-top: 5px;
+   padding-bottom: 5px;
+   width: 185px;
+   float: left;
+   font-family: arial, verdana, sans-serif;
+   font-size: 8pt;
+   font-weight: bold;
+   text-transform: uppercase;
+   color: #0a2c94;
+   text-decoration: none;
+   border-top: none;
+   border-bottom: solid 2px #aaaaaa;
+   border-left: solid thin #a9edff;
+   border-right: solid thin #a9edff;
+}
+.mm_item:link, .mm_item:visited {
+   color: #0a2c94;
+   text-decoration: none;
+}
+.xmm_item {
+   display: block;
+   padding-top: 5px;
+   padding-bottom: 5px;
+   padding-left: 2px;
+   margin: 0px;
+   width: 185px;
+   float: left;
+   font-family: arial, verdana, sans-serif;
+   font-size: 8pt;
+   font-weight: bold;
+   text-transform: uppercase;
+   color: #0a2c94;
+   text-decoration: none;
+   border-top: none;
+   border-bottom: solid 2px #aaaaaa;
+   border-left: solid thin #a9edff;
+   border-right: solid thin #a9edff;
+}
+.heading_and_logo {
+   background: white; 
+   color: #103099;
+   text-align: left;
+   border-left: 0px;
+   border-top: 0px;
+   border-right: 0px;
+   margin: 0px;
+   padding: 0px
+}
+.heading {
+   font-size: 150%;
+   background-image: url([==LOCAL_URL==]/img/aboutheader.gif);
+   background-repeat: no-repeat;
+   color: #103099;
+   height: 37px;
+   padding: 0px;
+   padding-top: 11px;
+   padding-left: 12px;
+   margin: 0px;
+   margin-left: 5px;
+   margin-top: 15px;
+   margin-bottom: 6px;
+}
+.heading_info {
+   background: white;
+   color: black;
+   padding: 2px;
+   margin: 1px;
+   margin-left: 5px;
+   margin-bottom: 12px;
+}
+.note {
+   background: white;
+   color: #990000;
+   font-size: 100%;
+   font-weight: bold;
+   width: 95%;
+   padding: 8px;
+   border: 1px solid #103099;
+   margin: 1px;
+}
+td {margin: 0px; padding: 0px; vertical-align: top}
+th {margin: 0px; padding: 0px; vertical-align: top}
+form {margin: 0px; padding: 0px; vertical-align: top}
