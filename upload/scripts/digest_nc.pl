@@ -700,9 +700,9 @@ sub hloop {
          if (length($path) > 0) {
             $newpath = $path . '/' . $hkey;
          }
-         if ($CTR_printconf) {print STDERR substr($manyspaces,0,3*$level)};
+         if ($CTR_printconf) {print STDOUT substr($manyspaces,0,3*$level)};
          if (ref($refvalnew)) {
-            if ($CTR_printconf) {print STDERR $hkey . ":\n"};
+            if ($CTR_printconf) {print STDOUT $hkey . ":\n"};
 #         
 #       If the hash keyword is also found in %$subrhash, call the subroutine
 #       identified by that hash:
@@ -716,7 +716,7 @@ sub hloop {
 
             &hloop($refvalnew,$level+1,$newpath,$subrhash);
          } else {
-            if ($CTR_printconf) {print STDERR $hkey . ":   " . $refvalnew . "\n"};
+            if ($CTR_printconf) {print STDOUT $hkey . ":   " . $refvalnew . "\n"};
          }
       }
    } elsif (ref($refval) eq "ARRAY") {
@@ -728,8 +728,8 @@ sub hloop {
       my $i1 = 0;
       foreach my $refvalnew (@$refval) {
          my $newpath = $path . '/' . $i1;
-         if ($CTR_printconf) {print STDERR substr($manyspaces,0,3*$level)};
-         if ($CTR_printconf) {print STDERR $i1 . ":\n"};
+         if ($CTR_printconf) {print STDOUT substr($manyspaces,0,3*$level)};
+         if ($CTR_printconf) {print STDOUT $i1 . ":\n"};
 #
 #       Recursive call to hloop for array elements:
 #
@@ -737,8 +737,8 @@ sub hloop {
          $i1++;
       }
    } elsif (ref($refval) eq "SCALAR") {
-      if ($CTR_printconf) {print STDERR substr($manyspaces,0,3*$level)};
-      if ($CTR_printconf) {print STDERR ${$refval} . "\n"};
+      if ($CTR_printconf) {print STDOUT substr($manyspaces,0,3*$level)};
+      if ($CTR_printconf) {print STDOUT ${$refval} . "\n"};
    }
    return;
 };
@@ -799,10 +799,10 @@ sub parse_all {
       $ds = Metamod::Dataset->newFromFile($xml_metadata_path);
       die "cannot read dataset $xml_metadata_path: $!\n" unless $ds;
       if ($CTR_printdump == 1) {
-         print STDERR "\n----- METADATA FROM EXISTING XML FILE -----\n\n";
+         print STDOUT "\n----- METADATA FROM EXISTING XML FILE -----\n\n";
          my %metadata = $ds->getMetadata;
          my %info = $ds->getInfo;
-         print STDERR Dumper(\%info, \%metadata);
+         print STDOUT Dumper(\%info, \%metadata);
       }
    }
    my %metadata = $ds->getMetadata;
@@ -855,7 +855,7 @@ sub parse_all {
          if (exists($ref_aggr->{"rule"})) {
             my $rule = $ref_aggr->{"rule"};
             if ($CTR_printdump == 1) {
-               print STDERR "\n----- Attribute, Rule: $attname, $rule\n";
+               print STDOUT "\n----- Attribute, Rule: $attname, $rule\n";
             }
             if ("$rule" =~ m/^all_should_be_equal/) {
                &rule_all_equal($rule, $attname, $ref_aggr, \%all_globatts, \%metadata);
@@ -973,11 +973,11 @@ sub parse_all {
    $ds->writeToFile($xml_metadata_path);
 
    if ($CTR_printdump == 1) {
-      print STDERR "\n----- VARIABLES FOUND -----\n\n";
-      print STDERR Dumper(\%all_variables);
-      print STDERR "\n\n----- GLOBAL ATTRIBUTES FOUND -----\n\n";
-      print STDERR Dumper(\%all_globatts);
-      print STDERR "\n\n=================================================\n";
+      print STDOUT "\n----- VARIABLES FOUND -----\n\n";
+      print STDOUT Dumper(\%all_variables);
+      print STDOUT "\n\n----- GLOBAL ATTRIBUTES FOUND -----\n\n";
+      print STDOUT Dumper(\%all_globatts);
+      print STDOUT "\n\n=================================================\n";
    }
 };
 #
@@ -1322,9 +1322,9 @@ sub parse_file {
       $foundglobatts{$attname1} = $attval;
       if ($CTR_printnc) {
          if ($attname eq $attname1) {
-            print STDERR "Global attribute: $attname = $attval\n";
+            print STDOUT "Global attribute: $attname = $attval\n";
          } else {
-            print STDERR "Global attribute: $attname ($attname1) = $attval\n";
+            print STDOUT "Global attribute: $attname ($attname1) = $attval\n";
          }
       }
    }
@@ -1357,9 +1357,9 @@ sub parse_file {
          $foundvars{$varname}->{"attributes"}->{$attname1} = $attval;
          if ($CTR_printnc) {
             if ($attname eq $attname1) {
-               print STDERR "Variable attribute: $varname:$attname = $attval\n";
+               print STDOUT "Variable attribute: $varname:$attname = $attval\n";
             } else {
-               print STDERR "Variable attribute: $varname:$attname ($attname1) = $attval\n";
+               print STDOUT "Variable attribute: $varname:$attname ($attname1) = $attval\n";
             }
          }
          if ($attname1 eq "standard_name") {
@@ -1651,10 +1651,10 @@ sub parse_file {
       $foundglobatts{$attname} = [@values_array];
    }
    if ($CTR_printdump == 1) {
-      print STDERR "----- Content of global lists: -----\n";
-      print STDERR Dumper(\%LSH_globlists);
-      print STDERR "----- Content of global switches: -----\n";
-      print STDERR Dumper(\%LSH_globswitches);
+      print STDOUT "----- Content of global lists: -----\n";
+      print STDOUT Dumper(\%LSH_globlists);
+      print STDOUT "----- Content of global switches: -----\n";
+      print STDOUT Dumper(\%LSH_globswitches);
    }
 #
 #   Check that all mandatory global attributes are present:
