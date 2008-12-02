@@ -967,6 +967,10 @@ sub parse_all {
    }
    
    # add all metadata
+      if ($CTR_printdump == 1) {
+         print STDOUT "\n----- NEW METADATA -----\n\n";
+         print STDOUT Dumper(\%info, \%metadata);
+      }
    $ds->addMetadata(\%metadata);
 
    # write the file
@@ -1055,7 +1059,9 @@ sub rule_highlow {
          }
       }
    }
-   $ref_metadata->{$attname} = [$selectedvalue];
+   if ($selectedvalue) {
+      $ref_metadata->{$attname} = [$selectedvalue];
+   }
 };
 #
 #---------------------------------------------------------------------------------
