@@ -33,6 +33,7 @@ our $VERSION = 0.4;
 
 use strict;
 use warnings;
+use Carp qw();
 use Metamod::DatasetTransformer;
 use Metamod::DatasetTransformer::MM2;
 
@@ -114,6 +115,9 @@ sub addMetadata {
     my ($self, $metaRef) = @_;
     foreach my $name (keys %$metaRef) {
         foreach my $val (@{ $metaRef->{$name} }) {
+            if (!defined $val) {
+                Carp::carp("undefined value for metadata $name");
+            }
             my $el = $self->{docMETA}->createElementNS($self->NAMESPACE_MM2, 'metadata');
             $el->setAttribute('name', $name);
             $el->appendChild($self->{docMETA}->createTextNode($val));
