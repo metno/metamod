@@ -117,6 +117,7 @@ sub addMetadata {
         foreach my $val (@{ $metaRef->{$name} }) {
             if (!defined $val) {
                 Carp::carp("undefined value for metadata $name");
+                next;
             }
             my $el = $self->{docMETA}->createElementNS($self->NAMESPACE_MM2, 'metadata');
             $el->setAttribute('name', $name);
