@@ -47,6 +47,7 @@ my $appdir = $ARGV[0];
 my $configfile = $appdir . '/master_config.txt';
 my $appfilelist = $appdir . '/filelist.txt';
 my %conf;
+my $missing_variables = 0;
 #
 #  Open file for reading
 #
@@ -199,6 +200,10 @@ foreach my $filelistpath (@flistpathes) {
    }
    close (FILES);
 }
+if ($missing_variables > 0) {
+   print "NOTE: All [==...==] constructs found that were not defined in the configuration file\n" .
+                "      were substituted with empty values\n";
+}
 #
 #----------------------------------------------------------------------
 sub substcopy {
@@ -270,14 +275,13 @@ sub substituteval {
          }
          else {
             if (length($ifil) > 0) {
-               print STDERR "WARNING: In $ifil, the following line contains [==" . $vname . "==],\n" .
-                            "         but no value for $vname is found in $configfile:\n\n";
+               print "WARNING: [==" . $vname . "==] in $ifil not found\n";
             } else {
-               print STDERR "WARNING: No value found in $configfile for:\n";
+               print "WARNING: [==" . $vname . "==] not found:\n";
+               print "         $textline\n";
             }
-            print STDERR "         $textline\n\n" .
-                         "         An empty string is substituted for [==" . $vname . "==]\n";
             $textline =~ s/$reg//mg;
+            $missing_variables++;
          }
          $substituted = 1;
          $scount++;

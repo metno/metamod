@@ -29,6 +29,12 @@ fi
 #
 #  Initialise webrun directory:
 #
+if [ '[==WEBRUN_DIRECTORY==]' == '' ]; then
+   echo "ERROR: WEBRUN_DIRECTORY must be defined in the configuration file"
+   echo "exit prepare_runtime_env.sh"
+   echo ""
+   exit
+fi
 mkdir -p [==WEBRUN_DIRECTORY==]
 if [ -d [==TARGET_DIRECTORY==]/htdocs/upl ]; then
    mkdir -p [==WEBRUN_DIRECTORY==]/u0
@@ -66,13 +72,22 @@ if [ -d [==TARGET_DIRECTORY==]/htdocs/upl ]; then
 #
 #  Initialize upload and OPeNDAP directories:
 #
-   mkdir -p [==UPLOAD_DIRECTORY==]
-   mkdir -p [==UPLOAD_FTP_DIRECTORY==]
-   mkdir -p [==OPENDAP_DIRECTORY==]
-   if [ ! -f [==OPENDAP_DIRECTORY==]/.htaccess ]; then
-      cat >[==OPENDAP_DIRECTORY==]/.htaccess <<EOF
+   if [ '[==UPLOAD_DIRECTORY==]' != '' ]; then
+      mkdir -p [==UPLOAD_DIRECTORY==] 
+   else
+      echo "ERROR: UPLOAD_DIRECTORY must be defined in the configuration file for UPLOAD applications"
+      echo "exit prepare_runtime_env.sh"
+      echo ""
+      exit
+   fi
+   if [ '[==UPLOAD_FTP_DIRECTORY==]' != '' ]; then mkdir -p [==UPLOAD_FTP_DIRECTORY==]; fi
+   if [ '[==OPENDAP_DIRECTORY==]' != '' ]; then
+      mkdir -p [==OPENDAP_DIRECTORY==]
+      if [ ! -f [==OPENDAP_DIRECTORY==]/.htaccess ]; then
+         cat >[==OPENDAP_DIRECTORY==]/.htaccess <<EOF
 Order Deny,Allow
 Deny from all
 EOF
+      fi
    fi
 fi
