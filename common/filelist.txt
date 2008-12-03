@@ -1,3 +1,4 @@
+prepare_runtime_env.sh
 htdocs/adm/index.php
 htdocs/funcs/mmLogging.inc
 =htdocs/funcs/readDataset.inc
