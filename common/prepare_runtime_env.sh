@@ -72,14 +72,7 @@ if [ -d [==TARGET_DIRECTORY==]/htdocs/upl ]; then
 #
 #  Initialize upload and OPeNDAP directories:
 #
-   if [ '[==UPLOAD_DIRECTORY==]' != '' ]; then
-      mkdir -p [==UPLOAD_DIRECTORY==] 
-   else
-      echo "ERROR: UPLOAD_DIRECTORY must be defined in the configuration file for UPLOAD applications"
-      echo "exit prepare_runtime_env.sh"
-      echo ""
-      exit
-   fi
+   if [ '[==UPLOAD_DIRECTORY==]' != '' ]; then mkdir -p [==UPLOAD_DIRECTORY==]; fi
    if [ '[==UPLOAD_FTP_DIRECTORY==]' != '' ]; then mkdir -p [==UPLOAD_FTP_DIRECTORY==]; fi
    if [ '[==OPENDAP_DIRECTORY==]' != '' ]; then
       mkdir -p [==OPENDAP_DIRECTORY==]

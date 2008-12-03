@@ -1,4 +1,6 @@
 prepare_runtime_env.sh
+start_services.sh
+stop_services.sh
 htdocs/adm/index.php
 htdocs/funcs/mmLogging.inc
 =htdocs/funcs/readDataset.inc
