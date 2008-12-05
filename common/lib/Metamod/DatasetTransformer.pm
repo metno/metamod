@@ -45,7 +45,7 @@ use constant XMLParser => new XML::LibXML();
 use constant XSLTParser => new XML::LibXSLT();
 
 sub new {
-    die "'new' not implemented yet: new(\$dataStr)\n";
+    die "'new' not implemented yet in $_[0]: new(\$dataStr)\n";
 }
 
 sub getBasename {
@@ -116,15 +116,15 @@ sub getPlugins {
 }
 
 sub test {
-    die "'test' not implemented yet\n";
+    die "'test' not implemented in $_[0] yet\n";
 }
 
 sub transform {
-    die "'transform' not implemented yet\n";
+    die "'transform' not implemented in $_[0] yet\n";
 }
 
 sub originalFormat {
-    die "'originalFormat' not implemented yet\n";
+    die "'originalFormat' not implemented in $_[0] yet\n";
 }
 
 1;
