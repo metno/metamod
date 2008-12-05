@@ -190,7 +190,7 @@ class MM_Dataset {
 			foreach ($values as $value) {
 				$el = $this->domMM2->createElementNS($this->namespaceMM2,'metadata');
 				$el->setAttribute("name", $name);
-				$txt = $this->domMM2->createTextNode($value);
+				$txt = $this->domMM2->createTextNode(utf8_encode($value));
 				$el->appendChild($txt);
 				$node->appendChild($el);
 			}
