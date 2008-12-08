@@ -555,9 +555,9 @@ function fmForm2XmlHtml(MM_Dataset $ds) {
     	if (isset($_POST[$st])) {
     		if ($st != "quadtree_nodes") {
     			if ($st == "drpath") {
-    				$info["name"] = htmlspecialchars($_POST[$st]);
+    				$info["name"] = $_POST[$st];
     			} else {
-    				$info[$st] = htmlspecialchars($_POST[$st]);
+    				$info[$st] = $_POST[$st];
     			}
     		}
     	}   
@@ -576,18 +576,13 @@ function fmForm2XmlHtml(MM_Dataset $ds) {
 		if ($mykey == "Submit" || $mykey == "cmd" || $mykey == "institutionId" || $mykey == "uploadDirectory" || $mykey == "drpath") {
 	    	continue;
 		}
-		# escape user-entered values
-		$mykey = htmlspecialchars($mykey);
-    	if (is_array($myvalue)) {
-			foreach ($myvalue as $myitem => $singleval) {
-		   		$myvalue[$myitem] = htmlspecialchars($singleval);
-			}
-    	} else {
-			$myvalue = htmlspecialchars($myvalue);
-    	}
 	
 		if (is_array($myvalue)) {
     		if (! isset($specialTags[$mykey])) {
+    			$xmlValues = array();
+    			foreach ( $myvalue as $value ) {
+    				$xmlValues[] = ereg_replace("\r", "",$value);
+				}
     			$ds->addMetadata(array($mykey => $myvalue));
     		}			
 	    	$html .= "<b>$mykey</b><br/>\n";
@@ -596,7 +591,8 @@ function fmForm2XmlHtml(MM_Dataset $ds) {
 	    	}
 		} else {
 			if (! isset($specialTags[$mykey])) {
-				$ds->addMetadata(array($mykey => array($myvalue)));
+				# add metadata, remove eventual carriages returns
+				$ds->addMetadata(array($mykey => array(ereg_replace("\r", "",$myvalue))));
 			}
 	    	$html .= "<b>$mykey</b><br />\n<p>".wordwrap(ereg_replace("\n","<br />\n",$myvalue),70)."</p>\n";
 		}
@@ -753,16 +749,14 @@ function fmcheckform($outputdst, $filename) {
 			if ($mykey == "Submit" || $mykey == "cmd") {
 	    		continue;
 			}
-			# escape user-entered values
-			$mykey = htmlspecialchars($mykey);
+		    # write user-entered values to hidden
+			$mykey = $mykey;
     		if (is_array($myvalue)) {
     			$myHiddenValue = array();
 				foreach ($myvalue as $myitem => $singleval) {
-		    		$myvalue[$myitem] = htmlspecialchars($singleval);
 		    		$myHiddenValue[$myitem] = $myvalue[$myitem]; 
 				}
     		} else {
-				$myvalue = htmlspecialchars($myvalue);
 				$myHiddenValue = $myvalue; # not modified value
     		}
 			echo(fmcreaterecordstart());

@@ -39,7 +39,7 @@ session_start(  );
 
 <head>
 <META http-equiv="Generator" content="Øystein Godøy, METNO/FOU">
-<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <style type="text/css">
 .fmerrmsg {
     color: red;
