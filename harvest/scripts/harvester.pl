@@ -33,6 +33,7 @@ use strict;
 use LWP::UserAgent;
 use lib qw([==TARGET_DIRECTORY==]/lib);
 use quadtreeuse;
+use mmTtime;
 use XML::LibXML;
 use Metamod::Dataset;
 use Metamod::ForeignDataset;
@@ -147,7 +148,7 @@ if ($@) {
 sub do_harvest {
    my $previous_day = -1;
    while (-e $continue_oai_harvest) {
-      my @ltime = localtime(&my_time());
+      my @ltime = localtime(mmTtime::ttime());
       my $newday = $ltime[3]; # 1-31
       my $current_hour = $ltime[2];
       if ($newday == $previous_day || $current_hour < [==HARVEST_HOUR==]) {
@@ -240,7 +241,7 @@ sub do_harvest {
             $new_status_content = $status_content;
          }
          {
-            my @utctime = gmtime(&my_time());
+            my @utctime = gmtime(mmTtime::ttime());
             my $year = 1900 + $utctime[5];
             my $mon = $utctime[4]; # 0-11
             my $mday = $utctime[3]; # 1-31
@@ -390,21 +391,21 @@ sub makesane {
 #
 #-----------------------------------------------------------------------
 #
-sub my_time {
-   my $realtime;
-   if (scalar @_ == 0) {
-      $realtime = time;
-   } else {
-      $realtime = $_[0];
-   }
-   my $scaling = [==TEST_IMPORT_SPEEDUP==];
-   if ($scaling <= 1) {
-      return $realtime;
-   } else {
-      my $basistime = [==TEST_IMPORT_BASETIME==];
-      return $basistime + ($realtime - $basistime)*$scaling;
-   }
-};
+# sub my_time {
+#   my $realtime;
+#   if (scalar @_ == 0) {
+#      $realtime = time;
+#   } else {
+#      $realtime = $_[0];
+#   }
+#   my $scaling = [==TEST_IMPORT_SPEEDUP==];
+#   if ($scaling <= 1) {
+#      return $realtime;
+#   } else {
+#      my $basistime = [==TEST_IMPORT_BASETIME==];
+#      return $basistime + ($realtime - $basistime)*$scaling;
+#   }
+# };
 #
 #-----------------------------------------------------------------------
 #

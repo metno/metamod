@@ -3,6 +3,7 @@ start_services.sh
 stop_services.sh
 htdocs/adm/index.php
 htdocs/funcs/mmLogging.inc
+htdocs/funcs/mmTtime.inc
 =htdocs/funcs/readDataset.inc
 =htdocs/funcs/mmDataset.inc
 =schema/oldDataset2Dataset.xslt
@@ -17,3 +18,4 @@ lib/Metamod/DatasetTransformer/DIF.pm
 lib/Metamod/Dataset.pm
 lib/Metamod/ForeignDataset.pm
 lib/quadtreeuse.pm
+lib/mmTtime.pm

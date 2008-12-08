@@ -39,6 +39,7 @@ use Fcntl qw(:DEFAULT :flock); # import LOCK_* constants
 use POSIX qw();
 use XML::LibXML();
 use UNIVERSAL qw();
+use mmTtime;
 
 use constant NAMESPACE_DS => 'http://www.met.no/schema/metamod/dataset';
 use constant DATASET => << 'EOT';
@@ -60,7 +61,7 @@ sub newFromDoc {
     my $parser = Metamod::DatasetTransformer->XMLParser;
     unless ($dataset) {
         $dataset = $class->DATASET();
-        my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime());
+        my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime(mmTtime::ttime()));
         $dataset =~ s/\Q1970-01-01T00:00:00Z\E/$sDate/g; # changes datestamp and creationDate
     }
     my $docDS = UNIVERSAL::isa($dataset, 'XML::LibXML::Document') ? $dataset : $parser->parse_string($dataset);

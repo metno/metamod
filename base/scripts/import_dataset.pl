@@ -35,6 +35,7 @@ use Metamod::Dataset;
 use Data::Dumper;
 use DBI;
 use File::Spec qw();
+use mmTtime;
 #
 #  Import datasets from XML files into the database.
 #
@@ -125,7 +126,7 @@ sub process_xml_loop {
 #      
 #        Find current time
 #      
-      my @timearr = localtime(&my_time());
+      my @timearr = localtime(mmTtime::ttime());
       my $hour = $timearr[2]; # 0-23
       my $min = $timearr[1]; # 0-59
 #
@@ -273,7 +274,7 @@ sub update_database {
 #
 #  Create the datestamp for the current date:
 #
-   my @timearr = localtime(&my_time());
+   my @timearr = localtime(mmTtime::ttime());
    my $datestamp = sprintf('%04d-%02d-%02d',1900+$timearr[5],1+$timearr[4],$timearr[3]);
 #
 #  Create hash with all existing basic keys in the database.
@@ -506,21 +507,21 @@ sub update_database {
       }
    }
 }
-sub my_time {
-   my $realtime;
-   if (scalar @_ == 0) {
-      $realtime = time;
-   } else {
-      $realtime = $_[0];
-   }
-   my $scaling = [==TEST_IMPORT_SPEEDUP==];
-   if ($scaling <= 1) {
-      return $realtime;
-   } else {
-      my $basistime = [==TEST_IMPORT_BASETIME==];
-      return $basistime + ($realtime - $basistime)*$scaling;
-   }
-};
+# sub my_time {
+#    my $realtime;
+#    if (scalar @_ == 0) {
+#       $realtime = time;
+#    } else {
+#       $realtime = $_[0];
+#    }
+#    my $scaling = [==TEST_IMPORT_SPEEDUP==];
+#    if ($scaling <= 1) {
+#       return $realtime;
+#    } else {
+#       my $basistime = [==TEST_IMPORT_BASETIME==];
+#       return $basistime + ($realtime - $basistime)*$scaling;
+#    }
+# };
 sub convert_to_htmlentities {
    my ($str,$conversions) = @_;
    my @contarr = split(//,$str);

@@ -33,6 +33,7 @@ use strict;
 use warnings;
 use Carp qw(carp croak);
 use quadtreeuse;
+use mmTtime;
 #use Dataset; # required later, so we don't have circular 'use'
 
 use 5.6.0;
@@ -152,7 +153,7 @@ sub transform {
         foreach my $date (qw(timestamp creationDate)) { # timestamp is reference for other dates if not existing
             unless ($info{$date}) {
                 if ($date eq 'timestamp') {
-                    $info{$date} = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime());
+                    $info{$date} = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime(mmTtime::ttime()));
                 } else {
                     $info{$date} = $info{timestamp};
                 }

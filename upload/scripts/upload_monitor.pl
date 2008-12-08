@@ -30,11 +30,13 @@
 #---------------------------------------------------------------------------- 
 #
 use strict;
+use lib qw([==TARGET_DIRECTORY==]/scripts [==TARGET_DIRECTORY==]/lib);
 use File::Copy;
 use File::Path;
 use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 use Data::Dumper;
 use Mail::Mailer;
+use mmTtime;
 $| = 1;
 #
 #  upload_monitor.pl
@@ -286,12 +288,12 @@ sub main_loop {
 #  be perfomed. 
 #
    &get_dataset_institution(\%dataset_institution);
-   my @ltime = localtime(&my_time());
+   my @ltime = localtime(mmTtime::ttime());
    my $current_day = $ltime[3]; # 1-31
    my $hour_finished = -1;
    $file_in_error_counter = 1;
    while (-e $path_continue_monitor) {
-      @ltime = localtime(&my_time());
+      @ltime = localtime(mmTtime::ttime());
       my $newday = $ltime[3]; # 1-31
       my $current_hour = $ltime[2]; # 0-23
       if ($current_day != $newday) {
@@ -305,7 +307,7 @@ sub main_loop {
          &get_dataset_institution(\%dataset_institution);
          &ftp_process_hour(\%ftp_events,$current_hour);
          &web_process_uploaded();
-         @ltime = localtime(&my_time());
+         @ltime = localtime(mmTtime::ttime());
          $hour_finished = $ltime[2]; # 0-23
       }
       sleep($sleeping_seconds);
@@ -368,7 +370,7 @@ sub ftp_process_hour {
          &syserror("SYS","find_fails", "", "ftp_process_hour", "");
          next;
       }
-      my $current_epoch_time = &my_time(); 
+      my $current_epoch_time = mmTtime::ttime(); 
       my $age_seconds = 60*60*24;
       %files_to_process = ();
       foreach my $filename (@files_found) {
@@ -381,7 +383,7 @@ sub ftp_process_hour {
 #             Get last modification time of file
 #             (seconds since the epoch)
 #            
-            my $modification_time = &my_time($file_stat[9]);
+            my $modification_time = mmTtime::ttime($file_stat[9]);
             if ($current_epoch_time - $modification_time < $age_seconds) {
                $age_seconds = $current_epoch_time - $modification_time;
             }
@@ -427,8 +429,8 @@ sub ftp_process_hour {
 #             Get last modification time of file
 #             (seconds since the epoch)
 #            
-               my $current_epoch_time = &my_time(); 
-               my $modification_time = &my_time($file_stat[9]);
+               my $current_epoch_time = mmTtime::ttime(); 
+               my $modification_time = mmTtime::ttime($file_stat[9]);
                if ($current_epoch_time - $modification_time > 60*60*5) {
                   &syserror("SYS","file_with_no_dataset", $filename, "ftp_process_hour", "");
                }
@@ -460,7 +462,7 @@ sub web_process_uploaded {
       }
    }
    foreach my $dataset_name (keys %datasets) {
-      my $current_epoch_time = &my_time(); 
+      my $current_epoch_time = mmTtime::ttime(); 
       my $age_seconds = 60*$upload_age_threshold + 1;
       %files_to_process = ();
       foreach my $filename (@{$datasets{$dataset_name}}) {
@@ -473,7 +475,7 @@ sub web_process_uploaded {
 #             Get last modification time of file
 #             (seconds since the epoch)
 #            
-            my $modification_time = &my_time($file_stat[9]);
+            my $modification_time = mmTtime::ttime($file_stat[9]);
             if ($current_epoch_time - $modification_time < $age_seconds) {
                $age_seconds = $current_epoch_time - $modification_time;
             }
@@ -1408,7 +1410,7 @@ sub clean_up_problem_dir {
 #       Find current time (epoch)
 #       as number of seconds since the epoch (1970)
 #      
-   my $current_epoch_time = &my_time(); 
+   my $current_epoch_time = mmTtime::ttime(); 
    my $age_seconds = 60*60*24*$days_to_keep_errfiles;
    foreach my $filename (@files_found) {
       if (-r $filename) {
@@ -1420,7 +1422,7 @@ sub clean_up_problem_dir {
 #             Get last modification time of file
 #             (seconds since the epoch)
 #            
-         my $modification_time = &my_time($file_stat[9]);
+         my $modification_time = mmTtime::ttime($file_stat[9]);
          if ($current_epoch_time - $modification_time > $age_seconds) {
             if (unlink($filename) == 0) {
                &syserror("SYS","Unlink file $filename did not succeed", "", "clean_up_problem_dir", "");
@@ -1433,7 +1435,7 @@ sub clean_up_problem_dir {
 #---------------------------------------------------------------------------------
 #
 sub clean_up_repository {
-   my $current_epoch_time = &my_time(); 
+   my $current_epoch_time = mmTtime::ttime(); 
    foreach my $dataset (keys %all_ftp_datasets) {
       my $days_to_keep_files = $all_ftp_datasets{$dataset};
       if ($days_to_keep_files > 0) {
@@ -1454,7 +1456,7 @@ sub clean_up_repository {
 #             Get last modification time of file
 #             (seconds since the epoch)
 #            
-            my $modification_time = &my_time($file_stat[9]);
+            my $modification_time = mmTtime::ttime($file_stat[9]);
             if ($current_epoch_time - $modification_time > 60*60*24*$days_to_keep_files) {
                my @cdlcontent = &shcommand_array("ncdump -h $fname");
                if (length($shell_command_error) > 0) {
@@ -1612,7 +1614,7 @@ sub get_date_and_time_string {
    if (scalar @_ > 0) {
       @ta = localtime($_[0]);
    } else {
-      @ta = localtime(&my_time());
+      @ta = localtime(mmTtime::ttime());
    }
    my $year = 1900 + $ta[5];
    my $mon = $ta[4] + 1; # 1-12
@@ -1638,8 +1640,8 @@ sub move_to_problemdir {
    if (scalar @file_stat == 0) {
       die "In move_to_problemdir: Could not stat $uploadname\n";
    }
-   my $modification_time = &my_time($file_stat[9]);
-   my @ltime = localtime(&my_time());
+   my $modification_time = mmTtime::ttime($file_stat[9]);
+   my @ltime = localtime(mmTtime::ttime());
    my $current_day = $ltime[3]; # 1-31
 
    my $destname = sprintf('%02d%04d',$current_day,$file_in_error_counter++) . "_" .
@@ -1664,21 +1666,21 @@ sub move_to_problemdir {
 #
 #---------------------------------------------------------------------------------
 #
-sub my_time {
-   my $realtime;
-   if (scalar @_ == 0) {
-      $realtime = time;
-   } else {
-      $realtime = $_[0];
-   }
-   my $scaling = [==TEST_IMPORT_SPEEDUP==];
-   if ($scaling <= 1) {
-      return $realtime;
-   } else {
-      my $basistime = [==TEST_IMPORT_BASETIME==];
-      return $basistime + ($realtime - $basistime)*$scaling;
-   }
-};
+# sub my_time {
+#    my $realtime;
+#    if (scalar @_ == 0) {
+#       $realtime = time;
+#    } else {
+#       $realtime = $_[0];
+#    }
+#    my $scaling = [==TEST_IMPORT_SPEEDUP==];
+#    if ($scaling <= 1) {
+#       return $realtime;
+#    } else {
+#       my $basistime = [==TEST_IMPORT_BASETIME==];
+#       return $basistime + ($realtime - $basistime)*$scaling;
+#    }
+# };
 #
 #---------------------------------------------------------------------------------
 #
