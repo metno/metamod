@@ -1138,6 +1138,8 @@ sub notify_web_system {
    if ($progress_report == 1) {
       print "notify_web_system: $code,$dataset_name\n";
       print "                   $path_to_errors_html\n";
+      print "                   Uploaded basenames:\n";
+      print Dumper(\@uploaded_basenames);
    }
    my %file_sizes = ();
    my $i1 = 0;
@@ -1229,7 +1231,6 @@ sub notify_web_system {
       if ($progress_report == 1) {
          print "                   rest_basenames:\n";
          print Dumper(\@rest_basenames);
-         print "-notify_web_system\n";
       }
       if (scalar @rest_basenames > 0) {
 #   
@@ -1255,7 +1256,7 @@ sub notify_web_system {
                                  $path_to_errors_html . '" />';
                      push (@new_file_content_arr,$new_line);
                   }
-                  my $added_new_lines = 1;
+                  $added_new_lines = 1;
                }
             }
             push (@new_file_content_arr,$line);
@@ -1264,6 +1265,9 @@ sub notify_web_system {
          open (USERFILE,">$ownerfile");
          print USERFILE $new_file_content;
          close (USERFILE);
+      }
+      if ($progress_report == 1) {
+         print "-notify_web_system\n";
       }
    } else {
       &syserror("SYS","dataset_not_owned_by_any_user", "", "notify_web_system", "");
