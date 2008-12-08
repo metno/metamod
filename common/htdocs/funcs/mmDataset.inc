@@ -59,7 +59,7 @@ class MM_Dataset {
 	function __construct($inputDS = "", $inputMM2 = "", $input_is_data = false) {
 			$sDate = gmstrftime("%Y-%m-%dT%H:%M:%SZ",mmTtime::ttime());
 			$dataDS =
-'<?xml version="1.0" encoding="iso8859-1" ?>
+'<?xml version="1.0" encoding="UTF-8" ?>
 <?xml-stylesheet href="dataset.xsl" type="text/xsl"?>
 <dataset
    xmlns="http://www.met.no/schema/metamod/dataset"
@@ -68,7 +68,7 @@ class MM_Dataset {
   <info name="" status="active" creationDate="'.$sDate.'" datestamp="'.$sDate.'" ownertag="" metadataFormat="MM2"/>
 </dataset>';
 			$dataMM2 =
-'<?xml version="1.0" encoding="iso8859-1"?>
+'<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="MM2.xsl" type="text/xsl"?>
 <MM2
    xmlns="http://www.met.no/schema/metamod/MM2"
@@ -191,7 +191,7 @@ class MM_Dataset {
 			foreach ($values as $value) {
 				$el = $this->domMM2->createElementNS($this->namespaceMM2,'metadata');
 				$el->setAttribute("name", $name);
-				$txt = $this->domMM2->createTextNode(utf8_encode($value));
+				$txt = $this->domMM2->createTextNode($value);
 				$el->appendChild($txt);
 				$node->appendChild($el);
 			}
