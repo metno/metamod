@@ -667,7 +667,7 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
 	$ds->write($outputfileBase);
 
     $mailheader = 'MIME-Version: 1.0' . "\r\n";
-    $mailheader .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+    $mailheader .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
     $mailheader .= 'From: '.$mysender. "\r\n" .
 	'Reply-To: '.$mysender . "\r\n" .
 	'X-Mailer: PHP/' . phpversion();
