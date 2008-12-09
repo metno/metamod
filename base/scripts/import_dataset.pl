@@ -75,7 +75,7 @@ if (scalar @ARGV == 1) {
 #  Connect to PostgreSQL database:
 #
 my $dbname = "[==DATABASE_NAME==]";
-my $user = "admin";
+my $user = "[==PG_ADMIN_USER==]";
 my $dbh = DBI->connect("dbi:Pg:dbname=" . $dbname . " [==PG_CONNECTSTRING_PERL==]", $user, "");
 #
 #  Use full transaction mode. The changes has to be committed or rolled back:

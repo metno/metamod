@@ -33,7 +33,7 @@
 </head><body>
 <?php
 include "gettables.php";
-$mmDbConnection = @pg_Connect ("dbname=[==DATABASE_NAME==] user=admin [==PG_CONNECTSTRING_PHP==]");
+$mmDbConnection = @pg_Connect ("dbname=[==DATABASE_NAME==] user=[==PG_ADMIN_USER==] [==PG_CONNECTSTRING_PHP==]");
 if ( $mmDbConnection ) {
 ?>
 <p>Connection OK</p>

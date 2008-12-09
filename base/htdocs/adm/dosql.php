@@ -33,7 +33,7 @@
 </head><body>
 <?php
 if (array_key_exists("sqlsentence", $_POST)) {
-   $mmDbConnection = @pg_Connect ("dbname=[==DATABASE_NAME==] user=admin [==PG_CONNECTSTRING_PHP==]");
+   $mmDbConnection = @pg_Connect ("dbname=[==DATABASE_NAME==] user=[==PG_ADMIN_USER==] [==PG_CONNECTSTRING_PHP==]");
    if ( $mmDbConnection ) {
       $sqlsentence = stripslashes($_POST["sqlsentence"]);
       echo "<p>Connection OK</p>\n";

@@ -201,7 +201,7 @@ $METADATAFORMATS = 	array (
 
 // change according to your local DB setup.
 $DB_HOST   = 'localhost';
-$DB_USER   = 'admin';
+$DB_USER   = '[==PG_ADMIN_USER==]';
 $DB_PASSWD = '';
 $DB_NAME   = 'oaipmh';												           
 

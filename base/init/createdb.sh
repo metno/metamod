@@ -3,10 +3,10 @@ DBNAME=[==DATABASE_NAME==]
 PSQL=[==PSQL==]
 CREATEDB=[==CREATEDB==]
 DROPDB=[==DROPDB==]
-$DROPDB -U admin [==PG_CONNECTSTRING_SHELL==] $DBNAME
-$CREATEDB -E UTF-8 -U admin [==PG_CONNECTSTRING_SHELL==] $DBNAME
+$DROPDB -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] $DBNAME
+$CREATEDB -E UTF-8 -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] $DBNAME
 echo "----------------- Database $DBNAME created ------------------"
-$PSQL -a -U admin [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<EOF
+$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<EOF
 
 CREATE TABLE DataSet (
    DS_id              SERIAL,
@@ -20,7 +20,7 @@ CREATE TABLE DataSet (
    DS_filePath        VARCHAR(1024),
    PRIMARY KEY (DS_id)
 );
-GRANT SELECT ON DataSet TO webuser;
+GRANT SELECT ON DataSet TO [==PG_WEB_USER==];
 
 CREATE TABLE SearchCategory (
    SC_id              INTEGER       NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE SearchCategory (
    SC_fnc             VARCHAR(9999) NOT NULL,
    PRIMARY KEY (SC_id)
 );
-GRANT SELECT ON SearchCategory TO webuser;
+GRANT SELECT ON SearchCategory TO [==PG_WEB_USER==];
 
 CREATE TABLE HierarchicalKey (
    HK_id              SERIAL,
@@ -39,7 +39,7 @@ CREATE TABLE HierarchicalKey (
    UNIQUE (SC_id, HK_parent, HK_name),
    PRIMARY KEY (HK_id)
 );
-GRANT SELECT ON HierarchicalKey TO webuser;
+GRANT SELECT ON HierarchicalKey TO [==PG_WEB_USER==];
 
 CREATE TABLE BasicKey (
    BK_id              SERIAL,
@@ -48,21 +48,21 @@ CREATE TABLE BasicKey (
    UNIQUE (SC_id, BK_name),
    PRIMARY KEY (BK_id)
 );
-GRANT SELECT ON BasicKey TO webuser;
+GRANT SELECT ON BasicKey TO [==PG_WEB_USER==];
 
 CREATE TABLE HK_Represents_BK (
    HK_id              INTEGER       NOT NULL REFERENCES HierarchicalKey ON DELETE CASCADE,
    BK_id              INTEGER       NOT NULL REFERENCES BasicKey ON DELETE CASCADE,
    PRIMARY KEY (HK_id, BK_id)
 );
-GRANT SELECT ON HK_Represents_BK TO webuser;
+GRANT SELECT ON HK_Represents_BK TO [==PG_WEB_USER==];
 
 CREATE TABLE BK_Describes_DS (
    BK_id              INTEGER       NOT NULL REFERENCES BasicKey ON DELETE CASCADE,
    DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
    PRIMARY KEY (BK_id, DS_id)
 );
-GRANT SELECT ON BK_Describes_DS TO webuser;
+GRANT SELECT ON BK_Describes_DS TO [==PG_WEB_USER==];
 
 CREATE TABLE NumberItem (
    SC_id              INTEGER       NOT NULL REFERENCES SearchCategory ON DELETE CASCADE,
@@ -71,28 +71,28 @@ CREATE TABLE NumberItem (
    DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
    PRIMARY KEY (SC_id, NI_from, NI_to, DS_id)
 );
-GRANT SELECT ON NumberItem TO webuser;
+GRANT SELECT ON NumberItem TO [==PG_WEB_USER==];
 
 CREATE TABLE GeographicalArea (
    GA_id              SERIAL,
    GA_name            VARCHAR(9999),
    PRIMARY KEY (GA_id)
 );
-GRANT SELECT ON GeographicalArea TO webuser;
+GRANT SELECT ON GeographicalArea TO [==PG_WEB_USER==];
 
 CREATE TABLE GA_Contains_GD (
    GA_id              INTEGER       NOT NULL REFERENCES GeographicalArea ON DELETE CASCADE,
    GD_id              VARCHAR(9999) NOT NULL,
    PRIMARY KEY (GA_id, GD_id)
 );
-GRANT SELECT ON GA_Contains_GD TO webuser;
+GRANT SELECT ON GA_Contains_GD TO [==PG_WEB_USER==];
 
 CREATE TABLE GA_Describes_DS (
    GA_id              INTEGER       NOT NULL,
    DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
    PRIMARY KEY (GA_id, DS_id)
 );
-GRANT SELECT ON GA_Describes_DS TO webuser;
+GRANT SELECT ON GA_Describes_DS TO [==PG_WEB_USER==];
 
 CREATE TABLE MetadataType (
    MT_name            VARCHAR(99),
@@ -100,7 +100,7 @@ CREATE TABLE MetadataType (
    MT_def             VARCHAR(9999) NOT NULL,
    PRIMARY KEY (MT_name)
 );
-GRANT SELECT ON MetadataType TO webuser;
+GRANT SELECT ON MetadataType TO [==PG_WEB_USER==];
 
 CREATE TABLE Metadata (
    MD_id              SERIAL,
@@ -108,14 +108,14 @@ CREATE TABLE Metadata (
    MD_content         VARCHAR(99999) NOT NULL,
    PRIMARY KEY (MD_id)
 );
-GRANT SELECT ON Metadata TO webuser;
+GRANT SELECT ON Metadata TO [==PG_WEB_USER==];
 
 CREATE TABLE DS_Has_MD (
    DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
    MD_id              INTEGER       NOT NULL REFERENCES Metadata ON DELETE CASCADE,
    PRIMARY KEY (DS_id, MD_id)
 );
-GRANT SELECT ON DS_Has_MD TO webuser;
+GRANT SELECT ON DS_Has_MD TO [==PG_WEB_USER==];
 
 CREATE TABLE Sessions (
    sessionid          VARCHAR(9999)NOT NULL,
@@ -123,7 +123,7 @@ CREATE TABLE Sessions (
    sessionstate       VARCHAR(99999) NOT NULL,
    PRIMARY KEY (sessionid)
 );
-GRANT ALL ON Sessions TO webuser;
+GRANT ALL ON Sessions TO [==PG_WEB_USER==];
 \q
 EOF
 date +'%Y-%m-%d %H:%M Database re-initialized, dynamic tables created' >>[==LOGFILE==]

@@ -131,7 +131,7 @@ if (strpos($mmDebug,"GET") !== false) {
    echo '==================================<BR />';
 }
 
-   $mmDbConnection = @pg_Connect ("dbname=[==DATABASE_NAME==] user=webuser [==PG_CONNECTSTRING_PHP==]");
+   $mmDbConnection = @pg_Connect ("dbname=[==DATABASE_NAME==] user=[==PG_WEB_USER==] [==PG_CONNECTSTRING_PHP==]");
    if ( !$mmDbConnection ) {
        mmPutLog("Error. Could not connect to database: $php_errormsg");
        $mmErrorMessage = "Error: Could not connect to database";

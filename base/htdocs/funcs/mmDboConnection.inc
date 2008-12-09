@@ -41,7 +41,7 @@
  * @return DBO-connection
  * @throws DBOException
  */
-function getDBOConnection($user="webuser", $password="") {
+function getDBOConnection($user="[==PG_WEB_USER==]", $password="") {
 	static $mmDBOConnection = array();
 	if (! isset($mmDBOConnection[$user])) {
 		$mmDBOConnection[$user] = new DBO("pgsql:"."[==PG_CONNECTSTRING_PERL==]", $user, $password);
