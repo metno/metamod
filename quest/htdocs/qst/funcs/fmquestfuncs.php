@@ -587,14 +587,14 @@ function fmForm2XmlHtml(MM_Dataset $ds) {
     		}			
 	    	$html .= "<b>$mykey</b><br/>\n";
 	    	foreach ($myvalue as $singleitem) {
-				$html .= "<p>".wordwrap(ereg_replace("\n","<br />\n",$singleitem."<br />"),70)."</p>\n";
+				$html .= "<p>".wordwrap(ereg_replace("\n","<br />\n",htmlspecialchars($singleitem)."<br />"),70)."</p>\n";
 	    	}
 		} else {
 			if (! isset($specialTags[$mykey])) {
 				# add metadata, remove eventual carriages returns
 				$ds->addMetadata(array($mykey => array(ereg_replace("\r", "",$myvalue))));
 			}
-	    	$html .= "<b>$mykey</b><br />\n<p>".wordwrap(ereg_replace("\n","<br />\n",$myvalue),70)."</p>\n";
+	    	$html .= "<b>$mykey</b><br />\n<p>".wordwrap(ereg_replace("\n","<br />\n",htmlspecialchars($myvalue)),70)."</p>\n";
 		}
     }
     $html .= "</body>\n</html>\n";
@@ -869,11 +869,11 @@ function fmcheckform($outputdst, $filename) {
 			if (is_array($myvalue)) {
 		    	echo(fminputstart());
 		    	foreach ($myvalue as $singleitem) {
-					echo($singleitem."<br>");
+					echo(htmlspecialchars($singleitem)."<br>");
 	    		}
 		    	echo(fminputend());
 			} else {
-	    		echo(fminputstart().$myvalue.fminputend());
+	    		echo(fminputstart().htmlspecialchars($myvalue).fminputend());
 			}
 			echo(fmcreaterecordend());
 
