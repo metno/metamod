@@ -38,7 +38,7 @@ use warnings;
 use Fcntl qw(:DEFAULT :flock); # import LOCK_* constants
 use POSIX qw();
 use XML::LibXML qw();
-use XML::LibXML::XPathContent qw();
+use XML::LibXML::XPathContext qw();
 use UNIVERSAL qw();
 use mmTtime;
 
