@@ -1,7 +1,7 @@
 #!/bin/sh
 webrun_directory=[==WEBRUN_DIRECTORY==]
 target_directory=[==TARGET_DIRECTORY==]
-if [ -r $target_directory/scripts/upload_monitor.pl ]; then
+if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" -a -r $target_directory/scripts/upload_monitor.pl ]; then
    work_directory=$webrun_directory/upl/work
    work_expand=$work_directory/expand
    work_flat=$work_directory/flat
@@ -12,7 +12,7 @@ if [ -r $target_directory/scripts/upload_monitor.pl ]; then
    >$continue_upload_monitor
    nohup nice $target_directory/scripts/upload_monitor.pl >$webrun_directory/upload_monitor.out &
 fi
-if [ -r $target_directory/scripts/import_dataset.pl ]; then
+if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/import_dataset.pl ]; then
    continue_xml_import=$webrun_directory/CONTINUE_XML_IMPORT
    path_to_import_updated=$webrun_directory/import_updated
    >$continue_xml_import
@@ -20,4 +20,9 @@ if [ -r $target_directory/scripts/import_dataset.pl ]; then
       >$path_to_import_updated
    fi
    nohup nice $target_directory/scripts/import_dataset.pl >$webrun_directory/import_dataset.out &
+fi
+if [ "[==METAMODHARVEST_DIRECTORY==]" != "" -a -r $target_directory/scripts/harvester.pl ]; then
+   continue_harvester=$webrun_directory/CONTINUE_OAI_HARVEST
+   >$continue_harvester
+   nohup nice $target_directory/scripts/harvester.pl >$webrun_directory/harvester.out &
 fi

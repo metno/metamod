@@ -25,6 +25,18 @@ Allow from [==ADMIN_DOMAIN==]
 EOF
       fi
    fi
+#
+#  Set up links to import directories:
+#
+   if [ '[==METAMODBASE_DIRECTORY==]' != '' ]; then
+      for path in `cat <<EOF
+[==IMPORTDIRS==]
+EOF
+`
+      do
+         ln -s $path [==TARGET_DIRECTORY==]/htdocs/adm
+      done
+   fi
 fi
 #
 #  Initialise webrun directory:
