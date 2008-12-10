@@ -36,7 +36,6 @@ use warnings;
 use Carp qw();
 use Metamod::DatasetTransformer;
 use Metamod::DatasetTransformer::MM2;
-use ttime;
 
 use constant NAMESPACE_MM2 => 'http://www.met.no/schema/metamod/MM2';
 use constant MM2 => <<'EOT';
@@ -50,7 +49,7 @@ use constant MM2 => <<'EOT';
 EOT
 sub new {
     my ($class, %options) = @_;
-    my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime(ttime::time()));
+    my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime(mmTtime::ttime()));
     my $dataDS = $class->DATASET;
     $dataDS =~ s/\Q1970-01-01T00:00:00Z\E/$sDate/g; # changes datestamp and creationDate
     $dataDS =~ s/metadataFormat=""/metadataFormat="MM2"/g;
