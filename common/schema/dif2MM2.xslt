@@ -95,6 +95,15 @@ version="1.0">
         </xsl:element>
     </xsl:template>
 
+    <!-- Dataset_Publisher and Originating_Center are translated to institution - several institutions allowed in MM2 -->
+    <xsl:template match="dif:Data_Set_Citation/dif:Dataset_Publisher">
+        <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
+            <xsl:attribute name="name">institution</xsl:attribute>
+            <xsl:value-of select="." />
+        </xsl:element>
+    </xsl:template>
+
+
     <xsl:template match="dif:Parameters">
         <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
             <xsl:attribute name="name">variable</xsl:attribute>
