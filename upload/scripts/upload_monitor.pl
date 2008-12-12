@@ -1060,6 +1060,7 @@ sub revert_XML_history {
          if (unlink($xml_history_filename) == 0) {
             &syserror("SYS","Unlink file $xml_history_filename did not succeed","", "revert_XML_history", "");
          }
+         @reprocess_basenames = &subtract($existing_basenames,$reuploaded_basenames);
       } else {
 #      
 #        Write new XML-history file:
