@@ -3,7 +3,7 @@ require 0.01;
 use strict;
 $mmTtime::VERSION = 0.01;
 #
-#  Method: time
+#  Method: ttime
 #
 sub ttime {
    my $realtime;

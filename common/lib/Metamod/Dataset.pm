@@ -61,7 +61,7 @@ sub newFromDoc {
     my ($class, $foreign, $dataset, %options) = @_;
     die "no metadata" unless $foreign;
     unless ($dataset) {
-        my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime(ttime::time()));
+        my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime(mmTtime::time()));
         my $dataset = $class->DATASET;
         $dataset =~ s/\Q1970-01-01T00:00:00Z\E/$sDate/g; # changes datestamp and creationDate
         $dataset =~ s/metadataFormat=""/metadataFormat="MM2"/g;
