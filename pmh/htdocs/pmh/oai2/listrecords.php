@@ -210,7 +210,11 @@ while ($countrec++ < $maxrec) {
 	}
 
 	$output .= '  <record>'."\n";
-	$output .= '   <header>'."\n";
+        if ($status_deleted) {
+	   $output .= '   <header status="deleted">'."\n";
+        } else {
+	   $output .= '   <header>'."\n";
+        }
 	$output .= xmlformat($identifier, 'identifier', '', 4);
 	$output .= xmlformat($datestamp, 'datestamp', '', 4);
 	if (!$status_deleted and $SQL['set'] != '') 

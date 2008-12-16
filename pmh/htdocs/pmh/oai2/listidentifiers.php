@@ -202,7 +202,7 @@ while ($countrec++ < $maxrec) {
 	$identifier = $oaiprefix.$record[0]; 
 	$datestamp = formatDatestamp($record[1]); 
 
-	if (isset($record[2]) && ($record[2] == 2) && 
+	if (isset($record[2]) && ($record[2] == 0) && 
 		($deletedRecord == 'transient' || $deletedRecord == 'persistent')) {
 		$status_deleted = TRUE;
 	} else {
