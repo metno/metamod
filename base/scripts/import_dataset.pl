@@ -429,63 +429,67 @@ sub update_database {
          my @result = $sql_getkey_DS->fetchrow_array;
          $dsid = $result[0];
       }
-      $sql_insert_DS->execute($dsid,$info{name},0,1,$datestamp,$info{ownertag}, $info{creationDate}, $info{metadataFormat}, File::Spec->rel2abs($inputBaseFile));
+      my $dsStatus = ($info{status} eq 'active') ? 1 : 0;
+      $sql_insert_DS->execute($dsid,$info{name},0,$dsStatus,$datestamp,$info{ownertag}, $info{creationDate}, $info{metadataFormat}, File::Spec->rel2abs($inputBaseFile));
+      
+      if ($dsStatus) {
 #
 #  Insert metadata:
 #  Metadata with metadata type name not in the database are ignored.
 #
-      foreach my $mref (@metaarray) {
-         my $mtname = $mref->[0];
-         my $mdcontent = &convert_to_htmlentities($mref->[1],\%html_conversions);
-         my $mdid;
-         if (exists($shared_metadatatypes{$mtname})) {
-            my $mdkey = $mtname . ':' . $mdcontent;
-            if ($progress_report >= 1) {
-               print "mdkey: " . $mdkey . "\n";
-            }
-            if (exists($metadata{$mdkey})) {
-               $mdid = $metadata{$mdkey};
-            } else {
+         foreach my $mref (@metaarray) {
+            my $mtname = $mref->[0];
+            my $mdcontent = &convert_to_htmlentities($mref->[1],\%html_conversions);
+            my $mdid;
+            if (exists($shared_metadatatypes{$mtname})) {
+               my $mdkey = $mtname . ':' . $mdcontent;
+               if ($progress_report >= 1) {
+                  print "mdkey: " . $mdkey . "\n";
+               }
+               if (exists($metadata{$mdkey})) {
+                  $mdid = $metadata{$mdkey};
+               } else {
+                  $sql_getkey_MD->execute();
+                  my @result = $sql_getkey_MD->fetchrow_array;
+                  $mdid = $result[0];
+                  $sql_insert_MD->execute($mdid,$mtname,$mdcontent);
+                  $metadata{$mdkey} = $mdid;
+               }
+               $sql_selectCount_DSMD->execute($dsid, $mdid);
+               my $count = $sql_selectCount_DSMD->fetchall_arrayref()->[0][0];
+               if ($count == 0) {
+                  $sql_insert_DSMD->execute($dsid,$mdid);
+               } else {
+                  write_to_log("duplicate metadata: $mdkey");
+               }
+            } elsif (exists($rest_metadatatypes{$mtname})) {
                $sql_getkey_MD->execute();
                my @result = $sql_getkey_MD->fetchrow_array;
                $mdid = $result[0];
                $sql_insert_MD->execute($mdid,$mtname,$mdcontent);
-               $metadata{$mdkey} = $mdid;
-            }
-            $sql_selectCount_DSMD->execute($dsid, $mdid);
-            my $count = $sql_selectCount_DSMD->fetchall_arrayref()->[0][0];
-            if ($count == 0) {
                $sql_insert_DSMD->execute($dsid,$mdid);
-            } else {
-               write_to_log("duplicate metadata: $mdkey");
             }
-         } elsif (exists($rest_metadatatypes{$mtname})) {
-            $sql_getkey_MD->execute();
-            my @result = $sql_getkey_MD->fetchrow_array;
-            $mdid = $result[0];
-            $sql_insert_MD->execute($mdid,$mtname,$mdcontent);
-            $sql_insert_DSMD->execute($dsid,$mdid);
-         }
 #
 #  Insert searchdata:
 #
-         if (exists($searchcategories{$mtname})) {
-            my $skey = $searchcategories{$mtname} . ':' . $mdcontent;
-            if ($progress_report == 1) {
-               print "Insert searchdata. Try: $skey\n";
-            }
-            if (exists($basickeys{$skey})) {
-               my $bkid = $basickeys{$skey};
-               $sql_insert_BKDS->execute($bkid,$dsid);
+            if (exists($searchcategories{$mtname})) {
+               my $skey = $searchcategories{$mtname} . ':' . $mdcontent;
                if ($progress_report == 1) {
-                  print " -OK: $bkid,$dsid\n";
+                  print "Insert searchdata. Try: $skey\n";
                }
-            } elsif ($mtname eq 'datacollection_period') {
-               my $scid = $searchcategories{$mtname};
-               if ($mdcontent =~ /(\d{4,4})-(\d{2,2})-(\d{2,2}) to (\d{4,4})-(\d{2,2})-(\d{2,2})/) {
-                  my $from = $1 . $2 . $3;
-                  my $to = $4 . $5 . $6;
-                  $sql_insert_NI->execute($scid,$from,$to,$dsid);
+               if (exists($basickeys{$skey})) {
+                  my $bkid = $basickeys{$skey};
+                  $sql_insert_BKDS->execute($bkid,$dsid);
+                  if ($progress_report == 1) {
+                     print " -OK: $bkid,$dsid\n";
+                  }
+               } elsif ($mtname eq 'datacollection_period') {
+                  my $scid = $searchcategories{$mtname};
+                  if ($mdcontent =~ /(\d{4,4})-(\d{2,2})-(\d{2,2}) to (\d{4,4})-(\d{2,2})-(\d{2,2})/) {
+                     my $from = $1 . $2 . $3;
+                     my $to = $4 . $5 . $6;
+                     $sql_insert_NI->execute($scid,$from,$to,$dsid);
+                  }
                }
             }
          }
