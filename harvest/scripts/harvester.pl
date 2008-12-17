@@ -299,10 +299,10 @@ sub process_DIF_records {
          return;
       }
       #optional status
-      my @statusNodes = $xpath->findnodes("oai:header/oai:status", $record);
+      my @statusNodes = $xpath->findnodes('oai:header/@status', $record);
       my $status = "active";
       if (@statusNodes > 0) {
-         $status  = $statusNodes[0]->textContent;
+         $status  = $statusNodes[0]->getValue;
       }
       
 #   
@@ -327,7 +327,7 @@ sub process_DIF_records {
       my $fds; # Metamod::ForeignDataset
       if ($status eq "deleted") {
          my $nullDoc = new XML::LibXML::Document($oaiDoc->version, $oaiDoc->encoding);
-         $fds = Metamod::ForeignDataset->newFromDoc($nullDoc);
+         $fds = Metamod::Dataset->new();
       } else {
          eval {
             # get the dif-node, this is the first (and only) element-node of metadata
