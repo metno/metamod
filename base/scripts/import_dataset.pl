@@ -410,8 +410,8 @@ sub update_database {
       }
 
       my $stm = $dbh->prepare("SELECT DS_id FROM DataSet ".
-                              " WHERE DS_parent = 0 AND DS_ownertag = ? and DS_name = ?");
-      $stm->execute($info{ownertag}, $info{name});
+                              " WHERE DS_parent = 0 AND DS_name = ?");
+      $stm->execute($info{name});
       my $dsid;
       while (my @row = $stm->fetchrow_array) {
          $dsid = $row[0];

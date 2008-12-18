@@ -827,7 +827,14 @@ sub parse_all {
          die "Not able to construct dataset-name from $xml_metadata_path";
       }
    }
-   $info{ownertag} = $ownertag;
+#
+#  Preserve ownertag in an existing dataset, even if a new ownertag is
+#  provided in the input file. This is a hack so that owenrtags may easily
+#  be changed in existing datasets by editing the *.xmd file.
+#
+   if (!$info{ownertag}) {
+      $info{ownertag} = $ownertag;
+   }
 
 #
 #  Populate the %metadata hash with values from the netCDF files.
