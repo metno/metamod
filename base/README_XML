@@ -1,154 +1,100 @@
 XML format for describing datasets
 ==================================
 
-Two variants of this XML format exists. One variant describes a
-collection of datasets. The other variant describes a single dataset.
+For each dataset we will need two XML files:
 
-The variant describing a collection of datasets has a 'datacollection'
-element at the topmost level. Within this element are one or more
-dataset elements.
+Dataset XMD File
+----------------
 
-The other variant has a single 'dataset' element at the topmost level.
+In addition to an XML file containing the metadata (in one of several possible formats),
+we will need an XML file that describes identification etc. for the dataset. 
 
-The attribute 'ownertag' is used in the topmost element in both
-variants. It is a short string for assigning all datasets in a file to 
-one owner. These tags are used in the METAMODSEARCH module which is
-configured to only make visible datasets with ownertags from a
-specified list.
+Such XML files will be given an ".xmd" extention, and have a format like this:
 
-Both variants use a latin-1 character encoding. Templates for the two
-versions are shown below:
-
-   <?xml version="1.0" encoding="ISO-8859-1"?>
-   <datacollection ownertag="...">
-      <dataset>
+<dataset xmlns="" ...>                       // Ref. to XML namespace etc.
+   <info status="..."                        // Value: active/deleted 
+         ownertag="..."
+         creationDate="..."                  // YYYY-MM-DDTHH:TT:SSZ
+         datestamp="..."                     // YYYY-MM-DDTHH:TT:SSZ
+         metadataFormat="..."                // Example: DIF, MM2
+         name="..." />                       // Unique identification
+   <quadtree>
       ...
-      </dataset>
-      <dataset>
-      ...
-      </dataset>
-      ...
-   </datacollection>
+   </quadtree> 
+</dataset>
 
-   <?xml version="1.0" encoding="ISO-8859-1"?>
-   <dataset ownertag="...">
-      ...
-   </dataset>
+Example XMD file:
 
-Dataset element
----------------
+<?xml version="1.0" encoding="iso8859-1" ?>
+<?xml-stylesheet href="dataset.xsl" type="text/xsl"?>
+<dataset
+   xmlns="http://www.met.no/schema/metamod/dataset"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+  <info name="DAMOC/test" 
+        status="active" 
+        ownertag="DAM"
+        creationDate="2008-10-31T14:30:00Z"
+        datestamp="2008-10-31T14:30:00Z"
+        metadataFormat="MM2" />
+  <quadtree_nodes>
+  1
+  11
+  113
+  </quadtree_nodes>
+</dataset>
 
-Within a dataset element, the XML file contains a sequence of elements.
-None of these elements have sub-elements, so the XML file is only two 
-or three levels deeep.
 
-None of these elements are mandatory.
+Metadata XML File
+-----------------
 
-General elements within a dataset element
--------------------------------------------
+The XML files containing metadata are of varying formats. They will all be given an
+".xml" extention.
 
-A dataset element contain elements of the following form:
+One of these formats are defined by METAMOD2, and is only used as an internal format
+within the METAMOD2 system. This format (MM2) is for metadata produced by the UPLOAD
+module or the QUEST module:
 
-   <METADATATYPE>...</METADATATYPE>
+<code>
+   <MM2 xmlns="" ...>                              // Ref. to XML namespace etc. (if needed)
+         <metadata name="...">value</metadata>     // To be repeated. One element
+                                                   // for each name,value pair.
+   </MM2>
+</code>
 
-where METADATATYPE is a metadata type name that must be found in the database
-at the time the XML file is imported. In the database, metadata type names
-are found in the MetadataType table as the value of the MT_name field.
+Metadata names with special meaning
+-----------------------------------
 
-Several instances of the same METADATATYPE element are allowed.
+METAMOD is generally ignorant of metadata-names, and most names can be configured. But some
+names have a special meaning and cannot be changed:
 
-Special elements within a dataset element
--------------------------------------------
+   area                        Geographic area either as detailed area 'Fram Strait' or as
+                               gcmd-list 'Continent > Europe > Northern Europe > Scandanavia > Norway'.
 
-Some elements within a dataset element do not adhere to the general
-description:
+   bounding_box                For the extraction of quadtree-nodes for geographic search (if no
+                               detailed coordinate set is available).
+   datacollection_period_from
+   datacollection_period_to
+   datacollection_period       Deprecated since metamod 2.1
 
-'Abstract' element:
+   topic                       Used in quest as gcmd-list without '> HIDDEN', see 'variable'.
 
-   <abstract>
-   ...
-   </abstract>
+   variable                    Parameter, either as CF-1.0 standard_name e.g. 'sea_surface_temperature'
+                               or as gcmd-list with '> HIDDEN':
+                               'Agriculture > Agricultural Chemicals > Fertilizers > HIDDEN'
 
-   The dataset element may contain only one 'abstract' element.
+   activity_type               Used for "Activity types" search
 
-'Quadtree_nodes' element:
+   institution                 Used for "Institutions" search
 
-   <quadtree_nodes>
-   ...
-   </quadtree_nodes>
-
-   Each line within this element contains a quadtree node. Together, the 
-   quadtree nodes defines the map area on which the map search facility of
-   the METAMODSEARCH module is based.
-
-   The dataset element may contain only one 'quadtree_nodes' element.
-
-'Datacollection_period*' elements:
-
-   <datacollection_period from="..." to="..." />
-
-   The values of the 'from' and 'to' attributes are dates of the form YYYY-MM-DD.
-
-   An alternative way to give these two values are:
-
-   <datacollection_period_from>...</datacollection_period_from>
-   <datacollection_period_to>...</datacollection_period_to>
-
-   If only the datacollection_period_from element is present, the 
-   datacollection_period_to element is arbitrarily set to 2999-01-01.
-   The datacollection_period values are used for the Datacollection 
-   period search in the METAMODSEARCH module.
-
-   The dataset element may only contain one 'datacollection_period' element, or
-   the combination of a 'datacollection_period_from' element and (optionally)
-   a 'datacollection_period_to' element.
-
-Elements used for search purposes
----------------------------------
-
-All elements are used to populate the MetaData table in the database. In addition,
-some elements are used to update the tables used for searching the database.
-These are the following elements:
-
-variable                - Used for "Topics and variables" search. If the value 
-                          of this element is found in the search structure, the
-                          search tables are updated, so that the dataset will be
-                          found when searching on the variable or any topic that
-                          "includes" the variable.
-
-                          Values of the variable element can have a special form:
-                          "xxx > xxx > ... > HIDDEN". When this is the case, the
-                          variable is not shown in the search interface as an
-                          ordinary variable. But searches for topics conforming
-                          to "xxx > xxx > ..." will find the dataset. The "xxx"s
-                          are elements of GCMD science keywords.
-
-gcmd_keyword            - Also used for "Topics and variables" search. An element
-                          value of "xxx > xxx > ..." taken from the GCMD science 
-                          keywords list is treated as if it was a variable element
-                          value of "xxx > xxx > ... > HIDDEN".
-
-area                    - Used for "Areas" search
-
-activity_type           - Used for "Activity types" search
-
-institution             - Used for "Institutions" search
-
-datacollection_period*  - Used for "Datacollection period" search
-
-quadtree_nodes          - Used for "Map search"
-
-Elements used for setting up links to actual data
--------------------------------------------------
-
-dataref                 - If the value of a 'dataref' element is recognised as an
-                          URL (starting with 'http://'), the value is presented in
-                          the METAMODSEARCH web interface in a special way. The last
-                          part of the value (corresponding to the regexp:
-                          '([^/]*)\/?$') is presented as a text linked to the given
-                          URL. If the URL ends with '.nc', it is assumed to be an
-                          OPeNDAP link. In that case, an '.html' is appended to the
-                          URL, so it will point to the HTML form-based view of the
-                          netCDF file.
-                          Othervise (no URL), the value is presented in a normal
-                          way.
+   dataref                     If the value of a 'dataref' element is recognised as an
+                               URL (starting with 'http://'), the value is presented in
+                               the METAMODSEARCH web interface in a special way. The last
+                               part of the value (corresponding to the regexp:
+                               '([^/]*)\/?$') is presented as a text linked to the given
+                               URL. If the URL ends with '.nc', it is assumed to be an
+                               OPeNDAP link. In that case, an '.html' is appended to the
+                               URL, so it will point to the HTML form-based view of the
+                               netCDF file.
+                               Othervise (no URL), the value is presented in a normal
+                               way.

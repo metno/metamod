@@ -16,7 +16,7 @@ SVN on https://svn.met.no/.
 MODULES
 -------
 
-METAMOD 2.x is divided into four separate modules:
+METAMOD 2.x is divided into six separate modules:
 
 METAMODBASE     Database for metadata describing scientific datasets and
                 web-based management utilities for the database. All software
@@ -34,16 +34,18 @@ METAMODQUEST    Web-based questionnaire for entering metadata into the
                 datatbase. All software for this module are contained in 
                 subdirectory: quest.
 
-METAMODQPMH     OAI-PMH server for metadata harvesting
+METAMODPMH      OAI-PMH server for metadata harvesting
+
+METAMODHARVEST  OAI-PMH client for metadata harvesting
 
 The modules can be used separately and in combination. An actual usage of
 the software must be the result of an installation process, where the
 modules to be used are chosen. An instance of the installed software,
 comprising one or more modules, is called an application. An application not
-using the METAMODBASE module must identify a database owned by another
-application where the METAMODBASE module is used. Several applications may,
-in this way, share a common database, for which one of the applications has
-the main responsibility.
+using the METAMODBASE module must identify another application that use the
+METAMODBASE module. Then the application will use the database in this other
+module. Several applications may, in this way, share a common database, for
+which one of the applications has the main responsibility.
 
 DEPENDENCIES
 ------------
@@ -67,8 +69,8 @@ of the METAMOD 2.x distribution:
   XML::Simple, XML::LibXML, XML::LibXSLT, DBI, DBD::Pg
   Geo::Proj4, Mail::Mailer, PDL, PDL::Char, PDL::NetCDF
 
-- METAMOD 2.x has been developed and tested using Fedora and Debian Linux,
-  but should work on most operating systems supporting the mentioned libraries
+METAMOD 2.x has been developed and tested using Fedora and Debian Linux, but
+should work on most operating systems supporting the mentioned libraries.
 
 
 SYSTEM OVERVIEW
@@ -82,9 +84,10 @@ An application must be configured and installed as described later in this
 README-file. After installation, if the application is a fresh one (where
 no database for the application already exists), a new database must be 
 initialized and filled with static data. Also, if not already done for the
-PostgreSQL installation, two database users must be defined: admin and webuser.
-This can be done by the createusers.sh script, and must be done prior to
-creating the database.
+PostgreSQL installation, two database users must be defined. The default names
+of these users are 'admin' and 'webuser', but these names are configurable.
+The users can be created by the createusers.sh script, and this must be done
+prior to creating the database.
 
 Initializing the database and loading the static data are done by running the
 init/create_and_load_all.sh script as described in base/README. The static
@@ -110,15 +113,17 @@ After initialization, loading of static data and setting up the runtime
 environment, the web interfaces for the METAMODSEARCH, METAMODUPLOAD and
 METAMODQUEST modules should be up and running.
 
-To fill the database with metadata, the METAMODUPLOAD and/or the METAMODQUEST
-modules must be applied. These modules produce XML files with metadata
-describing datasets (see base/README_XML). One XML file for each dataset.
-With the METAMODQUEST routine, all the content of an XML file has to be
-manually entered into an HTML form. The METAMODUPLOAD routine creates the XML
+To fill the database with metadata, any of the METAMODUPLOAD, METAMODQUEST 
+and/or METAMODHARVEST modules must be applied. These modules produce XML files
+with metadata describing datasets (see base/README_XML). Two XML files for each
+dataset. With the METAMODQUEST routine, all the content of an XML file has to 
+be manually entered into an HTML form. The METAMODUPLOAD routine creates the XML
 files based on netCDF files uploaded to a data repository. Uploads may either
 be done interactively through the METAMODUPLOAD web interface, or by FTP
 (usually from a script run by the data provider). Several netCDF files may
 comprise one dataset, and new netCDF files can be added to the dataset any time. 
+The METAMODHARVEST module periodically harvest metadata from external sources.
+The harvested metadata are saved as XML files.
 
 Two perl scripts are responsible for extracting the metadata from the netCDF
 files and load them into the database. The first script, upload_monitor.pl,
@@ -137,8 +142,8 @@ DIRECTORY STRUCTURE
 -------------------
 
 The top METAMOD 2.x directory (the directory where this README file resides)
-is divided into one subdirectory for each module (base, search, upload, quest
-and pmh). There is also a subdirectory (common) where files used by many
+is divided into one subdirectory for each module (base, search, upload, quest,
+pmh and harvest). There is also a subdirectory (common) where files used by many
 modules resides. In addition, one subdirectory (app) contains an example
 application.
 
@@ -223,13 +228,14 @@ METAMODSEARCH_DIRECTORY
 METAMODUPLOAD_DIRECTORY 
 METAMODQUEST_DIRECTORY 
 METAMODPMH_DIRECTORY 
+METAMODHARVEST_DIRECTORY 
 
-If any of these variables are missing, the corresponding modules will not be part
+If any of these variables are missing, the corresponding module will not be part
 of the application.
 
 Each application delivering data to a database (an application with the
-METAMODUPLOAD and/or the METAMODQUEST module) must have a short acronym
-that uniquely identify the application for the database. This acronym is
+METAMODUPLOAD, METAMODHARVEST and/or the METAMODQUEST module) must have a short
+acronym that uniquely identify the application for the database. This acronym is
 included in the master_config.txt file as the value of variable APPLICATION_ID.
 
 INSTALLATION

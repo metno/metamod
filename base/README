@@ -22,17 +22,21 @@ The tasks performed by the METAMODBASE module are:
                                  the static data in the database. These data
                                  are loaded into the database.
 
-- Updating the database from XML files. One XML file describes one "dataset", or
-  a collection of datasets. A dataset may also represent data
-  that will be collected some time in the future. Other METAMOD2 modules have the
-  responsibility of creating these XML files. 
+- Importing datasets into the database from XML files. Each dataset is described
+  by two XML files: <filename>.xmd and <filename>.xml. See README_XML for a
+  detailed description. A dataset may also represent data that will be collected
+  some time in the future. Other METAMOD2 modules have the responsibility of
+  creating these XML files. 
 
   The script import_dataset.pl will read XML files and update the database
   accordingly. It is intended to run for long periods of time. It mostly
   sleeps, but wakes up at regular time intervals to check if any new or updated
   XML files are found in a set of directories given by the value of the IMORTDIRS 
   variable in the application configuration file (master_config.txt). The
-  import_dataset.pl script will be started and monitored from a daemon, cronjob or 
-  a similar tool.
+  import_dataset.pl script is started from the start_services.pl command in the
+  target directory. The script should be stopped using the corresponding
+  stop_services.pl command, which will stop the script in an orderly fashion.
+  This software contain no tool for running this script (or other similar
+  scripts) as a daemon or cronjob.
 
-  The XML format used for dataset import is documented in README_XML
+  The XML formats used for dataset import is documented in README_XML.
