@@ -213,6 +213,7 @@ function fmcreatetextarea($myname,$label,$value,$length,$height,$curData) {
 		foreach ( $curData[$mname] as $row ) {
 			$value .= $row . "\n";
 		}
+		$value = trim($value);
    	}
 
     $mystr = fmcreaterecordstart();
@@ -403,7 +404,7 @@ function fmcreategcmdlist($myname,$mylabel,$myvalue,$size,$exclude,$include,$cur
     foreach ($myarr as $myrecord) {
     	$myrecord = rtrim($myrecord);
 		$mystr .= "<option value=\"$myrecord\" ";
-		if ($curValues[htmlspecialchars($myrecord)]) {
+		if ($curValues[$myrecord]) {
 			$mystr .= "selected=\"selected\" ";
 		}
 		$mystr .= ">";
@@ -835,8 +836,6 @@ function fmcheckform($outputdst, $filename) {
 						"contest for the Nobel prize in literature, please ".
 						"use the Edit button and shorten the text.</span>";
 					$errors = TRUE;
-		    	} else {
-					$myvalue = ereg_replace("\n","<br><br>\n",$myvalue);
 	    		}
 			}
 
@@ -869,7 +868,7 @@ function fmcheckform($outputdst, $filename) {
 			if (is_array($myvalue)) {
 		    	echo(fminputstart());
 		    	foreach ($myvalue as $singleitem) {
-					echo(htmlspecialchars($singleitem)."<br>");
+					echo(ereg_replace("\n","<br><br>\n",htmlspecialchars($singleitem))."<br />");
 	    		}
 		    	echo(fminputend());
 			} else {
