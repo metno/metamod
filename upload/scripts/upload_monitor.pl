@@ -520,6 +520,7 @@ sub process_files {
       print "-------- Files to process for dataset $dataset_name at $datestring\n";
       print Dumper(\%files_to_process);
    }
+   my @originally_uploaded = keys %files_to_process;
    if (! exists($dataset_institution{$dataset_name})) {
       foreach my $uploadname (keys %files_to_process) {
          &move_to_problemdir($uploadname);
@@ -557,11 +558,7 @@ sub process_files {
 #      
 #     Get type of file and act accordingly:
 #      
-      my $filetype = &shcommand_scalar("file $newpath");
-      if (!defined($filetype)) {
-         &syserror("SYS","file_command_fails_1", $uploadname, "process_files", "");
-         next;
-      }
+      my $filetype = &get_filetype($newpath);
 #
       if (index($filetype,"gzip compressed data") >= 0) {
 #         
@@ -573,7 +570,7 @@ sub process_files {
             $errors = 1;
             next;
          }
-         if (defined($extention) && $extention eq "gz") {
+         if (defined($extention) && ($extention eq "gz" || $extention eq "GZ")) {
 #            
 #              Strip ".gz" extention from $baseupldname
 #            
@@ -582,7 +579,7 @@ sub process_files {
             if ($baseupldname =~ /\.([^.]+)$/) {
                $extention = $1; # First matching ()-expression
             }
-         } elsif (defined($extention) && $extention eq "tgz") {
+         } elsif (defined($extention) && ($extention eq "tgz" || $extention eq "TGZ")) {
 #            
 #              Substitute "tgz" extention with "tar"
 #            
@@ -594,16 +591,11 @@ sub process_files {
             next;
          }
          $newpath = $work_start . '/' . $baseupldname;
-         $filetype = &shcommand_scalar("file $newpath");
-         if (!defined($filetype)) {
-            &syserror("SYS","file_command_fails_2", $uploadname, "process_files", "");
-            $errors = 1;
-            next;
-         }
+         $filetype = &get_filetype($newpath);
       }
 #
       if (index($filetype,"tar archive") >= 0) {
-         if (!defined($extention) || $extention ne "tar") {
+         if (!defined($extention) || ($extention ne "tar" && $extention ne "TAR")) {
             &syserror("SYSUSER","uploaded_filename_with_missing_tar_ext", $uploadname, "process_files", "");
             $errors = 1;
             next;
@@ -615,6 +607,10 @@ sub process_files {
          if (length($shell_command_error) > 0) {
             &syserror("SYSUSER","unable_to_unpack_tar_archive", $uploadname, "process_files", "");
             next;
+         }
+         if ($progress_report == 1) {
+            print "-------- Components of the tar file $newpath :\n";
+            print Dumper(\@tarcomponents);
          }
          my %basenames = ();
          my $errcondition = "";
@@ -711,12 +707,17 @@ sub process_files {
    }
    &purge_current_directory(\%orignames);
    my @expanded_files = glob("*");
+   if ($progress_report == 1) {
+      print "-------- Unpacked files in the work_flat directory:\n";
+      print Dumper(\@expanded_files);
+   }
 #         
-#  Convert CDL files to netCDF:
+#  Convert CDL files to netCDF and then check that all files are netCDF:
 #         
    $errors = 0;
-   my %problem_upl_files = ();
-   foreach my $expandedfile (@expanded_files) {
+   my %not_accepted = ();
+   foreach my $expfile (@expanded_files) {
+      my $expandedfile = $expfile;
       my $uploadname;
       if (exists($orignames{$expandedfile})) {
          $uploadname = $orignames{$expandedfile};
@@ -727,63 +728,79 @@ sub process_files {
       if ($expandedfile =~ /\.([^.]+)$/) {
          $extention = $1; # First matching ()-expression
       }
-      my $filetype = &shcommand_scalar("file $expandedfile");
-      if (length($shell_command_error) > 0) {
-         die "file $expandedfile fails: $shell_command_error";
+      my $filetype = &get_filetype($expandedfile);
+      if ($progress_report == 1) {
+         print "    ---- Processing $expandedfile: $filetype\n";
       }
       if (index($filetype,"text") >= 0) {
          my $path_to_remove_cr = $target_directory . '/scripts/remove_cr.sh';
          my $dummy = &shcommand_scalar("$path_to_remove_cr $expandedfile");
          if (length($shell_command_error) > 0) {
             &syserror("SYS","remove_cr_failed",$uploadname, "process_files","");
-            $problem_upl_files{$uploadname} = 1;
+            $not_accepted{$expandedfile} = 1;
             $errors = 1;
-         }
-      }
-      if ($errors == 0 && defined($extention) && $extention eq 'cdl' && index($filetype,"text") >= 0) {
-         my $firstline = &shcommand_scalar("head -1 $expandedfile");
-         if (length($shell_command_error) > 0) {
-            die "head -1 $expandedfile fails: $shell_command_error";
-         }
-         if ($firstline =~ /^\s*netcdf\s/) {
-            my $ncname = substr($expandedfile,0,length($expandedfile) - 3) . 'nc';
-            if (scalar grep($_ eq $ncname,@expanded_files) > 0) {
-               &syserror("USER","cdlfile_collides_with_ncfile_already_encountered",
-                         $uploadname, "process_files", "File: $expandedfile");
-               $problem_upl_files{$uploadname} = 1;
-               $errors = 1;
-            } else {
-               my $result = &shcommand_scalar("ncgen $expandedfile -o $ncname");
-               if (unlink($expandedfile) == 0) {
-                  die "Unlink file $expandedfile did not succeed\n";
-               }
-               if (length($shell_command_error) > 0) {
-                  my $diagnostic = $shell_command_error;
-                  $diagnostic =~ s/^[^\n]*\n//m;
-                  $diagnostic =~ s/\n/ /mg;
-                  &syserror("USER","ncgen_fails_on_cdlfile",
-                            $uploadname, "process_files",
-                            "File: $expandedfile\nCDLfile: $expandedfile\nDiagnostic: $diagnostic");
-                  if (-e $ncname && unlink($ncname) == 0) {
-                     die "Unlink file $ncname did not succeed\n";
-                  }
-                  $problem_upl_files{$uploadname} = 1;
+         } elsif (defined($extention) && ($extention eq 'cdl' || $extention eq 'CDL')) {
+            my $firstline = &shcommand_scalar("head -1 $expandedfile");
+            if (length($shell_command_error) > 0) {
+               die "head -1 $expandedfile fails: $shell_command_error";
+            }
+            if ($progress_report == 1) {
+               print "         Possible CDL-file. Firstline: $firstline\n";
+            }
+            if ($firstline =~ /^\s*netcdf\s/) {
+               my $ncname = substr($expandedfile,0,length($expandedfile) - 3) . 'nc';
+               if (scalar grep($_ eq $ncname,@expanded_files) > 0) {
+                  &syserror("SYSUSER","cdlfile_collides_with_ncfile_already_encountered",
+                            $uploadname, "process_files", "File: $expandedfile");
+                  $not_accepted{$expandedfile} = 1;
                   $errors = 1;
                   next;
+               } else {
+                  my $result = &shcommand_scalar("ncgen $expandedfile -o $ncname");
+                  if (unlink($expandedfile) == 0) {
+                     die "Unlink file $expandedfile did not succeed\n";
+                  }
+                  if (length($shell_command_error) > 0) {
+                     my $diagnostic = $shell_command_error;
+                     $diagnostic =~ s/^[^\n]*\n//m;
+                     $diagnostic =~ s/\n/ /mg;
+                     &syserror("SYSUSER","ncgen_fails_on_cdlfile",
+                               $uploadname, "process_files",
+                               "File: $expandedfile\nCDLfile: $expandedfile\nDiagnostic: $diagnostic");
+                     if (-e $ncname && unlink($ncname) == 0) {
+                        die "Unlink file $ncname did not succeed\n";
+                     }
+                     $not_accepted{$expandedfile} = 1;
+                     $errors = 1;
+                     next;
+                  }
+                  $filetype = &get_filetype($ncname);
+                  $expandedfile = $ncname;
+                  if ($progress_report == 1) {
+                     print "         Ncgen OK.\n";
+                  }
                }
+            } else {
+               &syserror("SYSUSER","text_file_with_cdl_extention_not_a_cdlfile",
+                         $uploadname, "process_files", "File: $expandedfile");
+               $not_accepted{$expandedfile} = 1;
+               $errors = 1;
+               next;
             }
-         } else {
-            &syserror("USER","text_file_with_cdl_extention_not_a_cdlfile",
-                      $uploadname, "process_files", "File: $expandedfile");
-            $problem_upl_files{$uploadname} = 1;
-            $errors = 1;
-            next;
          }
+      }
+      if (index($filetype,"NetCDF Data Format") < 0) {
+         &syserror("SYSUSER","file_not_netcdf", $uploadname, "process_files",
+                   "File: $expfile\nBadfile: $expandedfile\nFiletype: $filetype");
+         $not_accepted{$expandedfile} = 1;
+         $errors = 1;
       }
    }
    if ($errors == 1) {
-      foreach my $uploadname (keys %problem_upl_files) {
-         &syserror("SYS","problems_with_cdl_files",$uploadname, "process_files", "");
+      foreach my $expandedfile (keys %not_accepted) {
+         if (unlink($expandedfile) == 0) {
+            &syserror("SYS","could_not_unlink","", "process_files", "File: $expandedfile");
+         }
       }
    }
    &purge_current_directory(\%orignames);
@@ -828,7 +845,7 @@ sub process_files {
    }
    my @digest_input = ();
    foreach my $fname (@uploaded_files) {
-      push (@digest_input,$fname);
+         push (@digest_input,$fname);
    }
    foreach my $fname (@reprocess_basenames) {
       push (@digest_input,$destination_dir . '/' . $fname);
@@ -844,7 +861,6 @@ sub process_files {
       print DIGEST $fname . "\n";
    }
    close (DIGEST);
-   my @originally_uploaded = keys %files_to_process;
 #
 #  Run the digest_nc.pl script and process user errors if found:
 #
@@ -1632,60 +1648,62 @@ sub get_date_and_time_string {
 #
 #---------------------------------------------------------------------------------
 #
-sub move_to_problemdir {
-   my ($uploadname) = @_;
-   my $baseupldname = $uploadname;
-   if ($uploadname =~ /\/([^\/]+)$/) {
-      $baseupldname = $1; # First matching ()-expression
-   }
-#
-#  Move upload file to problem file directory:
-#
-   my @file_stat = stat($uploadname);
-   if (scalar @file_stat == 0) {
-      die "In move_to_problemdir: Could not stat $uploadname\n";
-   }
-   my $modification_time = mmTtime::ttime($file_stat[9]);
-   my @ltime = localtime(mmTtime::ttime());
-   my $current_day = $ltime[3]; # 1-31
-
-   my $destname = sprintf('%02d%04d',$current_day,$file_in_error_counter++) . "_" .
-                  $baseupldname;
-   my $destpath = $problem_dir_path . "/" . $destname;
-   if (move($uploadname,$destpath) == 0) {
-      die "In move_to_problemdir: $uploadname Move did not succeed. Error code: $!\n";
-   }
-#
-#     Write message to files_with_errors log:
-#
-   my $datestring = &get_date_and_time_string($modification_time);
-   my $path = $problem_dir_path . "/files_with_errors";
-   open (OUT,">>$path");
-   print OUT "File: $uploadname modified $datestring copied to $destname\n";
-   close(OUT);
-#
-   if (exists($files_to_process{$uploadname})) {
-      delete $files_to_process{$uploadname};
+sub get_filetype {
+   my ($filename) = @_;
+   if (-r $filename) {
+      my $filetype = &shcommand_scalar("file $filename");
+      if (length($shell_command_error) > 0) {
+         die "file $filename fails: $shell_command_error";
+      }
+      if ($filetype =~ /^[^:]*: (.*)$/) {
+         $filetype = $1; # First matching ()-expression
+      }
+      return $filetype;
+   } else {
+      die "Command 'file $filename' can not be done: File not readable";
    }
 };
 #
 #---------------------------------------------------------------------------------
 #
-# sub my_time {
-#    my $realtime;
-#    if (scalar @_ == 0) {
-#       $realtime = time;
-#    } else {
-#       $realtime = $_[0];
-#    }
-#    my $scaling = [==TEST_IMPORT_SPEEDUP==];
-#    if ($scaling <= 1) {
-#       return $realtime;
-#    } else {
-#       my $basistime = [==TEST_IMPORT_BASETIME==];
-#       return $basistime + ($realtime - $basistime)*$scaling;
-#    }
-# };
+sub move_to_problemdir {
+   my ($uploadname) = @_;
+   if (-e $uploadname) {
+      my $baseupldname = $uploadname;
+      if ($uploadname =~ /\/([^\/]+)$/) {
+         $baseupldname = $1; # First matching ()-expression
+      }
+#
+#  Move upload file to problem file directory:
+#
+      my @file_stat = stat($uploadname);
+      if (scalar @file_stat == 0) {
+         die "In move_to_problemdir: Could not stat $uploadname\n";
+      }
+      my $modification_time = mmTtime::ttime($file_stat[9]);
+      my @ltime = localtime(mmTtime::ttime());
+      my $current_day = $ltime[3]; # 1-31
+
+      my $destname = sprintf('%02d%04d',$current_day,$file_in_error_counter++) . "_" .
+                  $baseupldname;
+      my $destpath = $problem_dir_path . "/" . $destname;
+      if (move($uploadname,$destpath) == 0) {
+         die "In move_to_problemdir: $uploadname Move did not succeed. Error code: $!\n";
+      }
+#
+#     Write message to files_with_errors log:
+#
+      my $datestring = &get_date_and_time_string($modification_time);
+      my $path = $problem_dir_path . "/files_with_errors";
+      open (OUT,">>$path");
+      print OUT "File: $uploadname modified $datestring copied to $destname\n";
+      close(OUT);
+#
+      if (exists($files_to_process{$uploadname})) {
+         delete $files_to_process{$uploadname};
+      }
+   }
+};
 #
 #---------------------------------------------------------------------------------
 #
