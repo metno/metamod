@@ -45,7 +45,6 @@ use mmTtime;
 use constant NAMESPACE_DS => 'http://www.met.no/schema/metamod/dataset';
 use constant DATASET => << 'EOT';
 <?xml version="1.0" encoding="iso8859-1" ?>
-<?xml-stylesheet href="dataset.xsl" type="text/xsl"?>
 <dataset
    xmlns="http://www.met.no/schema/metamod/dataset"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

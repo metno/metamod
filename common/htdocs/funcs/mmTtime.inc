@@ -40,11 +40,14 @@ class mmTtime {
       } else {
          $realtime = $usetime;
       }
-      $scaling = [==TEST_IMPORT_SPEEDUP==];
+      $scaling = "[==TEST_IMPORT_SPEEDUP==]";
+      if (strlen($scaling) == 0 || substr_compare($scaling, "[=", 0, 2)) {
+      	 return $realtime; # no TEST_IMPORT_SPEEDUP given
+      }
       if ($scaling <= 1) {
          return $realtime;
       } else {
-         $basistime = [==TEST_IMPORT_BASETIME==];
+         $basistime = "[==TEST_IMPORT_BASETIME==]";
          return $basistime + ($realtime - $basistime)*$scaling;
       }
    }

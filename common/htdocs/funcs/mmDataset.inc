@@ -60,7 +60,6 @@ class MM_Dataset {
 			$sDate = gmstrftime("%Y-%m-%dT%H:%M:%SZ",mmTtime::ttime());
 			$dataDS =
 '<?xml version="1.0" encoding="UTF-8" ?>
-<?xml-stylesheet href="dataset.xsl" type="text/xsl"?>
 <dataset
    xmlns="http://www.met.no/schema/metamod/dataset"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -69,7 +68,6 @@ class MM_Dataset {
 </dataset>';
 			$dataMM2 =
 '<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet href="MM2.xsl" type="text/xsl"?>
 <MM2
    xmlns="http://www.met.no/schema/metamod/MM2"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

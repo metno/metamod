@@ -39,7 +39,6 @@ version="1.0">
     <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
     <xsl:template match="/">
-    	<xsl:processing-instruction name="xml-stylesheet">href="dataset.xsl" type="text/xsl"</xsl:processing-instruction>
         <xsl:apply-templates select="dif:DIF"/>
     </xsl:template>
 <!-- TODO: DS_datestamp in database is XXX in info? -->

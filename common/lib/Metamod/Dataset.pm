@@ -40,7 +40,6 @@ use Metamod::DatasetTransformer::MM2;
 use constant NAMESPACE_MM2 => 'http://www.met.no/schema/metamod/MM2';
 use constant MM2 => <<'EOT';
 <?xml version="1.0" encoding="iso8859-1"?>
-<?xml-stylesheet href="MM2.xsl" type="text/xsl"?>
 <MM2
    xmlns="http://www.met.no/schema/metamod/MM2"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

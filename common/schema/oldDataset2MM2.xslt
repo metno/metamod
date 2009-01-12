@@ -39,7 +39,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
     <xsl:output method="xml" indent="yes" encoding="iso8859-1"/>
     
     <xsl:template match="/">
-    	<xsl:processing-instruction name="xml-stylesheet">href="dataset.xsl" type="text/xsl"</xsl:processing-instruction>
         <xsl:apply-templates select="dataset"/>
     </xsl:template>
 
