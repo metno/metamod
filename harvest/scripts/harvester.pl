@@ -87,6 +87,14 @@ my $status_file = '[==WEBRUN_DIRECTORY==]/oai_harvest_status';
 my $path_to_syserrors = '[==WEBRUN_DIRECTORY==]/syserrors';
 my $progress_report = [==TEST_IMPORT_PROGRESS_REPORT==]; # If == 1, prints what's
                                                          # going on to STDOUT
+if ($progress_report == 1) {
+#
+#  Make sure test output is flushed:
+#
+   my $old_fh = select(STDOUT);
+   $| = 1;
+   select($old_fh);
+}
 #
 #  Set up the source URLs from which harvesting should be done, and also
 #  the mapping between ownertags and source URLs:
@@ -125,6 +133,7 @@ foreach my $hsource (@arr_harvest_sources) {
 # Create new user agent
 #
 my $useragent = LWP::UserAgent->new;
+$useragent->timeout(60*15);
 #
 #  Evaluate block to catch runtime errors
 #  (including "die()")

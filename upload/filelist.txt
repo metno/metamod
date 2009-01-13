@@ -15,6 +15,10 @@ htdocs/upl/newuserok.php
 htdocs/upl/newuser.php
 htdocs/upl/start.php
 htdocs/upl/upload.php
+htdocs/upl/testafile.php
+htdocs/upl/tfile.php
+htdocs/upl/BTN_tfile.php
+htdocs/upl/BTN_dotest.php
 htdocs/adm/approve.php
 htdocs/adm/show_usererrors.php
 htdocs/adm/show_syserrors.php

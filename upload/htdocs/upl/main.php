@@ -83,6 +83,10 @@
          include 'BTN_creupd_dir.php';
       } else if ($submit == 'BTN_upl') { // The user has pushed the "Upload file" link
          include 'BTN_upl.php';
+      } else if ($submit == 'BTN_tfile') { // The user has pushed the "Test a file" link
+         include 'BTN_tfile.php';
+      } else if ($submit == 'BTN_filetest') { // The user has loaded a file for testing
+         include 'BTN_dotest.php';
       } else if ($submit == 'BTN_newsession') { // The user has entered from index.php
          $nextpage = 1;
          $errmsg = "";
@@ -106,5 +110,7 @@
       include "maintable.php"; // Show the File Upload page
    } else if ($nextpage == 3) {
       include "mainadm.php"; // Show the Administration page
+   } else if ($nextpage == 4) {
+      include "testafile.php"; // Show the Test a file page
    }
 ?>

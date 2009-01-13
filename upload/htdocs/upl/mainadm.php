@@ -66,6 +66,8 @@ END_OF_STRING;
       <?php
          echo '<a class="mm_item" href="upload.php?sessioncode=' .
             $sessioncode . '&normemail=' . $normemail . '">Upload Files</a>' . "\n";
+         echo '<a class="mm_item" href="tfile.php?sessioncode=' .
+            $sessioncode . '&normemail=' . $normemail . '">Test a file</a>' . "\n";
          echo '<a class="mm_item" href="start.php?sessioncode=' .
             $sessioncode . '&normemail=' . $normemail . '">Log out</a>' . "\n";
       ?>

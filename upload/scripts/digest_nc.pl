@@ -820,11 +820,15 @@ sub parse_all {
       $metadata{"dataref"} = [$dataref];
    }
    if (!$info{"name"}) {
-      if ($xml_metadata_path =~ /\/([^\/]+\/[^\/]+)\.(xml|XML)$/) {
-         my $name = $1; # First matching ()-expression
-         $info{"name"} = $name;
+      if ($xml_metadata_path ne "TESTFILE") {
+         if ($xml_metadata_path =~ /\/([^\/]+\/[^\/]+)\.(xml|XML)$/) {
+            my $name = $1; # First matching ()-expression
+            $info{"name"} = $name;
+         } else {
+            die "Not able to construct dataset-name from $xml_metadata_path";
+         }
       } else {
-         die "Not able to construct dataset-name from $xml_metadata_path";
+         $info{"name"} = "TESTFILE";
       }
    }
 #
@@ -981,7 +985,9 @@ sub parse_all {
    $ds->addMetadata(\%metadata);
 
    # write the file
-   $ds->writeToFile($xml_metadata_path);
+   if ($xml_metadata_path ne "TESTFILE") {
+      $ds->writeToFile($xml_metadata_path);
+   }
 
    if ($CTR_printdump == 1) {
       print STDOUT "\n----- VARIABLES FOUND -----\n\n";

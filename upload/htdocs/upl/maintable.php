@@ -63,6 +63,8 @@ END_OF_STRING;
             ?>
             <p class="xmm_item">Upload files</p>
             <?php
+               echo '<a class="mm_item" href="tfile.php?sessioncode=' .
+                  $sessioncode . '&normemail=' . $normemail . '">Test a file</a>' . "\n";
                echo '<a class="mm_item" href="start.php?sessioncode=' .
                   $sessioncode . '&normemail=' . $normemail . '">Log out</a>' . "\n";
             ?>

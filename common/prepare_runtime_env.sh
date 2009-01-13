@@ -55,6 +55,8 @@ if [ -d [==TARGET_DIRECTORY==]/htdocs/upl ]; then
    mkdir -p [==WEBRUN_DIRECTORY==]/upl
    mkdir -p [==WEBRUN_DIRECTORY==]/upl/problemfiles
    mkdir -p [==WEBRUN_DIRECTORY==]/upl/uerr
+   mkdir -p [==WEBRUN_DIRECTORY==]/upl/ftaf
+   mkdir -p [==WEBRUN_DIRECTORY==]/upl/etaf
    cd [==TARGET_DIRECTORY==]/htdocs/upl
    rm -f uerr
    ln -s [==WEBRUN_DIRECTORY==]/upl/uerr

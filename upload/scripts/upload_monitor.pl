@@ -310,6 +310,7 @@ sub main_loop {
          @ltime = localtime(mmTtime::ttime());
          $hour_finished = $ltime[2]; # 0-23
       }
+      &testafile();
       sleep($sleeping_seconds);
    }
 }
@@ -492,10 +493,58 @@ sub web_process_uploaded {
 #
 # ----------------------------------------------------------------------------
 #
+sub testafile {
+   my %datasets = ();
+   my @files_found = &shcommand_array("find '[==WEBRUN_DIRECTORY==]/upl/ftaf' -type f");
+   if (scalar @files_found == 0 && length($shell_command_error) > 0) {
+      &syserror("SYS","find_fails", "", "testafile", "");
+   }
+   foreach my $filename (@files_found) {
+      my $dataset_name;
+      if ($filename =~ /([^\/]+)$/) {
+         $dataset_name = $1; # First matching ()-expression
+         if ($dataset_name =~ /([^_.]+)/) {
+            $dataset_name = $1; # First matching ()-expression
+         }
+         if (!exists($datasets{$dataset_name})) {
+            $datasets{$dataset_name} = [];
+         }
+         push (@{$datasets{$dataset_name}},$filename);
+      }
+   }
+   foreach my $dataset_name (keys %datasets) {
+      %files_to_process = ();
+      foreach my $filename (@{$datasets{$dataset_name}}) {
+         if (-r $filename) {
+            my @file_stat = stat($filename);
+            if (scalar @file_stat == 0) {
+               die "Could not stat $filename\n";
+            }
+#            
+#             Get last modification time of file
+#             (seconds since the epoch)
+#            
+            my $modification_time = mmTtime::ttime($file_stat[9]);
+            $files_to_process{$filename} = $modification_time;
+         }
+      }
+      my $filecount = scalar (keys %files_to_process);
+      if ($filecount > 0) {
+         my $datestring = &get_date_and_time_string();
+         &process_files($dataset_name,'TAF',$datestring);
+      }
+   }
+}
+#
+# ----------------------------------------------------------------------------
+#
 sub process_files {
 #   
 #  Process uploaded files for one dataset from either the FTP or web area.
 #  Names of the uploaded files are found in the global %files_to_process hash.
+#
+#  This routine may also be used to test a file against the repository requirements.
+#  Then, a dataset for the file need not exist.
 #
 #  Uploaded files are either single files or archives (tar). Archives are expanded
 #  and one archive file will produce many expanded files. Both single files
@@ -508,6 +557,7 @@ sub process_files {
 #  $dataset_name     - Name of the dataset
 #  $ftp_or_web       - ='FTP' if the files are uploaded through FTP,
 #                      ='WEB' if files are uploaded through the web application.
+#                      ='TAF' if the file is uploaded just for testing.
 #  $datestring       - Date/time of the last uploaded file as "YYYY-MM-DD HH:MM"
 #   
    my ($dataset_name,$ftp_or_web,$datestring) = @_;
@@ -521,7 +571,7 @@ sub process_files {
       print Dumper(\%files_to_process);
    }
    my @originally_uploaded = keys %files_to_process;
-   if (! exists($dataset_institution{$dataset_name})) {
+   if ($ftp_or_web ne 'TAF' && ! exists($dataset_institution{$dataset_name})) {
       foreach my $uploadname (keys %files_to_process) {
          &move_to_problemdir($uploadname);
       }
@@ -538,6 +588,7 @@ sub process_files {
       }
    }
 #
+   my $taf_basename; # Used if uploaded file is only for testing
    foreach my $uploadname (keys %files_to_process) {
       $errors = 0;
       my $baseupldname = $uploadname;
@@ -545,6 +596,7 @@ sub process_files {
       if ($uploadname =~ /\/([^\/]+)$/) {
          $baseupldname = $1; # First matching ()-expression
       }
+      $taf_basename = $baseupldname;
       if ($baseupldname =~ /\.([^.]+)$/) {
          $extention = $1; # First matching ()-expression
       }
@@ -821,40 +873,53 @@ sub process_files {
    if (length($shell_command_error) > 0) {
       &syserror("SYS","find_fails", "", "process_files", "");
    }
-   my @uploaded_basenames = &get_basenames(\@uploaded_files);
-   my $destination_dir = $opendap_directory . "/" . 
-                         $dataset_institution{$dataset_name}->[0] . "/" . $dataset_name;
-   $command = "find $destination_dir -type f -name \"$dataset_name" . '_*" -print';
-   my @existing_files = &shcommand_array($command);
-   if (length($shell_command_error) > 0) {
-      &syserror("SYS","find_fails_2", "", "process_files", "");
-   }
-   my @existing_basenames = &get_basenames(\@existing_files);
-   my @reuploaded_basenames = &intersect(\@uploaded_basenames,\@existing_basenames);
-   my @reprocess_basenames = ();
-   my $xmlpath = $webrun_directory . '/XML/' . $application_id . '/' . $dataset_name . '.xml';
-   if (scalar @reuploaded_basenames > 0) {
+   my @digest_input = ();
+   my $destination_url;
+   my $xmlpath;
+   my $destination_dir;
+   my @uploaded_basenames;
+   my @existing_basenames;
+   if ($ftp_or_web ne 'TAF') {
+      @uploaded_basenames = &get_basenames(\@uploaded_files);
+      $destination_dir = $opendap_directory . "/" . 
+                            $dataset_institution{$dataset_name}->[0] . "/" . $dataset_name;
+      $command = "find $destination_dir -type f -name \"$dataset_name" . '_*" -print';
+      my @existing_files = &shcommand_array($command);
+      if (length($shell_command_error) > 0) {
+         &syserror("SYS","find_fails_2", "", "process_files", "");
+      }
+      @existing_basenames = &get_basenames(\@existing_files);
+      my @reuploaded_basenames = &intersect(\@uploaded_basenames,\@existing_basenames);
+      my @reprocess_basenames = ();
+      $xmlpath = $webrun_directory . '/XML/' . $application_id . '/' . $dataset_name . '.xml';
+      if (scalar @reuploaded_basenames > 0) {
 #
 #  Some of the new files have been uploaded before:
 #
-      @reprocess_basenames = &revert_XML_history($dataset_name,
+         @reprocess_basenames = &revert_XML_history($dataset_name,
                                                         \@existing_basenames,
                                                         \@reuploaded_basenames,
                                                         \@uploaded_basenames,
                                                         $xmlpath);
-   }
-   my @digest_input = ();
-   foreach my $fname (@uploaded_files) {
+      }
+      foreach my $fname (@uploaded_files) {
          push (@digest_input,$fname);
+      }
+      foreach my $fname (@reprocess_basenames) {
+         push (@digest_input,$destination_dir . '/' . $fname);
+      }
+      $destination_url = $opendap_url;
+      if ($destination_url !~ /\/$/) {
+         $destination_url .= '/';
+      }
+      $destination_url .= 'data/' . $dataset_institution{$dataset_name}->[0] . "/" . $dataset_name . "/";
+   } else {
+      $destination_url = 'TESTFILE';
+      $xmlpath = 'TESTFILE';
+      foreach my $fname (@uploaded_files) {
+         push (@digest_input,$fname);
+      }
    }
-   foreach my $fname (@reprocess_basenames) {
-      push (@digest_input,$destination_dir . '/' . $fname);
-   }
-   my $destination_url = $opendap_url;
-   if ($destination_url !~ /\/$/) {
-      $destination_url .= '/';
-   }
-   $destination_url .= 'data/' . $dataset_institution{$dataset_name}->[0] . "/" . $dataset_name . "/";
    open (DIGEST,">digest_input");
    print DIGEST $destination_url . "\n";
    foreach my $fname (@digest_input) {
@@ -888,34 +953,49 @@ sub process_files {
 #
    if (length($shell_command_error) > 0) {
       &syserror("SYS","digest_nc_fails", "", "process_files", "");
-      foreach my $uploadname (keys %files_to_process) {
-         &move_to_problemdir($uploadname);
+      if ($ftp_or_web ne 'TAF') {
+         foreach my $uploadname (keys %files_to_process) {
+            &move_to_problemdir($uploadname);
+         }
       }
    } else {
+      if ($ftp_or_web ne 'TAF') {
 #
 #     Move new files to the data repository:
 #
-      foreach my $filepath (@digest_input) {
-         my $bname = $filepath;
-         if ($filepath =~ /\/([^\/]+)$/) {
-            $bname = $1; # First matching ()-expression
-         }
-         if ($filepath ne $destination_dir . "/$bname") {
-            if (move($filepath,$destination_dir) == 0) {
-               &syserror("SYS","Move $filepath to destination_dir did not succeed. Error code: $!",
-                         "", "process_files", "");
+         foreach my $filepath (@digest_input) {
+            my $bname = $filepath;
+            if ($filepath =~ /\/([^\/]+)$/) {
+               $bname = $1; # First matching ()-expression
+            }
+            if ($filepath ne $destination_dir . "/$bname") {
+               if (move($filepath,$destination_dir) == 0) {
+                  &syserror("SYS","Move $filepath to destination_dir did not succeed. Error code: $!",
+                            "", "process_files", "");
+               }
             }
          }
+      }
+      my $url_to_errors_html;
+      my $mailbody;
+      my $subject = '[==EMAIL_SUBJECT_WHEN_UPLOAD_ERROR==]';
+      if ($ftp_or_web eq 'TAF') {
+         $subject = 'File test report';
       }
       if (-z $usererrors_path) {
 #
 #     No user errors:
 #
-         &notify_web_system('File accepted ', $dataset_name, \@originally_uploaded, "");
+         if ($ftp_or_web ne 'TAF') {
+            &notify_web_system('File accepted ', $dataset_name, \@originally_uploaded, "");
+         } else {
+            $mailbody = "Dear [OWNER],\n\nNo errors found in $taf_basename .\n\n";
+         }
       } else {
 #         
 #     User errors found (by digest_nc.pl or this script):
 #         
+         $mailbody = '[==EMAIL_BODY_WHEN_UPLOAD_ERROR==]';
          my @bnames = &get_basenames(\@originally_uploaded);
          my $bnames_string = join(", ",@bnames);
          my $timecode = substr($datestring,8,2) . substr($datestring,11,2) . 
@@ -928,7 +1008,7 @@ sub process_files {
          print ERRORINFO $bnames_string . "\n";
          print ERRORINFO $datestring . "\n";
          close (ERRORINFO);
-         my $url_to_errors_html = $local_url . '/upl/uerr/' . $name_html_errfile;
+         $url_to_errors_html = $local_url . '/upl/uerr/' . $name_html_errfile;
          my $path_to_print_usererrors = $target_directory . '/scripts/print_usererrors.pl';
          my $path_to_usererrors_conf = $path_to_etc . '/usererrors.conf';
 #   
@@ -943,25 +1023,44 @@ sub process_files {
          if (length($shell_command_error) > 0) {
             &syserror("SYS","print_usererrors_fails", "", "process_files", "");
          }
-         &notify_web_system('Errors found ', $dataset_name, \@originally_uploaded,
+         if ($ftp_or_web ne 'TAF') {
+            &notify_web_system('Errors found ', $dataset_name, \@originally_uploaded,
                             $url_to_errors_html);
+         }
+      }
+      if (defined($mailbody)) {
 #
 #     Send mail to owner of the dataset:
 #
-         my $recipient = $dataset_institution{$dataset_name}->[1];
-         my $username = $dataset_institution{$dataset_name}->[2] . " ($recipient)";
+         my $recipient;
+         my $username;
+         if ($ftp_or_web ne 'TAF') {
+            $recipient = $dataset_institution{$dataset_name}->[1];
+            $username = $dataset_institution{$dataset_name}->[2] . " ($recipient)";
+         } else {
+            my $identfile = '[==WEBRUN_DIRECTORY==]/upl/etaf/' . $taf_basename;
+            unless (-r $identfile) {die "Can not read from file: $identfile\n";}
+            open (IDENT,$identfile);
+            undef $/;
+            my $identstring = <IDENT>;
+            $/ = "\n"; 
+            close (IDENT);
+            chomp($identstring);
+            if ($identstring =~ /^(\S+)\s+(.+)$/) {
+               $recipient = $1; # First matching ()-expression
+               $username = $2 . " ($recipient)";
+            }
+         }
 [==TEST_EMAIL_RECIPIENT==]         $recipient = '[==OPERATOR_EMAIL==]'; # <-- Remove this when production ready
          my $external_url = $url_to_errors_html;
          if (substr($external_url,0,7) ne 'http://') {
             $external_url = '[==BASE_PART_OF_EXTERNAL_URL==]' . $url_to_errors_html;
          }
-         my $mailbody = '[==EMAIL_BODY_WHEN_UPLOAD_ERROR==]';
          $mailbody =~ s/\[OWNER\]/$username/mg;
          $mailbody =~ s/\[DATASET\]/$dataset_name/mg;
          $mailbody =~ s/\[URL\]/$external_url/mg;
          $mailbody .= "\n";
          $mailbody .= '[==EMAIL_SIGNATURE==]';
-         my $subject = '[==EMAIL_SUBJECT_WHEN_UPLOAD_ERROR==]';
          my $sender = '[==FROM_ADDRESS==]';
          my $mailer = Mail::Mailer->new;
          my %headers = ( To => $recipient,
@@ -977,7 +1076,14 @@ sub process_files {
             &syserror("SYS","Unlink file $uploadname did not succeed","", "process_files", "");
          }
       }
-      &update_XML_history($dataset_name,\@uploaded_basenames,\@existing_basenames);
+      if ($ftp_or_web eq 'TAF') {
+         if (unlink('[==WEBRUN_DIRECTORY==]/upl/etaf/' . $taf_basename) == 0) {
+            &syserror("SYS","Unlink TAF file etaf/$taf_basename did not succeed","", "process_files", "");
+         }
+      }
+      if ($ftp_or_web ne 'TAF') {
+         &update_XML_history($dataset_name,\@uploaded_basenames,\@existing_basenames);
+      }
    }
 }
 #
