@@ -279,7 +279,7 @@ $SQL['set'] = '';
 function mmPutLog($string) {
    $logfile = '[==WEBRUN_DIRECTORY==]' . '/oaipmhlog';
    $fd = fopen($logfile,"a");
-   fwrite($fd,date("Y-m-d H.i: ") . $string . "\n");
+   fwrite($fd,date("Y-m-d H:i: ") . $string . "\n");
    fflush($fd);
    fclose($fd);
 }

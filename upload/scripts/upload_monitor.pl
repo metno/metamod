@@ -568,7 +568,8 @@ sub process_files {
    my $errors = 0;
    if ($progress_report == 1) {
       print "-------- Files to process for dataset $dataset_name at $datestring\n";
-      print Dumper(\%files_to_process);
+      my @files_arr = keys %files_to_process;
+      print Dumper(\@files_arr);
    }
    my @originally_uploaded = keys %files_to_process;
    if ($ftp_or_web ne 'TAF' && ! exists($dataset_institution{$dataset_name})) {
@@ -1051,25 +1052,29 @@ sub process_files {
                $username = $2 . " ($recipient)";
             }
          }
-[==TEST_EMAIL_RECIPIENT==]         $recipient = '[==OPERATOR_EMAIL==]'; # <-- Remove this when production ready
-         my $external_url = $url_to_errors_html;
-         if (substr($external_url,0,7) ne 'http://') {
-            $external_url = '[==BASE_PART_OF_EXTERNAL_URL==]' . $url_to_errors_html;
+         if ('[==TEST_EMAIL_RECIPIENT==]' eq '') {
+            $recipient = '[==OPERATOR_EMAIL==]';
          }
-         $mailbody =~ s/\[OWNER\]/$username/mg;
-         $mailbody =~ s/\[DATASET\]/$dataset_name/mg;
-         $mailbody =~ s/\[URL\]/$external_url/mg;
-         $mailbody .= "\n";
-         $mailbody .= '[==EMAIL_SIGNATURE==]';
-         my $sender = '[==FROM_ADDRESS==]';
-         my $mailer = Mail::Mailer->new;
-         my %headers = ( To => $recipient,
-                         Subject => $subject,
-                         From => $sender,
-                       );
-         $mailer->open(\%headers);
-         print $mailer $mailbody;
-         $mailer->close;
+         if ('[==TEST_EMAIL_RECIPIENT==]' ne '0') {
+            my $external_url = $url_to_errors_html;
+            if (substr($external_url,0,7) ne 'http://') {
+               $external_url = '[==BASE_PART_OF_EXTERNAL_URL==]' . $url_to_errors_html;
+            }
+            $mailbody =~ s/\[OWNER\]/$username/mg;
+            $mailbody =~ s/\[DATASET\]/$dataset_name/mg;
+            $mailbody =~ s/\[URL\]/$external_url/mg;
+            $mailbody .= "\n";
+            $mailbody .= '[==EMAIL_SIGNATURE==]';
+            my $sender = '[==FROM_ADDRESS==]';
+            my $mailer = Mail::Mailer->new;
+            my %headers = ( To => $recipient,
+                            Subject => $subject,
+                            From => $sender,
+                          );
+            $mailer->open(\%headers);
+            print $mailer $mailbody;
+            $mailer->close;
+         }
       }
       foreach my $uploadname (keys %files_to_process) {
          if (unlink($uploadname) == 0) {

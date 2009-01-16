@@ -151,7 +151,7 @@ function mmGetRunPath () {
 function mmPutLog($string) {
    $logfile = mmGetRunPath() . '/userlog';
    $fd = fopen($logfile,"a");
-   fwrite($fd,date("Y-m-d H.i: ") . $string . "\n");
+   fwrite($fd,date("Y-m-d H:i: ") . $string . "\n");
    fflush($fd);
    fclose($fd);
 }

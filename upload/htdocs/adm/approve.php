@@ -57,8 +57,12 @@
              array_key_exists("email",$userinfo) &&
              array_key_exists("paw",$userinfo)) {
             $email = $userinfo["email"];
-[==TEST_EMAIL_RECIPIENT==]          $email = '[==OPERATOR_EMAIL==]';
-            send_welcome_mail($userinfo["name"],$email,$userinfo["paw"]);
+            if ('[==TEST_EMAIL_RECIPIENT==]' == '') {
+               $email = '[==OPERATOR_EMAIL==]';
+            }
+            if ('[==TEST_EMAIL_RECIPIENT==]' != '0') {
+               send_welcome_mail($userinfo["name"],$email,$userinfo["paw"]);
+            }
             echo 'User approved and moved to u1, Welcome mail sent';
          } else {
             echo 'User approved and moved to u1, Heading problems in user file';

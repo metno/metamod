@@ -98,8 +98,12 @@
       } else if ($matchingcount == 1) { // The user is already a registered user. Change password
          $oldfilepath = $matching[0];
          rename($oldfilepath,$u1path . '/' . $filename);
-[==TEST_EMAIL_RECIPIENT==]          $email = '[==OPERATOR_EMAIL==]';
-         send_welcome_mail($name,$email,$paw);
+         if ('[==TEST_EMAIL_RECIPIENT==]' == '') {
+            $email = '[==OPERATOR_EMAIL==]';
+         }
+         if ('[==TEST_EMAIL_RECIPIENT==]' != '0') {
+            send_welcome_mail($name,$email,$paw);
+         }
          include "./newuserok.php";
       } else {
          $errmsg = 'Sorry, your request were not received. Internal error';
