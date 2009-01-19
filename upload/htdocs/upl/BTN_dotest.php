@@ -79,6 +79,17 @@
     }
     mmPutTest("BTN_dotest.php: OK original filename is: " . $origname);
  }
+ if ($error == 0) { // Extract user directory name from $origname
+    if (!preg_match ('/^([^_]+)_/',$origname,$matches)) {
+       mmPutLog('BTN_dotest.php: User directory not part of file name');
+       $errmsg = 'File name must start with "dir_" where dir is a destination directory (which need not exist)';
+       $error = 1;
+       $nextpage = 4;
+    } else {
+       $dirname = $matches[1];
+       mmPutTest("BTN_dotest.php: OK destination directory is: " . $dirname);
+    }
+ }
  if ($error == 0) { // Check file size
     $tmpname = $_FILES["fileinfo"]["tmp_name"];
     $size = $_FILES["fileinfo"]["size"];
@@ -91,8 +102,13 @@
     mmPutTest("BTN_dotest.php: OK file size is: " . $size);
     mmPutTest("BTN_dotest.php: OK temporary file name is: " . $tmpname);
  }
- if ($error == 0) { // Move the uploaded file to the destination directory:
+ if ($error == 0) { // Write a file containing the E-mail address, and
+                    // move the uploaded file to the destination directory:
 
+    $emailfile = '[==WEBRUN_DIRECTORY==]/upl/etaf/' . $origname;
+    $EMAILFILE = fopen($emailfile,'w');
+    fwrite($EMAILFILE,decodenorm($normemail) . " " . $userinfo["name"] . "\n");
+    fclose($EMAILFILE);
     $dirpath = '[==WEBRUN_DIRECTORY==]/upl/ftaf';
     mmPutTest("BTN_dotest.php: About to move uploaded file to: " . $dirpath);
     if (!move_uploaded_file($tmpname,$dirpath . '/' . $origname)) {
@@ -102,10 +118,6 @@
        $nextpage = 1;
     } else {
        $errmsg = $origname . ' loaded successfully. Test report will be sent on E-mail.';
-       $emailfile = '[==WEBRUN_DIRECTORY==]/upl/etaf/' . $origname;
-       $EMAILFILE = fopen($emailfile,'w');
-       fwrite($EMAILFILE,decodenorm($normemail) . " " . $userinfo["name"] . "\n");
-       fclose($EMAILFILE);
        $nextpage = 4;
     }
  }

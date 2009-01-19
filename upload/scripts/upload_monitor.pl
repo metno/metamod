@@ -724,7 +724,9 @@ sub process_files {
                   next;
                }
                if (move($component,$work_flat) == 0) {
-                  die "Move component $component to work_flat. Move did not succeed. Error code: $!\n";
+                  &syserror("SYS","move_tar_component_did_not_succeed",
+                            "", "process_files", "Component: $component Error code: $!");
+                  next;
                }
             }
             if ($errors == 1) {
@@ -741,10 +743,12 @@ sub process_files {
 #         
          if (-e $work_flat . '/' . $baseupldname) {
             &syserror("SYSUSER","uploaded_file_already_encountered", $uploadname, "process_files", "");
-            $errors = 1;
+            next;
          } else {
             if (move($newpath,$work_flat) == 0) {
-               die "Move newpath $newpath to work_flat. Move did not succeed. Error code: $!\n";
+               &syserror("SYS","move_newpath_tp_work_flat_did_not_succeed",
+                         "", "process_files", "Newpath: $newpath Error code: $!");
+               next;
             }
             $orignames{$baseupldname} = $uploadname;
          }
@@ -775,7 +779,9 @@ sub process_files {
       if (exists($orignames{$expandedfile})) {
          $uploadname = $orignames{$expandedfile};
       } else {
-         die "Expanded file $expandedfile have no corresponding upload file\n";
+         &syserror("SYS","expandedfile_has_no_corresponding_upload_file",
+                   "", "process_files", "Expanded file: $expandedfile");
+         next;
       }
       my $extention;
       if ($expandedfile =~ /\.([^.]+)$/) {
@@ -795,7 +801,9 @@ sub process_files {
          } elsif (defined($extention) && ($extention eq 'cdl' || $extention eq 'CDL')) {
             my $firstline = &shcommand_scalar("head -1 $expandedfile");
             if (length($shell_command_error) > 0) {
-               die "head -1 $expandedfile fails: $shell_command_error";
+               &syserror("SYS","head_command_fails_on_expandedfile",
+                         "", "process_files", "Expanded file: $expandedfile");
+               next;
             }
             if ($progress_report == 1) {
                print "         Possible CDL-file. Firstline: $firstline\n";
@@ -811,7 +819,8 @@ sub process_files {
                } else {
                   my $result = &shcommand_scalar("ncgen $expandedfile -o $ncname");
                   if (unlink($expandedfile) == 0) {
-                     die "Unlink file $expandedfile did not succeed\n";
+                     &syserror("SYS","unlink_fails_on_expandedfile",
+                               "", "process_files", "Expanded file: $expandedfile");
                   }
                   if (length($shell_command_error) > 0) {
                      my $diagnostic = $shell_command_error;
@@ -821,7 +830,8 @@ sub process_files {
                                $uploadname, "process_files",
                                "File: $expandedfile\nCDLfile: $expandedfile\nDiagnostic: $diagnostic");
                      if (-e $ncname && unlink($ncname) == 0) {
-                        die "Unlink file $ncname did not succeed\n";
+                        &syserror("SYS","unlink_fails_on_ncfile",
+                               "", "process_files", "Ncfile file: $ncname");
                      }
                      $not_accepted{$expandedfile} = 1;
                      $errors = 1;
@@ -873,6 +883,7 @@ sub process_files {
 #   print Dumper(\@uploaded_files);
    if (length($shell_command_error) > 0) {
       &syserror("SYS","find_fails", "", "process_files", "");
+      return;
    }
    my @digest_input = ();
    my $destination_url;
@@ -888,6 +899,7 @@ sub process_files {
       my @existing_files = &shcommand_array($command);
       if (length($shell_command_error) > 0) {
          &syserror("SYS","find_fails_2", "", "process_files", "");
+         return;
       }
       @existing_basenames = &get_basenames(\@existing_files);
       my @reuploaded_basenames = &intersect(\@uploaded_basenames,\@existing_basenames);
@@ -959,6 +971,7 @@ sub process_files {
             &move_to_problemdir($uploadname);
          }
       }
+      return;
    } else {
       if ($ftp_or_web ne 'TAF') {
 #
@@ -1023,6 +1036,7 @@ sub process_files {
             );
          if (length($shell_command_error) > 0) {
             &syserror("SYS","print_usererrors_fails", "", "process_files", "");
+            return;
          }
          if ($ftp_or_web ne 'TAF') {
             &notify_web_system('Errors found ', $dataset_name, \@originally_uploaded,
@@ -1040,7 +1054,10 @@ sub process_files {
             $username = $dataset_institution{$dataset_name}->[2] . " ($recipient)";
          } else {
             my $identfile = '[==WEBRUN_DIRECTORY==]/upl/etaf/' . $taf_basename;
-            unless (-r $identfile) {die "Can not read from file: $identfile\n";}
+            unless (-r $identfile) {
+               &syserror("SYS","email_file_not_found", "", "process_files", "File: $identfile");
+               return;
+            }
             open (IDENT,$identfile);
             undef $/;
             my $identstring = <IDENT>;
@@ -1364,7 +1381,10 @@ sub notify_web_system {
 #   
 #     Slurp in the content of a file
 #   
-         unless (-r $ownerfile) {die "Can not read from file: $ownerfile\n";}
+         unless (-r $ownerfile) {
+            &syserror("SYS","Could not read from $ownerfile", "", "notify_web_system", "");
+            next;
+         }
          open (USERFILE,$ownerfile);
          undef $/;
          my $file_content = <USERFILE>;

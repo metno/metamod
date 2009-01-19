@@ -86,8 +86,13 @@
  }
  if ($error == 0) { // Retrieve file info, check file name
     $origname = $_FILES["fileinfo"]["name"];
-    if (!preg_match ('/^[a-zA-Z0-9_.-]+$/',$origname)) {
-       mmPutLog('Upload: Illegal characters in file name');
+    if (strlen($origname) == 0) {
+       mmPutLog('BTN_upload.php: No such file name');
+       $errmsg = 'No such file name';
+       $error = 1;
+       $nextpage = 2;
+    } elseif (!preg_match ('/^[a-zA-Z0-9_.-]+$/',$origname)) {
+       mmPutLog('BTN_upload.php: Illegal characters in file name: "' . $origname .'"');
        $errmsg = 'Illegal characters in file name';
        $error = 1;
        $nextpage = 2;
