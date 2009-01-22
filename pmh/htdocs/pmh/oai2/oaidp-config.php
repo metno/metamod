@@ -355,8 +355,8 @@ function getRecords ($id = '', $from = '', $until = '') {
          'abstract', 'Summary', '','Not Available',
          '', 'Metadata_Name', 'CEOS IDN DIF','',
          '', 'Metadata_Version', '9.7','',
-         '!DS_datestamp', 'Last_DIF_Revision_Date', '','',
          '!DS_creationDate', 'DIF_Creation_Date', '','',
+         '!DS_datestamp', 'Last_DIF_Revision_Date', '','',
          '', 'Private', 'False','',
       );
    }

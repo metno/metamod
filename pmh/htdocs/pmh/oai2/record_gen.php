@@ -90,7 +90,9 @@ for ($i1=0; $i1 <= $keycount; $i1 += 4) {
                if ($val !== FALSE) {
                   $outlist[] = array($path,$val);
                } else {
-				     // simply skip this entry, go to the next
+                  if ($dfltval != '') {
+                     $outlist[] = array($path,$dfltval);
+                  }
                }
             } else {
                $outlist[] = array($path,htmlspecialchars($value));

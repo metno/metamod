@@ -990,7 +990,7 @@ sub process_files {
             }
          }
       }
-      my $url_to_errors_html;
+      my $url_to_errors_html = "";
       my $mailbody;
       my $subject = '[==EMAIL_SUBJECT_WHEN_UPLOAD_ERROR==]';
       if ($ftp_or_web eq 'TAF') {

@@ -40,7 +40,7 @@ function get_exception($mtname, $exception, $value) {
       		array_push($parts, $last);
       	}
       	$detail = join(' > ', $parts);
-      	$detail = FALSE;
+#      	$detail = FALSE; <--- Seems to be left here by a mistake? Egils
       }
       if ($exception < 0) {
       	 return $detail;

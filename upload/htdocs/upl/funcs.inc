@@ -359,7 +359,7 @@ function get_dirinfo($filepath)
    }
    $dirrecords = preg_grep(':<dir\b[^>]+/>:',$lines);
    foreach ($dirrecords as $dirrec) {
-      if (preg_match('/dirname="(\w+)" key="([^"]*)"/',$dirrec,$matches2) == 1) {
+      if (preg_match('/dirname="([^"]+)" key="([^"]*)"/',$dirrec,$matches2) == 1) {
          $dirinfo[$matches2[1]] = $matches2[2];
          if ($debug) {
             mmPutTest($matches2[1] . '=' . $dirinfo[$matches2[1]]);
