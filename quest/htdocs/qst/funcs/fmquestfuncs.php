@@ -867,6 +867,7 @@ function fmcheckform($outputdst, $filename) {
 	    		$searchstr = "/name=".$mykey."/";
 		    	$templitem = preg_grep($searchstr,$mytempl);
 		    	if (count($templitem) > 0) {
+		    		$label=$mykey;
 					parse_str(current($templitem));
 	    			echo(fmlabelstart().$label.fmlabelend());
 		    	} else {
