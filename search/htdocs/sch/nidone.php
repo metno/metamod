@@ -36,7 +36,7 @@
 unset($mmSessionState->sitems["$mmCategoryNum,NI"]);
 $from = $_POST["from"];
 $to = $_POST["to"];
-if ($from != "" && $to != "") {
+if (preg_match ('/^[0-9-]+$/',$to) && preg_match ('/^[0-9-]+$/',$from)) {
    $mmSessionState->sitems["$mmCategoryNum,NI"] = array();
    $numtype = mmGetCategoryFncValue($mmCategoryNum,"numtype");
    if ($numtype == "date") {
