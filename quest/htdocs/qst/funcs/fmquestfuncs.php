@@ -154,7 +154,7 @@ function fmparsestr($type,$label,$name,$value,$length,$height,$size,$checked,$ex
     	case 'list': $mystr = fmcreatelist($name,$label,$value,$curData); break;
     	case 'radio': $mystr = fmcreateradio($name,$label,$value,$checked,$curData); break;
     	case 'checkbox': $mystr = fmcreatecheckbox($name,$label,$value,$checked,$curData); break;
-    	case 'gcmdlist': $mystr = fmcreategcmdlist($name,$label,$value,$size,$exclude,$include,$curData); break;
+    	case 'gcmdlist': $mystr = fmcreategcmdlist($name,$label,$value,$height,$exclude,$include,$curData); break;
     	// grouping tags
     	case 'sectionstart': $mystr = fmcreatesectionstart($value); break;
     	case 'sectionend': $mystr = fmcreatesectionend(); break;
@@ -368,7 +368,7 @@ function fmcreatelist($myname,$label,$mylist,$curData) {
     return($mystr);
 }
 
-function fmcreategcmdlist($myname,$mylabel,$myvalue,$size,$exclude,$include,$curData) {
+function fmcreategcmdlist($myname,$mylabel,$myvalue,$height,$exclude,$include,$curData) {
 	// read curdata, php requires multilist names to end with [], remove
 	$mname = rtrim($myname, "[]");
 	$curValues = array();
@@ -400,7 +400,7 @@ function fmcreategcmdlist($myname,$mylabel,$myvalue,$size,$exclude,$include,$cur
            $myarr[] = $mysearchstr;
         }
     }
-    $mystr .= "<select name=\"$myname\" multiple size=".$size.">\n";
+    $mystr .= "<select name=\"$myname\" multiple size=".$height.">\n";
     foreach ($myarr as $myrecord) {
     	$myrecord = rtrim($myrecord);
 		$mystr .= "<option value=\"$myrecord\" ";
@@ -713,21 +713,42 @@ function fmcheckform($outputdst, $filename) {
 	}
 
     foreach ($mytempl as $line) {
-		if (! ereg('mandatory',$line)) continue;
+    	$name = "";
+    	$size = 0;
 		parse_str($line);
 		if ($name) { # name from $line
 			$pName = rtrim($name, "[]"); // phpName for arrays
 			if ($pName != $name) {
 				# array
-				if (!(array_key_exists($pName,$_POST) && is_array($_POST[$pName]) && (count ($_POST[$pName]) > 0))) {
-					echo(fmcreateerrmsg("Record ".$pName." is mandatory and missing"));
-	    			$errors = TRUE;
+				if (ereg('mandatory',$line)) {
+					if (!(array_key_exists($pName,$_POST) && is_array($_POST[$pName]) && (count ($_POST[$pName]) > 0))) {
+						echo(fmcreateerrmsg("Record ".$pName." is mandatory and missing"));
+	    				$errors = TRUE;
+					}
+				}
+				if ($size) {
+					if ((array_key_exists($pName,$_POST) && is_array($_POST[$pName]) && (count ($_POST[$pName]) > 0))) {
+						foreach ( $_POST[$pName] as $value ) {
+       						if (mb_strlen($value, 'utf-8') > $size) {
+       							echo(fmcreateerrmsg("Length of ".$pName." is ". mb_strlen($value, 'utf-8') . ". Maximum: $size"));
+	    						$errors = TRUE;
+       						}
+						}
+					}
 				}
 			} else {
-				# check for string-length, so value 0 returns true
-				if (! strlen($_POST[$name])) {
-	    			echo(fmcreateerrmsg("Record ".$name." is mandatory and missing"));
-	    			$errors = TRUE;
+				if (ereg('mandatory',$line)) {
+					# check for string-length, so value 0 returns true
+					if (! strlen($_POST[$name])) {
+	    				echo(fmcreateerrmsg("Record ".$name." is mandatory and missing"));
+	    				$errors = TRUE;
+					}
+				}
+				if ($size) {
+					if (mb_strlen($_POST[$name], 'utf-8') > $size) {
+						echo(fmcreateerrmsg("Length of ".$name." is ". mb_strlen($_POST[$name], 'utf-8') . ". Maximum: $size"));
+						$errors = TRUE;
+					}
 				}
 			}
 		}
@@ -825,18 +846,6 @@ function fmcheckform($outputdst, $filename) {
 						"letter abbreviation.</span>";
 					$errors = TRUE;
 		    	}
-			}
-
-			# Check that abstract is not too long
-			if ($mykey == "abstract" ||
-	    		$mykey == "description" ||
-	    		$mykey == "comment") {
-		    	if (strlen($myvalue) > 512) {
-					$myvalue = "<span style=\"color: red;\">This is no ".
-						"contest for the Nobel prize in literature, please ".
-						"use the Edit button and shorten the text.</span>";
-					$errors = TRUE;
-	    		}
 			}
 
 			# Check that history is of the correct format
