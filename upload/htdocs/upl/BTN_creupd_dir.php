@@ -83,10 +83,9 @@
 # }
  if ($error == 0) {
     $opendappath = get_repository_path() . "/" . $institution . "/" . $dirname;
-    if (file_exists($opendappath)) {
-    } else if (count(glob(get_repository_path() . "/*/" . $dirname)) > 0) {
-       mmPutLog('Create/Update: Repository directory used by another institution ' . $opendappath);
-       $errmsg = "Directory name already in use by another institution";
+    if (count(glob(get_repository_path() . "/*/" . $dirname)) > 0) {
+       mmPutLog('Create/Update: Repository directory used by another user ' . $opendappath);
+       $errmsg = "Directory name already used by another user";
        $error = 1;
        $nextpage = 3;
     } else if (!create_directory($opendappath)) {
