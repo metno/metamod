@@ -692,7 +692,7 @@ function fmcheckform($outputdst, $filename) {
 	$_SESSION["tempDataset"] = $ds->getDS_XML(); // store the dataset in a session
 	$_SESSION["tempMM2"] = $ds->getMM2_XML(); // store the dataset in a session
 
-    $errors = FALSE;
+    $errors = false;
     if (! file_exists($filename)) {
 		echo(fmcreateerrmsg("Could not open configuration file"));
 		return("No form created");
@@ -709,7 +709,7 @@ function fmcheckform($outputdst, $filename) {
 		}
 	} elseif ( ! $_POST["keyphrase"]) {
 		echo(fmcreateerrmsg("Record "."Key phrase"." is mandatory and missing"));
-		$errors = TRUE;	
+		$errors = true;	
 	}
 
     foreach ($mytempl as $line) {
@@ -723,7 +723,7 @@ function fmcheckform($outputdst, $filename) {
 				if (ereg('mandatory',$line)) {
 					if (!(array_key_exists($pName,$_POST) && is_array($_POST[$pName]) && (count ($_POST[$pName]) > 0))) {
 						echo(fmcreateerrmsg("Record ".$pName." is mandatory and missing"));
-	    				$errors = TRUE;
+	    				$errors = true;
 					}
 				}
 				if ($size) {
@@ -731,7 +731,7 @@ function fmcheckform($outputdst, $filename) {
 						foreach ( $_POST[$pName] as $value ) {
        						if (mb_strlen($value, 'utf-8') > $size) {
        							echo(fmcreateerrmsg("Length of ".$pName." is ". mb_strlen($value, 'utf-8') . ". Maximum: $size"));
-	    						$errors = TRUE;
+	    						$errors = true;
        						}
 						}
 					}
@@ -741,13 +741,13 @@ function fmcheckform($outputdst, $filename) {
 					# check for string-length, so value 0 returns true
 					if (! strlen($_POST[$name])) {
 	    				echo(fmcreateerrmsg("Record ".$name." is mandatory and missing"));
-	    				$errors = TRUE;
+	    				$errors = true;
 					}
 				}
 				if ($size) {
 					if (mb_strlen($_POST[$name], 'utf-8') > $size) {
 						echo(fmcreateerrmsg("Length of ".$name." is ". mb_strlen($_POST[$name], 'utf-8') . ". Maximum: $size"));
-						$errors = TRUE;
+						$errors = true;
 					}
 				}
 			}
@@ -768,6 +768,7 @@ function fmcheckform($outputdst, $filename) {
     	echo(fmcreatemsg("Please check contents and use the Edit button" .
     			" to correct any errors."));
     	foreach ($_POST as $mykey=>$myvalue) {
+    		$myvalueError = "";
 			if ($mykey == "Submit" || $mykey == "cmd") {
 	    		continue;
 			}
@@ -787,49 +788,49 @@ function fmcheckform($outputdst, $filename) {
 			if ($mykey == "bounding_box") {
 				$parts = explode(',', $myvalue);
 	    		if (! count($parts) == 4) {
-	    			$myvalue = "<span style=\"color: red;\">This field ".
+	    			$myvalueError = "<span style=\"color: red;\">This field ".
 						"should consist of four a decimal numbers, separated by comma. ".
 						"Please use the ".
 						"Edit button and correct errors</span>";
 	    		} else if (! (is_numeric($parts[0]) && is_numeric($parts[1]) && is_numeric($parts[2]) && is_numeric($parts[3]))) {
-					$myvalue = "<span style=\"color: red;\">This field ".
+					$myvalueError = "<span style=\"color: red;\">This field ".
 						"should be a decimal number. Please use the ".
 						"Edit button and correct errors</span>";
-					$errors = TRUE;
+					$errors = true;
 	    		} else {
 					if ($parts[1] > 90. || $parts[1] < -90.) {
-		    			$myvalue .= " <span style=\"color: red;\">The ".
+		    			$myvalueError .= " <span style=\"color: red;\">The ".
 		    				"southern latitude domain is -90&#176; to 90&#176; North".
 		    				"</span>";
-			    		$errors = TRUE;
+			    		$errors = true;
 					}
 					if ($parts[3] > 90. || $parts[3] < -90.) {
-		    			$myvalue .= " <span style=\"color: red;\">The ".
+		    			$myvalueError .= " <span style=\"color: red;\">The ".
 		    				"northern latitude domain is -90&#176; to 90&#176; North".
 		    				"</span>";
-			    		$errors = TRUE;
+			    		$errors = true;
 					}
 					if ($parts[0] > 180. || $parts[0] < -180.) {
-		    			$myvalue .= " <span style=\"color: red;\">The ".
+		    			$myvalueError .= " <span style=\"color: red;\">The ".
 		    				"eastern longitude domain is -180&#176; to 90&#176; East".
 		    				"</span>";
-			    		$errors = TRUE;
+			    		$errors = true;
 					}
 					if ($parts[2] > 180. || $parts[2] < -180.) {
-		    			$myvalue .= " <span style=\"color: red;\">The ".
+		    			$myvalueError .= " <span style=\"color: red;\">The ".
 		    				"western longitude domain is -180&#176; to 90&#176; East".
 		    				"</span>";
-			    		$errors = TRUE;
+			    		$errors = true;
 					}
 	    			if ($parts[2] >	$parts[0]) {
-						$myvalue .= " <span style=\"color: red;\">Western ".
+						$myvalueError .= " <span style=\"color: red;\">Western ".
 			    			"limit is East of Eastern limit</span>";
-						$errors = TRUE;
+						$errors = true;
 	    			}
 					if ($parts[1] > $parts[3]) {
-						$myvalue .= " <span style=\"color: red;\">Northern ".
+						$myvalueError .= " <span style=\"color: red;\">Northern ".
 		    				"limit is South of Southern limit</span>";
-						$errors = TRUE;
+						$errors = true;
 		    		}
 	    		}
 			}
@@ -839,22 +840,22 @@ function fmcheckform($outputdst, $filename) {
 	    		$mykey == "datacollection_period_to") {
 	    		if (!preg_match("/^\d\d\d\d-\d\d-\d\d \d\d:\d\d \w\w\w/",
 					$myvalue)) {
-					$myvalue = "<span style=\"color: red;\">This field ".
+					$myvalueError = "<span style=\"color: red;\">This field ".
 						"should be of the form YYYY-MM-DD HH:MM UTC, please use ".
 						"the Edit button and correct errors. If time is not in ".
 						"UTC please specify timezone by the correct three ".
 						"letter abbreviation.</span>";
-					$errors = TRUE;
+					$errors = true;
 		    	}
 			}
 
 			# Check that history is of the correct format
 			if ($mykey == "history") {
 	    		if (!preg_match("/^\d\d\d\d-\d\d-\d\d /", $myvalue)) {
-					$myvalue = "<span style=\"color: red;\">This should ".
+					$myvalueError = "<span style=\"color: red;\">This should ".
 						"be of the form YYYY-MM-DD Creation, Please use the ".
 						"Edit button and correct the text. </span>";
-					$errors = TRUE;
+					$errors = true;
 	    		}
 			}
 
@@ -878,17 +879,17 @@ function fmcheckform($outputdst, $filename) {
 			if (is_array($myvalue)) {
 		    	echo(fminputstart());
 		    	foreach ($myvalue as $singleitem) {
-					echo(ereg_replace("\n","<br><br>\n",htmlspecialchars($singleitem))."<br />");
+					echo(ereg_replace("\n","<br><br>\n",htmlspecialchars($singleitem))." $myvalueError<br />");
 	    		}
 		    	echo(fminputend());
 			} else {
-	    		echo(fminputstart().htmlspecialchars($myvalue).fminputend());
+	    		echo(fminputstart().htmlspecialchars($myvalue). " $myvalueError".fminputend());
 			}
 			echo(fmcreaterecordend());
 
 			# Add hidden elements to transport information to the data dump
 			# function
-			if (!$errors) {
+			if ($errors) {
     			if (is_array($myHiddenValue)) {
 					foreach ($myHiddenValue as $singleitem) {
 	    				echo(fmcreatehidden($mykey."[]",$singleitem));
