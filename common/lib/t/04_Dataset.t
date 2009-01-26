@@ -31,7 +31,7 @@ use strict;
 use warnings;
 
 use lib "..";
-use Test::More tests => 29;
+use Test::More tests => 33;
 
 use Data::Dumper qw(Dumper);
 
@@ -41,6 +41,12 @@ my $xsltMM2 = "../../schema/oldDataset2MM2.xslt";
 
 BEGIN {use_ok('Metamod::ForeignDataset')};
 BEGIN {use_ok('Metamod::Dataset');}
+
+my $string = pack('U4',"65","66","31","67");
+ok(Metamod::ForeignDataset::isXMLCharacter($string), "char is valid xml");
+ok(!Metamod::ForeignDataset::isXMLCharacter(substr($string, 2)), "char invalid in xml");
+is(Metamod::ForeignDataset::removeUndefinedXMLCharacters($string), "ABC", "remove undefined characters");
+is(Metamod::ForeignDataset::removeUndefinedXMLCharacters(substr($string, 2)), "C", "remove undefined characters at beginning");
 
 # short test of ForeignDataset, most tests in submodule Dataset
 my $fds = Metamod::ForeignDataset->newFromFile('oldDataset.xml', ('format' => 'oldDataset'));

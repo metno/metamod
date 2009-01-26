@@ -39,7 +39,7 @@ use Metamod::DatasetTransformer::MM2;
 
 use constant NAMESPACE_MM2 => 'http://www.met.no/schema/metamod/MM2';
 use constant MM2 => <<'EOT';
-<?xml version="1.0" encoding="iso8859-1"?>
+<?xml version="1.0" encoding="utf-8"?>
 <MM2
    xmlns="http://www.met.no/schema/metamod/MM2"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -114,6 +114,7 @@ sub addMetadata {
     my ($self, $metaRef) = @_;
     foreach my $name (keys %$metaRef) {
         foreach my $val (@{ $metaRef->{$name} }) {
+            $val = Metamod::ForeignDataset::removeUndefinedXMLCharacters($val); 
             if (!defined $val) {
                 Carp::carp("undefined value for metadata $name");
                 next;

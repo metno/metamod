@@ -44,7 +44,7 @@ use mmTtime;
 
 use constant NAMESPACE_DS => 'http://www.met.no/schema/metamod/dataset';
 use constant DATASET => << 'EOT';
-<?xml version="1.0" encoding="iso8859-1" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <dataset
    xmlns="http://www.met.no/schema/metamod/dataset"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -198,6 +198,36 @@ sub setQuadtree {
     return @oldQuadtree;
 }
 
+sub isXMLCharacter {
+    # see http://www.w3.org/TR/REC-xml/#dt-character
+    # Char	   ::=   	#x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+    my $ic = ord($_[0]);
+    my $retVal = 0;
+    if ($ic == 0x9 || $ic == 0xA || $ic == 0xD) {
+        $retVal = 1;
+    } elsif ($ic >= 0x20 and $ic <=0xD7FF) {
+        $retVal = 1;
+    } elsif ($ic >= 0xE000 and $ic <= 0xFFFD) {
+        $retVal = 1;
+    } elsif ($ic >= 0x10000 and $ic <= 0x10ffff) {
+        $retVal = 1;
+    } else {
+        $retVal = 0;
+    }
+    return $retVal;
+}
+
+sub removeUndefinedXMLCharacters {
+    my ($str) = @_;
+    for (my $i = 0; $i < length($str); $i++) {
+        if (!isXMLCharacter(substr($str, $i, 1))) {
+            # remove character
+            $str = substr($str, 0, $i) . substr($str, $i+1);
+            $i--;
+        }
+    }
+    return $str;
+}
 
 1;
 __END__
@@ -231,6 +261,14 @@ strings. The metadata-file is not modified, except for content-invariant changes
 
 =over 4
 
+=item isXMLCharacter($str)
+
+Check if the first character in $str is a valid xml-character as defined in http://www.w3.org/TR/REC-xml/#dt-character
+
+=item removeUndefinedXMLCharacters($str)
+
+Remove all undefined xml characters from the string.
+Return: clean string in scalar context
 
 =back
 
