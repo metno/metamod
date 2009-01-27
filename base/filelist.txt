@@ -12,3 +12,4 @@ htdocs/adm/viewdb.php
 htdocs/adm/dosql.php
 htdocs/adm/show_databaselog.php
 htdocs/adm/show_xml.php
+htdocs/adm/edit_xml.php

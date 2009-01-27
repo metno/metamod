@@ -4,11 +4,12 @@ stop_services.sh
 htdocs/adm/index.php
 htdocs/funcs/mmLogging.inc
 htdocs/funcs/mmTtime.inc
-=htdocs/funcs/readDataset.inc
-=htdocs/funcs/mmDataset.inc
+htdocs/funcs/mmDataset.inc
 =schema/oldDataset2Dataset.xslt
 =schema/oldDataset2MM2.xslt
 =schema/dif2dataset.xslt
+=schema/MM2.xsd
+=schema/dataset.xsd
 =schema/dif2MM2.xslt
 =schema/OAI-PMH.xsd
 lib/Metamod/DatasetTransformer.pm

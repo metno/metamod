@@ -33,106 +33,185 @@
  */
 ?>
 <?php
-// TODO: switch to using DOM
 require_once("mmLogging.inc");
 require_once("mmTtime.inc");
-class MM_Dataset {
-	private $domDS; // root-node of the dataset
-	private $domMM2; // root-node of the MM2
-	private $xpathDS;
-	private $xpathMM2;
-	private $namespaceDS = "http://www.met.no/schema/metamod/dataset";
-	private $namespaceMM2 = "http://www.met.no/schema/metamod/MM2";
-	
-	
-	/**
-	 * construct a MM_Dataset2
-	 * 
-	 * @param $inputDS The input can be "", then a new dataset will be created (default);
-	 *                 input can be a DOMNode, then that node will be the source for the dataset
-	 *                 if (input_is_data), input is assumed to be an xml-string
-	 *                 otherwise, input is assumed to be a filename
-	 * @param $inputMM corresponding metadata, should be given in the same way
-	 * @param $input_is_data set true if input is a xml-string rather than a filename
-	 * @throw MM_Dataset2Exception
-	 */
-	function __construct($inputDS = "", $inputMM2 = "", $input_is_data = false) {
-			$sDate = gmstrftime("%Y-%m-%dT%H:%M:%SZ",mmTtime::ttime());
-			$dataDS =
+
+/**
+ * convert a filename of a xm[ld] file to a string without appendix
+ * @param $file regular filename of any of the dataset xml or xmd file
+ * @return $file without appendix
+ */
+function mmGetBasename($file) {
+	return preg_replace("/\.xm[dl]$/", "", $file);
+}
+
+/**
+ * get a dataset-header initialized with
+ * actual datestamp and creationDate and
+ * metadataFormat = ""
+ * @return string with dataset content
+ */
+function mmGetDefaultDatasetHeader() {
+	$sDate = gmstrftime("%Y-%m-%dT%H:%M:%SZ",mmTtime::ttime());
+	return
 '<?xml version="1.0" encoding="UTF-8" ?>
 <dataset
    xmlns="http://www.met.no/schema/metamod/dataset"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
-  <info name="" status="active" creationDate="'.$sDate.'" datestamp="'.$sDate.'" ownertag="" metadataFormat="MM2"/>
+  <info name="" status="active" creationDate="'.$sDate.'" datestamp="'.$sDate.'" ownertag="" metadataFormat="Other"/>
 </dataset>';
-			$dataMM2 =
-'<?xml version="1.0" encoding="UTF-8"?>
-<MM2
-   xmlns="http://www.met.no/schema/metamod/MM2"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
-</MM2>';
+	
+}
+
+/**
+ * load the content of xm[ld] files into a string, respect locking
+ * @param $fileXMD filename of .xml or .xmd file
+ * @param $fileXML optional filename when not using the xml/xmd combination 
+ * @return [$xmdString, $xmlString]
+ */
+function mmGetDatasetFileContent($fileXMD, $fileXML = "") {
+	if ($fileXML == "") {
+		$basefile = mmGetBasename($fileXMD);
+		$fileXML = "$basefile.xml";
+		$fileXMD = "$basefile.xmd";
+	}
+	$dataXMD = "";
+	$dataXML = "";
+	// file_get_contents does not support LOCK_SH, open and read manually
+	$xmdfh = @fopen($fileXMD, "rb");
+	if ($xmdfh) {
+		flock($xmdfh, LOCK_SH);
+	}
+	$xmlfh = @fopen($fileXML, "rb");
+	if ($xmlfh) {
+		flock($xmlfh, LOCK_SH);
+		$dataXML = fread($xmlfh, filesize($fileXML));
+	}
+	if ($xmdfh) {
+		$dataXMD = fread($xmdfh, filesize($fileXMD));
+	}
+	if ($xmlfh) {
+		fclose($xmlfh); // close and unlock mm2
+	}
+	if ($xmlfh) {
+		fclose($xmdfh); // fclose and unlock ds
+	}
+
+	return array($dataXMD, $dataXML);
+}
+
+/**
+ * write the dataset (with flock-locking) to the output Basename.
+ * The $xmlContent will be written $outputBasename.xml
+ * The $xmdContent will be written to $outputBasename.xmd
+ * 
+ * @param $outputBasename Path to the output-files without appendix .xml or .xmd
+ * @param $xmdConent string content for xmdFile
+ * @param $xmlContent string content for xmlFile
+ * @throws MM_DatasetException if file or lock has problems 
+ * 
+*/
+
+function mmWriteDataset($outputBasename, $xmdContent, $xmlContent) {
+		$dsfh = fopen($outputBasename . ".xmd", "ab");
+		if (!$dsfh) {
+			throw new MM_DatasetException("cannot write dataset-file '$outputBasename.xmd'");
+		}
+		if (!flock($dsfh, LOCK_EX)) {
+			throw new MM_DatasetExeption("cannot lock dataset-file '$outputBasename.xmd'");
+		}
+		$mm2fh = fopen($outputBasename . ".xml", "ab");
+		if (!$mm2fh) {
+			throw new MM_DatasetException("cannot write metadata-file '$outputBasename.xml'");
+		}
+		if (!flock($mm2fh, LOCK_EX)) {
+			flock($dsfh, LOCK_UN);
+			throw new MM_DatasetExeption("cannot lock metadata-file '$outputBasename.xml'");			
+		}
+		if (!ftruncate($dsfh, 0)) {
+			throw new MM_DatasetException("cannot truncate dataset-file '$outputBasename.xmd'");
+		}
+		if (!ftruncate($mm2fh, 0)) {
+			throw new MM_DatasetException("cannot truncate metadata-file '$outputBasename.xml'");
+		}
+		fseek($dsfh, 0);
+		fseek($mm2fh, 0);
+
+		fwrite($dsfh, $xmdContent);
+		fwrite($mm2fh, $xmlContent);
+
+		// fclose include unlock
+		fclose($mm2fh);
+		fclose($dsfh);
+	}
+
+
+class MM_ForeignDataset {
+	protected $domDS;
+	protected $domOther;
+	protected $xpathDS;
+	protected $namespaceDS = "http://www.met.no/schema/metamod/dataset";
+	const DATASET_SCHEMA = "[==TARGET_DIRECTORY==]/schema/dataset.xsd"; 
+	/**
+	 * construct a ForeignDataset (Dataset and XML-file)
+	 * 
+	 * @param $inputDS The input can be "", then a new dataset will be created (default);
+	 *                 input can be a DOMNode, then that node will be the source for the dataset
+	 *                 if (input_is_data), input is assumed to be an xml-string
+	 *                 otherwise, input is assumed to be a filename
+	 * @param $inputOther corresponding metadata, should be given in the same way, but cannot be ""
+	 * @param $input_is_data set true if input is a xml-string rather than a filename
+	 * @throw MM_Dataset2Exception
+	 */
+	function __construct($inputDS="", $inputOther, $input_is_data = false) {
+		$dataDS = mmGetDefaultDatasetHeader();
+		if (strlen($inputOther) == 0) {
+			throw MM_DatasetException("cannot construct a foreign dataset without foreign data");
+		}
 		if (!$inputDS) {
-			// use defaults
+			if (is_object($inputOther) && ($inputOther instanceof DOMNode)) {
+				$dataOther = DOMDocument::saveXML($inputOther);
+			} elseif ($input_is_data) {
+				$dataOther = $inputOther;
+			} else {
+				list($noInterst, $dataOther) = mmGetDatasetFileContent($inputDS, $inputOther);
+			}
 		} elseif (is_object($inputDS) && ($inputDS instanceof DOMNode)) {
 			$dataDS = DOMDocument::saveXML($inputDS);
-			if (is_object($inputMM2) && ($inputMM2 instanceof DOMNode)) {
-				$dataMM2 = DOMDocument::saveXML($inputMM2);
+			if (is_object($inputOther) && ($inputOther instanceof DOMNode)) {
+				$dataOther = DOMDocument::saveXML($inputOther);
 			} else {
-				throw new MM_DatasetException("inputDS is DOMNode, but inputMM2 is not");
+				throw new MM_DatasetException("inputDS is DOMNode, but inputOther is not");
 			}
 		} elseif ($input_is_data) {
 			$dataDS = $inputDS;
-			$dataMM2 = $inputMM2;
+			$dataOther = $inputOther;
 		} else {
-			if (! file_exists($inputDS)) {
-				throw new MM_DatasetException("dataset-file '$inputDS' not found");
-			}
-			if (! file_exists($inputMM2)) {
-				throw new MM_DatasetException("metadata-file '$inputMM2' not found");
-			}
-			// file_get_contents does not support LOCK_SH, open and read manually
-			$dsfh = fopen($inputDS, "r");
-			if (!$dsfh) {
+			list($dataDS, $dataOther) = mmGetDatasetFileContent($inputDS, $inputOther);
+			if (strlen($dataDS) == 0) {
 				throw new MM_DatasetException("cannot read dataset-file '$inputDS'");
 			}
-			flock($dsfh, LOCK_SH);
-			$mmfh = fopen($inputMM2, "r");
-			if (!$mmfh) {
-				throw new MM_DatasetException("cannot read metadata-file '$inputMM2'");
+			if (strlen($dataOther) == 0) {
+				throw new MM_DatasetException("cannot read metadata-file '$inputOther'");
 			}
-			flock($mmfh, LOCK_SH);
-
-			$dataDS = fread($dsfh, filesize($inputDS));
-			$dataMM2 = fread($mmfh, filesize($inputMM2));
-			
-			fclose($mmfh); // close and unlock mm2
-			fclose($dsfh); // fclose and unlock ds
 		}
 		$this->domDS = new DOMDocument();
 		if (!$this->domDS->loadXML($dataDS)) {
 			mm_log(MM_ERROR, "unable to parse xml-string wit '$dataDS'", __FILE__, __LINE__);
 			throw new MM_DatasetException("unable to construct dataset with '$dataDS'");
 		}
-		$this->domMM2 = new DOMDocument();		
-		if (!$this->domMM2->loadXML($dataMM2)) {
-			mm_log(MM_ERROR, "unable to parse xml-string wit '$dataMM2'", __FILE__, __LINE__);
-			throw new MM_DatasetException("unable to construct metadata with '$dataMM2'");
+		$this->domOther = new DOMDocument();		
+		if (!$this->domOther->loadXML($dataOther)) {
+			mm_log(MM_ERROR, "unable to parse xml-string wit '$dataOther'", __FILE__, __LINE__);
+			throw new MM_DatasetException("unable to construct metadata with '$dataOther'");
 		}
 		$this->xpathDS = new DomXPath($this->domDS);
 		$this->xpathDS->registerNamespace('d', $this->namespaceDS);
 		if ($this->xpathDS->query('/d:dataset/d:info')->length != 1) {
 			throw new MM_DatasetException("failed to open xml: not a dataset document");
 		}
-		$this->xpathMM2 = new DomXPath($this->domMM2);
-		$this->xpathMM2->registerNamespace('m', $this->namespaceMM2);
-		if ($this->xpathMM2->query('/m:MM2')->length != 1) {
-			throw new MM_DatasetException("failed to open xml: not a metadata document");
-		}
 	}
-
-
 	/**
 	 * read the info of the dataset
 	 * @return array with info attribute - value pairs
@@ -157,58 +236,6 @@ class MM_Dataset {
 			$dinfo->setAttribute($name, $val);
 		}
 	}
-	
-	/**
-	 * read the metadata from the dataset
-	 * @return array with metadata_name -> [value] pairs. 
-	 *         value is an array of values, one per element
-	 * 
-	 */
-	function getMetadata() {
-		$retVal = array();
-		foreach ($this->xpathMM2->query('/m:MM2/m:metadata') as $mdata) {
-			$value = "";
-			foreach ($mdata->childNodes as $child) {
-				if ($child->nodeType == XML_TEXT_NODE) {
-      				$value .= $child->nodeValue;
-    			}
-			} 
-			$retVal[$mdata->getAttribute("name")][] = $value;
-		}
-		return $retVal;
-	}
-	
-	/**
-	 * Add a metadata-element, this will append, not overwrite existing metadata names.  
-	 * 
-	 * @param $metadata array with (name => [value]) pairs. value should be an array with values
-	 */
-	function addMetadata($metadata) {
-		$node = $this->xpathMM2->query('/m:MM2')->item(0);
-		foreach ($metadata as $name => $values) {
-			foreach ($values as $value) {
-				$el = $this->domMM2->createElementNS($this->namespaceMM2,'metadata');
-				$el->setAttribute("name", $name);
-				$txt = $this->domMM2->createTextNode($value);
-				$el->appendChild($txt);
-				$node->appendChild($el);
-			}
-		}
-	}
-	
-	/**
-	 * Remove all metadata-elements with the names in $names
-	 * @param $names array with metadata-names to remove
-	 * 
-	 */
-	function removeMetadata($names) {
-		foreach ($names as $name) {
-			foreach ($this->xpathMM2->query("/m:MM2/m:metadata[@name='$name']") as $node) {
-				$node->parentNode->removeChild($node);
-			}
-		}
-	}
-
 	/**
 	 * Retrieve the quadtree-nodes as list.
 	 * 
@@ -278,8 +305,8 @@ class MM_Dataset {
 	 * get a xml string of this metadata
 	 * @return xml
 	 */
-	function getMM2_XML() {
-		return $this->domMM2->saveXML();
+	function getOther_XML() {
+		return $this->domOther->saveXML();
 	}
 
 	/**
@@ -292,37 +319,158 @@ class MM_Dataset {
 	 * 
 	 */
 	function write($outputBasename) {
-		$dsfh = fopen($outputBasename . ".xmd", "a");
-		if (!$dsfh) {
-			throw new MM_DatasetException("cannot write dataset-file '$outputBasename.xmd'");
-		}
-		if (!flock($dsfh, LOCK_EX)) {
-			throw new MM_DatasetExeption("cannot lock dataset-file '$outputBasename.xmd'");
-		}
-		$mm2fh = fopen($outputBasename . ".xml", "a");
-		if (!$mm2fh) {
-			throw new MM_DatasetException("cannot write metadata-file '$outputBasename.xml'");
-		}
-		if (!flock($mm2fh, LOCK_EX)) {
-			flock($dsfh, LOCK_UN);
-			throw new MM_DatasetExeption("cannot lock metadata-file '$outputBasename.xml'");			
-		}
-		if (!ftruncate($dsfh, 0)) {
-			throw new MM_DatasetException("cannot truncate dataset-file '$outputBasename.xmd'");
-		}
-		if (!ftruncate($mm2fh, 0)) {
-			throw new MM_DatasetException("cannot truncate metadata-file '$outputBasename.xml'");
-		}
-		fseek($dsfh, 0);
-		fseek($mm2fh, 0);
-
-		fwrite($dsfh, $this->getDS_XML());
-		fwrite($mm2fh, $this->getMM2_XML());
-
-		// fclose include unlock
-		fclose($mm2fh);
-		fclose($dsfh);
+		mmWriteDataset($outputBasename, $this->getDS_XML(), $this->getOther_XML());
 	}
+	/**
+	 * validate the dataset (not the other)
+	 * @return true on success
+	 */
+	function validate() {
+		return $this->domDS->schemaValidate(self::DATASET_SCHEMA);
+	}
+}
+
+class MM_Dataset extends MM_ForeignDataset {
+	protected $xpathMM2;
+	protected $namespaceMM2 = "http://www.met.no/schema/metamod/MM2";
+	const MM2_SCHEMA = "[==TARGET_DIRECTORY==]/schema/MM2.xsd"; 
+	
+	
+	/**
+	 * construct a MM_Dataset2
+	 * 
+	 * @param $inputDS The input can be "", then a new dataset will be created (default);
+	 *                 input can be a DOMNode, then that node will be the source for the dataset
+	 *                 if (input_is_data), input is assumed to be an xml-string
+	 *                 otherwise, input is assumed to be a filename
+	 * @param $inputMM corresponding metadata, should be given in the same way
+	 * @param $input_is_data set true if input is a xml-string rather than a filename
+	 * @throw MM_Dataset2Exception
+	 */
+	function __construct($inputDS = "", $inputMM2 = "", $input_is_data = false) {
+			$dataDS = mmGetDefaultDatasetHeader();
+			$dataMM2 =
+'<?xml version="1.0" encoding="UTF-8"?>
+<MM2
+   xmlns="http://www.met.no/schema/metamod/MM2"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+</MM2>';
+		if (!$inputDS) {
+			// use defaults
+		} elseif (is_object($inputDS) && ($inputDS instanceof DOMNode)) {
+			$dataDS = DOMDocument::saveXML($inputDS);
+			if (is_object($inputMM2) && ($inputMM2 instanceof DOMNode)) {
+				$dataMM2 = DOMDocument::saveXML($inputMM2);
+			} else {
+				throw new MM_DatasetException("inputDS is DOMNode, but inputMM2 is not");
+			}
+		} elseif ($input_is_data) {
+			$dataDS = $inputDS;
+			$dataMM2 = $inputMM2;
+		} else {
+			list($dataDS, $dataMM2) = mmGetDatasetFileContent($inputDS, $inputMM2);
+			if (strlen($dataDS) == 0) {
+				throw new MM_DatasetException("cannot read dataset-file '$inputDS'");
+			}
+			if (strlen($dataMM2) == 0) {
+				throw new MM_DatasetException("cannot read metadata-file '$inputMM2'");
+			}
+		}
+		$this->domDS = new DOMDocument();
+		if (!$this->domDS->loadXML($dataDS)) {
+			mm_log(MM_ERROR, "unable to parse xml-string wit '$dataDS'", __FILE__, __LINE__);
+			throw new MM_DatasetException("unable to construct dataset with '$dataDS'");
+		}
+		$this->domOther = new DOMDocument();		
+		if (!$this->domOther->loadXML($dataMM2)) {
+			mm_log(MM_ERROR, "unable to parse xml-string wit '$dataMM2'", __FILE__, __LINE__);
+			throw new MM_DatasetException("unable to construct metadata with '$dataMM2'");
+		}
+		$this->xpathDS = new DomXPath($this->domDS);
+		$this->xpathDS->registerNamespace('d', $this->namespaceDS);
+		if ($this->xpathDS->query('/d:dataset/d:info')->length != 1) {
+			throw new MM_DatasetException("failed to open xml: not a dataset document");
+		}
+		$this->xpathMM2 = new DomXPath($this->domOther);
+		$this->xpathMM2->registerNamespace('m', $this->namespaceMM2);
+		if ($this->xpathMM2->query('/m:MM2')->length != 1) {
+			throw new MM_DatasetException("failed to open xml: not a metadata document");
+		}
+		$this->addInfo(array("metadataFormat" => "MM2"));
+	}
+
+
+	/**
+	 * read the metadata from the dataset
+	 * @return array with metadata_name -> [value] pairs. 
+	 *         value is an array of values, one per element
+	 * 
+	 */
+	function getMetadata() {
+		$retVal = array();
+		foreach ($this->xpathMM2->query('/m:MM2/m:metadata') as $mdata) {
+			$value = "";
+			foreach ($mdata->childNodes as $child) {
+				if ($child->nodeType == XML_TEXT_NODE) {
+      				$value .= $child->nodeValue;
+    			}
+			} 
+			$retVal[$mdata->getAttribute("name")][] = $value;
+		}
+		return $retVal;
+	}
+	
+	/**
+	 * Add a metadata-element, this will append, not overwrite existing metadata names.  
+	 * 
+	 * @param $metadata array with (name => [value]) pairs. value should be an array with values
+	 */
+	function addMetadata($metadata) {
+		$node = $this->xpathMM2->query('/m:MM2')->item(0);
+		foreach ($metadata as $name => $values) {
+			foreach ($values as $value) {
+				$el = $this->domOther->createElementNS($this->namespaceMM2,'metadata');
+				$el->setAttribute("name", $name);
+				$txt = $this->domOther->createTextNode($value);
+				$el->appendChild($txt);
+				$node->appendChild($el);
+			}
+		}
+	}
+	
+	/**
+	 * Remove all metadata-elements with the names in $names
+	 * @param $names array with metadata-names to remove
+	 * 
+	 */
+	function removeMetadata($names) {
+		foreach ($names as $name) {
+			foreach ($this->xpathMM2->query("/m:MM2/m:metadata[@name='$name']") as $node) {
+				$node->parentNode->removeChild($node);
+			}
+		}
+	}
+	
+	/**
+	 * get a xml string of this metadata
+	 * @return xml
+	 * @deprecated @see getOther_XML
+	 */
+	function getMM2_XML() {
+		return $this->getOther_XML();
+	}
+	
+	/**
+	 * validate the dataset and the mm2
+	 * @return true on success
+	 */
+	function validate() {
+		return $this->domDS->schemaValidate(parent::DATASET_SCHEMA) &&
+			$this->domOther->schemaValidate(self::MM2_SCHEMA);
+		
+	}
+	
 }
 
 class MM_DatasetException extends Exception {

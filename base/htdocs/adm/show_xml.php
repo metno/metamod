@@ -35,22 +35,26 @@
 <body>
 <pre>
 <?php
-   $importdirs = "[==IMPORTDIRS==]";
-   $arr_importdirs = explode("\n",$importdirs);
-   foreach ($arr_importdirs as $dirpath) {
-      echo "<h2>$dirpath</h2>\n";
-      $bname = basename($dirpath);
-      echo "<table cellpadding=\"10\">\n";
-      $files = scandir($dirpath);
-      foreach ($files as $file) {
-         if (preg_match ('/\.xmd$/i',$file)) {
-            echo "<tr><td><a href=\"$bname/$file\">$file</a></td>";
-         } elseif (preg_match ('/\.xml$/i',$file)) {
-            echo "<td><a href=\"$bname/$file\">$file</a></td></tr>\n";
-         }
-      }
-      echo "</table>\n";
-   }
+	$importdirs = "[==IMPORTDIRS==]";
+	$arr_importdirs = explode("\n",$importdirs);
+	foreach ($arr_importdirs as $dirpath) {
+	echo "<h2>$dirpath</h2>\n";
+		$bname = basename($dirpath);
+		if (is_dir($dirpath)) {
+			echo "<table cellpadding=\"10\">\n";
+			$files = scandir($dirpath);
+			foreach ($files as $file) {
+				if (preg_match ('/\.xmd$/i',$file)) {
+            		echo "<tr><td><a href=\"$bname/$file\">$file</a> <a href=\"edit_xml.php?file=$dirpath/$file\">(edit)</a></td>";
+         		} elseif (preg_match ('/\.xml$/i',$file)) {
+            		echo "<td><a href=\"$bname/$file\">$file</a> <a href=\"edit_xml.php?file=$dirpath/$file\">(edit)</a></td></tr>\n";
+         		}
+      		}
+      		echo "</table>\n";
+      	} else {
+      		echo "Directory not found";
+      	}
+   	}
 ?>
 </pre>
 </body>
