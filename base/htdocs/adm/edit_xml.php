@@ -51,8 +51,8 @@ function raw_param( $str ) {
 <?php
 	if (strlen($_REQUEST["file"]) && is_file($_REQUEST["file"])) {
 		echo "<pre>".$_REQUEST["file"]."</pre>";
-		$xml = raw_param($_REQUEST["xmlContent"]);
-		$xmd = raw_param($_REQUEST["xmdContent"]);	
+		$xml = html_entity_decode(raw_param($_REQUEST["xmlContent"],ENT_QUOTES, 'UTF-8'));
+		$xmd = html_entity_decode(raw_param($_REQUEST["xmdContent"],ENT_QUOTES, 'UTF-8'));	
 		if (strlen($_REQUEST["submitValue"]) && $_REQUEST["submitValue"] == "Save") {
 			mmWriteDataset(mmGetBasename($_REQUEST["file"]), $xmd, $xml);
 			echo "<p>Data successfully saved</p>";
@@ -97,9 +97,9 @@ function raw_param( $str ) {
 <form action="edit_xml.php" method="POST">
 	<input type="hidden" name="file" value="<?php echo $_REQUEST["file"]; ?>" />
 	<h2>Dataset Content</h2>
-	<textarea name="xmdContent" rows="15" cols="100"><?php echo $xmd; ?></textarea>
+	<textarea name="xmdContent" rows="15" cols="100"><?php echo htmlentities($xmd, ENT_QUOTES, 'UTF-8'); ?></textarea>
 	<h2>Metadata Content</h2>
-	<textarea name="xmlContent" rows="40" cols="100"><?php echo $xml; ?></textarea>
+	<textarea name="xmlContent" rows="40" cols="100"><?php echo htmlentities($xml, ENT_QUOTES, 'UTF-8'); ?></textarea>
 	<p>
 	<input type="submit" name="submitValue" value="Validate" />
 	<input type="submit" name="submitValue" value="Save" />
