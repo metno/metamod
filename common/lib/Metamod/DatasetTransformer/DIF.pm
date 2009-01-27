@@ -150,13 +150,12 @@ sub transform {
         my %info = $ds->getInfo;
         $info{name} =~ s^_^/^g;
         $info{ownertag} = 'DAM' if ($info{ownertag} eq 'DAMOCLES');
-        foreach my $date (qw(timestamp creationDate)) { # timestamp is reference for other dates if not existing
+        unless ($info{datestamp}) {
+            $info{datestamp} = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime(mmTtime::ttime()));
+        }
+        foreach my $date (qw(datestamp creationDate)) {
             unless ($info{$date}) {
-                if ($date eq 'timestamp') {
-                    $info{$date} = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime(mmTtime::ttime()));
-                } else {
-                    $info{$date} = $info{timestamp};
-                }
+                $info{$date} = $info{datestamp}; # datestamp is reference, see above
             }
             if (length $info{$date} == 10) {
                 $info{$date} .= 'T00:00:00Z';
