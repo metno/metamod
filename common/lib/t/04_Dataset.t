@@ -29,6 +29,7 @@
 #----------------------------------------------------------------------------
 use strict;
 use warnings;
+use encoding 'utf8';
 
 use lib "..";
 use Test::More tests => 33;
@@ -61,7 +62,7 @@ is($ds->originalFormat, 'MM2', "orignal format");
 
 my %info = $ds->getInfo;
 ok(exists $info{creationDate}, "getInfo, creationDate");
-$info{name} = 'blub';
+$info{'name'} = 'blub';
 $ds->setInfo(\%info);
 %info = $ds->getInfo;
 is($info{name}, 'blub', "setInfo, name");

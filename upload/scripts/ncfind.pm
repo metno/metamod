@@ -32,13 +32,24 @@ package ncfind;
 require 0.01;
 use strict;
 use Fcntl;
-$ncfind::VERSION = 0.01;
+use Encode;
+$ncfind::VERSION = 0.02;
 #   
 #    Use PDL module with netCDF interface
 #   
    use PDL;
    use PDL::Char;
    use PDL::NetCDF;
+
+#   
+# Default decoding of data to perl internal format
+# with utf-8 flag switched on.
+# It is no problem to _decode twice.
+# Original in netcdf is assumed to be 'utf8'.
+#
+sub _decode {
+    return map {Encode::decode('utf8', $_)} @_;
+}
 #   
 #     Constructor function: ncfind
 #   
@@ -60,7 +71,7 @@ $ncfind::VERSION = 0.01;
    sub globatt_names {
       my $self = shift;
       my $ncref = $self->{NCOBJ};
-      return @{$ncref->getattributenames()};
+      return _decode(@{$ncref->getattributenames()});
    }
 #   
 #     Method: globatt_value
@@ -71,9 +82,9 @@ $ncfind::VERSION = 0.01;
       my $ncref = $self->{NCOBJ};
       my $result = $ncref->getatt ($globattname);
       if (ref($result)) {
-         return sclr $result;
+         return _decode(sclr $result);
       } else {
-         return $result;
+         return _decode($result);
       }
    }
 #   
@@ -85,7 +96,7 @@ $ncfind::VERSION = 0.01;
 #      
 #       Return all variable names 
 #      
-      return @{$ncref->getvariablenames()};
+      return _decode(@{$ncref->getvariablenames()});
    }
 #   
 #     Method: att_names
@@ -94,7 +105,7 @@ $ncfind::VERSION = 0.01;
       my $self = shift;
       my $varname = shift;
       my $ncref = $self->{NCOBJ};
-      return @{$ncref->getattributenames($varname)};
+      return _decode(@{$ncref->getattributenames($varname)});
    }
 #   
 #     Method: att_value
@@ -106,9 +117,9 @@ $ncfind::VERSION = 0.01;
       my $ncref = $self->{NCOBJ};
       my $result = $ncref->getatt ($attname, $varname);
       if (ref($result)) {
-         return sclr $result;
+         return _decode(sclr $result);
       } else {
-         return $result;
+         return _decode($result);
       }
    }
 #   
@@ -121,7 +132,7 @@ $ncfind::VERSION = 0.01;
 #      
 #       Return the dimension names from a variable
 #      
-      return @{$ncref->getdimensionnames($varname)};
+      return _decode(@{$ncref->getdimensionnames($varname)});
    }
 #   
 #     Method: get_bordervalues

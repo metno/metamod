@@ -27,14 +27,16 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #----------------------------------------------------------------------------
 package Metamod::ForeignDataset;
-our $VERSION = 0.3;
+our $VERSION = 0.4;
 
 
 use strict;
 use warnings;
+use encoding 'utf-8';
 use 5.6.0;
 use strict;
 use warnings;
+use Encode;
 use Fcntl qw(:DEFAULT :flock); # import LOCK_* constants
 use POSIX qw();
 use XML::LibXML qw();
@@ -53,7 +55,15 @@ use constant DATASET => << 'EOT';
 </dataset>
 EOT
 
-
+sub _decode {
+	my ($self, $string) = @_;
+	if (!Encode::is_utf8($string)) {
+		print STDERR "String not properly encoded, trying iso8859-1 and utf8: $string\n";
+		eval {$string = Encode::decode('iso8859-1', $string,  Encode::FB_CROAK);};
+		if ($@) {$string = Encode::decode('utf8', $string);}
+	}
+	return $string;
+}
 
 sub newFromDoc {
     my ($class, $foreign, $dataset, %options) = @_;
@@ -164,10 +174,10 @@ sub replaceInfo {
     my %newInfo = %$infoRef;
     my $infoNode = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docDS})->item(0);
     while (my ($name, $val) = each %oldInfo) {
-        $infoNode->removeAttribute($name) unless $newInfo{$name};
+        $infoNode->removeAttribute($self->_decode($name)) unless $newInfo{$name};
     }
     while (my ($name, $val) = each %newInfo) {
-        $infoNode->setAttribute($name, $val);
+        $infoNode->setAttribute($self->_decode($name), $self->_decode($val));
     }
     return undef;
 }
@@ -266,6 +276,17 @@ Metamod::ForeignDataset - working with Metamod datasets without known Metadata
 The Metamod::ForeignDataset package give a convenient way to work with the xml-files describing
 default datasets consisting of meta-metadata (dataset.xmd files) and metadata (file.xml) files or
 strings. The metadata-file is not modified, except for content-invariant changes through the xml-parser/writer.
+
+XML::LibXML requires properly encoded utf-8 strings as input, with
+perl utf8-flag switched on. Please make sure to provide such data by:
+
+=over 4
+
+=item use Encode; and decode all data with decode('charset', $string);
+
+=item use encoding 'utf-8'; To set non-binary input-files annd all literals ('name') to utf8
+
+=back
 
 =head1 FUNCTIONS
 

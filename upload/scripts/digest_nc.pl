@@ -33,6 +33,7 @@ use strict;
 use lib qw([==TARGET_DIRECTORY==]/scripts [==TARGET_DIRECTORY==]/lib);
 use XML::Simple qw(:strict);
 use Metamod::Dataset;
+use encoding 'utf-8';
 use ncfind;
 use quadtreeuse;
 use Data::Dumper;
@@ -837,7 +838,7 @@ sub parse_all {
 #  be changed in existing datasets by editing the *.xmd file.
 #
    if (!$info{ownertag}) {
-      $info{ownertag} = $ownertag;
+      $info{'ownertag'} = $ownertag;
    }
 
 #

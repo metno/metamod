@@ -31,6 +31,7 @@ use base qw(Metamod::DatasetTransformer);
 
 use strict;
 use warnings;
+use encoding 'utf-8';
 use Carp qw(carp croak);
 use quadtreeuse;
 use mmTtime;
@@ -39,7 +40,7 @@ use mmTtime;
 use 5.6.0;
 
 
-our $VERSION = 0.4;
+our $VERSION = 0.5;
 our $XSLT_FILE_MM2 = "[==SOURCE_DIRECTORY==]/common/schema/dif2MM2.xslt";
 our $XSLT_FILE_DS = "[==SOURCE_DIRECTORY==]/common/schema/dif2dataset.xslt";
 
@@ -148,10 +149,10 @@ sub transform {
     
     if (!$self->{xmdStr}) {
         my %info = $ds->getInfo;
-        $info{name} =~ s^_^/^g;
-        $info{ownertag} = 'DAM' if ($info{ownertag} eq 'DAMOCLES');
-        unless ($info{datestamp}) {
-            $info{datestamp} = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime(mmTtime::ttime()));
+        $info{'name'} =~ s^_^/^g;
+        $info{'ownertag'} = 'DAM' if ($info{'ownertag'} eq 'DAMOCLES');
+        unless ($info{'datestamp'}) {
+            $info{'datestamp'} = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime(mmTtime::ttime()));
         }
         foreach my $date (qw(datestamp creationDate)) {
             unless ($info{$date}) {

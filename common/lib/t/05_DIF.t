@@ -29,6 +29,7 @@
 #----------------------------------------------------------------------------
 use strict;
 use warnings;
+use encoding 'utf-8';
 
 use lib "..";
 use Test::More tests => 12;

@@ -29,10 +29,11 @@
 
 package Metamod::Dataset;
 use base qw(Metamod::ForeignDataset);
-our $VERSION = 0.4;
+our $VERSION = 0.5;
 
 use strict;
 use warnings;
+use encoding 'utf-8';
 use Carp qw();
 use Metamod::DatasetTransformer;
 use Metamod::DatasetTransformer::MM2;
@@ -114,13 +115,14 @@ sub addMetadata {
     my ($self, $metaRef) = @_;
     foreach my $name (keys %$metaRef) {
         foreach my $val (@{ $metaRef->{$name} }) {
+        	$val = $self->_decode($val);
             $val = Metamod::ForeignDataset::removeUndefinedXMLCharacters($val); 
             if (!defined $val) {
                 Carp::carp("undefined value for metadata $name");
                 next;
             }
             my $el = $self->{docMETA}->createElementNS($self->NAMESPACE_MM2, 'metadata');
-            $el->setAttribute('name', $name);
+            $el->setAttribute('name', $self->_decode($name));
             $el->appendChild($self->{docMETA}->createTextNode($val));
             $self->{docMETA}->documentElement->appendChild($el);
         }
