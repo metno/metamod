@@ -39,6 +39,19 @@ require_once("../funcs/mmDataset.inc");
 function raw_param( $str ) {
 	return ini_get( 'magic_quotes_gpc' ) ? stripslashes( $str ) : $str;
 }
+/**
+ * htmlentities will fail silently if not all
+ * characters are given in the set character-set.
+ * This function will work around that problem, and translate
+ * then without character-set.
+ */
+function htmlEncodeUtf8 ( $str ) {
+	$encStr = htmlentities($str, ENT_QUOTES, 'UTF-8');
+	if (strlen($encStr) < strlen($str)) {
+		$encStr = htmlentities($str, ENT_QUOTES);
+	}
+	return $encStr;
+}
 
 ?>
 <html>
@@ -97,9 +110,9 @@ function raw_param( $str ) {
 <form action="edit_xml.php" method="POST">
 	<input type="hidden" name="file" value="<?php echo $_REQUEST["file"]; ?>" />
 	<h2>Dataset Content</h2>
-	<textarea name="xmdContent" rows="15" cols="100"><?php echo htmlentities($xmd, ENT_QUOTES, 'UTF-8'); ?></textarea>
+	<textarea name="xmdContent" rows="15" cols="100"><?php echo htmlEncodeUtf8($xmd); ?></textarea>
 	<h2>Metadata Content</h2>
-	<textarea name="xmlContent" rows="40" cols="100"><?php echo htmlentities($xml, ENT_QUOTES, 'UTF-8'); ?></textarea>
+	<textarea name="xmlContent" rows="40" cols="100"><?php echo htmlEncodeUtf8($xml); ?></textarea>
 	<p>
 	<input type="submit" name="submitValue" value="Validate" />
 	<input type="submit" name="submitValue" value="Save" />
