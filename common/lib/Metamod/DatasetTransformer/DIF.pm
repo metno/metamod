@@ -39,7 +39,7 @@ use mmTtime;
 use 5.6.0;
 
 
-our $VERSION = 0.3;
+our $VERSION = 0.4;
 our $XSLT_FILE_MM2 = "[==SOURCE_DIRECTORY==]/common/schema/dif2MM2.xslt";
 our $XSLT_FILE_DS = "[==SOURCE_DIRECTORY==]/common/schema/dif2dataset.xslt";
 
