@@ -27,7 +27,7 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #----------------------------------------------------------------------------
 package Metamod::ForeignDataset;
-our $VERSION = 0.2;
+our $VERSION = 0.3;
 
 
 use strict;
@@ -155,9 +155,19 @@ sub getInfo {
 sub setInfo {
     my ($self, $infoRef) = @_;
     my %info = ($self->getInfo, %$infoRef);
-    my $info = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docDS})->item(0);
-    while (my ($name, $val) = each %info) {
-        $info->setAttribute($name, $val);
+    return $self->replaceInfo($infoRef);
+}
+
+sub replaceInfo {
+    my ($self, $infoRef) = @_;
+    my %oldInfo = $self->getInfo;
+    my %newInfo = %$infoRef;
+    my $infoNode = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docDS})->item(0);
+    while (my ($name, $val) = each %oldInfo) {
+        $infoNode->removeAttribute($name) unless $newInfo{$name};
+    }
+    while (my ($name, $val) = each %newInfo) {
+        $infoNode->setAttribute($name, $val);
     }
     return undef;
 }
@@ -325,15 +335,22 @@ Return: XML::LibXML::Document of the metadata
 
 =item getInfo()
 
-read the info elements (name, ownertag, status, metadataFormat, creationDate) from the dataset
+read the info attributes (name, ownertag, status, metadataFormat, creationDate) from the dataset
 
 Return: %info
 
 =item setInfo(\%info)
 
-add or overwrite info elements to the dataset
+add or overwrite info attributes to the dataset
 
 Return: undef
+
+=item replaceInfo(\%info)
+
+replace all info attributes with those in %info. This will remove all attributes not in %info.
+
+Return: undef
+
 
 =item originalFormat()
 
