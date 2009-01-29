@@ -29,6 +29,7 @@
 package Metamod::ForeignDataset;
 our $VERSION = 0.4;
 
+our $DEBUG = 0;
 
 use strict;
 use warnings;
@@ -58,9 +59,12 @@ EOT
 sub _decode {
 	my ($self, $string) = @_;
 	if (!Encode::is_utf8($string)) {
-		print STDERR "String not properly encoded, trying iso8859-1 and utf8: $string\n";
-		eval {$string = Encode::decode('iso8859-1', $string,  Encode::FB_CROAK);};
-		if ($@) {$string = Encode::decode('utf8', $string);}
+		print STDERR "String not properly encoded, assuming utf8: $string\n" if $DEBUG;
+        eval {$string = Encode::decode('utf8', $string, Encode::FB_CROAK);};
+        if ($@) {
+        	print STDERR "Unable to properly decode string: $string\n";
+        	$string = Encode::decode('utf8', $string);
+        }
 	}
 	return $string;
 }

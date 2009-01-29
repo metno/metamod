@@ -41,14 +41,33 @@ $ncfind::VERSION = 0.02;
    use PDL::Char;
    use PDL::NetCDF;
 
+
+#
+# try encoding with utf8
+# if errors try encoding with iso8859-1
+# if still errors, try encoding with utf8 ignoring errors
+#
+sub _utf8Iso8859_1Decode {
+	my $retVal = $_[0];
+	eval {$retVal = Encode::decode('utf8', $retVal, Encode::FB_CROAK)};
+	if ($@) {
+		eval {$retVal = Encode::decode('iso8859-1', $retVal, Encode::FB_CROAK)};
+		if ($@) {
+			$retVal = Encode::decode('utf8', $retVal);
+		} 
+	}
+	return $retVal;
+}
+
 #   
 # Default decoding of data to perl internal format
 # with utf-8 flag switched on.
 # It is no problem to _decode twice.
-# Original in netcdf is assumed to be 'utf8'.
+# Original in netcdf is assumed to be 'utf8' or 'iso8859-1'.
 #
 sub _decode {
-    return map {Encode::decode('utf8', $_)} @_;
+    return wantarray ? map {_utf8Iso8859_1Decode($_)} @_
+                     : _utf8Iso8859_1Decode($_[0]);
 }
 #   
 #     Constructor function: ncfind

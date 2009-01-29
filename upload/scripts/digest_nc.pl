@@ -837,7 +837,7 @@ sub parse_all {
 #  provided in the input file. This is a hack so that owenrtags may easily
 #  be changed in existing datasets by editing the *.xmd file.
 #
-   if (!$info{ownertag}) {
+   if (!$info{'ownertag'}) {
       $info{'ownertag'} = $ownertag;
    }
 
@@ -948,8 +948,8 @@ sub parse_all {
    $ds->removeMetadata;
    
    # the following might exist in metadata instead of the info
-   $info{status} = (delete $metadata{status})->[0] if exists $metadata{status};
-   $info{creationDate} = (delete $metadata{creationDate})->[0] if exists $metadata{creationDate};
+   $info{'status'} = (delete $metadata{'status'})->[0] if exists $metadata{'status'};
+   $info{'creationDate'} = (delete $metadata{'creationDate'})->[0] if exists $metadata{'creationDate'};
    $ds->setInfo(\%info);
    
    #
@@ -958,24 +958,24 @@ sub parse_all {
    #
    my @nodes = get_quadtree_nodes(\%all_variables, \%all_globatts, \%metadata);
    $ds->setQuadtree(\@nodes);
-   delete $metadata{quadtree_nodes};
+   delete $metadata{'quadtree_nodes'};
 
    # start and stop date need special handling
-   my $start_date = (delete $metadata{start_date})->[0] if exists $metadata{start_date};
+   my $start_date = (delete $metadata{'start_date'})->[0] if exists $metadata{'start_date'};
    if ($start_date) {
-      $metadata{datacollection_period_from} = [substr($start_date,0,10)];
+      $metadata{'datacollection_period_from'} = [substr($start_date,0,10)];
    }
-   my $stop_date = (delete $metadata{stop_date})->[0] if exists $metadata{stop_date};
+   my $stop_date = (delete $metadata{'stop_date'})->[0] if exists $metadata{'stop_date'};
    if ($stop_date) {
-      $metadata{datacollection_period_to} = [substr($stop_date,0,10)];
+      $metadata{'datacollection_period_to'} = [substr($stop_date,0,10)];
    }
    # using bounding_box instead of *_latitude, *_longitude
-   my $south = (delete $metadata{southernmost_latitude})->[0] if exists $metadata{southernmost_latitude};
-   my $north = (delete $metadata{northernmost_latitude})->[0] if exists $metadata{northernmost_latitude};
-   my $east = (delete $metadata{easternmost_longitude})->[0] if exists $metadata{easternmost_longitude};
-   my $west = (delete $metadata{westernmost_longitude})->[0] if exists $metadata{westernmost_longitude};
+   my $south = (delete $metadata{'southernmost_latitude'})->[0] if exists $metadata{'southernmost_latitude'};
+   my $north = (delete $metadata{'northernmost_latitude'})->[0] if exists $metadata{'northernmost_latitude'};
+   my $east = (delete $metadata{'easternmost_longitude'})->[0] if exists $metadata{'easternmost_longitude'};
+   my $west = (delete $metadata{'westernmost_longitude'})->[0] if exists $metadata{'westernmost_longitude'};
    if (defined $south and defined $north and defined $east and defined $west) {
-      $metadata{bounding_box} = ["$east,$south,$west,$north"];
+      $metadata{'bounding_box'} = ["$east,$south,$west,$north"];
    }
    
    # add all metadata
