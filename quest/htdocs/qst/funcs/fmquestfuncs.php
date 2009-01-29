@@ -700,7 +700,6 @@ function fmcheckform($outputdst, $filename) {
 
     $mytempl = file($filename);
 
-	$uploadDir = "";
 	if (isset($_REQUEST["uploadDirectory"])) {
 		if (! (isset($_REQUEST["institutionId"]) && strlen($_REQUEST["institutionId"]))) {
 			$mysmg = "information missing during quest metadata configuration, please enter through the upload portal!";
@@ -754,8 +753,8 @@ function fmcheckform($outputdst, $filename) {
 		}
     }
     echo(fmstartform());
-    if (strlen($uploadDir) != 0) {
-		echo(fmcreatehidden("uploadDirectory", $uploadDir));
+    if (isset($_REQUEST["uploadDirectory"])) {
+		echo(fmcreatehidden("uploadDirectory", $_REQUEST["uploadDirectory"]));
     	echo(fmcreatehidden("institutionId", $_REQUEST["institutionId"]));
 	}
 	
