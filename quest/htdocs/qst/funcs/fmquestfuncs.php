@@ -646,8 +646,10 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
     	}
     	$outputfileBase = "$outputdst/$md5code";
     	if (file_exists($outputfileBase.".xml")) {
+    		echo(fmstartform());
 			echo(fmcreateerrmsg("You have submitted information using the same keyphrase before"));
 			echo(fmcreatebutton("Submit", "Edit form"));
+		    echo(fmendform());
 			return;
     	}
 	}
