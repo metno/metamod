@@ -712,6 +712,7 @@ function fmcheckform($outputdst, $filename) {
 	}
 
     foreach ($mytempl as $line) {
+    	if (ereg('^\#',$line)) continue;
     	$name = "";
     	$size = 0;
 		parse_str($line);
@@ -888,14 +889,12 @@ function fmcheckform($outputdst, $filename) {
 
 			# Add hidden elements to transport information to the data dump
 			# function
-			if ($errors) {
-    			if (is_array($myHiddenValue)) {
-					foreach ($myHiddenValue as $singleitem) {
-	    				echo(fmcreatehidden($mykey."[]",$singleitem));
-					}
-				} else {
-					echo(fmcreatehidden($mykey,$myHiddenValue));
-    			}
+			if (is_array($myHiddenValue)) {
+				foreach ($myHiddenValue as $singleitem) {
+    				echo(fmcreatehidden($mykey."[]",$singleitem));
+				}
+			} else {
+				echo(fmcreatehidden($mykey,$myHiddenValue));
 			}
     	}
 	    echo(fmcreatesectionend());
