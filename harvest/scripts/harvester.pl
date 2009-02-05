@@ -124,10 +124,12 @@ if (@ARGV == 2) {
 
 my @arr_harvest_sources = split(/\n/,$harvest_sources);
 my %hash_harvest_sources = ();
+my %hash_set_specifications = ();
 foreach my $hsource (@arr_harvest_sources) {
    next if $hsource =~ /^\s*$/; # possible empty line
-   my ($ownertag,$url) = ($hsource =~ /\S+/g);
+   my ($ownertag,$url,$setspec) = ($hsource =~ /\S+/g);
    $hash_harvest_sources{$ownertag} = $url;
+   $hash_set_specifications{$ownertag} = $setspec;
 }
 #
 # Create new user agent
@@ -201,6 +203,10 @@ sub do_harvest {
          my $urlsent = $url . '?verb=ListRecords&metadataPrefix=dif';
          if (defined($date_last_upd)) {
             $urlsent .= '&from=' . $date_last_upd;
+         }
+         if (exists($hash_set_specifications{$ownertag}) && 
+             defined($hash_set_specifications{$ownertag})) {
+            $urlsent .= '&set=' . $hash_set_specifications{$ownertag};
          }
 #         
 #          Send GET request 
