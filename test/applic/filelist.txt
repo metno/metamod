@@ -1,0 +1,8 @@
+etc/usererrors.conf
+etc/conf_digest_nc.xml
+staticdata/searchdata.xml
+htdocs/upl/style.css
+htdocs/sch/style.css
+htdocs/qst/config/metamod2-meta-config.txt
+=htdocs/img/background.jpg
+htdocs/style.css
