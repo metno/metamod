@@ -152,6 +152,7 @@ else
    exit
 fi
 exec >test_application.out
+set -x
 cd $basedir
 mkdir -p target
 mkdir -p webrun
@@ -182,6 +183,7 @@ else
 fi
 admindomain=`expr $servername : ".*\.\([^.]*\.[^.]*\)"`
 datasettags=`expr $servername : ".*\.\([^.]*\.[^.]*\)"`
+basedirbasename=`basename $basedir`
 cp master_config.txt bc.master_config.txt
 sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 /^TARGET_DIRECTORY *=/s|=.*$|= '$basedir/target'|
@@ -190,6 +192,7 @@ sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 /^DATABASE_NAME *=/s|=.*$|= '$idstring'|
 /^APPLICATION_ID *=/s|=.*$|= '$idstring'|
 /^BASE_PART_OF_EXTERNAL_URL *=/s|=.*$|= http//'$servername$appendport'|
+/^LOCAL_URL *=/s|=.*$|= '$basedirbasename'|
 /^PMH_PORT_NUMBER *=/s|=.*$|= '$pmhport'|
 /^PMH_REPOSITORY_IDENTIFIER *=/s|=.*$|= '$idstring'|
 /^PMH_EXPORT_TAGS *=/s|=.*$|= '"'$idstring'"'|

@@ -13,7 +13,7 @@ METAMODQUEST_DIRECTORY = [==SOURCE_DIRECTORY==]/quest
 BASE_PART_OF_EXTERNAL_URL = Substituted by test_application.sh
 
 # Initial part of local URLs:
-LOCAL_URL = /r1/htdocs
+LOCAL_URL = Substituted by test_application.sh
 
 # The administration web application is only accessible from the following
 # domain:
