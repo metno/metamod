@@ -36,7 +36,7 @@
 <pre>
 <?php
 	$importdirs = "[==IMPORTDIRS==]";
-	$arr_importdirs = explode("\n",$importdirs);
+	$arr_importdirs = preg_split('/\s*\n\s*/m',$importdirs);
 	foreach ($arr_importdirs as $dirpath) {
 	echo "<h2>$dirpath</h2>\n";
 		$bname = basename($dirpath);
