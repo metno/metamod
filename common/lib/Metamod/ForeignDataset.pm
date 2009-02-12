@@ -120,8 +120,9 @@ sub writeToFile {
     truncate($xmlF, 0) or die "can't truncate $fileBase.xml: $!\n";
     binmode $xmdF; # drop all PerlIO layers possibly created by a use open pragma
     binmode $xmlF;
-    print $xmdF $self->getDS_XML;
-    print $xmlF $self->getMETA_XML;
+    # use libxml to write the file, avoid any interference by perl (possible character conversion)
+    $self->{docDS}->toFH($xmdF, 1);
+    $self->{docMETA}->toFH($xmlF, 1);
     close $xmlF;
     close $xmdF;
     

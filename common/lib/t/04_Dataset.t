@@ -29,10 +29,11 @@
 #----------------------------------------------------------------------------
 use strict;
 use warnings;
-use encoding 'utf8';
+use encoding 'iso8859-1';
+use Encode qw(decode);
 
 use lib "..";
-use Test::More tests => 33;
+use Test::More tests => 36;
 
 use Data::Dumper qw(Dumper);
 
@@ -75,11 +76,18 @@ ok(-f 'test.xmd', "xmd file exists");
 unlink "test.xml"; unlink "test.xmd";
 
 my @metaVals = qw(a b c);
-my %metadata = ("abc" => \@metaVals);
+my $umlauts = decode('iso8859-1', "רזü");
+my %metadata = ("abc" => \@metaVals, umlauts => [$umlauts]);
 $ds->addMetadata(\%metadata);
 my %newMeta = $ds->getMetadata;
 ok(exists $newMeta{'abc'}, "write and get metadata, name");
 ok(eq_array($newMeta{'abc'}, \@metaVals), "write and get metadata, values");
+ok($ds->writeToFile('test'), "writeToFile with umlauts");
+$ds = newFromFile Metamod::Dataset('test.xml');
+ok(ref $ds, "reading dataset with umlauts");
+%newMeta = $ds->getMetadata;
+is($newMeta{umlauts}[0], $umlauts, "correctly reading umlauts");
+unlink "test.xml"; unlink "test.xmd";
 
 my $dsClone = $ds->getDS_DOC;
 my $mmClone = $ds->getMETA_DOC;
