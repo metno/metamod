@@ -170,7 +170,7 @@ sub getInfo {
 sub setInfo {
     my ($self, $infoRef) = @_;
     my %info = ($self->getInfo, %$infoRef);
-    return $self->replaceInfo($infoRef);
+    return $self->replaceInfo(\%info);
 }
 
 sub replaceInfo {

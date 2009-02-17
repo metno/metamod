@@ -33,7 +33,7 @@ use encoding 'iso8859-1';
 use Encode qw(decode);
 
 use lib "..";
-use Test::More tests => 36;
+use Test::More tests => 37;
 
 use Data::Dumper qw(Dumper);
 
@@ -63,10 +63,13 @@ is($ds->originalFormat, 'MM2', "orignal format");
 
 my %info = $ds->getInfo;
 ok(exists $info{creationDate}, "getInfo, creationDate");
+%info = ();
 $info{'name'} = 'blub';
 $ds->setInfo(\%info);
 %info = $ds->getInfo;
 is($info{name}, 'blub', "setInfo, name");
+ok(exists $info{creationDate}, "check no overwrite of creationDate");
+
 my @quadTree = (1, 11, 111, 112);
 ok(eq_array([], [$ds->setQuadtree(\@quadTree)]), "set quadtree");
 ok(eq_array(\@quadTree, [$ds->getQuadtree]), "get quadtree");

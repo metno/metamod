@@ -360,7 +360,7 @@ sub process_DIF_records {
             return;
          }
       }
-      # TODO: set status, datestamp, creationdate, ...
+      # set DIF-external elements
       $fds->setInfo({status => $status, ownertag => $ownertag, name => $dsname, datestamp => $datestamp});
       print "Write $base_filename.xm[ld]\n" if ($progress_report == 1);
       $fds->writeToFile($base_filename);
