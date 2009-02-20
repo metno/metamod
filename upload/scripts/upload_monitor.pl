@@ -34,12 +34,12 @@ use lib qw([==TARGET_DIRECTORY==]/scripts [==TARGET_DIRECTORY==]/lib);
 use File::Copy;
 use File::Path;
 use File::Spec;
-use File::Find qw();
 use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 use Data::Dumper;
 use Mail::Mailer;
 use mmTtime;
 use Metamod::Dataset;
+use Metamod::Utils qw(findFiles);
 $| = 1;
 #
 #  upload_monitor.pl
@@ -1891,21 +1891,6 @@ sub decodenorm {
       return '';
    }
 };
-#
-#-----------------------------------------------------------------------------------
-# search files in $dir, optionally with pattern $pattern and return list of files
-# $pattern should be a well escaped regex which will be read as is into /$pattern/
-sub findFiles {
-	my ($dir, $pattern) = @_;
-	my @files;
-	if ($pattern) {
-		my $regex = qr/$pattern/; # precompile
-        File::Find::find(sub {-f && /$regex/ && push @files, $File::Find::name;}, $dir);		
-	} else {
-		File::Find::find(sub {-f && push @files, $File::Find::name;}, $dir);
-	}
-	return @files;
-}
 
 #
 #-----------------------------------------------------------------------------------
