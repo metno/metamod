@@ -27,7 +27,7 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #----------------------------------------------------------------------------
 package Metamod::ForeignDataset;
-our $VERSION = 0.4;
+our $VERSION = 0.5;
 
 our $DEBUG = 0;
 
@@ -127,6 +127,24 @@ sub writeToFile {
     close $xmdF;
     
     return 1;
+}
+
+sub deleteDatasetFile {
+	 my ($self, $fileBase) = @_;
+	 $fileBase = Metamod::DatasetTransformer::getBasename($fileBase);
+    my ($xmlF, $xmdF);
+    # use sysopen, flock, truncate instead of open ">file" (see perlopentut)
+    sysopen($xmdF, "$fileBase.xmd", O_WRONLY | O_CREAT) or die "cannot write $fileBase.xmd: $!\n";
+    flock ($xmdF, LOCK_EX) or die "cannot lock $fileBase.xmd: $!\n";
+    sysopen($xmlF, "$fileBase.xml", O_WRONLY | O_CREAT) or die "cannot write $fileBase.xml: $!\n";
+    flock ($xmlF, LOCK_EX) or die "cannot lock $fileBase.xml: $!\n";
+
+    my $err1 = unlink "$fileBase.xmd";
+    my $err2 = unlink "$fileBase.xml";
+    close $xmlF;
+    close $xmdF;
+
+    return $err1 && $err2;
 }
 
 sub getDS_XML {
@@ -337,6 +355,12 @@ Dies on missing xml-file, or on invalid xml-strings in xml or xmd files.
 
 write the current content to $basename.xml and $basename.xmd (appendixes will be truncated). This will
 overwrite an existing file! Dies on error.
+
+=item deleteDatasetFile($basename)
+
+delete the files belonging to the dataset $basename (.xml and .xmd).
+Return false on failure, true on success. 
+This is a class rather than a object-method.
 
 =item getDS_XML
 
