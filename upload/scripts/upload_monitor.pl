@@ -39,6 +39,7 @@ use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 use Data::Dumper;
 use Mail::Mailer;
 use mmTtime;
+use Metamod::Dataset;
 $| = 1;
 #
 #  upload_monitor.pl
@@ -723,7 +724,7 @@ sub process_files {
                if ($component =~ /\/([^\/]+)$/) {
                   $bname = $1; # First matching ()-expression
                }
-               if (-e $work_flat . '/' . $bname) {
+               if (-e File->Spec->catfile($work_flat, $bname)) {
                   &syserror("USER","uploaded_tarfile_with_component_already_encountered",
                             $uploadname, "process_files", "Component: $bname");
                   $errors = 1;
@@ -897,8 +898,9 @@ sub process_files {
    my @existing_basenames;
    if ($ftp_or_web ne 'TAF') {
       @uploaded_basenames = &get_basenames(\@uploaded_files);
-      $destination_dir = $opendap_directory . "/" . 
-                            $dataset_institution{$dataset_name}->[0] . "/" . $dataset_name;
+      $destination_dir = File::Spec->catdir($opendap_directory, 
+                                            $dataset_institution{$dataset_name}->[0],
+                                            $dataset_name);
       my @existing_files = findFiles($destination_dir, "\Q$dataset_name\E_");
       if (length($shell_command_error) > 0) {
          &syserror("SYS","find_fails_2", "", "process_files", "");
@@ -907,7 +909,10 @@ sub process_files {
       @existing_basenames = &get_basenames(\@existing_files);
       my @reuploaded_basenames = &intersect(\@uploaded_basenames,\@existing_basenames);
       my @reprocess_basenames = ();
-      $xmlpath = $webrun_directory . '/XML/' . $application_id . '/' . $dataset_name . '.xml';
+      $xmlpath = File::Spec->catfile($webrun_directory,
+                                     'XML',
+                                     $application_id,
+                                     $dataset_name . '.xml');
       if (scalar @reuploaded_basenames > 0) {
 #
 #  Some of the new files have been uploaded before:
@@ -922,13 +927,16 @@ sub process_files {
          push (@digest_input,$fname);
       }
       foreach my $fname (@reprocess_basenames) {
-         push (@digest_input,$destination_dir . '/' . $fname);
+         push (@digest_input,File::Spec->catfile($destination_dir, $fname));
       }
       $destination_url = $opendap_url;
       if ($destination_url !~ /\/$/) {
          $destination_url .= '/';
       }
-      $destination_url .= 'data/' . $dataset_institution{$dataset_name}->[0] . "/" . $dataset_name . "/";
+      $destination_url .= join ('/', 'data',
+                                     $dataset_institution{$dataset_name}->[0],
+                                     $dataset_name,
+                                     ""); # last for for / at end
    } else {
       $destination_url = 'TESTFILE';
       $xmlpath = 'TESTFILE';
@@ -975,8 +983,37 @@ sub process_files {
          }
       }
       return;
-   } else {
+   } else {   	
       if ($ftp_or_web ne 'TAF') {
+#     run digest_nc again for each file with output to dataset/file.xml
+#     this creates the level 2 xml-files
+         foreach my $filepath (@digest_input) {
+         	my (undef, undef, $basename) = File::Spec->splitpath($filepath);
+         	my $fileURL = $destination_url . $basename;
+         	open (my $digest, ">digest_input");
+         	print $digest $fileURL, "\n";
+            print $digest $filepath, "\n";
+            close $digest;
+            my $pureFile = $basename;
+            $pureFile =~ s/\.[^.]*$//; # remove extension
+            my $xmlFileDir = substr $xmlpath, 0, length($xmlpath)-4; # remove .xml
+            if (! -d $xmlFileDir) {
+               if (!mkdir($xmlFileDir)) {
+               	syserror("SYS", "mkdir_fails", $filepath, "process_files", "mdkir $xmlFileDir");
+               	return;
+               }
+            }
+            my $xmlFilePath = File::Spec->catfile($xmlFileDir, $pureFile . '.xml');
+            Metamod::Dataset->deleteDatasetFile($xmlFilePath); # remove in case it exists already
+            my $digestCommand = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlFilePath";
+            print "RUN:    $digestCommand\n" if $progress_report == 1;
+            shcommand_scalar($digestCommand);
+            if (length($shell_command_error) > 0) {
+            	syserror("SYS", "digest_nc_file_fails", $filepath, "process_files", "");
+               return;
+            }
+         }         
+      	
 #
 #     Move new files to the data repository:
 #
@@ -1018,7 +1055,7 @@ sub process_files {
          my $timecode = substr($datestring,8,2) . substr($datestring,11,2) . 
                         substr($datestring,14,2);
          my $name_html_errfile = $dataset_name . '_' . $timecode . '.html';
-         my $path_to_errors_html = $uerr_directory . '/' . $name_html_errfile;
+         my $path_to_errors_html = File->Spec->catfile($uerr_directory, $name_html_errfile);
          my $errorinfo_path = "errorinfo";
          open (ERRORINFO,">$errorinfo_path");
          print ERRORINFO $path_to_errors_html . "\n";
@@ -1157,8 +1194,8 @@ sub revert_XML_history {
 #  in the repository that must be re-processed due to this revertion to an older
 #  XML file.
 #
-   my $xml_history_filename = $xml_history_directory . '/' . $dataset_name . '.hst';
-   my $xml_filename = $xml_directory . '/' . $dataset_name . '.xml';
+   my $xml_history_filename = File::Spec->catfile($xml_history_directory, $dataset_name . '.hst');
+   my $xml_filename = File::Spec->catfile($xml_directory, $dataset_name . '.xml');
    if (-r $xml_history_filename) {
       open (XMLHISTORY,$xml_history_filename);
 #
@@ -1166,9 +1203,8 @@ sub revert_XML_history {
 #  with all referenced data.
 #  Will also work on array references.
 #
-      undef $/;
+      local $/;
       my $xml_history = <XMLHISTORY>;
-      $/ = "\n";
       my $ref_xml_history = eval($xml_history);
       close (XMLHISTORY);
 #
@@ -1236,13 +1272,12 @@ sub update_XML_history {
 #  A new XML file has just been created for the dataset. Update the XML
 #  history file.
 #
-   my $xml_history_filename = $xml_history_directory . '/' . $dataset_name . '.hst';
-   my $xml_filename = $xml_directory . '/' . $dataset_name . '.xml';
+   my $xml_history_filename = File::Spec->catfile($xml_history_directory, $dataset_name . '.hst');
+   my $xml_filename = File::Spec->catfile($xml_directory, $dataset_name . '.xml');
    if (-r $xml_filename) {
       open (XMLFILE,$xml_filename);
-      undef $/;
+      local $/;
       my $xml_file = <XMLFILE>;
-      $/ = "\n";
       close (XMLFILE);
       my @new_xml_history;
       my @old_and_new = &union($uploaded_basenames,$existing_basenames);
