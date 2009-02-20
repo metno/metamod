@@ -18,5 +18,6 @@ lib/Metamod/DatasetTransformer/OldDataset.pm
 lib/Metamod/DatasetTransformer/DIF.pm
 lib/Metamod/Dataset.pm
 lib/Metamod/ForeignDataset.pm
+=lib/Metamod/Utils.pm
 lib/quadtreeuse.pm
 lib/mmTtime.pm
