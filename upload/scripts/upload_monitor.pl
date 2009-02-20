@@ -33,6 +33,8 @@ use strict;
 use lib qw([==TARGET_DIRECTORY==]/scripts [==TARGET_DIRECTORY==]/lib);
 use File::Copy;
 use File::Path;
+use File::Spec;
+use File::Find qw();
 use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 use Data::Dumper;
 use Mail::Mailer;
@@ -213,7 +215,12 @@ my @user_errors = ();
 #  -------------------
 #
 eval {
-   &main_loop();
+	if ($ARGV[0] && $ARGV[0] eq 'test') {
+		print STDERR "Testrun\n";
+		main_loop("test");
+	} else {
+      &main_loop();		
+	}
 };
 if ($@) {
    &syserror("SYS", "ABORTED: " . $@, "", "", "");
@@ -224,6 +231,7 @@ if ($@) {
 # ----------------------------------------------------------------------------
 #
 sub main_loop {
+   my ($testrun) = @_; # if test, always run, but only once
 #
 #  Make sure static directories exists:
 #
@@ -292,7 +300,7 @@ sub main_loop {
    my $current_day = $ltime[3]; # 1-31
    my $hour_finished = -1;
    $file_in_error_counter = 1;
-   while (-e $path_continue_monitor) {
+   while (-e $path_continue_monitor || $testrun) {
       @ltime = localtime(mmTtime::ttime());
       my $newday = $ltime[3]; # 1-31
       my $current_hour = $ltime[2]; # 0-23
@@ -311,6 +319,7 @@ sub main_loop {
          $hour_finished = $ltime[2]; # 0-23
       }
       &testafile();
+      if ($testrun) {last;}
       sleep($sleeping_seconds);
    }
 }
@@ -365,8 +374,7 @@ sub ftp_process_hour {
    foreach my $eventkey (@matches) {
       my ($dataset_name,$hour) = split(/\s+/,$eventkey);
       my $wait_minutes = $eventsref->{$eventkey};
-      my $pattern = '"' . $dataset_name . '_*"';
-      my @files_found = &shcommand_array("find $ftp_dir_path -name $pattern");
+      my @files_found = findFiles($ftp_dir_path, "^\Q$dataset_name\E_");
       if (scalar @files_found == 0 && length($shell_command_error) > 0) {
          &syserror("SYS","find_fails", "", "ftp_process_hour", "");
          next;
@@ -410,7 +418,7 @@ sub ftp_process_hour {
 #  routine). Only move files older than 5 hours. Newer files may be temporary
 #  files waiting to be renamed by the uploading software:
 #
-   my @all_files_found = &shcommand_array("find $ftp_dir_path -type f");
+   my @all_files_found = findFiles($ftp_dir_path);
    if (scalar @all_files_found == 0 && length($shell_command_error) > 0) {
       &syserror("SYS","find_fails_2", "", "ftp_process_hour", "");
    } else {
@@ -448,7 +456,7 @@ sub web_process_uploaded {
 #  Check the WEB upload area.
 #
    my %datasets = ();
-   my @files_found = &shcommand_array("find $upload_dir_path -type f");
+   my @files_found = findFiles($upload_dir_path);
    if (scalar @files_found == 0 && length($shell_command_error) > 0) {
       &syserror("SYS","find_fails", "", "web_process_uploaded", "");
    }
@@ -495,7 +503,7 @@ sub web_process_uploaded {
 #
 sub testafile {
    my %datasets = ();
-   my @files_found = &shcommand_array("find '[==WEBRUN_DIRECTORY==]/upl/ftaf' -type f");
+   my @files_found = findFiles('[==WEBRUN_DIRECTORY==]/upl/ftaf');
    if (scalar @files_found == 0 && length($shell_command_error) > 0) {
       &syserror("SYS","find_fails", "", "testafile", "");
    }
@@ -583,31 +591,29 @@ sub process_files {
 #  Clean up the work_start, work_flat and work_expand directories:
 #
    foreach my $dir ($work_start,$work_expand,$work_flat) {
-      &shcommand_scalar("rm -rf $dir/*");
-      if (length($shell_command_error) > 0) {
+   	rmtree($dir);
+      if (-d $dir) {
          die "Unable to clean up $dir: $shell_command_error";
       }
+      mkdir($dir); # create a fresh directory
    }
 #
    my $taf_basename; # Used if uploaded file is only for testing
    foreach my $uploadname (keys %files_to_process) {
       $errors = 0;
-      my $baseupldname = $uploadname;
-      my $extention;
-      if ($uploadname =~ /\/([^\/]+)$/) {
-         $baseupldname = $1; # First matching ()-expression
-      }
+      my (undef, undef, $baseupldname) = File::Spec->splitpath($uploadname);
       $taf_basename = $baseupldname;
+      my $extension;
       if ($baseupldname =~ /\.([^.]+)$/) {
-         $extention = $1; # First matching ()-expression
+         $extension = $1; # First matching ()-expression
       }
 #      
 #     Copy uploaded file to the work_start directory
 #      
-      if (copy($uploadname,$work_start . '/' . $baseupldname) == 0) {
+      my $newpath = File::Spec->catfile($work_start, $baseupldname);
+      if (link_or_copy($uploadname, $newpath) == 0) {
          die "Copy to workdir did not succeed. Uploaded file: $uploadname Error code: $!\n";
       }
-      my $newpath = $work_start . '/' . $baseupldname;
 #      
 #     Get type of file and act accordingly:
 #      
@@ -623,32 +629,32 @@ sub process_files {
             $errors = 1;
             next;
          }
-         if (defined($extention) && ($extention eq "gz" || $extention eq "GZ")) {
+         if (defined($extension) && ($extension eq "gz" || $extension eq "GZ")) {
 #            
-#              Strip ".gz" extention from $baseupldname
+#              Strip ".gz" extension from $baseupldname
 #            
             $baseupldname = substr($baseupldname,0,length($baseupldname)-3);
-            undef $extention;
+            undef $extension;
             if ($baseupldname =~ /\.([^.]+)$/) {
-               $extention = $1; # First matching ()-expression
+               $extension = $1; # First matching ()-expression
             }
-         } elsif (defined($extention) && ($extention eq "tgz" || $extention eq "TGZ")) {
+         } elsif (defined($extension) && ($extension eq "tgz" || $extension eq "TGZ")) {
 #            
-#              Substitute "tgz" extention with "tar"
+#              Substitute "tgz" extension with "tar"
 #            
             $baseupldname = substr($baseupldname,0,length($baseupldname)-3) . 'tar';
-            $extention = 'tar';
+            $extension = 'tar';
          } else {
             &syserror("SYSUSER","uploaded_filename_with_missing_gz_or_tgz", $uploadname, "process_files", "");
             $errors = 1;
             next;
          }
-         $newpath = $work_start . '/' . $baseupldname;
+         $newpath = File::Spec->catfile($work_start, $baseupldname);
          $filetype = &get_filetype($newpath);
       }
 #
       if (index($filetype,"tar archive") >= 0) {
-         if (!defined($extention) || ($extention ne "tar" && $extention ne "TAR")) {
+         if (!defined($extension) || ($extension ne "tar" && $extension ne "TAR")) {
             &syserror("SYSUSER","uploaded_filename_with_missing_tar_ext", $uploadname, "process_files", "");
             $errors = 1;
             next;
@@ -741,7 +747,7 @@ sub process_files {
 #         
 #        Move file directly to $work_flat:
 #         
-         if (-e $work_flat . '/' . $baseupldname) {
+         if (-e File::Spec->catfile($work_flat, $baseupldname)) {
             &syserror("SYSUSER","uploaded_file_already_encountered", $uploadname, "process_files", "");
             next;
          } else {
@@ -783,22 +789,21 @@ sub process_files {
                    "", "process_files", "Expanded file: $expandedfile");
          next;
       }
-      my $extention;
+      my $extension;
       if ($expandedfile =~ /\.([^.]+)$/) {
-         $extention = $1; # First matching ()-expression
+         $extension = $1; # First matching ()-expression
       }
       my $filetype = &get_filetype($expandedfile);
       if ($progress_report == 1) {
          print "    ---- Processing $expandedfile: $filetype\n";
       }
       if (index($filetype,"text") >= 0) {
-         my $path_to_remove_cr = $target_directory . '/scripts/remove_cr.sh';
-         my $dummy = &shcommand_scalar("$path_to_remove_cr $expandedfile");
-         if (length($shell_command_error) > 0) {
-            &syserror("SYS","remove_cr_failed",$uploadname, "process_files","");
+         my $errorMsg = remove_cr_from_file($expandedfile);
+         if (length($errorMsg) > 0) {
+            &syserror("SYS","remove_cr_failed: $errorMsg",$uploadname, "process_files","");
             $not_accepted{$expandedfile} = 1;
             $errors = 1;
-         } elsif (defined($extention) && ($extention eq 'cdl' || $extention eq 'CDL')) {
+         } elsif (defined($extension) && ($extension eq 'cdl' || $extension eq 'CDL')) {
             my $firstline = &shcommand_scalar("head -1 $expandedfile");
             if (length($shell_command_error) > 0) {
                &syserror("SYS","head_command_fails_on_expandedfile",
@@ -844,7 +849,7 @@ sub process_files {
                   }
                }
             } else {
-               &syserror("SYSUSER","text_file_with_cdl_extention_not_a_cdlfile",
+               &syserror("SYSUSER","text_file_with_cdl_extension_not_a_cdlfile",
                          $uploadname, "process_files", "File: $expandedfile");
                $not_accepted{$expandedfile} = 1;
                $errors = 1;
@@ -877,8 +882,7 @@ sub process_files {
 #  files in the repository that are not affected by re-uploads. Base the digest_nc.pl run
 #  on this XML file.
 #
-   my $command = "find $work_flat -type f -name \"$dataset_name" . '_*" -print';
-   my @uploaded_files = &shcommand_array($command);
+   my @uploaded_files = findFiles($work_flat, "^\Q$dataset_name\E_");
 #   print "Uploaded files:\n";
 #   print Dumper(\@uploaded_files);
    if (length($shell_command_error) > 0) {
@@ -895,8 +899,7 @@ sub process_files {
       @uploaded_basenames = &get_basenames(\@uploaded_files);
       $destination_dir = $opendap_directory . "/" . 
                             $dataset_institution{$dataset_name}->[0] . "/" . $dataset_name;
-      $command = "find $destination_dir -type f -name \"$dataset_name" . '_*" -print';
-      my @existing_files = &shcommand_array($command);
+      my @existing_files = findFiles($destination_dir, "\Q$dataset_name\E_");
       if (length($shell_command_error) > 0) {
          &syserror("SYS","find_fails_2", "", "process_files", "");
          return;
@@ -947,7 +950,7 @@ sub process_files {
 #   
 #  Run the digest_nc.pl script:
 #   
-   $command = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlpath";
+   my $command = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlpath";
    if ($progress_report == 1) {
       print "RUN:    $command\n";
    }
@@ -1246,9 +1249,8 @@ sub update_XML_history {
       my @new_element = (\@old_and_new,\$xml_file);
       if (-r $xml_history_filename) {
          open (XMLHISTORY,$xml_history_filename);
-         undef $/;
+         local $/;
          my $xml_history = <XMLHISTORY>;
-         $/ = "\n";
          my $ref_xml_history = eval($xml_history);
          close (XMLHISTORY);
 	 if (defined($ref_xml_history)) {
@@ -1386,10 +1388,7 @@ sub notify_web_system {
             next;
          }
          open (USERFILE,$ownerfile);
-         undef $/;
-         my $file_content = <USERFILE>;
-         my @file_content_arr = split(/\n/,$file_content);
-         $/ = "\n"; 
+         my @file_content_arr = <USERFILE>;
          close (USERFILE);
 #   
          my @new_file_content_arr = ();
@@ -1448,9 +1447,8 @@ sub get_dataset_institution {
          next;
       }
       open (INPUTFILE,$filename);
-      undef $/;
+      local $/;
       my $content = <INPUTFILE>;
-      $/ = "\n"; 
       close (INPUTFILE);
 #
       my $institution;
@@ -1553,8 +1551,7 @@ sub shcommand_array {
 #---------------------------------------------------------------------------------
 #
 sub clean_up_problem_dir {
-   my $pattern = '"[0-9]*"';
-   my @files_found = &shcommand_array("find $problem_dir_path -name $pattern");
+   my @files_found = findFiles($problem_dir_path, qr/^\d/);
    if (scalar @files_found == 0 && length($shell_command_error) > 0) {
       &syserror("SYS","find_fails", "", "clean_up_problem_dir", "");
    }
@@ -1723,10 +1720,7 @@ sub syserror {
    my $min = $ta[1]; # 0-59
    my $datestring = sprintf ('%04d-%02d-%02d %02d:%02d',$year,$mon,$mday,$hour,$min);
 #
-   my $baseupldname = $uploadname;
-   if ($uploadname =~ /\/([^\/]+)$/) {
-      $baseupldname = $1; # First matching ()-expression
-   }
+   my (undef, undef, $baseupldname) = File::Spec->splitpath($uploadname);
 #
    if ($type eq "SYS" || $type eq "SYSUSER") {
 #
@@ -1862,3 +1856,52 @@ sub decodenorm {
       return '';
    }
 };
+#
+#-----------------------------------------------------------------------------------
+# search files in $dir, optionally with pattern $pattern and return list of files
+# $pattern should be a well escaped regex which will be read as is into /$pattern/
+sub findFiles {
+	my ($dir, $pattern) = @_;
+	my @files;
+	if ($pattern) {
+		my $regex = qr/$pattern/; # precompile
+        File::Find::find(sub {-f && /$regex/ && push @files, $File::Find::name;}, $dir);		
+	} else {
+		File::Find::find(sub {-f && push @files, $File::Find::name;}, $dir);
+	}
+	return @files;
+}
+
+#
+#-----------------------------------------------------------------------------------
+# hardlink a $in to $out, if that files, i.e. because of different file-systems
+# really copy the file
+sub link_or_copy {
+	my ($in, $out) = @_;
+	if (link ($in, $out)) {
+		return 1;
+	} else {
+		return copy($in, $out);
+	}
+}
+
+
+#
+#-----------------------------------------------------------------------------------
+# remove \r from a file
+# returns error message on error, 0 on succes 
+# because it emulates a shell-script
+sub remove_cr_from_file {
+	my ($file) = @_;
+	eval {
+		open (my $f, $file) or die "Cannot read file $file: $!";
+		local $/;
+		my $data = <$f>;
+		close $f;
+		$data =~ s/\r//g;
+		open ($f, ">".$file) or die "Cannot write file $file: $!";
+		print $f $data;
+		close $f;
+	};
+	return $@;
+}

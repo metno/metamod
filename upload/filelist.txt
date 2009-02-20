@@ -28,6 +28,5 @@ scripts/ncfind.pm
 scripts/print_usererrors.pl
 scripts/upload_monitor.pl
 scripts/show_time_now.pl
-scripts/remove_cr.sh
 etc/standard_name.txt
 etc/conf_digest_nc.xsd
