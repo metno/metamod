@@ -38,7 +38,6 @@ use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 use Data::Dumper;
 use Mail::Mailer;
 use mmTtime;
-use Metamod::Dataset;
 use Metamod::Utils qw(findFiles);
 $| = 1;
 #
@@ -986,7 +985,7 @@ sub process_files {
    } else {   	
       if ($ftp_or_web ne 'TAF') {
 #     run digest_nc again for each file with output to dataset/file.xml
-#     this creates the level 2 xml-files
+#     this creates the level 2 (children) xml-files
          foreach my $filepath (@digest_input) {
          	my (undef, undef, $basename) = File::Spec->splitpath($filepath);
          	my $fileURL = $destination_url . $basename;
@@ -1004,8 +1003,7 @@ sub process_files {
                }
             }
             my $xmlFilePath = File::Spec->catfile($xmlFileDir, $pureFile . '.xml');
-            Metamod::Dataset->deleteDatasetFile($xmlFilePath); # remove in case it exists already
-            my $digestCommand = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlFilePath";
+            my $digestCommand = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlFilePath isChild";
             print "RUN:    $digestCommand\n" if $progress_report == 1;
             shcommand_scalar($digestCommand);
             if (length($shell_command_error) > 0) {

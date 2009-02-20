@@ -4,7 +4,7 @@ files are supposed to be CF compliant.
 
 Usage:
 
-   digest_nc.pl configdir inputfile ownertag xmlpath
+   digest_nc.pl configdir inputfile ownertag xmlpath [isChild]
 
    where:
 
@@ -24,7 +24,14 @@ Usage:
      xmlpath    Path to an XML file that will receive the result of the netCDF parsing.
                 If this file already exists, it will contain  the metadata for a
                 previous version of the dataset. In this case, a new version of the file
-                will be created, comprising a merge of the old and new metadata.
+                will be created, comprising a merge of the old and new metadata. The 
+                xmlpath will also define the dataset-name: last directory parts + filename
+                for parents, last two directory parts + filename for children.
+
+     isChild    if defined, creates a child xml-file, that is a xml-file which corresponds
+                exactly to one file, rather than to a set/directory of files. The content
+                of the old xmlpath will be ignored and just overwritten. The dataset-name
+                will contain of an extra directory.
 
 A netCDF file contains a set of global attributes and a set of variables. Each variable
 may also have attributes. The global attributes, variables and variable attributes

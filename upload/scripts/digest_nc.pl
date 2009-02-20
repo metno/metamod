@@ -65,18 +65,19 @@ use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 #
 #---------------------------------------------------------------------------------
 #
-my $argcount = scalar @ARGV;
-if ($argcount != 4) {
+if (@ARGV < 4 or @ARGV > 5) {
    die "\nUsage:\n\n     $0\n" .
                    "            metadata_configuration_file\n" .
                    "            file_for_netCDF_pathes\n" .
                    "            ownertag\n" .
-                   "            path_to_XML_file\n\n";
+                   "            path_to_XML_file\n" .
+                   "            [isChild]\n\n";
 }
 my $etcdirectory = $ARGV[0];
 my $pathfilename = $ARGV[1];
 my $ownertag = $ARGV[2];
 my $xml_metadata_path = $ARGV[3];
+my $isChild = $ARGV[4];
 #
 #---------------------------------------------------------------------------------
 #
@@ -794,9 +795,9 @@ sub parse_all {
 #
 #  First, check if there already exist an XML metadata file with name
 #  $xml_metadata_path. In this case, initialize the %metadata hash with metadata
-#  from this file:
+#  from this file if it is not a child:
 #
-   if (-r $xml_metadata_path) {
+   if (-r $xml_metadata_path && (! $isChild)) {
       $ds = Metamod::Dataset->newFromFile($xml_metadata_path);
       die "cannot read dataset $xml_metadata_path: $!\n" unless $ds;
       if ($CTR_printdump == 1) {
@@ -822,9 +823,14 @@ sub parse_all {
    }
    if (!$info{"name"}) {
       if ($xml_metadata_path ne "TESTFILE") {
-         if ($xml_metadata_path =~ /\/([^\/]+\/[^\/]+)\.(xml|XML)$/) {
-            my $name = $1; # First matching ()-expression
-            $info{"name"} = $name;
+      	my $nameReg;
+      	if ($isChild) {
+      		$nameReg = qr{/([^/]+/[^/]+/[^/]+)\.xml$}i;
+      	} else {
+      		$nameReg = qr{/([^/]+/[^/]+)\.xml$}i;
+      	}
+         if ($xml_metadata_path =~ /$nameReg/) {
+            $info{"name"} = $1;
          } else {
             die "Not able to construct dataset-name from $xml_metadata_path";
          }

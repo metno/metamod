@@ -188,32 +188,6 @@ sub process_xml_loop {
 	&write_to_log("Check for new datasets stopped");
 }
 
-# ------------------------------------------------------------------
-#
-# a parent is defined to be an additional directory between
-# $dir and the file part of filePath
-# return parent or undef
-sub getParent {
-	my ( $filePath, $dir ) = @_;
-	my ( $vol, $fileDir, $file ) = File::Spec->splitpath($filePath);
-	my @dirParts     = File::Spec->splitdir($dir);
-	my @fileDirParts = File::Spec->splitdir($fileDir);
-   # remove possible empty dirs
-   @dirParts = map {$_ eq "" ? () : $_} @dirParts;
-   @fileDirParts = map {$_ eq "" ? () : $_} @fileDirParts;
-
-	foreach my $part (@dirParts) {
-		my $fDirPart = shift @fileDirParts;
-		if ( $fDirPart ne $part ) {
-			die "filepath $filePath not part of directory $dir; :@dirParts:@fileDirParts:";
-		}
-	}
-	if ( @fileDirParts > 1 ) {
-		die "still finding several parents in $filePath to $dir: " . join ("/", @fileDirParts);
-	}
-	return $fileDirParts[0];    # might be undef
-}
-
 sub process_directories {
 	my ($last_updated,@dirs) = @_;
 
@@ -267,8 +241,7 @@ sub process_directories {
 		@files_to_consume =
 		  map { s^\.\w*$^^; $uniqueBaseFiles{$_}++ ? $_ : () } @files_to_consume;
 		foreach my $xmlfile (@files_to_consume) {
-			my $parent = getParent( $xmlfile, $xmldir1 );
-			eval { &update_database( $xmlfile, $parent ); };
+			eval { &update_database( $xmlfile ); };
 			if ($@) {
 				$dbh->rollback or die $dbh->errstr;
 				my $stm = $dbh->{"Statement"};
@@ -316,7 +289,7 @@ sub write_to_log {
 
 # ------------------------------------------------------------------
 sub update_database {
-	my ($inputBaseFile, $parentName) = @_;
+	my ($inputBaseFile) = @_;
 
 	#
 	#  Read input XML file-pair:
@@ -531,13 +504,14 @@ sub update_database {
 		}
 		my $dsStatus = ( $info{status} eq 'active' ) ? 1 : 0;
 		my $parentId = 0;
+		my $parentName = $ds->getParentName;
 		if ($parentName) {
 			$sql_getIDByNameAndParent_DS->execute($parentName, 0);
 			my @result = $sql_getIDByNameAndParent_DS->fetchrow_array;
 			if (@result != 0) {
 				$parentId = $result[0];
 			} else {
-				die "couldn't find parent for $info{name}";
+				die "couldn't find parent for $info{name}: $parentName";
 			}
 		}
 		$sql_insert_DS->execute(
