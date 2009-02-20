@@ -33,7 +33,7 @@ use encoding 'iso8859-1';
 use Encode qw(decode);
 
 use lib "..";
-use Test::More tests => 40;
+use Test::More tests => 43;
 
 use Data::Dumper qw(Dumper);
 
@@ -65,10 +65,18 @@ my %info = $ds->getInfo;
 ok(exists $info{creationDate}, "getInfo, creationDate");
 %info = ();
 $info{'name'} = 'blub';
+eval {$ds->setInfo(\%info);};
+ok($@, "croak on wrong dataset-name");
+$info{'name'} = 'project/blub';
+eval {$ds->setInfo(\%info);};
+%info = $ds->getInfo;
+is($info{name}, 'project/blub', "setInfo, name");
+ok(exists $info{creationDate}, "check no overwrite of creationDate");
+is($ds->getParentName, undef, "get undef parent");
+$info{name} = 'project/parent/blub';
 $ds->setInfo(\%info);
 %info = $ds->getInfo;
-is($info{name}, 'blub', "setInfo, name");
-ok(exists $info{creationDate}, "check no overwrite of creationDate");
+is($ds->getParentName, 'project/parent', "get defined parent");
 
 my @quadTree = (1, 11, 111, 112);
 ok(eq_array([], [$ds->setQuadtree(\@quadTree)]), "set quadtree");

@@ -52,9 +52,11 @@ use constant DATASET => << 'EOT';
    xmlns="http://www.met.no/schema/metamod/dataset"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
-  <info name="" status="active" creationDate="1970-01-01T00:00:00Z" datestamp="1970-01-01T00:00:00Z" ownertag="" metadataFormat=""/>
+  <info name="/" status="active" creationDate="1970-01-01T00:00:00Z" datestamp="1970-01-01T00:00:00Z" ownertag="" metadataFormat=""/>
 </dataset>
 EOT
+
+my $nameReg = qr{^([^/]*)/([^/]*/)?([^/]*)$}; # project/[parent/]name where parent is optional
 
 sub _decode {
 	my ($self, $string) = @_;
@@ -195,6 +197,10 @@ sub replaceInfo {
     my ($self, $infoRef) = @_;
     my %oldInfo = $self->getInfo;
     my %newInfo = %$infoRef;
+    unless ($newInfo{name} and $newInfo{name} =~ /$nameReg/) {
+    	my $infoName = $newInfo{name} || 'undef';
+    	croak("Cannot set name to $infoName, need project/[parent/]filename");
+    }
     my $infoNode = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docDS})->item(0);
     while (my ($name, $val) = each %oldInfo) {
         $infoNode->removeAttribute($self->_decode($name)) unless $newInfo{$name};
@@ -203,6 +209,21 @@ sub replaceInfo {
         $infoNode->setAttribute($self->_decode($name), $self->_decode($val));
     }
     return undef;
+}
+
+sub getParentName {
+	my ($self) = @_;
+	my %info = $self->getInfo;
+	if ($info{name} =~ /$nameReg/) {
+		if ($2) {
+			my $parent = substr $2, 0, length($2)-1; # remove trailing slash
+			return join('/', $1, $parent);
+		} else {
+			return undef;
+		}
+	} else {
+		croak("Cannot parse name to $info{name}, need project/[parent/]filename");
+	}
 }
 
 sub originalFormat {
@@ -401,6 +422,10 @@ replace all info attributes with those in %info. This will remove all attributes
 
 Return: undef
 
+=item getParentName
+
+The dataset-name can consist on 2 or 3 parts: project/parentname/filename or project/filename
+In the first case, this method will return project/parentname in the second case undef. 
 
 =item originalFormat()
 
