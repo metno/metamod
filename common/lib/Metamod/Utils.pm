@@ -36,15 +36,19 @@ our $VERSION = 0.1;
 use File::Find qw();
 
 sub findFiles {
-   my ($dir, $pattern) = @_;
+   my ($dir, @funcs) = @_;
    my @files;
-   if ($pattern) {
-      my $regex = qr/$pattern/; # precompile
-        File::Find::find(sub {-f && /$regex/ && push @files, $File::Find::name;}, $dir);     
-   } else {
-      File::Find::find(sub {-f && push @files, $File::Find::name;}, $dir);
-   }
+   
+   File::Find::find(sub {-f && _execFuncs($_, @funcs) && push @files, $File::Find::name;}, $dir);
    return @files;
+}
+
+sub _execFuncs {
+	my ($file, @funcs) = @_;
+	foreach my $func (@funcs) {
+		return 0 unless $func->($file);
+	}
+	return 1;
 }
 
 1;
@@ -59,7 +63,7 @@ Metamod::Utils - utilities for metamod
   use Metamod::Utils qw(findFiles);
   
   my @files = findFiles('/tmp');
-  my @numberFiles = findFiles('/tmp', qr{^\d});
+  my @numberFiles = findFiles('/tmp', sub {$_[0] =~ m/^\d/o});
 
 =head1 DESCRIPTION
 
@@ -68,10 +72,26 @@ The functions are listed below:
 
 =over 8
 
-=item findFiles($dir, [$pattern]])
+=item findFiles($dir, [@callbacks]])
 
-Return all files in the directory, matching the otional pattern.
-This uses internally File::Find. 
+Return all files in the directory. The each callback-function will be called with
+the filename as $_[0] parameter. All callbacks need to return true for the file.
+The callbacks have in addition access to the following variables: $File::Find::name and 
+$File::Find::dir. In addition the perl-special _ filehandle is set due to a previously checked -f.
+See stat or -X in L<perlfunc>.
+
+An example follows:
+
+  my %files;
+  foreach my $appendix (qw(.xml .xmd)) {
+     $files{$appendix} = findFiles('/dir',
+                                   sub {$_[0] =~ /$appendix$/o},
+                                   sub {-x _});
+  }
+
+The o flag of the pattern will make sure, that the pattern is only compiled once for
+each time the sub is compiled (that is twice), instead of for each file. Only executables
+will be selected.
 
 =back
 

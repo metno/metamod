@@ -31,14 +31,19 @@ use strict;
 use warnings;
 
 use lib "..";
-use Test::More tests => 4;
+use Test::More tests => 6;
 
 BEGIN {use_ok('Metamod::Utils', qw(findFiles));}
 
 my @allFiles = findFiles('.');
 ok((0 < grep {$_ =~ /00_Utils.t/} @allFiles), "finding 00_Utils.t in all");
-my @numberFiles = findFiles('.', qr{^\d});
+my @numberFiles = findFiles('.', sub {$_[0] =~ /^\d/o});
 ok((0 < grep {$_ =~ /00_Utils.t/} @numberFiles), "finding 00_Utils.t in files starting with number");
-my @plFiles = findFiles('.', qr{\.pl$});
+my $var = ".pl";
+my @plFiles = findFiles('.', sub {$_[0] =~ /\Q$var\E$/o;});
 ok((0 == grep {$_ =~ /00_Utils.t/} @plFiles), "not finding 00_Utils.t in files ending with .pl");
-
+$var = ".t";
+my @tFiles = findFiles('.', sub {$_[0] =~ /\Q$var\E$/o;});
+ok((0 < grep {$_ =~ /00_Utils.t/} @tFiles), "finding 00_Utils.t in files ending with .t");
+my @execFiles = findFiles('.', sub {$_[0] =~ /\Q$var\E$/o;}, sub {-x _});
+is(scalar @execFiles, 1, "Utils.t only executable .t - file");

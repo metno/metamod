@@ -52,9 +52,9 @@ use mmTtime;
 #
 my $progress_report = [==TEST_IMPORT_PROGRESS_REPORT==];    # If == 1, prints what
                                                             # happens to stdout
-my $sleeping_seconds = 14;
+my $sleeping_seconds = 600; # check every 10 minutes for new files
 if ( [==TEST_IMPORT_SPEEDUP==] > 1 ) {
-	$sleeping_seconds = 1;
+	$sleeping_seconds = 1; # don't wait in test-case
 }
 my $importdirs_string          = '[==IMPORTDIRS==]';
 my @importdirs                 = split( /\n/, $importdirs_string );
@@ -146,39 +146,22 @@ sub process_xml_loop {
 	#  Infinite loop that checks for new or modified XML files as long as
 	#  the file $continue_xml_import exists.
 	#
-	&write_to_log("Check for new datasets");
+	&write_to_log("Check for new datasets in @importdirs");
 	while ( -e $continue_xml_import ) {
 
-		#
-		#        Find current time
-		#
-		my @timearr = localtime( mmTtime::ttime() );
-		my $hour    = $timearr[2];                     # 0-23
-		my $min     = $timearr[1];                     # 0-59
-
-		#
-		if ( $min < 50 ) {
-
+#    The file $path_to_import_updated was last modified in the previous
+#    turn of this loop. All XML files that are modified later are candidates
+#    for import in the current turn of the loop.
+#    Get the modification time corresponding to the previous turn of the loop:
 #
-#       At least 10 minutes are remaining of the current clock hour.
-#       It will be safe to start an import batch. It will finish within this
-#       clock hour.
-#
-#       The file $path_to_import_updated was last modified in the previous
-#       turn of this loop. All XML files that are modified later are candidates
-#       for import in the current turn of the loop.
-#       Get the modification time corresponding to the previous turn of the loop:
-#
-			my @status = stat($path_to_import_updated);
-			if ( scalar @status == 0 ) {
-				die "Could not stat $path_to_import_updated\n";
-			}
-			my $last_updated = $status[9];    # Seconds since the epoch
-         process_directories($last_updated, @importdirs);
-
-			#
-			#
+		my @status = lstat($path_to_import_updated);
+		if ( scalar @status == 0 ) {
+			die "Could not stat $path_to_import_updated\n";
 		}
+		my $last_updated = $status[9];    # Seconds since the epoch
+		my $checkTime = time();
+      process_directories($last_updated, @importdirs);
+      utime($checkTime, $checkTime, $path_to_import_updated);
 		sleep($sleeping_seconds);
 	}
 
@@ -191,48 +174,21 @@ sub process_xml_loop {
 sub process_directories {
 	my ($last_updated,@dirs) = @_;
 
-         #
-         #        Remember the current time by touching the file
-         #        $path_to_import_updated_new (it will be created if it does not
-         #        exist).
-         #        Later, if a new batch of XML files are imported, transfer this
-         #        modification time to $path_to_import_updated.
-         #
-         `touch $path_to_import_updated_new`;
-
 	foreach my $xmldir (@dirs) {
-		my @files_to_consume = ();
 		my $xmldir1          = $xmldir;
 		$xmldir1 =~ s/^ *//g;
 		$xmldir1 =~ s/ *$//g;
+		my @files_to_consume;
 		if ( -d $xmldir1 ) {
-			my @newfiles = findFiles( $xmldir1, qr{\.xm[ld]$} );
-			foreach my $file (@newfiles) {
-
-				#
-				#                   Check if the file is modified after the
-				#                   modification time of $path_to_import_updated.
-				#
-				my @status = stat($file);
-				if ( scalar @status == 0 ) {
-					die "Could not stat $file\n";
-				}
-				my $modified = $status[9];
-				if ( $modified > $last_updated ) {
-					if ( $progress_report == 1 ) {
-						print "      $file -accepted\n";
-					}
-					push( @files_to_consume, $file );
+			# xm[ld] files newer than $last_updated
+			@files_to_consume = findFiles( $xmldir1, sub {$_[0] =~ /\.xm[ld]$/;},
+			                                         sub {(stat(_))[9] > $last_updated;} );
+         if ( $progress_report == 1 ) {
+			   foreach my $file (@files_to_consume) {
+					print "      $file -accepted\n";
 				}
 			}
 		}
-
-		#
-		#           Touch the $path_to_import_updated file to prepare for the next
-		#           turn of the loop:
-		#
-		`touch --reference=$path_to_import_updated_new $path_to_import_updated`
-		  if @files_to_consume;
 
 		#
 		# generate a list of unique basenames,
