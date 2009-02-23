@@ -31,7 +31,7 @@ package Metamod::Utils;
 use base qw(Exporter);
 our $VERSION = 0.1;
 
-@EXPORT_OK = qw(findFiles isNetcdf);
+@EXPORT_OK = qw(findFiles isNetcdf trim);
 
 use File::Find qw();
 
@@ -64,6 +64,13 @@ sub isNetcdf {
 	return 0;
 }
 
+sub trim {
+	my ($str) = @_;
+	$str =~ s/^\s+//;
+	$str =~ s/\s+$//;
+	return $str;
+}
+
 1;
 __END__
 
@@ -73,11 +80,18 @@ Metamod::Utils - utilities for metamod
 
 =head1 SYNOPSIS
 
-  use Metamod::Utils qw(findFiles);
+  use Metamod::Utils qw(findFiles isNetcdf trim);
   
   my @files = findFiles('/tmp');
   my @numberFiles = findFiles('/tmp', sub {$_[0] =~ m/^\d/o});
 
+  if (isNetcdf("file.nc")) {
+  	   # ... do something with a nc file
+  }
+  
+  my $trimmed = trim("  string  "); # $trimmed = "string"
+  
+  
 =head1 DESCRIPTION
 
 This modules is a collection of small functions useful when working with Metamod.
@@ -111,6 +125,10 @@ will be selected.
 
 Checks if a file is a netcdf file by checking the first 3 bytes (magic-key) of the file to be CDF.
 It will die if the file is not readable.
+
+=item trim($str)
+
+Remove leading and trailing strings. Return string. Does not change inline.
 
 =back
 
