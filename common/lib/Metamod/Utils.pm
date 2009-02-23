@@ -31,7 +31,7 @@ package Metamod::Utils;
 use base qw(Exporter);
 our $VERSION = 0.1;
 
-@EXPORT_OK = qw(findFiles);
+@EXPORT_OK = qw(findFiles isNetcdf);
 
 use File::Find qw();
 
@@ -49,6 +49,19 @@ sub _execFuncs {
 		return 0 unless $func->($file);
 	}
 	return 1;
+}
+
+sub isNetcdf {
+	my ($file) = @_;
+	my $fh;
+	open ($fh, $file) or die "Cannot read $file: $!";
+	my $buffer;
+	if (sysread($fh, $buffer, 4) == 4) {
+		if ($buffer eq "CDF\1") {
+			return 1;
+		}
+	}
+	return 0;
 }
 
 1;
@@ -92,6 +105,12 @@ An example follows:
 The o flag of the pattern will make sure, that the pattern is only compiled once for
 each time the sub is compiled (that is twice), instead of for each file. Only executables
 will be selected.
+
+
+=item isNetcdf($file)
+
+Checks if a file is a netcdf file by checking the first 3 bytes (magic-key) of the file to be CDF.
+It will die if the file is not readable.
 
 =back
 

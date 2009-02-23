@@ -33,7 +33,7 @@ use warnings;
 use lib "..";
 use Test::More tests => 6;
 
-BEGIN {use_ok('Metamod::Utils', qw(findFiles));}
+BEGIN {use_ok('Metamod::Utils', qw(findFiles isNetcdf));}
 
 my @allFiles = findFiles('.');
 ok((0 < grep {$_ =~ /00_Utils.t/} @allFiles), "finding 00_Utils.t in all");
@@ -47,3 +47,6 @@ my @tFiles = findFiles('.', sub {$_[0] =~ /\Q$var\E$/o;});
 ok((0 < grep {$_ =~ /00_Utils.t/} @tFiles), "finding 00_Utils.t in files ending with .t");
 my @execFiles = findFiles('.', sub {$_[0] =~ /\Q$var\E$/o;}, sub {-x _});
 is(scalar @execFiles, 1, "Utils.t only executable .t - file");
+
+ok(isNetcdf("test.nc"), "test.nc is netcdf");
+ok(!isNetcdf("00_Utils.t"), "test.nc is no netcdf");
