@@ -154,7 +154,7 @@ sub process_xml_loop {
 #    for import in the current turn of the loop.
 #    Get the modification time corresponding to the previous turn of the loop:
 #
-		my @status = lstat($path_to_import_updated);
+		my @status = stat($path_to_import_updated);
 		if ( scalar @status == 0 ) {
 			die "Could not stat $path_to_import_updated\n";
 		}

@@ -44,6 +44,7 @@ use XML::LibXML qw();
 use XML::LibXML::XPathContext qw();
 use UNIVERSAL qw();
 use mmTtime;
+use Carp qw();
 
 use constant NAMESPACE_DS => 'http://www.met.no/schema/metamod/dataset';
 use constant DATASET => << 'EOT';
@@ -199,7 +200,7 @@ sub replaceInfo {
     my %newInfo = %$infoRef;
     unless ($newInfo{name} and $newInfo{name} =~ /$nameReg/) {
     	my $infoName = $newInfo{name} || 'undef';
-    	croak("Cannot set name to $infoName, need project/[parent/]filename");
+    	Carp::croak("Cannot set name to $infoName, need project/[parent/]filename");
     }
     my $infoNode = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docDS})->item(0);
     while (my ($name, $val) = each %oldInfo) {
@@ -222,7 +223,7 @@ sub getParentName {
 			return undef;
 		}
 	} else {
-		croak("Cannot parse name to $info{name}, need project/[parent/]filename");
+		Carp::croak("Cannot parse name to $info{name}, need project/[parent/]filename");
 	}
 }
 
