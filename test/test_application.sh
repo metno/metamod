@@ -186,7 +186,7 @@ sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 /^DATABASE_NAME *=/s|=.*$|= '$idstring'|
 /^APPLICATION_ID *=/s|=.*$|= '$idstring'|
 /^BASE_PART_OF_EXTERNAL_URL *=/s|=.*$|= http//'$servername$appendport'|
-/^LOCAL_URL *=/s|=.*$|= '$basedirbasename'|
+/^LOCAL_URL *=/s|=.*$|= /'$basedirbasename'|
 /^PMH_PORT_NUMBER *=/s|=.*$|= '$pmhport'|
 /^PMH_REPOSITORY_IDENTIFIER *=/s|=.*$|= '$idstring'|
 /^PMH_EXPORT_TAGS *=/s|=.*$|= '"'$idstring'"'|
@@ -215,6 +215,8 @@ rm -rf data/*
 #
 cd $basedir/source
 ./update_target.pl test/applic
+cd $basedir/target
+./prepare_runtime_env.sh
 #
 # E. A set of upload users is installed in the webrun/u1 directory:
 # =================================================================
@@ -222,7 +224,7 @@ cd $basedir/source
 cd $basedir/webrun
 rm -rf u1
 mkdir u1
-cp $basedir/source/u1input/* u1
+cp $basedir/source/test/u1input/* u1
 #
 # F. The database is initialized and filled with static data.
 # ===========================================================
@@ -233,7 +235,6 @@ cd $basedir/target/init
 # G. The services defined for the application is started.
 # =======================================================
 #
-exit
 cd $basedir/target
 ./start_services.sh
 #
@@ -241,20 +242,21 @@ cd $basedir/target
 # ======================================
 #
 #    by copying files to the ftp- and web-upload areas. Input files
-#    are taken from the ncinput directory.
+#    are taken from the list of files found in ncinput/files.
 #
-cd $basedir/ncinput
-rm -rf ../t_dir
-mkdir ../t_dir
-for fil in `cat files`; do cp $fil ../t_dir; mv ../t_dir/$fil $basedir/ftpinput; sleep 30; done
+cd $basedir
+rm -rf t_dir
+mkdir t_dir
+cd $basedir/source/test/ncinput
+for fil in `cat files`; do cp $fil $basedir/t_dir; mv $basedir/t_dir/* $basedir/ftpupload; sleep 10; done
 #
 # I. After sleeping some time the services is stopped.
 # ====================================================
 #
 cd $basedir/target
-sleep 600
+sleep 20
 ./stop_services.sh
-sleep 60
+sleep 20
 #
 # J. Postprocessing:
 # ==================
