@@ -50,29 +50,19 @@
 #                                 run (deemed to be a normal problemfree
 #                                 run).
 #
-# If the -i option is given, then the script will enter an interactive stage
+# If the -i option is given, then the script will enter an interactive loop
 # where some basic information is enquired from the user. This information
-# is stored in the file [basedirectory]/testrc.
+# is stored in the file [basedirectory]/testrc. An initial checkout of the
+# METAMOD2 software is made. Then the script terminates.
 #
-# Then the script perform the following tasks:
+# When the script is started without the -i option, the basic information
+# gathered from the user in an earlier interactive run is taken from the
+# testrc-file, and the script performs the following tasks:
 #
 # A. The source directory is updated. (svn update).
 #
-# B. The master_config.txt file in the app directory is 'doctored' by this 
-#    script in the following ways:
-#
-#    - The value of the TARGET_DIRECTORY is set to 
-#      <full path to basedirectory>/target
-#    - The value of the WEBRUN_DIRECTORY is set to 
-#      <full path to basedirectory>/webrun
-#    - The value of the UPLOAD_DIRECTORY is set to 
-#      <full path to basedirectory>/webupload
-#    - The value of the UPLOAD_FTP_DIRECTORY is set to 
-#      <full path to basedirectory>/ftpupload
-#    - The value of the OPENDAP_DIRECTORY is set to 
-#      <full path to basedirectory>/data
-#    - The value of TEST_IMPORT_BASETIME is set to the time corresponding
-#      <current date> 00:00 UTC.
+# B. The master_config.txt file in the app directory is 'doctored' 
+#    by changing the value of some important variables.
 #
 # C. Purging of the directory structure: All content in the following
 #    directories are deleted:
@@ -103,7 +93,8 @@ if [ $# -eq 2 -a $1 = '-i' ]; then
    cd $2
    basedir=`pwd`
    mkdir -p source
-   echo -n "Get the source from the following subversion URL: "
+   echo ""
+   echo -n "Get the METAMOD source from the following subversion URL: "
    read sourceurl
    echo -n "Short string used for application id etc: "
    read idstring
@@ -111,6 +102,8 @@ if [ $# -eq 2 -a $1 = '-i' ]; then
    read apacheport
    echo -n "URL of OPeNDAP server (any URL will do): "
    read opendapurl
+   echo -n "Operator E-mail address: "
+   read operatoremail
    echo "Enter the ownertag and source URL for the OAI-PMH server to be harvested."
    echo -n "Two items separated by space: "
    read oaiharvesttag oaiharvestsource
@@ -119,6 +112,7 @@ sourceurl = $sourceurl
 idstring = $idstring
 apacheport = $apacheport
 opendapurl = $opendapurl
+operatoremail = $operatoremail
 oaiharvest = $oaiharvesttag $oaiharvestsource
 EOF
    echo ""
@@ -139,6 +133,7 @@ elif [ $# -eq 1 -a -d $1 -a -d $1/source -a -r $1/testrc ]; then
    read dummy1 dummy2 idstring
    read dummy1 dummy2 apacheport
    read dummy1 dummy2 opendapurl
+   read dummy1 dummy2 operatoremail
    read dummy1 dummy2 oaiharvesttag oaiharvestsource
 else
    echo ""
@@ -184,7 +179,6 @@ fi
 admindomain=`expr $servername : ".*\.\([^.]*\.[^.]*\)"`
 datasettags=`expr $servername : ".*\.\([^.]*\.[^.]*\)"`
 basedirbasename=`basename $basedir`
-cp master_config.txt bc.master_config.txt
 sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 /^TARGET_DIRECTORY *=/s|=.*$|= '$basedir/target'|
 /^WEBRUN_DIRECTORY *=/s|=.*$|= '$basedir/webrun'|
@@ -201,9 +195,10 @@ sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 /^UPLOAD_FTP_DIRECTORY *=/s|=.*$|= '$basedir/ftpupload'|
 /^OPENDAP_DIRECTORY *=/s|=.*$|= '$basedir/data'|
 /^OPENDAP_URL *=/s|=.*$|= '$opendapurl'|
+/^OPERATOR_EMAIL *=/s|=.*$|= '$operatoremail'|
 /^DATASET_TAGS *=/s|=.*$|= '"'$idstring','$oaiharvesttag'"'|
 /^UPLOAD_OWNERTAG *=/s|=.*$|= '$idstring'|
-/^TEST_IMPORT_BASETIME *=/s|=.*$|= '$importbasetime'|' bc.master_config.txt >master_config.txt
+/^TEST_IMPORT_BASETIME *=/s|=.*$|= '$importbasetime'|' source.master_config.txt >master_config.txt
 #
 # C. Purging of the directory structure:
 # ======================================
@@ -238,6 +233,7 @@ cd $basedir/target/init
 # G. The services defined for the application is started.
 # =======================================================
 #
+exit
 cd $basedir/target
 ./start_services.sh
 #
