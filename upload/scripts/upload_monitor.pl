@@ -823,10 +823,6 @@ sub process_files {
                   next;
                } else {
                   my $result = &shcommand_scalar("ncgen $expandedfile -o $ncname");
-                  if (unlink($expandedfile) == 0) {
-                     &syserror("SYS","unlink_fails_on_expandedfile",
-                               "", "process_files", "Expanded file: $expandedfile");
-                  }
                   if (length($shell_command_error) > 0) {
                      my $diagnostic = $shell_command_error;
                      $diagnostic =~ s/^[^\n]*\n//m;
@@ -841,6 +837,10 @@ sub process_files {
                      $not_accepted{$expandedfile} = 1;
                      $errors = 1;
                      next;
+                  }
+                  if (unlink($expandedfile) == 0) {
+                     &syserror("SYS","unlink_fails_on_expandedfile",
+                               "", "process_files", "Expanded file: $expandedfile");
                   }
                   $filetype = &get_filetype($ncname);
                   $expandedfile = $ncname;
