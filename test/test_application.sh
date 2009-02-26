@@ -7,7 +7,8 @@
 #
 # Invocation:
 #
-#    ./test_application.sh [ -i ] basedirectory
+#    ./test_application.sh -i basedirectory
+#    ./test_application.sh basedirectory
 #
 #    where:
 #
@@ -84,10 +85,24 @@
 # I. After sleeping some time (to let the import script finish its tasks),
 #    the services is stopped.
 #
-# J. Postprocessing: Output files (logs etc.) are compared with the set of
-#    files in the compare directory. Any discrepancies are reported by E-mail.
+# J. Postprocessing: If the compare directory is not empty, output files
+#    (logs etc.) in the webrun directory are compared with the set of
+#    corresponding files in the compare directory. Any discrepancies are
+#    reported by E-mail.
+#
+#    If the compare directory is empty, then the log files currently residing
+#    on the webrun directory are copied to the compare directory. While copying,
+#    dates and timestamps (YYYY-MM-DD and YYYY-MM-DD HH:MM) are substituted
+#    with strings '_DATE_' and '_TIMESTAMP_' respectively. This action prepares
+#    the system for repeated normal runs where the produced logfiles are
+#    compared with those now residing in the compare directory.
+#
+#    If changes are made in the METAMOD2 software that result in changes in
+#    the log files, then the compare directory should be emptied so that
+#    the new log file structure can be initialized.
 #
 #------------------------------------------------------------------------
+logfiles='syserrors databaselog'
 if [ $# -eq 2 -a $1 = '-i' ]; then
    mkdir -p $2
    cd $2
@@ -104,16 +119,21 @@ if [ $# -eq 2 -a $1 = '-i' ]; then
    read opendapurl
    echo -n "Operator E-mail address: "
    read operatoremail
+   echo "Comma-separated list of E-mail addresses for recievers"
+   echo -n "of unnormal test results: "
+   read developeremail
    echo "Enter the ownertag and source URL for the OAI-PMH server to be harvested."
-   echo -n "Two items separated by space: "
-   read oaiharvesttag oaiharvestsource
+   echo "If harvesting only on a set, also enter the set name."
+   echo -n "Two or three items separated by space: "
+   read oaiharvesttag oaiharvestsource oaiharvestset
    cat >testrc <<EOF
 sourceurl = $sourceurl
 idstring = $idstring
 apacheport = $apacheport
 opendapurl = $opendapurl
 operatoremail = $operatoremail
-oaiharvest = $oaiharvesttag $oaiharvestsource
+developeremail = $developeremail
+oaiharvest = $oaiharvesttag $oaiharvestsource $oaiharvestset
 EOF
    echo ""
    echo "The entered items can any time be changed by editing the $basedir/testrc file."
@@ -134,7 +154,8 @@ elif [ $# -eq 1 -a -d $1 -a -d $1/source -a -r $1/testrc ]; then
    read dummy1 dummy2 apacheport
    read dummy1 dummy2 opendapurl
    read dummy1 dummy2 operatoremail
-   read dummy1 dummy2 oaiharvesttag oaiharvestsource
+   read dummy1 dummy2 developeremail
+   read dummy1 dummy2 oaiharvesttag oaiharvestsource oaiharvestset
 else
    echo ""
    echo "Usage:       $0 -i basedirectory"
@@ -146,7 +167,7 @@ else
    echo ""
    exit
 fi
-exec >test_application.out
+exec >test_application.out 2>&1
 set -x
 cd $basedir
 mkdir -p target
@@ -190,7 +211,7 @@ sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 /^PMH_PORT_NUMBER *=/s|=.*$|= '$pmhport'|
 /^PMH_REPOSITORY_IDENTIFIER *=/s|=.*$|= '$idstring'|
 /^PMH_EXPORT_TAGS *=/s|=.*$|= '"'$idstring'"'|
-/^OAI_HARVEST_SOURCES *=/s|=.*$|= '$oaiharvesttag' '$oaiharvestsource'|
+/^OAI_HARVEST_SOURCES *=/s|=.*$|= '$oaiharvesttag' '$oaiharvestsource' '$oaiharvestset'|
 /^UPLOAD_DIRECTORY *=/s|=.*$|= '$basedir/webupload'|
 /^UPLOAD_FTP_DIRECTORY *=/s|=.*$|= '$basedir/ftpupload'|
 /^OPENDAP_DIRECTORY *=/s|=.*$|= '$basedir/data'|
@@ -225,6 +246,10 @@ cd $basedir/webrun
 rm -rf u1
 mkdir u1
 cp $basedir/source/test/u1input/* u1
+cd $basedir/data
+for dir in `cat $basedir/source/test/directories`; do
+   mkdir -p $dir
+done
 #
 # F. The database is initialized and filled with static data.
 # ===========================================================
@@ -254,10 +279,42 @@ for fil in `cat files`; do cp $fil $basedir/t_dir; mv $basedir/t_dir/* $basedir/
 # ====================================================
 #
 cd $basedir/target
-sleep 20
+sleep 300
 ./stop_services.sh
-sleep 20
+sleep 100
 #
 # J. Postprocessing:
 # ==================
 #
+cd $basedir
+if [ -z "`ls compare`" ]; then
+   for fil in $logfiles; do
+      if [ -r webrun/$fil ]; then
+         sed '1,$s/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]/_TIMESTAMP_/' webrun/$fil >t_log
+         sed '1,$s/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/_DATE_/' t_log >compare/$fil
+         rm t_log
+      else
+         echo "Missing file: webrun/$fil"
+      fi
+   done
+else
+   echo "`whoami`@`uname -n`:`pwd`" >t_result
+   count=1
+   for fil in $logfiles; do
+      if [ -r webrun/$fil ]; then
+         sed '1,$s/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]/_TIMESTAMP_/' webrun/$fil >t_log1
+         sed '1,$s/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/_DATE_/' t_log1 | sort >t_log2
+         rm t_log1
+         echo "========== diff for $fil:" >>t_result
+         sort compare/$fil >t_log3
+         diff t_log2 t_log3 >>t_result
+         count=`expr $count + 1`
+      else
+         echo "========== Missing file: webrun/$fil" >>t_result
+      fi
+   done
+   lines=`wc -l t_result | sed 's/ t_result//'`
+   if [ $lines -ne $count ]; then
+      mail -s "METAMOD2 $idstring test gives unexpected output" $developeremail <t_result
+   fi
+fi

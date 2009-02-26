@@ -34,6 +34,8 @@
 #
 # use strict;
 use XML::Simple qw(:strict);
+use lib qw([==TARGET_DIRECTORY==]/lib);
+use mmTtime;
 # use Data::Dumper;
 use DBI;
 if (scalar @ARGV != 1) {
@@ -78,7 +80,11 @@ eval {
 if ($@) {
    warn $@;
    $dbh->rollback or die $dbh->errstr;
-   my $datestamp = localtime;
+   my @utctime = gmtime(mmTtime::ttime());
+   my $year = 1900 + $utctime[5];
+   my $mon = $utctime[4]; # 0-11
+   my $mday = $utctime[3]; # 1-31
+   my $datestamp = sprintf('%04d-%02d-%02d',$year,$mon+1,$mday);
    @logarr = ("========= $datestamp: Load static searchdata failed. =========",
               "          Database rolled back",
               "          " . $@);
@@ -120,7 +126,11 @@ sub update_database {
 #   print Dumper($xmlref);
 #   return;
 #
-   my $datestamp = localtime;
+   my @utctime = gmtime(mmTtime::ttime());
+   my $year = 1900 + $utctime[5];
+   my $mon = $utctime[4]; # 0-11
+   my $mday = $utctime[3]; # 1-31
+   my $datestamp = sprintf('%04d-%02d-%02d',$year,$mon+1,$mday);
    push (@logarr,"========== Load static search data. $datestamp ==========");
 #
 #  Create hash with all static search data in the database:
