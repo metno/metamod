@@ -106,7 +106,7 @@ version="1.0">
     <xsl:template match="dif:Parameters">
         <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
             <xsl:attribute name="name">variable</xsl:attribute>
-            <xsl:value-of select="dif:Category" /> &gt; <xsl:value-of select="dif:Topic" /> &gt; <xsl:value-of select="dif:Term" /><xsl:if test="dif:Variable_Level_1"> &gt;  <xsl:value-of select="dif:Variable_Level_1" /></xsl:if><xsl:if test="dif:Variable_Level_2"> &gt;  <xsl:value-of select="dif:Variable_Level_2" /></xsl:if><xsl:if test="dif:Variable_Level_3"> &gt;  <xsl:value-of select="dif:Variable_Level_3" /></xsl:if> &gt; HIDDEN
+            <xsl:value-of select="dif:Topic" /> &gt; <xsl:value-of select="dif:Term" /><xsl:if test="dif:Variable_Level_1"> &gt; <xsl:value-of select="dif:Variable_Level_1" /></xsl:if><xsl:if test="dif:Variable_Level_2"> &gt; <xsl:value-of select="dif:Variable_Level_2" /></xsl:if><xsl:if test="dif:Variable_Level_3"> &gt; <xsl:value-of select="dif:Variable_Level_3" /></xsl:if> &gt; HIDDEN
         </xsl:element>        
 		<xsl:if test="dif:Detailed_Variable">
         	<xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">

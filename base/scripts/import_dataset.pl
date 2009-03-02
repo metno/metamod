@@ -282,21 +282,22 @@ sub update_database {
 	#  Create hash with all existing basic keys in the database.
 	#  The keys in this hash have the form: 'SC_id:BK_name' and
 	#  the values are the corresponding 'BK_id's.
+	#  The BK_name are used as lower case.
 	#
 	my %basickeys = ();
 	my $stm       = $dbh->prepare("SELECT BK_id,SC_id,BK_name FROM BasicKey");
 	$stm->execute();
 	while ( my @row = $stm->fetchrow_array ) {
-		my $key = $row[1] . ':' . $row[2];
+		my $key = $row[1] . ':' . cleanContent($row[2]);
 		$basickeys{$key} = $row[0];
 	}
 
 #
 #  Create hash with existing metadata in the database that may be shared between
-#  datasets. The keys in this hash have the form: 'MT_name:MD_content' and
-#  the values are the corresponding 'MD_id's.
+#  datasets. The keys in this hash have the form: 'MT_name:MD_content' with 
+#  MD_content in lower-case and the values are the corresponding 'MD_id's.
 #
-	my %metadata = ();
+	my %dbMetadata = ();
 	$stm =
 	  $dbh->prepare(
 		"SELECT Metadata.MT_name,MD_content,MD_id FROM Metadata, MetadataType "
@@ -304,8 +305,8 @@ sub update_database {
 		  . "MetadataType.MT_share = TRUE" );
 	$stm->execute();
 	while ( my @row = $stm->fetchrow_array ) {
-		my $key = $row[0] . ':' . $row[1];
-		$metadata{$key} = $row[2];
+		my $key = $row[0] . ':' . cleanContent($row[1]);
+		$dbMetadata{$key} = $row[2];
 	}
 
 #
@@ -490,19 +491,19 @@ sub update_database {
 				  &convert_to_htmlentities( $mref->[1], \%html_conversions );
 				my $mdid;
 				if ( exists( $shared_metadatatypes{$mtname} ) ) {
-					my $mdkey = $mtname . ':' . $mdcontent;
+					my $mdkey = $mtname . ':' . cleanContent($mdcontent);
 					if ( $progress_report >= 1 ) {
 						print "mdkey: " . $mdkey . "\n";
 					}
-					if ( exists( $metadata{$mdkey} ) ) {
-						$mdid = $metadata{$mdkey};
+					if ( exists( $dbMetadata{$mdkey} ) ) {
+						$mdid = $dbMetadata{$mdkey};
 					}
 					else {
 						$sql_getkey_MD->execute();
 						my @result = $sql_getkey_MD->fetchrow_array;
 						$mdid = $result[0];
 						$sql_insert_MD->execute( $mdid, $mtname, $mdcontent );
-						$metadata{$mdkey} = $mdid;
+						$dbMetadata{$mdkey} = $mdid;
 					}
 					$sql_selectCount_DSMD->execute( $dsid, $mdid );
 					my $count = $sql_selectCount_DSMD->fetchall_arrayref()->[0][0];
@@ -525,9 +526,9 @@ sub update_database {
 				#  Insert searchdata:
 				#
 				if ( exists( $searchcategories{$mtname} ) ) {
-					my $skey = $searchcategories{$mtname} . ':' . $mdcontent;
+					my $skey = $searchcategories{$mtname} . ':' . cleanContent($mdcontent);
 					if ( $progress_report == 1 ) {
-						print "Insert searchdata. Try: $skey\n";
+						print "Insert searchdata. Try: '$skey'\n";
 					}
 					if ( exists( $basickeys{$skey} ) ) {
 						my $bkid = $basickeys{$skey};
@@ -569,21 +570,6 @@ sub update_database {
 	}
 }
 
-# sub my_time {
-#    my $realtime;
-#    if (scalar @_ == 0) {
-#       $realtime = time;
-#    } else {
-#       $realtime = $_[0];
-#    }
-#    my $scaling = [==TEST_IMPORT_SPEEDUP==];
-#    if ($scaling <= 1) {
-#       return $realtime;
-#    } else {
-#       my $basistime = [==TEST_IMPORT_BASETIME==];
-#       return $basistime + ($realtime - $basistime)*$scaling;
-#    }
-# };
 sub convert_to_htmlentities {
 	my ( $str, $conversions ) = @_;
 	my @contarr = split( //, $str );
@@ -597,4 +583,14 @@ sub convert_to_htmlentities {
 		}
 	}
 	return $result;
+}
+
+sub cleanContent {
+	my ($content) = @_;
+	# trim
+	$content =~ s/^\s+//;
+	$content =~ s/\s+$//;
+	# convert several spaces to one space
+	$content =~ s/\s+/ /;
+	return lc($content); 
 }
