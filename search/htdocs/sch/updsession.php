@@ -184,6 +184,8 @@ if ($mmError == 0) {
        }
        if (in_array($mmButtonName, array('show','cross','help'))) {
           $mmSessionState->state = 'do' . $mmButtonName . '.php';
+       } else {
+          $mmSessionState->state = 'doshow.php';
        }
     } else {
        mmPutLog(__FILE__ . __LINE__ . " No such button: $mmButtonName");
