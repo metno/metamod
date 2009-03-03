@@ -297,7 +297,7 @@ if [ -z "`ls compare`" ]; then
          echo "Missing file: webrun/$fil"
       fi
    done
-else
+elseif [ 1 -eq 0 ]; then
    echo "`whoami`@`uname -n`:`pwd`" >t_result
    count=1
    for fil in $logfiles; do
@@ -317,4 +317,13 @@ else
    if [ $lines -ne $count ]; then
       mail -s "METAMOD2 $idstring test gives unexpected output" $developeremail <t_result
    fi
+else
+   echo "`whoami`@`uname -n`:`pwd`" >t_result
+   echo "======= syserrors:" >>t_result
+   cat webrun/syserrors >>t_result
+   echo "======= databaselog:" >>t_result
+   cat webrun/databaselog >>t_result
+   echo "======= upload_monitor.out:" >>t_result
+   cat webrun/upload_monitor.out >>t_result
+   mail -s "METAMOD2 output from $idstring test" $developeremail <t_result
 fi
