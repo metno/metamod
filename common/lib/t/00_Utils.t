@@ -37,15 +37,18 @@ BEGIN {use_ok('Metamod::Utils', qw(findFiles isNetcdf trim));}
 
 my @allFiles = findFiles('.');
 ok((0 < grep {$_ =~ /00_Utils.t/} @allFiles), "finding 00_Utils.t in all");
-my @numberFiles = findFiles('.', sub {$_[0] =~ /^\d/o});
+my @numberFiles = findFiles('.', sub {$_[0] =~ /^\d/});
 ok((0 < grep {$_ =~ /00_Utils.t/} @numberFiles), "finding 00_Utils.t in files starting with number");
-my $var = ".pl";
-my @plFiles = findFiles('.', sub {$_[0] =~ /\Q$var\E$/o;});
-ok((0 == grep {$_ =~ /00_Utils.t/} @plFiles), "not finding 00_Utils.t in files ending with .pl");
-$var = ".t";
-my @tFiles = findFiles('.', sub {$_[0] =~ /\Q$var\E$/o;});
-ok((0 < grep {$_ =~ /00_Utils.t/} @tFiles), "finding 00_Utils.t in files ending with .t");
-my @execFiles = findFiles('.', sub {$_[0] =~ /\Q$var\E$/o;}, sub {-x _});
+foreach my $var (qw(.pl .t)) {
+   my @files = findFiles('.', eval 'sub {$_[0] =~ /\Q$var\E$/o;}');
+   if ($var eq ".pl") {
+      ok((0 == grep {$_ =~ /00_Utils.t/} @files), "not finding 00_Utils.t in files ending with .pl");
+   } elsif ($var eq ".t") {
+      ok((0 < grep {$_ =~ /00_Utils.t/} @files), "finding 00_Utils.t in files ending with .t");
+   }
+}
+my $var = '.t';
+my @execFiles = findFiles('.', eval 'sub {$_[0] =~ /\Q$var\E$/o;}', sub {-x _});
 is(scalar @execFiles, 1, "Utils.t only executable .t - file");
 
 ok(isNetcdf("test.nc"), "test.nc is netcdf");

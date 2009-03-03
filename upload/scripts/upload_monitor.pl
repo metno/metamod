@@ -374,7 +374,7 @@ sub ftp_process_hour {
    foreach my $eventkey (@matches) {
       my ($dataset_name,$hour) = split(/\s+/,$eventkey);
       my $wait_minutes = $eventsref->{$eventkey};
-      my @files_found = findFiles($ftp_dir_path, sub {$_[0] =~ /^\Q$dataset_name\E_/o;});
+      my @files_found = findFiles($ftp_dir_path, eval 'sub {$_[0] =~ /^\Q$dataset_name\E_/o;}');
       if (scalar @files_found == 0 && length($shell_command_error) > 0) {
          &syserror("SYS","find_fails", "", "ftp_process_hour", "");
          next;
@@ -882,7 +882,7 @@ sub process_files {
 #  files in the repository that are not affected by re-uploads. Base the digest_nc.pl run
 #  on this XML file.
 #
-   my @uploaded_files = findFiles($work_flat, sub {$_[0] =~ /^\Q$dataset_name\E_/o;});
+   my @uploaded_files = findFiles($work_flat, eval 'sub {$_[0] =~ /^\Q$dataset_name\E_/o;}');
 #   print "Uploaded files:\n";
 #   print Dumper(\@uploaded_files);
    if (length($shell_command_error) > 0) {
@@ -900,7 +900,7 @@ sub process_files {
       $destination_dir = File::Spec->catdir($opendap_directory, 
                                             $dataset_institution{$dataset_name}->[0],
                                             $dataset_name);
-      my @existing_files = findFiles($destination_dir, sub {$_[0] =~ /\Q$dataset_name\E_/o;});
+      my @existing_files = findFiles($destination_dir, eval 'sub {$_[0] =~ /\Q$dataset_name\E_/o;}');
       if (length($shell_command_error) > 0) {
          &syserror("SYS","find_fails_2", "", "process_files", "");
          return;

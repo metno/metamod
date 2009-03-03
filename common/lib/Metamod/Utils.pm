@@ -83,7 +83,13 @@ Metamod::Utils - utilities for metamod
   use Metamod::Utils qw(findFiles isNetcdf trim);
   
   my @files = findFiles('/tmp');
-  my @numberFiles = findFiles('/tmp', sub {$_[0] =~ m/^\d/o});
+  my @numberFiles = findFiles('/tmp', sub {$_[0] =~ m/^\d/});
+
+  # precompile pattern with variables
+  foreach my $var (qw(.x .y .z)) {
+  	   my @files = findFiles('/tmp', eval 'sub{$_[0] =~ m/$var$/o}');
+  	   print scalar @files , " files ending with $var\n";
+  }
 
   if (isNetcdf("file.nc")) {
   	   # ... do something with a nc file
