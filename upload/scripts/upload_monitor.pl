@@ -723,7 +723,7 @@ sub process_files {
                if ($component =~ /\/([^\/]+)$/) {
                   $bname = $1; # First matching ()-expression
                }
-               if (-e File->Spec->catfile($work_flat, $bname)) {
+               if (-e File::Spec->catfile($work_flat, $bname)) {
                   &syserror("USER","uploaded_tarfile_with_component_already_encountered",
                             $uploadname, "process_files", "Component: $bname");
                   $errors = 1;
@@ -1053,7 +1053,7 @@ sub process_files {
          my $timecode = substr($datestring,8,2) . substr($datestring,11,2) . 
                         substr($datestring,14,2);
          my $name_html_errfile = $dataset_name . '_' . $timecode . '.html';
-         my $path_to_errors_html = File->Spec->catfile($uerr_directory, $name_html_errfile);
+         my $path_to_errors_html = File::Spec->catfile($uerr_directory, $name_html_errfile);
          my $errorinfo_path = "errorinfo";
          open (ERRORINFO,">$errorinfo_path");
          print ERRORINFO $path_to_errors_html . "\n";
