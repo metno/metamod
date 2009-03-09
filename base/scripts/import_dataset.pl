@@ -182,7 +182,7 @@ sub process_directories {
 		if ( -d $xmldir1 ) {
 			# xm[ld] files newer than $last_updated
 			@files_to_consume = findFiles( $xmldir1, sub {$_[0] =~ /\.xm[ld]$/;},
-			                                         sub {(stat(_))[9] > $last_updated;} );
+			                                         sub {(stat(_))[9] >= $last_updated;} );
          if ( $progress_report == 1 ) {
 			   foreach my $file (@files_to_consume) {
 					print "      $file -accepted\n";
