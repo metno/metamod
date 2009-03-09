@@ -44,9 +44,9 @@
          echo "<table cellpadding=\"10\">\n";
          $files = scandir($dirpath);
          foreach ($files as $file) {
-            if (is_dir($file)) {
+            if (is_dir($file) && $file != '.' && $file != '..') {
                echo "<tr><th colspan=\"2\">$file</th></tr>\n";
-               $files2 = scandir($file);
+               $files2 = scandir($dirpath.'/'.$file);
                foreach ($files2 as $f2) {
                   if (preg_match ('/\.xmd$/i',$f2)) {
                      echo "<tr><td><a href=\"$bname/$file/$f2\">$f2</a> <a href=\"edit_xml.php?file=$dirpath/$file/$f2\">(edit)</a></td>";
