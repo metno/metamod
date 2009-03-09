@@ -35,26 +35,38 @@
 <body>
 <pre>
 <?php
-	$importdirs = "[==IMPORTDIRS==]";
-	$arr_importdirs = preg_split('/\s*\n\s*/m',$importdirs);
-	foreach ($arr_importdirs as $dirpath) {
-	echo "<h2>$dirpath</h2>\n";
-		$bname = basename($dirpath);
-		if (is_dir($dirpath)) {
-			echo "<table cellpadding=\"10\">\n";
-			$files = scandir($dirpath);
-			foreach ($files as $file) {
-				if (preg_match ('/\.xmd$/i',$file)) {
-            		echo "<tr><td><a href=\"$bname/$file\">$file</a> <a href=\"edit_xml.php?file=$dirpath/$file\">(edit)</a></td>";
-         		} elseif (preg_match ('/\.xml$/i',$file)) {
-            		echo "<td><a href=\"$bname/$file\">$file</a> <a href=\"edit_xml.php?file=$dirpath/$file\">(edit)</a></td></tr>\n";
-         		}
-      		}
-      		echo "</table>\n";
-      	} else {
-      		echo "Directory not found";
-      	}
-   	}
+   $importdirs = "[==IMPORTDIRS==]";
+   $arr_importdirs = preg_split('/\s*\n\s*/m',$importdirs);
+   foreach ($arr_importdirs as $dirpath) {
+      echo "<h2>$dirpath</h2>\n";
+      $bname = basename($dirpath);
+      if (is_dir($dirpath)) {
+         echo "<table cellpadding=\"10\">\n";
+         $files = scandir($dirpath);
+         foreach ($files as $file) {
+            if (is_dir($file)) {
+               echo "<tr><th colspan=\"2\">$file</th></tr>\n";
+               $files2 = scandir($file);
+               foreach ($files2 as $f2) {
+                  if (preg_match ('/\.xmd$/i',$f2)) {
+                     echo "<tr><td><a href=\"$bname/$file/$f2\">$f2</a> <a href=\"edit_xml.php?file=$dirpath/$file/$f2\">(edit)</a></td>";
+                  } elseif (preg_match ('/\.xml$/i',$f2)) {
+                     echo "<td><a href=\"$bname/$file/$f2\">$f2</a> <a href=\"edit_xml.php?file=$dirpath/$file/$f2\">(edit)</a></td></tr>\n";
+                  }
+               }
+            } else {
+               if (preg_match ('/\.xmd$/i',$file)) {
+                  echo "<tr><td><a href=\"$bname/$file\">$file</a> <a href=\"edit_xml.php?file=$dirpath/$file\">(edit)</a></td>";
+               } elseif (preg_match ('/\.xml$/i',$file)) {
+                  echo "<td><a href=\"$bname/$file\">$file</a> <a href=\"edit_xml.php?file=$dirpath/$file\">(edit)</a></td></tr>\n";
+               }
+            }
+         }
+         echo "</table>\n";
+      } else {
+         echo "Directory not found";
+      }
+   }
 ?>
 </pre>
 </body>
