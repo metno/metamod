@@ -31,3 +31,5 @@ htdocs/sch/gadone.php
 htdocs/sch/garemove.php
 htdocs/sch/nidone.php
 htdocs/sch/niremove.php
+htdocs/sch/showdone.php
+htdocs/sch/showutil.inc

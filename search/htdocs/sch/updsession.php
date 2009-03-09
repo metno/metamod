@@ -109,6 +109,7 @@ if ($mmError == 0) {
        $mmSessionState->QueryResultOffset = 0;
        $mmSessionState->state = 'presentation.php';
        $mmSessionState->options = mmInitialiseOptions();
+       $mmSessionState->exploded = array();
        $mmSessionId = $timeofday['usec'];
        $AccessTime = $timeofday['sec'];
        $s1 = serialize($mmSessionState);
@@ -154,6 +155,11 @@ if ($mmError == 0) {
        $mmSelectedNum = $a1[2];
        $mmCategoryNum = $a1[3];
        $mmCategoryName = mmGetCategoryFncValue($mmCategoryNum,"name");
+    } else if (preg_match ('/^([^_0-9]+)(\d+)$/',$mmSubmitButton,$a1)) {
+       $mmButtonName = $a1[1];
+       $mmSelectedNum = $a1[2];
+       $mmCategoryNum = 0;
+       $mmCategoryName = "";
     } else {
        $mmButtonName = $mmSubmitButton;
        $mmCategoryNum = 0;

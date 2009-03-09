@@ -58,7 +58,7 @@
                               # is not othervise set.
 #
 #  Debug option: Set the $mmDebug value to a blank-separated string of debug options:
-#  $mmDebug="POST GET mmColumns options mmSessionState mmSubmitButton"
+#  $mmDebug="POST GET mmColumns options mmSessionState mmSubmitButton getdslist"
 #  If no debug, set $mmDebug to the empty string.
 #
    $mmDebug = "";
@@ -67,6 +67,7 @@
 #
    $mmButtons = array( "index"    => array("",              "presentation.php","NOFORM"),
                        "show"     => array("",              "doshow.php",      "NOFORM"),
+                       "showex"   => array("showdone.php",  "doshow.php",      "NOFORM"),
                        "options"  => array("",              "dooptions.php",   "FORM"),
                        "optsdone" => array("optsdone.php",  "current",         "NOFORM"),
                        "cross"    => array("",              "docross.php",     "NOFORM"),

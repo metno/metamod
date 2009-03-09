@@ -29,6 +29,7 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
+include 'getdslist.php';
 $columns = array();
 # print_r($mmSessionState->options);
 reset($mmSessionState->options);
@@ -60,7 +61,8 @@ if ($mmError == 0) {
 #   Compute array $ds_arr and comma-separated string $ds_ids containing all
 #   dataset ids satisfying the current search criteria:
 #
-   include 'getdslist.php';
+   list($ds_arr,$dr_paths,$ds_children) = getdslist();
+   $ds_ids = implode(",",$ds_arr);
 }
 if ($mmError == 0 && strlen($ds_ids) > 0 && count($columns) > 0) {
    $vert_arr = array();

@@ -29,9 +29,29 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
+include 'getdslist.php';
+include 'showutil.inc';
 $columns = array();
 reset($mmSessionState->options);
 $maxcol = 0;
+# echo "<pre>\nmmSessionState->options ---------\n";
+# print_r($mmSessionState->options);
+# echo "</pre>\n";
+#
+#  Compute the following variables based on the $mmSessionState->options
+#  array:
+#
+#  columns    - Array. Represents the columns of the table presented to
+#               the user. Indices are integers >= 1 representing column numbers.
+#               $columns[N] corresponds to an entry in the $mmSessionState->options
+#               array with index "col=N". The value of $mmSessionState->options["col=N"]
+#               is the metadata type name. $columns[N] is set to an array of two
+#               text strings: [0]: metadata type name, and [1]: column name as shown
+#               to the user.
+#
+#  mtnames    - Comma-separated list of metadata type names (each name within pairs of
+#               apostrophes).
+#  
 foreach ($mmSessionState->options as $opt => $mtname) {
    if (substr($opt,0,4) == 'col=') {
       $j1 = substr($opt,4);
@@ -63,11 +83,19 @@ for ($i1 = 1; $i1 <= $maxcol; $i1++) {
    }
 }
 #
-#  Compute arrays $dr_paths, $ds_arr. And comma-separated
-#  string $ds_ids:
+#  Compute arrays representing top level datasets:
 #
-include 'getdslist.php';
+#     $ds_arr    - Contains DS_id for all selected datasets. Indexed from 0 and up.
+#     $dr_paths  - Contains DS_name for all selected datasets. Indexed by DS_id.
+#     $dr_children  - Array of arrays indexed by DS_id. Each array value comprise
+#                     the DS_ids of the children of the given DS_id.
 #
+#  and variable:
+#
+#     $ds_ids:   - Comma-separated string with all DS_ids
+#
+list($ds_arr,$dr_paths,$ds_children) = getdslist();
+$ds_ids = implode(",",$ds_arr);
 if ($mmError == 0) {
    if (strlen($ds_ids) > 0) {
       if (strlen($mtnames) > 0) {
@@ -103,18 +131,21 @@ if ($mmError == 0) {
             if (array_key_exists("fontsize",$mmSessionState->options)) {
                $fontsize = $mmSessionState->options["fontsize"];
             }
+            echo '<form action="search.php" method="POST">' . "\n";
+            echo mmHiddenSessionField();
             echo '<div style="font-size: ' . $fontsize . '%">' . "\n";
-            echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=\"98%\">\n";
-            $line = "<tr>";
+            $maintablestart = "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=\"98%\">\n";
+            $maintablestart .= "<tr>";
             for ($i1 = 1; $i1 <= $maxcol; $i1++) {
                if (array_key_exists($i1,$columns)) {
                   $col = $columns[$i1];
-                  $line .= "<th class=\"tdresult\" align=\"center\">" . $col[1] . "</th>";
+                  $maintablestart .= "<th class=\"tdresult\" align=\"center\">" . $col[1] . "</th>";
                   $mdcontent[$col[0]] = "";
                }
             }
-            $line .= "</tr>\n";
-            echo $line;
+            $maintablestart .= "</tr>\n";
+            echo $maintablestart;
+            $in_table = TRUE;
             $current_ds = -1;
             for ($i1=0; $i1 <= $num;$i1++) {
                if ($i1 < $num) {
@@ -127,46 +158,58 @@ if ($mmError == 0) {
                }
                if ($i1 == $num || ($current_ds >= 0 && $new_ds != $current_ds)) {
                   $line = "<tr>";
+                  if (in_array($current_ds, $mmSessionState->exploded)) {
+                     $btext = '-';
+                  } else {
+                     $btext = '+';
+                  }
+                  if (array_key_exists($current_ds, $ds_children)) {
+                     $sbox = '<input class="explusminus" type="submit" ' .
+                           'name="mmSubmitButton_showex' . $current_ds . '" value="' .
+                           $btext . '" /> ' . "\n";
+                  } else {
+                     $sbox = "";
+                  }
                   for ($i2 = 1; $i2 <= $maxcol; $i2++) {
                      if (array_key_exists($i2,$columns)) {
                         $col = $columns[$i2];
                         if ($col[0] == "DR") {
-                           $drpath = $dr_paths[$current_ds];
-                           $line .= "<td class=\"tdresult\"><p>" . $drpath . "</p>\n</td>";
-                        } else { # never reached if $use_only_ds == 0:
+                           $displayval = $dr_paths[$current_ds];
+                        } else { # never reached if $use_only_ds == 1:
                            $displayval = $mdcontent[$col[0]];
-                           $line .= "<td class=\"tdresult\">" . $displayval . "</td>";
                            $mdcontent[$col[0]] = "";
                         }
+                        $line .= "<td class=\"tdresult\">" . $sbox . $displayval . "</td>";
+                        $sbox = "";
                      }
                   }
                   $line .= "</tr>\n";
                   echo $line;
+                  if (in_array($current_ds, $mmSessionState->exploded) &&
+                          array_key_exists($current_ds, $ds_children)) {
+                     echo "</table>\n";
+                     $in_table = FALSE;
+                     showlowerlevel($ds_children[$current_ds],$columns);
+                     if ($i1 < $num) {
+                        echo "<br />\n";
+                        echo $maintablestart;
+                        $in_table = TRUE;
+                     }
+                  }
                }
                if ($i1 < $num) {
                   $current_ds = $new_ds;
                   if ($use_only_ds == 0) {
-                     $s1 = $rowarr[0];
-                     $jpos = strpos($s1,' > HIDDEN');
-                     if ($jpos !== false) {
-                        $s1 = substr($s1,0,$jpos);
-                     }
-                     if ($rowarr[1] == "dataref" && substr($s1,0,7) == 'http://') {
-                        if (preg_match (':/([^/]+)(/?)$:',$s1,$a1)) {
-                           $nameshown = $a1[1];
-                           if (strlen($a1[2]) == 0 && preg_match (':\.nc$:',$nameshown)) {
-                              $s1 = '<a href="' . $s1 . '.html">' . $nameshown . '</a>';
-                           } else {
-                              $s1 = '<a href="' . $s1 . '">' . $nameshown . '</a>';
-                           }
-                        }
-                     }
+                     $s1 = displayval($rowarr[1],$rowarr[0]);
                      $mdcontent[$rowarr[1]] .= "<p>" . $s1 . "</p>\n";
                   }
                }
             }
+            if ($in_table) {
+               echo "</table>\n";
+            }
             echo "</div>\n";
-            echo "</table>\n";
+            echo "</form>\n";
          } else {
             echo "<p>Nothing found</p>\n";
          }

@@ -171,6 +171,13 @@ var $state                Text string describing the current application
                           state, i.e. which screen is currently shown to
                           the user.
 
+var $options              Array containing options set in the option
+                          dialogue.
+
+var $exploded             Array containing DS_ids for all top level datasets
+                          that currently have all their children shown in
+                          the user web interface.
+
 var $QueryResultOffset    When showing a large table of rows, it will be
                           splitted up into smaller tables. This variable
                           represents the row number offset in the large
@@ -256,8 +263,8 @@ in index:        Value:
                         corner of the image, and the coordinates are increasing
                         rightwards and downwards.
                  a[4-5] Coordinates for the second rectangle-defining corner.
-                 a[6] - Number of DR_ids found from element 7 and on
-                 a[7-]  DR_ids representing all datasets in the database that
+                 a[6] - Number of DS_ids found from element 7 and on
+                 a[7-]  DS_ids representing all datasets in the database that
                         partly (or in full) cover the rectangular search area
 
 PROGRAM FLOW
@@ -365,12 +372,12 @@ representing the search result.
 
 The SQL sentence has the following general structure:
 
-   SELECT DR_id, DS_id, DR_path FROM DataReference 
-      WHERE DR_ownertag IN ([==DATASET_TAGS==]) AND
+   SELECT DS_id, DS_name FROM DataSet 
+      WHERE DS_ownertag IN ([==DATASET_TAGS==]) AND
       <criteria based on search category 1> AND
       <criteria based on search category 2> AND
       ...
-      ORDER BY DataReference.DS_id
+      ORDER BY DataSet.DS_id
 
 Lines like "<criteria based on search category N> AND" are empty if no selection
 criteria are set for that search category.
@@ -381,7 +388,7 @@ kinds of search criteria:
 Type 1 and 2 (basic key search or hierarchical key search) results in the following
 kind of search criteria:
 
-   DR_id IN (SELECT DISTINCT DR_id FROM BK_describes_DR WHERE BK_id IN (...))
+   DS_id IN (SELECT DISTINCT DS_id FROM BK_describes_DR WHERE BK_id IN (...))
 
    Here (...) is a list of BK_ids.
    
@@ -402,7 +409,7 @@ kind of search criteria:
 Type 3 search categories (search based on numerical values) results in the 
 following kind of search criteria:
 
-   DR_id IN (SELECT DISTINCT DR_id FROM NumberItem WHERE SC_id = <N> AND
+   DS_id IN (SELECT DISTINCT DS_id FROM NumberItem WHERE SC_id = <N> AND
              NI_from <= <upper> AND NI_to >= <lower>)
 
    Here <N> is the search category number (SC_id), <upper> is the upper limit
@@ -413,7 +420,7 @@ following kind of search criteria:
 Type 4 search categories (geographical search) results in the following kind of 
 search criteria:
 
-   DR_id IN (...)
+   DS_id IN (...)
 
    The list (...) is constructed from the array $mmSessionState->sitems[<N>,GA]
    where <N> is the search category number (SC_id). From this array, all elements
