@@ -821,7 +821,7 @@ sub parse_all {
    } else {
       $metadata{"dataref"} = [$dataref];
    }
-   if (!$info{"name"}) {
+   if ($info{"name"} ne '/') { # '/' is minimal allowed name, default
       if ($xml_metadata_path ne "TESTFILE") {
       	my $nameReg;
       	if ($isChild) {
