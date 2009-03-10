@@ -90,9 +90,10 @@ function showlowerlevel($dsarr,$columns) {
       $usemtnames = array();
       $indexmtnames = array();
       $jindex = $lastcolnum + 1;
+      $columncount = 0;
       reset($valuecounts);
       foreach ($valuecounts as $mtname => $mdcontarr) {
-         if ($lastcolnum-1 >= $max_columns) {
+         if ($columncount >= $max_columns) {
             break;
          }
          $completecount = 0;
@@ -115,6 +116,7 @@ function showlowerlevel($dsarr,$columns) {
             if ($ix > $lastcolnum) {
                $lastcolnum = $ix;
             }
+            $columncount++;
          }
       }
       $displaynames = array();
