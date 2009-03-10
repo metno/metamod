@@ -90,12 +90,8 @@ function showlowerlevel($dsarr,$columns) {
       $usemtnames = array();
       $indexmtnames = array();
       $jindex = $lastcolnum + 1;
-      $columncount = 0;
       reset($valuecounts);
       foreach ($valuecounts as $mtname => $mdcontarr) {
-         if ($columncount >= $max_columns) {
-            break;
-         }
          $completecount = 0;
          $totalcount = 0;
          foreach ($mdcontarr as $mdcontent => $countval) {
@@ -116,7 +112,6 @@ function showlowerlevel($dsarr,$columns) {
             if ($ix > $lastcolnum) {
                $lastcolnum = $ix;
             }
-            $columncount++;
          }
       }
       $displaynames = array();
@@ -127,7 +122,18 @@ function showlowerlevel($dsarr,$columns) {
             $displaynames[$jkey] = $col[1];
          }
       }
-      $colcount = count($usemtnames);
+      $colcount = 0;
+      $jlast = 0;
+      for ($i1 = 0; $i1 <= $lastcolnum; $i1++) {
+         if ($colcount > $max_columns) {
+            break;
+         }
+         if (array_key_exists($i1,$usemtnames)) {
+            $jlast = $i1;
+            $colcount++;
+         }
+      }
+      $lastcolnum = $jlast;
       echo '<table border="0" cellspacing="0" cellpadding="3" width="98%">' . "\n";
       $line = '<tr><th width="30">&nbsp;</th>';
       for ($i1 = 0; $i1 <= $lastcolnum; $i1++) {
