@@ -125,7 +125,7 @@ function showlowerlevel($dsarr,$columns) {
       $colcount = 0;
       $jlast = 0;
       for ($i1 = 0; $i1 <= $lastcolnum; $i1++) {
-         if ($colcount > $max_columns) {
+         if ($colcount >= $max_columns) {
             break;
          }
          if (array_key_exists($i1,$usemtnames)) {
