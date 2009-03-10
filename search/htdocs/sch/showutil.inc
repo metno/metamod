@@ -53,10 +53,14 @@ function showlowerlevel($dsarr,$columns) {
    $lastcolnum = 0;
    $max_columns = [==SEARCH_APP_MAX_COLUMNS==];
    reset($columns);
+   $mandatory_mtname = "NOT_USED";
    foreach ($columns as $cnum => $carr) {
       $prefcolumns[$carr[0]] = $cnum;
       if ($lastcolnum < $cnum) {
          $lastcolnum = $cnum;
+      }
+      if ($cnum == 1) {
+         $mandatory_mtname = $carr[0];
       }
    }
    $dslist = implode(",",$dsarr);
@@ -100,7 +104,7 @@ function showlowerlevel($dsarr,$columns) {
             }
             $totalcount++;
          }
-         if ($completecount < $totalcount) {
+         if ($completecount < $totalcount || $mtname == $mandatory_mtname) {
             if (array_key_exists($mtname, $prefcolumns)) {
                $ix = $prefcolumns[$mtname];
             } else {
