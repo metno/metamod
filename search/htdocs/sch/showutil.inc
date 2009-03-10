@@ -51,6 +51,7 @@ function showlowerlevel($dsarr,$columns) {
    global $mmDbConnection, $mmColumns, $mmError, $mmErrorMessage;
    $prefcolumns = array();
    $lastcolnum = 0;
+   $max_columns = [==SEARCH_APP_MAX_COLUMNS==];
    reset($columns);
    foreach ($columns as $cnum => $carr) {
       $prefcolumns[$carr[0]] = $cnum;
@@ -88,9 +89,12 @@ function showlowerlevel($dsarr,$columns) {
       $dsidcount = count($dsidsfound);
       $usemtnames = array();
       $indexmtnames = array();
-      $jindex = $lastcolnum;
+      $jindex = $lastcolnum + 1;
       reset($valuecounts);
       foreach ($valuecounts as $mtname => $mdcontarr) {
+         if ($lastcolnum-1 >= $max_columns) {
+            break;
+         }
          $completecount = 0;
          $totalcount = 0;
          foreach ($mdcontarr as $mdcontent => $countval) {
