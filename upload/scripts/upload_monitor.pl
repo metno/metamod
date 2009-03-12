@@ -858,13 +858,10 @@ sub process_files {
          }
       }
       if ($filetype ne 'nc3') {
-         my $first3chars = `dd if=$expandedfile ibs=3 count=1 2>/dev/null`;
-         if ($first3chars ne 'CDF') {
-            &syserror("SYSUSER","file_not_netcdf", $uploadname, "process_files",
+         &syserror("SYSUSER","file_not_netcdf", $uploadname, "process_files",
                    "File: $expfile\nBadfile: $expandedfile\nFiletype: $filetype");
-            $not_accepted{$expandedfile} = 1;
-            $errors = 1;
-         }
+         $not_accepted{$expandedfile} = 1;
+         $errors = 1;
       }
    }
    if ($errors == 1) {
