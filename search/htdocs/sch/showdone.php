@@ -29,10 +29,19 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
-$key = array_search($mmSelectedNum, $mmSessionState->exploded);
+$max_secondlevel_rows = [==SEARCH_APP_MAXROWS_SCNDLEV==];
+$key = array_key_exists($mmSelectedNum, $mmSessionState->exploded);
 if ($key === FALSE) {
-   array_push($mmSessionState->exploded,$mmSelectedNum);
+   $mmSessionState->exploded[$mmSelectedNum] = 1;
 } else {
-   unset ($mmSessionState->exploded[$key]);
+   if ($_POST["mmSubmitButton_showex" . $mmSelectedNum] == "Prev") {
+      $mmSessionState->exploded[$mmSelectedNum] =
+            $mmSessionState->exploded[$mmSelectedNum] - $max_secondlevel_rows;
+   } elseif ($_POST["mmSubmitButton_showex" . $mmSelectedNum] == "Next") {
+      $mmSessionState->exploded[$mmSelectedNum] =
+            $mmSessionState->exploded[$mmSelectedNum] + $max_secondlevel_rows;
+   } else {
+      unset ($mmSessionState->exploded[$mmSelectedNum]);
+   }
 }
 ?>

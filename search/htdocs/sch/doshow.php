@@ -131,7 +131,7 @@ if ($mmError == 0) {
             if (array_key_exists("fontsize",$mmSessionState->options)) {
                $fontsize = $mmSessionState->options["fontsize"];
             }
-            echo '<form action="search.php" method="POST">' . "\n";
+            echo '<form action="search.php#current" method="POST">' . "\n";
             echo mmHiddenSessionField();
             echo '<div style="font-size: ' . $fontsize . '%">' . "\n";
             $maintablestart = "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=\"98%\">\n";
@@ -158,13 +158,17 @@ if ($mmError == 0) {
                }
                if ($i1 == $num || ($current_ds >= 0 && $new_ds != $current_ds)) {
                   $line = "<tr>";
-                  if (in_array($current_ds, $mmSessionState->exploded)) {
+                  if (array_key_exists($current_ds, $mmSessionState->exploded)) {
                      $btext = '-';
                   } else {
                      $btext = '+';
                   }
                   if (array_key_exists($current_ds, $ds_children)) {
-                     $sbox = '<input class="explusminus" type="submit" ' .
+                     $sbox = "";
+                     if ($current_ds == $mmSelectedNum) {
+                        $sbox .= '<a name="current"></a>';
+                     }
+                     $sbox .= '<input class="explusminus" type="submit" ' .
                            'name="mmSubmitButton_showex' . $current_ds . '" value="' .
                            $btext . '" /> ' . "\n";
                   } else {
@@ -185,11 +189,12 @@ if ($mmError == 0) {
                   }
                   $line .= "</tr>\n";
                   echo $line;
-                  if (in_array($current_ds, $mmSessionState->exploded) &&
+                  if (array_key_exists($current_ds, $mmSessionState->exploded) &&
                           array_key_exists($current_ds, $ds_children)) {
-                     echo "</table>\n";
+                     echo "</table><br />\n";
                      $in_table = FALSE;
-                     showlowerlevel($ds_children[$current_ds],$columns);
+                     showlowerlevel($current_ds,$ds_children[$current_ds],
+                                    $mmSessionState->exploded[$current_ds],$columns);
                      if ($i1 < $num) {
                         echo "<br />\n";
                         echo $maintablestart;

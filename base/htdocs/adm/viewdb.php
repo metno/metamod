@@ -54,7 +54,14 @@ if ( $mmDbConnection ) {
    if ($refrow == '') {
       $result = pg_query ($mmDbConnection, "select * from $dbtable");
    } else {
-      $result = pg_query ($mmDbConnection, "select * from $dbtable where $refrow = '$refval'");
+      if ($dbtable == "DS_Has_MD") {
+         $result = pg_query ($mmDbConnection,
+                             "select DS_Has_MD.DS_id, DS_Has_MD.MD_id, MT_name, MD_content" .
+                             " from DS_Has_MD, Metadata where DS_Has_MD.$refrow = '$refval'" .
+                             " and DS_Has_MD.MD_id = Metadata.MD_id");
+      } else {
+         $result = pg_query ($mmDbConnection, "select * from $dbtable where $refrow = '$refval'");
+      }
    }
    if ( !$result ) {
       echo "<p>Error: Could not get rows from table $dbtable<BR>";
@@ -62,7 +69,11 @@ if ( $mmDbConnection ) {
       $num = pg_numrows($result);
       echo "<table border=1>\n";
       echo "<tr>\n";
-      $rowarr = $tables[$dbtable];
+      if ($refrow != '' && $dbtable == "DS_Has_MD") {
+         $rowarr = array('DS_id','MD_id','MT_name','MD_content');
+      } else {
+         $rowarr = $tables[$dbtable];
+      }
       echo "<th>" . implode("</th><th>",$rowarr) . "</th>\n";
       echo "<th>References</th>\n";
       $flipped_rownames = array_flip($rowarr);

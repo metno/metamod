@@ -43,9 +43,12 @@ class SessionState {
    var $options;            // Array containing options set in the options
                             // dialogue.
 
-   var $exploded;           // Array containing DS_ids for all top level datasets
-                            // that currently have all their children shown in
-                            // the user web interface.
+   var $exploded;           // Array containing one entry for each DS_id 
+                            // that currently have their children shown in
+                            // the user web interface. DS_id is used as key in this
+                            // array. The value is the row number (within the
+                            // table of all children) that currently is shown
+                            // as the first row in the corresponding visible table.
 
    var $QueryResultOffset;  // When showing a large table of rows, it will be
                             // splitted up into smaller tables. This variable

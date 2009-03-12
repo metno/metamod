@@ -47,9 +47,10 @@ function displayval($mtname, $value) {
    }
    return $s1;
 }
-function showlowerlevel($dsarr,$columns) {
-   global $mmDbConnection, $mmColumns, $mmError, $mmErrorMessage;
+function showlowerlevel($parentds,$dsarr,$startrow,$columns) {
+   global $mmDbConnection, $mmColumns, $mmError, $mmErrorMessage, $mmDebug;
    $prefcolumns = array();
+   $max_secondlevel_rows = [==SEARCH_APP_MAXROWS_SCNDLEV==];
    $lastcolnum = 0;
    $max_columns = [==SEARCH_APP_MAX_COLUMNS==];
    reset($columns);
@@ -69,6 +70,9 @@ function showlowerlevel($dsarr,$columns) {
       "WHERE Dataset.DS_id IN (" . $dslist . ") AND\n" .
       "Metadata.MD_id = DS_Has_MD.MD_id and Dataset.DS_id = DS_Has_MD.DS_id \n" .
       "ORDER BY Dataset.DS_id \n";
+   if (strpos($mmDebug,"secondlevel") !== false) {
+      echo "<pre>sqlsentence = $sqlsentence</pre>\n";
+   }
    $result = pg_query ($mmDbConnection, $sqlsentence);
    if (!$result) {
       mmPutLog(__FILE__ . __LINE__ . " Could not $sqlsentence");
@@ -79,8 +83,19 @@ function showlowerlevel($dsarr,$columns) {
       $num = pg_numrows($result);
       $valuecounts = array();
       $dsidsfound = array();
+      $dsidslast = array();
+      $dsidsrows = array();
+      $mtname_sort_values = array();
+      $mtname_sort = '[==SEARCH_APP_SORT_COLUMN==]';
+      $rowcounter = 0;
       for ($i1=0; $i1 < $num;$i1++) {
          list($mdcontent,$mtname,$dsid) = pg_fetch_row($result,$i1);
+         if ($mtname_sort == $mtname) {
+            $key1 = $mdcontent . sprintf('%010d',$dsid);
+            if (!array_key_exists($key1,$mtname_sort_values)) {
+               $mtname_sort_values[$key1] = $dsid;
+            }
+         }
          if (!array_key_exists($mtname, $valuecounts)) {
             $valuecounts[$mtname] = array();
          }
@@ -88,9 +103,41 @@ function showlowerlevel($dsarr,$columns) {
             $valuecounts[$mtname][$mdcontent] = 0;
          }
          $valuecounts[$mtname][$mdcontent]++;
-         $dsidsfound[$dsid] = 1;
+         if (!array_key_exists($dsid,$dsidsfound)) {
+            $rowcounter++;
+            $dsidsfound[$dsid] = $i1;
+            $dsidsrows[$rowcounter] = $dsid;
+         }
+         $dsidslast[$dsid] = $i1;
       }
       $dsidcount = count($dsidsfound);
+      if (count($mtname_sort_values) > 0) {
+         ksort($mtname_sort_values);
+         $dsidsrows = array();
+         $rowcounter = 0;
+         reset($mtname_sort_values);
+         foreach ($mtname_sort_values as $dsid) {
+            $rowcounter++;
+            $dsidsrows[$rowcounter] = $dsid;
+         }
+         if (count($mtname_sort_values) < $dsidcount) {
+            $arr1 = $dsidsfound;
+            reset($mtname_sort_values);
+            foreach ($mtname_sort_values as $dsid) {
+               if (array_key_exists($dsid, $dsidsfound)) {
+                  unset ($arr1[$dsid]);
+               }
+            }
+            reset($arr1);
+            foreach ($arr1 as $dsid => $i1) {
+               $rowcounter++;
+               $dsidsrows[$rowcounter] = $dsid;
+            }
+         }
+      }
+      if (strpos($mmDebug,"secondlevel") !== false) {
+         echo "<pre>dsidcount = $dsidcount</pre>";
+      }
       $usemtnames = array();
       $indexmtnames = array();
       $jindex = $lastcolnum + 1;
@@ -138,6 +185,26 @@ function showlowerlevel($dsarr,$columns) {
          }
       }
       $lastcolnum = $jlast;
+      if ($dsidcount > $max_secondlevel_rows) {
+         $rowdisplayfirst = $startrow;
+         $rowdisplaylast = $startrow + $max_secondlevel_rows - 1;
+         if ($rowdisplaylast > $dsidcount) {
+            $rowdisplaylast = $dsidcount;
+         }
+         $navigate = "<br />Rows: $rowdisplayfirst - $rowdisplaylast\n";
+         if ($startrow > 1) {
+            $navigate .= '<input class="exnextprev" type="submit" ' .
+                         'name="mmSubmitButton_showex' . $parentds . '" value="Prev" />' . "\n";
+         }
+         if ($rowdisplaylast < $dsidcount) {
+            $navigate .= '<input class="exnextprev" type="submit" ' .
+                         'name="mmSubmitButton_showex' . $parentds . '" value="Next" />' . "\n";
+         }
+      } else {
+         $navigate = "";
+         $rowdisplayfirst = 1;
+         $rowdisplaylast = $dsidcount;
+      }
       echo '<table border="0" cellspacing="0" cellpadding="3" width="98%">' . "\n";
       $line = '<tr><th width="30">&nbsp;</th>';
       for ($i1 = 0; $i1 <= $lastcolnum; $i1++) {
@@ -147,7 +214,8 @@ function showlowerlevel($dsarr,$columns) {
             } else {
                $colname = $usemtnames[$i1];
             }
-            $line .= "<th class=\"tdresult\" align=\"center\">" . $colname . "</th>";
+            $line .= "<th class=\"tdresult\" align=\"center\">" . $colname . $navigate . "</th>";
+            $navigate = "";
          }
       }
       $line .= "</tr>\n";
@@ -156,28 +224,24 @@ function showlowerlevel($dsarr,$columns) {
       for ($i2=0; $i2 <= $lastcolnum;$i2++) {
          $mdcontentall[$i2] = "";
       }
-      $current_ds = -1;
-      for ($i1=0; $i1 <= $num;$i1++) {
-         if ($i1 < $num) {
+      for ($irow=$rowdisplayfirst; $irow <= $rowdisplaylast;$irow++) {
+         $ifirst = $dsidsfound[$dsidsrows[$irow]];
+         $ilast = $dsidslast[$dsidsrows[$irow]];
+         for ($i1=$ifirst; $i1 <= $ilast;$i1++) {
             list($mdcontent,$mtname,$dsid) = pg_fetch_row($result,$i1);
-         }
-         if ($i1 == $num || ($current_ds >= 0 && $dsid != $current_ds)) {
-            $line = "<tr><td>&nbsp;</td>\n";
-            for ($i2=0; $i2 <= $lastcolnum;$i2++) {
-               if (array_key_exists($i2,$usemtnames)) {
-                  $line .= '<td class="tdresult">' . $mdcontentall[$i2] . "</td>\n";
-                  $mdcontentall[$i2] = "";
-               }
-            }
-            $line .= "</tr>\n";
-            echo $line;
-         }
-         if ($i1 < $num) {
             $jindex = $indexmtnames[$mtname];
             $s1 = displayval($mtname,$mdcontent);
             $mdcontentall[$jindex] .= "<p>" . $s1 . "</p>\n";
-            $current_ds = $dsid;
          }
+         $line = "<tr><td>&nbsp;</td>\n";
+         for ($i2=0; $i2 <= $lastcolnum;$i2++) {
+            if (array_key_exists($i2,$usemtnames)) {
+               $line .= '<td class="tdresult">' . $mdcontentall[$i2] . "</td>\n";
+               $mdcontentall[$i2] = "";
+            }
+         }
+         $line .= "</tr>\n";
+         echo $line;
       }
       echo "</table>\n";
    }

@@ -58,7 +58,7 @@
                               # is not othervise set.
 #
 #  Debug option: Set the $mmDebug value to a blank-separated string of debug options:
-#  $mmDebug="POST GET mmColumns options mmSessionState mmSubmitButton getdslist"
+#  $mmDebug="POST GET mmColumns options mmSessionState mmSubmitButton getdslist secondlevel"
 #  If no debug, set $mmDebug to the empty string.
 #
    $mmDebug = "";
