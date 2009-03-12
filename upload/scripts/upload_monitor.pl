@@ -38,7 +38,7 @@ use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 use Data::Dumper;
 use Mail::Mailer;
 use mmTtime;
-use Metamod::Utils qw(findFiles);
+use Metamod::Utils qw(findFiles getFiletype);
 $| = 1;
 #
 #  upload_monitor.pl
@@ -617,9 +617,9 @@ sub process_files {
 #      
 #     Get type of file and act accordingly:
 #      
-      my $filetype = &get_filetype($newpath);
+      my $filetype = getFiletype($newpath);
 #
-      if (index($filetype,"gzip compressed data") >= 0) {
+      if ($filetype =~ /^gzip/) { # gzip or gzip-compressed 
 #         
 #           Uncompress file:
 #         
@@ -650,10 +650,10 @@ sub process_files {
             next;
          }
          $newpath = File::Spec->catfile($work_start, $baseupldname);
-         $filetype = &get_filetype($newpath);
+         $filetype = getFiletype($newpath);
       }
 #
-      if (index($filetype,"tar archive") >= 0) {
+      if ($filetype eq "tar") {
          if (!defined($extension) || ($extension ne "tar" && $extension ne "TAR")) {
             &syserror("SYSUSER","uploaded_filename_with_missing_tar_ext", $uploadname, "process_files", "");
             $errors = 1;
@@ -793,11 +793,11 @@ sub process_files {
       if ($expandedfile =~ /\.([^.]+)$/) {
          $extension = $1; # First matching ()-expression
       }
-      my $filetype = &get_filetype($expandedfile);
+      my $filetype = getFiletype($expandedfile);
       if ($progress_report == 1) {
          print "    ---- Processing $expandedfile: $filetype\n";
       }
-      if (index($filetype,"text") >= 0) {
+      if ($filetype eq 'ascii') {
          my $errorMsg = remove_cr_from_file($expandedfile);
          if (length($errorMsg) > 0) {
             &syserror("SYS","remove_cr_failed: $errorMsg",$uploadname, "process_files","");
@@ -842,7 +842,7 @@ sub process_files {
                      &syserror("SYS","unlink_fails_on_expandedfile",
                                "", "process_files", "Expanded file: $expandedfile");
                   }
-                  $filetype = &get_filetype($ncname);
+                  $filetype = getFiletype($ncname);
                   $expandedfile = $ncname;
                   if ($progress_report == 1) {
                      print "         Ncgen OK.\n";
@@ -857,7 +857,7 @@ sub process_files {
             }
          }
       }
-      if (index($filetype,"NetCDF Data Format") < 0) {
+      if ($filetype ne 'nc3') {
          my $first3chars = `dd if=$expandedfile ibs=3 count=1 2>/dev/null`;
          if ($first3chars ne 'CDF') {
             &syserror("SYSUSER","file_not_netcdf", $uploadname, "process_files",
@@ -1805,24 +1805,6 @@ sub get_date_and_time_string {
    my $min = $ta[1]; # 0-59
    my $datestring = sprintf ('%04d-%02d-%02d %02d:%02d',$year,$mon,$mday,$hour,$min);
    return $datestring;
-};
-#
-#---------------------------------------------------------------------------------
-#
-sub get_filetype {
-   my ($filename) = @_;
-   if (-r $filename) {
-      my $filetype = &shcommand_scalar("file $filename");
-      if (length($shell_command_error) > 0) {
-         die "file $filename fails: $shell_command_error";
-      }
-      if ($filetype =~ /^[^:]*: (.*)$/) {
-         $filetype = $1; # First matching ()-expression
-      }
-      return $filetype;
-   } else {
-      die "Command 'file $filename' can not be done: File not readable";
-   }
 };
 #
 #---------------------------------------------------------------------------------

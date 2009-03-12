@@ -31,9 +31,9 @@ use strict;
 use warnings;
 
 use lib "..";
-use Test::More tests => 7;
+use Test::More tests => 14;
 
-BEGIN {use_ok('Metamod::Utils', qw(findFiles isNetcdf trim));}
+BEGIN {use_ok('Metamod::Utils', qw(findFiles isNetcdf trim getFiletype));}
 
 my @allFiles = findFiles('.');
 ok((0 < grep {$_ =~ /00_Utils.t/} @allFiles), "finding 00_Utils.t in all");
@@ -53,5 +53,11 @@ is(scalar @execFiles, 1, "Utils.t only executable .t - file");
 
 ok(isNetcdf("test.nc"), "test.nc is netcdf");
 ok(!isNetcdf("00_Utils.t"), "test.nc is no netcdf");
+
+ok(getFiletype("test.nc") eq "nc3", "test.nc filetype is nc3");
+ok(getFiletype("test.gz") eq "gzip", "test.gz filetype is gzip");
+ok(getFiletype("test.bz2") eq "bzip2", "test.bz2 filetype is bzip2");
+ok(getFiletype("test.zip") eq "pkzip", "test.nc filetype is pkzip");
+ok(getFiletype("00_Utils.t") eq "ascii", "00_Utils.t is ascii");
 
 is(trim("\nhallo\t "), "hallo", "trim");

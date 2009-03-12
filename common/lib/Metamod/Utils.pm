@@ -29,9 +29,9 @@
 
 package Metamod::Utils;
 use base qw(Exporter);
-our $VERSION = 0.1;
+our $VERSION = 0.2;
 
-@EXPORT_OK = qw(findFiles isNetcdf trim);
+@EXPORT_OK = qw(findFiles isNetcdf trim getFiletype);
 
 use File::Find qw();
 
@@ -51,17 +51,39 @@ sub _execFuncs {
 	return 1;
 }
 
-sub isNetcdf {
-	my ($file) = @_;
-	my $fh;
-	open ($fh, $file) or die "Cannot read $file: $!";
-	my $buffer;
-	if (sysread($fh, $buffer, 4) == 4) {
-		if ($buffer eq "CDF\1") {
-			return 1;
+# name, offset, magic-number
+my %magicNumber = (
+    'gzip' => [0, pack("C2", 0x1f, 0x8b)],
+    'bzip2' => [0, "BZh"],
+    'gzip-compress' => [0, pack("C2", 0x1f, 0x9d)],
+    'pkzip' => [0, pack("C4", 0x50, 0x4b, 0x03, 0x04)], # PK..
+    'tar' => [257, "ustar"],
+    'nc3' => [0, "CDF\1"],
+);
+sub getFiletype {
+	my ($filename) = @_;
+	# simple 'file' replacement
+	if ($filename =~ /\.tar/i) {
+		return 'tar-archive'; # pre-posix tar files don't have a magic number
+	}
+	if (-T $filename) {
+		return 'ascii'
+	}
+	open (my $f, $filename) or die "Cannot read $filename: $!";
+	my $maxLength = sysread($f, my $buffer, 1024); # setting 1024 as max offset
+	foreach my $type (keys %magicNumber) {
+		my ($offset, $magic) = @{$magicNumber{$type}};
+		if ((length($magic) + $offset) < $maxLength) {
+			if (substr($buffer, $offset, length($magic)) eq $magic) {
+				return $type;
+			}  
 		}
 	}
-	return 0;
+	return "";
+}
+
+sub isNetcdf {
+    return getFiletype(@_) eq 'nc3';
 }
 
 sub trim {
@@ -131,6 +153,14 @@ will be selected.
 
 Checks if a file is a netcdf file by checking the first 3 bytes (magic-key) of the file to be CDF.
 It will die if the file is not readable.
+
+=item getFiletype($file)
+
+get the filetype of a file. Supported files are: nc3, gzip, gzip-compressed, bzip2, pkzip,
+ascii and tar
+
+ascii detection works with perls -T option
+tar detection uses file-extension only for pre-POSIX tar (normally the case)
 
 =item trim($str)
 
