@@ -1068,13 +1068,15 @@ sub rule_highlow {
          if (ref($refval) ne "ARRAY") {
             die 'parse_all: ref($refval) ne "ARRAY" in $all_globatts{$fpath}';
          }
-         if (!defined($selectedvalue)) {
-            $selectedvalue = $refval->[0];
-         } else {
-            if ($rule eq "take_highest" && $selectedvalue < $refval->[0]) {
+         if (defined($refval->[0])) {
+            if (!defined($selectedvalue)) {
                $selectedvalue = $refval->[0];
-            } elsif ($rule eq "take_lowest" && $selectedvalue > $refval->[0]) {
-               $selectedvalue = $refval->[0];
+            } else {
+               if ($rule eq "take_highest" && $selectedvalue < $refval->[0]) {
+                  $selectedvalue = $refval->[0];
+               } elsif ($rule eq "take_lowest" && $selectedvalue > $refval->[0]) {
+                  $selectedvalue = $refval->[0];
+               }
             }
          }
       }
