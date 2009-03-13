@@ -126,6 +126,8 @@ if [ $# -eq 2 -a $1 = '-i' ]; then
    echo "If harvesting only on a set, also enter the set name."
    echo -n "Two or three items separated by space: "
    read oaiharvesttag oaiharvestsource oaiharvestset
+   echo -n "Absolute path to file containing all nc/cdl files to upload: "
+   read filestoupload
    cat >testrc <<EOF
 sourceurl = $sourceurl
 idstring = $idstring
@@ -134,6 +136,7 @@ opendapurl = $opendapurl
 operatoremail = $operatoremail
 developeremail = $developeremail
 oaiharvest = $oaiharvesttag $oaiharvestsource $oaiharvestset
+filestoupload = $filestoupload
 EOF
    echo ""
    echo "The entered items can any time be changed by editing the $basedir/testrc file."
@@ -156,6 +159,10 @@ elif [ $# -eq 1 -a -d $1 -a -d $1/source -a -r $1/testrc ]; then
    read dummy1 dummy2 operatoremail
    read dummy1 dummy2 developeremail
    read dummy1 dummy2 oaiharvesttag oaiharvestsource oaiharvestset
+   read dummy1 dummy2 filestoupload
+   if [ -z $filestoupload ]; then
+      filestoupload=$basedir/source/test/ncinput/files
+   fi
 else
    echo ""
    echo "Usage:       $0 -i basedirectory"
@@ -267,13 +274,13 @@ cd $basedir/target
 # ======================================
 #
 #    by copying files to the ftp- and web-upload areas. Input files
-#    are taken from the list of files found in ncinput/files.
+#    are taken from the list of files found in the file having abs. path $filestoupload.
 #
 cd $basedir
 rm -rf t_dir
 mkdir t_dir
 cd $basedir/source/test/ncinput
-for fil in `cat files`; do cp $fil $basedir/t_dir; mv $basedir/t_dir/* $basedir/ftpupload; sleep 10; done
+for fil in `cat $filestoupload`; do cp $fil $basedir/t_dir; mv $basedir/t_dir/* $basedir/ftpupload; sleep 10; done
 #
 # I. After sleeping some time the services is stopped.
 # ====================================================
@@ -297,16 +304,16 @@ if [ -z "`ls compare`" ]; then
          echo "Missing file: webrun/$fil"
       fi
    done
-elseif [ 1 -eq 0 ]; then
+elif [ 1 -eq 1 ]; then
    echo "`whoami`@`uname -n`:`pwd`" >t_result
    count=1
    for fil in $logfiles; do
       if [ -r webrun/$fil ]; then
          sed '1,$s/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]/_TIMESTAMP_/' webrun/$fil >t_log1
-         sed '1,$s/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/_DATE_/' t_log1 | sort >t_log2
+         sed '1,$s/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/_DATE_/' t_log1 | sort | uniq >t_log2
          rm t_log1
          echo "========== diff for $fil:" >>t_result
-         sort compare/$fil >t_log3
+         sort compare/$fil | uniq >t_log3
          diff t_log2 t_log3 >>t_result
          count=`expr $count + 1`
       else
