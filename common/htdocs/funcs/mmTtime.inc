@@ -41,7 +41,7 @@ class mmTtime {
          $realtime = $usetime;
       }
       $scaling = "[==TEST_IMPORT_SPEEDUP==]";
-      if (strlen($scaling) == 0 || substr_compare($scaling, "[=", 0, 2)) {
+      if (strlen($scaling) == 0 || substr_compare($scaling, "[", 0, 1)) {
       	 return $realtime; # no TEST_IMPORT_SPEEDUP given
       }
       if ($scaling <= 1) {
