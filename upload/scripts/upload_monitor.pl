@@ -988,7 +988,7 @@ sub process_files {
 #     this creates the level 2 (children) xml-files
          foreach my $filepath (@digest_input) {
          	my (undef, undef, $basename) = File::Spec->splitpath($filepath);
-         	my $fileURL = $destination_url . $basename;
+         	my $fileURL = $destination_url . "catalog.html?dataset=$dataset_name/". $basename;
          	open (my $digest, ">digest_input");
          	print $digest $fileURL, "\n";
             print $digest $filepath, "\n";
