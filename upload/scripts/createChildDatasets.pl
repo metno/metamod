@@ -111,14 +111,18 @@ foreach my $parentDir (@PARENT_DIRS) {
 			my @ncFiles = findFiles( $dataref, \&isNetcdf );
 			foreach my $ncFile (@ncFiles) {
 				my ( $vol, $directory, $file ) = File::Spec->splitpath($ncFile);
-				$file =~ s/\.[^.]+//;    # remove extension
+				my $freeFile = $file;
+				$freeFile =~ s/\.[^.]+//;    # remove extension
 				my %info = $ds->getInfo;
 				my @parentDir = split '/', $info{name};
 				my $xmlPath =
-				  File::Spec->catfile( $OUTPUT_DIR, @parentDir, $file . '.xml' );
+				  File::Spec->catfile( $OUTPUT_DIR, @parentDir, $freeFile . '.xml' );
+				next if -f $xmlPath;
 				mkpath( File::Spec->catdir( $OUTPUT_DIR, @parentDir ) );
 				my $opendapRef = $ncFile;
 				$opendapRef =~ s:\Q$NCFILE_PREFIX\E:$opendapURL:o;
+				$opendapRef =~ s:[^/]+$::; # remove file
+				$opendapRef .= 'catalog.html?dataset=' . $parentDir[-1] . '/' . $file; 
 				my $digestInput = "digest_input$$";
 				open( my $digestFH, ">$digestInput" )
 				  or die "Cannot write file $digestInput: $!\n";
