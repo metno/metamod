@@ -40,6 +40,9 @@ if ($key === FALSE) {
    } elseif ($_POST["mmSubmitButton_showex" . $mmSelectedNum] == "Next") {
       $mmSessionState->exploded[$mmSelectedNum] =
             $mmSessionState->exploded[$mmSelectedNum] + $max_secondlevel_rows;
+   } elseif (is_numeric($_POST["mmSubmitButton_showex" . $mmSelectedNum])) {
+      $mmSessionState->exploded[$mmSelectedNum] = 
+                $_POST["mmSubmitButton_showex" . $mmSelectedNum];
    } else {
       unset ($mmSessionState->exploded[$mmSelectedNum]);
    }

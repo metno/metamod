@@ -189,11 +189,14 @@ if ($mmError == 0) {
 #      Clean up the $mmSessionState->exploded array so that any active second level
 #      tables start at row number one:
 #
-       $found_file = strpos(
-          "bkdone.php gadone.php hkdone.php nidone.php " .
-          "niremove.php hkclear.php garemove.php bkclear.php",
-          $fname
-       );
+       $found_file = false;
+       if (strlen($fname) > 0) {
+          $found_file = strpos(
+             "bkdone.php gadone.php hkdone.php nidone.php " .
+             "niremove.php hkclear.php garemove.php bkclear.php",
+             $fname
+          );
+       }
        if ($found_file !== false) {
           reset($mmSessionState->exploded);
           foreach ($mmSessionState->exploded as $dsid => $rownum) {

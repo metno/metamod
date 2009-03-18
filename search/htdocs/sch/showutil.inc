@@ -38,11 +38,7 @@ function displayval($mtname, $value) {
    if ($mtname == "dataref" && substr($s1,0,7) == 'http://') {
       if (preg_match (':/([^/]+)(/?)$:',$s1,$a1)) {
          $nameshown = $a1[1];
-         if (strlen($a1[2]) == 0 && preg_match (':\.nc$:',$nameshown)) {
-            $s1 = '<a href="' . $s1 . '.html">' . $nameshown . '</a>';
-         } else {
-            $s1 = '<a href="' . $s1 . '">' . $nameshown . '</a>';
-         }
+         $s1 = '<a href="' . $s1 . '">' . $nameshown . '</a>';
       }
    }
    return $s1;
@@ -191,7 +187,7 @@ function showlowerlevel($parentds,$dsarr,$startrow,$columns) {
          if ($rowdisplaylast > $dsidcount) {
             $rowdisplaylast = $dsidcount;
          }
-         $navigate = "<br />Rows: $rowdisplayfirst - $rowdisplaylast\n";
+         $navigate = "<br />Rows: $rowdisplayfirst - $rowdisplaylast of $dsidcount\n";
          if ($startrow > 1) {
             $navigate .= '<input class="exnextprev" type="submit" ' .
                          'name="mmSubmitButton_showex' . $parentds . '" value="Prev" />' . "\n";
@@ -199,6 +195,11 @@ function showlowerlevel($parentds,$dsarr,$startrow,$columns) {
          if ($rowdisplaylast < $dsidcount) {
             $navigate .= '<input class="exnextprev" type="submit" ' .
                          'name="mmSubmitButton_showex' . $parentds . '" value="Next" />' . "\n";
+#            $newrownum = (int)(($dsidcount-0.9)/$max_secondlevel_rows);
+#            $newrownum = $newrownum*$max_secondlevel_rows + 1;
+#            $navigate .= '<input class="exnextprev" type="submit" ' .
+#                         'name="mmSubmitButton_showex' . $parentds . '" value="' .
+#                         $newrownum . '" />' . "\n";
          }
       } else {
          $navigate = "";
