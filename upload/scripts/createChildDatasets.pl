@@ -102,12 +102,15 @@ foreach my $parentDir (@PARENT_DIRS) {
 		my %metadata = $ds->getMetadata;
 		next unless exists $metadata{dataref};
 		my $dataref = $metadata{dataref}[0];
-      my $opendapURL = $OPENDAP_PREFIX . 'data/';
+        my $opendapURL = $OPENDAP_PREFIX . 'data/';
 		if ( $dataref =~ s:^\Q$opendapURL\E:$NCFILE_PREFIX:o ) {
 			if (!-d $dataref) {
 				print STDERR "no such directory: $dataref, derifed from $OPENDAP_PREFIX, $NCFILE_PREFIX  $metadata{dataref}[0]";
 				next;
 			}
+			# extract institution from original dataref, it is the first path after the general opendap url
+			my $institution = $metadata{dataref}[0];
+			$institution =~ s:\Q$opendapURL\E([^/]+)/.*:$1:o; 
 			my @ncFiles = findFiles( $dataref, \&isNetcdf );
 			foreach my $ncFile (@ncFiles) {
 				my ( $vol, $directory, $file ) = File::Spec->splitpath($ncFile);
@@ -122,7 +125,7 @@ foreach my $parentDir (@PARENT_DIRS) {
 				my $opendapRef = $ncFile;
 				$opendapRef =~ s:\Q$NCFILE_PREFIX\E:$opendapURL:o;
 				$opendapRef =~ s:[^/]+$::; # remove file
-				$opendapRef .= 'catalog.html?dataset=' . $parentDir[-1] . '/' . $file; 
+				$opendapRef .= 'catalog.html?dataset=' . join('/', $institution, $parentDir[-1], $file); 
 				my $digestInput = "digest_input$$";
 				open( my $digestFH, ">$digestInput" )
 				  or die "Cannot write file $digestInput: $!\n";
