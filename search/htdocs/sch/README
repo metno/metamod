@@ -267,6 +267,9 @@ in index:        Value:
                  a[7-]  DS_ids representing all datasets in the database that
                         partly (or in full) cover the rectangular search area
 
+            GAQ  Array of Quadtree nodes corresponding to the rectangular
+                 geographical search area.
+
 PROGRAM FLOW
 ------------
 

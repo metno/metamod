@@ -104,7 +104,8 @@ function getdslist() {
             $sqlsentence .= "      AND \n";
          }
          $drsearch = array_slice($mmSessionState->sitems[$s1],7);
-         $sqlsentence .= "      DS_id IN (" . implode(', ',$drsearch) . ")\n";
+         $sqlsentence .= "      (DS_id IN (" . implode(', ',$drsearch) . ") OR \n" .
+                         "      DS_parent IN (" . implode(', ',$drsearch) . "))\n";
          $j1++;
       }
    }

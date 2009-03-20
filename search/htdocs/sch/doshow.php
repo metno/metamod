@@ -29,8 +29,8 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
-include 'getdslist.php';
-include 'showutil.inc';
+include_once 'getdslist.php';
+include_once 'showutil.inc';
 $columns = array();
 reset($mmSessionState->options);
 $maxcol = 0;
