@@ -52,7 +52,11 @@ if ( $mmDbConnection ) {
    }
    echo "<h2>The $dbtable table:</h2>\n";
    if ($refrow == '') {
-      $result = pg_query ($mmDbConnection, "select * from $dbtable");
+      if ($dbtable == 'DataSet') {
+         $result = pg_query ($mmDbConnection, "select * from $dbtable where DS_parent = 0");
+      } else {
+         $result = pg_query ($mmDbConnection, "select * from $dbtable");
+      }
    } else {
       if ($dbtable == "DS_Has_MD") {
          $result = pg_query ($mmDbConnection,
@@ -74,14 +78,25 @@ if ( $mmDbConnection ) {
       } else {
          $rowarr = $tables[$dbtable];
       }
-      echo "<th>" . implode("</th><th>",$rowarr) . "</th>\n";
+      if ($refrow == '' && $dbtable == 'DataSet') {
+         $children_html = '<th>Show</th>';
+      } else {
+         $children_html = '';
+      }
+      echo $children_html . "<th>" . implode("</th><th>",$rowarr) . "</th>\n";
       echo "<th>References</th>\n";
       $flipped_rownames = array_flip($rowarr);
       echo "</tr>\n";
       for ($i1=0; $i1<$num; $i1++) {
 	 echo "<tr>\n";
          $rowarr = pg_fetch_row($result, $i1);
-	 echo "<td>" . implode("</td><td>",$rowarr) . "</td>\n";
+         if ($refrow == '' && $dbtable == 'DataSet') {
+            $children_html = '<td><a href="viewdb.php?dbtable=DataSet&refrow=DS_parent&refval=' .
+                             $rowarr[0] . '">Children</a></td>';
+         } else {
+            $children_html = '';
+         }
+	 echo $children_html . "<td>" . implode("</td><td>",$rowarr) . "</td>\n";
          echo "<td>";
          if (array_key_exists($dbtable,$tablesrefs)) {
             $items = explode(" ",$tablesrefs[$dbtable]);
