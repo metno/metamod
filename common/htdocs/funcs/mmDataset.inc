@@ -119,7 +119,7 @@ function mmWriteDataset($outputBasename, $xmdContent, $xmlContent) {
 			throw new MM_DatasetException("cannot write dataset-file '$outputBasename.xmd'");
 		}
 		if (!flock($dsfh, LOCK_EX)) {
-			throw new MM_DatasetExeption("cannot lock dataset-file '$outputBasename.xmd'");
+			throw new MM_DatasetException("cannot lock dataset-file '$outputBasename.xmd'");
 		}
 		$mm2fh = fopen($outputBasename . ".xml", "ab");
 		if (!$mm2fh) {
@@ -127,7 +127,7 @@ function mmWriteDataset($outputBasename, $xmdContent, $xmlContent) {
 		}
 		if (!flock($mm2fh, LOCK_EX)) {
 			flock($dsfh, LOCK_UN);
-			throw new MM_DatasetExeption("cannot lock metadata-file '$outputBasename.xml'");			
+			throw new MM_DatasetException("cannot lock metadata-file '$outputBasename.xml'");			
 		}
 		if (!ftruncate($dsfh, 0)) {
 			throw new MM_DatasetException("cannot truncate dataset-file '$outputBasename.xmd'");
