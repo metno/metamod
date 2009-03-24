@@ -30,7 +30,7 @@
 ?>
 <?php
 function getdslist() {
-   global $mmDbConnection, $mmCategorytype, $mmSessionState, $mmDebug;
+   global $mmError, $mmDbConnection, $mmCategorytype, $mmSessionState, $mmDebug;
 #
 #  This script computes arrays:
 #
@@ -38,11 +38,17 @@ function getdslist() {
 #                  criteria. Indexed from 0 and up.
 #     $dr_paths  - Contains DS_name for all top level datasets in $ds_arr.
 #                  Indexed by DS_id.
-#     $ds_children - For each DS_id having children, this array contains an
-#                    array of all its children (given by the childrens DS_ids).
+#     $ds_with_children
+#                - Array with DS_ids as key. Set to 1 for each DS_id representing
+#                  a dataset having children.
 #
-   $sqlsentence = "SELECT DS_id, DS_name, DS_parent \n" .
-                  "   FROM DataSet WHERE DS_ownertag IN ([==DATASET_TAGS==]) AND \n";
+#  and a character string:
+#
+#     $sqlpart   - Part of SQL WHERE clause corresponding to the selected search
+#                  criteria (apart from the map search criteria).
+#
+   $sqlpart = "";
+   $sql_gapart = "";
    $j1 = 0;
 #
 # foreach value in an array
@@ -79,9 +85,9 @@ function getdslist() {
       $bkids = array_unique($bkids);
       if (count($bkids) > 0) {
          if ($j1 > 0) {
-            $sqlsentence .= "      AND \n";
+            $sqlpart .= "      AND \n";
          }
-         $sqlsentence .= "      DS_id IN (" .
+         $sqlpart .= "      DS_id IN (" .
             " SELECT DISTINCT DS_id FROM BK_describes_DS WHERE BK_id IN (" .
             implode(', ',$bkids) . ") )\n";
          $j1++;
@@ -89,10 +95,10 @@ function getdslist() {
       $s1 = $category . ',NI';
       if ($mmSessionState->countItems($s1) > 0) {
          if ($j1 > 0) {
-            $sqlsentence .= "      AND \n";
+            $sqlpart .= "      AND \n";
          }
          $bkids = array_keys($mmSessionState->sitems[$s1]);
-         $sqlsentence .= "      DS_id IN (" .
+         $sqlpart .= "      DS_id IN (" .
             " SELECT DISTINCT DS_id FROM NumberItem WHERE SC_id = " .
             $category . " AND NI_from <= " . $mmSessionState->sitems[$s1][1] . " AND " .
             " NI_to >= " . $mmSessionState->sitems[$s1][0] . ")\n";
@@ -100,20 +106,45 @@ function getdslist() {
       }
       $s1 = $category . ',GA';
       if ($mmSessionState->countItems($s1) > 7) {
-         if ($j1 > 0) {
-            $sqlsentence .= "      AND \n";
-         }
          $drsearch = array_slice($mmSessionState->sitems[$s1],7);
-         $sqlsentence .= "      (DS_id IN (" . implode(', ',$drsearch) . ") OR \n" .
-                         "      DS_parent IN (" . implode(', ',$drsearch) . "))\n";
-         $j1++;
+         $sql_gapart .= "      (DS_id IN (" . implode(', ',$drsearch) . "))\n";
       }
    }
+   $dbug = strpos($mmDebug,"getdslist");
    $dr_paths = array();
    $ds_arr = array();
-   $ds_children = array();
-   $dbug = strpos($mmDebug,"getdslist");
-   if ($j1 > 0) {
+   $ds_with_children = array();
+   if (($sqlpart != "" || $sql_gapart != "") && $mmError == 0) {
+      $sqlsentence = "SELECT DISTINCT DS_parent FROM DataSet ORDER BY DS_parent";
+      if ($dbug !== FALSE) {echo '<pre>' .$sqlsentence . '</pre>' . "\n";}
+      $result1 = pg_query ($mmDbConnection, $sqlsentence);
+      if (!$result1) {
+         mmPutLog(__FILE__ . __LINE__ . " Could not $sqlsentence");
+         $mmErrorMessage = $msg_start . "Internal application error";
+         $mmError = 1;
+      } else {
+         $num = pg_numrows($result1);
+         if ($dbug !== FALSE) {echo '<pre>Result count = ' . $num . '</pre>' . "\n";}
+         if ($num > 0) {
+            for ($i1=0; $i1 < $num;$i1++) {
+               list($dsid) = pg_fetch_row($result1,$i1);
+               if ($dsid > 0) {
+                  $ds_with_children[$dsid] = 1;
+               }
+            }
+         }
+      }
+   }
+   if (($sqlpart != "" || $sql_gapart != "") && $mmError == 0) {
+      $sqlsentence = "SELECT DS_id, DS_name FROM DataSet WHERE\n" .
+                  "DS_parent = 0 AND DS_ownertag IN ([==DATASET_TAGS==]) \n";
+                  $sqlpart . $sql_gapart . "ORDER BY DataSet.DS_id\n";
+      if ($sqlpart != "") {
+         $sqlsentence .= " AND " . $sqlpart;
+      }
+      if ($sql_gapart != "") {
+         $sqlsentence .= " AND " . $sql_gapart;
+      }
       $sqlsentence .= "ORDER BY DataSet.DS_id\n";
       if ($dbug !== FALSE) {echo '<pre>' .$sqlsentence . '</pre>' . "\n";}
       $result1 = pg_query ($mmDbConnection, $sqlsentence);
@@ -126,27 +157,15 @@ function getdslist() {
          if ($num > 0) {
             if ($dbug !== FALSE) {echo "<pre>dsid, dsname, dsparent:\n";}
             for ($i1=0; $i1 < $num;$i1++) {
-               list($dsid, $dsname, $dsparent) = pg_fetch_row($result1,$i1);
-               if ($dbug !== FALSE) {echo "$dsid, $dsname, $dsparent\n";}
-               if ($dsparent == 0) {
-                  $dr_paths[$dsid] = $dsname;
-                  array_push($ds_arr,$dsid);
-               } else {
-                  if (!array_key_exists($dsparent, $ds_children)) {
-                     $ds_children[$dsparent] = array();
-                  }
-                  array_push($ds_children[$dsparent],$dsid);
-               }
+               list($dsid, $dsname) = pg_fetch_row($result1,$i1);
+               if ($dbug !== FALSE) {echo "$dsid, $dsname\n";}
+               $dr_paths[$dsid] = $dsname;
+               array_push($ds_arr,$dsid);
             }
             if ($dbug !== FALSE) {echo "</pre>\n";}
          }
       }
    }
-   if ($dbug !== FALSE) {
-      echo "<pre>ds_children:\n";
-      print_r($ds_children);
-      echo "</pre>\n";
-   }
-   return array($ds_arr,$dr_paths,$ds_children);
+   return array($ds_arr,$dr_paths,$ds_with_children,$sqlpart);
 }
 ?>

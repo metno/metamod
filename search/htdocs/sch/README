@@ -174,9 +174,15 @@ var $state                Text string describing the current application
 var $options              Array containing options set in the option
                           dialogue.
 
-var $exploded             Array containing DS_ids for all top level datasets
-                          that currently have all their children shown in
-                          the user web interface.
+var $exploded             Array indexed by DS_ids for top level datasets
+                          that currently have their children shown in
+                          the user web interface. The value is the
+                          child number currently visible as the first row 
+                          in the children table. Children is numbered in
+                          the same sequence as the rows are shown in the
+                          table. Since there is a limit of how many rows
+                          are shown for each first level dataset, the
+                          first visible row may not always be 1.
 
 var $QueryResultOffset    When showing a large table of rows, it will be
                           splitted up into smaller tables. This variable

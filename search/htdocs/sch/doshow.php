@@ -85,16 +85,20 @@ for ($i1 = 1; $i1 <= $maxcol; $i1++) {
 #
 #  Compute arrays representing top level datasets:
 #
-#     $ds_arr    - Contains DS_id for all selected datasets. Indexed from 0 and up.
-#     $dr_paths  - Contains DS_name for all selected datasets. Indexed by DS_id.
-#     $dr_children  - Array of arrays indexed by DS_id. Each array value comprise
-#                     the DS_ids of the children of the given DS_id.
+#     $ds_arr    - Contains DS_id for all selected top level datasets. Indexed from 0 and up.
+#     $dr_paths  - Contains DS_name for all selected top level datasets. Indexed by DS_id.
+#     $ds_with_children
+#                - Array with DS_ids as keys. Exists for each DS_id representing a top level
+#                  datasets having children.
 #
 #  and variable:
 #
-#     $ds_ids:   - Comma-separated string with all DS_ids
+#     $sqlpart   - Part of WHERE-clause in SQL sentence corresponding to the
+#                  selected search criteria.
 #
-list($ds_arr,$dr_paths,$ds_children) = getdslist();
+#     $ds_ids:   - Comma-separated string with all DS_ids in $ds_arr.
+#
+list($ds_arr,$dr_paths,$ds_with_children,$sqlpart) = getdslist();
 $ds_ids = implode(",",$ds_arr);
 if ($mmError == 0) {
    if (strlen($ds_ids) > 0) {
@@ -163,7 +167,7 @@ if ($mmError == 0) {
                   } else {
                      $btext = '+';
                   }
-                  if (array_key_exists($current_ds, $ds_children)) {
+                  if (array_key_exists($current_ds, $ds_with_children)) {
                      $sbox = "";
                      if ($current_ds == $mmSelectedNum) {
                         $sbox .= '<a name="current"></a>';
@@ -190,11 +194,11 @@ if ($mmError == 0) {
                   $line .= "</tr>\n";
                   echo $line;
                   if (array_key_exists($current_ds, $mmSessionState->exploded) &&
-                          array_key_exists($current_ds, $ds_children)) {
+                          array_key_exists($current_ds, $ds_with_children)) {
                      echo "</table><br />\n";
                      $in_table = FALSE;
-                     showlowerlevel($current_ds,$ds_children[$current_ds],
-                                    $mmSessionState->exploded[$current_ds],$columns);
+                     showlowerlevel($current_ds,$mmSessionState->exploded[$current_ds],
+                                    $columns,$sqlpart);
                      if ($i1 < $num) {
                         echo "<br />\n";
                         echo $maintablestart;

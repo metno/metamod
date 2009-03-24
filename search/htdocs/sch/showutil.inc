@@ -44,7 +44,7 @@ function displayval($mtname, $value) {
    }
    return $s1;
 }
-function showlowerlevel($parentds,$dsarr,$startrow,$columns) {
+function showlowerlevel($parentds,$startrow,$columns,$sqlpart) {
    global $mmDbConnection, $mmColumns, $mmError, $mmErrorMessage, $mmDebug, $mmSessionState;
    $prefcolumns = array();
    $max_secondlevel_rows = [==SEARCH_APP_MAXROWS_SCNDLEV==];
@@ -59,6 +59,29 @@ function showlowerlevel($parentds,$dsarr,$startrow,$columns) {
       }
       if ($cnum == 1) {
          $mandatory_mtname = $carr[0];
+      }
+   }
+   $dsarr = array();
+   $dbug = strpos($mmDebug,"secondlevel");
+   $sqlsentence = "SELECT DS_id FROM DataSet WHERE DS_parent = $parentds\n";
+   if ($sqlpart != "") {
+      $sqlsentence .= " AND " . $sqlpart;
+   }
+   $sqlsentence .= "ORDER BY DataSet.DS_id\n";
+   if ($dbug !== FALSE) {echo '<pre>' .$sqlsentence . '</pre>' . "\n";}
+   $result1 = pg_query ($mmDbConnection, $sqlsentence);
+   if (!$result1) {
+      mmPutLog(__FILE__ . __LINE__ . " Could not $sqlsentence");
+      $mmErrorMessage = $msg_start . "Internal application error";
+      $mmError = 1;
+   } else {
+      $num = pg_numrows($result1);
+      if ($num > 0) {
+         if ($dbug !== FALSE) {echo "<pre>Result count = $num</pre>\n";}
+         for ($i1=0; $i1 < $num;$i1++) {
+            list($dsid) = pg_fetch_row($result1,$i1);
+            array_push($dsarr,$dsid);
+         }
       }
    }
    if ($mmSessionState->countItems('9,GA') > 7) {

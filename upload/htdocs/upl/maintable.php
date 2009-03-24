@@ -116,9 +116,6 @@ END_OF_STRING;
    Only alphanumeric characters, underline (_), period (.) and hyphens (-)
    are allowed in file names. The initial part of a file name must be the name of a
    user directory followed by underline (_).</p>
-   <p>The following user directories are owned by you:
-   &nbsp;&nbsp;
-   <span class="dirlist">
     <?php
          $metadataQuest = "[==QUEST_METADATA_UPLOAD_FORM==]";
          $userinfo = get_userinfo($filepath);
@@ -131,11 +128,38 @@ END_OF_STRING;
        		$institution = $userinfo["institution"];
     	 }
          
+         echo '<p>The table below shows all the directories owned by you.</p>' . "\n";
      	 if (strlen($metadataQuest) > 0) {
-         	foreach ($dirinfo as $d1 => $k1) {
+            $warning_text = <<<EOF
+    <p><b>Note</b>: You may edit the metadata for a directory dataset by clicking one
+    of the buttons below, but any later uploads to the repository will change the metadata
+    to whatever are found in the uploaded netCDF files.</p>
+EOF;
+            echo $warning_text;
+         }
+         echo '<table border="0" cellspacing="20">' . "\n";
+         $dirinfo_sorted = $dirinfo;
+         ksort($dirinfo_sorted);
+         $colcount = floor(count($dirinfo_sorted) / 3);
+         if ($colcount < 1) {
+            $colcount = 1;
+         }
+         if ($colcount > 6) {
+            $colcount = 6;
+         }
+         $j1 = 0;
+       	 foreach ($dirinfo_sorted as $d1 => $k1) {
+            if ($j1 > 0 && $j1 % $colcount == 0) {
+                echo '</tr>';
+            }
+            if ($j1 % $colcount == 0) {
+                echo '<tr>';
+            }
+            echo '<td>';
+            if (strlen($metadataQuest) > 0) {
 			$form = <<<EOF
      <form action="$metadataQuest" method="post">
-      	<fieldset>
+      	<fieldset style="border-width: 0">
      	 	<input type="hidden" name="institutionId" value="$institution" />
      	 	<input type="hidden" name="uploadDirectory" value="$d1" />
 			<input type="submit" name="$d1" value="$d1" />
@@ -143,14 +167,18 @@ END_OF_STRING;
      </form>
 EOF;
 			echo $form;
-         	}
-     	 } else {
-         	foreach ($dirinfo as $d1 => $k1) {
-            	echo $d1 . " ";
-         	}
-     	 }
+             } else {
+                echo '<span class="dirlist">' . $d1 . '</span>' . "\n";
+             }
+             echo '</td>';
+             $j1++;
+          }
+          while ($j1 > 0 && $j1 % $colcount != 0) {
+             echo '<td>&nbsp;</td>';
+             $j1++;
+          }
+          echo '</tr></table>' . "\n";
       ?>
-   </span>.</p>
    <p>You may create new user directories in the 
    <?php
        echo '<a href="adm.php?sessioncode=' .
