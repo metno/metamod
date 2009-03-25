@@ -66,30 +66,58 @@ if ( !-x $DIGESTNC ) {
 
 our $USAGE = <<EOT;
 usage: $0 OUTPUT_XML_DIR
+       $0 -i FILELIST OUTPUT_XML_DIR
 
 example: $0 /tmp/testoutput
 EOT
 
-unless ( @ARGV == 1 ) {
+unless ( @ARGV == 1 || (@ARGV == 3 && $ARGV[0] eq '-i') ) {
 	print STDERR $USAGE;
 	exit 1;
 }
 
-our ($OUTPUT_DIR) = @ARGV;
+our $OUTPUT_DIR;
+our $FILELIST;
+if (@ARGV == 1) {
+   $OUTPUT_DIR = $ARGV[0];
+} else {
+   $OUTPUT_DIR = $ARGV[2];
+   $FILELIST = $ARGV[1];
+}
 unless ( -d $NCFILE_PREFIX ) {
 	print STDERR $USAGE, "\n";
 	print STDERR "NCFILE_PREFIX $NCFILE_PREFIX: no such dir\n";
 	exit 1;
 }
 
-foreach my $parentDir (@PARENT_DIRS) {
+if ($FILELIST) {
+#
+#  Slurp in the content of a file
+#
+   unless (-r $FILELIST) {die "Can not read from file: $FILELIST\n";}
+   open (FLIST,$FILELIST);
+   undef $/;
+   my $pfiles = <FLIST>;
+   chomp($pfiles);
+   $/ = "\n"; 
+   close (FLIST);
+   my @parentFiles = split(/\s*\n\s*/m,$pfiles);
+   &process_parentfiles(\@parentFiles);
+} else {
+   foreach my $parentDir (@PARENT_DIRS) {
 	my @parentFiles = findFiles( $parentDir, sub { $_[0] =~ /\.xm[ld]$/; } );
 	my %unique;
 	@parentFiles = map {
 		my $bn = Metamod::DatasetTransformer::getBasename($_);
 		$unique{$bn}++ ? () : $_;
 	} @parentFiles;
-	foreach my $parentFile (@parentFiles) {
+        &process_parentfiles(\@parentFiles);
+   }
+}
+
+sub process_parentfiles {
+        my ($ref_to_parentfiles) = @_;
+	foreach my $parentFile (@$ref_to_parentfiles) {
 		my $ds = Metamod::Dataset->newFromFile($parentFile);
 		unless ($ds) {
 			print STDERR "Cannot read dataset of $parentFile, skipping...\n";
