@@ -200,7 +200,9 @@ sub replaceInfo {
     my %newInfo = %$infoRef;
     unless ($newInfo{name} and $newInfo{name} =~ /$nameReg/) {
     	my $infoName = $newInfo{name} || 'undef';
-    	Carp::croak("Cannot set name to $infoName, need project/[parent/]filename");
+        if ($infoName ne 'TESTFILE') {
+    	   Carp::croak("Cannot set name to $infoName, need project/[parent/]filename");
+        }
     }
     my $infoNode = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docDS})->item(0);
     while (my ($name, $val) = each %oldInfo) {
