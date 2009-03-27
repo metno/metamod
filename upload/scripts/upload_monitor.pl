@@ -1421,7 +1421,10 @@ sub notify_web_system {
             next;
          }
          open (USERFILE,$ownerfile);
-         my @file_content_arr = <USERFILE>;
+         undef $/;
+         my $file_content = <USERFILE>;
+         my @file_content_arr = split(/\n/,$file_content);
+         $/ = "\n"; 
          close (USERFILE);
 #   
          my @new_file_content_arr = ();
