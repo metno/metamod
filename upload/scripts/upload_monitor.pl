@@ -986,7 +986,7 @@ sub process_files {
       if ($ftp_or_web ne 'TAF') {
 #     run digest_nc again for each file with output to dataset/file.xml
 #     this creates the level 2 (children) xml-files
-         foreach my $filepath (@digest_input) {
+         foreach my $filepath (@uploaded_files) {
          	my (undef, undef, $basename) = File::Spec->splitpath($filepath);
          	my $fileURL = $destination_url . "catalog.html?dataset=". join ('/', $dataset_institution{$dataset_name}->[0], $dataset_name, $basename);
          	open (my $digest, ">digest_input");
