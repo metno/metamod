@@ -1044,7 +1044,9 @@ sub process_files {
          if ($ftp_or_web ne 'TAF') {
             &notify_web_system('File accepted ', $dataset_name, \@originally_uploaded, "");
          } else {
-            $mailbody = "Dear [OWNER],\n\nNo errors found in $taf_basename .\n\n";
+            my @bnames = &get_basenames(\@originally_uploaded);
+            my $bnames_string = join(", ",@bnames);
+            $mailbody = "Dear [OWNER],\n\nNo errors found in file(s) $bnames_string .\n\n";
          }
       } else {
 #         
@@ -1140,8 +1142,11 @@ sub process_files {
          }
       }
       if ($ftp_or_web eq 'TAF') {
-         if (unlink('[==WEBRUN_DIRECTORY==]/upl/etaf/' . $taf_basename) == 0) {
-            &syserror("SYS","Unlink TAF file etaf/$taf_basename did not succeed","", "process_files", "");
+         my @bnames = &get_basenames(\@originally_uploaded);
+         foreach my $bn (@bnames) {
+            if (unlink('[==WEBRUN_DIRECTORY==]/upl/etaf/' . $bn) == 0) {
+               &syserror("SYS","Unlink TAF file etaf/$bn did not succeed","", "process_files", "");
+            }
          }
       }
       if ($ftp_or_web ne 'TAF') {
