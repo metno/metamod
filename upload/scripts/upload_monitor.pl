@@ -215,9 +215,9 @@ my @user_errors = ();
 #  -------------------
 #
 eval {
-	if ($ARGV[0] && $ARGV[0] eq 'test') {
-		print STDERR "Testrun\n";
-		main_loop("test");
+	if ($ARGV[0]) {
+		print STDERR "Testrun: " . $ARGV[0] . "\n";
+		main_loop($ARGV[0]);
 	} else {
       &main_loop();		
 	}
@@ -304,7 +304,7 @@ sub main_loop {
       @ltime = localtime(mmTtime::ttime());
       my $newday = $ltime[3]; # 1-31
       my $current_hour = $ltime[2]; # 0-23
-      if ($current_day != $newday) {
+      if ($current_day != $newday || ($testrun && $testrun eq 'newday')) {
          &clean_up_problem_dir();
          &clean_up_repository();
          $file_in_error_counter = 1;
@@ -1631,6 +1631,9 @@ sub clean_up_repository {
          my $directory = $opendap_directory . "/" . 
                          $dataset_institution{$dataset}->[0] . "/" . $dataset;
          my @files = glob($directory . "/" . $dataset . "_*");
+         if ($progress_report == 1) {
+            print "\nclean_up_repository directory: $directory\n";
+         }
          foreach my $fname (@files) {
             my @file_stat = stat($fname);
             if (scalar @file_stat == 0) {
@@ -1643,6 +1646,9 @@ sub clean_up_repository {
 #            
             my $modification_time = mmTtime::ttime($file_stat[9]);
             if ($current_epoch_time - $modification_time > 60*60*24*$days_to_keep_files) {
+               if ($progress_report == 1) {
+                  print "   $fname\n";
+               }
                my @cdlcontent = &shcommand_array("ncdump -h $fname");
                if (length($shell_command_error) > 0) {
                   &syserror("SYS","Could not ncdump -h $fname", "", "clean_up_repository", "");
@@ -1650,11 +1656,17 @@ sub clean_up_repository {
                }
                my $lnum = 0;
                my $lmax = scalar @cdlcontent;
+               if ($progress_report == 1) {
+                  print "      Line count of CDL file (lmax) = $lmax\n";
+               }
                while ($lnum < $lmax) {
                   if ($cdlcontent[$lnum] eq 'dimensions:') {
                      last;
                   }
                   $lnum++;
+               }
+               if ($progress_report == 1) {
+                  print "      'dimensions:' found at line = $lnum\n";
                }
                $lnum++;
                while ($lnum < $lmax) {
@@ -1663,6 +1675,9 @@ sub clean_up_repository {
                   }
                   $cdlcontent[$lnum] =~ s/=\s*\d+\s*;$/= 1 ;/;
                   $lnum++;
+               }
+               if ($progress_report == 1) {
+                  print "      'variables:' found at line = $lnum\n";
                }
                if ($lnum >= $lmax) {
                   &syserror("SYS","Error while changing CDL content from $fname",
