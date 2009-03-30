@@ -618,6 +618,9 @@ sub process_files {
 #     Get type of file and act accordingly:
 #      
       my $filetype = getFiletype($newpath);
+      if ($progress_report == 1) {
+         print "     Processing $newpath Filtype: $filetype\n";
+      }
 #
       if ($filetype =~ /^gzip/) { # gzip or gzip-compressed 
 #         

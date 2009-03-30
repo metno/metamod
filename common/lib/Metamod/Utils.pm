@@ -64,7 +64,7 @@ sub getFiletype {
 	my ($filename) = @_;
 	# simple 'file' replacement
 	if ($filename =~ /\.tar/i) {
-		return 'tar-archive'; # pre-posix tar files don't have a magic number
+		return 'tar'; # pre-posix tar files don't have a magic number
 	}
 	if (-T $filename) {
 		return 'ascii'
