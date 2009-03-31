@@ -1037,12 +1037,18 @@ sub process_files {
       if ($ftp_or_web eq 'TAF') {
          $subject = 'File test report';
       }
+      my $dont_send_email_to_user = 
+            &string_found_in_file($dataset_name,$webrun_directory . '/' . 'datasets_for_silent_upload');
       if (-z $usererrors_path) {
 #
 #     No user errors:
 #
          if ($ftp_or_web ne 'TAF') {
-            &notify_web_system('File accepted ', $dataset_name, \@originally_uploaded, "");
+            if ($dont_send_email_to_user) {
+               &notify_web_system('Operator reload ', $dataset_name, \@originally_uploaded,"");
+            } else {
+               &notify_web_system('File accepted ', $dataset_name, \@originally_uploaded, "");
+            }
          } else {
             my @bnames = &get_basenames(\@originally_uploaded);
             my $bnames_string = join(", ",@bnames);
@@ -1082,8 +1088,12 @@ sub process_files {
             return;
          }
          if ($ftp_or_web ne 'TAF') {
-            &notify_web_system('Errors found ', $dataset_name, \@originally_uploaded,
+            if ($dont_send_email_to_user) {
+               &notify_web_system('Operator reload ', $dataset_name, \@originally_uploaded,"");
+            } else {
+               &notify_web_system('Errors found ', $dataset_name, \@originally_uploaded,
                             $url_to_errors_html);
+            }
          }
       }
       if (defined($mailbody)) {
@@ -1112,7 +1122,7 @@ sub process_files {
                $username = $2 . " ($recipient)";
             }
          }
-         if ('[==TEST_EMAIL_RECIPIENT==]' eq '') {
+         if ('[==TEST_EMAIL_RECIPIENT==]' eq '' || $dont_send_email_to_user) {
             $recipient = '[==OPERATOR_EMAIL==]';
          }
          if ('[==TEST_EMAIL_RECIPIENT==]' ne '0') {
@@ -1930,4 +1940,26 @@ sub remove_cr_from_file {
 		close $f;
 	};
 	return $@;
+}
+#
+#-----------------------------------------------------------------------------------
+# Check if string found in file:
+#
+sub string_found_in_file {
+   my ($searchfor,$fname) = @_;
+   if (-r $fname) {
+      open (FH,$fname);
+      undef $/;
+      my $content = <FH>;
+      $/ = "\n"; 
+      close (FH);
+      my $found = index($content,$searchfor);
+      if ($found >= 0) {
+         return 1;
+      } else {
+         return 0;
+      }
+   } else {
+      return 0;
+   }
 }
