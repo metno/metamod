@@ -846,7 +846,21 @@ sub parse_all {
    if (!$info{'ownertag'}) {
       $info{'ownertag'} = $ownertag;
    }
-
+#
+#  Start and stop date need special handling
+#
+   {
+      my $start_date = (delete $metadata{'datacollection_period_from'})->[0]
+                       if exists $metadata{'datacollection_period_from'};
+      if ($start_date) {
+         $metadata{'start_date'} = [$start_date];
+      }
+      my $stop_date = (delete $metadata{'datacollection_period_to'})->[0]
+                      if exists $metadata{'datacollection_period_to'};
+      if ($stop_date) {
+         $metadata{'stop_date'} = [$stop_date];
+      }
+   }
 #
 #  Populate the %metadata hash with values from the netCDF files.
 #
@@ -967,13 +981,15 @@ sub parse_all {
    delete $metadata{'quadtree_nodes'};
 
    # start and stop date need special handling
-   my $start_date = (delete $metadata{'start_date'})->[0] if exists $metadata{'start_date'};
-   if ($start_date) {
-      $metadata{'datacollection_period_from'} = [substr($start_date,0,10)];
-   }
-   my $stop_date = (delete $metadata{'stop_date'})->[0] if exists $metadata{'stop_date'};
-   if ($stop_date) {
-      $metadata{'datacollection_period_to'} = [substr($stop_date,0,10)];
+   {
+      my $start_date = (delete $metadata{'start_date'})->[0] if exists $metadata{'start_date'};
+      if ($start_date) {
+         $metadata{'datacollection_period_from'} = [substr($start_date,0,10)];
+      }
+      my $stop_date = (delete $metadata{'stop_date'})->[0] if exists $metadata{'stop_date'};
+      if ($stop_date) {
+         $metadata{'datacollection_period_to'} = [substr($stop_date,0,10)];
+      }
    }
    # using bounding_box instead of *_latitude, *_longitude
    my $south = (delete $metadata{'southernmost_latitude'})->[0] if exists $metadata{'southernmost_latitude'};
