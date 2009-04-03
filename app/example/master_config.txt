@@ -1,6 +1,6 @@
 SERVER = somecomputer.somedomain.com
 BASE_DIRECTORY = /home/someuser
-SOURCE_DIRECTORY = [==BASE_DIRECTORY==]/metamod_2.0.1
+SOURCE_DIRECTORY = [==BASE_DIRECTORY==]/metamod_2.2.0
 TARGET_DIRECTORY = [==BASE_DIRECTORY==]/example
 METAMODBASE_DIRECTORY = [==SOURCE_DIRECTORY==]/base
 METAMODSEARCH_DIRECTORY = [==SOURCE_DIRECTORY==]/search
@@ -79,7 +79,7 @@ UPLOAD_URL = [==LOCAL_URL==]/upl/index.php
 APP_MENU =
  [==METADATA_SEARCH_URL==] Metadata Search
  [==UPLOAD_URL==] File Upload
- [==OPENDAP_URL==] OPeNDAP
+ [==OPENDAP_URL==] Browse data repository
 
 # HTML code for a header across the top of applications:
 APP_HEADER_HTML =
@@ -87,6 +87,9 @@ APP_HEADER_HTML =
 
 # HTML code for a footer across the bottom of applications:
 APP_FOOTER_HTML =
+
+# Comma-separated list of dataset tags accessible from this application:
+DATASET_TAGS = 'MM'
 
 # ============ METAMODBASE configuration ==============
 # Path for logfile for logging important operations on the database:
@@ -122,16 +125,18 @@ SEARCH_APP_HEADER_HTML = [==APP_HEADER_HTML==]
 SEARCH_APP_DESCRIPTION =
  Search the METAMOD Catalogue. Use the links on the left hand side
  to access pages for setting search conditions. Then use the menu below to
- view results.
-
-# Comma-separated list of dataset tags accessible from this application:
-DATASET_TAGS = 'MM'
+ view results. Initially, only directory level datasets are shown. For each
+ directory level dataset containing files on a second level, there is a small
+ [+] button that may be used to show metadata about the files.<BR /><BR />
 
 # HTML to fill an initial page where no results are shown (can be empty):
 SEARCH_APP_PRESENTATION_HTML =
 
 # Max number of columns allowed in the search result page:
 SEARCH_APP_MAX_COLUMNS = 5
+
+# Max number of rows displayed for second level datasets with same parent:
+SEARCH_APP_MAXROWS_SCNDLEV = 50
 
 # Set of Metadata types to be shown as columns in search results.
 # Each line below comprise at least two items (items with several words must be
@@ -163,6 +168,10 @@ SEARCH_APP_SHOW_COLUMNS =
  distribution_statement 'Distribution statement'
  spatial_resolution 'Spatial resolution'
  project_name 'Project name'
+
+# Column used to sort the rows representing second level datasets. Given as
+# MT_name in the Metadatatype table.
+SEARCH_APP_SORT_COLUMN = datacollection_period
 
 # The sequence by which the search categories are visible in the search
 # application. The numbers are keys in the SearchCategory database table.
@@ -356,11 +365,3 @@ TEST_IMPORT_PROGRESS_REPORT = 1
 # to [==OPERATOR_EMAIL==].
 TEST_EMAIL_RECIPIENT =
 
-# ============ Miscellaneous ===============
-# Set this value to a '#' to comment out using the locally installed Perl
-# library directory (see below):
-USE_LOCAL_PERL_LIB = #
-
-# Path to a locally installed Perl library directory (eventually used in the
-# quadtreeuse.pm file):
-LOCAL_PERL_LIB = 

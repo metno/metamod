@@ -361,7 +361,7 @@ function getRecords ($id = '', $from = '', $until = '') {
       );
    }
    $query = 'SELECT DS_id, DS_name, DS_status, DS_datestamp, DS_creationDate, DS_ownertag FROM DataSet WHERE ' .
-            "DS_status <= 2 AND DS_ownertag IN ([==PMH_EXPORT_TAGS==]) ";
+            "DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN ([==PMH_EXPORT_TAGS==]) ";
    if ($id != '') {
       $query .= "AND DS_name = '$id' ";
    }
@@ -450,7 +450,7 @@ function idQuery ($id = '')
 		$query = 'select distinct '.$SQL['identifier'].','.$SQL['datestamp'].','.
                          $SQL['deleted'].' FROM '.$SQL['table'];
 	}
-        $query .= " WHERE DS_status <= 2 AND DS_ownertag IN ([==PMH_EXPORT_TAGS==])";
+        $query .= " WHERE DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN ([==PMH_EXPORT_TAGS==])";
 	
 	if ($id != '') {
 		$query .= ' AND '.$SQL['identifier']." = '$id'";
