@@ -45,6 +45,20 @@ function displayval($mtname, $value) {
    return $s1;
 }
 function showlowerlevel($parentds,$startrow,$columns,$sqlpart) {
+#
+#  Show table of file level datasets (children of one directory level dataset) 
+#  selected by the search criteria.
+#
+#  $parentds     - DS_id of the directory level dataset
+#  $startrow     - The whole table may be too large to display in one part. If this
+#                  is the case, $startrow represents the row number of the first row
+#                  to display in the current invocation of this function (row numbers
+#                  starts from 0). The number of rows allowed to show in one invocation
+#                  is defined by the constant $max_secondlevel_rows below.
+#  $columns      - Column names (see doshow.php)
+#  $sqlpart      - Part of WHERE-clause in SQL sentence corresponding to the selected 
+#                  search criteria.
+#
    global $mmDbConnection, $mmColumns, $mmError, $mmErrorMessage, $mmDebug, $mmSessionState;
    $prefcolumns = array();
    $max_secondlevel_rows = [==SEARCH_APP_MAXROWS_SCNDLEV==];
@@ -88,7 +102,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart) {
       $dsarr = mmGetqtnodes(7,$parentds,$dsarr);
    }
    if (count($dsarr) > 0) {
-      $dslist = implode(",",$dsarr);
+      $dslist = $parentds . ',' . implode(",",$dsarr);
       $sqlsentence = "SELECT Metadata.MD_content, Metadata.MT_name, Dataset.DS_id \n" .
          "FROM Metadata, Dataset, DS_Has_MD \n" .
          "WHERE Dataset.DS_id IN (" . $dslist . ") AND\n" .
@@ -105,7 +119,16 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart) {
       }
       if ($mmError == 0) {
          $num = pg_numrows($result);
+#
+#  $valuecounts  - Array indexed by MT_name. Each value is an array indexed by MD_content.
+#                  The parent dataset and all its children datasets are investigated.
+#                  $valuecounts[mtname][mdcontent] is increased by one for each 
+#                  dataset having metadata of type mtname with value mdcontent.
+#                  This array is used to find columns with values equal to the parent
+#                  value for all rows. Such columns are not displayed.
+#
          $valuecounts = array();
+         $not_empty = array();
          $dsidsfound = array();
          $dsidslast = array();
          $dsidsrows = array();
@@ -114,7 +137,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart) {
          $rowcounter = 0;
          for ($i1=0; $i1 < $num;$i1++) {
             list($mdcontent,$mtname,$dsid) = pg_fetch_row($result,$i1);
-            if ($mtname_sort == $mtname) {
+            if ($mtname_sort == $mtname && $dsid != $parentds) {
                $key1 = $mdcontent . sprintf('%010d',$dsid);
                if (!array_key_exists($key1,$mtname_sort_values)) {
                   $mtname_sort_values[$key1] = $dsid;
@@ -127,12 +150,15 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart) {
                $valuecounts[$mtname][$mdcontent] = 0;
             }
             $valuecounts[$mtname][$mdcontent]++;
-            if (!array_key_exists($dsid,$dsidsfound)) {
-               $rowcounter++;
-               $dsidsfound[$dsid] = $i1;
-               $dsidsrows[$rowcounter] = $dsid;
+            if ($dsid != $parentds) {
+               $not_empty[$mtname] = 1;
+               if (!array_key_exists($dsid,$dsidsfound)) {
+                  $rowcounter++;
+                  $dsidsfound[$dsid] = $i1;
+                  $dsidsrows[$rowcounter] = $dsid;
+               }
+               $dsidslast[$dsid] = $i1;
             }
-            $dsidslast[$dsid] = $i1;
          }
          $dsidcount = count($dsidsfound);
          if (count($mtname_sort_values) > 0) {
@@ -170,22 +196,24 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart) {
             $completecount = 0;
             $totalcount = 0;
             foreach ($mdcontarr as $mdcontent => $countval) {
-               if ($countval == $dsidcount) {
+               if ($countval == $dsidcount + 1) {
                   $completecount++;
                }
                $totalcount++;
             }
-            if ($completecount < $totalcount || $mtname == $mandatory_mtname) {
-               if (array_key_exists($mtname, $prefcolumns)) {
-                  $ix = $prefcolumns[$mtname];
-               } else {
-                  $ix = $jindex;
-                  $jindex++;
-               }
-               $usemtnames[$ix] = $mtname;
-               $indexmtnames[$mtname] = $ix;
-               if ($ix > $lastcolnum) {
-                  $lastcolnum = $ix;
+            if (array_key_exists($mtname, $not_empty)) {
+               if ($completecount < $totalcount || $mtname == $mandatory_mtname) {
+                  if (array_key_exists($mtname, $prefcolumns)) {
+                     $ix = $prefcolumns[$mtname];
+                  } else {
+                     $ix = $jindex;
+                     $jindex++;
+                  }
+                  $usemtnames[$ix] = $mtname;
+                  $indexmtnames[$mtname] = $ix;
+                  if ($ix > $lastcolnum) {
+                     $lastcolnum = $ix;
+                  }
                }
             }
          }
