@@ -63,7 +63,7 @@ my %magicNumber = (
 sub getFiletype {
 	my ($filename) = @_;
 	# simple 'file' replacement
-	if ($filename =~ /\.tar/i) {
+	if ($filename =~ /\.tar$/i) {
 		return 'tar'; # pre-posix tar files don't have a magic number
 	}
 	if (-T $filename) {

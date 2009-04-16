@@ -1912,13 +1912,17 @@ sub decodenorm {
 #-----------------------------------------------------------------------------------
 # hardlink a $in to $out, if that files, i.e. because of different file-systems
 # really copy the file
+#
+# Reverted to just copy. Problems arise if a gzip'ed file is linked. gunzip
+# will not touch a file with more than one hard link. /egils 2009-04-15.
+#
 sub link_or_copy {
 	my ($in, $out) = @_;
-	if (link ($in, $out)) {
-		return 1;
-	} else {
+#	if (link ($in, $out)) {
+#		return 1;
+#	} else {
 		return copy($in, $out);
-	}
+#	}
 }
 
 
