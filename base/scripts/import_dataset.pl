@@ -33,10 +33,13 @@ use strict;
 use lib qw([==TARGET_DIRECTORY==]/scripts [==TARGET_DIRECTORY==]/lib);
 use Metamod::Dataset;
 use Metamod::Utils qw(findFiles);
+use Metamod::Config;
 use Data::Dumper;
 use DBI;
 use File::Spec qw();
 use mmTtime;
+
+my $config = new Metamod::Config();
 
 #
 #  Import datasets from XML files into the database.
@@ -50,18 +53,18 @@ use mmTtime;
 #  With one command line argument, the program will import the XML file
 #  given by this argument.
 #
-my $progress_report = [==TEST_IMPORT_PROGRESS_REPORT==];    # If == 1, prints what
+my $progress_report = $config->get("TEST_IMPORT_PROGRESS_REPORT");    # If == 1, prints what
                                                             # happens to stdout
 my $sleeping_seconds = 600; # check every 10 minutes for new files
 if ( [==TEST_IMPORT_SPEEDUP==] > 1 ) {
 	$sleeping_seconds = 1; # don't wait in test-case
 }
-my $importdirs_string          = '[==IMPORTDIRS==]';
+my $importdirs_string          = $config->get("IMPORTDIRS");
 my @importdirs                 = split( /\n/, $importdirs_string );
-my $path_to_import_updated     = '[==WEBRUN_DIRECTORY==]/import_updated';
-my $path_to_import_updated_new = '[==WEBRUN_DIRECTORY==]/import_updated.new';
-my $path_to_logfile            = '[==LOGFILE==]';
-my $continue_xml_import        = '[==WEBRUN_DIRECTORY==]/CONTINUE_XML_IMPORT';
+my $path_to_import_updated     = $config->get("WEBRUN_DIRECTORY").'/import_updated';
+my $path_to_import_updated_new = $config->get("WEBRUN_DIRECTORY").'/import_updated.new';
+my $path_to_logfile            = $config->get("LOGFILE");
+my $continue_xml_import        = $config->get("WEBRUN_DIRECTORY").'/CONTINUE_XML_IMPORT';
 
 #
 #  Check number of command line arguments
@@ -88,10 +91,10 @@ if ( scalar @ARGV == 1 ) {
 #
 #  Connect to PostgreSQL database:
 #
-my $dbname = "[==DATABASE_NAME==]";
-my $user   = "[==PG_ADMIN_USER==]";
+my $dbname = $config->get("DATABASE_NAME");
+my $user   = $config->get("PG_ADMIN_USER");
 my $dbh =
-  DBI->connect( "dbi:Pg:dbname=" . $dbname . " [==PG_CONNECTSTRING_PERL==]",
+  DBI->connect( "dbi:Pg:dbname=" . $dbname . " ". $config->get("PG_CONNECTSTRING_PERL"),
 	$user, "" );
 
 #

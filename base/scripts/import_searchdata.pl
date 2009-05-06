@@ -38,6 +38,8 @@ use lib qw([==TARGET_DIRECTORY==]/lib);
 use mmTtime;
 # use Data::Dumper;
 use DBI;
+use Metamod::Config;
+my $config = new Metamod::Config();
 if (scalar @ARGV != 1) {
    die "\nUsage:\n\n     $0 name_of_xml_file\n\n";
 }
@@ -45,9 +47,9 @@ my $searchdataxml = $ARGV[0];
 #
 #  Connect to PostgreSQL database:
 #
-my $dbname = "[==DATABASE_NAME==]";
-my $user = "[==PG_ADMIN_USER==]";
-local $dbh = DBI->connect("dbi:Pg:dbname=" . $dbname . " [==PG_CONNECTSTRING_PERL==]", $user, "");
+my $dbname = $config->get("DATABASE_NAME");
+my $user = $config->get("PG_ADMIN_USER");
+local $dbh = DBI->connect("dbi:Pg:dbname=" . $dbname . " ".$config->get("PG_CONNECTSTRING_PERL"), $user, "");
 #
 #  Use full transaction mode. The changes has to be committed or rolled back:
 #
@@ -93,7 +95,7 @@ if ($@) {
    $dbh->disconnect or warn $dbh->errstr;
    push (@logarr,"========= Load static searchdata finished");
 }
-open (LOG,">>[==LOGFILE==]");
+open (LOG,">>".$config->get("LOGFILE"));
 foreach my $line (@logarr) {
    print LOG $line . "\n";
 }

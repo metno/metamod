@@ -39,6 +39,8 @@ use Data::Dumper;
 use Mail::Mailer;
 use mmTtime;
 use Metamod::Utils qw(findFiles getFiletype);
+use Metamod::Config;
+my $config = new Metamod::Config();
 $| = 1;
 #
 #  upload_monitor.pl
@@ -165,29 +167,29 @@ $| = 1;
 #  
 #  Global variables (constants after initialization):
 #
-my $progress_report = [==TEST_IMPORT_PROGRESS_REPORT==]; # If == 1, prints what
+my $progress_report = $config->get("TEST_IMPORT_PROGRESS_REPORT"); # If == 1, prints what
                                                          # is going on to stdout
-my $ftp_dir_path = '[==UPLOAD_FTP_DIRECTORY==]';
-my $upload_dir_path = '[==UPLOAD_DIRECTORY==]';
-my $webrun_directory = '[==WEBRUN_DIRECTORY==]';
+my $ftp_dir_path = $config->get('UPLOAD_FTP_DIRECTORY');
+my $upload_dir_path = $config->get('UPLOAD_DIRECTORY');
+my $webrun_directory = $config->get('WEBRUN_DIRECTORY');
 my $work_directory = $webrun_directory . "/upl/work";
 my $uerr_directory = $webrun_directory . "/upl/uerr";
 my $work_expand = $work_directory . "/expand";
 my $work_flat = $work_directory . "/flat";
 my $work_start = $work_directory . "/start";
-my $upload_ownertag = '[==UPLOAD_OWNERTAG==]';
-my $application_id = '[==APPLICATION_ID==]';
+my $upload_ownertag = $config->get('UPLOAD_OWNERTAG');
+my $application_id = $config->get('APPLICATION_ID');
 my $xml_directory = $webrun_directory . '/XML/' . $application_id;
 my $xml_history_directory = $webrun_directory . '/XML/history';
-my $target_directory = '[==TARGET_DIRECTORY==]';
-my $opendap_directory = '[==OPENDAP_DIRECTORY==]';
-my $opendap_url = '[==OPENDAP_URL==]';
+my $target_directory = $config->get('TARGET_DIRECTORY');
+my $opendap_directory = $config->get('OPENDAP_DIRECTORY');
+my $opendap_url = $config->get('OPENDAP_URL');
 my $path_continue_monitor = $webrun_directory . "/upl/CONTINUE_UPLOAD_MONITOR";
 my $sleeping_seconds = 60;
-if ([==TEST_IMPORT_SPEEDUP==] > 1) {
+if ($config->get('TEST_IMPORT_SPEEDUP') and $config->get('TEST_IMPORT_SPEEDUP') > 1) {
    $sleeping_seconds = 1;
 }
-my $upload_age_threshold = [==UPLOAD_AGE_THRESHOLD==];
+my $upload_age_threshold = $config->get('UPLOAD_AGE_THRESHOLD');
 my %all_ftp_datasets;     # Initialized in sub read_ftp_events. For each dataset
                           # found in the ftp_events file, this hash contains the
                           # number of days to keep the files in the repository.
@@ -197,7 +199,7 @@ my $problem_dir_path = $webrun_directory . "/upl/problemfiles";
 my $path_to_syserrors = $webrun_directory . "/syserrors";
 my $path_to_shell_error = $webrun_directory . "/upl/shell_command_error";
 # my $path_to_shell_log = $webrun_directory . "/upl/shell_log";
-my $local_url = '[==LOCAL_URL==]';
+my $local_url = $config->get('LOCAL_URL');
 #
 #  Dynamic global variables:
 #
@@ -503,7 +505,7 @@ sub web_process_uploaded {
 #
 sub testafile {
    my %datasets = ();
-   my @files_found = findFiles('[==WEBRUN_DIRECTORY==]/upl/ftaf');
+   my @files_found = findFiles($config->get('WEBRUN_DIRECTORY').'/upl/ftaf');
    if (scalar @files_found == 0 && length($shell_command_error) > 0) {
       &syserror("SYS","find_fails", "", "testafile", "");
    }
@@ -1033,7 +1035,7 @@ sub process_files {
       }
       my $url_to_errors_html = "";
       my $mailbody;
-      my $subject = '[==EMAIL_SUBJECT_WHEN_UPLOAD_ERROR==]';
+      my $subject = $config->get('EMAIL_SUBJECT_WHEN_UPLOAD_ERROR');
       if ($ftp_or_web eq 'TAF') {
          $subject = 'File test report';
       }
@@ -1058,7 +1060,7 @@ sub process_files {
 #         
 #     User errors found (by digest_nc.pl or this script):
 #         
-         $mailbody = '[==EMAIL_BODY_WHEN_UPLOAD_ERROR==]';
+         $mailbody = $config->get('EMAIL_BODY_WHEN_UPLOAD_ERROR');
          my @bnames = &get_basenames(\@originally_uploaded);
          my $bnames_string = join(", ",@bnames);
          my $timecode = substr($datestring,8,2) . substr($datestring,11,2) . 
@@ -1106,7 +1108,7 @@ sub process_files {
             $recipient = $dataset_institution{$dataset_name}->[1];
             $username = $dataset_institution{$dataset_name}->[2] . " ($recipient)";
          } else {
-            my $identfile = '[==WEBRUN_DIRECTORY==]/upl/etaf/' . $taf_basename;
+            my $identfile = $config->get('WEBRUN_DIRECTORY').'/upl/etaf/' . $taf_basename;
             unless (-r $identfile) {
                &syserror("SYS","email_file_not_found", "", "process_files", "File: $identfile");
                return;
@@ -1122,20 +1124,20 @@ sub process_files {
                $username = $2 . " ($recipient)";
             }
          }
-         if ('[==TEST_EMAIL_RECIPIENT==]' eq '' || $dont_send_email_to_user) {
-            $recipient = '[==OPERATOR_EMAIL==]';
+         if ((!$config->get('TEST_EMAIL_RECIPIENT')) || $dont_send_email_to_user) {
+            $recipient = $config->get('OPERATOR_EMAIL');
          }
-         if ('[==TEST_EMAIL_RECIPIENT==]' ne '0') {
+         if ($config->get('TEST_EMAIL_RECIPIENT') ne '0') {
             my $external_url = $url_to_errors_html;
             if (substr($external_url,0,7) ne 'http://') {
-               $external_url = '[==BASE_PART_OF_EXTERNAL_URL==]' . $url_to_errors_html;
+               $external_url = $config->get('BASE_PART_OF_EXTERNAL_URL') . $url_to_errors_html;
             }
             $mailbody =~ s/\[OWNER\]/$username/mg;
             $mailbody =~ s/\[DATASET\]/$dataset_name/mg;
             $mailbody =~ s/\[URL\]/$external_url/mg;
             $mailbody .= "\n";
-            $mailbody .= '[==EMAIL_SIGNATURE==]';
-            my $sender = '[==FROM_ADDRESS==]';
+            $mailbody .= $config->get('EMAIL_SIGNATURE');
+            my $sender = $config->get('FROM_ADDRESS');
             my $mailer = Mail::Mailer->new;
             my %headers = ( To => $recipient,
                             Subject => $subject,
@@ -1154,7 +1156,7 @@ sub process_files {
       if ($ftp_or_web eq 'TAF') {
          my @bnames = &get_basenames(\@originally_uploaded);
          foreach my $bn (@bnames) {
-            if (unlink('[==WEBRUN_DIRECTORY==]/upl/etaf/' . $bn) == 0) {
+            if (unlink($config->get('WEBRUN_DIRECTORY').'/upl/etaf/' . $bn) == 0) {
                &syserror("SYS","Unlink TAF file etaf/$bn did not succeed","", "process_files", "");
             }
          }

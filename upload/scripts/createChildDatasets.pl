@@ -47,13 +47,15 @@ use lib qw([==TARGET_DIRECTORY==]/lib);
 use Metamod::Utils qw(findFiles isNetcdf trim);
 use Metamod::Dataset;
 use Metamod::DatasetTransformer;
+use Metamod::Config;
+my $config = new Metamod::Config;
 
 use constant DEBUG => 0;
 
-our $TARGETDIR      = "[==TARGET_DIRECTORY==]";
-our $NCFILE_PREFIX  = File::Spec->catfile(trim('[==OPENDAP_DIRECTORY==]'), ""); # have directory-separator at end
-our @PARENT_DIRS    = split (' ', '[==IMPORTDIRS==]');
-our $OPENDAP_PREFIX = trim('[==OPENDAP_URL==]');
+our $TARGETDIR      = $config->get('TARGET_DIRECTORY');
+our $NCFILE_PREFIX  = File::Spec->catfile(trim($config->get('OPENDAP_DIRECTORY')), ""); # have directory-separator at end
+our @PARENT_DIRS    = split (' ', $config->get('IMPORTDIRS'));
+our $OPENDAP_PREFIX = trim($config->get('OPENDAP_URL'));
 if (substr($OPENDAP_PREFIX, length($OPENDAP_PREFIX) -1) ne '/') {
 	$OPENDAP_PREFIX .= '/';
 }

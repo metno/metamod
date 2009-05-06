@@ -31,6 +31,7 @@
 #
 use strict;
 use LWP::UserAgent;
+use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 use lib qw([==TARGET_DIRECTORY==]/lib);
 use quadtreeuse;
 use mmTtime;
@@ -38,7 +39,8 @@ use XML::LibXML;
 use Metamod::Dataset;
 use Metamod::ForeignDataset;
 use Metamod::DatasetTransformer::DIF;
-use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
+use Metamod::Config;
+my $config = Metamod::Config->new();
 # use encoding 'utf8';
 #
 #  OAI-PMH Harvester
@@ -80,12 +82,12 @@ use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 #                                    </metadata>
 #                                 </record>
 #
-my $continue_oai_harvest = '[==WEBRUN_DIRECTORY==]/CONTINUE_OAI_HARVEST';
-my $xmldirectory = '[==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]/';
-my $applicationid = '[==APPLICATION_ID==]';
-my $status_file = '[==WEBRUN_DIRECTORY==]/oai_harvest_status';
-my $path_to_syserrors = '[==WEBRUN_DIRECTORY==]/syserrors';
-my $progress_report = [==TEST_IMPORT_PROGRESS_REPORT==]; # If == 1, prints what's
+my $continue_oai_harvest = $config->get('WEBRUN_DIRECTORY').'/CONTINUE_OAI_HARVEST';
+my $xmldirectory = $config->get('WEBRUN_DIRECTORY').'/XML/'.$config->get('APPLICATION_ID').'/';
+my $applicationid = $config->get('APPLICATION_ID');
+my $status_file = $config->get('WEBRUN_DIRECTORY').'/oai_harvest_status';
+my $path_to_syserrors = $config->get('WEBRUN_DIRECTORY').'syserrors';
+my $progress_report = $config->get('TEST_IMPORT_PROGRESS_REPORT'); # If == 1, prints what's
                                                          # going on to STDOUT
 if ($progress_report == 1) {
 #
@@ -99,10 +101,10 @@ if ($progress_report == 1) {
 #  Set up the source URLs from which harvesting should be done, and also
 #  the mapping between ownertags and source URLs:
 #
-my $harvest_sources = '[==OAI_HARVEST_SOURCES==]';
+my $harvest_sources = $config->get('OAI_HARVEST_SOURCES');
 my $harvest_schema;
 {
-   my $harvest_validation_schema = '[==OAI_HARVEST_VALIDATION_SCHEMA==]';
+   my $harvest_validation_schema = $config->get('OAI_HARVEST_VALIDATION_SCHEMA');
    $harvest_schema = XML::LibXML::Schema->new( location => $harvest_validation_schema )
       if $harvest_validation_schema;
 }
@@ -162,8 +164,8 @@ sub do_harvest {
       my @ltime = localtime(mmTtime::ttime());
       my $newday = $ltime[3]; # 1-31
       my $current_hour = $ltime[2];
-      if ($newday == $previous_day || $current_hour < [==HARVEST_HOUR==]) {
-         if ([==TEST_IMPORT_SPEEDUP==] <= 1) {
+      if ($newday == $previous_day || $current_hour < $config->get('HARVEST_HOUR')) {
+         if ($config->get('TEST_IMPORT_SPEEDUP') <= 1) {
             sleep(15*60);
          } else {
             sleep(1);
@@ -413,11 +415,11 @@ sub makesane {
 #   } else {
 #      $realtime = $_[0];
 #   }
-#   my $scaling = [==TEST_IMPORT_SPEEDUP==];
+#   my $scaling = $config->get('TEST_IMPORT_SPEEDUP');
 #   if ($scaling <= 1) {
 #      return $realtime;
 #   } else {
-#      my $basistime = [==TEST_IMPORT_BASETIME==];
+#      my $basistime = $config->get('TEST_IMPORT_BASETIME');
 #      return $basistime + ($realtime - $basistime)*$scaling;
 #   }
 # };
