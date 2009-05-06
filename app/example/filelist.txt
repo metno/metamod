@@ -1,3 +1,4 @@
+master_config.txt
 htdocs/sch/style.css
 htdocs/upl/style.css
 htdocs/upl/index.html
