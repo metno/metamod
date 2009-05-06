@@ -1,3 +1,4 @@
+=master_config.txt
 etc/usererrors.conf
 etc/conf_digest_nc.xml
 staticdata/searchdata.xml
