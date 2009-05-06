@@ -72,9 +72,6 @@ sub _getDefaultConfigFile {
     print STDERR "Metamod/Config.pm in ". Cwd::abs_path($INC{$packageInit}). "\n" if $DEBUG;
     my ($vol, $dir, undef) = File::Spec->splitpath(Cwd::abs_path($INC{$packageInit}));
     my @dirs = File::Spec->splitdir($dir);
-    for (my $i = 0; $i < @dirs; $i++) {
-    	print STDERR "$i $dirs[$i]\n";
-    }
     pop @dirs; # remove last /
     print STDERR "dir of Metamod: ".scalar @dirs." ". File::Spec->catdir(@dirs). " $dir\n" if $DEBUG;
     # go up to dirs
