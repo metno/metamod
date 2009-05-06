@@ -47,9 +47,10 @@ foreach my $var (qw(.pl .t)) {
       ok((0 < grep {$_ =~ /00_Utils.t/} @files), "finding 00_Utils.t in files ending with .t");
    }
 }
+chmod 0755, '00_Utils.t';
 my $var = '.t';
 my @execFiles = findFiles('.', eval 'sub {$_[0] =~ /\Q$var\E$/o;}', sub {-x _});
-is(scalar @execFiles, 1, "Utils.t only executable .t - file");
+is(scalar @execFiles, 1, "00_Utils.t only executable .t - file");
 
 ok(isNetcdf("test.nc"), "test.nc is netcdf");
 ok(!isNetcdf("00_Utils.t"), "test.nc is no netcdf");
