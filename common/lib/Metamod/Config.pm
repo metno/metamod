@@ -28,6 +28,10 @@
 #----------------------------------------------------------------------------
 
 package Metamod::Config;
+
+our $VERSION = 0.1;
+our $DEBUG = 0;
+
 use strict;
 use warnings;
 
@@ -38,11 +42,13 @@ our %_config; #_config{file} => $config
 
 sub new {
 	my ($class, $file) = @_;
+    my $fileFlag = "";
 	unless ($file) {
 		$file = _getDefaultConfigFile();
+		$fileFlag = "default";
 	}
 	if ((! -f $file) and (! -r _)) {
-        die "Cannot read config-file: $file";		
+        die "Cannot read $fileFlag config-file: $file";		
 	}
     $file = _normalizeFile($file);
 	unless (exists $_config{$file}) {
@@ -63,9 +69,19 @@ sub _getDefaultConfigFile {
     unless (exists $INC{$packageInit}) {
     	die ("Cannot find $packageInit in \%INC. \%INC contains: ". join (" ", keys %INC). "\n");
     }
-    my ($vol, $dir, undef) = File::Spec->splitpath($INC{$packageInit});
+    print STDERR "Metamod/Config.pm in ". Cwd::abs_path($INC{$packageInit}). "\n" if $DEBUG;
+    my ($vol, $dir, undef) = File::Spec->splitpath(Cwd::abs_path($INC{$packageInit}));
     my @dirs = File::Spec->splitdir($dir);
-    pop @dirs; pop @dirs; # ../..
+    for (my $i = 0; $i < @dirs; $i++) {
+    	print STDERR "$i $dirs[$i]\n";
+    }
+    pop @dirs; # remove last /
+    print STDERR "dir of Metamod: ".scalar @dirs." ". File::Spec->catdir(@dirs). " $dir\n" if $DEBUG;
+    # go up to dirs
+    pop @dirs; 
+    print STDERR "dir of intermediate: ".scalar @dirs." ". File::Spec->catdir(@dirs)."\n" if $DEBUG;
+    pop @dirs;
+    print STDERR "dir of master_config: ".scalar @dirs." ". File::Spec->catdir(@dirs)."\n" if $DEBUG;
     return File::Spec->catpath($vol, File::Spec->catdir(@dirs), 'master_config.txt');
 }
 
