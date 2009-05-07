@@ -31,6 +31,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
  *--------------------------------------------------------------------------- 
  */
+require_once("../funcs/mmConfig.inc");
 require_once("../funcs/mmDataset.inc");
 /**
  * depending on php-setup, it will at \ to all ' or ", will be removed here

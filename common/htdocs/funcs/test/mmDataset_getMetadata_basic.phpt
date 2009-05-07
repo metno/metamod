@@ -2,6 +2,8 @@
 MM_Dataset getMetadata function - basic test for MM_Dataset getMetadata
 --FILE--
 <?php
+require_once("../mmConfig.inc");
+$mmConfig= MMConfig::getInstance('test_config.txt');
 require_once("../mmDataset.inc");
 $ds = new MM_Dataset();
 $ds->addMetadata(array("hallo" => array("world")));

@@ -31,13 +31,31 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
  *--------------------------------------------------------------------------- 
  */
-
+ 
+/**
+ * @brief mmLogging - Logging facility for metamod
+ * 
+ * logging should be initialize by
+ * 
+ * require_once("mmConfig.inc");
+ * $mmConfig = MMConfig->getInstance('configfile');
+ * require_once("mmLogging.inc");
+ * 
+ * 
+ * and somewhere in your code you can use:
+ * mm_log(MM_DEBUG, "test-log", __FILE__, __LINE__);
+ */
+ 
+ 
 # function: mm_log
 # it can be configured here via the MM_LOGLEVEL and the $logFile
 # usage: mm_log(MM_DEBUG, "my message", __FILE__, __LINE__);
 # log-levels are MM_ERROR, MM_WARNING, MM_INFO, MM_DEBUG
 
-$LogFile = "[==PHPLOGFILE==]";
+if (! is_a($mmConfig,'MMConfig')) {
+	trigger_error("\$mmConfig needs to be configure before including mmLogging", E_USER_ERROR);
+}
+$LogFile = $mmConfig->getVar("PHPLOGFILE");
  
  // availabe log-levels
 define('MM_ERROR','ERROR');
@@ -53,21 +71,14 @@ $MMLogLevel[MM_INFO] = 20;
 $MMLogLevel[MM_DEBUG] = 10;
 $MMLogLevel[MM_NONE] = 0;
 
-// current log-level, change this according to your needs
-define('MM_LOGLEVEL', $MMLogLevel[MM_[==PHPLOGLEVEL==]]);
-// used for testing
-#define('MM_LOGLEVEL', $MMLogLevel[MM_WARNING]);
-#$LogFile = "testfile";
-
-
 // generic logging function
 function mm_log($level, $message, $file, $line) {
-	global $LogFile, $MMLogLevel;
+	global $LogFile, $MMLogLevel, $mmConfig;
 	$levelId = 40;
 	if (isset($MMLogLevel[$level])) {
 		$levelId = $MMLogLevel[$level];
 	}
-    if ($levelId >= MM_LOGLEVEL) {
+    if ($levelId >= $MMLogLevel[$mmConfig->getVar("PHPLOGLEVEL")]) {
    		$date = strftime('%c');
     	$msg = "$level in $file at line $line ($date): $message";
     	if (strlen($LogFile) > 0) { 

@@ -2,6 +2,8 @@
 readDataset() function - basic test for readDataset
 --FILE--
 <?php
+require_once("../mmConfig.inc");
+$mmConfig = MMConfig::getInstance('test_config.txt');
 require_once("../mmLogging.inc");
 mm_log(MM_DEBUG, "test-log", __FILE__, __LINE__);
 var_dump(0);

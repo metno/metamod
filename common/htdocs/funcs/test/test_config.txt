@@ -1,0 +1,17 @@
+# small test config to be read by mmConfig
+BASE_DIRECTORY = /home/someuser
+
+WEBRUN_DIRECTORY = .
+
+TARGET_DIRECTORY = [==BASE_DIRECTORY==]/example
+
+# Path for logfile for logging important operations on the database:
+LOGFILE = [==WEBRUN_DIRECTORY==]/databaselog
+
+# Path for logfile of php-messages (leave empty to log to webserver-errorlogfile)
+PHPLOGFILE = [==WEBRUN_DIRECTORY==]/phplog
+
+# Minimum log level, one of ERROR, WARNING, INFO, DEBUG
+PHPLOGLEVEL = DEBUG
+
+TEST_IMPORT_SPEEDUP = 

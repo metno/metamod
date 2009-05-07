@@ -33,21 +33,26 @@
  */
 ?>
 <?php
+if (! is_a($mmConfig,'MMConfig')) {
+	trigger_error("\$mmConfig needs to be configure in your script with \$mmConfig = MMConfig::getInstance('configfile') before including mmTtime", E_USER_ERROR);
+}
+
 class mmTtime {
    function ttime($usetime = 0) {
+   	global $mmConfig;
       if ($usetime == 0) {
          $realtime = time();
       } else {
          $realtime = $usetime;
       }
-      $scaling = "[==TEST_IMPORT_SPEEDUP==]";
-      if (strlen($scaling) == 0 || substr_compare($scaling, "[", 0, 1)) {
+      $scaling = $mmConfig->getVar("TEST_IMPORT_SPEEDUP");
+      if (strlen($scaling) == 0) {
       	 return $realtime; # no TEST_IMPORT_SPEEDUP given
       }
       if ($scaling <= 1) {
          return $realtime;
       } else {
-         $basistime = "[==TEST_IMPORT_BASETIME==]";
+         $basistime = $mmConfig->getVar("TEST_IMPORT_BASETIME");
          return $basistime + ($realtime - $basistime)*$scaling;
       }
    }

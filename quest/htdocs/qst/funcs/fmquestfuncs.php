@@ -29,6 +29,7 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
+require_once("../funcs/mmConfig.inc");
 require_once("../funcs/mmLogging.inc");
 require_once("../funcs/mmDataset.inc");
 

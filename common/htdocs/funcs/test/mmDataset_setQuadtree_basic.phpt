@@ -2,6 +2,8 @@
 MM_Dataset setQuadtree function - basic test for MM_Dataset setQuadtree
 --FILE--
 <?php
+require_once("../mmConfig.inc");
+$mmConfig= MMConfig::getInstance('test_config.txt');
 require_once("../mmDataset.inc");
 $quadTree = array(11,112, 113);
 $ds = new MM_Dataset();

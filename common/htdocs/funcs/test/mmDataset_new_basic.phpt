@@ -2,6 +2,8 @@
 MM_Dataset setInfo function - basic test for MM_Dataset
 --FILE--
 <?php
+require_once("../mmConfig.inc");
+$mmConfig= MMConfig::getInstance('test_config.txt');
 require_once("../mmDataset.inc");
 $basename = mmGetBasename("dataset.xml");
 var_dump($basename);

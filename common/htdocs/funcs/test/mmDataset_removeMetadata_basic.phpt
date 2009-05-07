@@ -2,6 +2,8 @@
 MM_Dataset removeMetadata function - basic test for MM_Dataset removeMetadata
 --FILE--
 <?php
+require_once("../mmConfig.inc");
+$mmConfig= MMConfig::getInstance('test_config.txt');
 require_once("../mmDataset.inc");
 $ds2 = new MM_Dataset();
 $ds2->addMetadata(array("hallo" => array("world")));
