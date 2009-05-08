@@ -47,7 +47,7 @@ function fmquestversion() {
 function fmcreateform($outputdst, $filename, $edit=false) {
 
     if (! file_exists($filename)) {
-		echo(fmcreateerrmsg("Could not open configuration file"));
+		echo(fmcreateerrmsg("Could not open configuration file: $filename"));
 		return("No form created");
     }
 	# this quest goes defines the metadata for a metamod upload directory

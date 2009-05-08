@@ -15,3 +15,13 @@ PHPLOGFILE = [==WEBRUN_DIRECTORY==]/phplog
 PHPLOGLEVEL = DEBUG
 
 TEST_IMPORT_SPEEDUP = 
+
+# substitution
+!substitute_to_file_with_new_name htdocs/qst/quest.php => htdocs/funcs/test/mmConfig_new.php
+TEST_SUBSTITUTION = test
+!end_substitute_to_file_with_new_name
+
+!substitute_to_file_with_new_name htdocs/qst/quest.php => htdocs/qst/test2.php
+TEST_SUBSTITUTION = test2
+!end_substitute_to_file_with_new_name
+

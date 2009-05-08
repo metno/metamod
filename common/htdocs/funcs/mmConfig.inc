@@ -84,6 +84,10 @@ class MMConfig {
 	private function _readConfig() {
 		// parse the file
 		$conf = array();
+		# get the filesystem prefix to installed base
+		$prefix = __FILE__;
+		$prefix = preg_replace("/htdocs\/funcs\/mmConfig.inc$/", "", $prefix);
+		
 		$fh = fopen($this->filename,'r');
 		if (!$fh) trigger_error("cannot open config-file at: ".$this->filename, E_USER_ERROR);
 		$origname = "";
@@ -95,10 +99,11 @@ class MMConfig {
 			$line = rtrim($line);
 			if (preg_match('/^[A-Z0-9_#!]/', $line) && $varname != "") {
 				if (strlen($origname) > 0) {
-					$conf[$varname.':'.$origname.':'.$newname] = $value;
+					$conf[$varname.':'.$origname.':'.$prefix.$newname] = $value;
 				} else {
 					$conf[$varname] = $value;
 				}
+				$varname = "";
 			}
 			if (preg_match('/^([A-Z0-9_]+)\s*=(.*)$/', $line, $matches)) {
 				$varname = $matches[1];
@@ -125,14 +130,22 @@ class MMConfig {
 	 * Read a variable from the configuration
 	 * 
 	 * @param var the variable-key
+	 * @param origName This can optionally be used for substitutions. (!substitute_to_file in master_config)
+	 *        The scripts original filename, i.e. htdocs/qst/quest.php, usually, this should be left empty
+	 * @param myFile This can optionally be used for substitutions. It should then contain __FILE__ of the installed
+	 *        script. Usually, this should be left empty.
 	 */
-	function getVar($var) {
-		$val = $this->substituteVariable($var);
+	function getVar($var, $origName="", $myFile="") {
+		$val = $this->substituteVariable($var, $origName, $myFile);
 		return $val;
 	}
 	
-	private function substituteVariable($var) {
-		$val = $this->vars[$var];
+	private function substituteVariable($var, $origName, $myFile) {
+		if (strlen($myFile)) {
+			$val = $this->vars["$var:$origName:$myFile"];
+		} else {
+			$val = $this->vars[$var];
+		}
 		$maxSubst = 20;
 		$substNo = 0;
 		$count = 1;
@@ -148,9 +161,8 @@ class MMConfig {
 }
 
 $mmConfig = "";
-if (file_exists(MMConfig::getDefaultConfigFile())) {
+if (file_exists(realpath(MMConfig::getDefaultConfigFile()))) {
 	$mmConfig = MMConfig::getInstance();
 }
-
 ?>
 

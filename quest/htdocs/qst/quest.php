@@ -34,6 +34,8 @@ session_start(  );
  *               - read on re-edit
  *               - deleted after writing dataset to permanent storage in fmprocessform 
  */
+ 
+ require_once("../funcs/mmConfig.inc"); # defines also $mmConfig
 ?>
 <html>
 
@@ -97,20 +99,20 @@ legend {
     font-size: 14pt;
 }
 </style>
-<title>[==QUEST_TITLE==]</title>
+<title><?PHP echo $mmConfig->getVar('QUEST_TITLE','htdocs/qst/quest.php', __FILE__) ?></title>
 </head>
 
 <body>
-[==APP_HEADER_HTML==]
+<?PHP echo $mmConfig->getVar('APP_HEADER_HTML') ?>
+
+
 
 <?PHP
-$fmquestconfig="[==QUEST_FORM_DEFINITON_FILE==]";
-$fmquestoutput="[==QUEST_OUTPUT_DIRECTORY==]";
-$mysender = "[==QUEST_SENDER_ADDRESS==]";
-$myrecipents = "[==QUEST_RECIPIENTS==]";
-$myokmsg = <<<END_STRING
-[==QUEST_OKMESSAGE==]
-END_STRING;
+$fmquestconfig=$mmConfig->getVar('QUEST_FORM_DEFINITON_FILE','htdocs/qst/quest.php', __FILE__);
+$fmquestoutput=$mmConfig->getVar('QUEST_OUTPUT_DIRECTORY','htdocs/qst/quest.php', __FILE__);
+$mysender = $mmConfig->getVar('QUEST_SENDER_ADDRESS');
+$myrecipents = $mmConfig->getVar('QUEST_RECIPIENTS');
+$myokmsg = $mmConfig->getVar('QUEST_OKMESSAGE');
 
 require("funcs/fmquestfuncs.php");
 
@@ -125,6 +127,6 @@ if ($_POST["Submit"] == "Check form") {
 }
 ?>
 
-[==APP_FOOTER_HTML==]
+<?PHP echo $mmConfig->getVar('APP_FOOTER_HTML') ?>
 </body>
 </html>
