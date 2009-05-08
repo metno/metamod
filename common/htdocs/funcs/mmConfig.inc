@@ -114,7 +114,7 @@ class MMConfig {
 				$origname = "";
 				$newname = "";
 			} elseif (!preg_match('/^#/', $line) && !preg_match('/^\s*$/', $line)) {
-				$conf[$varname] = $value;
+				$value .= "\n$line";
 			}
 		}
 		fclose($fh);
