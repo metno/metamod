@@ -170,7 +170,7 @@ foreach my $filelistpath (@flistpathes) {
             my $targetfile = $targetdir . '/' . $targetname;
             if (exists($copied_targetnames{$targetname}) || !( -e $targetfile) ||
                  (stat($srcfilepath))[9] > (stat($targetfile))[9] ||
-                 $config_modified > (stat($targetfile))[9] ) {
+                 ($ch1 ne '=' and $config_modified > (stat($targetfile))[9]) ) {
 #
 #        File $filename or the config file is modified later than $targetfile:
 #        (or the file has already been copied from another filelist - this
