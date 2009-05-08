@@ -31,9 +31,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
  *--------------------------------------------------------------------------- 
  */
-?>
 
-<?php
 /**
  * @brief Runtime Config-file access
  * 
@@ -165,4 +163,3 @@ if (file_exists(realpath(MMConfig::getDefaultConfigFile()))) {
 	$mmConfig = MMConfig::getInstance();
 }
 ?>
-
