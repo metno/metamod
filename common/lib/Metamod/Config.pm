@@ -64,7 +64,7 @@ sub new {
 
 # get the file in ../../master_config.txt
 sub _getDefaultConfigFile {
-    my ($vol, $dir, undef) = File::Spec->splitpath(__FILE__);
+    my ($vol, $dir, undef) = File::Spec->splitpath(Cwd::abs_path(__FILE__));
     my @dirs = File::Spec->splitdir($dir);
     pop @dirs; # remove last /
     print STDERR "dir of Metamod: ".scalar @dirs." ". File::Spec->catdir(@dirs). " $dir\n" if $DEBUG;
