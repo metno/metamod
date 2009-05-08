@@ -64,13 +64,7 @@ sub new {
 
 # get the file in ../../master_config.txt
 sub _getDefaultConfigFile {
-	my @package = split '::', __PACKAGE__ . '.pm';
-    my $packageInit = File::Spec->catfile(@package);
-    unless (exists $INC{$packageInit}) {
-    	die ("Cannot find $packageInit in \%INC. \%INC contains: ". join (" ", keys %INC). "\n");
-    }
-    print STDERR "Metamod/Config.pm in ". Cwd::abs_path($INC{$packageInit}). "\n" if $DEBUG;
-    my ($vol, $dir, undef) = File::Spec->splitpath(Cwd::abs_path($INC{$packageInit}));
+    my ($vol, $dir, undef) = File::Spec->splitpath(__FILE__);
     my @dirs = File::Spec->splitdir($dir);
     pop @dirs; # remove last /
     print STDERR "dir of Metamod: ".scalar @dirs." ". File::Spec->catdir(@dirs). " $dir\n" if $DEBUG;
