@@ -50,7 +50,7 @@ if (isset($_POST['mmSessionId'])) {
    $mmSessionId = $_GET['mmSessionId'];
 }
 if (!isset($mmSessionId)) {
-   $msg_start = "Your attempt to enter [==SEARCH_APP_NAME==] did not succeed. ";
+   $msg_start = "Your attempt to enter ".$mmConfig->getVar('SEARCH_APP_NAME')." did not succeed. ";
 } else {
    $msg_start = "Your previous session was terminated because of: ";
 }

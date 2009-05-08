@@ -30,7 +30,7 @@
 ?>
 <?php
 function getdslist() {
-   global $mmError, $mmDbConnection, $mmCategorytype, $mmSessionState, $mmDebug;
+   global $mmError, $mmDbConnection, $mmCategorytype, $mmSessionState, $mmDebug, $mmConfig;
 #
 #  This script computes arrays:
 #
@@ -137,7 +137,7 @@ function getdslist() {
    }
    if (($sqlpart != "" || $sql_gapart != "") && $mmError == 0) {
       $sqlsentence = "SELECT DS_id, DS_name FROM DataSet WHERE\n" .
-                  "DS_parent = 0 AND DS_ownertag IN ([==DATASET_TAGS==]) \n";
+                  "DS_parent = 0 AND DS_ownertag IN (".$mmConfig->getVar('DATASET_TAGS').") \n";
                   $sqlpart . $sql_gapart . "ORDER BY DataSet.DS_id\n";
       if ($sqlpart != "") {
          $sqlsentence .= " AND " . $sqlpart;

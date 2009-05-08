@@ -29,7 +29,7 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
-$maxcol = [==SEARCH_APP_MAX_COLUMNS==];
+$maxcol = $mmConfig->getVar('SEARCH_APP_MAX_COLUMNS');
 if (array_key_exists("update",$_POST)) {
    $mmSessionState->options = array();
    for ($i1 = 1; $i1 <= $maxcol; $i1++) {

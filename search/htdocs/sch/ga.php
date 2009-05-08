@@ -52,7 +52,7 @@
       <p>
       <?php
          if (! file_exists("maps")) {
-            if (! symlink("[==WEBRUN_DIRECTORY==]/maps","maps")) {
+            if (! symlink($mmConfig->getVar('WEBRUN_DIRECTORY')."/maps","maps")) {
                mmPutLog("Error. Could not create symlink ./maps");
                $mmErrorMessage = "Sorry, internal error";
                $mmError = 1;

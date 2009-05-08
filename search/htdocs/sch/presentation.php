@@ -27,5 +27,6 @@
 #  along with METAMOD; if not, write to the Free Software 
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
 #---------------------------------------------------------------------------- 
+
+echo $mmConfig->getVar('SEARCH_APP_PRESENTATION_HTML');
 ?>
-[==SEARCH_APP_PRESENTATION_HTML==]

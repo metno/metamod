@@ -59,11 +59,11 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart) {
 #  $sqlpart      - Part of WHERE-clause in SQL sentence corresponding to the selected 
 #                  search criteria.
 #
-   global $mmDbConnection, $mmColumns, $mmError, $mmErrorMessage, $mmDebug, $mmSessionState;
+   global $mmDbConnection, $mmColumns, $mmError, $mmErrorMessage, $mmDebug, $mmSessionState, $mmConfig;
    $prefcolumns = array();
-   $max_secondlevel_rows = [==SEARCH_APP_MAXROWS_SCNDLEV==];
+   $max_secondlevel_rows = $mmConfig->getVar('SEARCH_APP_MAXROWS_SCNDLEV');
    $lastcolnum = 0;
-   $max_columns = [==SEARCH_APP_MAX_COLUMNS==];
+   $max_columns = $mmConfig->getVar('SEARCH_APP_MAX_COLUMNS');
    reset($columns);
    $mandatory_mtname = "NOT_USED";
    foreach ($columns as $cnum => $carr) {
@@ -133,7 +133,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart) {
          $dsidslast = array();
          $dsidsrows = array();
          $mtname_sort_values = array();
-         $mtname_sort = '[==SEARCH_APP_SORT_COLUMN==]';
+         $mtname_sort = $mmConfig->getVar('SEARCH_APP_SORT_COLUMN');
          $rowcounter = 0;
          for ($i1=0; $i1 < $num;$i1++) {
             list($mdcontent,$mtname,$dsid) = pg_fetch_row($result,$i1);

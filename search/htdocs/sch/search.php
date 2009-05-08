@@ -29,6 +29,7 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
+	require_once("../funcs/mmConfig.inc");
 #-----------------------------------------------------------------------------
 #   The main page in the search web application.
 #   ============================================
@@ -90,9 +91,7 @@
 #
 #  Initialize the mmColumns array:
 #
-   $s1 = <<<END_OF_STRING
-[==SEARCH_APP_SHOW_COLUMNS==]
-END_OF_STRING;
+   $s1 = $mmConfig->getVar('SEARCH_APP_SHOW_COLUMNS');
    mmCreate_mmColumns($s1);
    if (strpos($mmDebug,"mmColumns") !== false) {
       echo "<pre>\nmmColumns ---------\n";
@@ -104,10 +103,10 @@ END_OF_STRING;
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-   <title>[==SEARCH_APP_TITLE==]</title>
+   <title><?php echo $mmConfig->getVar('SEARCH_APP_TITLE'); ?></title>
    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
    <link href="style.css" rel="stylesheet" type="text/css" />
-   <link href="[==LOCAL_URL==]/style.css" rel="stylesheet" type="text/css" />
+   <link href="<?php echo $mmConfig->getVar('LOCAL_URL'); ?>/style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <?php
@@ -132,7 +131,7 @@ if (strpos($mmDebug,"GET") !== false) {
    echo '==================================<BR />';
 }
 
-   $mmDbConnection = @pg_Connect ("dbname=[==DATABASE_NAME==] user=[==PG_WEB_USER==] [==PG_CONNECTSTRING_PHP==]");
+   $mmDbConnection = @pg_Connect ("dbname=".$mmConfig->getVar('DATABASE_NAME')." user=".$mmConfig->getVar('PG_WEB_USER')." ".$mmConfig->getVar('PG_CONNECTSTRING_PHP'));
    if ( !$mmDbConnection ) {
        mmPutLog("Error. Could not connect to database: $php_errormsg");
        $mmErrorMessage = "Error: Could not connect to database";

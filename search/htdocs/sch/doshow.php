@@ -131,7 +131,7 @@ if ($mmError == 0) {
 #         echo "Count: " . $num . "<br />\n";
          if ($num > 0) {
             $mdcontent = array();
-            $fontsize = [==DEFAULT_FONTSIZE==];
+            $fontsize = $mmConfig->getVar('DEFAULT_FONTSIZE');
             if (array_key_exists("fontsize",$mmSessionState->options)) {
                $fontsize = $mmSessionState->options["fontsize"];
             }

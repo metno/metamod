@@ -29,7 +29,7 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
-$maxcol = [==SEARCH_APP_MAX_COLUMNS==];
+$maxcol = $mmConfig->getVar('SEARCH_APP_MAX_COLUMNS');
 $totalcol = $maxcol+4;
 ?>
 <form action="search.php" method="POST">
@@ -50,7 +50,7 @@ $totalcol = $maxcol+4;
    <tr><td colspan="<?php echo $totalcol; ?>">
 <p>Select the metadata to be shown as columns in the "Show results" page by checking
 radiobuttons in the table below. The columns in this page are numbered from 1 to
-[==SEARCH_APP_MAX_COLUMNS==]. By checking a radio button corresponding to a given
+<?php echo $mmConfig->getVar('SEARCH_APP_MAX_COLUMNS') ?>. By checking a radio button corresponding to a given
 metadata category (in the first table column), metadata from this category will be
 shown in the selected page column. Checking a radiobutton in the last table row
 (the "Not to be used" row), will hide the corresponding page column, and thereby reduce
@@ -149,7 +149,7 @@ if (array_key_exists("h",$cselected)) {
 echo '   <td><input type="radio" name="v" value="notused" ' . $v_checked . "/>\n";
 echo '   <td><input type="radio" name="h" value="notused" ' . $h_checked . "/>\n";
 echo "</tr>\n";
-$fontsize = [==DEFAULT_FONTSIZE==];
+$fontsize = $mmConfig->getVar('DEFAULT_FONTSIZE');
 if (array_key_exists("fontsize",$mmSessionState->options)) {
    $fontsize = $mmSessionState->options["fontsize"];
 }

@@ -29,7 +29,7 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
-$max_secondlevel_rows = [==SEARCH_APP_MAXROWS_SCNDLEV==];
+$max_secondlevel_rows = $mmConfig->getVar('SEARCH_APP_MAXROWS_SCNDLEV');
 $key = array_key_exists($mmSelectedNum, $mmSessionState->exploded);
 if ($key === FALSE) {
    $mmSessionState->exploded[$mmSelectedNum] = 1;

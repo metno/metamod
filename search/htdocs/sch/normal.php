@@ -40,24 +40,22 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-   <title>[==SEARCH_APP_TITLE==]</title>
+   <title><?php echo $mmConfig->getVar('SEARCH_APP_TITLE'); ?></title>
    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
    <link href="style.css" rel="stylesheet" type="text/css" />
-   <link href="[==LOCAL_URL==]/style.css" rel="stylesheet" type="text/css" />
+   <link href=<?php echo $mmConfig->getVar('LOCAL_URL'); ?>/style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <?php
     }
 ?>
 <div class="mybody">
-   [==SEARCH_APP_HEADER_HTML==]
+   <?php echo $mmConfig->getVar('SEARCH_APP_HEADER_HTML'); ?>
    <table class="main_structure" cellpadding="0" cellspacing="0">
       <tr>
          <td class="main_menu">
             <?php
-               $s1 = <<<END_OF_STRING
-[==APP_MENU==]
-END_OF_STRING;
+               $s1 = $mmConfig->getVar('APP_MENU');
                $a1 = explode("\n",$s1);
                foreach ($a1 as $s2) {
                   if (preg_match ('/^ *([^ ]+) (.*)$/i',$s2,$a2)) {
@@ -71,8 +69,8 @@ END_OF_STRING;
             <table cellpadding="0" cellspacing="0">
                <tr>
                   <td>
-                     <p class="heading">[==SEARCH_APP_TITLE==]</p>
-                     <p class="heading_info">[==SEARCH_APP_DESCRIPTION==]
+                     <p class="heading"><?php echo $mmConfig->getVar('SEARCH_APP_TITLE'); ?></p>
+                     <p class="heading_info"><?php echo $mmConfig->getVar('SEARCH_APP_DESCRIPTION'); ?>
                      </p>
                      <?php
                         if ($mmError > 0) {
@@ -105,7 +103,8 @@ END_OF_STRING;
             <?php
                if (isset($mmCategorytype)) {
                   reset($mmCategorytype);
-                  foreach (array([==SEARCH_CATEGORY_SEQUENCE==]) as $category) {
+                  $catSequence = split(',', $mmConfig->getVar('SEARCH_CATEGORY_SEQUENCE'));
+                  foreach ($catSequence as $category) {
                      $type = $mmCategorytype[$category];
                      if ($type == 1) {
                         if (mmGetCategoryFncValue($category,"status") != "hidden") {
@@ -149,7 +148,7 @@ END_OF_STRING;
          </td>
       </tr>
    </table>
-   [==APP_FOOTER_HTML==]
+   <?php echo $mmConfig->getVar('APP_FOOTER_HTML'); ?>
 </div>
 <?php
     if ($mmError > 0) {

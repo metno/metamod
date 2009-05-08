@@ -110,7 +110,7 @@ if ($mmError == 0 && strlen($ds_ids) > 0 && count($columns) > 0) {
       }
    }
    if ($mmError == 0) {
-      $fontsize = [==DEFAULT_FONTSIZE==];
+      $fontsize = $mmConfig->getVar('DEFAULT_FONTSIZE');
       if (array_key_exists("fontsize",$mmSessionState->options)) {
          $fontsize = $mmSessionState->options["fontsize"];
       }

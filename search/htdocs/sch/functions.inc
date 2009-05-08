@@ -152,7 +152,8 @@ function mmShowErrorMessage($string) {
 }
 
 function mmGetRunPath () {
-   return '[==WEBRUN_DIRECTORY==]';
+	global $mmConfig;
+   return $mmConfig->getVar('WEBRUN_DIRECTORY');
 }
 
 function mmPutLog($string) {
@@ -540,7 +541,7 @@ function mmCreate_mmColumns($s1) {
 }
 
 function mmInitialiseOptions() {
-   global $mmColumns;
+   global $mmColumns, $mmConfig;
    $retarr = array();
    reset($mmColumns);
    foreach ($mmColumns as $col) {
@@ -551,7 +552,7 @@ function mmInitialiseOptions() {
          }
       }
    }
-   $retarr["fontsize"] = [==DEFAULT_FONTSIZE==];
+   $retarr["fontsize"] = $mmConfig->getVar('DEFAULT_FONTSIZE');
    return $retarr;
 }
 ?>
