@@ -44,7 +44,8 @@ my $appdir = $ARGV[0];
 #
 #   Read the configuration file:
 #
-my $configfile = $appdir . '/master_config.txt';
+my $configMaster = 'master_config.txt';
+my $configfile = "$appdir/$configMaster";
 my $appfilelist = $appdir . '/filelist.txt';
 my %conf;
 my $missing_variables = 0;
@@ -108,6 +109,15 @@ if (!exists($conf{'TARGET_DIRECTORY'})) {
 my @flistpathes = ();
 my $targetdir = $conf{'TARGET_DIRECTORY'};
 $targetdir = &substituteval($targetdir);
+#
+# Install the config-file
+#
+if (! -f "$targetdir/$configMaster" or ($config_modified > (stat _)[9])) {
+   print "Copy to $targetdir/$configMaster\n";
+   copy($configfile, "$targetdir/$configMaster") or
+      die "Could not copy $configfile to $targetdir: $!";
+}
+
 if (!exists($conf{'SOURCE_DIRECTORY'})) {
    die "SOURCE_DIRECTORY is not defined in $configfile";
 }
