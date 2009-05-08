@@ -27,6 +27,7 @@
 #  along with METAMOD; if not, write to the Free Software 
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
 #---------------------------------------------------------------------------- 
+require_once("../funcs/mmConfig.inc");
 ?>
 <html>
 
@@ -47,7 +48,7 @@ div,span,p {
     font-family: sans serif;
 }
 div.fmheader {
-    background: url("[==QUEST_ADM_BACKGROUND==]");
+    background: url(<?PHP echo $mmConfig->getVar('QUEST_ADM_BACKGROUND') ?>);
     margin-bottom: 2em;
     padding-left: 5px;
     border-bottom: solid thin;
@@ -102,7 +103,7 @@ style="clear:left;border: none;" alt="IPY logo"></a>
 -->
 
 <?PHP
-$fmfadmdir="[==QUEST_ADM_TOPDIR==]";
+$fmfadmdir=$mmConfig->getVar('QUEST_ADM_TOPDIR');
 # $validuser="steingod";
 # $validpw="moose";
 

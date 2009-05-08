@@ -1,5 +1,5 @@
-htdocs/qst/funcs/fmquestfuncs.php
+=htdocs/qst/funcs/fmquestfuncs.php
 =htdocs/qst/config/cf-standard-name-table.xml
 =htdocs/qst/config/gcmd-location-keywords.txt
 =htdocs/qst/config/gcmd-science-keywords.txt
-htdocs/adm/fmfadm.php
+=htdocs/adm/fmfadm.php

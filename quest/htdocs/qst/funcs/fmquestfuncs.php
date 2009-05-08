@@ -251,7 +251,7 @@ function fmcreatebutton($myname,$myvalue,$curData = array()) {
     return($mystr);
 }
 
-function fmcreateradio($myname,$label,$mylist,$checked,$curData) {
+function fmcreateradio($myname,$label,$mylist,$checked,$curData=array()) {
 	// assign curValue from curData
 	$curValue = "";
 	if (isset($curData[$myname])) {
@@ -564,7 +564,7 @@ function fmForm2XmlHtml(MM_Dataset $ds) {
     		}
     	}   
 	}
-	$info["ownertag"] = "[==QUEST_OWNERTAG==]"; // hard-coded ownertag
+	$info["ownertag"] = $mmConfig->getVar('QUEST_OWNERTAG'); // hard-coded ownertag
 	$ds->addInfo($info);
 	// handle quadtree
 	if (isset($_POST["quadtree_nodes"])) {
@@ -634,7 +634,7 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
     		}
     	}
 		if (! (isset($_REQUEST["dataref"]) && strlen($_REQUEST["dataref"]))) {
-			$_POST["dataref"] = "[==OPENDAP_URL==]" . '/' . $_REQUEST["institutionId"] . '/' . $_REQUEST["uploadDirectory"];
+			$_POST["dataref"] = $mmConfig->getVar('OPENDAP_URL') . '/' . $_REQUEST["institutionId"] . '/' . $_REQUEST["uploadDirectory"];
 		}
 		# unset parameters which should not be used in xml-generation
 		unset($_POST["institutionId"]);
