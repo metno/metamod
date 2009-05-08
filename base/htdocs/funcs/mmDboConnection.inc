@@ -33,6 +33,7 @@
  */
 ?>
 <?php
+require_once("../funcs/mmConfig.inc");
 
 /**
  * Fetch a DBO connection for a user.
@@ -41,10 +42,10 @@
  * @return DBO-connection
  * @throws DBOException
  */
-function getDBOConnection($user="[==PG_WEB_USER==]", $password="") {
+function getDBOConnection($user=$mmConfig->getVar('PG_WEB_USER'), $password="") {
 	static $mmDBOConnection = array();
 	if (! isset($mmDBOConnection[$user])) {
-		$mmDBOConnection[$user] = new DBO("pgsql:"."[==PG_CONNECTSTRING_PERL==]", $user, $password);
+		$mmDBOConnection[$user] = new DBO("pgsql:".$mmConfig->getVar('PG_CONNECTSTRING_PERL'), $user, $password);
 	}
 	return $mmDBOConnection[$user];
 } 

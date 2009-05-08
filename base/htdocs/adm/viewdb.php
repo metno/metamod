@@ -27,13 +27,14 @@
 #  along with METAMOD; if not, write to the Free Software 
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
 #---------------------------------------------------------------------------- 
+require_once('../funcs/mmConfig.inc');
 ?>
 <html>
 <head>
 </head><body>
 <?php
 include "gettables.php";
-$mmDbConnection = @pg_Connect ("dbname=[==DATABASE_NAME==] user=[==PG_ADMIN_USER==] [==PG_CONNECTSTRING_PHP==]");
+$mmDbConnection = @pg_Connect ("dbname=".$mmConfig->getVar('DATABASE_NAME')." user=".$mmConfig->getVar('PG_ADMIN_USER')." ".$mmConfig->getVar('PG_CONNECTSTRING_PHP'));
 if ( $mmDbConnection ) {
 ?>
 <p>Connection OK</p>

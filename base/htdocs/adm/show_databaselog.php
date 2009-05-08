@@ -35,7 +35,8 @@
 <body>
 <pre>
 <?php
-   $path_to_dblog = "[==LOGFILE==]";
+	require_once('../funcs/mmConfig.inc');
+   $path_to_dblog = $mmConfig->getVar('LOGFILE');
    $dblog = file_get_contents($path_to_dblog);
    echo $dblog;
 ?>

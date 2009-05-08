@@ -27,6 +27,7 @@
 #  along with METAMOD; if not, write to the Free Software 
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
 #---------------------------------------------------------------------------- 
+require_once('../funcs/mmConfig.inc');
 ?>
 <html>
 <head>
@@ -35,7 +36,7 @@
 <body>
 <pre>
 <?php
-   $importdirs = "[==IMPORTDIRS==]";
+   $importdirs = $mmConfig->getVar('IMPORTDIRS');
    $arr_importdirs = preg_split('/\s*\n\s*/m',$importdirs);
    if ($_REQUEST["subdirectory"]) {
    	$arr_importdirs = array($_REQUEST["subdirectory"]);

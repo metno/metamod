@@ -32,8 +32,9 @@
 <head>
 </head><body>
 <?php
+require_once("../funcs/mmConfig.inc");
 if (array_key_exists("sqlsentence", $_POST)) {
-   $mmDbConnection = @pg_Connect ("dbname=[==DATABASE_NAME==] user=[==PG_ADMIN_USER==] [==PG_CONNECTSTRING_PHP==]");
+   $mmDbConnection = @pg_Connect ("dbname=".$mmConfig->getVar('DATABASE_NAME')." user=".$mmConfig->getVar('PG_ADMIN_USER')." ".$mmConfig->getVar('PG_CONNECTSTRING_PHP'));
    if ( $mmDbConnection ) {
       $sqlsentence = stripslashes($_POST["sqlsentence"]);
       echo "<p>Connection OK</p>\n";
