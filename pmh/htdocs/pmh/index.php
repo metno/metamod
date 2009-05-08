@@ -1,4 +1,5 @@
 <?php
+require_once('../funcs/mmConfig.php');
 require_once('oai2/oaidp-config.php');
 $pos = strrpos($MY_URI, '/');
 $MY_URI = substr($MY_URI, 0, $pos). '/oai2.php';

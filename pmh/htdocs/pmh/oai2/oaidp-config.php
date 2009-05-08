@@ -53,7 +53,7 @@ $SHOW_QUERY_ERROR = FALSE;
 
 // The content-type the WWW-server delivers back. For debug-puposes, "text/plain" 
 // is easier to view. On a production site you should use "text/xml".
-$CONTENT_TYPE = 'Content-Type: [==PMH_CONTENT_TYPE==]';
+$CONTENT_TYPE = 'Content-Type: '.$mmConfig->getVar('PMH_CONTENT_TYPE');
 
 // If everything is running ok, you should use this
 // $SHOW_QUERY_ERROR = FALSE;
@@ -74,12 +74,12 @@ $CONTENT_TYPE = 'Content-Type: [==PMH_CONTENT_TYPE==]';
 error_reporting(E_ALL & ~E_NOTICE);
 
 // do not change
-$MY_URI = 'http://'.$_SERVER['SERVER_NAME'][==PMH_PORT_NUMBER==].$_SERVER['SCRIPT_NAME'];
+$MY_URI = 'http://'.$_SERVER['SERVER_NAME'].$mmConfig->getVar('PMH_PORT_NUMBER').$_SERVER['SCRIPT_NAME'];
 # echo $MY_URI . '<BR />';
 
 // MUST (only one)
 // please adjust
-$repositoryName       = '[==PMH_REPOSITORY_NAME==]';
+$repositoryName       = $mmConfig->getVar('PMH_REPOSITORY_NAME');
 $baseURL			  = $MY_URI;
 // You can use a static URI as well.
 // $baseURL 			= "http://my.server.org/oai/oai2.php";
@@ -110,7 +110,7 @@ $granularity          = 'YYYY-MM-DD';
 // MUST (only one)
 // the earliest datestamp in your repository,
 // please adjust
-$earliestDatestamp    = '[==PMH_EARLIEST_DATESTAMP==]';
+$earliestDatestamp    = $mmConfig->getVar('PMH_EARLIEST_DATESTAMP');
 
 // this is appended if your granularity is seconds.
 // do not change
@@ -120,7 +120,7 @@ if ($granularity == 'YYYY-MM-DDThh:mm:ss:Z') {
 
 // MUST (multiple)
 // please adjust
-$adminEmail			= array('mailto:[==OPERATOR_EMAIL==]'); 
+$adminEmail			= array('mailto:'.$mmConfig->getVar('OPERATOR_EMAIL')); 
 
 // MAY (multiple) 
 // Comment out, if you do not want to use it.
@@ -141,7 +141,7 @@ $delimiter			= ':';
 // see: http://www.openarchives.org/OAI/2.0/guidelines-oai-identifier.htm
 // Basically use domainname-word.domainname
 // please adjust
-$repositoryIdentifier = '[==PMH_REPOSITORY_IDENTIFIER==]'; 
+$repositoryIdentifier = $mmConfig->getVar('PMH_REPOSITORY_IDENTIFIER'); 
 
 
 // description is defined in identify.php 
@@ -156,13 +156,13 @@ $show_identifier = false;
 // (verb is ListRecords)
 // If there are more records to deliver
 // a ResumptionToken will be generated.
-$MAXRECORDS = [==PMH_MAXRECORDS==];
+$MAXRECORDS = $mmConfig->getVar('PMH_MAXRECORDS');
 
 // maximum mumber of identifiers to deliver
 // (verb is ListIdentifiers)
 // If there are more identifiers to deliver
 // a ResumptionToken will be generated.
-$MAXIDS = [==PMH_MAXRECORDS==];
+$MAXIDS = $mmConfig->getVar('PMH_MAXRECORDS');
 
 // After 24 hours resumptionTokens become invalid.
 $tokenValid = 24*3600;
@@ -201,7 +201,7 @@ $METADATAFORMATS = 	array (
 
 // change according to your local DB setup.
 $DB_HOST   = 'localhost';
-$DB_USER   = '[==PG_ADMIN_USER==]';
+$DB_USER   = $mmConfig->getVar('PG_ADMIN_USER');
 $DB_PASSWD = '';
 $DB_NAME   = 'oaipmh';												           
 
@@ -277,7 +277,8 @@ $SQL['set'] = '';
 // further extensions to the query, please leave it as it is.
 
 function mmPutLog($string) {
-   $logfile = '[==WEBRUN_DIRECTORY==]' . '/oaipmhlog';
+	global $mmConfig;
+   $logfile = $mmConfig->getVar('WEBRUN_DIRECTORY') . '/oaipmhlog';
    $fd = fopen($logfile,"a");
    fwrite($fd,date("Y-m-d H:i: ") . $string . "\n");
    fflush($fd);
@@ -297,7 +298,7 @@ function selectallQuery ($id = '')
 	return $query;
 }
 function getRecords ($id = '', $from = '', $until = '') {
-   global $mmDbConnection;
+   global $mmDbConnection, $mmConfig;
    global $metadataPrefix;
    global $key_conversion;
    if ($metadataPrefix == 'oai_dc') {
@@ -360,7 +361,7 @@ function getRecords ($id = '', $from = '', $until = '') {
       );
    }
    $query = 'SELECT DS_id, DS_name, DS_status, DS_datestamp, DS_creationDate, DS_ownertag FROM DataSet WHERE ' .
-            "DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN ([==PMH_EXPORT_TAGS==]) ";
+            "DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN ('".$mmConfig->getVar('PMH_EXPORT_TAGS')."') ";
    if ($id != '') {
       $query .= "AND DS_name = '$id' ";
    }
@@ -440,7 +441,7 @@ function getRecords ($id = '', $from = '', $until = '') {
 // this function will return identifier and datestamp for all records
 function idQuery ($id = '')
 {
-	global $SQL;
+	global $SQL, $mmConfig;
 
 	if ($SQL['set'] != '') {
 		$query = 'select distinct '.$SQL['identifier'].','.$SQL['datestamp'].','.
@@ -449,7 +450,7 @@ function idQuery ($id = '')
 		$query = 'select distinct '.$SQL['identifier'].','.$SQL['datestamp'].','.
                          $SQL['deleted'].' FROM '.$SQL['table'];
 	}
-        $query .= " WHERE DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN ([==PMH_EXPORT_TAGS==])";
+        $query .= " WHERE DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN ('".$mmConfig->getVar('PMH_EXPORT_TAGS')."')";
 	
 	if ($id != '') {
 		$query .= ' AND '.$SQL['identifier']." = '$id'";

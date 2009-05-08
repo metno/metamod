@@ -39,6 +39,7 @@ error_reporting (E_ALL ^ E_NOTICE);
 $output = '';
 $errors = '';
 
+require_once('../funcs/mmConfig.inc');
 require_once('oai2/oaidp-util.php');
 require_once('oai2/buildxml.php');
 require_once('oai2/get_exception.php');
@@ -84,7 +85,7 @@ foreach($verbs as $val) {
 }
 
 ini_set("track_errors",1);
-$mmDbConnection = @pg_Connect ("dbname=[==DATABASE_NAME==] user=[==PG_WEB_USER==] [==PG_CONNECTSTRING_PHP==]");
+$mmDbConnection = @pg_Connect ("dbname=".$mmConfig->getVar('DATABASE_NAME')." user=".$mmConfig->getVar('PG_WEB_USER')." ".$mmConfig->getVar('PG_CONNECTSTRING_PHP'));
 if ( !$mmDbConnection ) {
    mmPutLog("Error. Could not connect to database: $php_errormsg");
    $errors .= oai_error('serviceUnavailable');
