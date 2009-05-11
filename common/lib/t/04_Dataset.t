@@ -30,7 +30,7 @@
 use strict;
 use warnings;
 use encoding 'iso8859-1';
-use Encode qw(decode);
+use Encode qw(decode encode);
 
 use lib "..";
 use Test::More tests => 43;
@@ -90,7 +90,7 @@ ok(! -f "test.xml", "test.xml deleted");
 ok(! -f "test.xmd", "test.xmd deleted");
 
 my @metaVals = qw(a b c);
-my $umlauts = decode('iso8859-1', "רזü");
+my $umlauts = decode('iso8859-1', chr(248).chr(230).chr(252)); # decode('iso8859-1', "/o, ae, "u");
 my %metadata = ("abc" => \@metaVals, umlauts => [$umlauts]);
 $ds->addMetadata(\%metadata);
 my %newMeta = $ds->getMetadata;

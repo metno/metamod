@@ -83,7 +83,7 @@
                   fclose($fileid);
                   include "./newuserok.php";
                   $notification .= "\n\n" . $approvelink;
-                  mail($mmConfig->getVar('OPERATOR_EMAIL'), "New ".$mmConfig->getVar('APPLICATION_NAME')". user",$notification, "From: ".$mmConfig->getVar('FROM_ADDRESS'));
+                  mail($mmConfig->getVar('OPERATOR_EMAIL'), "New ".$mmConfig->getVar('APPLICATION_NAME')." user",$notification, "From: ".$mmConfig->getVar('FROM_ADDRESS'));
                } else {
                   mmPutLog("Error while opening file: $u0path/$filename");
                   $errmsg = 'Sorry, your request were not received. Internal error';

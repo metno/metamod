@@ -33,8 +33,6 @@
  */
 ?>
 <?php
-require_once("../funcs/mmConfig.inc");
-
 /**
  * Fetch a DBO connection for a user.
  * @param $user the database-user
@@ -42,13 +40,17 @@ require_once("../funcs/mmConfig.inc");
  * @return DBO-connection
  * @throws DBOException
  */
-function getDBOConnection($user=$mmConfig->getVar('PG_WEB_USER'), $password="") {
+function getDBOConnection($user="", $password="") {
+	global $mmConfig;
+	if (strlen($user) == 0) {
+		$user = $mmConfig->getVar('PG_WEB_USER');
+	}
 	static $mmDBOConnection = array();
 	if (! isset($mmDBOConnection[$user])) {
 		$mmDBOConnection[$user] = new DBO("pgsql:".$mmConfig->getVar('PG_CONNECTSTRING_PERL'), $user, $password);
 	}
 	return $mmDBOConnection[$user];
-} 
+}
 
 /**
  * Get the information of a dataset as xml.
