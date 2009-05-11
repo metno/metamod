@@ -68,7 +68,7 @@ my $config = new Metamod::Config();
 my $progress_report = $config->get("TEST_IMPORT_PROGRESS_REPORT");    # If == 1, prints what
                                                             # happens to stdout
 my $sleeping_seconds = 600; # check every 10 minutes for new files
-if ( $config->getVar('TEST_IMPORT_SPEEDUP') > 1 ) {
+if ( $config->get('TEST_IMPORT_SPEEDUP') > 1 ) {
 	$sleeping_seconds = 1; # don't wait in test-case
 }
 my $importdirs_string          = $config->get("IMPORTDIRS");
