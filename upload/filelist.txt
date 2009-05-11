@@ -23,11 +23,11 @@
 =htdocs/adm/show_usererrors.php
 =htdocs/adm/show_syserrors.php
 =htdocs/adm/show_users.php
-scripts/digest_nc.pl
+=scripts/digest_nc.pl
 =scripts/ncfind.pm
 =scripts/print_usererrors.pl
-scripts/upload_monitor.pl
+=scripts/upload_monitor.pl
 =scripts/show_time_now.pl
-scripts/createChildDatasets.pl
+=scripts/createChildDatasets.pl
 =etc/standard_name.txt
 =etc/conf_digest_nc.xsd

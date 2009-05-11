@@ -1,8 +1,8 @@
 init/create_and_load_all.sh
 init/createdb.sh
-scripts/import_searchdata.pl
-scripts/import_dataset.pl
 scripts/createusers.sh
+=scripts/import_searchdata.pl
+=scripts/import_dataset.pl
 =htdocs/adm/highlight.html
 =htdocs/adm/highlight.php
 =htdocs/adm/gettables.php

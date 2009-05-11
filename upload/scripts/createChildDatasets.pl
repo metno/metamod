@@ -41,9 +41,19 @@
 #
 use strict;
 use warnings;
-use File::Path qw(mkpath);
 use File::Spec;
-use lib qw([==TARGET_DIRECTORY==]/lib);
+# small routine to get lib-directories relative to the installed file
+sub getTargetDir {
+    my ($finalDir) = @_;
+    my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
+    $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
+    $dir = File::Spec->catdir($dir, $finalDir); 
+    return File::Spec->catpath($vol, $dir, "");
+}
+
+use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
+
+use File::Path qw(mkpath);
 use Metamod::Utils qw(findFiles isNetcdf trim);
 use Metamod::Dataset;
 use Metamod::DatasetTransformer;

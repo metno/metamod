@@ -1,1 +1,1 @@
-scripts/harvester.pl
+=scripts/harvester.pl

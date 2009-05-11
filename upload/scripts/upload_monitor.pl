@@ -30,7 +30,19 @@
 #---------------------------------------------------------------------------- 
 #
 use strict;
-use lib qw([==TARGET_DIRECTORY==]/scripts [==TARGET_DIRECTORY==]/lib);
+use warnings;
+use File::Spec;
+# small routine to get lib-directories relative to the installed file
+sub getTargetDir {
+    my ($finalDir) = @_;
+    my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
+    $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
+    $dir = File::Spec->catdir($dir, $finalDir); 
+    return File::Spec->catpath($vol, $dir, "");
+}
+
+use lib ('../../common/lib', getTargetDir('lib'));
+
 use File::Copy;
 use File::Path;
 use File::Spec;

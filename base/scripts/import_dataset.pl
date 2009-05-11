@@ -30,7 +30,19 @@
 #----------------------------------------------------------------------------
 #
 use strict;
-use lib qw([==TARGET_DIRECTORY==]/scripts [==TARGET_DIRECTORY==]/lib);
+use warnings;
+use File::Spec;
+# small routine to get lib-directories relative to the installed file
+sub getTargetDir {
+    my ($finalDir) = @_;
+    my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
+    $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
+    $dir = File::Spec->catdir($dir, $finalDir); 
+    return File::Spec->catpath($vol, $dir, "");
+}
+
+use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
+
 use Metamod::Dataset;
 use Metamod::Utils qw(findFiles);
 use Metamod::Config;
@@ -56,7 +68,7 @@ my $config = new Metamod::Config();
 my $progress_report = $config->get("TEST_IMPORT_PROGRESS_REPORT");    # If == 1, prints what
                                                             # happens to stdout
 my $sleeping_seconds = 600; # check every 10 minutes for new files
-if ( [==TEST_IMPORT_SPEEDUP==] > 1 ) {
+if ( $config->getVar('TEST_IMPORT_SPEEDUP') > 1 ) {
 	$sleeping_seconds = 1; # don't wait in test-case
 }
 my $importdirs_string          = $config->get("IMPORTDIRS");

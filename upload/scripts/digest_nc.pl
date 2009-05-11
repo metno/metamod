@@ -30,7 +30,19 @@
 #---------------------------------------------------------------------------- 
 #
 use strict;
-use lib qw([==TARGET_DIRECTORY==]/scripts [==TARGET_DIRECTORY==]/lib);
+use warnings;
+use File::Spec;
+
+# small routine to get lib-directories relative to the installed file
+sub getTargetDir {
+	my ($finalDir) = @_;
+    my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
+    $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
+    $dir = File::Spec->catdir($dir, $finalDir); 
+    return File::Spec->catpath($vol, $dir, "");
+}
+
+use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
 use XML::Simple qw(:strict);
 use Metamod::Dataset;
 use encoding 'utf-8';
@@ -38,6 +50,7 @@ use ncfind;
 use quadtreeuse;
 use Data::Dumper;
 use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
+
 #
 # Check and collect metadata in netCDF files. 
 # ===========================================
