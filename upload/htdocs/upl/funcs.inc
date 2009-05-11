@@ -149,22 +149,26 @@ function mkpasswd()
 
 function send_welcome_mail($name,$emailadr,$paw)
 {
+	global $mmConfig;
+	$appName = $mmConfig->getVar('APPLICATION_NAME');
+	$signature = $mmConfig->getVar('EMAIL_SIGNATURE');
    $content = <<<END_TEXT
- Dear $name,
+Dear $name,
 
- Welcome to the [==APPLICATION_NAME==] file upload service. Your initial password
- for logging into this service will be: $paw
+Welcome to the $appName file upload service. Your initial password
+for logging into this service will be: $paw
  
- You may change the password when logging into the service, as long
- as you initially provide the password given here.
+You may change the password when logging into the service, as long
+as you initially provide the password given here.
 
-[==EMAIL_SIGNATURE==]
+$signature
 END_TEXT;
-   mail($emailadr, "Access to [==APPLICATION_NAME==] file upload service",$content, "From: [==FROM_ADDRESS==]");
+   mail($emailadr, "Access to $appName file upload service",$content, "From: ".$mmConfig->getVar('FROM_ADDRESS'));
 }
 
 function mmGetRunPath () {
-   return '[==WEBRUN_DIRECTORY==]';
+	global $mmConfig;
+   return $mmConfig->getVar('WEBRUN_DIRECTORY');
 }
 
 function mmPutLog($string) {
@@ -400,12 +404,14 @@ function get_unique_filename ($namefile)
 
 function get_upload_path()
 {
-   return '[==UPLOAD_DIRECTORY==]';
+	global $mmConfig;
+   return $mmConfig->getVar('UPLOAD_DIRECTORY');
 }
 
 function get_repository_path()
 {
-   return '[==OPENDAP_DIRECTORY==]';
+	global $mmConfig;
+   return $mmConfig->getVar('OPENDAP_DIRECTORY');
 }
 
 function create_user_session($filename)
@@ -458,7 +464,8 @@ function get_buttonname()
 
 function conditional_decode($string)
 {
-   if ([==DECODE_FROM_UTF8==]) {
+	global $mmConfig;
+   if ($mmConfig->getVar('DECODE_FROM_UTF8')) {
       return utf8_decode($string);
    } else {
       return $string;

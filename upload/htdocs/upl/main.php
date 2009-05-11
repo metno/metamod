@@ -29,10 +29,11 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
+include_once("../funcs/mmConfig.inc");
 #
 #  Main page for users which are logged into the upload service.
 #
-   $debug = [==DEBUG==];
+   $debug = $mmConfig->getVar('DEBUG');
    if ($debug == 0) {
       ob_start(); // Turn on output buffering. The output buffer is discarded before
                   // normal user output is sent.
@@ -65,7 +66,7 @@
       if ($error == 0) {
          $error = 1;
          mmPutLog('Attempted upload of too large file. get_buttonname() returned FALSE');
-         $maxsize = [==MAX_UPLOAD_SIZE_BYTES==]/1000000;
+         $maxsize = $mmConfig->getVar('MAX_UPLOAD_SIZE_BYTES')/1000000;
          $errmsg = "Upload failed. Max file size (" . $maxsize . " MB) exceeded";
       }
    } else {

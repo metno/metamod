@@ -29,6 +29,7 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
+	require_once("../funcs/mmConfig.inc");
 #
 #  This file is activated by the METAMOD2 file repository operator from
 #  an E-mail sent by the upl/newuser.php file. It will move the user file from
@@ -57,10 +58,10 @@
              array_key_exists("email",$userinfo) &&
              array_key_exists("paw",$userinfo)) {
             $email = $userinfo["email"];
-            if ('[==TEST_EMAIL_RECIPIENT==]' == '') {
-               $email = '[==OPERATOR_EMAIL==]';
+            if (strlen($mmConfig->getVar('TEST_EMAIL_RECIPIENT')) == 0) {
+               $email = $mmConfig->getVar('OPERATOR_EMAIL');
             }
-            if ('[==TEST_EMAIL_RECIPIENT==]' != '0') {
+            if ($mmConfig->getVar('TEST_EMAIL_RECIPIENT') != '0') {
                send_welcome_mail($userinfo["name"],$email,$userinfo["paw"]);
             }
             echo 'User approved and moved to u1, Welcome mail sent';

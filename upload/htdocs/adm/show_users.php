@@ -26,7 +26,8 @@
 #  You should have received a copy of the GNU General Public License 
 #  along with METAMOD; if not, write to the Free Software 
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
-#---------------------------------------------------------------------------- 
+#----------------------------------------------------------------------------
+require_once("../funcs/mmConfig.inc"); 
 ?>
 <html>
 <head>
@@ -37,7 +38,7 @@
 #
 #  Get array containing all files in a directory
 #
-   $userfiles = scandir("[==WEBRUN_DIRECTORY==]/u1");
+   $userfiles = scandir($mmConfig->getVar('WEBRUN_DIRECTORY')."/u1");
    reset($userfiles);
    foreach ($userfiles as $filename) {
       $firstchar = substr($filename,0,1);
@@ -45,7 +46,7 @@
 #
 #        Get last file modification time
 #
-         $filepath = "[==WEBRUN_DIRECTORY==]/u1/$filename";
+         $filepath = $mmConfig->getVar('WEBRUN_DIRECTORY')."/u1/$filename";
          $modified = filemtime($filepath);
          $modified_str = date('Y-m-d H:i',$modified);
          echo "<h3>$filename modified $modified_str</h3>\n<pre>\n";

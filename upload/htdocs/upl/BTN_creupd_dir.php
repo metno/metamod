@@ -53,22 +53,22 @@
        mmPutLog('Create/Update: Illegal character in directory name');
        $errmsg = "[Create/Update] failed. Illegal character in directory name." .
                  " Use only: a-z A-Z 0-9 . -";
-    } else if (strlen($dirname) > [==MAXLENGTH_DIRNAME==]) {
+    } else if (strlen($dirname) > $mmConfig->getVar('MAXLENGTH_DIRNAME')) {
        $error = 1;
        $nextpage = 3;
        mmPutLog('Create/Update: Illegal directory name');
        $errmsg = "[Create/Update] failed. Directory name too long." .
-                 " Max [==MAXLENGTH_DIRNAME==] characters allowed";
+                 " Max ".$mmConfig->getVar('MAXLENGTH_DIRNAME')." characters allowed";
     }
  }
  if ($error == 0) {
     $dirkey = conditional_decode($_POST["dirkey"]);
-    if (strlen($dirkey) > [==MAXLENGTH_DIRKEY==]) {
+    if (strlen($dirkey) > $mmConfig->getVar('MAXLENGTH_DIRKEY')) {
        $error = 1;
        $nextpage = 3;
        mmPutLog('Create/Update: Illegal directory key');
        $errmsg = "[Create/Update] failed. Directory access key too long." .
-                 " Max [==MAXLENGTH_DIRKEY==] characters allowed";
+                 " Max ".$mmConfig->getVar('MAXLENGTH_DIRKEY')." characters allowed";
     }
     $ndirkey = normstring($dirkey);
  }

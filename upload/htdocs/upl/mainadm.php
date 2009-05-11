@@ -26,20 +26,21 @@
 #  You should have received a copy of the GNU General Public License 
 #  along with METAMOD; if not, write to the Free Software 
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
-#---------------------------------------------------------------------------- 
+#----------------------------------------------------------------------------
+require_once("../funcs/mmConfig.inc"); 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-   <title>[==UPLOAD_APP_TITLE==]</title>
+   <title><?php echo $mmConfig->getVar('UPLOAD_APP_TITLE'); ?></title>
    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-   <link href="[==LOCAL_URL==]/style.css" rel="stylesheet" type="text/css" />
+   <link href="<?php echo $mmConfig->getVar('LOCAL_URL'); ?>/style.css" rel="stylesheet" type="text/css" />
    <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div class="mybody">
-[==APP_HEADER_HTML==]
+<?php echo $mmConfig->getVar('APP_HEADER_HTML'); ?>
 <form action="main.php" method="post">
 <?php
    echo '<input type="hidden" name="normemail" value="' . $normemail . '" />' . "\n";
@@ -51,9 +52,7 @@
    <tr>
    <td class="main_menu">
       <?php
-         $s1 = <<<END_OF_STRING
-[==APP_MENU==]
-END_OF_STRING;
+         $s1 = $mmConfig->getVar('APP_MENU');
          $a1 = explode("\n",$s1);
          foreach ($a1 as $s2) {
             if (preg_match ('/^ *([^ ]+) (.*)$/i',$s2,$a2)) {
@@ -76,11 +75,11 @@ END_OF_STRING;
       <table cellpadding="0" cellspacing="0" width="100%">
          <tr>
          <td>
-            <p class="heading">[==UPLOAD_APP_TITLE==]</p>
+            <p class="heading"><?php $mmConfig->getVar('UPLOAD_APP_TITLE'); ?></p>
             <p class="heading_info">
-[==UPLOAD_APP_INLOGGED_TEXT==]
+<?php echo $mmConfig->getVar('UPLOAD_APP_INLOGGED_TEXT'); ?>
 <br /><br />
-[==UPLOAD_APP_COMMON_TEXT==]
+<?php echo $mmConfig->getVar('UPLOAD_APP_COMMON_TEXT'); ?>
             </p>
             <?php
                if (strlen($errmsg) > 0) {
@@ -129,7 +128,7 @@ END_OF_STRING;
             &nbsp;
          </td>
          <td class="inputform">
-            &nbsp;<b>Directory name:</b><br />&nbsp;(max [==MAXLENGTH_DIRNAME==] characters)
+            &nbsp;<b>Directory name:</b><br />&nbsp;(max <?php echo $mmConfig->getVar('MAXLENGTH_DIRNAME'); ?> characters)
          </td>
          <td class="inputform">
             <input name="dirname" value="<?php echo $dirname; ?>" size="10" />
@@ -164,7 +163,7 @@ END_OF_STRING;
    </tr>
 </table>
 </form>
-[==APP_FOOTER_HTML==]
+<?php echo $mmConfig->getVar('APP_FOOTER_HTML'); ?>
 </div>
 </body>
 </html>

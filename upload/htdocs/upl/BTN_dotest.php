@@ -105,11 +105,11 @@
  if ($error == 0) { // Write a file containing the E-mail address, and
                     // move the uploaded file to the destination directory:
 
-    $emailfile = '[==WEBRUN_DIRECTORY==]/upl/etaf/' . $origname;
+    $emailfile = $mmConfig->getVar('WEBRUN_DIRECTORY').'/upl/etaf/' . $origname;
     $EMAILFILE = fopen($emailfile,'w');
     fwrite($EMAILFILE,decodenorm($normemail) . " " . $userinfo["name"] . "\n");
     fclose($EMAILFILE);
-    $dirpath = '[==WEBRUN_DIRECTORY==]/upl/ftaf';
+    $dirpath = $mmConfig->getVar('WEBRUN_DIRECTORY').'/upl/ftaf';
     mmPutTest("BTN_dotest.php: About to move uploaded file to: " . $dirpath);
     if (!move_uploaded_file($tmpname,$dirpath . '/' . $origname)) {
        mmPutLog('Could not move uploaded file to the upload directory');

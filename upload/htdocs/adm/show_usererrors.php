@@ -26,7 +26,8 @@
 #  You should have received a copy of the GNU General Public License 
 #  along with METAMOD; if not, write to the Free Software 
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
-#---------------------------------------------------------------------------- 
+#----------------------------------------------------------------------------
+require_once("../funcs/mmConfig.inc"); 
 ?>
 <html>
 <head>
@@ -38,11 +39,11 @@
 #
 #  Get array containing all files in a directory
 #
-   $errfiles = scandir("[==WEBRUN_DIRECTORY==]/upl/uerr");
+   $errfiles = scandir($mmConfig->getVar('WEBRUN_DIRECTORY')."/upl/uerr");
    reset($errfiles);
    foreach ($errfiles as $filename) {
       if (preg_match ('/\.html$/',$filename)) {
-         echo '<a href="[==LOCAL_URL==]/upl/uerr/' . $filename . '">' . $filename . '</a><br />' . "\n";
+         echo '<a href='.$mmConfig->getVar('LOCAL_URL').'/upl/uerr/' . $filename . '">' . $filename . '</a><br />' . "\n";
       }
    }
 ?>

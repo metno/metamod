@@ -26,7 +26,8 @@
 #  You should have received a copy of the GNU General Public License 
 #  along with METAMOD; if not, write to the Free Software 
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
-#---------------------------------------------------------------------------- 
+#----------------------------------------------------------------------------
+require_once("../funcs/mmConfig.inc"); 
 ?>
 <html>
 <head>
@@ -35,7 +36,7 @@
 <body>
 <pre>
 <?php
-   $path_to_syserrors = "[==WEBRUN_DIRECTORY==]/syserrors";
+   $path_to_syserrors = $mmConfig->getVar('WEBRUN_DIRECTORY')."/syserrors";
    $syserrors = file_get_contents($path_to_syserrors);
    echo $syserrors;
 ?>

@@ -26,29 +26,28 @@
 #  You should have received a copy of the GNU General Public License 
 #  along with METAMOD; if not, write to the Free Software 
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
-#---------------------------------------------------------------------------- 
+#----------------------------------------------------------------------------
+require_once("../funcs/mmConfig.inc"); 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-   <title>[==UPLOAD_APP_TITLE==]</title>
+   <title><?php echo $mmConfig->getVar('UPLOAD_APP_TITLE'); ?></title>
    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-   <link href="[==LOCAL_URL==]/style.css" rel="stylesheet" type="text/css" />
+   <link href="<?php echo $mmConfig->getVar('LOCAL_URL'); ?>/style.css" rel="stylesheet" type="text/css" />
    <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div class="mybody">
-[==APP_HEADER_HTML==]
+<?php echo $mmConfig->getVar('APP_HEADER_HTML'); ?>
    <table class="main_structure" cellpadding="0" cellspacing="0" width="100%">
       <col width="10%" />
       <col width="90%" />
       <tr>
          <td class="main_menu">
             <?php
-               $s1 = <<<END_OF_STRING
-[==APP_MENU==]
-END_OF_STRING;
+               $s1 = $mmConfig->getVar('APP_MENU');
                $a1 = explode("\n",$s1);
                foreach ($a1 as $s2) {
                   if (preg_match ('/^ *([^ ]+) (.*)$/i',$s2,$a2)) {
@@ -73,11 +72,11 @@ END_OF_STRING;
             <table cellpadding="0" cellspacing="0" width="100%">
                <tr>
                   <td>
-                     <p class="heading">[==UPLOAD_APP_TITLE==]</p>
+                     <p class="heading"><?php echo $mmConfig->getVar('UPLOAD_APP_TITLE'); ?></p>
                      <p class="heading_info">
-[==UPLOAD_APP_INLOGGED_TEXT==]
+<?php echo $mmConfig->getVar('UPLOAD_APP_INLOGGED_TEXT'); ?>
 <br /><br />
-[==UPLOAD_APP_COMMON_TEXT==]
+<?php echo $mmConfig->getVar('UPLOAD_APP_COMMON_TEXT'); ?>
                      </p>
                      <?php
                         if (strlen($errmsg) > 0) {
@@ -94,7 +93,7 @@ END_OF_STRING;
    <div class="loginform" style="border-left: 1px solid #4d4d8d;">
    <h3>Upload file</h3>
    <p>Use the "File name" entry or the "Browse..." button below to enter the name of
-   a file on your local file system that you want to upload to the [==APPLICATION_NAME==] data repository.</p>
+   a file on your local file system that you want to upload to the <?php echo $mmConfig->getVar('APPLICATION_NAME'); ?> data repository.</p>
    <p>Normally, the file should be a netCDF file (or another format accepted in the repository).
    However, if you have a large number of small files, you may pack the files into an archive
    file. Then you upload the archive file</p>
@@ -111,13 +110,13 @@ END_OF_STRING;
    please check the file name by using the radio button in the leftmost table column.</p>
    <p>Finally, push the "Upload" button to initiate the actual upload.</p>
    <p><b>Note:</b> Files to be uploaded must not exceed a size limit of
-   <?php $maxsize = [==MAX_UPLOAD_SIZE_BYTES==]/1000000; echo $maxsize; ?>
+   <?php $maxsize = $mmConfig->getVar('MAX_UPLOAD_SIZE_BYTES')/1000000; echo $maxsize; ?>
    MB.
    Only alphanumeric characters, underline (_), period (.) and hyphens (-)
    are allowed in file names. The initial part of a file name must be the name of a
    user directory followed by underline (_).</p>
     <?php
-         $metadataQuest = "[==QUEST_METADATA_UPLOAD_FORM==]";
+         $metadataQuest = $mmConfig->getVar('QUEST_METADATA_UPLOAD_FORM');
          $userinfo = get_userinfo($filepath);
     	 if (!array_key_exists("institution",$userinfo)) {
        		$error = 2;
@@ -188,7 +187,7 @@ EOF;
 
    <form enctype="multipart/form-data" action="main.php" method="post">
    <p>
-      <input type="hidden" name="MAX_FILE_SIZE" value="[==MAX_UPLOAD_SIZE_BYTES==]" />
+      <input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $mmConfig->getVar('MAX_UPLOAD_SIZE_BYTES'); ?>" />
       <?php
          echo '<input type="hidden" name="normemail" value="' . $normemail . '" />' . "\n";
          echo '<input type="hidden" name="sessioncode" value="' . $sessioncode . '" />' . "\n";
@@ -238,7 +237,7 @@ EOF;
          </td>
       </tr>
    </table>
-[==APP_FOOTER_HTML==]
+<?php echo $mmConfig->getVar('APP_FOOTER_HTML'); ?>
 </div>
 </body>
 </html>

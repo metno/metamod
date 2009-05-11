@@ -83,7 +83,7 @@
                   fclose($fileid);
                   include "./newuserok.php";
                   $notification .= "\n\n" . $approvelink;
-                  mail('[==OPERATOR_EMAIL==]', "New [==APPLICATION_NAME==] user",$notification, "From: [==FROM_ADDRESS==]");
+                  mail($mmConfig->getVar('OPERATOR_EMAIL'), "New ".$mmConfig->getVar('APPLICATION_NAME')". user",$notification, "From: ".$mmConfig->getVar('FROM_ADDRESS'));
                } else {
                   mmPutLog("Error while opening file: $u0path/$filename");
                   $errmsg = 'Sorry, your request were not received. Internal error';
@@ -92,16 +92,16 @@
             } else { // The user has already sent a registration form
                include "./newuserok.php";
                $msg = "Repeated request from: $email" . "\n\n" . $approvelink;
-               mail('[==OPERATOR_EMAIL==]', "New [==APPLICATION_NAME==] user",$msg, "From: [==FROM_ADDRESS==]");
+               mail($mmConfig->getVar('OPERATOR_EMAIL'), "New ".$mmConfig->getVar('APPLICATION_NAME')." user",$msg, "From: ".$mmConfig->getVar('FROM_ADDRESS'));
             }
          }
       } else if ($matchingcount == 1) { // The user is already a registered user. Change password
          $oldfilepath = $matching[0];
          rename($oldfilepath,$u1path . '/' . $filename);
-         if ('[==TEST_EMAIL_RECIPIENT==]' == '') {
-            $email = '[==OPERATOR_EMAIL==]';
+         if (strlen($mmConfig->getVar('TEST_EMAIL_RECIPIENT')) == 0) {
+            $email = $mmConfig->getVar('OPERATOR_EMAIL');
          }
-         if ('[==TEST_EMAIL_RECIPIENT==]' != '0') {
+         if ($mmConfig->getVar('TEST_EMAIL_RECIPIENT') != '0') {
             send_welcome_mail($name,$email,$paw);
          }
          include "./newuserok.php";
