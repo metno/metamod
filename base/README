@@ -33,9 +33,9 @@ The tasks performed by the METAMODBASE module are:
   sleeps, but wakes up at regular time intervals to check if any new or updated
   XML files are found in a set of directories given by the value of the IMORTDIRS 
   variable in the application configuration file (master_config.txt). The
-  import_dataset.pl script is started from the start_services.pl command in the
+  import_dataset.pl script is started from the 'metamodInit.sh start' command in the
   target directory. The script should be stopped using the corresponding
-  stop_services.pl command, which will stop the script in an orderly fashion.
+  'metamodInit.sh stop' command, which will stop the script in an orderly fashion.
   This software contain no tool for running this script (or other similar
   scripts) as a daemon or cronjob.
 

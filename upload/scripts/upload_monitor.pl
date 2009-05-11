@@ -90,8 +90,9 @@ $| = 1;
 #
 #  Overall operation:
 #
-#  The script executes an infinite loop as long as the file $path_continue_monitor
-#  exists. After each repetition of the loop body, the script waits for 
+#  The script executes an infinite loop as long as it is not terminated. Termination
+#  might take some time due to clean-up work (finishing the loop).
+#  After each repetition of the loop body, the script waits for 
 #  $sleeping_seconds seconds.
 #
 #  The ftp_events file contains, for each of the datasets, the hours at which
@@ -179,6 +180,10 @@ $| = 1;
 #  
 #  Global variables (constants after initialization):
 #
+our $SIG_TERM = 0;
+sub sigterm {++$SIG_TERM;}
+$SIG{TERM} = \&sigterm;
+
 my $progress_report = $config->get("TEST_IMPORT_PROGRESS_REPORT"); # If == 1, prints what
                                                          # is going on to stdout
 my $ftp_dir_path = $config->get('UPLOAD_FTP_DIRECTORY');
@@ -196,7 +201,6 @@ my $xml_history_directory = $webrun_directory . '/XML/history';
 my $target_directory = $config->get('TARGET_DIRECTORY');
 my $opendap_directory = $config->get('OPENDAP_DIRECTORY');
 my $opendap_url = $config->get('OPENDAP_URL');
-my $path_continue_monitor = $webrun_directory . "/upl/CONTINUE_UPLOAD_MONITOR";
 my $sleeping_seconds = 60;
 if ($config->get('TEST_IMPORT_SPEEDUP') and $config->get('TEST_IMPORT_SPEEDUP') > 1) {
    $sleeping_seconds = 1;
@@ -229,11 +233,13 @@ my @user_errors = ();
 #  -------------------
 #
 eval {
-	if ($ARGV[0]) {
+	if ($ARGV[0] && $ARGV[0] eq 'test') {
 		print STDERR "Testrun: " . $ARGV[0] . "\n";
 		main_loop($ARGV[0]);
 	} else {
-      &main_loop();		
+		Metamod::Utils::daemonize($ARGV[0], $ARGV[1]);
+		$SIG{TERM} = \&sigterm;
+        &main_loop();		
 	}
 };
 if ($@) {
@@ -297,8 +303,7 @@ sub main_loop {
 #
    %dataset_institution = ();
 #
-#  Loop which will continue until the file $path_continue_monitor is no longer
-#  found.
+#  Loop which will continue until terminated SIG{TERM}.
 #
 #  For each new hour, the loop will check (in the ftp_process_hour
 #  routine) if any FTP-processing are sceduled (looking in the %ftp_events hash).
@@ -314,7 +319,7 @@ sub main_loop {
    my $current_day = $ltime[3]; # 1-31
    my $hour_finished = -1;
    $file_in_error_counter = 1;
-   while (-e $path_continue_monitor || $testrun) {
+   while ((!$SIG_TERM) || $testrun) {
       @ltime = localtime(mmTtime::ttime());
       my $newday = $ltime[3]; # 1-31
       my $current_hour = $ltime[2]; # 0-23

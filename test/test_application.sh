@@ -268,7 +268,7 @@ cd $basedir/target/init
 # =======================================================
 #
 cd $basedir/target
-./start_services.sh
+./metamodInit.sh start
 #
 # H. Uploads to the system is simulated.
 # ======================================
@@ -287,7 +287,7 @@ for fil in `cat $filestoupload`; do cp $fil $basedir/t_dir; mv $basedir/t_dir/* 
 #
 cd $basedir/target
 sleep 300
-./stop_services.sh
+./metamodInit.sh stop
 sleep 100
 #
 # J. Postprocessing:

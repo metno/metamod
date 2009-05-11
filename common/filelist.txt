@@ -1,6 +1,5 @@
 prepare_runtime_env.sh
-start_services.sh
-stop_services.sh
+metamodInit.sh
 =htdocs/adm/index.php
 =htdocs/funcs/mmConfig.inc
 =htdocs/funcs/mmLogging.inc

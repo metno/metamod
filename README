@@ -150,8 +150,8 @@ script monitors a number of directories to see if XML files are created or
 updated, and loads the XML files into the database. Both scripts are running
 in the background. They wake up at regular intervals to see if any work
 are pending. These perl scripts have to be manually started by the 
-start_services.sh shell script. They will run until another shell script,
-stop_services.sh, stops the scripts in an orderly fashion.
+'metamodInit.sh start' shell script. They will run until another shell script,
+'metamodInit.sh stop', stops the scripts in an orderly fashion.
 
 DIRECTORY STRUCTURE
 -------------------
@@ -432,7 +432,7 @@ this E-mail will be sent to the operator instead.
 
 10. Start the perl scripts responsible for loading data into the database:
 cd to the target directory
-run:     ./start_services.sh
+run:     ./metamodInit.sh start
 
 11. Enter the METAMODUPLOAD web page from a browser and log into the
 user account you have created. Enter the "Administration" page and create
@@ -446,7 +446,7 @@ loaded into the database. This can be done by looking at the databaselog
 (path defined by the LOGFILE variable in master_config.txt), and by
 entering the METAMODSEARCH web page and search for the data.
 You may also consult the output files from the two perl scripts started
-by start_services.sh: upload_monitor.out and import_dataset.out.
+by 'metamodInit.sh start': upload_monitor.out and import_dataset.out.
 
 13. Do a similar exercise with the files test2_arctic20.200611.cdl and
 test2_synop_99710.cdl. A new directory/dataset has to be created for these
@@ -459,4 +459,4 @@ this E-mail will be sent to the operator instead.
 
 14. Stop the perl scripts responsible for loading data into the database:
 cd to the target directory
-run:     ./stop_services.sh
+run:     ./metamodInit.sh stop

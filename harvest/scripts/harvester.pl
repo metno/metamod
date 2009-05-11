@@ -43,6 +43,7 @@ sub getTargetDir {
 
 use lib ('../../common/lib', getTargetDir('lib'));
 
+use POSIX;
 use LWP::UserAgent;
 use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 use quadtreeuse;
@@ -51,6 +52,7 @@ use XML::LibXML;
 use Metamod::Dataset;
 use Metamod::ForeignDataset;
 use Metamod::DatasetTransformer::DIF;
+use Metamod::Utils qw();
 use Metamod::Config;
 my $config = Metamod::Config->new();
 # use encoding 'utf8';
@@ -94,7 +96,6 @@ my $config = Metamod::Config->new();
 #                                    </metadata>
 #                                 </record>
 #
-my $continue_oai_harvest = $config->get('WEBRUN_DIRECTORY').'/CONTINUE_OAI_HARVEST';
 my $xmldirectory = $config->get('WEBRUN_DIRECTORY').'/XML/'.$config->get('APPLICATION_ID').'/';
 my $applicationid = $config->get('APPLICATION_ID');
 my $status_file = $config->get('WEBRUN_DIRECTORY').'/oai_harvest_status';
@@ -121,7 +122,13 @@ my $harvest_schema;
       if $harvest_validation_schema;
 }
 
-if (@ARGV == 2) {
+if (@ARGV == 4) {
+   if ($ARGV[0] ne '-log' and $ARGV[2] ne '-pid') {
+      die "usage: $0 -log logfile -pid pidfile\n";
+   }
+   # create a daemon
+   Metamod::Utils::daemonize($ARGV[1], $ARGV[3]);
+} elsif (@ARGV == 2) {
    # run for input file rather than source-harvesting
    my ($ownertag, $file) = @ARGV;
    open my $f, $file or die "Cannot read $file: $!\n";
@@ -130,10 +137,14 @@ if (@ARGV == 2) {
    close $f;
    process_DIF_records($ownertag, $content_from_get);
    exit(0); # do not continue
-} elsif (@ARGV > 0) {
-   print STDERR "usage: harvester.pl\ntest-usage: harvester.pl OWNERTAG FILE\n";
+} else {
+   print STDERR "commandline-usage: harvester.pl\ntest-usage: harvester.pl OWNERTAG FILE\ndaemon-usage: harvester.pl -log logfile -pid pidfile\n";
    exit(1);
 }
+our $SIG_TERM = 0;
+sub sigterm {++$SIG_TERM;}
+$SIG{TERM} = \&sigterm;
+
 
 
 my @arr_harvest_sources = split(/\n/,$harvest_sources);
@@ -172,7 +183,7 @@ if ($@) {
 #
 sub do_harvest {
    my $previous_day = -1;
-   while (-e $continue_oai_harvest) {
+   while (! $SIG_TERM ) {
       my @ltime = localtime(mmTtime::ttime());
       my $newday = $ltime[3]; # 1-31
       my $current_hour = $ltime[2];

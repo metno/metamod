@@ -60,11 +60,12 @@ my $config = new Metamod::Config();
 #  while monitoring a number of directories (@importdirs) where XML files are
 #  found. As new XML files are created or updated in these directories,
 #  they are imported into the database. The loop will continue as long as
-#  the file [==WEBRUN_DIRECTORY==]/CONTINUE_XML_IMPORT exists.
+#  you terminate the process.
 #
 #  With one command line argument, the program will import the XML file
 #  given by this argument.
 #
+
 my $progress_report = $config->get("TEST_IMPORT_PROGRESS_REPORT");    # If == 1, prints what
                                                             # happens to stdout
 my $sleeping_seconds = 600; # check every 10 minutes for new files
@@ -76,19 +77,19 @@ my @importdirs                 = split( /\n/, $importdirs_string );
 my $path_to_import_updated     = $config->get("WEBRUN_DIRECTORY").'/import_updated';
 my $path_to_import_updated_new = $config->get("WEBRUN_DIRECTORY").'/import_updated.new';
 my $path_to_logfile            = $config->get("LOGFILE");
-my $continue_xml_import        = $config->get("WEBRUN_DIRECTORY").'/CONTINUE_XML_IMPORT';
 
 #
 #  Check number of command line arguments
 #
-if ( scalar @ARGV > 1 ) {
+if ( scalar @ARGV > 2 ) {
 	die "\nUsage:\n\n   Import single XML file:     $0 filename\n"
 	  . "   Import a directory:         $0 directory\n"
-	  . "   Infinite monitoring loop:   $0\n\n";
+	  . "   Infinite monitoring loop:   $0\n"
+	  . "   Infinite daemon monitor:    $0 logfile pidfile\n\n";
 }
 my $inputfile;
 my $inputDir;
-if ( scalar @ARGV == 1 ) {
+if ( @ARGV == 1 ) {
 	if ( -f $ARGV[0] ) {
 		$inputfile = $ARGV[0];
 	}
@@ -98,7 +99,13 @@ if ( scalar @ARGV == 1 ) {
 	else {
 		die "Unknown inputfile or inputdir: $ARGV[0]\n";
 	}
+} elsif ( @ARGV == 2 ) {
+	Metamod::Utils::daemonize($ARGV[0], $ARGV[1]);
 }
+our $SIG_TERM = 0;
+sub sigterm {++$SIG_TERM;}
+$SIG{TERM} = \&sigterm;
+
 
 #
 #  Connect to PostgreSQL database:
@@ -159,10 +166,10 @@ sub process_xml_loop {
 
 	#
 	#  Infinite loop that checks for new or modified XML files as long as
-	#  the file $continue_xml_import exists.
+	#  SIG_TERM (standard kill, Ctrl-C) has not been called.
 	#
 	&write_to_log("Check for new datasets in @importdirs");
-	while ( -e $continue_xml_import ) {
+	while ( ! $SIG_TERM ) {
 
 #    The file $path_to_import_updated was last modified in the previous
 #    turn of this loop. All XML files that are modified later are candidates

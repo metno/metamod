@@ -29,7 +29,7 @@
 
 package Metamod::Utils;
 use base qw(Exporter);
-our $VERSION = 0.2;
+our $VERSION = 0.3;
 
 @EXPORT_OK = qw(findFiles isNetcdf trim getFiletype);
 
@@ -93,6 +93,34 @@ sub trim {
 	return $str;
 }
 
+sub daemonize {
+	my ($logFile, $pidFile) = @_;
+	# check if writing is possible
+	if ($pidFile) {
+	   open my $pfh, ">$pidFile" or die "Cannot write pidfile $pidFile: $!\n";
+       close $pfh;
+	}
+    close STDIN;
+    close STDOUT;
+    if ($logFile) {
+        open STDOUT, ">>$logFile" or die "Can't redirect STDOUT to $logFile: $!";
+    }
+    close STDERR;
+    if ($logFile) {
+        open STDERR, ">>&STDOUT" or die "Can't redirect STDERR: $!";
+    }
+    my $pid = fork;
+    exit if $pid;
+    die "Couldn't fork: $!" unless defined($pid);
+    POSIX::setsid()
+        or die "Can't start a new session: $!";
+    if ($pidFile) {
+        open my $pfh, ">$pidFile" or die "Cannot write pidfile $pidFile: $!\n";
+        print $pfh "$$\n";
+        close $pfh;
+    }
+}
+
 1;
 __END__
 
@@ -103,6 +131,8 @@ Metamod::Utils - utilities for metamod
 =head1 SYNOPSIS
 
   use Metamod::Utils qw(findFiles isNetcdf trim);
+  
+  daemonize('/var/log/logfile','/var/pid/pidfile');
   
   my @files = findFiles('/tmp');
   my @numberFiles = findFiles('/tmp', sub {$_[0] =~ m/^\d/});
@@ -165,6 +195,11 @@ tar detection uses file-extension only for pre-POSIX tar (normally the case)
 =item trim($str)
 
 Remove leading and trailing strings. Return string. Does not change inline.
+
+=item daemonize($logFile, $pidFile)
+
+Make the current process a daemon. Log all STDOUT and STDERR to $logFile, write the
+generated pid to $pidFile.
 
 =back
 
