@@ -260,6 +260,9 @@ $SQL['datestamp'] = 'DS_datestamp';
 // this feature.
 $SQL['deleted'] = 'DS_status';
 
+// the format of the dataset
+$SQL['metadataFormat'] = 'DS_metadataFormat';
+
 // to be able to quickly retrieve the sets to which one item belongs,
 // the setnames are stored for each item
 // the name of the column where you store sets
@@ -319,19 +322,36 @@ function getRecords ($id = '', $from = '', $until = '') {
       $key_conversion = array(
          '!DS_name 1', 'Entry_ID', '','',
          'title', 'Entry_Title', '','Not Available',
-         'PI_name', '*Data_Set_Citation Dataset_Creator', '','',
-         'title', '*Data_Set_Citation Dataset_Title', '','',
-         'institution', '*Data_Set_Citation Dataset_Publisher', '','',
-         'dataref', '*Data_Set_Citation Online_Resource', '','',
+# there is no way to make sure, that PI_name, title institution and dataref belong
+# to the same Data_Set. As long as the data is extracted via digest_nc, we allow only
+# one Data_Set, but when received from other sources (i.e. from DIF), this is not clear.
+# Just hoping for the best. HK 13.05.2009
+         'PI_name', '*Data_Set_Citation Dataset_Creator', '','Not Available',
+         'title', 'Data_Set_Citation Dataset_Title', '','Not Available',
+   		'', 'Data_Set_Citation Dataset_Release_Date', 'Not Available', '',
+   		'', 'Data_Set_Citation Dataset_Release_Place', 'Not Available', '',
+         'institution', 'Data_Set_Citation Dataset_Publisher', '','',
+         '', 'Data_Set_Citation Version', 'Not Available', '',
+         'dataref', 'Data_Set_Citation Online_Resource', '','',
+         '', '*Personnel Role', 'Technical Contact', '',
+         '', 'Personnel First_Name', 'Egil', '',
+         '', 'Personnel Last_Name', 'Støren', '',
+         '', 'Personnel Email', 'Not Available', '',
+         '', 'Personnel Phone', '+4722963000', '',
+         '', 'Personnel Contact_Address Address', "Norwegian Meteorological Institute\nP.O. Box 43\nBlindern",'',
+         '', 'Personnel Contact_Address City', 'Oslo','',
+         '', 'Personnel Contact_Address Postal_Code', 'N-0313','',
+         '', 'Personnel Contact_Address Country', 'Norway','',
          'variable', '*Parameters Category', 'EARTH SCIENCE','Not Available',
          'variable 1', 'Parameters Topic', '','Not Available',
          'variable 2', 'Parameters Term', '','Not Available',
          'variable 3', 'Parameters Variable_Level_1', '','',
          'variable -1', 'Parameters Detailed_Variable', '','',
-         'topiccategory', 'ISO_Topic_Category', '','',
+         'topiccategory 1', 'ISO_Topic_Category', '','',
          'keywords', 'Keyword', '','',
          'datacollection_period 1', 'Temporal_Coverage Start_Date', '','',
          'datacollection_period 2', 'Temporal_Coverage Stop_Date', '','',
+         '', 'Data_Set_Progress', 'In Work', '', # in work, means Not Available here
          'bounding_box 1', 'Spatial_Coverage', '','',
          'area 1', '*Location Location_Category', '','',
          'area 2', 'Location Location_Type', '','',
@@ -339,11 +359,14 @@ function getRecords ($id = '', $from = '', $until = '') {
          'area -1', 'Location Detailed_Location', '','',
          'latitude_resolution 1', 'Data_Resolution Latitude_Resolution', '','',
          'longitude_resolution 1', 'Data_Resolution Longitude_Resolution', '','',
+         '', 'Project Short_Name', 'Not Available', '',
          'distribution_statement', 'Access_Constraints', '','',
+         '', 'Use_Constraints', 'Not Available', '',
+         '', 'Data_Set_Language', 'Not Available', '',
          '', 'Data_Center Data_Center_Name Short_Name', 'NO/MET','',
          '', 'Data_Center Data_Center_Name Long_Name', 'Norwegian Meteorological Institute, Norway','',
          '', 'Data_Center Data_Center_URL', 'http://met.no/','',
-         '', 'Data_Center Personnel Role', 'DATA CENTER CONTACT','',
+         '', 'Data_Center Personnel Role', 'Data Center Contact','',
          '', 'Data_Center Personnel First_Name', 'Egil','',
          '', 'Data_Center Personnel Last_Name', 'Støren','',
          '', 'Data_Center Personnel Phone', '+4722963000','',
@@ -353,6 +376,7 @@ function getRecords ($id = '', $from = '', $until = '') {
          '', 'Data_Center Personnel Contact_Address Country', 'Norway','',
          'references', 'Reference', '','',
          'abstract', 'Summary', '','Not Available',
+         '', '*IDN_Node Short_Name', 'Not Available', '',
          '', 'Metadata_Name', 'CEOS IDN DIF','',
          '', 'Metadata_Version', '9.7','',
          '!DS_creationDate', 'DIF_Creation_Date', '','',
@@ -360,7 +384,7 @@ function getRecords ($id = '', $from = '', $until = '') {
          '', 'Private', 'False','',
       );
    }
-   $query = 'SELECT DS_id, DS_name, DS_status, DS_datestamp, DS_creationDate, DS_ownertag FROM DataSet WHERE ' .
+   $query = 'SELECT DS_id, DS_name, DS_status, DS_datestamp, DS_creationDate, DS_ownertag, DS_metadataFormat FROM DataSet WHERE ' .
             "DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN ('".$mmConfig->getVar('PMH_EXPORT_TAGS')."') ";
    if ($id != '') {
       $query .= "AND DS_name = '$id' ";
@@ -393,6 +417,7 @@ function getRecords ($id = '', $from = '', $until = '') {
             $allresults[$dsid]['DS_datestamp'] = substr($rowarr[3], 0, 10);
             $allresults[$dsid]['DS_creationDate'] = substr($rowarr[4], 0, 10);
             $allresults[$dsid]['DS_ownertag'] = $rowarr[5];
+				$allresults[$dsid]['DS_metadataFormat'] = $rowarr[6];
             $allresults[$dsid]['DS_set'] = '';
          }
          $mtnames = array();

@@ -662,4 +662,26 @@ $areas = array("Arctic Ocean" => "Ocean > Arctic Ocean",
    "Southern Hemipshere" => "Geographic Region > Southern Hemipshere",
    "Denmark Strait Sea" => "Ocean > Arctic Ocean"
 );
+
+$topicCategories = array(
+"farming" => "Farming",
+"biodata" => "Biota",
+"boundaries" => "Boundaries",
+"climatologyMeteorologyAtmosphere" => "Climatology/Meteorology/Atmosphere",
+"economy" => "Economy",
+"elevation" => "Elevation",
+"environment" => "Environment",
+"geoscientificinformation" => "Geoscientific Information",
+"health" => "Health",
+"imageryBaseMapsEarthCover" => "Imagery/Base Maps/Earth Cover",
+"intelligenceMilitary" =>  "Intelligence/Military",
+"inlandWaters" => "Inland Waters",
+"location" => "Location",
+"oceans" => "Oceans",
+"planningCadastre" => "Planning Cadastre",
+"society" => "Society",
+"structure" => "Structure",
+"transportation" => "Transportation",
+"utilitiesCommunications" => "Utilities/Communications"
+);
 ?>

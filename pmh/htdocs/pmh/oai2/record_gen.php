@@ -42,6 +42,25 @@ $prefix = $metadataPrefix;
 $output .= 
 '   <metadata>'."\n";
 
+$gotFile = 0;
+if (($metadataPrefix == 'dif') && ($record[$SQL['metadataFormat']] == 'DIF')) {
+	# read original record from file, don't create from database
+	# $output .= $mmConfig->getVar("WEBRUN_DIRECTORY").'/XML/'.$record[$SQL['identifier']];
+	# TODO: fix the filenames. Some providers might have some strange characters, which get translated by harvester/makesane
+	list($xmdContent, $xmlContent) = mmGetDatasetFileContent($mmConfig->getVar("WEBRUN_DIRECTORY").'/XML/'.$record[$SQL['identifier']]);
+	if (strlen($xmlContent)) {
+		$ds = new MM_ForeignDataset($xmdContent, $xmlContent, 1);
+		$xml =  $ds->getOther_XML();
+		$xmlArray = explode("\n", $xml);
+		$xmlArray = array_slice($xmlArray, 1); # remove first line, <?xml 
+		$output .= implode("\n", $xmlArray);
+		$gotFile = 1;			
+	}
+}
+
+if (!$gotFile) {
+
+
 $output .= metadataHeader($prefix);
 
 $b1 = new buildxml(6,1);
@@ -126,6 +145,8 @@ if (isset($METADATAFORMATS[$prefix]['record_prefix'])) {
 	$output .= ':'.$METADATAFORMATS[$prefix]['record_prefix'];
 }
 $output .= ">\n";
+}
+
 $output .= 
 '   </metadata>'."\n";
 ?>

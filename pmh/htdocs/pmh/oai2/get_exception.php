@@ -28,7 +28,7 @@
 //
 
 function get_exception($mtname, $exception, $value) {
-   include 'var_topic.php'; // Includes arrays $topics and $areas
+   include 'var_topic.php'; // Includes arrays $topics, $areas and $topicCategories
    if ($mtname == 'variable') {
    	  $detail = $value;
       if (array_key_exists($value, $topics)) {
@@ -100,6 +100,13 @@ function get_exception($mtname, $exception, $value) {
       if ($exception == 1) {
          return str_replace('/','_',$value);
       }
+   }
+   elseif ($mtname == "topiccategory") {
+   	if (array_key_exists($value, $topicCategories)) {
+   		return $topicCategories[$value];
+   	} else {
+   		return $value;
+   	}
    }
    return FALSE;
 }

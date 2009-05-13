@@ -40,6 +40,7 @@ $output = '';
 $errors = '';
 
 require_once('../funcs/mmConfig.inc');
+require_once ("../funcs/mmDataset.inc");
 require_once('oai2/oaidp-util.php');
 require_once('oai2/buildxml.php');
 require_once('oai2/get_exception.php');

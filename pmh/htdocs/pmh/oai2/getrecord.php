@@ -122,7 +122,7 @@ foreach ($res as $record) { // Note: Only one record in $res
 
 // return the metadata record itself
 	if (!$status_deleted) 
-		include('oai2/'.$inc_record); 
+		include('oai2/'.$inc_record);
 
 	$output .= 
 '  </record>'."\n"; 
