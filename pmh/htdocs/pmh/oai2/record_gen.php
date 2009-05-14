@@ -45,106 +45,109 @@ $output .=
 $gotFile = 0;
 if (($metadataPrefix == 'dif') && ($record[$SQL['metadataFormat']] == 'DIF')) {
 	# read original record from file, don't create from database
-	# $output .= $mmConfig->getVar("WEBRUN_DIRECTORY").'/XML/'.$record[$SQL['identifier']];
-	# TODO: fix the filenames. Some providers might have some strange characters, which get translated by harvester/makesane
-	list($xmdContent, $xmlContent) = mmGetDatasetFileContent($mmConfig->getVar("WEBRUN_DIRECTORY").'/XML/'.$record[$SQL['identifier']]);
+	# $output .= $mmConfig->getVar("WEBRUN_DIRECTORY").'/XML/'.mmDatasetName2FileName($record[$SQL['identifier']]);
+	$filename = $mmConfig->getVar("WEBRUN_DIRECTORY").'/XML/'.mmDatasetName2FileName($record[$SQL['identifier']]);
+	list($xmdContent, $xmlContent) = mmGetDatasetFileContent($filename);
 	if (strlen($xmlContent)) {
-		$ds = new MM_ForeignDataset($xmdContent, $xmlContent, 1);
-		$xml =  $ds->getOther_XML();
-		$xmlArray = explode("\n", $xml);
-		$xmlArray = array_slice($xmlArray, 1); # remove first line, <?xml 
-		$output .= implode("\n", $xmlArray);
-		$gotFile = 1;			
+		try {
+			$ds = new MM_ForeignDataset($xmdContent, $xmlContent, 1);
+			$xml =  $ds->getOther_XML();
+			$xmlArray = explode("\n", $xml);
+			$xmlArray = array_slice($xmlArray, 1); # remove first line, <?xml 
+			$output .= implode("\n", $xmlArray);
+			$gotFile = 1;
+		} catch (MM_DatasetException $mde) {
+			mm_log(MM_WARNING,"unparsable xml in $filename",__FILE__, __LINE__);
+		}
 	}
 }
 
 if (!$gotFile) {
 
+	$output .= metadataHeader($prefix);
 
-$output .= metadataHeader($prefix);
+	$b1 = new buildxml(6,1);
+	$prev_mtname = '';
+	$keycount = count($key_conversion);
+	for ($i1=0; $i1 <= $keycount; $i1 += 4) {
+   	if ($i1 < $keycount) {
+      	$mtstring = $key_conversion[$i1];
+      	$xmlpath = $key_conversion[$i1+1];
+	      $constval = $key_conversion[$i1+2];
+   	   $defaultval = $key_conversion[$i1+3];
+   	} else {
+      	list($mtstring,$xmlpath,$constval,$defaultval) = array('LAST'.$prev_mtname,'','','');
+   	}
+   	$mtparts = array();
+	   $mtname = '';
+   	if ($mtstring != '') {
+	      $mtparts = explode(" ",$mtstring);
+   	   $mtname = $mtparts[0];
+      	if (substr($mtname,0,1) == '!') {
+	         $mtname = substr($mtname,1);
+   	   }
+   	}
+   	if ($mtname != $prev_mtname && $prev_mtname != '') {
+      	if (array_key_exists($prev_mtname, $record)) {
+         	if (is_array($record[$prev_mtname])) {
+            	$valueset = $record[$prev_mtname];
+	         } else {
+   	         $valueset = array($record[$prev_mtname]);
+      	   }
+	      } else {
+   	      $valueset = array("USE_DEFAULT");
+      	}
+	      foreach ($valueset as $value) {
+   	      $outlist = array();
+      	   foreach ($prev_keys as $keyrecord) {
+         	   list($excpt,$path,$const,$dfltval) = $keyrecord;
+            	if ($const != '') {
+               	$outlist[] = array($path,htmlspecialchars($const));
+	            } else if ($value == "USE_DEFAULT") {
+   	            if ($dfltval != '') {
+      	            $outlist[] = array($path,$dfltval);
+         	      }
+            	} else if ($excpt != 0) {
+               	$val = get_exception($prev_mtname,$excpt,$value);
+	               if ($val !== FALSE) {
+   	               $outlist[] = array($path,$val);
+      	         } else {
+         	         if ($dfltval != '') {
+            	         $outlist[] = array($path,$dfltval);
+               	   }
+	               }
+   	         } else {
+      	         $outlist[] = array($path,htmlspecialchars($value));
+         	   }
+	         }
+   	      reset($outlist);
+      	   foreach ($outlist as $tupple) {
+         	   $b1->add($tupple[0],xmlstr($tupple[1]));
+	         }
+   	   }
+   	}
+	   if ($mtname == '') {
+   	   $b1->add($xmlpath,xmlstr($constval));
+   	}
+	   if ($mtname != $prev_mtname) {
+   	   $prev_keys = array();
+	   }
+   	$exception = 0;
+	   if (count($mtparts) > 1) {
+   	   $exception = $mtparts[1];
+	   }
+   	$prev_keys[] = array($exception,$xmlpath,$constval,$defaultval);
+	   $prev_mtname = $mtname;
+	}
+	$output .= $b1->get();
 
-$b1 = new buildxml(6,1);
-$prev_mtname = '';
-$keycount = count($key_conversion);
-for ($i1=0; $i1 <= $keycount; $i1 += 4) {
-   if ($i1 < $keycount) {
-      $mtstring = $key_conversion[$i1];
-      $xmlpath = $key_conversion[$i1+1];
-      $constval = $key_conversion[$i1+2];
-      $defaultval = $key_conversion[$i1+3];
-   } else {
-      list($mtstring,$xmlpath,$constval,$defaultval) = array('LAST'.$prev_mtname,'','','');
-   }
-   $mtparts = array();
-   $mtname = '';
-   if ($mtstring != '') {
-      $mtparts = explode(" ",$mtstring);
-      $mtname = $mtparts[0];
-      if (substr($mtname,0,1) == '!') {
-         $mtname = substr($mtname,1);
-      }
-   }
-   if ($mtname != $prev_mtname && $prev_mtname != '') {
-      if (array_key_exists($prev_mtname, $record)) {
-         if (is_array($record[$prev_mtname])) {
-            $valueset = $record[$prev_mtname];
-         } else {
-            $valueset = array($record[$prev_mtname]);
-         }
-      } else {
-         $valueset = array("USE_DEFAULT");
-      }
-      foreach ($valueset as $value) {
-         $outlist = array();
-         foreach ($prev_keys as $keyrecord) {
-            list($excpt,$path,$const,$dfltval) = $keyrecord;
-            if ($const != '') {
-               $outlist[] = array($path,htmlspecialchars($const));
-            } else if ($value == "USE_DEFAULT") {
-               if ($dfltval != '') {
-                  $outlist[] = array($path,$dfltval);
-               }
-            } else if ($excpt != 0) {
-               $val = get_exception($prev_mtname,$excpt,$value);
-               if ($val !== FALSE) {
-                  $outlist[] = array($path,$val);
-               } else {
-                  if ($dfltval != '') {
-                     $outlist[] = array($path,$dfltval);
-                  }
-               }
-            } else {
-               $outlist[] = array($path,htmlspecialchars($value));
-            }
-         }
-         reset($outlist);
-         foreach ($outlist as $tupple) {
-            $b1->add($tupple[0],xmlstr($tupple[1]));
-         }
-      }
-   }
-   if ($mtname == '') {
-      $b1->add($xmlpath,xmlstr($constval));
-   }
-   if ($mtname != $prev_mtname) {
-      $prev_keys = array();
-   }
-   $exception = 0;
-   if (count($mtparts) > 1) {
-      $exception = $mtparts[1];
-   }
-   $prev_keys[] = array($exception,$xmlpath,$constval,$defaultval);
-   $prev_mtname = $mtname;
-}
-$output .= $b1->get();
-
-// Here, no changes need to be done
-$output .=           
-'     </'.$METADATAFORMATS[$prefix]['metadataPrefix'];
-if (isset($METADATAFORMATS[$prefix]['record_prefix'])) {
-	$output .= ':'.$METADATAFORMATS[$prefix]['record_prefix'];
-}
-$output .= ">\n";
+	// Here, no changes need to be done
+	$output .=           
+	'     </'.$METADATAFORMATS[$prefix]['metadataPrefix'];
+	if (isset($METADATAFORMATS[$prefix]['record_prefix'])) {
+		$output .= ':'.$METADATAFORMATS[$prefix]['record_prefix'];
+	}
+	$output .= ">\n";
 }
 
 $output .= 

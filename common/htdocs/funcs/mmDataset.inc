@@ -46,6 +46,23 @@ function mmGetBasename($file) {
 }
 
 /**
+ * convert a dataset-name, i.e. DAMOC/my-d&!ataset to a filename as done in harvester.pl/makesane
+ * @param $datasetName name as returned by MM_dataset->getInfo()[name]
+ * @return filename relative to WEBRUN/XML directory
+ */
+function mmDatasetName2FileName($datasetName) {
+	$specials = array( ';','?',':','@','&','=','+','$',',','-','!','~','*','(',')','%'); #without / since this is used in dataset
+	foreach ( $specials as $special ) {
+		$convert[$special] = sprintf("-%02x", ord($special));
+	}
+	$filename = "";
+	foreach (str_split($datasetName) as $char) {
+		$filename .= array_key_exists($char, $convert) ? $convert[$char] : $char;
+	}
+	return $filename;
+}
+
+/**
  * get a dataset-header initialized with
  * actual datestamp and creationDate and
  * metadataFormat = ""
