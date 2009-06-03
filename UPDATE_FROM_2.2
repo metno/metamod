@@ -1,0 +1,23 @@
+UPDATING FROM 2.2 to 2.3 (current trunk)
+========================================
+
+The current trunk add full-text search capabilities to Metamod. This
+requires some additional steps to update from an older version:
+
+a) Install the postgres ts2search extension (postgresql-contrib package)
+   This step is only required for postgres < 8.3
+
+b) Add the location of the full path of tsearch2.sql to master_config.txt
+
+c) To use the fulltext-search, add the keyword 'FullText' to the
+   SEARCH_CATEGORY_SEQUENCE in master_config.txt, i.e.
+   SEARCH_CATEGORY_SEQUENCE = 4,1,7,2,9,8,FullText
+   
+
+d) If you want to keep the existing database, that is, you don't want to
+   reinstall all datasets, you need to do the following:
+   i) install the tsearch2.sql script
+   ii) install the update2.2To2.3.sql script
+   iii) create the full-text index for the existing data with
+        makeDatabaseFulltextAware_2.2-2.3.pl
+        

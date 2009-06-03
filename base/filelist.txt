@@ -3,6 +3,7 @@ init/createdb.sh
 scripts/createusers.sh
 =scripts/import_searchdata.pl
 =scripts/import_dataset.pl
+=scripts/makeDatabaseFulltextAware_2.2-2.3.pl
 =htdocs/adm/highlight.html
 =htdocs/adm/highlight.php
 =htdocs/adm/gettables.php

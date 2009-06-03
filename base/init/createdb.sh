@@ -6,6 +6,9 @@ DROPDB=[==DROPDB==]
 $DROPDB -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] $DBNAME
 $CREATEDB -E UTF-8 -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] $DBNAME
 echo "----------------- Database $DBNAME created ------------------"
+echo "----------- Trying ot install Fulltext-search: tsearch2.sql --"
+$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME << [==PG_TSEARCH2_SCRIPT==]
+echo "----------------- Database Fulltext-search prepared ---------"
 $PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<EOF
 
 CREATE TABLE DataSet (
@@ -106,9 +109,31 @@ CREATE TABLE Metadata (
    MD_id              SERIAL,
    MT_name            VARCHAR(99)   NOT NULL REFERENCES MetadataType,
    MD_content         VARCHAR(99999) NOT NULL,
+   MD_content_vector  TSVECTOR, # full-text vector
    PRIMARY KEY (MD_id)
 );
 GRANT SELECT ON Metadata TO "[==PG_WEB_USER==]";
+
+# create the full text index
+CREATE INDEX MD_content_vector_idx 
+ON Metadata 
+USING gist(MD_content_vector);
+
+CREATE FUNCTION update_MD_content_fulltext() RETURNS trigger AS $$
+    BEGIN
+        -- Check that name is given (error on delete!)
+        IF NEW.MT_name IS NULL THEN
+            RAISE EXCEPTION 'MT_name cannot be null';
+        END IF;
+
+        -- Remember who changed the payroll when
+        NEW.MD_content_vector := to_tsvector(NEW.MD_content);
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_MD_content_fulltext BEFORE INSERT OR UPDATE ON Metadata
+    FOR EACH ROW EXECUTE PROCEDURE update_MD_content_fulltext();
 
 CREATE TABLE DS_Has_MD (
    DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,

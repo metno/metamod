@@ -192,7 +192,7 @@ if ($mmError == 0) {
        $found_file = false;
        if (strlen($fname) > 0) {
           $found_file = strpos(
-             "bkdone.php gadone.php hkdone.php nidone.php " .
+             "bkdone.php gadone.php hkdone.php nidone.php ftdone.php ftremove.php " .
              "niremove.php hkclear.php garemove.php bkclear.php",
              $fname
           );
@@ -204,6 +204,7 @@ if ($mmError == 0) {
           }
        }
        if (file_exists($fname)) {
+	       echo "include-file $fname $found_file";
           include $fname;
        }
        if (in_array($mmButtonName, array('show','cross','help'))) {

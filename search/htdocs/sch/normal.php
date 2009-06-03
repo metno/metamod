@@ -105,18 +105,22 @@
                   reset($mmCategorytype);
                   $catSequence = split(',', $mmConfig->getVar('SEARCH_CATEGORY_SEQUENCE'));
                   foreach ($catSequence as $category) {
-                     $type = $mmCategorytype[$category];
-                     if ($type == 1) {
-                        if (mmGetCategoryFncValue($category,"status") != "hidden") {
-                           mmShowSelectedBK($category);
-                        }
-                     } else if ($type == 2) {
-                        mmShowSelectedHK($category);
-                     } else if ($type == 3) {
-                        mmShowSelectedNI($category);
-                     } else if ($type == 4) {
-                        mmShowSelectedGA($category);
-                     }
+							if ($category == 'FullText') {
+								mmShowSelectedFT();
+							} else {
+	                     $type = $mmCategorytype[$category];
+   	                  if ($type == 1) {
+      	                  if (mmGetCategoryFncValue($category,"status") != "hidden") {
+         	                  mmShowSelectedBK($category);
+            	            }
+               	      } else if ($type == 2) {
+                  	      mmShowSelectedHK($category);
+                     	} else if ($type == 3) {
+	                        mmShowSelectedNI($category);
+   	                  } else if ($type == 4) {
+      	                  mmShowSelectedGA($category);
+         	            }
+							}
                   }
                }
             ?>

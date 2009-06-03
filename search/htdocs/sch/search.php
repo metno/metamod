@@ -86,7 +86,10 @@
                        "ga"       => array("",              "ga.php",          "FORM"),
                        "gaget"    => array("gaupdate.php",  "ga.php",          "FORM"),
                        "garemove" => array("garemove.php",  "current",         "NOFORM"),
-                       "gadone"   => array("gadone.php",    "current",         "NOFORM")
+                       "gadone"   => array("gadone.php",    "current",         "NOFORM"),
+                       "ft"       => array("",              "ft.php",          "FORM"),
+                       "ftdone"   => array("ftdone.php",    "current",         "NOFORM"),
+                       "ftremove" => array("ftremove.php",  "current",         "NOFORM")
                      );
 #
 #  Initialize the mmColumns array:

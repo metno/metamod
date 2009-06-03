@@ -35,6 +35,8 @@ class SessionState {
    var $sitems;             // Array using indices of the form: "category,detail"
                             // where category is a key in the SearchCategory table,
                             // and detail is dependent on the category type.
+                            
+   var $fullTextQuery;      // fulltext query string
 
    var $state;              // Text string describing the current application
                             // state, i.e. which screen is currently shown to
@@ -390,6 +392,16 @@ function mmShowSelectedNI($category) {
    foreach (mmGetSelectedNI($category,$numtype) as $nitext) {
       echo '<p class="indented">' . $nitext . '</p>' . "\n";
    }
+}
+
+function mmShowSelectedFT() {
+	// show the selected full-text searchstring
+	global $mmSessionState;
+	$name = 'FULLTEXT SEARCH';
+	echo mmAnchor("search.php?mmSubmitButton=ft_0",$name, "search") . "\n";
+	if (strlen($mmSessionState->fullTextQuery)) {
+		echo '<p class="indented">'. $mmSessionState->fullTextQuery . "</p>\n";
+	}
 }
 
 function mmShowSelectedGA($category) {
