@@ -136,7 +136,7 @@ CREATE FUNCTION update_MD_content_fulltext() RETURNS trigger AS $$
         END IF;
 
         -- add the full-text vector
-        NEW.MD_content_vector := to_tsvector(NEW.MD_content);
+        NEW.MD_content_vector := to_tsvector('default',NEW.MD_content);
         RETURN NEW;
     END;
 $$ LANGUAGE plpgsql;
