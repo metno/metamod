@@ -11,6 +11,15 @@ $PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME < [==PG_
 echo "----------------- Database Fulltext-search prepared ---------"
 $PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<EOF
 
+-- allow plpgsql
+CREATE TRUSTED LANGUAGE plpgsql;
+
+-- allow full-text search
+GRANT SELECT ON pg_ts_cfg TO "[==PG_WEB_USER==]";
+GRANT SELECT ON pg_ts_cfgmap TO "[==PG_WEB_USER==]";
+GRANT SELECT ON pg_ts_parser TO "[==PG_WEB_USER==]";
+GRANT SELECT ON pg_ts_dict TO "[==PG_WEB_USER==]";
+
 CREATE TABLE DataSet (
    DS_id              SERIAL,
    DS_name            VARCHAR(9999) UNIQUE NOT NULL,
@@ -114,7 +123,7 @@ CREATE TABLE Metadata (
 );
 GRANT SELECT ON Metadata TO "[==PG_WEB_USER==]";
 
-# create the full text index
+-- create the full text index
 CREATE INDEX MD_content_vector_idx 
 ON Metadata 
 USING gist(MD_content_vector);
@@ -126,7 +135,7 @@ CREATE FUNCTION update_MD_content_fulltext() RETURNS trigger AS $$
             RAISE EXCEPTION 'MT_name cannot be null';
         END IF;
 
-        -- Remember who changed the payroll when
+        -- add the full-text vector
         NEW.MD_content_vector := to_tsvector(NEW.MD_content);
         RETURN NEW;
     END;

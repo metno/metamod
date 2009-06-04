@@ -1,5 +1,6 @@
 init/create_and_load_all.sh
 init/createdb.sh
+init/update2.2To2.3.sql
 scripts/createusers.sh
 =scripts/import_searchdata.pl
 =scripts/import_dataset.pl

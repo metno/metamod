@@ -49,7 +49,7 @@
 #-----------------------------------------------------------------------------
 #
    ini_set("track_errors",1);
-   $logfile = mmGetRunPath() . '/phplog';
+   $logfile = $mmConfig->getVar('PHPLOGFILE');
    ini_set("error_log",$logfile);
    ini_set("log_errors",1);
    ini_set("display_errors",1);
