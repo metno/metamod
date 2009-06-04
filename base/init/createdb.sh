@@ -9,7 +9,7 @@ echo "----------------- Database $DBNAME created ------------------"
 echo "----------- Trying ot install Fulltext-search: tsearch2.sql --"
 $PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME < [==PG_TSEARCH2_SCRIPT==]
 echo "----------------- Database Fulltext-search prepared ---------"
-$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<EOF
+$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<'EOF'
 
 -- allow plpgsql
 CREATE TRUSTED LANGUAGE plpgsql;
