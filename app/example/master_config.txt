@@ -47,7 +47,7 @@ PG_ADMIN_USER = admin
 PG_WEB_USER = webuser
 
 # the location of the initialization sql-script for the full-text facilities
-PG_TSEARCH2_SCRIPT = /usr/local/src/postgresql-8.3.5/contrib/tsearch2/tsearch2.sql
+PG_TSEARCH2_SCRIPT = /usr/share/postgresql/8.1/contrib/tsearch2.sql
 
 # PG_CONNECTSTRING_* are strings used to indicate hostname and port for
 # connecting to the PostgreSQL database. They are found in various

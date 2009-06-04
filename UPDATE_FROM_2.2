@@ -7,7 +7,8 @@ requires some additional steps to update from an older version:
 a) Install the postgres ts2search extension (postgresql-contrib package)
    This step is only required for postgres < 8.3
 
-b) Add the location of the full path of tsearch2.sql to master_config.txt
+b) Add the location of the full path of tsearch2.sql to master_config.txt as
+   PG_TSEARCH2_SCRIPT = /usr/share/postgresql/8.1/contrib/tsearch2.sql
 
 c) To use the fulltext-search, add the keyword 'FullText' to the
    SEARCH_CATEGORY_SEQUENCE in master_config.txt, i.e.
