@@ -109,7 +109,7 @@ CREATE TABLE Metadata (
    MD_id              SERIAL,
    MT_name            VARCHAR(99)   NOT NULL REFERENCES MetadataType,
    MD_content         VARCHAR(99999) NOT NULL,
-   MD_content_vector  TSVECTOR, # full-text vector
+   MD_content_vector  TSVECTOR, -- full-text vector
    PRIMARY KEY (MD_id)
 );
 GRANT SELECT ON Metadata TO "[==PG_WEB_USER==]";

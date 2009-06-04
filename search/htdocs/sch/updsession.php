@@ -204,7 +204,6 @@ if ($mmError == 0) {
           }
        }
        if (file_exists($fname)) {
-	       echo "include-file $fname $found_file";
           include $fname;
        }
        if (in_array($mmButtonName, array('show','cross','help'))) {
