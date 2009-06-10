@@ -143,6 +143,9 @@ SEARCH_APP_PRESENTATION_HTML =
 # Max number of columns allowed in the search result page:
 SEARCH_APP_MAX_COLUMNS = 5
 
+# Max number of rows displayed for second level datasets with same parent:
+SEARCH_APP_MAXROWS_SCNDLEV = 50
+
 # Set of Metadata types to be shown as columns in search results.
 # Each line below comprise at least two items (items with several words must be
 # enclosed in apostophes). Item1 is MT_name in the Metadatatype database table.
