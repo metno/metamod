@@ -103,7 +103,7 @@ $ds_ids = implode(",",$ds_arr);
 if ($mmError == 0) {
    if (strlen($ds_ids) > 0) {
       if (strlen($mtnames) > 0) {
-         $sqlsentence = "SELECT Metadata.MD_content, Metadata.MT_name, Dataset.DS_id \n" .
+         $sqlsentence = "SELECT Metadata.MD_content, Metadata.MT_name, Dataset.DS_id, Dataset.DS_name \n" .
             "FROM Metadata, Dataset, DS_Has_MD \n" .
             "WHERE Dataset.DS_id in (" . $ds_ids . ") AND\n" .
             "Metadata.MT_name in (" . $mtnames . ") AND \n" .
@@ -209,7 +209,7 @@ if ($mmError == 0) {
                if ($i1 < $num) {
                   $current_ds = $new_ds;
                   if ($use_only_ds == 0) {
-                     $s1 = displayval($rowarr[1],$rowarr[0]);
+                     $s1 = displayval($rowarr[1],$rowarr[0],$rowarr[3]);
                      $mdcontent[$rowarr[1]] .= "<p>" . $s1 . "</p>\n";
                   }
                }

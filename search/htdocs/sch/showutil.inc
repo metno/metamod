@@ -30,7 +30,7 @@
 ?>
 <?php
 include_once 'gautil.inc';
-function displayval($mtname, $value) {
+function displayval($mtname, $value, $dsName) {
    $s1 = $value;
    $jpos = strpos($s1,' > HIDDEN');
    if ($jpos !== false) {
@@ -39,7 +39,7 @@ function displayval($mtname, $value) {
    if ($mtname == "dataref" && substr($s1,0,7) == 'http://') {
       if (preg_match (':/([^/]+)(/?)$:',$s1,$a1)) {
          $nameshown = $a1[1];
-         $s1 = '<a href="' . $s1 . '">' . $nameshown . '</a>';
+         $s1 = '<a href="' . $s1 . '"><b>' . $nameshown . '</b></a>' . " <a href=\"xmlShow.php?dsName=$dsName\" target=\"_new\">Show xml</a> ";
       }
    }
    return $s1;
@@ -103,7 +103,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart) {
    }
    if (count($dsarr) > 0) {
       $dslist = $parentds . ',' . implode(",",$dsarr);
-      $sqlsentence = "SELECT Metadata.MD_content, Metadata.MT_name, Dataset.DS_id \n" .
+      $sqlsentence = "SELECT Metadata.MD_content, Metadata.MT_name, Dataset.DS_id, Dataset.DS_name \n" .
          "FROM Metadata, Dataset, DS_Has_MD \n" .
          "WHERE Dataset.DS_id IN (" . $dslist . ") AND\n" .
          "Metadata.MD_id = DS_Has_MD.MD_id and Dataset.DS_id = DS_Has_MD.DS_id \n" .
@@ -285,9 +285,9 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart) {
             $ifirst = $dsidsfound[$dsidsrows[$irow]];
             $ilast = $dsidslast[$dsidsrows[$irow]];
             for ($i1=$ifirst; $i1 <= $ilast;$i1++) {
-               list($mdcontent,$mtname,$dsid) = pg_fetch_row($result,$i1);
+               list($mdcontent,$mtname,$dsid,$dsname) = pg_fetch_row($result,$i1);
                $jindex = $indexmtnames[$mtname];
-               $s1 = displayval($mtname,$mdcontent);
+               $s1 = displayval($mtname,$mdcontent,$dsname);
                $mdcontentall[$jindex] .= "<p>" . $s1 . "</p>\n";
             }
             $line = "<tr><td>&nbsp;</td>\n";
