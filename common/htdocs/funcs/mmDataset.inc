@@ -111,7 +111,7 @@ function mmGetDatasetFileContent($fileXMD, $fileXML = "") {
 	if ($xmlfh) {
 		fclose($xmlfh); // close and unlock mm2
 	}
-	if ($xmlfh) {
+	if ($xmdfh) {
 		fclose($xmdfh); // fclose and unlock ds
 	}
 
