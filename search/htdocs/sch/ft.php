@@ -43,11 +43,11 @@
    <tr><td>
 <?php
 echo <<<END_TEXT
-   <p>Enter full-text search query. More about syntax comes later...
+   <p>Enter a list of search words separated by spaces. 
 END_TEXT;
 echo <<<END_TEXT
    Then, click the "OK" button.</p>
-   <p>Only data references matching the full-text query will be selected.
+   <p>Only data references matching all the entered search-terms will be selected.
    To accept all data-references, use an empty string, or click
    "Remove" button.
    </p>

@@ -397,7 +397,7 @@ function mmShowSelectedNI($category) {
 function mmShowSelectedFT() {
 	// show the selected full-text searchstring
 	global $mmSessionState;
-	$name = 'FULLTEXT SEARCH';
+	$name = 'Search';
 	echo mmAnchor("search.php?mmSubmitButton=ft_0",$name, "search") . "\n";
 	if (strlen($mmSessionState->fullTextQuery)) {
 		echo '<p class="indented">'. $mmSessionState->fullTextQuery . "</p>\n";
