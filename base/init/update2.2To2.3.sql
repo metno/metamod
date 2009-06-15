@@ -33,7 +33,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE FUNCTION to_mmDefault_tsquery(IN text) RETURNS tsquery AS $$
     BEGIN
-        RETURN plainto_tsquery('[==PG_TSEARCH_LANGUAGE==]', $1);
+        RETURN to_tsquery('[==PG_TSEARCH_LANGUAGE==]', $1);
     END;
 $$ LANGUAGE plpgsql;
 

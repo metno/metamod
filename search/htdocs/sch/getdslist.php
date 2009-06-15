@@ -29,6 +29,14 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
+function formatEscapeSearchString($str) {
+	$items = array();
+	foreach ( explode(' ', $str) as $item ) {
+		$items[] = pg_escape_string($item);
+	}
+	return implode('&', $items);
+}
+
 function getdslist() {
    global $mmError, $mmDbConnection, $mmCategorytype, $mmSessionState, $mmDebug, $mmConfig;
 #
@@ -112,7 +120,7 @@ function getdslist() {
    }
    if (strlen($mmSessionState->fullTextQuery) > 0) {
    	// TODO have syntax for compount query, currently only single words
-   	$ftQuery = pg_escape_string($mmSessionState->fullTextQuery);
+   	$ftQuery = formatEscapeSearchString($mmSessionState->fullTextQuery);
       if ($j1 > 0) {
          $sqlpart .= "      AND \n";
       }
