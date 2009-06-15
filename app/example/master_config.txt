@@ -49,6 +49,10 @@ PG_WEB_USER = webuser
 # the location of the initialization sql-script for the full-text facilities
 PG_TSEARCH2_SCRIPT = /usr/share/postgresql/8.1/contrib/tsearch2.sql
 
+# the language to use for the data for full-text indexing, pre-installed are 'default' and 'simple' (pg <= 8.2); 'english' and 'simple' (pg >= 8.3)
+# see 'select * from pg_ts_config;'
+PG_TSEARCH_LANGUAGE = english 
+
 # PG_CONNECTSTRING_* are strings used to indicate hostname and port for
 # connecting to the PostgreSQL database. They are found in various
 # commands and script functions. These strings should be empty if hostname and

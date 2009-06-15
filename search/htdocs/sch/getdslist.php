@@ -122,7 +122,7 @@ function getdslist() {
        SELECT DISTINCT(DataSet.DS_id) FROM DS_Has_MD, Metadata, DataSet
         WHERE DataSet.DS_id  = DS_Has_MD.DS_id
           AND Metadata.MD_id = DS_HAS_MD.MD_id
-          AND MD_content_vector @@ to_tsquery('default','$ftQuery')
+          AND MD_content_vector @@ to_mmDefault_tsquery('$ftQuery')
       )
       
 EOFT;

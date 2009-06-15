@@ -10,12 +10,16 @@ a) Install the postgres ts2search extension (postgresql-contrib package)
 b) Add the location of the full path of tsearch2.sql to master_config.txt as
    PG_TSEARCH2_SCRIPT = /usr/share/postgresql/8.1/contrib/tsearch2.sql
 
-c) To use the fulltext-search, add the keyword 'FullText' to the
+c) Add the used language for the full-text index (e.g. default for pg <= 8.2 and english for pg >= 8.3)
+   PG_TSEARCH_LANGUAGE = 'english' 
+
+
+d) To use the fulltext-search, add the keyword 'FullText' to the
    SEARCH_CATEGORY_SEQUENCE in master_config.txt, i.e.
    SEARCH_CATEGORY_SEQUENCE = 4,1,7,2,9,8,FullText
    
 
-d) If you want to keep the existing database, that is, you don't want to
+e) If you want to keep the existing database, that is, you don't want to
    reinstall all datasets, you need to do the following:
    i) install the tsearch2.sql script
    ii) install the update2.2To2.3.sql script

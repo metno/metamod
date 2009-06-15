@@ -11,12 +11,24 @@ $PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME < [==PG_
 echo "----------------- Database Fulltext-search prepared ---------"
 $PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<'EOF'
 
+-- drop eventuelly existing stuff
+DROP TRIGGER IF EXISTS update_MD_content_fulltext ON Metadata;
+DROP FUNCTION IF EXISTS update_MD_content_fulltext();
+DROP FUNCTION IF EXISTS to_mmDefault_tsvector(text);
+DROP FUNCTION IF EXISTS to_mmDefault_tsquery(text);
+DROP LANGUAGE IF EXISTS plpgsql;
+
 -- allow plpgsql
 CREATE TRUSTED LANGUAGE plpgsql;
 
 -- allow full-text search
-GRANT SELECT ON pg_ts_cfg TO "[==PG_WEB_USER==]";
+-- pg < 8.2
+GRANT SELECT ON pg_ts_cfg TO "[==PG_WEB_USER==]"; 
 GRANT SELECT ON pg_ts_cfgmap TO "[==PG_WEB_USER==]";
+-- pg >= 8.3
+GRANT SELECT ON pg_ts_config TO "[==PG_WEB_USER==]"; 
+GRANT SELECT ON pg_ts_config_map TO "[==PG_WEB_USER==]";
+-- all pg
 GRANT SELECT ON pg_ts_parser TO "[==PG_WEB_USER==]";
 GRANT SELECT ON pg_ts_dict TO "[==PG_WEB_USER==]";
 
@@ -128,6 +140,18 @@ CREATE INDEX MD_content_vector_idx
 ON Metadata 
 USING gist(MD_content_vector);
 
+CREATE FUNCTION to_mmDefault_tsvector(IN text) RETURNS tsvector AS $$
+    BEGIN
+        RETURN to_tsvector('[==PG_TSEARCH_LANGUAGE==]', $1);
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION to_mmDefault_tsquery(IN text) RETURNS tsquery AS $$
+    BEGIN
+        RETURN to_tsquery('[==PG_TSEARCH_LANGUAGE==]', $1);
+    END;
+$$ LANGUAGE plpgsql;
+
 CREATE FUNCTION update_MD_content_fulltext() RETURNS trigger AS $$
     BEGIN
         -- Check that name is given (error on delete!)
@@ -136,7 +160,7 @@ CREATE FUNCTION update_MD_content_fulltext() RETURNS trigger AS $$
         END IF;
 
         -- add the full-text vector
-        NEW.MD_content_vector := to_tsvector('default',NEW.MD_content);
+        NEW.MD_content_vector := to_mmDefault_tsvector(NEW.MD_content);
         RETURN NEW;
     END;
 $$ LANGUAGE plpgsql;
