@@ -113,8 +113,8 @@ if ($mmError == 0) {
        $mmSessionId = $timeofday['usec'];
        $AccessTime = $timeofday['sec'];
        $s1 = serialize($mmSessionState);
-       $sqlsentence = "INSERT INTO Sessions VALUES ('$mmSessionId',$AccessTime,'$s1')";
-       $result = pg_query ($mmDbConnection, $sqlsentence);
+       $sqlsentence = 'INSERT INTO Sessions VALUES ($1,$2,$3)';
+       $result = pg_query_params($mmDbConnection, $sqlsentence, array($mmSessionId, $AccessTime, $s1));
        if (!$result) {
           mmPutLog(__FILE__ . __LINE__ . " Could not $sqlsentence");
           $mmErrorMessage = $msg_start . "Database error";
@@ -135,7 +135,11 @@ if ($mmError == 0) {
              $mmError = 1;
           } else {
              $rowarr = pg_fetch_row($result, 0);
-	     $mmSessionState = unserialize($rowarr[0]);
+	     		 $mmSessionState = unserialize($rowarr[0]);
+	     		 if ($mmSessionState == false) {
+	     		 	$mmErrorMessage = $msg_start . "error unserializing session";
+	     		 	$mmError = 1;
+	     		 }
           }
        }
     }
@@ -223,9 +227,9 @@ if ($mmError == 0) {
        $AccessTime = $timeofday['sec'];
        $s1 = serialize($mmSessionState);
        $sqlsentence = 
-          "UPDATE Sessions SET sessionstate = '$s1', accesstime = $AccessTime \n" .
-          "WHERE sessionid = '$mmSessionId'";
-       $result = pg_query ($mmDbConnection, $sqlsentence);
+          'UPDATE Sessions SET sessionstate = $1, accesstime = $2 ' .
+          'WHERE sessionid = $3';
+       $result = pg_query_params($mmDbConnection, $sqlsentence, array($s1, $AccessTime, $mmSessionId));
        if (!$result) {
           mmPutLog(__FILE__ . __LINE__ . " Could not $sqlsentence");
           $mmErrorMessage = $msg_start . "Database error";

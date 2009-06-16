@@ -56,7 +56,7 @@ END_TEXT;
    </td></tr>
 <?php
 echo "<tr><td>\n";
-echo  'Query-String: <input type="text" size="12" name="fullTextQuery" value="' . $mmSessionState->fullTextQuery . '" />' ."\n";
+echo  'Query-String: <input type="text" size="12" name="fullTextQuery" value="' . htmlspecialchars($mmSessionState->fullTextQuery) . '" />' ."\n";
 echo "</td></tr>\n";
 ?>
 </table>

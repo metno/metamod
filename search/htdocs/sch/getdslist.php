@@ -29,12 +29,34 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
-function formatEscapeSearchString($str) {
-	$items = array();
-	foreach ( explode(' ', $str) as $item ) {
-		$items[] = pg_escape_string($item);
+function formatSearchString($str) {
+	return implode('&', explode(' ', $str));
+}
+/**
+ * Add a parameter to the sql parameter list
+ * @param $param the parameter to be added
+ * @param $paramArray The array this parameter will be added to. Use this array in pg_query_params
+ * @return The parameter name to be used in the query, i.e. $1 $2 $3,...
+ */
+function addSQLParameter($param, &$paramArray) {
+	$paramArray[] = $param;
+	return '$'.count($paramArray);
+}
+
+/**
+ * Convert a list of input parameters to a SQL sentence as ($1,$2,$3) adding
+ * all parameters to $paramArray
+ * 
+ * @param $inputParams the paramters as array
+ * @param $paramArray the array to be given to pg_query_params
+ * @return the SQL IN list, as ($4,$5,$6)
+ */
+function createSQL_IN_list($inputParams, &$paramArray) {
+	$sqlParams = array();
+	foreach ($inputParams as $item) {
+		$sqlParams[] = addSQLParameter($item, $paramArray);
 	}
-	return implode('&', $items);
+	return '('. implode(',', $sqlParams) .')';
 }
 
 function getdslist() {
@@ -56,8 +78,10 @@ function getdslist() {
 #                  criteria (apart from the map search criteria).
 #
    $sqlpart = "";
+   $sqlPartParams = array();
    $sql_gapart = "";
    $j1 = 0;
+   
 #
 # foreach value in an array
 #
@@ -95,9 +119,9 @@ function getdslist() {
          if ($j1 > 0) {
             $sqlpart .= "      AND \n";
          }
-         $sqlpart .= "      DS_id IN (" .
-            " SELECT DISTINCT DS_id FROM BK_describes_DS WHERE BK_id IN (" .
-            implode(', ',$bkids) . ") )\n";
+         $sqlpart .= '      DS_id IN (' .
+            ' SELECT DISTINCT DS_id FROM BK_describes_DS WHERE BK_id IN ' .
+            createSQL_IN_List($bkids, $sqlPartParams) . " )\n";
          $j1++;
       }
       $s1 = $category . ',NI';
@@ -106,10 +130,11 @@ function getdslist() {
             $sqlpart .= "      AND \n";
          }
          $bkids = array_keys($mmSessionState->sitems[$s1]);
-         $sqlpart .= "      DS_id IN (" .
-            " SELECT DISTINCT DS_id FROM NumberItem WHERE SC_id = " .
-            $category . " AND NI_from <= " . $mmSessionState->sitems[$s1][1] . " AND " .
-            " NI_to >= " . $mmSessionState->sitems[$s1][0] . ")\n";
+         $sqlpart .= '      DS_id IN (' .
+            ' SELECT DISTINCT DS_id FROM NumberItem WHERE SC_id = ' .
+            addSQLParameter($category,$sqlPartParams) . 
+            ' AND NI_from <= ' . addSQLParameter($mmSessionState->sitems[$s1][1], $sqlPartParams) . " AND " .
+            " NI_to >= " . addSQLParameter($mmSessionState->sitems[$s1][0], $sqlPartParams) . ")\n";
          $j1++;
       }
       $s1 = $category . ',GA';
@@ -119,22 +144,17 @@ function getdslist() {
       }
    }
    if (strlen($mmSessionState->fullTextQuery) > 0) {
-   	// TODO have syntax for compount query, currently only single words
-   	$ftQuery = formatEscapeSearchString($mmSessionState->fullTextQuery);
       if ($j1 > 0) {
          $sqlpart .= "      AND \n";
       }
 		$j1++;
-   	$sqlpart .=  <<<EOFT
-      DS_id IN (
+		$partParam = addSQLParameter(formatSearchString($mmSessionState->fullTextQuery), $sqlPartParams); 
+   	$sqlpart .= '      DS_id IN (
        SELECT DISTINCT(DataSet.DS_id) FROM DS_Has_MD, Metadata, DataSet
         WHERE DataSet.DS_id  = DS_Has_MD.DS_id
           AND Metadata.MD_id = DS_HAS_MD.MD_id
-          AND MD_content_vector @@ to_mmDefault_tsquery('$ftQuery')
-      )
-      
-EOFT;
-   	
+          AND MD_content_vector @@ to_mmDefault_tsquery('.$partParam.')
+      ) ';   	
    }
    
    $dbug = strpos($mmDebug,"getdslist");
@@ -165,7 +185,6 @@ EOFT;
    if (($sqlpart != "" || $sql_gapart != "") && $mmError == 0) {
       $sqlsentence = "SELECT DS_id, DS_name FROM DataSet WHERE\n" .
                   "DS_parent = 0 AND DS_ownertag IN (".$mmConfig->getVar('DATASET_TAGS').") \n";
-                  $sqlpart . $sql_gapart . "ORDER BY DataSet.DS_id\n";
       if ($sqlpart != "") {
          $sqlsentence .= " AND " . $sqlpart;
       }
@@ -174,7 +193,7 @@ EOFT;
       }
       $sqlsentence .= "ORDER BY DataSet.DS_id\n";
       if ($dbug !== FALSE) {echo '<pre>' .$sqlsentence . '</pre>' . "\n";}
-      $result1 = pg_query ($mmDbConnection, $sqlsentence);
+      $result1 = pg_query_params ($mmDbConnection, $sqlsentence, $sqlPartParams);
       if (!$result1) {
          mmPutLog(__FILE__ . __LINE__ . " Could not $sqlsentence");
          $mmErrorMessage = $msg_start . "Internal application error";

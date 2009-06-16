@@ -400,7 +400,7 @@ function mmShowSelectedFT() {
 	$name = 'Search';
 	echo mmAnchor("search.php?mmSubmitButton=ft_0",$name, "search") . "\n";
 	if (strlen($mmSessionState->fullTextQuery)) {
-		echo '<p class="indented">'. $mmSessionState->fullTextQuery . "</p>\n";
+		echo '<p class="indented">'. htmlspecialchars($mmSessionState->fullTextQuery) . "</p>\n";
 	}
 }
 
