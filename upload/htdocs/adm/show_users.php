@@ -35,6 +35,7 @@ require_once("../funcs/mmConfig.inc");
 </head>
 <body>
 <?php
+   include "../upl/funcs.inc";
 #
 #  Get array containing all files in a directory
 #
@@ -47,9 +48,10 @@ require_once("../funcs/mmConfig.inc");
 #        Get last file modification time
 #
          $filepath = $mmConfig->getVar('WEBRUN_DIRECTORY')."/u1/$filename";
+         $normfilename = decodenorm($filename);
          $modified = filemtime($filepath);
          $modified_str = date('Y-m-d H:i',$modified);
-         echo "<h3>$filename modified $modified_str</h3>\n<pre>\n";
+         echo "<h3>$filename ($normfilename) modified $modified_str</h3>\n<pre>\n";
          $content = file_get_contents($filepath);
          $content_ent = htmlentities($content);
          echo $content_ent;

@@ -41,7 +41,7 @@ fi
 #
 #  Initialise webrun directory:
 #
-if [ '[==WEBRUN_DIRECTORY==]' == '' ]; then
+if [ '[==WEBRUN_DIRECTORY==]' = '' ]; then
    echo "ERROR: WEBRUN_DIRECTORY must be defined in the configuration file"
    echo "exit prepare_runtime_env.sh"
    echo ""
