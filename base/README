@@ -40,3 +40,7 @@ The tasks performed by the METAMODBASE module are:
   scripts) as a daemon or cronjob.
 
   The XML formats used for dataset import is documented in README_XML.
+
+When METAMOD is updated from version 2.2 to 2.3, an existing database has to be 
+prepared for fulltext search. How to do this is described in UPDATE_FROM_2.2 in
+the top METAMOD directory.

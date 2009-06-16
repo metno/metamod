@@ -21,8 +21,12 @@ d) To use the fulltext-search, add the keyword 'FullText' to the
 
 e) If you want to keep the existing database, that is, you don't want to
    reinstall all datasets, you need to do the following:
-   i) install the tsearch2.sql script
-   ii) install the update2.2To2.3.sql script
+
+   i) Run the tsearch2.sql script (using psql)
+   ii) Run the update2.2To2.3.sql script (using psql)
    iii) create the full-text index for the existing data with
         makeDatabaseFulltextAware_2.2-2.3.pl
         
+   These steps are achieved by running the script:
+
+   init/update_to_Fulltext.sh

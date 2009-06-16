@@ -7,7 +7,7 @@ DROPDB=dropdb
 #
 exec >create_and_load_all.out 2>&1
 echo "------------ Reinitialize the database, create dynamic tables:"
-source createdb.sh
+. ./createdb.sh
 echo ""
 echo "------------ Run cload scripts:"
 cd ../staticdata
