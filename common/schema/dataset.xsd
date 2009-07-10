@@ -30,6 +30,8 @@
         <sequence>
             <element ref='t:info'/>
             <element ref='t:quadtree_nodes' minOccurs='0' maxOccurs='1'/>
+            <element ref='t:wmsInfo' minOccurs='0' maxOccurs='1' />
+            <element ref='t:projectionInfo' minOccurs='0' maxOccurs='1' />
         </sequence>
     </complexType>
     <complexType name='Info'>
@@ -52,8 +54,20 @@
             <extension base="string" />
         </simpleContent>
     </complexType>
+   <complexType name='WMSInfo'>
+      <sequence>
+         <any />
+      </sequence>
+   </complexType>
+   <complexType name='ProjectionInfo'>
+      <sequence>
+         <any />
+      </sequence>
+   </complexType>
 
     <element name='dataset' type='t:Dataset' />
     <element name='info' type='t:Info' />
     <element name='quadtree_nodes' type='t:QuadtreeNode' />
+    <element name='wmsInfo' type='t:WMSInfo' />
+    <element name='projectionInfo' type='t:ProjectionInfo' />
 </schema>

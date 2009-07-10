@@ -373,6 +373,10 @@ sub update_database {
 	  $dbh->prepare(
 "INSERT INTO DataSet (DS_id, DS_name, DS_parent, DS_status, DS_datestamp, DS_ownertag, DS_creationDate, DS_metadataFormat, DS_filePath)"
 		  . " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)" );
+    my $sql_insert_ProjectionInfo = $dbh->prepare("INSERT INTO ProjectionInfo (DS_id, PI_content) VALUES (?, ?)");
+    my $sql_delete_ProjectionInfo = $dbh->prepare("DELETE FROM ProjectionInfo WHERE DS_id = ?");
+    my $sql_insert_WMSInfo = $dbh->prepare("INSERT INTO WMSInfo (DS_id, WI_content) VALUES (?, ?)");
+    my $sql_delete_WMSInfo = $dbh->prepare("DELETE FROM WMSInfo WHERE DS_id = ?");
 	my $sql_insert_GA =
 	  $dbh->prepare("INSERT INTO GeographicalArea (GA_id) VALUES (?)");
 	my $sql_insert_BKDS =
@@ -589,6 +593,25 @@ sub update_database {
 			}
 			$sql_insert_GADS->execute( $gaid, $dsid );
 		}
+		
+		#
+		#   Insert new projectionInformation
+		#
+		$sql_delete_ProjectionInfo->execute($dsid);
+		my $projectionInfo = $ds->getProjectionInfo;
+		if ($projectionInfo) {
+			$sql_insert_ProjectionInfo->execute($dsid, $projectionInfo);
+		}
+
+        #
+        #   Insert new wmsInformation
+        #
+        $sql_delete_WMSInfo->execute($dsid);
+        my $wmsInfo = $ds->getWMSInfo;
+        if ($projectionInfo) {
+            $sql_insert_WMSInfo->execute($dsid, $wmsInfo);
+        }
+
 	}
 }
 

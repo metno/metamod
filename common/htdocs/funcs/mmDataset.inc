@@ -297,7 +297,7 @@ class MM_ForeignDataset {
 			$nodelist = $this->xpathDS->query("/d:dataset/*");
 			$inserted = false;
 			foreach ($nodelist as $node) {
-				if ($node->nodeName != 'info' && $node->nodeName != 'datacollection_period') {
+				if ($node->nodeName != 'info') {
 					$ds->insertBefore($quadtreeNode, $node);
 					$inserted = true;
 					break;
@@ -309,6 +309,118 @@ class MM_ForeignDataset {
 		}
 		return $oldVals;
 	}
+
+	/**
+	 * Get the wmsInfo content
+	 * @return xml string with wmsInfo content (not including <wmsInfo> tag)
+	 */
+	function getWMSInfo() {
+		$retVal = '';
+		foreach ($this->xpathDS->query("/d:dataset/d:wmsInfo/*") as $node) {
+			$dom = new DOMDocument();
+			$node = $dom->importNode($node, true);
+			$dom->appendChild($node);
+			$xml = $dom->saveXML();
+			// remove xml-processing flags
+			$xml = preg_replace('/<\?[^?]*\?>/', '', $xml);
+			$retVal .= trim($xml);
+		}
+		return $retVal;
+	}
+
+	/**
+	 * Set/overwrite the wmsInfo content.
+	 * @param $wmsInfo xml string with wmsInfo-content (not including <wmsInfo> tag)
+	 * @return array($oldWmsInfo)
+	 */
+	function setWMSInfo($wmsInfo) {
+		$oldContent = $this->getWMSInfo();
+		// delete old item
+		foreach ($this->xpathDS->query("/d:dataset/d:wmsInfo") as $node) {
+			$node->parentNode->removeChild($node);
+		}
+		if (strlen($wmsInfo)) {
+			$ds = $this->xpathDS->query("/d:dataset")->item(0);
+			# create node with new content
+			$wmsNode = $this->domDS->createElementNS($this->namespaceDS,'wmsInfo');
+			$contentDoc = new DOMDocument();
+			$contentDoc->loadXML($wmsInfo);
+			$contentNode = $this->domDS->importNode($contentDoc->firstChild, true);
+			$wmsNode->appendChild($contentNode);
+			
+			# add content to doc, after info and optional quadtree_node
+			$nodelist = $this->xpathDS->query("/d:dataset/*");
+			$inserted = false;
+			foreach ($nodelist as $node) {
+				if ($node->nodeName != 'info' && $node->nodeName != 'quadtree_nodes') {
+					$ds->insertBefore($wmsNode, $node);
+					$inserted = true;
+					break;
+				}
+			}
+			if (!$inserted) {
+			   $ds->appendChild($wmsNode);
+			}
+		}
+ 		return $oldContent;
+	}
+
+	/**
+	 * Get the projectionInfo content
+	 * @return xml string with projectionInfo content (not including <projectionInfo> tag)
+	 */
+	function getProjectionInfo() {
+		$retVal = '';
+		foreach ($this->xpathDS->query("/d:dataset/d:projectionInfo/*") as $node) {
+			$dom = new DOMDocument();
+			$node = $dom->importNode($node, true);
+			$dom->appendChild($node);
+			$xml = $dom->saveXML();
+			// remove xml-processing flags
+			$xml = preg_replace('/<\?[^?]*\?>/', '', $xml);
+			$retVal .= trim($xml);
+		}
+		return $retVal;
+	}
+
+	/**
+	 * Set/overwrite the projectionInfo content.
+	 * @param $projectionInfo xml string with projectionInfo-content (not including <projectionInfo> tag)
+	 * @return array($oldprojectionInfo)
+	 */
+	function setProjectionInfo($projectionInfo) {
+		$oldContent = $this->getProjectionInfo();
+		// delete old item
+		foreach ($this->xpathDS->query("/d:dataset/d:projectionInfo") as $node) {
+			$node->parentNode->removeChild($node);
+		}
+		if (strlen($projectionInfo)) {
+			$ds = $this->xpathDS->query("/d:dataset")->item(0);
+			# create node with new content
+			$piNode = $this->domDS->createElementNS($this->namespaceDS,'projectionInfo');
+			$contentDoc = new DOMDocument();
+			$contentDoc->loadXML($projectionInfo);
+			$contentNode = $this->domDS->importNode($contentDoc->firstChild, true);
+			$piNode->appendChild($contentNode);
+			
+			# add content to doc, after info and optional quadtree_node
+			$nodelist = $this->xpathDS->query("/d:dataset/*");
+			$inserted = false;
+			foreach ($nodelist as $node) {
+				if ($node->nodeName != 'info' && $node->nodeName != 'quadtree_nodes' && $node->nodeName != 'wmsInfo') {
+					$ds->insertBefore($piNode, $node);
+					$inserted = true;
+					break;
+				}
+			}
+			if (!$inserted) {
+			   $ds->appendChild($piNode);
+			}
+		}
+ 		return $oldContent;
+	}
+
+
 
 	/**
 	 * get a xml string of this dataset

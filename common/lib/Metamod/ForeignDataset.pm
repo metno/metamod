@@ -257,12 +257,83 @@ sub setQuadtree {
         $node->parentNode->removeChild($node);
     }
     if (@$quadRef > 0) {
+        # create node with new content
         my $valStr = join "\n", @$quadRef;
         my $qEl = $self->{docDS}->createElementNS($self->NAMESPACE_DS,'quadtree_nodes');
         $qEl->appendChild($self->{docDS}->createTextNode($valStr));
-        $self->{docDS}->documentElement->appendChild($qEl);
+        
+        # add element as first node after required info-node
+        my $infoNode = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docDS})->item(0);
+        $self->{docDS}->documentElement->insertBefore($qEl, $infoNode);
     }
     return @oldQuadtree;
+}
+
+sub getWMSInfo {
+	my ($self) = @_;
+	my $retVal;
+	my ($node) = $self->{xpath}->findnodes('/d:dataset/d:wmsInfo', $self->{docDS});
+	if ($node) {
+		$retVal = "";
+		foreach my $child ($node->childNodes) {
+			$retVal .= $child->toString();
+		}
+	}
+    return $retVal;
+}
+
+sub setWMSInfo {
+	my ($self, $content) = @_;
+	my $oldContent = $self->getWMSInfo;
+    foreach my $node ($self->{xpath}->findnodes('/d:dataset/d:wmsInfo', $self->{docDS})) {
+        # remove old value
+        $node->parentNode->removeChild($node);
+    }
+	if ($content) {
+		# create node with new content
+		my $el = $self->{docDS}->createElementNS($self->NAMESPACE_DS, 'wmsInfo');
+		my $parser = Metamod::DatasetTransformer->XMLParser;
+		my $contentDoc = $parser->parse_string($content);
+		$el->appendChild($contentDoc->documentElement);
+		
+		# add content to doc, before optional projectionInfo 
+		my $piNode = $self->{xpath}->findnodes('/d:dataset/d:projectionInfo', $self->{docDS});
+		$self->{docDS}->documentElement->insertBefore($el, $piNode);
+	}
+	return $oldContent;
+}
+
+sub getProjectionInfo {
+    my ($self) = @_;
+    my $retVal;
+    my ($node) = $self->{xpath}->findnodes('/d:dataset/d:projectionInfo', $self->{docDS});
+    if ($node) {
+        $retVal = "";
+        foreach my $child ($node->childNodes) {
+            $retVal .= $child->toString();
+        }
+    }
+    return $retVal;	
+}
+
+sub setProjectionInfo {
+    my ($self, $content) = @_;
+    my $oldContent = $self->getProjectionInfo;
+    foreach my $node ($self->{xpath}->findnodes('/d:dataset/d:projectionInfo', $self->{docDS})) {
+        # remove old value
+        $node->parentNode->removeChild($node);
+    }
+    if ($content) {
+        # create node with new content
+        my $el = $self->{docDS}->createElementNS($self->NAMESPACE_DS, 'projectionInfo');
+        my $parser = Metamod::DatasetTransformer->XMLParser;
+        my $contentDoc = $parser->parse_string($content);
+        $el->appendChild($contentDoc->documentElement);
+        
+        # add element to doc, as last element
+        $self->{docDS}->documentElement->appendChild($el);
+    }
+    return $oldContent;	
 }
 
 sub isXMLCharacter {
@@ -444,6 +515,29 @@ Return: array with quadtree_nodes
 set the @quadtree_nodes as dataset-quadtree-nodes
 
 Return: @oldQuadtree_nodes
+
+=item getWMSInfo()
+
+Return: raw-xml content of the WMSInfo node
+
+=item setWMSInfo($wmsInfo)
+
+set/replace the raw-xml WMSInfo node.
+
+Return: old WMSInfo
+Throws: Exception if $wmsInfo is not valid
+
+=item getProjectionInfo()
+
+Return: raw content of the ProjectionInfo node
+
+=item setProjectionInfo($projectionInfo)
+
+set/replace the raw ProjectionInfo node
+
+Return: old ProjectionInfo
+Throws: Exception if $projectionInfo is not valid
+
 
 =back
 

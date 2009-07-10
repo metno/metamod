@@ -33,7 +33,7 @@ use encoding 'iso8859-1';
 use Encode qw(decode encode);
 
 use lib "..";
-use Test::More tests => 43;
+use Test::More tests => 49;
 
 use Data::Dumper qw(Dumper);
 
@@ -84,6 +84,18 @@ ok(eq_array(\@quadTree, [$ds->getQuadtree]), "get quadtree");
 ok($ds->writeToFile('test'), "writeToFile");
 ok(-f 'test.xml', "xml file exists");
 ok(-f 'test.xmd', "xmd file exists");
+
+my $testFD = Metamod::ForeignDataset->newFromFile('test');
+my $wmsInfo = '<wms><sdl type="1">blablub</sdl></wms>';
+my $projectionInfo = '<fimexSetup name="bla">a long string</fimexSetup>';
+ok(!$testFD->getWMSInfo, 'no WMSInfo yet');
+ok(!$testFD->getProjectionInfo, 'no ProjectionInfo yet');
+$testFD->setWMSInfo($wmsInfo); # throw exception
+ok(1, 'adding WMSInfo'); # made it here
+$testFD->setProjectionInfo($projectionInfo); # throw exception
+ok(1, 'adding ProjectionInfo'); # made it here
+ok($wmsInfo eq $testFD->getWMSInfo(), 'wmsInfo unchanged');
+ok($projectionInfo eq $testFD->getProjectionInfo(), 'projectionInfo unchanged');
 
 ok(Metamod::ForeignDataset->deleteDatasetFile("test"), "delete dataset");
 ok(! -f "test.xml", "test.xml deleted");

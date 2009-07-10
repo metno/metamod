@@ -53,4 +53,19 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER update_MD_content_fulltext BEFORE INSERT OR UPDATE ON Metadata
     FOR EACH ROW EXECUTE PROCEDURE update_MD_content_fulltext();
 
-    
+
+-- extension column to Dataset, uncoupled
+CREATE TABLE ProjectionInfo (
+   DS_id              INTEGER       UNIQUE NOT NULL REFERENCES DataSet ON DELETE CASCADE,
+   PI_content         TEXT
+);
+GRANT SELECT ON ProjectionInfo TO "[==PG_WEB_USER==]";
+
+-- extension column to Dataset, uncoupled
+CREATE TABLE WMSInfo (
+   DS_id              INTEGER       UNIQUE NOT NULL REFERENCES DataSet ON DELETE CASCADE,
+   WI_content         TEXT
+);
+GRANT SELECT ON WMSInfo TO "[==PG_WEB_USER==]";
+
+
