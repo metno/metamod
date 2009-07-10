@@ -34,6 +34,7 @@ our $VERSION = 0.3;
 @EXPORT_OK = qw(findFiles isNetcdf trim getFiletype);
 
 use File::Find qw();
+use POSIX qw();
 
 sub findFiles {
    my ($dir, @funcs) = @_;
