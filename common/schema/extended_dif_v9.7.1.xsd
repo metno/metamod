@@ -1,0 +1,496 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/"
+           targetNamespace="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/"
+           xml:lang="en"
+           version="1.0">
+
+<xs:annotation>
+    <xs:documentation>
+        Schema created from application of stylesheet convert-enumerations.xsl
+        to source file source_extended_dif_v9.7.1.xsd.
+    </xs:documentation>
+</xs:annotation>
+
+<xs:annotation>
+    <xs:documentation>
+        This is the XML Schema for metadata conforming to the Directory
+        Interchange Format of the Global Change Master Directory (GCMD).
+        It extends the schema provided by GCMD to include more rigorous
+        element validation.
+    </xs:documentation>
+</xs:annotation>
+
+<xs:simpleType name="DIFstring">
+    <xs:annotation>
+        <xs:documentation>
+            A string which must not be empty.
+        </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+        <xs:pattern value="\s*\S(.|\n|\r)*"/>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="DIFdate">
+    <xs:annotation>
+        <xs:documentation>
+            Date formatted yyyy-mm-dd (mm and dd optional).
+        </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+        <xs:pattern value="\d{4}(-\d{2}(-\d{2})?)?"/>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="Boolean">
+    <xs:annotation>
+        <xs:documentation>
+            An element to represent the values "True" and "False."
+        </xs:documentation>
+    </xs:annotation>
+  <xs:restriction base="xs:string"><xs:pattern value="((T|t)(R|r)(U|u)(E|e))|((F|f)(A|a)(L|l)(S|s)(E|e))"/></xs:restriction>
+</xs:simpleType>
+
+
+<xs:simpleType name="EntryIdString">
+    <xs:restriction base="xs:string">
+    <xs:annotation>
+        <xs:documentation>
+            No backslash, forward slash, colon or spaces.
+            Max 80 characters.
+        </xs:documentation>
+    </xs:annotation>
+        <xs:pattern value="[^\\/:\s]{1,80}"/>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="EntryTitleString">
+    <xs:annotation>
+        <xs:documentation>
+            Limit length of title string.
+        </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+        <xs:pattern value=".{1,220}"/>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="URLstring">
+    <xs:annotation>
+        <xs:documentation>
+            Restricted to 600 characters.
+        </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+        <xs:pattern value=".{1,600}"/>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="compoundName">
+    <xs:all>
+        <xs:element ref="Short_Name" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Long_Name" minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+</xs:complexType>
+
+<xs:element name="Short_Name" type="DIFstring"/>
+<xs:element name="Long_Name" type="DIFstring"/>
+
+<xs:simpleType name="RoleKeyword">
+  <xs:restriction base="xs:string"><xs:pattern value="((D|d)(A|a)(T|t)(A|a)( | )(C|c)(E|e)(N|n)(T|t)(E|e)(R|r)( | )(C|c)(O|o)(N|n)(T|t)(A|a)(C|c)(T|t))|((D|d)(I|i)(F|f)( | )(A|a)(U|u)(T|t)(H|h)(O|o)(R|r))|((I|i)(N|n)(V|v)(E|e)(S|s)(T|t)(I|i)(G|g)(A|a)(T|t)(O|o)(R|r))|((T|t)(E|e)(C|c)(H|h)(N|n)(I|i)(C|c)(A|a)(L|l)( | )(C|c)(O|o)(N|n)(T|t)(A|a)(C|c)(T|t))"/></xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="DataSetProgressKeyword">
+  <xs:restriction base="xs:string"><xs:pattern value="((P|p)(L|l)(A|a)(N|n)(N|n)(E|e)(D|d))|((I|i)(N|n)( | )(W|w)(O|o)(R|r)(K|k))|((C|c)(O|o)(M|m)(P|p)(L|l)(E|e)(T|t)(E|e))"/></xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="TopicKeyword">
+  <xs:restriction base="xs:string"><xs:pattern value="((A|a)(G|g)(R|r)(I|i)(C|c)(U|u)(L|l)(T|t)(U|u)(R|r)(E|e))|((A|a)(T|t)(M|m)(O|o)(S|s)(P|p)(H|h)(E|e)(R|r)(E|e))|((B|b)(I|i)(O|o)(S|s)(P|p)(H|h)(E|e)(R|r)(E|e))|((B|b)(I|i)(O|o)(L|l)(O|o)(G|g)(I|i)(C|c)(A|a)(L|l)( | )(C|c)(L|l)(A|a)(S|s)(S|s)(I|i)(F|f)(I|i)(C|c)(A|a)(T|t)(I|i)(O|o)(N|n))|((C|c)(L|l)(I|i)(M|m)(A|a)(T|t)(E|e)( | )(I|i)(N|n)(D|d)(I|i)(C|c)(A|a)(T|t)(O|o)(R|r)(S|s))|((C|c)(R|r)(Y|y)(O|o)(S|s)(P|p)(H|h)(E|e)(R|r)(E|e))|((H|h)(U|u)(M|m)(A|a)(N|n)( | )(D|d)(I|i)(M|m)(E|e)(N|n)(S|s)(I|i)(O|o)(N|n)(S|s))|((L|l)(A|a)(N|n)(D|d)( | )(S|s)(U|u)(R|r)(F|f)(A|a)(C|c)(E|e))|((O|o)(C|c)(E|e)(A|a)(N|n)(S|s))|((P|p)(A|a)(L|l)(E|e)(O|o)(C|c)(L|l)(I|i)(M|m)(A|a)(T|t)(E|e))|((S|s)(O|o)(L|l)(I|i)(D|d)( | )(E|e)(A|a)(R|r)(T|t)(H|h))|((S|s)(P|p)(E|e)(C|c)(T|t)(R|r)(A|a)(L|l)(/|/)(E|e)(N|n)(G|g)(I|i)(N|n)(E|e)(E|e)(R|r)(I|i)(N|n)(G|g))|((S|s)(U|u)(N|n)(-|-)(E|e)(A|a)(R|r)(T|t)(H|h)( | )(I|i)(N|n)(T|t)(E|e)(R|r)(A|a)(C|c)(T|t)(I|i)(O|o)(N|n)(S|s))|((T|t)(E|e)(R|r)(R|r)(E|e)(S|s)(T|t)(R|r)(I|i)(A|a)(L|l)( | )(H|h)(Y|y)(D|d)(R|r)(O|o)(S|s)(P|p)(H|h)(E|e)(R|r)(E|e))"/></xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="ISOTopicCategoryKeyword">
+  <xs:restriction base="xs:string"><xs:pattern value="((F|f)(A|a)(R|r)(M|m)(I|i)(N|n)(G|g))|((B|b)(I|i)(O|o)(T|t)(A|a))|((B|b)(O|o)(U|u)(N|n)(D|d)(A|a)(R|r)(I|i)(E|e)(S|s))|((C|c)(L|l)(I|i)(M|m)(A|a)(T|t)(O|o)(L|l)(O|o)(G|g)(Y|y)(/|/)(M|m)(E|e)(T|t)(E|e)(O|o)(R|r)(O|o)(L|l)(O|o)(G|g)(Y|y)(/|/)(A|a)(T|t)(M|m)(O|o)(S|s)(P|p)(H|h)(E|e)(R|r)(E|e))|((E|e)(C|c)(O|o)(N|n)(O|o)(M|m)(Y|y))|((E|e)(L|l)(E|e)(V|v)(A|a)(T|t)(I|i)(O|o)(N|n))|((E|e)(N|n)(V|v)(I|i)(R|r)(O|o)(N|n)(M|m)(E|e)(N|n)(T|t))|((G|g)(E|e)(O|o)(S|s)(C|c)(I|i)(E|e)(N|n)(T|t)(I|i)(F|f)(I|i)(C|c)( | )(I|i)(N|n)(F|f)(O|o)(R|r)(M|m)(A|a)(T|t)(I|i)(O|o)(N|n))|((H|h)(E|e)(A|a)(L|l)(T|t)(H|h))|((I|i)(M|m)(A|a)(G|g)(E|e)(R|r)(Y|y)(/|/)(B|b)(A|a)(S|s)(E|e)( | )(M|m)(A|a)(P|p)(S|s)(/|/)(E|e)(A|a)(R|r)(T|t)(H|h)( | )(C|c)(O|o)(V|v)(E|e)(R|r))|((I|i)(N|n)(T|t)(E|e)(L|l)(L|l)(I|i)(G|g)(E|e)(N|n)(C|c)(E|e)(/|/)(M|m)(I|i)(L|l)(I|i)(T|t)(A|a)(R|r)(Y|y))|((I|i)(N|n)(L|l)(A|a)(N|n)(D|d)( | )(W|w)(A|a)(T|t)(E|e)(R|r)(S|s))|((L|l)(O|o)(C|c)(A|a)(T|t)(I|i)(O|o)(N|n))|((O|o)(C|c)(E|e)(A|a)(N|n)(S|s))|((P|p)(L|l)(A|a)(N|n)(N|n)(I|i)(N|n)(G|g)( | )(C|c)(A|a)(D|d)(A|a)(S|s)(T|t)(R|r)(E|e))|((S|s)(O|o)(C|c)(I|i)(E|e)(T|t)(Y|y))|((S|s)(T|t)(R|r)(U|u)(C|c)(T|t)(U|u)(R|r)(E|e))|((T|t)(R|r)(A|a)(N|n)(S|s)(P|p)(O|o)(R|r)(T|t)(A|a)(T|t)(I|i)(O|o)(N|n))|((U|u)(T|t)(I|i)(L|l)(I|i)(T|t)(I|i)(E|e)(S|s)(/|/)(C|c)(O|o)(M|m)(M|m)(U|u)(N|n)(I|i)(C|c)(A|a)(T|t)(I|i)(O|o)(N|n)(S|s))"/></xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="LocationCategoryKeyword">
+  <xs:restriction base="xs:string"><xs:pattern value="((C|c)(O|o)(N|n)(T|t)(I|i)(N|n)(E|e)(N|n)(T|t))|((O|o)(C|c)(E|e)(A|a)(N|n))|((G|g)(E|e)(O|o)(G|g)(R|r)(A|a)(P|p)(H|h)(I|i)(C|c)( | )(R|r)(E|e)(G|g)(I|i)(O|o)(N|n))|((S|s)(O|o)(L|l)(I|i)(D|d)( | )(E|e)(A|a)(R|r)(T|t)(H|h))|((S|s)(P|p)(A|a)(C|c)(E|e))|((V|v)(E|e)(R|r)(T|t)(I|i)(C|c)(A|a)(L|l)( | )(L|l)(O|o)(C|c)(A|a)(T|t)(I|i)(O|o)(N|n))"/></xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="DIFObject">
+      <xs:sequence>
+         <xs:element ref="Entry_ID" minOccurs="1" maxOccurs="1"/>
+         <xs:element ref="Entry_Title" minOccurs="1" maxOccurs="1"/>
+         <xs:element ref="Data_Set_Citation" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Personnel" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Discipline" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Parameters" minOccurs="1" maxOccurs="unbounded"/>
+         <xs:element ref="ISO_Topic_Category" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Keyword" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Sensor_Name" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Source_Name" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Temporal_Coverage" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Paleo_Temporal_Coverage" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Data_Set_Progress" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Spatial_Coverage" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Location" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Data_Resolution" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Project" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Quality" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Access_Constraints" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Use_Constraints" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Data_Set_Language" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Originating_Center" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Data_Center" minOccurs="1" maxOccurs="unbounded"/>
+         <xs:element ref="Distribution" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Multimedia_Sample" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Reference" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Summary" minOccurs="1" maxOccurs="1"/>
+         <xs:element ref="Related_URL" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Parent_DIF" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="IDN_Node" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Originating_Metadata_Node" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Metadata_Name" minOccurs="1" maxOccurs="1"/>
+         <xs:element ref="Metadata_Version" minOccurs="1" maxOccurs="1"/>
+         <xs:element ref="DIF_Creation_Date" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Last_DIF_Revision_Date" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="DIF_Revision_History" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Future_DIF_Review_Date" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Private" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+</xs:complexType>
+
+<xs:element name="DIF" type="DIFObject"/>
+
+<xs:element name="Entry_ID" type="EntryIdString"/>
+<xs:element name="Entry_Title" type="EntryTitleString"/>
+<xs:element name="Data_Set_Citation" type="DataSetCitationObject"/>
+
+<xs:complexType name="DataSetCitationObject">
+    <xs:all>
+         <xs:element ref="Dataset_Creator" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Dataset_Title" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Dataset_Series_Name" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Dataset_Release_Date" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Dataset_Release_Place" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Dataset_Publisher" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Version" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Issue_Identification" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Data_Presentation_Form" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Other_Citation_Details" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Online_Resource" minOccurs="0" maxOccurs="1"/>
+   </xs:all>
+</xs:complexType>
+
+<xs:element name="Dataset_Creator" type="DIFstring"/>
+<xs:element name="Dataset_Title" type="EntryTitleString"/>
+<xs:element name="Dataset_Series_Name" type="EntryTitleString"/>
+<xs:element name="Dataset_Release_Date" type="DIFstring"/>
+<xs:element name="Dataset_Release_Place" type="DIFstring"/>
+<xs:element name="Dataset_Publisher" type="DIFstring"/>
+<xs:element name="Version" type="DIFstring"/>
+<xs:element name="Issue_Identification" type="DIFstring"/>
+<xs:element name="Data_Presentation_Form" type="DIFstring"/>
+<xs:element name="Other_Citation_Details" type="DIFstring"/>
+<xs:element name="Online_Resource" type="URLstring"/>
+
+<xs:element name="Personnel" type="PersonnelObject"/>
+<xs:complexType name="PersonnelObject">
+    <xs:sequence>
+        <xs:element ref="Role" minOccurs="1" maxOccurs="unbounded"/>
+        <xs:element ref="First_Name" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Middle_Name" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Last_Name" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="Email" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="Phone" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="fax" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="Contact_Address" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+</xs:complexType>
+
+<xs:element name="Role" type="RoleKeyword"/>
+<xs:element name="First_Name" type="DIFstring"/>
+<xs:element name="Middle_Name" type="DIFstring"/>
+<xs:element name="Last_Name" type="DIFstring"/>
+<xs:element name="Email" type="DIFstring"/>
+<xs:element name="Phone" type="DIFstring"/>
+
+
+<xs:element name="fax" type="DIFstring"/>
+<xs:element name="Fax" type="DIFstring" substitutionGroup="fax"/>
+<xs:element name="FAX" type="DIFstring" substitutionGroup="fax"/>
+
+<xs:element name="Contact_Address" type="AddressObject"/>
+<xs:complexType name="AddressObject">
+    <xs:sequence>
+         <xs:element ref="Address" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="City" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Province_or_State" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Postal_Code" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Country" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+</xs:complexType>
+
+<xs:element name="Address" type="DIFstring"/>
+<xs:element name="City" type="DIFstring"/>
+<xs:element name="Province_or_State" type="DIFstring"/>
+<xs:element name="Postal_Code" type="DIFstring"/>
+<xs:element name="Country" type="DIFstring"/>
+
+<xs:element name="Discipline" type="DisciplineObject"/>
+<xs:complexType name="DisciplineObject">
+   <xs:all>
+       <xs:element ref="Discipline_Name" minOccurs="1" maxOccurs="1"/>
+       <xs:element ref="Subdiscipline" minOccurs="0" maxOccurs="1"/>
+       <xs:element ref="Detailed_Subdiscipline" minOccurs="0" maxOccurs="1"/>
+   </xs:all>
+</xs:complexType>
+<xs:element name="Discipline_Name" type="DIFstring"/>
+<xs:element name="Subdiscipline" type="DIFstring"/>
+<xs:element name="Detailed_Subdiscipline" type="DIFstring"/>
+
+<xs:element name="Parameters" type="ParameterObject"/>
+<xs:complexType name="ParameterObject">
+   <xs:sequence>
+      <xs:element ref="Category" minOccurs="1" maxOccurs="1"/>
+      <xs:element ref="Topic" minOccurs="1" maxOccurs="1"/>
+      <xs:element ref="Term" minOccurs="1" maxOccurs="1"/>
+      <xs:element ref="Variable_Level_1" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="Variable_Level_2" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="Variable_Level_3" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="Detailed_Variable" minOccurs="0" maxOccurs="1"/>
+   </xs:sequence>
+</xs:complexType>
+
+<xs:element name="Category" type="DIFstring" default="EARTH SCIENCE"/>
+<xs:element name="Topic" type="TopicKeyword"/>
+<xs:element name="Term" type="DIFstring"/>
+<xs:element name="Variable_Level_1" type="DIFstring"/>
+<xs:element name="Variable_Level_2" type="DIFstring"/>
+<xs:element name="Variable_Level_3" type="DIFstring"/>
+<xs:element name="Detailed_Variable" type="DIFstring"/>
+
+<xs:element name="ISO_Topic_Category" type="ISOTopicCategoryKeyword"/>
+<xs:element name="Keyword" type="DIFstring"/>
+<xs:element name="Sensor_Name" type="compoundName"/>
+<xs:element name="Source_Name" type="compoundName"/>
+
+<xs:element name="Temporal_Coverage" type="dateRange"/>
+<xs:complexType name="dateRange">
+    <xs:sequence>
+        <xs:element ref="Start_Date" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Stop_Date" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+</xs:complexType>
+
+<xs:element name="Start_Date" type="DIFdate"/>
+<xs:element name="Stop_Date" type="DIFdate"/>
+
+<xs:element name="Paleo_Temporal_Coverage" type="paleoDateRange"/>
+<xs:complexType name="paleoDateRange">
+    <xs:sequence>
+        <xs:element ref="Paleo_Start_Date" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Paleo_Stop_Date" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="Chronostratigraphic_Unit" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+</xs:complexType>
+<xs:element name="Paleo_Start_Date" type="DIFstring"/>
+<xs:element name="Paleo_Stop_Date" type="DIFstring"/>
+<xs:element name="Chronostratigraphic_Unit" type="chronostratigraphicUnitObject"/>
+<xs:complexType name="chronostratigraphicUnitObject">
+   <xs:sequence>
+      <xs:element ref="Eon" minOccurs="1" maxOccurs="1"/>
+      <xs:element ref="Era" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="Period" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="Epoch" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="Stage" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="Detailed_Classification" minOccurs="0" maxOccurs="1"/>
+   </xs:sequence>
+</xs:complexType>
+<xs:element name="Eon" type="DIFstring"/>
+<xs:element name="Era" type="DIFstring"/>
+<xs:element name="Period" type="DIFstring"/>
+<xs:element name="Epoch" type="DIFstring"/>
+<xs:element name="Stage" type="DIFstring"/>
+<xs:element name="Detailed_Classification" type="DIFstring"/>
+
+<xs:element name="Data_Set_Progress" type="DataSetProgressKeyword"/>
+
+<xs:element name="Spatial_Coverage" type="SpatialObject"/>
+<xs:complexType name="SpatialObject">
+   <xs:sequence>
+      <xs:element ref="Southernmost_Latitude" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="Northernmost_Latitude" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="Westernmost_Longitude" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="Easternmost_Longitude" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="Minimum_Altitude" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="Maximum_Altitude" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="Minimum_Depth" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="Maximum_Depth" minOccurs="0" maxOccurs="1"/>
+   </xs:sequence>
+</xs:complexType>
+
+<xs:element name="Southernmost_Latitude" type="DIFstring"/>
+<xs:element name="Northernmost_Latitude" type="DIFstring"/>
+<xs:element name="Westernmost_Longitude" type="DIFstring"/>
+<xs:element name="Easternmost_Longitude" type="DIFstring"/>
+<xs:element name="Minimum_Altitude" type="DIFstring"/>
+<xs:element name="Maximum_Altitude" type="DIFstring"/>
+<xs:element name="Minimum_Depth" type="DIFstring"/>
+<xs:element name="Maximum_Depth" type="DIFstring"/>
+
+<xs:element name="Location">
+   <xs:complexType>
+      <xs:sequence>
+         <xs:element ref="Location_Category" minOccurs="1" maxOccurs="1"/>
+         <xs:element ref="Location_Type" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Location_Subregion1" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Location_Subregion2" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Location_Subregion3" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Detailed_Location" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+   </xs:complexType>
+</xs:element>
+<xs:element name="Location_Category" type="LocationCategoryKeyword"/>
+<xs:element name="Location_Type" type="DIFstring"/>
+<xs:element name="Location_Subregion1" type="DIFstring"/>
+<xs:element name="Location_Subregion2" type="DIFstring"/>
+<xs:element name="Location_Subregion3" type="DIFstring"/>
+<xs:element name="Detailed_Location" type="DIFstring"/>
+
+<xs:element name="Data_Resolution">
+   <xs:complexType>
+      <xs:sequence>
+         <xs:element ref="Latitude_Resolution" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Longitude_Resolution" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Horizontal_Resolution_Range" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Vertical_Resolution" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Vertical_Resolution_Range" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Temporal_Resolution" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Temporal_Resolution_Range" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+   </xs:complexType>
+</xs:element>
+<xs:element name="Latitude_Resolution" type="DIFstring"/>
+<xs:element name="Longitude_Resolution" type="DIFstring"/>
+<xs:element name="Horizontal_Resolution_Range" type="DIFstring"/>
+<xs:element name="Vertical_Resolution" type="DIFstring"/>
+<xs:element name="Vertical_Resolution_Range" type="DIFstring"/>
+<xs:element name="Temporal_Resolution" type="DIFstring"/>
+<xs:element name="Temporal_Resolution_Range" type="DIFstring"/>
+
+<xs:element name="Project" type="compoundName"/>
+<xs:element name="Quality" type="DIFstring"/>
+<xs:element name="Access_Constraints" type="DIFstring"/>
+<xs:element name="Use_Constraints" type="DIFstring"/>
+<xs:element name="Data_Set_Language" type="DIFstring"/>
+<xs:element name="Originating_Center" type="DIFstring"/>
+
+<xs:element name="Data_Center" type="DataCenterObject"/>
+<xs:complexType name="DataCenterObject">
+   <xs:sequence>
+      <xs:element ref="Data_Center_Name" minOccurs="1" maxOccurs="1"/>
+      <xs:element ref="Data_Center_URL" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="Data_Set_ID" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element ref="Personnel" minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>
+</xs:complexType>
+
+<xs:element name="Data_Center_Name" type="compoundName"/>
+<xs:element name="Data_Center_URL" type="URLstring"/>
+<xs:element name="Data_Set_ID" type="DIFstring"/>
+
+
+
+
+
+<xs:complexType name="DataCenterPersonnelObject">
+    <xs:complexContent>
+        <xs:restriction base="PersonnelObject">
+            <xs:sequence>
+                <xs:element name="Role" type="RoleKeyword" fixed="Data Center Contact"/>
+
+                
+                <xs:element ref="First_Name" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="Middle_Name" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="Last_Name" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="Email" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="Phone" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="fax" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="Contact_Address" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+        </xs:restriction>
+    </xs:complexContent>
+</xs:complexType>
+
+<xs:element name="Distribution">
+   <xs:complexType>
+      <xs:sequence>
+         <xs:element ref="Distribution_Media" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Distribution_Size" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Distribution_Format" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Fees" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+   </xs:complexType>
+</xs:element>
+<xs:element name="Distribution_Media" type="DIFstring"/>
+<xs:element name="Distribution_Size" type="DIFstring"/>
+<xs:element name="Distribution_Format" type="DIFstring"/>
+<xs:element name="Fees" type="DIFstring"/>
+
+<xs:element name="Multimedia_Sample">
+   <xs:complexType>
+      <xs:sequence>
+         <xs:element ref="File" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="URL" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Format" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Caption" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+   </xs:complexType>
+</xs:element>
+<xs:element name="File" type="DIFstring"/>
+<xs:element name="Format" type="DIFstring"/>
+<xs:element name="Caption" type="DIFstring"/>
+<xs:element name="Description" type="DIFstring"/>
+
+<xs:element name="Reference" type="DIFstring"/>
+<xs:element name="Summary" type="DIFstring"/>
+
+<xs:element name="Related_URL">
+   <xs:complexType>
+      <xs:sequence>
+         <xs:element ref="URL_Content_Type" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="URL" minOccurs="1" maxOccurs="unbounded"/>
+         <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+   </xs:complexType>
+</xs:element>
+<xs:element name="URL_Content_Type">
+   <xs:complexType>
+      <xs:sequence>
+         <xs:element ref="Type" minOccurs="1" maxOccurs="1"/>
+         <xs:element ref="Subtype" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+   </xs:complexType>
+</xs:element>
+<xs:element name="Type" type="DIFstring"/>
+<xs:element name="Subtype" type="DIFstring"/>
+<xs:element name="URL" type="URLstring"/>
+
+<xs:element name="Parent_DIF" type="DIFstring"/>
+<xs:element name="IDN_Node" type="compoundName"/>
+<xs:element name="Originating_Metadata_Node" type="DIFstring"/>
+<xs:element name="Metadata_Name" type="DIFstring" default="CEOS IDN DIF"/>
+<xs:element name="Metadata_Version" type="DIFstring" default="9.7"/>
+<xs:element name="DIF_Creation_Date" type="DIFdate"/>
+<xs:element name="Last_DIF_Revision_Date" type="DIFdate"/>
+
+
+
+<xs:element name="DIF_Revision_History" type="DIFstring"/>
+
+<xs:element name="Future_DIF_Review_Date" type="DIFdate"/>
+<xs:element name="Private" type="Boolean"/>
+
+</xs:schema>

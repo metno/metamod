@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/"
+            xmlns="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/"
+            xml:lang="en"
+            version="1.0">
+
+<xs:annotation>
+  <xs:documentation>
+    This schema extends the GCMD DIF schema to satisfy the requirements of
+    the IPY metadata profile.
+  </xs:documentation>
+</xs:annotation>
+
+<xs:redefine
+      schemaLocation="http://nsidc.org/xml/schema/dif/extended_dif_v9.7.1.xsd">
+
+   <xs:complexType name="DIFObject">
+      <xs:complexContent>
+      <xs:restriction base="DIFObject">
+      <xs:sequence>
+
+         <!-- Unique identifier provided by the data authority. Example: org.nsidc.nsidc-0001 -->
+         <!-- required by IPY profile -->
+         <xs:element ref="Entry_ID" minOccurs="1" maxOccurs="1"/>
+
+         <!-- A title for the data set -->
+         <!-- required by IPY profile -->
+         <xs:element ref="Entry_Title" minOccurs="1" maxOccurs="1"/>
+
+         <!-- Required by IPY profile -->
+         <xs:element ref="Data_Set_Citation" minOccurs="1" maxOccurs="unbounded"/>
+
+         <!-- Required metadata contact information for IPY profile -->
+         <xs:element ref="Personnel" minOccurs="1" maxOccurs="unbounded"/>
+
+         <!-- Cannot find a description of "Discipline" in the DIF specification. -->
+         <!-- Clarify whether this is actually a legitimate DIF field.            -->
+         <xs:element ref="Discipline" minOccurs="0" maxOccurs="unbounded"/>
+
+         <!-- required by IPY profile -->
+         <xs:element ref="Parameters" minOccurs="1" maxOccurs="unbounded"/>
+
+         <!-- Required by IPY profile -->
+         <xs:element ref="ISO_Topic_Category" minOccurs="1" maxOccurs="unbounded"/>
+
+         <xs:element ref="Keyword" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Sensor_Name" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Source_Name" minOccurs="0" maxOccurs="unbounded"/>
+
+         <!-- Required by IPY profile -->
+         <xs:element ref="Temporal_Coverage" minOccurs="1" maxOccurs="unbounded"/>
+
+         <xs:element ref="Paleo_Temporal_Coverage" minOccurs="0" maxOccurs="unbounded"/>
+
+         <!-- Required by IPY profile -->
+         <xs:element ref="Data_Set_Progress" minOccurs="1" maxOccurs="1"/>
+         <xs:element ref="Spatial_Coverage" minOccurs="1" maxOccurs="unbounded"/>
+         <xs:element ref="Location" minOccurs="1" maxOccurs="unbounded"/>
+
+         <xs:element ref="Data_Resolution" minOccurs="0" maxOccurs="unbounded"/>
+
+         <!-- Required by IPY profile. Project name(s) should be selected from      -->
+         <!-- the list of GCMD project valids, which (will) include IPY project IDs -->
+         <xs:element ref="Project" minOccurs="1" maxOccurs="unbounded"/>
+
+         <xs:element ref="Quality" minOccurs="0" maxOccurs="1"/>
+
+         <!-- Access and use constraints are required by IPY profile -->
+         <xs:element ref="Access_Constraints" minOccurs="1" maxOccurs="1"/>
+         <xs:element ref="Use_Constraints" minOccurs="1" maxOccurs="1"/>
+
+         <!-- Required by IPY profile. Need to represent the following restrictions -->
+         <!-- as per the DIF spec:                                                  -->
+         <!-- Consists of 1 - 80 characters from the UTF-8 character set            -->
+         <!-- [...] may be selected from the Suggested Language Keywords List,      -->
+         <!-- which is adapted from the ISO 639 language codes:                     -->
+         <!-- http://www.loc.gov/standards/iso639-2/php/code_list.php               -->
+         <xs:element ref="Data_Set_Language" minOccurs="1" maxOccurs="unbounded"/>
+
+         <xs:element ref="Originating_Center" minOccurs="0" maxOccurs="1"/>
+
+         <!-- the center responsible for distributing the data -->
+         <xs:element ref="Data_Center" minOccurs="1" maxOccurs="unbounded"/>
+
+         <xs:element ref="Distribution" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Multimedia_Sample" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Reference" minOccurs="0" maxOccurs="1"/>
+
+         <!-- required by IPY profile -->
+         <xs:element ref="Summary" minOccurs="1" maxOccurs="1"/>
+         <xs:element ref="Related_URL" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element ref="Parent_DIF" minOccurs="0" maxOccurs="unbounded"/>
+
+         <!-- required by IPY profile. This is the flag that identifies the -->
+         <!-- project as an IPY project. Select from the GCMD list of IDN   -->
+         <!-- Node values.                                                  -->
+         <xs:element ref="IDN_Node" minOccurs="1" maxOccurs="unbounded"/>
+
+         <xs:element ref="Originating_Metadata_Node" minOccurs="0" maxOccurs="1"/>
+
+         <!-- the authority for the metadata standard and/or profile -->
+         <xs:element ref="Metadata_Name" minOccurs="1" maxOccurs="1"/>
+         <xs:element ref="Metadata_Version" minOccurs="1" maxOccurs="1"/>
+
+         <xs:element ref="DIF_Creation_Date" minOccurs="0" maxOccurs="1"/>
+
+         <!-- Required by IPY profile -->
+         <xs:element ref="Last_DIF_Revision_Date" minOccurs="1" maxOccurs="1"/>
+
+         <xs:element ref="DIF_Revision_History" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Future_DIF_Review_Date" minOccurs="0" maxOccurs="1"/>
+         <xs:element ref="Private" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+
+   <xs:complexType name="DataSetCitationObject">
+      <xs:complexContent>
+      <xs:restriction base="DataSetCitationObject">
+         <xs:all>
+            <!-- required by IPY profile -->
+            <xs:element ref="Dataset_Creator" minOccurs="1" maxOccurs="1"/>
+
+            <xs:element ref="Dataset_Title" minOccurs="0" maxOccurs="1"/>
+            <xs:element ref="Dataset_Series_Name" minOccurs="0" maxOccurs="1"/>
+
+            <!-- required by IPY profile -->
+            <xs:element ref="Dataset_Release_Date" minOccurs="1" maxOccurs="1"/>
+            <xs:element ref="Dataset_Release_Place" minOccurs="1" maxOccurs="1"/>
+            <xs:element ref="Dataset_Publisher" minOccurs="1" maxOccurs="1"/>
+            <xs:element ref="Version" minOccurs="1" maxOccurs="1"/>
+
+            <xs:element ref="Issue_Identification" minOccurs="0" maxOccurs="1"/>
+            <xs:element ref="Data_Presentation_Form" minOccurs="0" maxOccurs="1"/>
+            <xs:element ref="Other_Citation_Details" minOccurs="0" maxOccurs="1"/>
+
+            <!-- required by IPY profile -->
+            <xs:element ref="Online_Resource" minOccurs="1" maxOccurs="1"/>
+         </xs:all>
+      </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+
+</xs:redefine>
+
+</xs:schema>
