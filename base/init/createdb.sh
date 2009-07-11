@@ -49,7 +49,7 @@ GRANT SELECT ON DataSet TO "[==PG_WEB_USER==]";
 -- extension column to Dataset, uncoupled
 CREATE TABLE ProjectionInfo (
    DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
-   PI_content         TEXT
+   PI_content         TEXT,
    UNIQUE (DS_id)
 );
 GRANT SELECT ON ProjectionInfo TO "[==PG_WEB_USER==]";
@@ -57,7 +57,7 @@ GRANT SELECT ON ProjectionInfo TO "[==PG_WEB_USER==]";
 -- extension column to Dataset, uncoupled
 CREATE TABLE WMSInfo (
    DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
-   WI_content         TEXT
+   WI_content         TEXT,
    UNIQUE (DS_id)
 );
 GRANT SELECT ON WMSInfo TO "[==PG_WEB_USER==]";
