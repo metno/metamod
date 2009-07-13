@@ -44,7 +44,7 @@ function displayval($mtname, $value, $dsName) {
    }
    return $s1;
 }
-function showlowerlevel($parentds,$startrow,$columns,$sqlpart) {
+function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
 #
 #  Show table of file level datasets (children of one directory level dataset) 
 #  selected by the search criteria.
@@ -58,6 +58,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart) {
 #  $columns      - Column names (see doshow.php)
 #  $sqlpart      - Part of WHERE-clause in SQL sentence corresponding to the selected 
 #                  search criteria.
+# $sqlPartParams - list of parameters connected to the $sqlpart, e.g. WHERE DS_id = $1 AND DS_name = $2
 #
    global $mmDbConnection, $mmColumns, $mmError, $mmErrorMessage, $mmDebug, $mmSessionState, $mmConfig;
    $prefcolumns = array();
@@ -83,7 +84,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart) {
    }
    $sqlsentence .= "ORDER BY DataSet.DS_id\n";
    if ($dbug !== FALSE) {echo '<pre>' .$sqlsentence . '</pre>' . "\n";}
-   $result1 = pg_query ($mmDbConnection, $sqlsentence);
+   $result1 = pg_query_params($mmDbConnection, $sqlsentence, $sqlPartParams);
    if (!$result1) {
       mmPutLog(__FILE__ . __LINE__ . " Could not $sqlsentence");
       $mmErrorMessage = $msg_start . "Internal application error";
@@ -111,7 +112,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart) {
       if (strpos($mmDebug,"secondlevel") !== false) {
          echo "<pre>sqlsentence = $sqlsentence</pre>\n";
       }
-      $result = pg_query ($mmDbConnection, $sqlsentence);
+      $result = pg_query($mmDbConnection, $sqlsentence);
       if (!$result) {
          mmPutLog(__FILE__ . __LINE__ . " Could not $sqlsentence");
          $mmErrorMessage = $msg_start . "Internal application error";

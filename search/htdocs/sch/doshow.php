@@ -98,7 +98,7 @@ for ($i1 = 1; $i1 <= $maxcol; $i1++) {
 #
 #     $ds_ids:   - Comma-separated string with all DS_ids in $ds_arr.
 #
-list($ds_arr,$dr_paths,$ds_with_children,$sqlpart) = getdslist();
+list($ds_arr,$dr_paths,$ds_with_children,$sqlpart,$sqlPartParams) = getdslist();
 $ds_ids = implode(",",$ds_arr);
 if ($mmError == 0) {
    if (strlen($ds_ids) > 0) {
@@ -198,7 +198,7 @@ if ($mmError == 0) {
                      echo "</table><br />\n";
                      $in_table = FALSE;
                      showlowerlevel($current_ds,$mmSessionState->exploded[$current_ds],
-                                    $columns,$sqlpart);
+                                    $columns,$sqlpart,$sqlPartParams);
                      if ($i1 < $num) {
                         echo "<br />\n";
                         echo $maintablestart;

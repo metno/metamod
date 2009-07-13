@@ -77,6 +77,12 @@ function getdslist() {
 #     $sqlpart   - Part of SQL WHERE clause corresponding to the selected search
 #                  criteria (apart from the map search criteria).
 #
+# and an array:
+#
+#     $sqlPartParam - the sqlpart contains a set of parameters name $1, $2, ... 
+#                     the values of these parameters are here.
+#
+
    $sqlpart = "";
    $sqlPartParams = array();
    $sql_gapart = "";
@@ -212,6 +218,6 @@ function getdslist() {
          }
       }
    }
-   return array($ds_arr,$dr_paths,$ds_with_children,$sqlpart);
+   return array($ds_arr,$dr_paths,$ds_with_children,$sqlpart, $sqlPartParams);
 }
 ?>
