@@ -96,20 +96,22 @@ sub trim {
 
 sub daemonize {
 	my ($logFile, $pidFile) = @_;
+    # check if writing to pidFile is possible
+    my $pidFH;
+    if ($pidFile) {
+       open $pidFH, ">$pidFile" or die "Cannot write pidfile $pidFile: $!\n";
+    }
+    if ($logFile && !-w $logFile) {
+    	die "Cannot write logfile $logFile\n";
+    }
     my $pid;
     if ($pid = _Fork()) {exit 0;};
     POSIX::setsid()
         or die "Can't start a new session: $!";
     if ($pid = _Fork()) {exit 0;}; # fork twice / disable control-terminal
-    if ($pidFile) {
-        open my $pfh, ">$pidFile" or die "Cannot write pidfile $pidFile: $!\n";
-        print $pfh "$$\n";
-        close $pfh;
-    }
-    # check if writing is possible
-    if ($pidFile) {
-       open my $pfh, ">$pidFile" or die "Cannot write pidfile $pidFile: $!\n";
-       close $pfh;
+    if ($pidFH) {
+        print $pidFH "$$\n";
+        close $pidFH;
     }
     # close/redirect std filehandles
     open(STDIN,  "+>/dev/null"); # instead of closing
