@@ -53,7 +53,8 @@ start() {
          work_expand=$work_directory/expand
          work_flat=$work_directory/flat
          path_to_shell_error=$webrun_directory/upl/shell_command_error
-         rm -f $work_directory/*
+         rm -rf $work_expand
+         rm -rf $work_flat
          rm -f $path_to_shell_error
       fi
       start_daemon -n 10 -p $upload_monitor_pid $target_directory/scripts/upload_monitor.pl $webrun_directory/upload_monitor.out $upload_monitor_pid
