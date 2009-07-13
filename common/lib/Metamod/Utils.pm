@@ -101,8 +101,9 @@ sub daemonize {
     if ($pidFile) {
        open $pidFH, ">$pidFile" or die "Cannot write pidfile $pidFile: $!\n";
     }
-    if ($logFile && !-w $logFile) {
-    	die "Cannot write logfile $logFile\n";
+    my $logFH;
+    if ($logFile) {
+       open $logFH, ">>$logFile" or die "Cannot write logfile $logFile: $!\n";
     }
     my $pid;
     if ($pid = _Fork()) {exit 0;};
@@ -115,8 +116,8 @@ sub daemonize {
     }
     # close/redirect std filehandles
     open(STDIN,  "+>/dev/null"); # instead of closing
-    if ($logFile) {
-        open STDOUT, ">>$logFile" or die "Can't redirect STDOUT to $logFile: $!";
+    if ($logFH) {
+        open STDOUT, ">>&", $logFH or die "Can't redirect STDOUT to $logFile: $!";
     } else {
         open (STDOUT, ">/dev/null"); # instead of closing 
     }
