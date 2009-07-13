@@ -386,7 +386,7 @@ function getRecords ($id = '', $from = '', $until = '') {
       );
    }
    $query = 'SELECT DS_id, DS_name, DS_status, DS_datestamp, DS_creationDate, DS_ownertag, DS_metadataFormat FROM DataSet WHERE ' .
-            "DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN ('".$mmConfig->getVar('PMH_EXPORT_TAGS')."') ";
+            "DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN (".$mmConfig->getVar('PMH_EXPORT_TAGS').") ";
    if ($id != '') {
       $query .= "AND DS_name = '$id' ";
    }
