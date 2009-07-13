@@ -96,31 +96,49 @@ sub trim {
 
 sub daemonize {
 	my ($logFile, $pidFile) = @_;
-	# check if writing is possible
-	if ($pidFile) {
-	   open my $pfh, ">$pidFile" or die "Cannot write pidfile $pidFile: $!\n";
-       close $pfh;
-	}
-    close STDIN;
-    close STDOUT;
-    if ($logFile) {
-        open STDOUT, ">>$logFile" or die "Can't redirect STDOUT to $logFile: $!";
-    }
-    close STDERR;
-    if ($logFile) {
-        open STDERR, ">>&STDOUT" or die "Can't redirect STDERR: $!";
-    }
-    my $pid = fork;
-    exit if $pid;
-    die "Couldn't fork: $!" unless defined($pid);
+    my $pid;
+    if ($pid = _Fork()) {exit 0;};
     POSIX::setsid()
         or die "Can't start a new session: $!";
+    if ($pid = _Fork()) {exit 0;}; # fork twice / disable control-terminal
     if ($pidFile) {
         open my $pfh, ">$pidFile" or die "Cannot write pidfile $pidFile: $!\n";
         print $pfh "$$\n";
         close $pfh;
     }
+    # check if writing is possible
+    if ($pidFile) {
+       open my $pfh, ">$pidFile" or die "Cannot write pidfile $pidFile: $!\n";
+       close $pfh;
+    }
+    # close/redirect std filehandles
+    open(STDIN,  "+>/dev/null"); # instead of closing
+    if ($logFile) {
+        open STDOUT, ">>$logFile" or die "Can't redirect STDOUT to $logFile: $!";
+    } else {
+        open (STDOUT, ">/dev/null"); # instead of closing 
+    }
+    open STDERR, ">>&STDOUT" or die "Can't redirect STDERR: $!";
 }
+
+##---------------------------------------------------------------------------##
+##  _Fork(): Try to fork if at all possible.  Function will croak
+##  if unable to fork.
+##
+sub _Fork {
+    my($pid);
+    FORK: {
+        if (defined($pid = fork)) {
+            return $pid;
+        } elsif ($! =~ /No more process/) {
+            sleep 3;
+            redo FORK;
+        } else {
+            die "Can't fork: $!";
+        }
+    }
+}
+
 
 1;
 __END__
