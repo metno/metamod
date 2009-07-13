@@ -36,10 +36,10 @@ header('Content-type: text/xml');
 <?php
 	require_once('../funcs/mmConfig.inc');
 	require_once ("../funcs/mmDataset.inc");
-	$filename = $mmConfig->getVar("WEBRUN_DIRECTORY").'/XML/'.mmDatasetName2FileName($_REQUEST['dsName']);
+	$filename = $mmConfig->getVar("WEBRUN_DIRECTORY").'/XML/'.$_REQUEST['dsName'];
 	list($xmdContent, $xml) = mmGetDatasetFileContent($filename);
 	if (!strlen($xml)) {
-		$xml = "<?xml ?><error_no_file name=\"$filename\"\>";
+		$xml = "<?xml version=\"1.0\" ?><error_no_file name=\"$filename\"\>";
 	}
 	echo $xml;
 ?>
