@@ -84,7 +84,7 @@ my $difSchema = XML::LibXML::Schema->new( location => $difSchemaURI );
 my $errors = 0;
 my $parser = XML::LibXML->new();
 my $doc = $parser->parse_string(fetchSource($harvestSource), $harvestSource);
-print STDERR "well-formed xml in $harvestSource\n";
+print STDERR "well-formed xml in $harvestSource\n" if $debug;
 
 $oaiSchema->validate($doc);
 print STDERR "valid oai-pmh document in $harvestSource\n" if $debug;
@@ -127,7 +127,7 @@ while (defined (my $record = $records->shift)) {
 if ($errors) {
 	die "found $errors validation errors in $recordNo records\n";
 } else {
-    print STDERR "sucessfully finished without errors, testing $recordNo records" if $debug;
+    print STDERR "sucessfully finished without errors, testing $recordNo records\n";
     exit(0);
 }
 
