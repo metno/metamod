@@ -14,8 +14,8 @@
 </xs:annotation>
 
 <xs:redefine
-      schemaLocation="http://nsidc.org/xml/schema/dif/extended_dif_v9.7.1.xsd">
-
+   schemaLocation="extended_dif_v9.7.1.xsd">
+<!--       schemaLocation="http://nsidc.org/xml/schema/dif/extended_dif_v9.7.1.xsd"> -->
    <xs:complexType name="DIFObject">
       <xs:complexContent>
       <xs:restriction base="DIFObject">
