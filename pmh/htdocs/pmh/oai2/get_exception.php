@@ -39,13 +39,23 @@ function get_exception($mtname, $exception, $value) {
       	if ($last != 'HIDDEN') {
       		array_push($parts, $last);
       	}
-      	$detail = join(' > ', $parts);
-#      	$detail = FALSE; <--- Seems to be left here by a mistake? Egils
+      	if (count($parts) == 1) {
+      		// no gcmd-keywords, just a parameter which is unable to translate
+      		$detail = $parts[0];
+      		$parts = array();
+      	} else {
+      		# $detail = join(' > ', $parts); # detail not required if full gcmd-keywords
+      		$detail = FALSE;
+      	}
       }
       if ($exception < 0) {
       	 return $detail;
       } elseif ($exception <= count($parts)) {
-         return $parts[$exception - 1];
+      	$value = $parts[$exception - 1]; 
+      	if ($value == "Spectral Engineering") {
+      	   $value = "Spectral/Engineering"; # fix bug in Metamod-data
+      	}
+         return $value;
       }
    }
    elseif ($mtname == "datacollection_period") {

@@ -347,16 +347,16 @@ function getRecords ($id = '', $from = '', $until = '') {
          'variable 2', 'Parameters Term', '','Not Available',
          'variable 3', 'Parameters Variable_Level_1', '','',
          'variable -1', 'Parameters Detailed_Variable', '','',
-         'topiccategory 1', 'ISO_Topic_Category', '','', # required by IPY
+         'topiccategory 1', 'ISO_Topic_Category', '','Climatology/Meteorology/Atmosphere', # topiccategory required, using most likely one as default
          'keywords', 'Keyword', '','',
-         'datacollection_period 1', 'Temporal_Coverage Start_Date', '','', # required by IPY
-         'datacollection_period 2', 'Temporal_Coverage Stop_Date', '','',  # required by IPY
+         'datacollection_period 1', 'Temporal_Coverage Start_Date', '','1970-01-01', # required by IPY
+         'datacollection_period 2', 'Temporal_Coverage Stop_Date', '','1970-01-01',  # required by IPY
          '', 'Data_Set_Progress', 'In Work', '', # in work, means Not Available here
-         'bounding_box 1', 'Spatial_Coverage', '','', # required by IPY
-         'area 1', '*Location Location_Category', '','', # required by IPY
+         'bounding_box 1', 'Spatial_Coverage', '','<Minimum_Altitude>0</Minimum_Altitude>', # spatial coverage required by IPY
+         'area 1', '*Location Location_Category', '','Ocean', # required by IPY
          'area 2', 'Location Location_Type', '','',
          'area 3', 'Location Location_Subregion1', '','',
-         'area -1', 'Location Detailed_Location', '','',
+         'area -1', 'Location Detailed_Location', '','Not Available',
          'latitude_resolution 1', 'Data_Resolution Latitude_Resolution', '','',
          'longitude_resolution 1', 'Data_Resolution Longitude_Resolution', '','',
          '', 'Project Short_Name', 'Not Available', '',
