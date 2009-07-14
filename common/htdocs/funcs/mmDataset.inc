@@ -169,7 +169,6 @@ class MM_ForeignDataset {
 	protected $domOther;
 	protected $xpathDS;
 	protected $namespaceDS = "http://www.met.no/schema/metamod/dataset";
-	const DATASET_SCHEMA = "[==TARGET_DIRECTORY==]/schema/dataset.xsd"; 
 	/**
 	 * construct a ForeignDataset (Dataset and XML-file)
 	 * 
@@ -455,14 +454,20 @@ class MM_ForeignDataset {
 	 * @return true on success
 	 */
 	function validate() {
-		return $this->domDS->schemaValidate(self::DATASET_SCHEMA);
+		return $this->domDS->schemaValidate($this->getDatasetSchema());
+	}
+	/*
+	 * @return the dataset schema
+	 */
+	static function getDatasetSchema() {
+		global $mmConfig;
+		return $mmConfig->getVar("TARGET_DIRECTORY") . "/schema/dataset.xsd"; 	   
 	}
 }
 
 class MM_Dataset extends MM_ForeignDataset {
 	protected $xpathMM2;
 	protected $namespaceMM2 = "http://www.met.no/schema/metamod/MM2";
-	const MM2_SCHEMA = "[==TARGET_DIRECTORY==]/schema/MM2.xsd"; 
 	
 	
 	/**
@@ -595,9 +600,16 @@ class MM_Dataset extends MM_ForeignDataset {
 	 * @return true on success
 	 */
 	function validate() {
-		return $this->domDS->schemaValidate(parent::DATASET_SCHEMA) &&
-			$this->domOther->schemaValidate(self::MM2_SCHEMA);
+		return $this->domDS->schemaValidate($this->getDatasetSchema) &&
+			$this->domOther->schemaValidate($this->getMM2Schema);
 		
+	}
+	/**
+	 * @return the mm2 schema
+	 */
+	static function getMM2Schema() {
+		global $mmConfig;
+		return $mmConfig->getVar("TARGET_DIRECTORY") . "/schema/MM2.xsd"; 	   
 	}
 	
 }

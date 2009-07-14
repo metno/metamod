@@ -83,7 +83,7 @@ function htmlEncodeUtf8 ( $str ) {
 			$domXMD->encoding = "UTF-8";
 			$xmd = $domXMD->saveXML(); // save as utf-8
 			echo "<p>Dataset is well-defined</p>";
-			$validXMD = $domXMD->schemaValidate(MM_ForeignDataset::DATASET_SCHEMA); 
+			$validXMD = $domXMD->schemaValidate(MM_ForeignDataset::getDatasetSchema()); 
 			if ($validXMD) {
 				echo "<p>Dataset is valid</p>";
 			} else {
@@ -98,7 +98,7 @@ function htmlEncodeUtf8 ( $str ) {
 			$domXML->encoding = "UTF-8";
 			$xml = $domXML->saveXML(); // save as utf-8
 			echo "<p>xml-file is well-defined</p>";
-			$validXML = $domXML->schemaValidate(MM_Dataset::MM2_SCHEMA); 
+			$validXML = $domXML->schemaValidate(MM_Dataset::getMM2Schema()); 
 			if ($validXML) {
 				echo "<p>xml-file is valid MM2 file.</p>";
 			} else {
