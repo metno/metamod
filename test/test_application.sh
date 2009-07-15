@@ -253,6 +253,7 @@ cd $basedir/webrun
 rm -rf u1
 mkdir u1
 cp $basedir/source/test/u1input/* u1
+chmod 666 u1/* # writeable for everybody
 cd $basedir/data
 for dir in `cat $basedir/source/test/directories`; do
    mkdir -p $dir
