@@ -252,6 +252,7 @@ cd $basedir/target
 cd $basedir/webrun
 rm -rf u1
 mkdir u1
+chmod 777 u1
 cp $basedir/source/test/u1input/* u1
 chmod 666 u1/* # writeable for everybody
 cd $basedir/data
