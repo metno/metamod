@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+  <info name="DAMOC/itp12" status="active" creationDate="2009-03-13T14:01:40Z" datestamp="2009-03-13T14:01:40Z" ownertag="DAM" metadataFormat="MM2"/>
+<quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">144444
+233314
+233323
+233332
+233333
+233334
+322221
+322222</quadtree_nodes></dataset>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+  <info name="DAMOC/pops" status="active" creationDate="2009-07-06T13:00:12Z" datestamp="2009-07-06T13:00:12Z" ownertag="DAM" metadataFormat="MM2"/>
+<quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">23332
+41111
+122242
+144234
+144412
+144413
+144414
+144431
+233142
+233144
+233212
+233213
+233214
+233231
+233232
+233233
+233241
+233314
+233332
+233333
+233334
+233341
+233343
+233411
+322224
+322422
+322424
+322442
+322444
+324222
+324224
+324241
+324242
+324243
+324412
+324414
+411121
+411123
+411124
+411131
+411132
+411134
+411141
+411311</quadtree_nodes></dataset>

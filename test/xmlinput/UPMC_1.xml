@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2007-09-15</metadata>
+  <metadata name="datacollection_period_to">2008-08-15</metadata>
+  <metadata name="institution">UPMC Université Pierre et Marie Curie</metadata>
+  <metadata name="contact">jga@lodyc.jussieu.fr</metadata>
+  <metadata name="dataref">UPMC-1 (planned activity)</metadata>
+  <metadata name="activity_type">Float</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Ice Depth/Thickness &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Ocean Currents &gt; HIDDEN</metadata>
+  <metadata name="variable">Spectral Engineering &gt; Infrared Wavelengths &gt; Brightness Temperature &gt; HIDDEN</metadata>
+  <metadata name="area">Central Arctic</metadata>
+  <metadata name="abstract">
+Isobaric floats equipped with ULS for measuring sea-ice drafts
+Profiling floats for measuring CTD between
+surface and 1000m depth.
+   </metadata>
+</MM2>

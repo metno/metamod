@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2005-11-28</metadata>
+  <metadata name="datacollection_period_to">2007-12-31</metadata>
+  <metadata name="bounding_box">180.0,-78.7249984741211,-180.0,86.9499969482422</metadata>
+  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/DTU/gmmicemov/</metadata>
+  <metadata name="area">Arctic Ocean</metadata>
+  <metadata name="contact">rs@space.dtu.dk</metadata>
+  <metadata name="topiccategory">oceans</metadata>
+  <metadata name="PI_name">Roberto Saldo</metadata>
+  <metadata name="keywords">Ice</metadata>
+  <metadata name="activity_type">Space borne instrument</metadata>
+  <metadata name="project_name">DAMOCLES</metadata>
+  <metadata name="Conventions">CF-1.0</metadata>
+  <metadata name="distribution_statement">Free</metadata>
+  <metadata name="abstract">
+Envisat ASAR GMM derived 3 day ice movement 
+   </metadata>
+  <metadata name="title">GMM ice movement</metadata>
+  <metadata name="product_name">GMM icemovement</metadata>
+  <metadata name="institution">DTU Technical University of Denmark</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Sea Ice Motion &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Sea Ice &gt; Sea Ice Motion &gt; HIDDEN</metadata>
+</MM2>

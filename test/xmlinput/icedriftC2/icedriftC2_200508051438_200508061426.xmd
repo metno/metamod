@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+  <info name="DAMOC/icedriftC2/icedriftC2_200508051438_200508061426" status="active" creationDate="2009-03-20T12:17:16Z" datestamp="2009-03-20T12:17:16Z" ownertag="DAM" metadataFormat="MM2"/>
+<quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">141443
+141444
+143342
+144211
+144213
+144231
+233332
+233334
+233341
+233343
+312124
+322243
+322422
+322444
+324223
+324224
+324232
+324242
+411144
+411314
+411323
+411324
+411334
+411343
+411413
+413113
+413114</quadtree_nodes></dataset>

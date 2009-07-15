@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+  <info name="DAMOC/MSM0204CTD" status="active" creationDate="2008-10-01T00:00:00Z" datestamp="2008-10-01T00:00:00Z" ownertag="DAM" metadataFormat="MM2"/>
+  
+<quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">324221
+324223
+324241
+324243
+324244
+413112
+413114
+413132
+413133
+413134</quadtree_nodes></dataset>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="institution">NPI Norwegian Polar Institute</metadata>
+  <metadata name="contact">edmond.hansen@npolar.no</metadata>
+  <metadata name="dataref">NPI-1 (planned activity)</metadata>
+  <metadata name="activity_type">Cruise</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Water Masses &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Temperature &gt; Ocean Mixed Layer &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Temperature &gt; Potential Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Temperature &gt; Water Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Salinity/Density &gt; Density &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Salinity/Density &gt; Salinity &gt; HIDDEN</metadata>
+  <metadata name="area">Fram Strait</metadata>
+  <metadata name="abstract">
+Annual cruises with RV Lance
+   </metadata>
+</MM2>

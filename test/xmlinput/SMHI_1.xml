@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">1958-01-01</metadata>
+  <metadata name="datacollection_period_to">2008-12-31</metadata>
+  <metadata name="institution">SMHI Swedish Meteorological and Hydrological Institute</metadata>
+  <metadata name="dataref">SMHI-1 (planned activity)</metadata>
+  <metadata name="activity_type">Model run</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Pressure &gt; Sea Level Pressure &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Radiation &gt; Incoming Solar Radiation &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Radiation &gt; Longwave Radiation &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Radiation &gt; Net Radiation &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Radiation &gt; Outgoing Longwave Radiation &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Radiation &gt; Radiative Flux &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Radiation &gt; Shortwave Radiation &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Temperature &gt; Air Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Temperature &gt; Surface Air Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Water Vapor &gt; Humidity &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Winds &gt; Surface Winds &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Clouds &gt; Cloud Amount/Frequency &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Precipitation &gt; Rain &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Precipitation &gt; Snow &gt; HIDDEN</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Heat Flux &gt; HIDDEN</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Ice Depth/Thickness &gt; HIDDEN</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Ice Extent &gt; HIDDEN</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Ice Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Sea Ice Concentration &gt; HIDDEN</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Snow Depth &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Heat Budget &gt; Heat Flux &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Temperature &gt; Potential Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Temperature &gt; Sea Surface Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Salinity/Density &gt; Salinity &gt; HIDDEN</metadata>
+  <metadata name="area">Greenland Sea</metadata>
+  <metadata name="area">Iceland Sea</metadata>
+  <metadata name="area">Norwegian Sea</metadata>
+  <metadata name="area">Fram Strait</metadata>
+  <metadata name="area">Denmark Strait</metadata>
+  <metadata name="area">Laptev Sea</metadata>
+  <metadata name="area">Kara Sea</metadata>
+  <metadata name="area">Central Arctic</metadata>
+  <metadata name="area">Beufort Sea</metadata>
+  <metadata name="area">Chukchi Sea</metadata>
+  <metadata name="area">East Siberian Sea</metadata>
+  <metadata name="area">White Sea</metadata>
+  <metadata name="abstract">
+WP4 uses different kind of models. Climate models will at least provide monthly mean data. NWP models
+will provide data with 3-6 h intervall.
+   </metadata>
+</MM2>

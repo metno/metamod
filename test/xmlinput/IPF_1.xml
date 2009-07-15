@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="institution">IPF International Polar Foundation</metadata>
+  <metadata name="contact">gg@polarfoundation.org</metadata>
+  <metadata name="dataref">IPF-1 (planned activity)</metadata>
+  <metadata name="activity_type">exhibition</metadata>
+  <metadata name="abstract">
+No observational data collection.
+Data display activity
+End user
+   </metadata>
+</MM2>

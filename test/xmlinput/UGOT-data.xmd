@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+  <info name="DAMOC/UGOT-data" status="active" creationDate="2008-10-01T00:00:00Z" datestamp="2008-10-01T00:00:00Z" ownertag="DAM" metadataFormat="MM2"/>
+  <quadtree_nodes>
+23123
+124423
+124441
+124443
+142221
+213324
+213341
+213411
+213412
+213423
+213432
+214333
+231113
+231114
+231123
+231124
+231131
+231142
+231213
+231214
+231222
+231223
+231412
+231421
+232111
+232133
+232141
+232143
+232323
+232324
+232332
+232342
+232343
+232413
+234121
+412242
+412422
+421333
+   </quadtree_nodes>
+</dataset>

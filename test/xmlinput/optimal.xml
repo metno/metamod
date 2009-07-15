@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2005-12-01</metadata>
+  <metadata name="datacollection_period_to">2007-11-26</metadata>
+  <metadata name="bounding_box">180,30.9435,-180,90</metadata>
+  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/DTU/optimal/</metadata>
+  <metadata name="area">Arctic Ocean</metadata>
+  <metadata name="contact">rs@space.dtu.dk</metadata>
+  <metadata name="topiccategory">oceans</metadata>
+  <metadata name="PI_name">Roberto Saldo</metadata>
+  <metadata name="keywords">Cryosphere Ice Atmosphere</metadata>
+  <metadata name="activity_type">Space borne instrument</metadata>
+  <metadata name="project_name">DAMOCLES</metadata>
+  <metadata name="Conventions">CF-1.0</metadata>
+  <metadata name="history">2007-11-26 creation</metadata>
+  <metadata name="distribution_statement">Free</metadata>
+  <metadata name="abstract">
+Ice, ocean and atmosphere parameters retrieved from AMSR-E passive microwave 
+measurements by optimal estimation. 
+   </metadata>
+  <metadata name="title">Optimal estimated parameters from AMSR-E data</metadata>
+  <metadata name="product_name">OptimalAMSR</metadata>
+  <metadata name="institution">DTU Technical University of Denmark</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Sea Ice Concentration &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Sea Ice &gt; Sea Ice Concentration &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Clouds &gt; Cloud Liquid Water/Ice &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Sea Ice &gt; Ice Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Ice Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Temperature &gt; Sea Surface Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Water Vapor &gt; Condensation &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Winds &gt; Surface Winds &gt; HIDDEN</metadata>
+</MM2>

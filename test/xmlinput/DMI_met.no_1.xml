@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">1987-07-01</metadata>
+  <metadata name="datacollection_period_to">2007-12-31</metadata>
+  <metadata name="institution">DMI Danish Meteorological Institute</metadata>
+  <metadata name="contact">san@dmi.dk</metadata>
+  <metadata name="institution">met.no Norwegian Meteorological Institute</metadata>
+  <metadata name="dataref">DMI/met.no-1 (planned activity)</metadata>
+  <metadata name="activity_type">Space borne instrument</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Ice Edges &gt; HIDDEN</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Sea Ice Concentration &gt; HIDDEN</metadata>
+  <metadata name="area">Greenland Sea</metadata>
+  <metadata name="area">Iceland Sea</metadata>
+  <metadata name="area">Norwegian Sea</metadata>
+  <metadata name="area">Fram Strait</metadata>
+  <metadata name="area">Denmark Strait</metadata>
+  <metadata name="area">Laptev Sea</metadata>
+  <metadata name="area">Kara Sea</metadata>
+  <metadata name="area">Central Arctic</metadata>
+  <metadata name="area">Beufort Sea</metadata>
+  <metadata name="area">Chukchi Sea</metadata>
+  <metadata name="area">East Siberian Sea</metadata>
+  <metadata name="area">White Sea</metadata>
+  <metadata name="abstract">
+Sea ice concentration and edge dataset based on reanalyzed SSM/I data.
+   </metadata>
+</MM2>

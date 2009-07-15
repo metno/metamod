@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2007-01-01</metadata>
+  <metadata name="datacollection_period_to">2007-01-31</metadata>
+  <metadata name="bounding_box">179.956,45.2402,-179.995,89.9033</metadata>
+  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/met.no/icesst/</metadata>
+  <metadata name="topiccategory">oceans</metadata>
+  <metadata name="area">Arctic Ocean</metadata>
+  <metadata name="area">Nordic Seas</metadata>
+  <metadata name="contact">jens.debernard@met.no</metadata>
+  <metadata name="references">http://met.no/english/r_and_d_activities/method/num_mod/mi_pom.html, http://met.no/english/r_and_d_activities/method/num_mod/mi_im.html</metadata>
+  <metadata name="operational_status">Operational</metadata>
+  <metadata name="PI_name">Jens Debernard</metadata>
+  <metadata name="product_version">1.0</metadata>
+  <metadata name="forecast_type">nowcast</metadata>
+  <metadata name="keywords">forecast</metadata>
+  <metadata name="keywords">sea</metadata>
+  <metadata name="keywords">ice</metadata>
+  <metadata name="keywords">asimillation</metadata>
+  <metadata name="Conventions">CF-1.0</metadata>
+  <metadata name="history">2007-05-24 creation</metadata>
+  <metadata name="grid_projection">polar_stereographic</metadata>
+  <metadata name="distribution_statement">Free</metadata>
+  <metadata name="product_name">coupled MI-POM, MI-IM model</metadata>
+  <metadata name="software_version">MIPOM v. 23, MI-IM v. 3</metadata>
+  <metadata name="title">met.no DAMOCLES sea ice operational ice concentration and sst</metadata>
+  <metadata name="abstract">
+This data set contains ice concentration (fraction of ice), and sea surface 
+temperature analysis from the met.no operational coupled ice-ocean model 
+Arctic-20. Each file contains one month of daily analysis valid at 00 GMT. The 
+quality of this data set will vary due to model upgrades, and should therefore 
+in the long term, improve with time. New model-versions are tested 
+semi-operationally before they are included in this data set. 
+   </metadata>
+  <metadata name="institution">met.no Norwegian Meteorological Institute</metadata>
+  <metadata name="variable">sea_ice_area_fraction</metadata>
+  <metadata name="variable">sea_water_temperature</metadata>
+</MM2>

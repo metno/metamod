@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2007-03-15</metadata>
+  <metadata name="datacollection_period_to">2008-03-15</metadata>
+  <metadata name="institution">UdS Université de Savoie</metadata>
+  <metadata name="contact">dmars@univ-savoie.fr</metadata>
+  <metadata name="dataref">UdS-1 (planned activity)</metadata>
+  <metadata name="activity_type">field_experiment</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Ice Deformation &gt; HIDDEN</metadata>
+  <metadata name="area">Central Arctic</metadata>
+  <metadata name="abstract">
+seismic field experiment for measuring fracturing and
+deformation of the sea-ice for 1 year at small
+spatial scale
+(ie meters to kilometers).
+   </metadata>
+</MM2>

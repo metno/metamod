@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2005-12-01</metadata>
+  <metadata name="datacollection_period_to">2008-10-07</metadata>
+  <metadata name="bounding_box">4.2901667,62.8221667,4.2901667,62.8221667</metadata>
+  <metadata name="variable">sea_water_pressure</metadata>
+  <metadata name="variable">sea_water_temperature</metadata>
+  <metadata name="variable">sea_water_speed</metadata>
+  <metadata name="variable">direction_of_sea_water_velocity</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Ocean Currents Oceans &gt; Ocean Temperature &gt; Water Temperature Oceans &gt; Salinity/Density &gt; Salinity Oceans &gt; Ocean Pressure &gt; Water Pressure &gt; HIDDEN</metadata>
+  <metadata name="variable">depth</metadata>
+  <metadata name="variable">sea_water_salinity</metadata>
+  <metadata name="area">Nordic Seas</metadata>
+  <metadata name="contact">Kjell.Orvik@gfi.uib.no</metadata>
+  <metadata name="topiccategory">oceans</metadata>
+  <metadata name="PI_name">Kjell Arild Orvik</metadata>
+  <metadata name="keywords">ocean current temperature salinity pressure</metadata>
+  <metadata name="activity_type">Moored instrument</metadata>
+  <metadata name="project_name">DAMOCLES</metadata>
+  <metadata name="Conventions">CF-1.0</metadata>
+  <metadata name="Platform_name">Svinøy S1 mooring</metadata>
+  <metadata name="history">2008-11-26 Created</metadata>
+  <metadata name="distribution_statement">Restricted to Damocles</metadata>
+  <metadata name="abstract">
+Mooring observing current, temperature, salinity and pressure. The mooring is 
+named S1 in the Svinøy section and positioned at 62o 49.33 N, 4o 17.41 E. The 
+depth is 500m and the dataset contains hourly records (raw data) from 100m and 
+300m. Time is specified in UTC. 
+   </metadata>
+  <metadata name="title">Svinøy S1 mooring</metadata>
+  <metadata name="institution">UiB University of Bergen</metadata>
+  <metadata name="product_name">Svinøy S1 mooring 100m and 300m</metadata>
+  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/UiB/svinoy-mooring/</metadata>
+</MM2>

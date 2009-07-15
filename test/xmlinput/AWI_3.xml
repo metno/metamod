@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">1993-04-03</metadata>
+  <metadata name="datacollection_period_to">1993-04-03</metadata>
+  <metadata name="institution">AWI Alfred Wegener Institute for Polar and Marine Research</metadata>
+  <metadata name="contact">cluepkes@awi-bremerhaven.de</metadata>
+  <metadata name="dataref">AWI-3 (planned activity)</metadata>
+  <metadata name="activity_type">aircraft</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Pressure &gt; Atmospheric Pressure Measurements &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Temperature &gt; Air Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Temperature &gt; Dew Point Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Temperature &gt; Potential Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Water Vapor &gt; Humidity &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Winds &gt; Flight Level Winds &gt; HIDDEN</metadata>
+  <metadata name="area">Fram Strait</metadata>
+  <metadata name="abstract">
+Data of drop sondes released from an aircraft during cold-air
+outbreaks over the Fram Strait (4 March
+1993).
+The 7 profiles of temperature, humidity and wind are available as a function of distance to the
+pack ice edge. Details can
+be found in Luepkes and Schluenzen 1996, Boundary-Layer Meteorology, 79,107-130
+
+   </metadata>
+</MM2>

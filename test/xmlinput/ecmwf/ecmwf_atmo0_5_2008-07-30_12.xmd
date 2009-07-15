@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+  <info name="DAMOC/ecmwf/ecmwf_atmo0_5_2008-07-30_12" status="active" creationDate="2009-03-20T11:04:03Z" datestamp="2009-03-20T11:04:03Z" ownertag="NDAM" metadataFormat="MM2"/>
+<quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">1
+2
+3
+4</quadtree_nodes></dataset>

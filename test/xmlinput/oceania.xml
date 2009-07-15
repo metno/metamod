@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2007-06-19</metadata>
+  <metadata name="datacollection_period_to">2007-07-22</metadata>
+  <metadata name="bounding_box">20.004,70.5,0.044,79.831</metadata>
+  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/IOPAS/oceania/</metadata>
+  <metadata name="Conventions">CF-1.0</metadata>
+  <metadata name="topiccategory">oceans</metadata>
+  <metadata name="area">Greenland Sea</metadata>
+  <metadata name="area">Barents Sea</metadata>
+  <metadata name="contact">ilona_g@iopan.gda.pl</metadata>
+  <metadata name="operational_status">Operational</metadata>
+  <metadata name="PI_name">Ilona Goszczko</metadata>
+  <metadata name="product_version">1.0</metadata>
+  <metadata name="keywords">Oceanography Pressure Temperature Coductivity Salinity</metadata>
+  <metadata name="references">http://seabird.com</metadata>
+  <metadata name="references">http://www.iopan.gda.pl</metadata>
+  <metadata name="activity_type">Cruise</metadata>
+  <metadata name="project_name">Damocles, AREX 2007</metadata>
+  <metadata name="history">2007-07-22 creation</metadata>
+  <metadata name="distribution_statement">Restricted to Damocles</metadata>
+  <metadata name="quality_index">1</metadata>
+  <metadata name="software_version">CTD Seabird SBE911plus, Seasave Win32 V 7.12</metadata>
+  <metadata name="abstract">
+IO PAS CTD data file from Arctic Cruise with R/V Oceania performed in summer 
+2007 
+   </metadata>
+  <metadata name="title">IO PAS CTD data file</metadata>
+  <metadata name="Platform_name">R/V Oceania</metadata>
+  <metadata name="product_name">oceania_ctd_ar07</metadata>
+  <metadata name="institution">IOPAN Instytut Oceanologii, Polska Akademia Nauk</metadata>
+  <metadata name="variable">sea_water_electrical_conductivity</metadata>
+  <metadata name="variable">sea_water_temperature</metadata>
+  <metadata name="variable">sea_water_salinity</metadata>
+  <metadata name="variable">sea_water_pressure</metadata>
+</MM2>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2005-05-10</metadata>
+  <metadata name="datacollection_period_to">2006-02-10</metadata>
+  <metadata name="bounding_box">179.635,56.0234,-178.51,90</metadata>
+  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/DMI/icedriftC4/</metadata>
+  <metadata name="area">Arctic Ocean</metadata>
+  <metadata name="contact">gd@dmi.dk</metadata>
+  <metadata name="topiccategory">oceans</metadata>
+  <metadata name="PI_name">Gorm Dybkjaer</metadata>
+  <metadata name="keywords">Ice drift</metadata>
+  <metadata name="keywords">Arctic</metadata>
+  <metadata name="keywords">IR</metadata>
+  <metadata name="keywords">VIS</metadata>
+  <metadata name="keywords">AVHRR</metadata>
+  <metadata name="keywords">MCC</metadata>
+  <metadata name="Platform_name">AVHRR</metadata>
+  <metadata name="activity_type">Space borne instrument</metadata>
+  <metadata name="project_name">DAMOCLES</metadata>
+  <metadata name="Conventions">CF-1.0</metadata>
+  <metadata name="history">2007-10-25 creation</metadata>
+  <metadata name="distribution_statement">Free</metadata>
+  <metadata name="abstract">
+A 9 month ice drift data set based on VIS and IR data 
+   </metadata>
+  <metadata name="title">Ice drift in Greenland seas</metadata>
+  <metadata name="product_name">Ice drift</metadata>
+  <metadata name="institution">DMI Danish Meteorological Institute</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Sea Ice Motion &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Sea Ice &gt; Sea Ice Motion &gt; HIDDEN</metadata>
+  <metadata name="variable">Ice displacement</metadata>
+</MM2>

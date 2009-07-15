@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="variable">Oceans, Ocean Circulation, Ocean Currents &gt; HIDDEN</metadata>
+  <metadata name="area">Barents Sea</metadata>
+  <metadata name="contact">ilker.fer@gfi.uib.no</metadata>
+  <metadata name="PI_name">Ilker Fer</metadata>
+  <metadata name="keywords">ADCP</metadata>
+  <metadata name="keywords">Storfjorden</metadata>
+  <metadata name="keywords">current</metadata>
+  <metadata name="keywords">overflow</metadata>
+  <metadata name="keywords">Microcat</metadata>
+  <metadata name="activity_type">Moored instrument</metadata>
+  <metadata name="project_name">DAMOCLES</metadata>
+  <metadata name="Conventions">CF-1.0</metadata>
+  <metadata name="Platform_name">Bottom mounted frame</metadata>
+  <metadata name="distribution_statement">free</metadata>
+  <metadata name="abstract">
+Under the Developing Arctic Modeling and Observing Capabilities for Long-term 
+Environmental Studies (DAMOCLES) project, an acoustic Doppler current profiler 
+(ADCP) was deployed at the sill separating the Storfjorden in Svalbard 
+Archipelago and Storfjordrenna north of Storfjordbanken on the Barents Sea 
+shelf. Storfjorden, through its polynya activity, produces highly saline water 
+near the freezing temperature which fills the fjord to the sill level (115 m) 
+and initiates a gravity driven overflow. A self-contained 307.2 KHz broadband 
+Workhorse, Sentinel, RD Instruments ADCP was deployed at 76deg 58min N, 19deg 
+15min E at the 111 m isobath on 4 September 2003, 17:30 UTC. The deployment was 
+conducted from R.V. G.O. Sars, during the last leg of the cruise 2003010 (01.09 
+– 14.09 2003). The instrument was recovered from R.V. G.O. Sars on 19 August 
+2004. The instrument is installed in an aluminum trawl-proof frame, attached to 
+a concrete block of 2.5x2.5x0.37 m dimensions. The ADCP sampled at 4-m depth 
+cell size, averaging data (33 pings per ensemble) at 10 min intervals. The first 
+cell was centered at about 6 mab (meter above bottom). This dataset consists of 
+hourly averaged vertical profiles of current velocities as well as temperature 
+at the instrument depth. 
+   </metadata>
+  <metadata name="title">Acoustic Doppler Current Profiler data from the Storfjorden Sill, 2003/2004</metadata>
+  <metadata name="product_name">Horizontal velocity and temperature at Storfjorden Sill</metadata>
+  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/UiB/StorfjordADCP/</metadata>
+  <metadata name="institution">UiB University of Bergen</metadata>
+</MM2>

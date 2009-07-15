@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="variable">sea_ice_area_fraction</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="area">Northern Hemisphere</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="contact">heygster@uni-bremen.de</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="topiccategory">geoscientificinformation</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="topiccategory">oceans</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="PI_name">Georg Heygster</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="product_version">1.0</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="keywords">Space borne instrument</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="references">Spreen, Kaleschke, Heygster, 2008 (doi:10.1029/2005JC003384)</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="datacollection_period_from">2007-01-01</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="activity_type">Space borne instrument</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="project_name">DAMOCLES</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="Conventions">CF-1.0</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="Platform_name">Aqua (NASA)</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="history">2007-02-01 creation</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="distribution_statement">Free</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="quality_index">1</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="software_version">ASI algorithm V.5</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="datacollection_period_to">2007-01-31</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="title">Sea ice concentration derived from AMSR-E</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="abstract">
+Sea ice concentration calculated with the ARTIST
+Sea Ice (ASI) algorithm (see 
+www.seaice.de) using AMSR-E (Advanced
+Microwave Scanning Radiometer) data. 
+AMSR-E is a multichannel, dual 
+polarisation (H and V) radiometer on NASA's 
+satellite Aqua.
+Ice concentration is the fraction of a satellite footprint 
+covered by sea ice, 
+given in 0% (no ice) to 100% (totally ice-covered). About 
+14 daily
+satellite passes; in the Arctic, each point is covered at least 
+twice
+daily. All satellite passes of one day are interpolated and averaged
+onto 
+a 6.25 km grid, using the "nearneighbor" routine of the
+Generic Mapping Tools 
+(GMT) 
+ </metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="bounding_box">179.953491210938,31.0110759735107,-180,89.9592056274414</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="institution">UB University of Bremen</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="product_name">asi-n6250-2008*-v5 </metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="dataref">http://damocles.met.no:8080/thredds/catalog/data/UB/iceconc/catalog.html?dataset=UB/iceconc/iceconc_2007-01.nc</metadata></MM2>

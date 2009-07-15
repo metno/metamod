@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2001-07-05</metadata>
+  <metadata name="datacollection_period_to">2001-08-21</metadata>
+  <metadata name="bounding_box">120,79,-10,90</metadata>
+  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/SU/aoe/</metadata>
+  <metadata name="product_name">AOE-2001 dataset</metadata>
+  <metadata name="area">Arctic Ocean</metadata>
+  <metadata name="contact">michaelt@misu.su.se</metadata>
+  <metadata name="topiccategory">climatologyMeteorologyAtmosphere</metadata>
+  <metadata name="PI_name">Michael Tjernstrom</metadata>
+  <metadata name="keywords">Polar</metadata>
+  <metadata name="keywords">Troposphere</metadata>
+  <metadata name="keywords">Meteorological Observation</metadata>
+  <metadata name="keywords">Measurement</metadata>
+  <metadata name="keywords">Atmospheric Boundary Layer</metadata>
+  <metadata name="keywords">Clouds</metadata>
+  <metadata name="keywords">Remote Sensing</metadata>
+  <metadata name="keywords">Soundings</metadata>
+  <metadata name="keywords">Temperature</metadata>
+  <metadata name="keywords">Humidity</metadata>
+  <metadata name="keywords">Wind</metadata>
+  <metadata name="keywords">Pressure</metadata>
+  <metadata name="keywords">Turbulence</metadata>
+  <metadata name="keywords">Radiation</metadata>
+  <metadata name="keywords">Visibility</metadata>
+  <metadata name="activity_type">Cruise</metadata>
+  <metadata name="project_name">AOE-2001</metadata>
+  <metadata name="Conventions">CF-1.0</metadata>
+  <metadata name="history">2007-11-23 creation</metadata>
+  <metadata name="distribution_statement">Free</metadata>
+  <metadata name="title">Arctic Ocean Experiment 2001 AOE-2001.</metadata>
+  <metadata name="abstract">
+Arctic Ocean Experiment 2001 AOE-2001 was an icebreaker based field experiment 
+with a target on the formation of low clouds in the central Arctic summer during 
+July and August 2001. A main portion of the 2-moth experiment was a 3-week ice 
+drift from 89 to 88 degN. Main components of the meteorology part of the 
+experiment were surface-based remote- sensing observations, general meteorology 
+observations (weather staion and soundings) and boundary-layer observations on 
+the ice. For a complete review of the experiment and a full list of instruments, 
+see Tjernström et al. 2004 ("The summertime Arctic atmosphere: Meteorological 
+measurements during the Arctic Ocean Experiment (AOE-2001)" in Bulletin of the 
+American Meteorological Society, 85, 1305 - 1321, and its on-line supplement 
+"Experimental equipment: A supplement to The summertime Arctic atmosphere: 
+Meteorological measurements during the Arctic Ocean Experiment (AOE-2001)"). 
+Observations included in the dataset:
+   Observations from 2D-wind sonic anemometer on the mast of Oden during AOE-2001. Beware of flow distortion from the ship.
+   One-hour averaged cloud base observations from cloud base lidar and cloud radar during AOE-2001
+   Instant cloud-top observations from S-band cloud radar operating in two modes, a low-range high-resolution and a high-range low-resolution mode, respectively, obtained during AOE-2001. The presented data is the highest cloud top altitude observed.
+   Various meteorological observations from a mast placed on an ice-floe during AOE-2001
+   Turbulence statistics from sonic anemometer at 15 meters on the mast averaged over 15 minute obtained during AOE-2001
+   Turbulence statistics from sonic anemometer at 5 meters on the mast averaged over 15 minute obtained during AOE-2001
+   Various meteorological observations from Odens weather station situated at 35 metres ASL during AOE-2001. Winds may be subject to considerable flow distortion. Precipitation is in arbitrary units.
+   One-hour averaged precipitation from present-weather-sensor, which measures no. of precip particles falling past the sensor, during AOE-2001
+   Wind profile data from 915 MHz profiler on foredeck of Oden obtained during AOE-2001
+   Atmospheric baloon sounding data obtained during AOE-2001. The observations are interpolated to a fixed grid for plotting purposes.
+   Measurements from the high range of the S-band cloud radar obtained during AOE-2001. The variables presented are radar reflectivity and hydro-meteor fall velocity.
+   Measurements from the low range of the S-band cloud radar obtained during AOE-2001. The variables presented are radar reflectivity and hydro-meteor fall velocity.
+   Temperature profiles measured by a scanning radiometer obtained during AOE-2001.
+   Measurements from the sodar obtained during AOE-2001. Note that the altitude for each record varies in time.
+   Observations 5 metres AGL from mobile ISSF PAM station 1 during AOE-2001.
+   Turbulence observations 5 metres AGL from mobile ISSF PAM station 1 during AOE-2001.
+   Observations 5 metres AGL from mobile ISSF PAM station 2 during AOE-2001.
+   Turbulence observations 5 metres AGL from mobile ISSF PAM station 1 during AOE-2001.
+   Observations 5 metres AGL from mobile ISSF PAM station 3 during AOE-2001.
+   Turbulence observations 5 metres AGL from mobile ISSF PAM station 1 during AOE-2001.
+   One-hour averaged visibility observations from back-scatter sensor during AOE-2001.
+   </metadata>
+  <metadata name="institution">SU Stockholm University</metadata>
+  <metadata name="variable">air_potential_temperature</metadata>
+  <metadata name="variable">air_pressure</metadata>
+  <metadata name="variable">air_temperature</metadata>
+  <metadata name="variable">cloud_area_fraction</metadata>
+  <metadata name="variable">cloud_base_altitude</metadata>
+  <metadata name="variable">cloud_top_altitude</metadata>
+  <metadata name="variable">dew_point_temperature</metadata>
+  <metadata name="variable">downward_eastward_momentum_flux_in_air</metadata>
+  <metadata name="variable">downward_heat_flux_in_air</metadata>
+  <metadata name="variable">downward_northward_momentum_flux_in_air</metadata>
+  <metadata name="variable">downward_water_vapor_flux_in_air_due_to_diffusion</metadata>
+  <metadata name="variable">downwelling_longwave_flux_in_air</metadata>
+  <metadata name="variable">downwelling_shortwave_flux_in_air</metadata>
+  <metadata name="variable">eastward_wind</metadata>
+  <metadata name="variable">magnitude_of_surface_downward_stress</metadata>
+  <metadata name="variable">net_downward_longwave_flux_in_air</metadata>
+  <metadata name="variable">net_downward_shortwave_flux_in_air</metadata>
+  <metadata name="variable">northward_wind</metadata>
+  <metadata name="variable">precipitation</metadata>
+  <metadata name="variable">precipitation_flux</metadata>
+  <metadata name="variable">Radar Reflectivity</metadata>
+  <metadata name="variable">relative_humidity</metadata>
+  <metadata name="variable">specific_humidity</metadata>
+  <metadata name="variable">square_of_air_temperature</metadata>
+  <metadata name="variable">square_of_eastward_wind</metadata>
+  <metadata name="variable">square_of_northward_wind</metadata>
+  <metadata name="variable">square_of_upward_air_velocity</metadata>
+  <metadata name="variable">upward_air_velocity</metadata>
+  <metadata name="variable">upwelling_longwave_flux_in_air</metadata>
+  <metadata name="variable">upwelling_shortwave_flux_in_air</metadata>
+  <metadata name="variable">visibility_in_air</metadata>
+  <metadata name="variable">wind_from_direction</metadata>
+  <metadata name="variable">wind_speed</metadata>
+</MM2>

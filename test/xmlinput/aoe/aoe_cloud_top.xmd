@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+  <info name="DAMOC/aoe/aoe_cloud_top" status="active" creationDate="2009-03-20T10:41:08Z" datestamp="2009-03-20T10:41:08Z" ownertag="DAM" metadataFormat="MM2"/>
+<quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">23333
+144444
+322222
+322224
+322242
+411111
+411112
+411113
+411121
+411123
+411141
+411143
+411321
+411322
+411324
+411342
+411344
+413114
+413121
+413122
+413123
+413132</quadtree_nodes></dataset>

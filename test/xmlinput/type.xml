@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2006-05-01</metadata>
+  <metadata name="datacollection_period_to">2099-01-01</metadata>
+  <metadata name="bounding_box">179.926,31.0883,-180,89.9347</metadata>
+  <metadata name="dataref">http://mersea.met.no/cgi-bin/nph-dods/data/seaice/type/</metadata>
+  <metadata name="field_type">daily</metadata>
+  <metadata name="Conventions">CF-1.0</metadata>
+  <metadata name="area">Northern Hemisphere</metadata>
+  <metadata name="contact">osisaf-manager@met.no</metadata>
+  <metadata name="operational_status">Operational</metadata>
+  <metadata name="product_version">2.1</metadata>
+  <metadata name="references">OSI SAF Sea Ice Product Manual, Andersen S., Breivik L.A., Eastwood S., Godøy Ø., Lind M., Porcires M., Schyberg H., v3.2, October 2005. http://www.osi-saf.org</metadata>
+  <metadata name="spatial_resolution">10.0km</metadata>
+  <metadata name="software_version">3.2</metadata>
+  <metadata name="title">Sea Ice Type from EUMETSAT OSI SAF</metadata>
+  <metadata name="institution">met.no Norwegian Meteorological Institute</metadata>
+  <metadata name="activity_type">Space borne instrument</metadata>
+  <metadata name="variable">ice_type</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Ice Types &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Sea Ice &gt; Ice Types &gt; HIDDEN</metadata>
+</MM2>

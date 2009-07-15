@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2005-09-01</metadata>
+  <metadata name="datacollection_period_to">2007-11-16</metadata>
+  <metadata name="bounding_box">25.0667,70.9333,-8.6667,76.5</metadata>
+  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/met.no/synop/</metadata>
+  <metadata name="area">Barents Sea</metadata>
+  <metadata name="area">Greenland Sea</metadata>
+  <metadata name="contact">o.godoy@met.no</metadata>
+  <metadata name="topiccategory">climatologyMeteorologyAtmosphere</metadata>
+  <metadata name="PI_name">Øystein Godøy</metadata>
+  <metadata name="keywords">Atmospheric Observation Temperature Humidity Clouds Pressure Precipitation Wind SYNOP</metadata>
+  <metadata name="activity_type">Land station</metadata>
+  <metadata name="project_name">IPY/Damocles/iAOOS</metadata>
+  <metadata name="Conventions">CF-1.0</metadata>
+  <metadata name="history">2007-11-16 Created</metadata>
+  <metadata name="distribution_statement">Free</metadata>
+  <metadata name="abstract">
+Quality controlled synoptic meteorological measurements performed by the 
+Norwegian Meteorological Institute. Data are extracted from the public available 
+database http://eklima.met.no/. 
+   </metadata>
+  <metadata name="title">SYNOP data from BJØRNØYA, JAN MAYEN and HOPEN</metadata>
+  <metadata name="institution">met.no Norwegian Meteorological Institute</metadata>
+  <metadata name="product_name">SYNOP</metadata>
+  <metadata name="variable">wind_speed</metadata>
+  <metadata name="variable">wind_from_direction</metadata>
+  <metadata name="variable">relative_humidity</metadata>
+  <metadata name="variable">air_temperature</metadata>
+  <metadata name="variable">air_pressure_at_sea_level</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Pressure &gt; Surface Pressure &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Temperature &gt; Surface Air Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Water Vapor &gt; Humidity &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Clouds &gt; Cloud Types &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Clouds &gt; Cloud Amount/Frequency &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Precipitation &gt; Precipitation Amount &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Winds &gt; Surface Winds &gt; HIDDEN</metadata>
+</MM2>

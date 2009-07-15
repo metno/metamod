@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2006-09-01</metadata>
+  <metadata name="datacollection_period_to">2008-09-01</metadata>
+  <metadata name="institution">met.no Norwegian Meteorological Institute</metadata>
+  <metadata name="contact">c.mauritzen@met.no</metadata>
+  <metadata name="dataref">met.no-1 (planned activity)</metadata>
+  <metadata name="activity_type">Moored instrument</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Ocean Currents &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Water Masses &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Heat Budget &gt; Advection &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Temperature &gt; Potential Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Salinity/Density &gt; Salinity &gt; HIDDEN</metadata>
+  <metadata name="area">Central Arctic</metadata>
+  <metadata name="abstract">
+Bottom-anchored profiler. Will be deployed by Kapitan Dranitsyn September 2006 at 32W on the continental
+slope
+   </metadata>
+</MM2>

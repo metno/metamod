@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2006-06-19</metadata>
+  <metadata name="datacollection_period_to">2006-07-20</metadata>
+  <metadata name="institution">IOPAN Instytut Oceanologii, Polska Akademia Nauk</metadata>
+  <metadata name="contact">wpeter@iopan.gda.pl</metadata>
+  <metadata name="dataref">IOPAN-1 (planned activity)</metadata>
+  <metadata name="activity_type">Cruise</metadata>
+  <metadata name="variable">Atmosphere &gt; Aerosols &gt; Aerosol Optical Depth/Thickness &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Pressure &gt; Atmospheric Pressure Measurements &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Radiation &gt; Heat Flux &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Temperature &gt; Air Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Temperature &gt; Dew Point Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Water Vapor &gt; Humidity &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Atmospheric Winds &gt; Surface Winds &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Clouds &gt; Cloud Amount/Frequency &gt; HIDDEN</metadata>
+  <metadata name="variable">Atmosphere &gt; Clouds &gt; Cloud Types &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Advection &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Convection &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Diffusion &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Eddies &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Fresh Water Flux &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Fronts &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Gyres &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Ocean Currents &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Ocean Mixed Layer &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Thermohaline Circulation &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Upwelling/Downwelling &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Water Masses &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Wind-driven Circulation &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Heat Budget &gt; Advection &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Heat Budget &gt; Heat Flux &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Pressure &gt; Sea Level Pressure &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Temperature &gt; Ocean Mixed Layer &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Temperature &gt; Potential Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Temperature &gt; Sea Surface Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Temperature &gt; Thermocline &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Temperature &gt; Water Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Waves &gt; Sea State &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Winds &gt; Convergence/Divergence &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Winds &gt; Surface Winds &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Salinity/Density &gt; Conductivity &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Salinity/Density &gt; Density &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Salinity/Density &gt; Halocline &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Salinity/Density &gt; Potential Density &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Salinity/Density &gt; Pycnocline &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Salinity/Density &gt; Salinity &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Salinity/Density &gt; Salt Transport &gt; HIDDEN</metadata>
+  <metadata name="area">Greenland Sea</metadata>
+  <metadata name="area">Norwegian Sea</metadata>
+  <metadata name="area">Fram Strait</metadata>
+  <metadata name="area">Laptev Sea</metadata>
+  <metadata name="abstract">
+r/v 'OCEANIA'
+   </metadata>
+</MM2>

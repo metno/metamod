@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2008-01-01</metadata>
+  <metadata name="datacollection_period_to">2009-12-31</metadata>
+  <metadata name="institution">NERSC Nansen Environmental and Remote Sensing Center</metadata>
+  <metadata name="contact">hanne.sagen@nersc.no</metadata>
+  <metadata name="institution">FORTH Foundation for research and Technology</metadata>
+  <metadata name="institution">NAXYS Naxys AS</metadata>
+  <metadata name="dataref">NERSC/FORTH/NAXYS-1 (planned activity)</metadata>
+  <metadata name="activity_type">Moored instrument</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Acoustics &gt; Acoustic Tomography &gt; HIDDEN</metadata>
+  <metadata name="area">Fram Strait</metadata>
+  <metadata name="abstract">
+Acoustic Data from the Tomography array will be collected from 2008. Two low frequency sources, one on
+each side of the Fram Strait, will transmit sound at a center freqeuncy of 250 Hz and a band width of
+100 Hz. A vertical array with upto 16 hydrophones will record the arriving signal. Thereafter the data
+will go through pre-processing (detection og arrival peaks, estimation of traveltimes ect) before it
+goes into inversion algorithms and assimilation schemes. We expect to provide averaged profiles of temperature
+between the source and receiver pairs with increasing accuracy with depth.
+   </metadata>
+</MM2>

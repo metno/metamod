@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+  <info name="DAMOC/oceania" status="active" creationDate="2008-10-01T00:00:00Z" datestamp="2008-10-01T00:00:00Z" ownertag="DAM" metadataFormat="MM2"/>
+  <quadtree_nodes>
+4133
+41313
+41314
+43111
+43112
+43121
+413123
+413411
+413413
+413431
+413433
+413434
+431131
+431132
+431141
+431142
+4131133
+4131134
+4131143
+4131144
+4131241
+4131243
+4131244
+4132313
+4132331
+4132333
+4134143
+4134321
+4134323
+4311331
+4311332
+4311341
+4312211
+4312213
+4312231
+4312233
+4312234
+4312311
+4312312
+4312321
+4312322
+4312411
+4312412
+   </quadtree_nodes>
+</dataset>

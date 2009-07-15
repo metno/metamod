@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+  <info name="DAMOC/ark22-2-met/ark22-2-met_polarstern-soundings" status="active" creationDate="2009-03-31T12:51:09Z" datestamp="2009-03-31T12:51:09Z" ownertag="DAM" metadataFormat="MM2"/>
+<quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">32234
+312322
+312411
+321311
+321312
+321423
+321424
+322313
+324121
+324123
+411111
+411112
+411121
+411122
+411212
+411221
+412113
+421231
+421244
+422133
+422144
+422231
+422234
+422241
+431313</quadtree_nodes></dataset>

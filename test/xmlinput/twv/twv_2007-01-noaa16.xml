@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="variable">atmosphere_water_vapor_content</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="area">Northern Hemisphere</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="contact">melsheimer@uni-bremen.de</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="topiccategory">geoscientificinformation</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="topiccategory">climatologyMeteorologyAtmosphere</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="PI_name">Georg Heygster</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="product_version">1.0</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="keywords">Space borne instrument</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="references">Melsheimer and Heygster, 2008 (doi:10.1109/TGRS.2008.918013)</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="datacollection_period_from">2007-01-01</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="activity_type">Space borne instrument</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="project_name">DAMOCLES</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="Conventions">CF-1.0</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="Platform_name">NOAA-16</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="history">2007-10-10 creation</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="distribution_statement">Free</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="latitude_resolution">0.5</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="longitude_resolution">0.5</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="quality_index">2</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="software_version">twv_algo3.pro V1.0</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="datacollection_period_to">2007-01-31</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="title">Total Water Vapour derived from AMSU-B</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="abstract">
+Daily total water vapor (TWV) derived from radiances (five channels)
+measured 
+by the microwave instrument AMSU-B on the polar-orbiting
+satellites NOAA-16 and 
+17. For TWV less then about 7 kg/m2, the
+retrieval works over any surface (land, 
+open sea, sea ice). For TWV
+above about 7 kg/m2, the retrieval works over sea 
+ice only, for TWV
+above 20 kg/m2, the retrieval fails over all surfaces. About 
+14 daily
+satellite passes, in the Arctic, each point is covered at least 
+twice
+daily. All satellite passes of one day are interpolated and averaged
+onto 
+a half-degree grid, using the "nearneighor" routine of the
+Generic Mapping Tools 
+(GMT) using four sectors and a searchradius of
+60km.
+ </metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="bounding_box">179.75,50.25,-179.75,89.75</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="institution">UB University of Bremen</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="product_name">TWV12345 from AMSU-B</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="dataref">http://damocles.met.no:8080/thredds/catalog/data/UB/twv/catalog.html?dataset=UB/twv/twv_2007-01-noaa16.nc</metadata></MM2>

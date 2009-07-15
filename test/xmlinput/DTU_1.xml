@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2004-12-01</metadata>
+  <metadata name="datacollection_period_to">2009-11-30</metadata>
+  <metadata name="institution">DTU Technical University of Denmark</metadata>
+  <metadata name="contact">ltp@oersted.dtu.dk</metadata>
+  <metadata name="dataref">DTU-1 (planned activity)</metadata>
+  <metadata name="activity_type">Space borne instrument</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Sea Ice Motion &gt; HIDDEN</metadata>
+  <metadata name="area">Laptev Sea</metadata>
+  <metadata name="area">Kara Sea</metadata>
+  <metadata name="area">Central Arctic</metadata>
+  <metadata name="area">Beufort Sea</metadata>
+  <metadata name="area">Chukchi Sea</metadata>
+  <metadata name="area">East Siberian Sea</metadata>
+  <metadata name="abstract">
+3-day ice drift from ENVISAT ASAR GMM and WSM data. Data are available within hours of acquisition.
+   </metadata>
+</MM2>

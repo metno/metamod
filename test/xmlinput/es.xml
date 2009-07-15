@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="bounding_box">179.927383422852,-89.9347229003906,-179.927383422852,-39.2844619750977</metadata>
+  <metadata name="field_type">daily</metadata>
+  <metadata name="variable">ice_concentration</metadata>
+  <metadata name="area">Southern Hemipshere</metadata>
+  <metadata name="contact">osisaf-manager@met.no</metadata>
+  <metadata name="product_version">2.1</metadata>
+  <metadata name="operational_status">operational</metadata>
+  <metadata name="software_version">3.2</metadata>
+  <metadata name="title">Total Sea Ice Concentration from EUMETSAT OSI SAF</metadata>
+  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/met.no/es/</metadata>
+  <metadata name="institution">EUMETSAT OSI SAF</metadata>
+</MM2>

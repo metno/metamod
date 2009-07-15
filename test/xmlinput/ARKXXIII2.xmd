@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+  <info name="DAMOC/ARKXXIII2" status="active" creationDate="2009-01-19T14:00:31Z" datestamp="2009-01-19T14:00:31Z" ownertag="DAM" metadataFormat="MM2"/>
+<quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">32422
+41311
+41313
+324212
+324214
+324232
+324234
+324241
+324242
+324412
+413312</quadtree_nodes></dataset>

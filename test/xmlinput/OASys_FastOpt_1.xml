@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="institution">OASYS O.A.Sys - Ocean Atmosphere Systems</metadata>
+  <metadata name="contact">michael@oasys-research.de</metadata>
+  <metadata name="institution">FastOpt FastOpt</metadata>
+  <metadata name="dataref">OASys/FastOpt-1 (planned activity)</metadata>
+  <metadata name="activity_type">Model run</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Advection &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Buoy Position &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Diffusion &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Fresh Water Flux &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Gyres &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Ocean Currents &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Ocean Mixed Layer &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Thermohaline Circulation &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Water Masses &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Wind-driven Circulation &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Heat Budget &gt; Heat Flux &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Temperature &gt; Ocean Mixed Layer &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Temperature &gt; Potential Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Temperature &gt; Sea Surface Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Salinity/Density &gt; Density &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Salinity/Density &gt; Halocline &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Salinity/Density &gt; Potential Density &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Salinity/Density &gt; Salinity &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Salinity/Density &gt; Salt Transport &gt; HIDDEN</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Heat Flux &gt; HIDDEN</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Ice Depth/Thickness &gt; HIDDEN</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Ice Extent &gt; HIDDEN</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Ice Growth/Melt &gt; HIDDEN</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Ice Temperature &gt; HIDDEN</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Sea Ice Age &gt; HIDDEN</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Sea Ice Concentration &gt; HIDDEN</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Sea Ice Motion &gt; HIDDEN</metadata>
+  <metadata name="abstract">
+NAOSIM stands for 'North Atlantic/Arctic Ice Ocean Model'
+
+   </metadata>
+</MM2>

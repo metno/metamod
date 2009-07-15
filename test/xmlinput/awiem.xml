@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2007-04-16</metadata>
+  <metadata name="datacollection_period_to">2007-04-16</metadata>
+  <metadata name="bounding_box">34.54,87.06,-57.88,89.61</metadata>
+  <metadata name="variable">sea_ice_thickness</metadata>
+  <metadata name="variable">altitude</metadata>
+  <metadata name="variable">Cryosphere &gt; Sea Ice &gt; Ice Depth/Thickness &gt; HIDDEN</metadata>
+  <metadata name="area">Arctic Ocean</metadata>
+  <metadata name="contact">Christian.Haas@ualberta.ca</metadata>
+  <metadata name="topiccategory">oceans</metadata>
+  <metadata name="PI_name">Christian Haas</metadata>
+  <metadata name="keywords">sea ice thickness</metadata>
+  <metadata name="activity_type">Aircraft</metadata>
+  <metadata name="project_name">Damocles,TotalPoleAirship</metadata>
+  <metadata name="Conventions">CF-1.0</metadata>
+  <metadata name="history">2007-04-16 creation</metadata>
+  <metadata name="distribution_statement">Free</metadata>
+  <metadata name="abstract">
+A 350 km long HEM profile of ice thickness has been obtained between the North 
+Pole and 87N, 60W, in April 2007 as part of the Damocles Tara activities 
+   </metadata>
+  <metadata name="title">Helicopter EM ice thickness profile</metadata>
+  <metadata name="institution">AWI Alfred Wegener Institute for Polar and Marine Research</metadata>
+  <metadata name="product_name">HEM ice thickness</metadata>
+  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/AWI/awiem/</metadata>
+</MM2>

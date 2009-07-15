@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="institution">UoL Arctic Centre University of Lapland</metadata>
+  <metadata name="contact">monica.tennberg@ulapland.fi</metadata>
+  <metadata name="dataref">UoL-1 (planned activity)</metadata>
+  <metadata name="activity_type">investigation</metadata>
+  <metadata name="abstract">
+social impacts
+
+   </metadata>
+</MM2>

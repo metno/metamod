@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="variable">Oceans, Ocean Circulation, Ocean Currents &gt; HIDDEN</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="area">Barents Sea</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="contact">ilker.fer@gfi.uib.no</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="PI_name">Ilker Fer</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="keywords">ADCP</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="keywords">Storfjorden</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="keywords">current</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="keywords">overflow</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="activity_type">Moored instrument</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="project_name">DAMOCLES</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="Conventions">CF-1.0</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="Platform_name">Bottom mounted frame</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="distribution_statement">free</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="abstract">Under the Developing Arctic Modeling and Observing Capabilities for Long-term 
+Environmental Studies (DAMOCLES) project, an acoustic Doppler current profiler 
+(ADCP) was deployed at the sill separating the Storfjorden in Svalbard 
+Archipelago and Storfjordrenna north of Storfjordbanken on the Barents Sea 
+shelf. Storfjorden, through its polynya activity, produces highly saline water 
+near the freezing temperature which fills the fjord to the sill level (115 m) 
+and initiates a gravity driven overflow. A self-contained 307.2 KHz broadband 
+Workhorse, Sentinel, RD Instruments ADCP was deployed at 76deg 58min N, 19deg 
+18min E at the 116 m isobath on 13th ofAugust 2006, 05:00 UTC. The deployment 
+was conducted from R.V. H\a kon Mosby, during the cruise HM2006 615. The 
+instrument was recovered during the first leg of HM2007 613 on the 15 of July 
+2007, 23:04 utc. The instrument was installed in an aluminum trawl-proof frame, 
+attached to a concrete block of 2.5x2.5x0.37 m dimensions. The ADCP sampled at 
+4-m depth cell size, averaging data (13 pings per ensemble) at 2 min intervals. 
+The first cell was centered at about 6 mab (meter above bottom). This dataset 
+consists of hourly averaged vertical profiles of current velocities as well as 
+temperature at the instrument depth. </metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="title">Acoustic Doppler Current Profiler data from the Storfjorden Sill, 2006/2007</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="product_name">Horizontal velocity and temperature at Storfjorden Sill</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="dataref">http://damocles.met.no:8080/thredds/catalog/data/UiB/StorfjordADCP/catalog.html?dataset=UiB/StorfjordADCP/StorfjordADCP_2007.nc</metadata><metadata xmlns="http://www.met.no/schema/metamod/MM2" name="institution">UiB University of Bergen</metadata></MM2>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+  <info name="DAMOC/TaraMeteo" status="active" creationDate="2009-03-31T10:00:29Z" datestamp="2009-03-31T10:00:29Z" ownertag="DAM" metadataFormat="MM2"/>
+<quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">41113
+231434
+233142
+233144
+233211
+233212
+233213
+233231
+233232
+233233
+233322
+233323
+233324
+233332
+233334
+233341
+411112
+411114
+411311
+411313
+411331
+411333
+413111
+413113</quadtree_nodes></dataset>

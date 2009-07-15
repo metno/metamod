@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2005-09-01</metadata>
+  <metadata name="datacollection_period_to">2009-09-01</metadata>
+  <metadata name="institution">AWI Alfred Wegener Institute for Polar and Marine Research</metadata>
+  <metadata name="contact">abeszczynska@awi-bremerhaven.de</metadata>
+  <metadata name="dataref">AWI-2 (planned activity)</metadata>
+  <metadata name="activity_type">Moored instrument</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Circulation &gt; Ocean Currents &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Heat Budget &gt; Heat Flux &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Pressure &gt; Water Pressure &gt; HIDDEN</metadata>
+  <metadata name="variable">Oceans &gt; Ocean Temperature &gt; Water Temperature &gt; HIDDEN</metadata>
+  <metadata name="area">Fram Strait</metadata>
+  <metadata name="abstract">
+The array of 12 deep moorings across Fram Strait at 78deg50min N operated on annual basis
+   </metadata>
+</MM2>

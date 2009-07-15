@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+  <metadata name="datacollection_period_from">2006-10-02</metadata>
+  <metadata name="datacollection_period_to">2006-10-31</metadata>
+  <metadata name="bounding_box">4.29,62.8333333333,4.29,62.8333333333</metadata>
+  <metadata name="dataref">http://damocles.met.no:8080/thredds/dodsC/data/UiB/GFI/GFI_S1M10983.nc</metadata>
+  <metadata name="topiccategory">oceans</metadata>
+  <metadata name="contact">orvik@gfi.uib.no</metadata>
+  <metadata name="PI_name">Kjell Arild Orvik</metadata>
+  <metadata name="keywords">oceanography velocity salinity temperature pressure</metadata>
+  <metadata name="references">http://www.gfi.uib.no/</metadata>
+  <metadata name="Platform_name">GFI Rig S1</metadata>
+  <metadata name="Conventions">CF-1.0</metadata>
+  <metadata name="history">2007-05-11 Created</metadata>
+  <metadata name="distribution_statement">Free</metadata>
+  <metadata name="product_name">Mooring data</metadata>
+  <metadata name="area">Norwegian Sea</metadata>
+  <metadata name="abstract">
+Moored rig at Svinøy observing current and some other parameters 
+   </metadata>
+  <metadata name="title">Svinøy mooring S1</metadata>
+  <metadata name="institution">UiB University of Bergen</metadata>
+  <metadata name="variable">direction_of_sea_water_velocity</metadata>
+  <metadata name="variable">sea_water_pressure</metadata>
+  <metadata name="variable">sea_water_salinity</metadata>
+  <metadata name="variable">sea_water_speed</metadata>
+  <metadata name="variable">eastward_sea_water_velocity</metadata>
+  <metadata name="variable">northward_sea_water_velocity</metadata>
+</MM2>

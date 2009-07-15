@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="iso8859-1"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+  <info name="DAMOC/ark22" status="active" creationDate="2008-10-01T00:00:00Z" datestamp="2008-10-01T00:00:00Z" ownertag="DAM" metadataFormat="MM2"/>
+  <quadtree_nodes>
+144233
+144234
+144243
+144244
+144411
+144414
+144423
+144424
+233244
+233311
+233312
+233323
+233331
+233332
+233334
+233343
+233344
+233414
+233421
+233432
+233433
+233434
+234113
+234114
+234121
+234122
+234123
+234131
+234211
+411212
+411221
+411222
+411231
+411234
+411241
+411242
+411243
+411322
+411324
+411431
+411433
+411434
+412111
+413221
+413241
+413242
+413244
+413444
+414133
+414311
+   </quadtree_nodes>
+</dataset>
