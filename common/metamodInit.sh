@@ -45,7 +45,7 @@ start() {
    if [ ! -f [==WEBRUN_DIRECTORY==]/userlog ]; then
       # create world writeable logfile
       > [==WEBRUN_DIRECTORY==]/userlog
-      chmod 666 [==PHPLOGFILE==]
+      chmod 666 [==WEBRUN_DIRECTORY==]/userlog
    fi
    if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" -a -r $target_directory/scripts/upload_monitor.pl ]; then
       if ! running $upload_monitor_pid; then
