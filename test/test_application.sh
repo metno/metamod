@@ -287,7 +287,8 @@ su $WEBUSER -c "./metamodInit.sh start"
 #
 cd $basedir
 rm -rf t_dir
-su $WEBUSER -c mkdir t_dir
+mkdir t_dir
+chown $WEBUSER t_dir
 cd $basedir/source/test/ncinput
 for fil in `cat $filestoupload`; do su $WEBUSER -c "cp $fil $basedir/t_dir"; su $WEBUSER -c "mv $basedir/t_dir/* $basedir/ftpupload"; sleep 10; done
 #
