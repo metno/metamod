@@ -355,7 +355,7 @@ sub process_DIF_records {
          my $localid = $2;
          my $localid_sane = &makesane($localid);
          $base_filename = $xmldirectory . $ownertag . '_' . $localid_sane;
-         $dsname = $applicationid . '/' . $ownertag . '_' . $localid;
+         $dsname = $applicationid . '/' . $ownertag . '_' . $localid_sane;
       } else {
          &syserror("","Wrong identifier format: ".$identifier, $record->toString);
          return;
@@ -386,7 +386,12 @@ sub process_DIF_records {
          }
       }
       # set DIF-external elements
-      $fds->setInfo({status => $status, ownertag => $ownertag, name => $dsname, datestamp => $datestamp});
+      eval {
+        $fds->setInfo({status => $status, ownertag => $ownertag, name => $dsname, datestamp => $datestamp});
+      }; if ($@) {
+      	&syserror("CONTENT", "problems setting info in record $i: $@", $record->toString);
+      	return;
+      }
       print "Write $base_filename.xm[ld]\n" if ($progress_report == 1);
       $fds->writeToFile($base_filename);
    }
