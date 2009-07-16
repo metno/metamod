@@ -381,6 +381,8 @@ sub update_database {
 	  $dbh->prepare("INSERT INTO GeographicalArea (GA_id) VALUES (?)");
 	my $sql_insert_BKDS =
 	  $dbh->prepare("INSERT INTO BK_Describes_DS (BK_id, DS_id) VALUES (?, ?)");
+	my $sql_selectCount_BKDS=
+	  $dbh->prepare("SELECT COUNT(*) FROM BK_Describes_DS WHERE BK_id = ? AND DS_id = ?");
 	my $sql_insert_NI =
 	  $dbh->prepare(
 "INSERT INTO NumberItem (SC_id, NI_from, NI_to, DS_id) VALUES (?, ?, ?, ?)"
@@ -558,15 +560,13 @@ sub update_database {
 					}
 					if ( exists( $basickeys{$skey} ) ) {
 						my $bkid = $basickeys{$skey};
-						eval {
-						   $sql_insert_BKDS->execute( $bkid, $dsid );
-						}; if ($@) {
-						    if ($@ =~ 'duplicate') {
-                                write_to_log("duplicate basic key: $skey");
-                            } else {
-                            	die $@;
-                            }	
-						} 
+                        $sql_selectCount_BKDS->execute( $bkid, $dsid);
+                        my $count = $sql_selectCount_DSMD->fetchall_arrayref()->[0][0];
+                        if ( $count == 0 ) {
+                            $sql_insert_BKDS->execute( $bkid, $dsid );
+                        } else {
+                            write_to_log("duplicate basic key: $skey");
+                        }
 						if ( $progress_report == 1 ) {
 							print " -OK: $bkid,$dsid\n";
 						}
