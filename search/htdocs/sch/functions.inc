@@ -259,7 +259,7 @@ function mmGetBK($category) {
       $mmErrorMessage = "Internal application error";
       $mmError = 1;
    } else {
-      $sqlsentence = "select BK_id,BK_name from BasicKey where (SC_id = $category)";
+      $sqlsentence = "select BK_id,BK_name from BasicKey where (SC_id = $category) order by BK_name";
       $result = pg_exec ($mmDbConnection, $sqlsentence);
       if ( !$result ) {
          mmPutLog(__FILE__ . __LINE__ . "Could not $sqlsentence");
@@ -309,7 +309,7 @@ function mmGetHK($category) {
       $mmError = 1;
    } else {
       $sqlsentence = 
-         "select HK_id,HK_name from HierarchicalKey where (SC_id = $category AND HK_level = 1)";
+         "select HK_id,HK_name from HierarchicalKey where (SC_id = $category AND HK_level = 1) order by HK_name";
       $result = pg_exec ($mmDbConnection, $sqlsentence);
       if ( !$result ) {
          mmPutLog(__FILE__ . __LINE__ . "Could not $sqlsentence");

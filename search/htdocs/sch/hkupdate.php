@@ -113,13 +113,13 @@ array_pop($oldlist);
 #
 if ($expand_new_level == 1) {
    $sqlsentence = 'SELECT HK_level, HK_id, HK_name FROM HierarchicalKey WHERE HK_parent = ' .
-            $mmSelectedNum . ' ORDER BY HK_id';
+            $mmSelectedNum . ' ORDER BY HK_name';
    $hkresult = do_select($sqlsentence);
    $hkresultcount = count($hkresult);
    if ($hkresultcount == 0) {
       $sqlsentence = 'SELECT BasicKey.BK_id, BK_name FROM BasicKey, HK_Represents_BK WHERE ' .
             'HK_id = ' . $mmSelectedNum . ' AND BasicKey.BK_id = HK_Represents_BK.BK_id ' .
-            'ORDER BY BasicKey.BK_id';
+            'ORDER BY BasicKey.BK_name';
       $bkresult = do_select($sqlsentence);
    }
 }
