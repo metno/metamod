@@ -561,7 +561,7 @@ sub update_database {
 					if ( exists( $basickeys{$skey} ) ) {
 						my $bkid = $basickeys{$skey};
                         $sql_selectCount_BKDS->execute( $bkid, $dsid);
-                        my $count = $sql_selectCount_DSMD->fetchall_arrayref()->[0][0];
+                        my $count = $sql_selectCount_BKDS->fetchall_arrayref()->[0][0];
                         if ( $count == 0 ) {
                             $sql_insert_BKDS->execute( $bkid, $dsid );
                         } else {
