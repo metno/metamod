@@ -32,7 +32,7 @@
  // The user has pushed the "Create/Update" button in the Administration page
  //
  check_credentials(); // Sets $error, $errmsg, $nextpage, $normemail, $sessioncode,
-                      // $runpath, $filepath and $filecontent (globals).
+                      // $runpath, $filepath, $filecontent and $dirinfo (globals).
  if ($error == 0) { // Check that institution exists and set $institution var.
     $userinfo = get_userinfo($filepath);
     if (!array_key_exists("institution",$userinfo)) {
@@ -83,7 +83,12 @@
 # }
  if ($error == 0) {
     $opendappath = get_repository_path() . "/" . $institution . "/" . $dirname;
-    if (count(glob(get_repository_path() . "/*/" . $dirname)) > 0) {
+    $dir_count = count(glob(get_repository_path() . "/*/" . $dirname));
+    if (file_exists($opendappath) && $dir_count == 1) {
+#
+#      Directory already exists. No need to create
+#
+    } else if ($dir_count > 0) {
        mmPutLog('Create/Update: Repository directory used by another user ' . $opendappath);
        $errmsg = "Directory name already used by another user";
        $error = 1;
@@ -120,8 +125,8 @@
           }
        } else {
           $dirinfo[$dirname] = $ndirkey;
-          $errmsg = "Directory key updated";
-          $update_dirinfo_needed = TRUE;
+          $errmsg = "Directory name already used by another user";
+          $error = 1;
        }
        $nextpage = 3;
     } else if (count(glob(get_upload_path() . "/*/" . $dirname)) > 0) {
