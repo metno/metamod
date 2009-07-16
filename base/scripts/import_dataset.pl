@@ -558,7 +558,15 @@ sub update_database {
 					}
 					if ( exists( $basickeys{$skey} ) ) {
 						my $bkid = $basickeys{$skey};
-						$sql_insert_BKDS->execute( $bkid, $dsid );
+						eval {
+						   $sql_insert_BKDS->execute( $bkid, $dsid );
+						}; if ($@) {
+						    if ($@ =~ 'duplicate') {
+                                write_to_log("duplicate basic key: $skey");
+                            } else {
+                            	die $@;
+                            }	
+						} 
 						if ( $progress_report == 1 ) {
 							print " -OK: $bkid,$dsid\n";
 						}
