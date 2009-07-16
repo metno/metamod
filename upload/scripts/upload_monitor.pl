@@ -450,7 +450,9 @@ sub ftp_process_hour {
                 scalar grep($dataset_name eq $_, keys %all_ftp_datasets) == 0) {
             my @file_stat = stat($filename);
             if (scalar @file_stat == 0) {
-               die "Could not stat $filename\n";
+#
+# egils: Should not die, because uploaded files may have temporary names while uploading:
+#               die "Could not stat $filename\n";
                &syserror("SYS","Could not stat $filename", "", "ftp_process_hour", "");
             } else {
 #            
