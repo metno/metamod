@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <includepath>
   <includepathentry path="${resource_loc:/Metamod/common/lib}" />
+  <includepathentry path="/home/heikok/Programme/MetSis/metamodPerl5lib" />
 </includepath>
 

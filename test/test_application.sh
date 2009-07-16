@@ -102,6 +102,8 @@
 #    the new log file structure can be initialized.
 #
 #------------------------------------------------------------------------
+WEBUSER=www-data
+
 logfiles='syserrors databaselog'
 if [ $# -eq 2 -a $1 = '-i' ]; then
    mkdir -p $2
@@ -252,9 +254,7 @@ cd $basedir/target
 cd $basedir/webrun
 rm -rf u1
 mkdir u1
-chmod 777 u1
 cp $basedir/source/test/u1input/* u1
-chmod 666 u1/* # writeable for everybody
 cd $basedir/data
 for dir in `cat $basedir/source/test/directories`; do
    mkdir -p $dir
@@ -271,8 +271,13 @@ cd $basedir/target/init
 # G. The services defined for the application is started.
 # =======================================================
 #
+chown -R $WEBUSER $basedir/webrun
+chown -R $WEBUSER $basedir/webupload
+chown -R $WEBUSER $basedir/ftpupload
+chown -R $WEBUSER $basedir/data
 cd $basedir/target
-./metamodInit.sh start
+su $WEBUSER -c ./metamodInit.sh start
+
 #
 # H. Uploads to the system is simulated.
 # ======================================
@@ -282,16 +287,16 @@ cd $basedir/target
 #
 cd $basedir
 rm -rf t_dir
-mkdir t_dir
+su $WEBUSER -c mkdir t_dir
 cd $basedir/source/test/ncinput
-for fil in `cat $filestoupload`; do cp $fil $basedir/t_dir; mv $basedir/t_dir/* $basedir/ftpupload; sleep 10; done
+for fil in `cat $filestoupload`; do su $WEBUSER -c cp $fil $basedir/t_dir; su $WEBUSER -c mv $basedir/t_dir/* $basedir/ftpupload; sleep 10; done
 #
 # I. After sleeping some time the services is stopped.
 # ====================================================
 #
 cd $basedir/target
 sleep 300
-./metamodInit.sh stop
+su $WEBUSER -c ./metamodInit.sh stop
 sleep 100
 #
 # J. Postprocessing:

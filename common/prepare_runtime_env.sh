@@ -52,9 +52,6 @@ if [ -d [==TARGET_DIRECTORY==]/htdocs/upl ]; then
    mkdir -p [==WEBRUN_DIRECTORY==]/u0
    mkdir -p [==WEBRUN_DIRECTORY==]/u1
    mkdir -p [==WEBRUN_DIRECTORY==]/u2
-   chmod 777 [==WEBRUN_DIRECTORY==]/u0 # writeable for httpd user / nobody
-   chmod 777 [==WEBRUN_DIRECTORY==]/u1
-   chmod 777 [==WEBRUN_DIRECTORY==]/u2
    mkdir -p [==WEBRUN_DIRECTORY==]/upl
    mkdir -p [==WEBRUN_DIRECTORY==]/upl/problemfiles
    mkdir -p [==WEBRUN_DIRECTORY==]/upl/uerr
