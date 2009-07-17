@@ -25,3 +25,5 @@ TEST_SUBSTITUTION = test
 TEST_SUBSTITUTION = test2
 !end_substitute_to_file_with_new_name
 
+FIMEX_PROGRAM = fimex
+

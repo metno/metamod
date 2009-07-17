@@ -118,6 +118,9 @@ DROPDB = dropdb
 # List of import directories:
 IMPORTDIRS = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
 
+# locate your fimex program for reprojection of data
+FIMEX_PROGRAM = fimex
+
 # ============ METAMODSEARCH configuration ==============
 # Name of web-based search application as seen by users:
 SEARCH_APP_NAME = METAMOD search

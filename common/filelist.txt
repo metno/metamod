@@ -5,6 +5,7 @@ metamodInit.sh
 =htdocs/funcs/mmLogging.inc
 =htdocs/funcs/mmTtime.inc
 =htdocs/funcs/mmDataset.inc
+=htdocs/funcs/mmFimex.inc
 =schema/oldDataset2Dataset.xslt
 =schema/oldDataset2MM2.xslt
 =schema/dif2dataset.xslt
