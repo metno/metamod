@@ -91,6 +91,10 @@ include_once("../funcs/mmConfig.inc");
       } else if ($submit == 'BTN_newsession') { // The user has entered from index.php
          $nextpage = 1;
          $errmsg = "";
+      } else if ($submit == 'BTN_editproj_dir') { // The user has pushed the 'Edit projection' on admin page
+      	include 'BTN_editproj_dir.php';
+      } else if ($submit == 'BTN_writeproj_dir') { // The user has pushed the 'Apply' on the projEdit.php
+      	include 'BTN_writeproj_dir.php';
       } else if ($submit == 'BTN_logout') { // The user has pushed the "Log out" button
          $normemail = conditional_decode($_POST["normemail"]);
          $sessioncode = conditional_decode($_POST["sessioncode"]);
@@ -113,5 +117,7 @@ include_once("../funcs/mmConfig.inc");
       include "mainadm.php"; // Show the Administration page
    } else if ($nextpage == 4) {
       include "testafile.php"; // Show the Test a file page
+   } else if ($nextpage == 5) {
+      include "projEdit.php";
    }
 ?>

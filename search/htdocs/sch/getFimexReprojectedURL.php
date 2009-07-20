@@ -38,11 +38,11 @@ require_once('../funcs/mmLogging.inc');
 require_once('../funcs/mmFimex.inc');
 
 /**
- * This page downloads a netcdf-file from an URI and reprojects it with
+ * This page downloads a netcdf-file from an URL and reprojects it with
  * fimex projection parameters
  * 
  * The required parameters of the request (GET or POST) are
- * @param ncURI link to a netcdf file, either local file:, ftp: or http:
+ * @param ncURL location of netcdf file, either local file:, ftp: or http:
  * @param interpolationMethod
  * @param projString
  * @param xAxisString
@@ -50,7 +50,7 @@ require_once('../funcs/mmFimex.inc');
  * @param axisUnitIsMetric
  */
 $errMsg = ''; # error message to put on screen
-$params = array("ncURI", "interpolationMethod", "projString", "xAxisString", "yAxisString", "axisUnitIsMetric");
+$params = array("ncURL", "interpolationMethod", "projString", "xAxisString", "yAxisString", "axisUnitIsMetric");
 foreach ( $params as $param ) {
 	if (strlen($_REQUEST[$param])) {
 	   $params[$param] = $_REQUEST[$param];
@@ -67,7 +67,7 @@ if ($params["axisUnitIsMetric"] == "true") {
 }
 
 $tempNcIn = tempnam(sys_get_temp_dir(), 'fimexNcInput');
-if (mmRetrieveNcURL($params["ncURI"], $tempNcIn, $errMsg)) {
+if (mmRetrieveNcURL($params["ncURL"], $tempNcIn, $errMsg)) {
 	$tempNcOut = tempnam(sys_get_temp_dir(), 'fimexNcOutput');
    if (mmFimexProjectFile($tempNcIn, "netcdf", $tempNcOut, "netcdf",
    	  				      $params["interpolationMethod"], $params["projString"],

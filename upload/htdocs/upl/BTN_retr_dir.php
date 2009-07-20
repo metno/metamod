@@ -48,6 +48,10 @@
  }
  if ($error == 0) {
     $dirname = conditional_decode($_POST["dirname"]);
+    if (strlen($dirname) == 0) {
+       // directory name can be in input or select box
+       $dirname = conditional_decode($_POST["knownDirname"]);
+    }
 #    $dirinfo = get_dirinfo($filepath);
 #    if (is_bool($dirinfo) && $dirinfo == FALSE) {
 #       mmPutLog("Function get_dirinfo returned FALSE");

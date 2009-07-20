@@ -47,6 +47,11 @@
  if ($error == 0) {
     $update_dirinfo_needed = FALSE;
     $dirname = conditional_decode($_POST["dirname"]);
+    if (strlen($dirname) == 0) {
+       // directory name can be in input or select box
+       $dirname = conditional_decode($_POST["knownDirname"]);
+    }
+    
     if (!preg_match ('/^[a-zA-Z0-9.-]+$/',$dirname)) {
        $error = 1;
        $nextpage = 3;

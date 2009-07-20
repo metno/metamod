@@ -1,10 +1,12 @@
 =htdocs/upl/adm.php
 =htdocs/upl/BTN_adm.php
 =htdocs/upl/BTN_creupd_dir.php
+=htdocs/upl/BTN_editproj_dir.php
 =htdocs/upl/BTN_login.php
 =htdocs/upl/BTN_retr_dir.php
 =htdocs/upl/BTN_upload.php
 =htdocs/upl/BTN_upl.php
+=htdocs/upl/BTN_writeproj_dir.php
 =htdocs/upl/funcs.inc
 =htdocs/upl/index.php
 =htdocs/upl/login.php
@@ -13,6 +15,7 @@
 =htdocs/upl/maintable.php
 =htdocs/upl/newuserok.php
 =htdocs/upl/newuser.php
+=htdocs/upl/projEdit.php
 =htdocs/upl/start.php
 =htdocs/upl/upload.php
 =htdocs/upl/testafile.php

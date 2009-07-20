@@ -27,7 +27,7 @@
 #  along with METAMOD; if not, write to the Free Software 
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
 #----------------------------------------------------------------------------
-require_once("../funcs/mmConfig.inc"); 
+require_once("../funcs/mmConfig.inc");
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -133,6 +133,16 @@ require_once("../funcs/mmConfig.inc");
          <td class="inputform">
             <input name="dirname" value="<?php echo $dirname; ?>" size="10" />
          </td>
+         <td class="inputform">
+         	<select name="knownDirname" size="1">
+         	<?php
+         		$dirinfo_sorted = ksort($dirinfo);
+         		foreach ( $dirinfo as $di => $ki ) {
+       				echo("<option>$di</option>");
+					}         		
+         	?>
+         	</select>
+         </td>
          </tr>
          <tr>
          <td class="inputform">
@@ -141,6 +151,9 @@ require_once("../funcs/mmConfig.inc");
          <td class="inputform">
             <input class="selectbutton1" type="submit" name="BTN_creupd_dir" value="Create/Update" />
          </td>
+         <td class="inputform">
+            <input class="selectbutton1" type="submit" name="BTN_editproj_dir" value="Edit Projections" />
+         </td>
          </tr>
          <tr>
          <td class="inputform" colspan="2">
@@ -148,6 +161,7 @@ require_once("../funcs/mmConfig.inc");
             <p>&nbsp;</p>
             <p>&nbsp;</p>
          </td>
+         <td class="inputform"/>
          </tr>
          <tr>
          <td class="inputform">
@@ -156,6 +170,7 @@ require_once("../funcs/mmConfig.inc");
          <td class="inputform">
             <input name="dirkey" value="<?php echo $dirkey; ?>" size="10" />
          </td>
+         <td class="inputform"/>
          </tr>
       </table>
       </div>

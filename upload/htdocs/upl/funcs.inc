@@ -471,4 +471,50 @@ function conditional_decode($string)
       return $string;
    }
 }
+
+/**
+ * Check if the currently active user (set by check_credentials()) is allowed to access a directory
+ * @param $directory name of the directory
+ * @param $key optional directory key
+ * @param $errMsg optional string which will be filled with return message
+ * @return true for success, false for access-failure
+ */
+function checkDirectoryPermission($directory, $key = "", &$errMsg = "") {
+	global $filepath;
+	if (strlen($directory) == 0) {
+	   $errMsg .= "no directory given";
+	   return false;
+	}
+   $dirinfo = get_dirinfo($filepath);
+   if (array_key_exists($directory, $dirinfo)) {
+      // $directory belongs to current user
+      return true; 
+   }
+   if (strlen($key) > 0) {
+   	// check all other directories
+   	$userInfoDir = mmGetRunPath() . "/u1";
+		if ($dh = opendir($userInfoDir)) {
+   		while (($file = readdir($dh)) !== false) {
+				if (is_file($file) && is_readable($file)) {
+			   	$file_dirinfo = get_dirinfo($filepath);
+			   	if (array_key_exists($directory, $dirinfo)) {
+			      	if ($key == $dirinfo[$directory]) {
+			      		// $key matches $directory
+			      		return true;
+				      } else {
+				      	$errMsg .= "key does not match";
+				         return false;
+				      }
+			   	}
+				}
+   	   }
+      	closedir($dh);
+		} else {
+   		$errMsg .= "internal error: problems reading directory $userInfoDir";
+			return false;
+   	}
+   }
+	$errMsg .= "directory $directory not found";
+	return false;
+}
 ?>

@@ -389,7 +389,14 @@ class MM_ForeignDataset {
 	 */
 	function setProjectionInfo($projectionInfo) {
 		$oldContent = $this->getProjectionInfo();
-		// delete old item
+		// generate new node and add to dom (without place)
+		$contentDoc = new DOMDocument();
+		if (!$contentDoc->loadXML($projectionInfo)) {
+		   throw new MM_DatasetException("cannot load projection-info");
+		}
+		$contentNode = $this->domDS->importNode($contentDoc->firstChild, true);
+		
+		// delete old items
 		foreach ($this->xpathDS->query("/d:dataset/d:projectionInfo") as $node) {
 			$node->parentNode->removeChild($node);
 		}
@@ -397,9 +404,6 @@ class MM_ForeignDataset {
 			$ds = $this->xpathDS->query("/d:dataset")->item(0);
 			# create node with new content
 			$piNode = $this->domDS->createElementNS($this->namespaceDS,'projectionInfo');
-			$contentDoc = new DOMDocument();
-			$contentDoc->loadXML($projectionInfo);
-			$contentNode = $this->domDS->importNode($contentDoc->firstChild, true);
 			$piNode->appendChild($contentNode);
 			
 			# add content to doc, after info and optional quadtree_node
