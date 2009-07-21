@@ -17,6 +17,10 @@ CREATE INDEX MD_content_vector_idx
 ON Metadata 
 USING gist(MD_content_vector);
 
+-- create index for better performance
+CREATE INDEX idx_ds_has_md_mdid ON ds_has_md(md_id);
+
+
 DROP TRIGGER IF EXISTS update_MD_content_fulltext ON Metadata;
 DROP FUNCTION IF EXISTS update_MD_content_fulltext();
 DROP FUNCTION IF EXISTS to_mmDefault_tsvector(text);

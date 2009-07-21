@@ -84,7 +84,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
       $sqlsentence .= " AND " . $sqlpart;
    }
    $sqlsentence .= " ORDER BY DataSet.DS_id\n";
-   if ($dbug !== FALSE) {echo '<pre>' .$sqlsentence . '</pre>' . "\n";}
+   if ($dbug !== FALSE) {echo '<pre>' .$sqlsentence . ' with params ' . join(',', $tmpSqlPartParams) .'</pre>' . "\n";}
    $result1 = pg_query_params($mmDbConnection, $sqlsentence, $tmpSqlPartParams);
    if (!$result1) {
       mmPutLog(__FILE__ . __LINE__ . " Could not $sqlsentence");

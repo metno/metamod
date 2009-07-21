@@ -163,6 +163,7 @@ CREATE FUNCTION to_mmDefault_tsvector(IN text) RETURNS tsvector AS $$
     END;
 $$ LANGUAGE plpgsql;
 
+-- do not use this function, postgres will need to see the language, to determine index use
 CREATE FUNCTION to_mmDefault_tsquery(IN text) RETURNS tsquery AS $$
     BEGIN
         RETURN to_tsquery('[==PG_TSEARCH_LANGUAGE==]', $1);
@@ -190,6 +191,9 @@ CREATE TABLE DS_Has_MD (
    MD_id              INTEGER       NOT NULL REFERENCES Metadata ON DELETE CASCADE,
    PRIMARY KEY (DS_id, MD_id)
 );
+-- search on ds_has_md is most often executed query
+-- table may fit completely in memory, so consider 'set random_page_cost = 2 (or even 1.5)' see postgresql.conf
+CREATE INDEX idx_ds_has_md_mdid ON ds_has_md(md_id);
 GRANT SELECT ON DS_Has_MD TO "[==PG_WEB_USER==]";
 
 CREATE TABLE Sessions (
