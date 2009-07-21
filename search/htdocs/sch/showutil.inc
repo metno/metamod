@@ -103,19 +103,19 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
    if ($mmSessionState->countItems('9,GA') > 7) {
       $dsarr = mmGetqtnodes(7,$parentds,$dsarr);
    }
-   if (count($dsarr) > 0) {
-		$inSqlParams = array();
-		$tmpInList = $dsarr;
+   $tmpInList = array_slice($dsarr, $startrow, $max_secondlevel_rows);
+   if (count($tmpInList) > 0) {
+		$tmpSqlParams = array();
 		array_unshift($tmpInList, $parentds);
       $sqlsentence = "SELECT Metadata.MD_content, Metadata.MT_name, Dataset.DS_id, Dataset.DS_name \n" .
-         "FROM Metadata, Dataset, DS_Has_MD \n" .
-         "WHERE Dataset.DS_id IN " . createSQL_IN_list($tmpInList, $inSqlParams) . " AND\n" .
-         "Metadata.MD_id = DS_Has_MD.MD_id and Dataset.DS_id = DS_Has_MD.DS_id \n" .
-         "ORDER BY Dataset.DS_id \n";
+         " FROM Metadata, Dataset, DS_Has_MD \n" .
+         " WHERE Dataset.DS_id IN " . createSQL_IN_list($tmpInList, $tmpSqlParams) . " AND\n" .
+         " Metadata.MD_id = DS_Has_MD.MD_id and Dataset.DS_id = DS_Has_MD.DS_id \n" .
+         " ORDER BY Dataset.DS_id ";
       if (strpos($mmDebug,"secondlevel") !== false) {
          echo "<pre>sqlsentence = $sqlsentence</pre>\n";
       }
-      $result = pg_query_params($mmDbConnection, $sqlsentence, $inSqlParams);
+      $result = pg_query_params($mmDbConnection, $sqlsentence, $tmpSqlParams);
       if (!$result) {
          mmPutLog(__FILE__ . __LINE__ . " Could not $sqlsentence");
          $mmErrorMessage = $msg_start . "Internal application error";
@@ -241,18 +241,19 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
             }
          }
          $lastcolnum = $jlast;
-         if ($dsidcount > $max_secondlevel_rows) {
+         $dsarrCount = count($dsarr);
+         if ($dsarrCount > $max_secondlevel_rows) {
             $rowdisplayfirst = $startrow;
             $rowdisplaylast = $startrow + $max_secondlevel_rows - 1;
-            if ($rowdisplaylast > $dsidcount) {
-               $rowdisplaylast = $dsidcount;
+            if ($rowdisplaylast > $dsarrCount) {
+               $rowdisplaylast = $dsarrCount;
             }
-            $navigate = "<br />Rows: $rowdisplayfirst - $rowdisplaylast of $dsidcount\n";
+            $navigate = "<br />Rows: $rowdisplayfirst - $rowdisplaylast of $dsarrCount\n";
             if ($startrow > 1) {
                $navigate .= '<input class="exnextprev" type="submit" ' .
                             'name="mmSubmitButton_showex' . $parentds . '" value="Prev" />' . "\n";
             }
-            if ($rowdisplaylast < $dsidcount) {
+            if ($rowdisplaylast < count($dsarr)) {
                $navigate .= '<input class="exnextprev" type="submit" ' .
                             'name="mmSubmitButton_showex' . $parentds . '" value="Next" />' . "\n";
 #            $newrownum = (int)(($dsidcount-0.9)/$max_secondlevel_rows);
@@ -263,8 +264,6 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
             }
          } else {
             $navigate = "";
-            $rowdisplayfirst = 1;
-            $rowdisplaylast = $dsidcount;
          }
          echo '<table border="0" cellspacing="0" cellpadding="3" width="98%">' . "\n";
          $line = '<tr><th width="30">&nbsp;</th>';
@@ -285,7 +284,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
          for ($i2=0; $i2 <= $lastcolnum;$i2++) {
             $mdcontentall[$i2] = "";
          }
-         for ($irow=$rowdisplayfirst; $irow <= $rowdisplaylast;$irow++) {
+         for ($irow=0; $irow <= $dsidcount;$irow++) {
             $ifirst = $dsidsfound[$dsidsrows[$irow]];
             $ilast = $dsidslast[$dsidsrows[$irow]];
             for ($i1=$ifirst; $i1 <= $ilast;$i1++) {
