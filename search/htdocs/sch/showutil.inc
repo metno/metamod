@@ -78,13 +78,14 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
    }
    $dsarr = array();
    $dbug = strpos($mmDebug,"secondlevel");
-   $sqlsentence = "SELECT DS_id FROM DataSet WHERE DS_parent = $parentds\n";
+   $tmpSqlPartParams = $sqlPartParams;
+   $sqlsentence = "SELECT DS_id FROM DataSet WHERE DS_parent = ". addSQLParameter($parentds, $tmpSqlPartParams);
    if ($sqlpart != "") {
       $sqlsentence .= " AND " . $sqlpart;
    }
-   $sqlsentence .= "ORDER BY DataSet.DS_id\n";
+   $sqlsentence .= " ORDER BY DataSet.DS_id\n";
    if ($dbug !== FALSE) {echo '<pre>' .$sqlsentence . '</pre>' . "\n";}
-   $result1 = pg_query_params($mmDbConnection, $sqlsentence, $sqlPartParams);
+   $result1 = pg_query_params($mmDbConnection, $sqlsentence, $tmpSqlPartParams);
    if (!$result1) {
       mmPutLog(__FILE__ . __LINE__ . " Could not $sqlsentence");
       $mmErrorMessage = $msg_start . "Internal application error";
@@ -103,16 +104,18 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
       $dsarr = mmGetqtnodes(7,$parentds,$dsarr);
    }
    if (count($dsarr) > 0) {
-      $dslist = $parentds . ',' . implode(",",$dsarr);
+		$inSqlParams = array();
+		$tmpInList = $dsarr;
+		array_unshift($tmpInList, $parentds);
       $sqlsentence = "SELECT Metadata.MD_content, Metadata.MT_name, Dataset.DS_id, Dataset.DS_name \n" .
          "FROM Metadata, Dataset, DS_Has_MD \n" .
-         "WHERE Dataset.DS_id IN (" . $dslist . ") AND\n" .
+         "WHERE Dataset.DS_id IN " . createSQL_IN_list($tmpInList, $inSqlParams) . " AND\n" .
          "Metadata.MD_id = DS_Has_MD.MD_id and Dataset.DS_id = DS_Has_MD.DS_id \n" .
          "ORDER BY Dataset.DS_id \n";
       if (strpos($mmDebug,"secondlevel") !== false) {
          echo "<pre>sqlsentence = $sqlsentence</pre>\n";
       }
-      $result = pg_query($mmDbConnection, $sqlsentence);
+      $result = pg_query_params($mmDbConnection, $sqlsentence, $inSqlParams);
       if (!$result) {
          mmPutLog(__FILE__ . __LINE__ . " Could not $sqlsentence");
          $mmErrorMessage = $msg_start . "Internal application error";
