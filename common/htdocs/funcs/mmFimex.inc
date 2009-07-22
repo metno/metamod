@@ -69,6 +69,7 @@ xAxisValues = $xaxis
 yAxisValues = $yaxis
 xAxisUnit = $xUnit
 yAxisUnit = $yUnit
+
 EOT;
 	if (strlen($proj)) {
 	   $fimexSetup .= "projString = $proj\n";
@@ -151,13 +152,13 @@ function mmRetrieveNcURL($url, $outputNcFile, &$errMsg = "") {
  * <!-- see fimex-interpolation for more info on options -->
  * <projection name="Lat/Long" method="nearestghbor" 
  *           projString="+proj=latlong +elips=sphere +a=6371000 +e=0" 
- *           xAxis="0,1,...,x;relativeStart=0;unit=degree" 
- *           yAxis="0,1,...,x;relativeStart=0;unit=degree" 
+ *           xAxis="0,1,...,x;relativeStart=0" 
+ *           yAxis="0,1,...,x;relativeStart=0" 
  *           toDegree="true"/>
  * <projection name="Stereo" method="coord_nearestneighbor"
- *           projString="+proj=stere +elips=sphere +lon_0=0 +lat_0=90 +lat_ts=-32 +a=6371000 +e=0" 
- *           xAxis="0,50000,...,x;relativeStart=0;unit=m" 
- *           yAxis="0,50000,...,x;relativeStart=0;unit=m" 
+ *           projString="+proj=stere +elips=sphere +lon_0=-32 +lat_0=90 +lat_ts=60 +a=6371000 +e=0" 
+ *           xAxis="0,50000,...,x;relativeStart=0" 
+ *           yAxis="0,50000,...,x;relativeStart=0" 
  *           toDegree="false" /> 
  * </fimexProjections>        
  */
@@ -255,7 +256,7 @@ class MM_FimexSetup {
 			} else {
 			   $params[] = 'interpolationMethod=nearestneighbor';
 			}
-			if ($this->getProjectionProperty($projName, 'toDegree')) {
+			if ($this->getProjectionProperty($projName, 'toDegree') == 'true') {
 				$params[] = 'axisUnitIsMetric=false';
 			} else {
 			   $params[] = 'axisUnitIsMetric=true';

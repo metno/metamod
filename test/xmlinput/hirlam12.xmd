@@ -314,7 +314,7 @@
 <projectionInfo xmlns:default="http://www.met.no/schema/metamod/fimexProjections"><default:fimexProjections xmlns="http://www.met.no/schema/metamod/fimexProjections" xmlns:default="http://www.met.no/schema/metamod/fimexProjections">
 <default:dataset urlRegex="!(.*/thredds).*dataset=(.*)!" urlReplace="$1/fileServer/data/$2"/>
 <!-- see fimex-interpolation for more info on options -->
-<default:projection name="Lat/Long" method="nearestghbor" projString="+proj=latlong +elips=sphere +a=6371000 +e=0" xAxis="0,1,...,x;relativeStart=0;unit=degree" yAxis="0,1,...,x;relativeStart=0;unit=degree" toDegree="true"/>
-<default:projection name="Stereo" method="coord_nearestneighbor" projString="+proj=stere +elips=sphere +lon_0=0 +lat_0=90 +lat_ts=-32 +a=6371000 +e=0" xAxis="0,50000,...,x;relativeStart=0;unit=m" yAxis="0,50000,...,x;relativeStart=0;unit=m" toDegree="false"/> 
+<default:projection name="Lat/Long" method="nearestneighbor" projString="+proj=latlong +ellps=sphere +a=6371000 +e=0" xAxis="-180,-179,...,180" yAxis="60,61,...,90" toDegree="true"/>
+<default:projection name="Stereo" method="bilinear" projString="+proj=stere +ellps=sphere +lat_0=90 +lon_0=-32 +lat_ts=60 +a=6371000 +e=0" xAxis="0,10000,...,x;relativeStart=0" yAxis="0,10000,...,x;relativeStart=0" toDegree="false"/> 
 </default:fimexProjections></projectionInfo>
 </dataset>
