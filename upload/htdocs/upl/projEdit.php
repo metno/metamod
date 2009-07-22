@@ -107,6 +107,7 @@ require_once("../funcs/mmConfig.inc");
             directory <?php $directory ?>. This facility will only work with netcdf files in CF-1.x convention.
             The reprojection will only work with freely available dataset, restricted dataset cannot be retrieve by this options yet.
             </p>
+            <p>The setup will be uploaded within the next 10 minutes. <b>Please test your setup!</b></p>
             <p>Simply edit/add a setup according the example below:</p>
             <pre>
 <?php $input = <<<EOT
