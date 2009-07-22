@@ -31,9 +31,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
  *--------------------------------------------------------------------------- 
  */
-?>
 
-<?php
 require_once("mmConfig.inc");
 require_once("mmLogging.inc");
 require_once("mmDataset.inc");

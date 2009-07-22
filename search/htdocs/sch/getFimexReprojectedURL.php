@@ -58,7 +58,7 @@ foreach ( $params as $param ) {
 	   $errMsg .= "parameter $param missing in input ";
 	}
 }
-$params["projString"] = $_REQUEST[$param]; // may be empty
+$params["projString"] = $_REQUEST["projString"]; // may be empty
 if ($params["axisUnitIsMetric"] == "true") {
    $params["axisUnitIsMetric"] = true;
 } else if ($params["axisUnitIsMetric"] == "false") {
@@ -75,17 +75,17 @@ if (mmRetrieveNcURL($params["ncURL"], $tempNcIn, $errMsg)) {
    					      $params["xAxisString"], $params["yAxisString"],
    					      $params["axisUnitIsMetric"], $errMsg)) {
    	// send out the netcdf file
-   	HttpResponse::setCache(true);
-		HttpResponse::setContentType("application/x-netcdf");
-		HttpResponse::setContentDisposition($tempNcOut.".nc", true);
-		HttpResponse::setFile($tempNcOut.".nc");
-		HttpResponse::send();
+   	$projProj = preg_replace("/.*\+proj\=(\w+).*/", '$1', $params["projString"]);
+   	if (strlen($projProj) == 0) {
+   	   $projProj = "fimex";
+   	}
+   	$fileName = $projProj . '_'. basename($params["ncURL"]);
+   	header('Content-Description: File Transfer');
+		header('Content-Type: application/x-netcdf');
+		header('Content-Length: ' . filesize($tempNcOut));
+		header('Content-Disposition: attachment; filename=' . basename($fileName));
+		readfile($tempNcOut);
 		flush();
-		// below for php < 5.1 with pecl extension?
-   	//http_send_content_disposition($tempNcOut.".nc", true);
-		//http_send_content_type("application/x-netcdf");
-		//http_throttle(0.1, 2048);
-		//http_send_file($tempNcOut);
    } else {
       die($errMsg);
    }
