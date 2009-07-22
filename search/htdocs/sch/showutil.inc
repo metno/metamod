@@ -30,16 +30,28 @@
 ?>
 <?php
 include_once 'gautil.inc';
-function displayval($mtname, $value, $dsName) {
+require_once("../funcs/mmFimex.inc");
+
+function displayval($mtname, $value, $dsName, $fimexSetup = false) {
    $s1 = $value;
    $jpos = strpos($s1,' > HIDDEN');
    if ($jpos !== false) {
       $s1 = substr($s1,0,$jpos);
    }
-   if ($mtname == "dataref" && substr($s1,0,7) == 'http://') {
-      if (preg_match (':/([^/]+)(/?)$:',$s1,$a1)) {
+   if ($mtname == "dataref") {
+   	$dataUrl = $s1;
+      if ((substr($s1,0,7) == 'http://') && (preg_match (':/([^/]+)(/?)$:',$s1,$a1))) {
          $nameshown = $a1[1];
-         $s1 = '<a href="' . $s1 . '"><b>' . $nameshown . '</b></a>' . " <a href=\"xmlShow.php?dsName=$dsName\" target=\"_new\">Show xml</a> ";
+         $s1 = '<a href="' . $dataUrl . '"><b>' . $nameshown . '</b></a>';
+      }
+      $s1 .= "<br/><a href=\"xmlShow.php?dsName=$dsName\" target=\"_new\">Show xml</a> ";
+      if ($fimexSetup) {
+         foreach ($fimexSetup->getProjections() as $projName) {
+         	$urlParams = $fimexSetup->getProjectionAsURLParameters($projName, $dataUrl);
+         	if ($urlParams) {
+            	$s1 .= '<br/><a href="getFimexReprojectedURL.php?'.$urlParams.'" target="_new">'.$projName.'</a>';
+         	}
+         }
       }
    }
    return $s1;
@@ -76,6 +88,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
          $mandatory_mtname = $carr[0];
       }
    }
+   $fimexSetup = getFimexSetupFromDb($mmDbConnection, $parentds);
    $dsarr = array();
    $dbug = strpos($mmDebug,"secondlevel");
    $tmpSqlPartParams = $sqlPartParams;
@@ -290,7 +303,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
             for ($i1=$ifirst; $i1 <= $ilast;$i1++) {
                list($mdcontent,$mtname,$dsid,$dsname) = pg_fetch_row($result,$i1);
                $jindex = $indexmtnames[$mtname];
-               $s1 = displayval($mtname,$mdcontent,$dsname);
+               $s1 = displayval($mtname,$mdcontent,$dsname,$fimexSetup);
                $mdcontentall[$jindex] .= "<p>" . $s1 . "</p>\n";
             }
             $line = "<tr><td>&nbsp;</td>\n";
@@ -307,4 +320,5 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
       }
    }
 }
+
 ?>

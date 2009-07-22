@@ -50,7 +50,7 @@ require_once('../funcs/mmFimex.inc');
  * @param axisUnitIsMetric
  */
 $errMsg = ''; # error message to put on screen
-$params = array("ncURL", "interpolationMethod", "projString", "xAxisString", "yAxisString", "axisUnitIsMetric");
+$params = array("ncURL", "interpolationMethod", "xAxisString", "yAxisString", "axisUnitIsMetric");
 foreach ( $params as $param ) {
 	if (strlen($_REQUEST[$param])) {
 	   $params[$param] = $_REQUEST[$param];
@@ -58,12 +58,13 @@ foreach ( $params as $param ) {
 	   $errMsg .= "parameter $param missing in input ";
 	}
 }
+$params["projString"] = $_REQUEST[$param]; // may be empty
 if ($params["axisUnitIsMetric"] == "true") {
    $params["axisUnitIsMetric"] = true;
 } else if ($params["axisUnitIsMetric"] == "false") {
 	$params["axisUnitIsMetric"] = false;
 } else {
-   $errMsg .= "parameter axisUnitIsMetric should be true/false, but is: $params['axisUnitIsMetric'] ";
+   $errMsg .= "parameter axisUnitIsMetric should be true/false, but is: ".$params['axisUnitIsMetric'];
 }
 
 $tempNcIn = tempnam(sys_get_temp_dir(), 'fimexNcInput');
@@ -74,10 +75,17 @@ if (mmRetrieveNcURL($params["ncURL"], $tempNcIn, $errMsg)) {
    					      $params["xAxisString"], $params["yAxisString"],
    					      $params["axisUnitIsMetric"], $errMsg)) {
    	// send out the netcdf file
-   	http_send_content_disposition($tempNcOut.".nc", true);
-		http_send_content_type("application/x-netcdf");
+   	HttpResponse::setCache(true);
+		HttpResponse::setContentType("application/x-netcdf");
+		HttpResponse::setContentDisposition($tempNcOut.".nc", true);
+		HttpResponse::setFile($tempNcOut.".nc");
+		HttpResponse::send();
+		flush();
+		// below for php < 5.1 with pecl extension?
+   	//http_send_content_disposition($tempNcOut.".nc", true);
+		//http_send_content_type("application/x-netcdf");
 		//http_throttle(0.1, 2048);
-		http_send_file($tempNcOut);
+		//http_send_file($tempNcOut);
    } else {
       die($errMsg);
    }

@@ -36,6 +36,7 @@
 <?php
 require_once("mmConfig.inc");
 require_once("mmLogging.inc");
+require_once("mmDataset.inc");
 
 /**
  * @param $input local input file
@@ -43,7 +44,7 @@ require_once("mmLogging.inc");
  * @param $output local netcdf output file
  * @param $outputType file-type, e.g. netcdf
  * @param $method one of fimex interpolation methods: nearestneighbor, bilinear, bicubic, coord_nearestneighbor or coord_kdtree
- * @param $proj proj-string of output-projection
+ * @param $proj proj-string of output-projection, if left empty, no reprojection will occur
  * @param $xaxis xaxis-ticks, e.g. 10.5,11,...,29.5
  * @param $yaxis yaxis-ticks
  * @param $axisUnitIsMetric boolean flag to indicate metric or degree axes
@@ -66,13 +67,14 @@ type=$outputType
 
 [interpolate]
 method = $method
-projString = $proj
 xAxisValues = $xaxis
 yAxisValues = $yaxis
 xAxisUnit = $xUnit
 yAxisUnit = $yUnit
- 	 
 EOT;
+	if (strlen($proj)) {
+	   $fimexSetup .= "projString = $proj\n";
+	}
  	
    $fimexInput = tempnam(sys_get_temp_dir(), 'fimexInput');
    $fiFH = fopen($fimexInput, "w");
@@ -142,5 +144,172 @@ function mmRetrieveNcURL($url, $outputNcFile, &$errMsg = "") {
 }
 
 
+/**
+ * Class for hiding the xml-structure and giving easy access to the FimexSetup string.
+ * 
+ * Example of fimex-setup string:
+ * <fimexProjections xmlns="http://www.met.no/schema/metamod/fimexProjections">
+ * <dataset urlRegex="" urlReplace=""/>
+ * <!-- see fimex-interpolation for more info on options -->
+ * <projection name="Lat/Long" method="nearestghbor" 
+ *           projString="+proj=latlong +elips=sphere +a=6371000 +e=0" 
+ *           xAxis="0,1,...,x;relativeStart=0;unit=degree" 
+ *           yAxis="0,1,...,x;relativeStart=0;unit=degree" 
+ *           toDegree="true"/>
+ * <projection name="Stereo" method="coord_nearestneighbor"
+ *           projString="+proj=stere +elips=sphere +lon_0=0 +lat_0=90 +lat_ts=-32 +a=6371000 +e=0" 
+ *           xAxis="0,50000,...,x;relativeStart=0;unit=m" 
+ *           yAxis="0,50000,...,x;relativeStart=0;unit=m" 
+ *           toDegree="false" /> 
+ * </fimexProjections>        
+ */
+class MM_FimexSetup {
+   protected $urlRegex = false;
+   protected $urlReplace = false;
+   protected $projections = array(); # $projections contains projection-name => array(projString => ..., xAxis => ..., yAxis => ..., method => ..., toDegree => ...)
+   static $fimexProjectionNS = "http://www.met.no/schema/metamod/fimexProjections";
+   /**
+    * create a new MM_FimexSetup from a string
+    * @param $str xml-string
+    * @throws MM_DatasetException if the string is not parseable
+    */
+   function __construct($str = "") {
+      if (strlen($str)) {
+         $dom = new DOMDocument();
+         if (!$dom->loadXML($str)) {
+         	mm_log(MM_ERROR, "unable to parse xml-string $str", __FILE__, __LINE__);
+         	throw new MM_DatasetException("unable to parse xml-string $str");
+         }
+         $xpath = new DomXPath($dom);
+         $xpath->registerNamespace('f', MM_FimexSetup::$fimexProjectionNS);
+         
+         foreach ($xpath->query('/f:fimexProjections/f:dataset') as $node) {
+				foreach ($node->attributes as $att) {
+				   if ($att->name == 'urlRegex') {
+				      $this->urlRegex = $att->value;
+				   } else if ($att->name == 'urlReplace') {
+				      $this->urlReplace = $att->value;
+				   }
+				}            
+         }
+         
+         foreach ($xpath->query('/f:fimexProjections/f:projection') as $node) {
+         	$nodeArray = array();
+         	foreach ($node->attributes as $att) {
+         		$nodeArray[$att->name] = $att->value;
+         	}
+         	if ($nodeArray["name"]) {
+         		$this->projections[$nodeArray["name"]] = $nodeArray;        	   
+         	}
+         }
+      }
+   }
+   /**
+    * @return array with names of projections
+    */
+   function getProjections() {
+      return array_keys($this->projections);
+   }
+   /**
+    * get the value of a projection property
+    * @param $projName the projection's name
+    * @param $property name of the property as projStr, method, xAxis, yAxis, toDegree
+    * @return property-value of projection or ""
+    */
+   function getProjectionProperty($projName, $property) {
+ 		if (array_key_exists($projName, $this->projections)) {
+      	return $this->projections[$projName][$property];
+ 		} else {
+ 		   return "";
+ 		}
+   }
+   
+   /**
+    * get the regex to match the url against 
+    */
+   function getURLRegex() {
+      return $this->urlRegex;
+   }
+   /**
+    * get the regex/replace to change the url with 
+    */
+   function getURLReplace() {
+      return $this->urlReplace;
+   }
+   /**
+    * Get the url parameters for e.g. sch/getFimexReprojectedURL.php
+    * 
+    * @param $projName the name of the projection
+    * @param $dataURL the basic name of the data-url. This will be regex-replaced by urlRegex and urlReplace.
+    * @return url-parameters as string i.e. ncURL=http://www.ncdata.com/file.nc&interpolationMethod=nearestneighbor&......
+    */
+   function getProjectionAsURLParameters($projName, $dataURL) {
+   	$params = array();
+      if ($this->getURLRegex() && $this->getURLReplace()) {
+         $url = preg_replace($this->getURLRegex(), $this->getURLReplace(), $dataURL);
+         $params[] = 'ncURL='.urlencode($url);
+      } else {
+         $params[] = 'ncURL='.urlencode($dataURL);
+      }
+      if (array_key_exists($projName, $this->projections)) {
+			if ($this->getProjectionProperty($projName, 'method')) {
+			   $params[] = 'interpolationMethod='.urlencode($this->getProjectionProperty($projName, 'method'));
+			} else {
+			   $params[] = 'interpolationMethod=nearestneighbor';
+			}
+			if ($this->getProjectionProperty($projName, 'toDegree')) {
+				$params[] = 'axisUnitIsMetric=false';
+			} else {
+			   $params[] = 'axisUnitIsMetric=true';
+			}
+		   $params[] = 'projString='.urlencode($this->getProjectionProperty($projName, 'projString'));
+			$params[] = 'xAxisString='.urlencode($this->getProjectionProperty($projName, 'xAxis'));
+			$params[] = 'yAxisString='.urlencode($this->getProjectionProperty($projName, 'yAxis'));
+			return join('&', $params);
+      }
+      return false;
+   }
+   
+}
+/**
+ * retrieve a fimex-setup from the database
+ * @param $pgDb postgres database connection
+ * @param $datasetId id of an dataset to retrieve the setup
+ * @return a MM_FimexSetup, or false
+ */
+function getFimexSetupFromDb($pgDb, $datasetId) {
+	$sql = 
+'SELECT PI_content FROM ProjectionInfo
+   WHERE DS_id = $1 AND (PI_content IS NOT NULL OR PI_content != \'\')';
+
+	$result = pg_query_params($pgDb, $sql, array($datasetId));
+	if (!$result) {
+	   mm_log(MM_ERROR, "Could not execute $sqlsentence", __FILE__, __LINE__);
+      die("Internal Error");
+	}
+	if (pg_num_rows($result) != 1) {
+		// try parent
+		$sql = 
+'SELECT PI_content FROM ProjectionInfo, Dataset ' .
+' WHERE (PI_content IS NOT NULL OR PI_content != \'\') ' .
+'   AND DS_parent = $1 ' .
+'   AND ProjectionInfo.DS_id = Dataset.DS_id';
+		$result = pg_query_params($pgDb, $sql, array($datasetId));
+		if (!$result) {
+		   mm_log(MM_ERROR, "Could not execute $sqlsentence", __FILE__, __LINE__);
+	      die("Internal Error");
+		}
+	}
+   $retVal = false;
+	if (pg_num_rows($result) == 1) {
+	   list($content) = pg_fetch_array($result);
+		try {
+		   $retVal = new MM_FimexSetup($content);
+		} catch (MM_DatasetException $ex) {
+		   mm_log(MM_WARNING, "Error in fimex setup of dataset $datasetId", __FILE__, __LINE__);
+		}
+	}
+   return $retVal;
+}
 
 ?>

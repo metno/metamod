@@ -111,7 +111,7 @@ require_once("../funcs/mmConfig.inc");
             <pre>
 <?php $input = <<<EOT
 <fimexProjections xmlns="http://www.met.no/schema/metamod/fimexProjections">
-<dataset urlRegex=""/>
+<dataset urlRegex="!(.*/thredds).*dataset=(.*)!" urlReplace="$1/fileServer/data/$2"/>
 <!-- see fimex-interpolation for more info on options -->
 <projection name="Lat/Long" method="nearestghbor" 
             projString="+proj=latlong +elips=sphere +a=6371000 +e=0" 
