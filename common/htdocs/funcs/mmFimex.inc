@@ -36,6 +36,19 @@ require_once("mmConfig.inc");
 require_once("mmLogging.inc");
 require_once("mmDataset.inc");
 
+if ( !function_exists('sys_get_temp_dir')) { // first defined in php 5.2.1
+	function sys_get_temp_dir() {
+   	if (!empty($_ENV['TMP'])) { return realpath($_ENV['TMP']); }
+    	if (!empty($_ENV['TMPDIR'])) { return realpath( $_ENV['TMPDIR']); }
+    	if (!empty($_ENV['TEMP'])) { return realpath( $_ENV['TEMP']); }
+    	$tempfile=tempnam(":\n\\/?><",''); // create tempfile in non-existing directory, will switch back to system-default temp
+    	if (file_exists($tempfile)) {
+    		unlink($tempfile);
+    		return realpath(dirname($tempfile));
+   	}
+	}
+}
+
 /**
  * @param $input local input file
  * @param $inputType file-type, e.g. netcdf
