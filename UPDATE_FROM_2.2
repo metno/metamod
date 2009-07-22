@@ -31,12 +31,14 @@ e) If you want to keep the existing database, that is, you don't want to
 
    init/update_to_Fulltext.sh
 
-f) consider setting 'random_page_cost = 2' (or lower) in postgresql.conf 
+f) consider setting 'random_page_cost = 2' (or lower) in postgresql.conf
+   for better search performance
    
 SUPPORT OF FIMEX CONVERSION
 ===========================
 
 * add curl support to php: apt-get install php5-curl
+* restart apache
 * install fimex
 * set the master_config.txt FIMEX_PROGRAM to fimex, either full path or in PATH
  
