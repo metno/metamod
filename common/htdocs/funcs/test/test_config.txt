@@ -3,7 +3,8 @@ BASE_DIRECTORY = /home/someuser
 
 WEBRUN_DIRECTORY = .
 
-TARGET_DIRECTORY = [==BASE_DIRECTORY==]/example
+# required relative to schema-directory
+TARGET_DIRECTORY = ../../..
 
 # Path for logfile for logging important operations on the database:
 LOGFILE = [==WEBRUN_DIRECTORY==]/databaselog

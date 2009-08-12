@@ -11,5 +11,5 @@ var_dump($config->getVar("TEST_SUBSTITUTION", 'htdocs/qst/quest.php', __FILE__))
 ?>
 --EXPECT--
 string(23) "../../master_config.txt"
-string(22) "/home/someuser/example"
+string(8) "../../.."
 string(4) "test"

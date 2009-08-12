@@ -41,6 +41,7 @@ $errors = '';
 
 require_once('../funcs/mmConfig.inc');
 require_once ("../funcs/mmDataset.inc");
+require_once("../funcs/mmOAIPMH.inc");
 require_once('oai2/oaidp-util.php');
 require_once('oai2/buildxml.php');
 require_once('oai2/get_exception.php');
@@ -156,14 +157,26 @@ if ($errors != '') {
 	oai_exit();
 }
 
+$oaiStr = $xmlheader . $request . $output . "</OAI-PMH>\n";
+$mmOAI = new MM_OaiPmh($oaiStr);
+if (!$mmOAI->validateOAI()) {
+   oai_exit();
+}
+// remove elements and check validity again
+if ($mmOAI->removeInvalidRecords() > 0) {
+   if (!$mmOAI->validateOAI()) {
+   	oai_exit();
+   }
+}
+
+// output
 if ($compress) {
 	ob_start('ob_gzhandler');
 }
-
 header($CONTENT_TYPE);
-echo $xmlheader;
-echo $request;
-echo $output;
-oai_close(); 
+echo $mmOAI->getOAI_XML();
+if ($compress) {
+   ob_end_flush();
+}
 
 ?>
