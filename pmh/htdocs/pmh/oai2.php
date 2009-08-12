@@ -160,11 +160,13 @@ if ($errors != '') {
 $oaiStr = $xmlheader . $request . $output . "</OAI-PMH>\n";
 $mmOAI = new MM_OaiPmh($oaiStr);
 if (!$mmOAI->validateOAI()) {
+	$errors = 'oai response does not validate';
    oai_exit();
 }
 // remove elements and check validity again
 if ($mmOAI->removeInvalidRecords() > 0) {
    if (!$mmOAI->validateOAI()) {
+   	$errors = 'oai response does not validate after removal of invalid records';
    	oai_exit();
    }
 }
