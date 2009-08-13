@@ -164,7 +164,7 @@ if (!$mmOAI->validateOAI()) {
    oai_exit();
 }
 // remove elements and check validity again
-if ($mmOAI->removeInvalidRecords() > 0) {
+if (@$mmOAI->removeInvalidRecords() > 0) {
    if (!$mmOAI->validateOAI()) {
    	$errors = 'oai response does not validate after removal of invalid records';
    	oai_exit();

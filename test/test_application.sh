@@ -322,7 +322,7 @@ elif [ 1 -eq 1 ]; then
          sed '1,$s/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]/_TIMESTAMP_/' webrun/$fil >t_log1
          sed '1,$s/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/_DATE_/' t_log1 | sort | uniq >t_log2
          rm t_log1
-         echo "========== diff for $fil:" >>t_result
+         echo "========== diff for $fil (new vs. old):" >>t_result
          sort compare/$fil | uniq >t_log3
          diff t_log2 t_log3 >>t_result
          count=`expr $count + 1`
