@@ -5,6 +5,7 @@ target_directory="[==TARGET_DIRECTORY==]"
 upload_monitor_pid=$webrun_directory/upload_monitor.pid
 import_dataset_pid=$webrun_directory/import_dataset.pid
 harvester_pid=$webrun_directory/harvester.pid
+create_thredds_catalogs_pid=$webrun_directory/create_thredds_catalogs.pid
 
 
 . /lib/lsb/init-functions
@@ -82,6 +83,13 @@ start() {
          return $?;
       fi
    fi   
+   if [ "[==METAMODTHREDDS_DIRECTORY==]" != "" -a -r $target_directory/scripts/create_thredds_catalogs.pl ]; then
+      start_daemon -n 10 -p $create_thredds_catalogs_pid $target_directory/scripts/create_thredds_catalogs.pl $webrun_directory/create_thredds_catalogs.out $create_thredds_catalogs_pid
+      if [ $? -ne 0 ]; then
+         echo "create_thredds_catalogs failed: $?"
+         return $?;
+      fi
+   fi   
 }
 
 stop() {
@@ -93,6 +101,9 @@ stop() {
    fi
    if [ "[==METAMODHARVEST_DIRECTORY==]" != "" -a -r $target_directory/scripts/harvester.pl ]; then
       killproc -p $harvester_pid $target_directory/scripts/harvester.pl SIGTERM
+   fi
+   if [ "[==METAMODTHREDDS_DIRECTORY==]" != "" -a -r $target_directory/scripts/create_thredds_catalogs.pl ]; then
+      killproc -p $create_thredds_catalogs_pid $target_directory/scripts/create_thredds_catalogs.pl SIGTERM
    fi
 }
 
@@ -125,6 +136,14 @@ status() {
       else
          echo "harvester not running"
          retval=3
+      fi
+   fi  
+   if [ "[==METAMODTHREDDS_DIRECTORY==]" != "" -a -r $target_directory/scripts/create_thredds_catalogs.pl ]; then
+      if running $create_thredds_catalogs_pid; then
+         echo "create_thredds_catalogs running"
+      else
+         echo "create_thredds_catalogs not running"
+         retval=4
       fi
    fi  
    return $retval;
