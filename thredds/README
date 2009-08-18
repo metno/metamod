@@ -1,0 +1,56 @@
+This is the top directory of the METAMODTHREDDS module. This module keeps
+a THREDDS catalog up to date. I. e., an attempt will be made to add any new
+dataset created in the METAMOD2 database, into the THREDDS catalog.
+
+The THREDDS system itself must be installed separately, independent of the 
+METAMOD2 system.
+
+This module comprise one script:
+
+   scripts/create_thredds_catalogs.pl
+
+This script runs as a daemon. It wakes up at fixed intervals to see if any
+dataset has been added to or removed from the database. If so, a new version
+of the THREDDS catalog is created, and the THREDDS data server is restarted.
+
+The script reads one configuration file that resides in the webrun directory:
+
+   thredds_config
+
+This file contains three different line types (commands). The line types are
+identified by an initial command keyword:
+
+   distribution <rolename> <distribution_statement>
+   ignore dataset <dataset_name>
+   run each <minutes> minute
+
+Blank lines and comments are ignored. Comments starts with the '#' character
+and continue to the next newline.
+
+The 'distribution' command makes an association between the distribution
+statements as found in the METAMOD2 database and the rolenames found in the
+tomcat-users.xml file used by the THREDDS system. Several distribution
+statements can be associated with the same rolename, but only one rolename
+can be associated with a given distribution statement.
+
+Datasets in THREDDS will only be accessible for users having the rolename
+corresponding to the distribution_statement that is found for the dataset in
+the METAMOD2 database.
+
+Only top level METAMOD2 datasets (i.e. directory datasets) are checked
+when the script search for distribution statements in the database. Any
+distribution_statement found in a low level dataset (i.e. file dataset) is
+ignored.
+
+Datasets with the special distribution_statement "Free" (or "free") are open
+for all users. For these datasets, a THREDDS catalog entry is created that
+do not require the user to have any specific role.
+
+The 'ignore' command will exclude the corresponding dataset from the THREDDS
+catalog. The dataset will not be visible in the THREDDS web interface at all.
+
+The 'run' command tells the script how often it should wake up to check for
+any changes in the database.
+
+The script will read the 'thredds_config' file each time it wakes up. Changes
+in the config file will accordingly not need any restart of the script itself.
