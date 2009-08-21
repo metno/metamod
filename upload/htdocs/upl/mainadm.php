@@ -96,10 +96,12 @@ require_once("../funcs/mmConfig.inc");
       <div class="loginform" style="border-left: 1px solid #4d4d8d;">
       <h2>Directory Administration</h2>
       <table border="0" cellspacing="0" cellpadding="4">
-         <colgroup width="55%" />
-         <colgroup width="5%" />
-         <colgroup width="17%" />
-         <colgroup width="23%" />
+         <colgroup width="53%" />
+         <colgroup width="3%" />
+         <colgroup width="11%" />
+         <colgroup width="11%" />
+         <colgroup width="11%" />
+         <colgroup width="11%" />
          <tr>
          <td rowspan="4">
             <p>In this page you can create new directories in the data repository and
@@ -133,7 +135,7 @@ require_once("../funcs/mmConfig.inc");
          <td class="inputform">
             <input name="dirname" value="<?php echo $dirname; ?>" size="10" />
          </td>
-         <td class="inputform">
+         <td class="inputform" colspan="2">
          	<select name="knownDirname" size="1">
          	<?php
          		$dirinfo_sorted = ksort($dirinfo);
@@ -154,14 +156,16 @@ require_once("../funcs/mmConfig.inc");
          <td class="inputform">
             <input class="selectbutton1" type="submit" name="BTN_editproj_dir" value="Edit Projections" />
          </td>
+         <td class="inputform">
+            <input class="selectbutton1" type="submit" name="BTN_editWMS_dir" value="Edit WMS parameter" />
+         </td>
          </tr>
          <tr>
-         <td class="inputform" colspan="2">
+         <td class="inputform" colspan="4">
             <p>&nbsp;</p>
             <p>&nbsp;</p>
             <p>&nbsp;</p>
          </td>
-         <td class="inputform"/>
          </tr>
          <tr>
          <td class="inputform">
@@ -170,6 +174,7 @@ require_once("../funcs/mmConfig.inc");
          <td class="inputform">
             <input name="dirkey" value="<?php echo $dirkey; ?>" size="10" />
          </td>
+         <td class="inputform"/>
          <td class="inputform"/>
          </tr>
       </table>
