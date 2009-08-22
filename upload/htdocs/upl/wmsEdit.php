@@ -115,10 +115,10 @@ require_once("../funcs/mmConfig.inc");
             and the parameter setup under ViewContext->LayerList->Layer->[Name,Title,Abstract]. A complete 'Layer'-section per parameter is required:</p>
             <pre>
 <?php $input = <<<EOT
-<metamodWMCSetup xmlns="http://www.met.no/schema/metamod/metamodWMCSetup">
-<!-- regex to replace name from url to dianaSetup name,
-     i.e. from http://thredds.met.no/dodsC/.../osisaf/fil20090703.nc to osisaf_20090703. -->
-<datasetName urlRegex="!.*/file(\\d{8})\\.nc!" urlReplace="osisaf$1."/>
+<mm:wmcSetup xmlns:mm="http://www.met.no/schema/metamod/wmcSetup">
+<!-- regex to replace name from dataset-name to dianaSetup name,
+     i.e. from DAM/osisaf/file20090703 to osisaf_20090703. -->
+<mm:datasetName regex="!.*/file(\d{8})!" replace="osisaf_$1."/>
 <ViewContext xmlns="http://www.opengis.net/context" 
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
              version="1.1.0" id="OpenLayers_Context_466" 
@@ -174,7 +174,7 @@ require_once("../funcs/mmConfig.inc");
     </Layer>
   </LayerList>
 </ViewContext>
-</metamodWMCSetup>
+</mm:wmcSetup>
 EOT;
 echo htmlentities($input);
 ?>
