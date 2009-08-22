@@ -97,7 +97,11 @@ if ( $mmDbConnection ) {
          } else {
             $children_html = '';
          }
-	 echo $children_html . "<td>" . implode("</td><td>",$rowarr) . "</td>\n";
+	 echo $children_html;
+	 foreach ( $rowarr as $colVal) {
+        echo "<td><pre>". htmlspecialchars($colVal)."</pre></td>";   
+    }
+    echo "\n";
          echo "<td>";
          if (array_key_exists($dbtable,$tablesrefs)) {
             $items = explode(" ",$tablesrefs[$dbtable]);
