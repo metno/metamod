@@ -121,6 +121,9 @@ IMPORTDIRS = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
 # locate your fimex program for reprojection of data
 FIMEX_PROGRAM = fimex
 
+# The WMS server URL to send the WMC page to
+WMS_URL = http://wms.met.no/wmcConfig?wmcDoc=
+
 # ============ METAMODSEARCH configuration ==============
 # Name of web-based search application as seen by users:
 SEARCH_APP_NAME = METAMOD search

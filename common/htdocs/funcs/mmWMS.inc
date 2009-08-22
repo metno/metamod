@@ -141,7 +141,23 @@ function getWMSSetupFromDb($pgDB, $datasetName) {
 	}
 	return false;
 }
-   
 
+/**
+ * check if a wms setups exist for the dsid or its parent
+ * @param $pgDB database handle
+ * @param $dsid datasetId or datasetId of parent
+ */
+function checkWMSSetupExistsInDb($pgDB, $dsid) {
+   $sql = 'SELECT WMSInfo.DS_id FROM WMSInfo, Dataset '.
+          ' WHERE WMSInfo.DS_id = Dataset.DS_id '.
+	     	 '   AND (WI_content IS NOT NULL OR WI_content != \'\')'.          
+          '   AND (Dataset.DS_id = $1 OR Dataset.DS_parent = $1 )';
+	$result = pg_query_params($pgDB, $sql, array($dsid));
+	if (!$result) {
+	  	mm_log(MM_ERROR, "Could not execute $sqlsentence", __FILE__, __LINE__);
+     	die("Internal Error");
+	}
+	return pg_num_rows($result) > 0;
+}
 
 ?>

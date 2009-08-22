@@ -109,6 +109,10 @@ PHPLOGLEVEL = DEBUG
 # locate your fimex program for reprojection of data
 FIMEX_PROGRAM = fimex
 
+# The WMS server URL to send the WMC page to
+WMS_URL = http://wms.met.no/wmcConfig?wmcDoc=
+
+
 # ============ METAMODBASE configuration ==============
 # Path for logfile for logging important operations on the database:
 LOGFILE = [==WEBRUN_DIRECTORY==]/databaselog

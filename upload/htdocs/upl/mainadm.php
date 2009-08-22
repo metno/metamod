@@ -153,12 +153,24 @@ require_once("../funcs/mmConfig.inc");
          <td class="inputform">
             <input class="selectbutton1" type="submit" name="BTN_creupd_dir" value="Create/Update" />
          </td>
-         <td class="inputform">
+         <?php
+         if (strlen($mmConfig->getVar("FIMEX_PROGRAM"))) {
+         	echo '<td class="inputform">
             <input class="selectbutton1" type="submit" name="BTN_editproj_dir" value="Edit Projections" />
          </td>
-         <td class="inputform">
+';
+         } else {
+         	echo '<td class="inputform" />'."\n";
+         }
+         if (strlen($mmConfig->getVar("WMS_URL"))) {
+				echo '<td class="inputform">
             <input class="selectbutton1" type="submit" name="BTN_editWMS_dir" value="Edit WMS parameter" />
          </td>
+';
+         } else {
+         	echo '<td class="inputform" />'."\n";
+         }
+         ?>
          </tr>
          <tr>
          <td class="inputform" colspan="4">
