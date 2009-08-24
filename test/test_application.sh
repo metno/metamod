@@ -215,7 +215,7 @@ sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 /^ADMIN_DOMAIN *=/s|=.*$|= '$admindomain'|
 /^DATABASE_NAME *=/s|=.*$|= '$idstring'|
 /^APPLICATION_ID *=/s|=.*$|= '$idstring'|
-/^BASE_PART_OF_EXTERNAL_URL *=/s|=.*$|= http//'$servername$appendport'|
+/^BASE_PART_OF_EXTERNAL_URL *=/s|=.*$|= http://'$servername$appendport'|
 /^LOCAL_URL *=/s|=.*$|= /'$basedirbasename'|
 /^PMH_PORT_NUMBER *=/s|=.*$|= '$pmhport'|
 /^PMH_REPOSITORY_IDENTIFIER *=/s|=.*$|= '$idstring'|
