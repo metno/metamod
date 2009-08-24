@@ -296,6 +296,7 @@ class MM_ForeignDataset {
 			$nodelist = $this->xpathDS->query("/d:dataset/*");
 			$inserted = false;
 			foreach ($nodelist as $node) {
+				if ($node->nodeType != XML_ELEMENT_NODE) {next;}
 				if ($node->nodeName != 'info') {
 					$ds->insertBefore($quadtreeNode, $node);
 					$inserted = true;
@@ -351,6 +352,7 @@ class MM_ForeignDataset {
 			$nodelist = $this->xpathDS->query("/d:dataset/*");
 			$inserted = false;
 			foreach ($nodelist as $node) {
+				if ($node->nodeType != XML_ELEMENT_NODE) {next;}
 				if ($node->nodeName != 'info' && $node->nodeName != 'quadtree_nodes') {
 					$ds->insertBefore($wmsNode, $node);
 					$inserted = true;
@@ -410,6 +412,7 @@ class MM_ForeignDataset {
 			$nodelist = $this->xpathDS->query("/d:dataset/*");
 			$inserted = false;
 			foreach ($nodelist as $node) {
+				if ($node->nodeType != XML_ELEMENT_NODE) {next;}
 				if ($node->nodeName != 'info' && $node->nodeName != 'quadtree_nodes' && $node->nodeName != 'wmsInfo') {
 					$ds->insertBefore($piNode, $node);
 					$inserted = true;
