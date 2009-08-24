@@ -616,7 +616,7 @@ sub update_database {
         #
         $sql_delete_WMSInfo->execute($dsid);
         my $wmsInfo = $ds->getWMSInfo;
-        if ($projectionInfo) {
+        if ($wmsInfo) {
             $sql_insert_WMSInfo->execute($dsid, $wmsInfo);
         }
 
