@@ -1,4 +1,8 @@
 <?php
+global $topics;
+global $inverse_topics;
+global $areas;
+global $topicCategories;
 $topics = array("aerosol_angstrom_exponent" => array("Atmosphere > Aerosols > Aerosol Particle Properties")
    ,"air_potential_temperature" => array("Atmosphere > Atmospheric Temperature > Potential Temperature")
    ,"air_pressure" => array("Atmosphere > Atmospheric Pressure > Atmospheric Pressure Measurements")
@@ -643,6 +647,18 @@ $topics = array("aerosol_angstrom_exponent" => array("Atmosphere > Aerosols > Ae
    ,"y_sea_water_velocity" => array("Oceans > Ocean Circulation > Ocean Currents", "Oceans > Tides > Tidal Currents")
    ,"y_wind" => array("Atmosphere > Atmospheric Winds > Surface Winds", "Atmosphere > Atmospheric Winds > Wind Profiles", "Atmosphere > Atmospheric Winds > Boundary Layer Winds", "Atmosphere > Atmospheric Winds > Upper Level Winds", "Atmosphere > Atmospheric Winds > Flight Level Winds", "Oceans > Ocean Winds > Surface Winds")
 );
+$inverse_topics = array();
+reset($topics);
+foreach ($topics as $var => $gcmdarr) {
+   reset($gcmdarr);
+   foreach ($gcmdarr as $gcmdcode) {
+      if (array_key_exists($gcmdcode, $inverse_topics)) {
+         $inverse_topics[$gcmdcode][] = $var;
+      } else {
+         $inverse_topics[$gcmdcode] = array($var);
+      }
+   }
+}
 $areas = array("Arctic Ocean" => "Ocean > Arctic Ocean",
    "Northern Hemisphere" => "Geographic Region > Northern Hemisphere",
    "Norwegian Sea" => "Ocean > Atlantic Ocean > North Atlantic Ocean",

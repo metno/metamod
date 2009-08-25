@@ -270,6 +270,11 @@ $SQL['metadataFormat'] = 'DS_metadataFormat';
 // is set to an empty string for all records.
 $SQL['set'] = '';
 
+// Including arrays that define a mapping between CF standard_names and
+// GCMD keywords:
+
+include 'var_topic.php';
+
 // Here are a couple of queries which might need to be adjusted to 
 // your needs. Normally, if you have correctly named the columns above,
 // this does not need to be done.
@@ -342,9 +347,9 @@ function getRecords ($id = '', $from = '', $until = '') {
          '', 'Personnel Contact_Address City', 'Oslo','',
          '', 'Personnel Contact_Address Postal_Code', 'N-0313','',
          '', 'Personnel Contact_Address Country', 'Norway','',
-         'variable', '*Parameters Category', 'EARTH SCIENCE','Not Available',
-         'variable 1', 'Parameters Topic', '','Not Available',
-         'variable 2', 'Parameters Term', '','Not Available',
+         'variable 4', '*Parameters Category', 'EARTH SCIENCE','',
+         'variable 1', 'Parameters Topic', '','',
+         'variable 2', 'Parameters Term', '','',
          'variable 3', 'Parameters Variable_Level_1', '','',
          'variable -1', 'Parameters Detailed_Variable', '','',
          'topiccategory 1', 'ISO_Topic_Category', '','', # required by IPY

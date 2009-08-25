@@ -110,7 +110,11 @@ if (!$gotFile) {
             	} else if ($excpt != 0) {
                	$val = get_exception($prev_mtname,$excpt,$value);
 	               if ($val !== FALSE) {
+                  if ($excpt == 4) {
+                     $outlist[] = array($path,htmlspecialchars($const));
+                  } else {
    	               $outlist[] = array($path,$val);
+                  }
       	         } else {
          	         if ($dfltval != '') {
             	         $outlist[] = array($path,$dfltval);

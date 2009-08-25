@@ -28,34 +28,41 @@
 //
 
 function get_exception($mtname, $exception, $value) {
-   include 'var_topic.php'; // Includes arrays $topics, $areas and $topicCategories
+   global $topics;
+   global $inverse_topics;
+   global $areas;
+   global $topicCategories;
    if ($mtname == 'variable') {
    	  $detail = $value;
       if (array_key_exists($value, $topics)) {
          $parts = explode(" > ",$topics[$value][0]);
+         if ($exception < 0) {
+      	    return $detail;
+         } elseif ($exception == 4) {
+            return $value; # Hack. Return some non-false value. The actual value to be used is a constant
+                           # not accessible from this function. Egils
+         } elseif ($exception <= count($parts)) {
+            return $parts[$exception - 1];
+         }
       } else { // gcmd-string keywords, splitted by >, appended '> HIDDEN' at the end
       	$parts = preg_split('/\s*>\s*/', $value, -1, PREG_SPLIT_NO_EMPTY);
       	$last = array_pop($parts);
       	if ($last != 'HIDDEN') {
       		array_push($parts, $last);
       	}
-      	if (count($parts) == 1) {
-      		// no gcmd-keywords, just a parameter which is unable to translate
-      		$detail = $parts[0];
-      		$parts = array();
-      	} else {
-      		# $detail = join(' > ', $parts); # detail not required if full gcmd-keywords
-      		$detail = FALSE;
-      	}
-      }
-      if ($exception < 0) {
-      	 return $detail;
-      } elseif ($exception <= count($parts)) {
-      	$value = $parts[$exception - 1]; 
-      	if ($value == "Spectral Engineering") {
-      	   $value = "Spectral/Engineering"; # fix bug in Metamod-data
-      	}
-         return $value;
+        if (array_key_exists($detail, $inverse_topics)) {
+           if ($exception < 0) {
+      	      return FALSE; # detail not required if full gcmd-keywords
+           } elseif ($exception == 4) {
+              return $value; # Hack. See above
+           } elseif ($exception <= count($parts)) {
+      	      $val = $parts[$exception - 1]; 
+      	      if ($val == "Spectral Engineering") {
+      	         $val = "Spectral/Engineering"; # fix bug in Metamod-data
+      	      }
+              return $val;
+           }
+        }
       }
    }
    elseif ($mtname == "datacollection_period") {
@@ -112,11 +119,11 @@ function get_exception($mtname, $exception, $value) {
       }
    }
    elseif ($mtname == "topiccategory") {
-   	if (array_key_exists($value, $topicCategories)) {
-   		return $topicCategories[$value];
-   	} else {
-   		return $value;
-   	}
+   	  if (array_key_exists($value, $topicCategories)) {
+   		 return $topicCategories[$value];
+   	  } else {
+   		 return $value;
+   	  }
    }
    return FALSE;
 }
