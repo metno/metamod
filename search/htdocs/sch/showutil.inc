@@ -71,7 +71,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
 #  $startrow     - The whole table may be too large to display in one part. If this
 #                  is the case, $startrow represents the row number of the first row
 #                  to display in the current invocation of this function (row numbers
-#                  starts from 0). The number of rows allowed to show in one invocation
+#                  starts from 1). The number of rows allowed to show in one invocation
 #                  is defined by the constant $max_secondlevel_rows below.
 #  $columns      - Column names (see doshow.php)
 #  $sqlpart      - Part of WHERE-clause in SQL sentence corresponding to the selected 
@@ -123,7 +123,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
    if ($mmSessionState->countItems('9,GA') > 7) {
       $dsarr = mmGetqtnodes(7,$parentds,$dsarr);
    }
-   $tmpInList = array_slice($dsarr, $startrow, $max_secondlevel_rows);
+   $tmpInList = array_slice($dsarr, $startrow-1, $max_secondlevel_rows);
    if (count($tmpInList) > 0) {
 		$tmpSqlParams = array();
 		array_unshift($tmpInList, $parentds);
@@ -304,7 +304,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
          for ($i2=0; $i2 <= $lastcolnum;$i2++) {
             $mdcontentall[$i2] = "";
          }
-         for ($irow=0; $irow <= $dsidcount;$irow++) {
+         for ($irow=1; $irow <= $dsidcount;$irow++) {
             $ifirst = $dsidsfound[$dsidsrows[$irow]];
             $ilast = $dsidslast[$dsidsrows[$irow]];
             for ($i1=$ifirst; $i1 <= $ilast;$i1++) {
