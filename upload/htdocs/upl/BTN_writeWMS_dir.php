@@ -39,6 +39,7 @@
 // @param $wmsInfo
 //
 require_once("../funcs/mmDataset.inc");
+require_once("../funcs/mmWMS.inc");
 check_credentials(); // Sets $error, $errmsg, $nextpage, $normemail, $sessioncode,
                      // $runpath, $filepath, $filecontent and $dirinfo (globals).
 if ($error == 0) {
@@ -48,9 +49,13 @@ if ($error == 0) {
 	if (checkDirectoryPermission($directory, $dirkey, &$errmsg)) {
 		$wmsDatasetFile = mmGetRunPath() . "/XML/" . $mmConfig->getVar("APPLICATION_ID") . '/' . $directory . '.xmd';
 		if (is_writable($wmsDatasetFile)) {
-			list($xmdContent, $xmlContent) = mmGetDatasetFileContent($wmsDatasetFile);
 			try {
-		   	$wmsDataset = new MM_ForeignDataset($xmdContent, $xmlContent, true);
+				if (strlen($wmsInput)) {
+					// validate, throws on error
+				   new MM_WMSSetup($wmsInput, true);
+				}
+				list($xmdContent, $xmlContent) = mmGetDatasetFileContent($wmsDatasetFile);
+				$wmsDataset = new MM_ForeignDataset($xmdContent, $xmlContent, true);
 		   	$wmsDataset->setWMSInfo($wmsInput);
 		   	$wmsDataset->write(mmGetBasename($wmsDatasetFile));
 				$errmsg .= "Successfully updated $directory";

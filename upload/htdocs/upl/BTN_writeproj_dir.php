@@ -39,6 +39,7 @@
 // @param $projectionInput
 //
 require_once("../funcs/mmDataset.inc");
+require_once("../funcs/mmFimex.inc");
 check_credentials(); // Sets $error, $errmsg, $nextpage, $normemail, $sessioncode,
                      // $runpath, $filepath, $filecontent and $dirinfo (globals).
 if ($error == 0) {
@@ -48,8 +49,12 @@ if ($error == 0) {
 	if (checkDirectoryPermission($directory, $dirkey, &$errmsg)) {
 		$projDatasetFile = mmGetRunPath() . "/XML/" . $mmConfig->getVar("APPLICATION_ID") . '/' . $directory . '.xmd';
 		if (is_writable($projDatasetFile)) {
-			list($xmdContent, $xmlContent) = mmGetDatasetFileContent($projDatasetFile);
 			try {
+				if (strlen($projectionInput)) {
+					// validate, throws on error
+				   new MM_FimexSetup($projectionInput, true);
+				}
+			   list($xmdContent, $xmlContent) = mmGetDatasetFileContent($projDatasetFile);
 		   	$projDataset = new MM_ForeignDataset($xmdContent, $xmlContent, true);
 		   	$projDataset->setProjectionInfo($projectionInput);
 		   	$projDataset->write(mmGetBasename($projDatasetFile));

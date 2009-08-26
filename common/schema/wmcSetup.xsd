@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://www.met.no/schema/metamod/wmcSetup" 
+        xmlns:w="http://www.met.no/schema/metamod/wmcSetup"
+        xmlns:c="http://www.opengis.net/context" 
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified">
+        
+<!-- local version of http://schemas.opengis.net/context/1.1.0/context.xsd -->
+<import namespace="http://www.opengis.net/context" 
+        schemaLocation="context/1.1.0/context.xsd"/>
+        
+    <!-- root element -->
+    <element name='wmcSetup' type="w:WmcSetup" />
+     <!-- embedded elements -->
+    <element name='datasetName' type="w:DatasetName" />
+ 
+    <complexType name='WmcSetup'>
+        <sequence>
+            <element ref='w:datasetName' minOccurs='1' maxOccurs='1'/>
+            <!-- <element ref='c:ViewContext' minOccurs='0' maxOccurs='1' /> -->
+            <any minOccurs="0" maxOccurs="1" namespace="##any" processContents="skip" />
+        </sequence>
+    </complexType>
+
+    <complexType name='DatasetName'>
+        <attribute name="regex" type="string" use="required"/>
+        <attribute name="replace" type="string" use="required"/>
+    </complexType>
+    
+        
+</schema>

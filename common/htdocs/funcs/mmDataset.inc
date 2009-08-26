@@ -335,17 +335,27 @@ class MM_ForeignDataset {
 	 */
 	function setWMSInfo($wmsInfo) {
 		$oldContent = $this->getWMSInfo();
+
+		// check and prepare
+		if (strlen($wmsInfo)) {
+    		$contentDoc = new DOMDocument();
+	   	if (!$contentDoc->loadXML($wmsInfo)) {
+		   	throw new MM_DatasetException("cannot load wms-info, xml not well-formed");	      
+	   	}
+   		$contentNode = $this->domDS->importNode($contentDoc->firstChild, true);
+		}
+
+
 		// delete old item
 		foreach ($this->xpathDS->query("/d:dataset/d:wmsInfo") as $node) {
 			$node->parentNode->removeChild($node);
 		}
+
+		// add new item to correct position
 		if (strlen($wmsInfo)) {
 			$ds = $this->xpathDS->query("/d:dataset")->item(0);
 			# create node with new content
 			$wmsNode = $this->domDS->createElementNS($this->namespaceDS,'wmsInfo');
-			$contentDoc = new DOMDocument();
-			$contentDoc->loadXML($wmsInfo);
-			$contentNode = $this->domDS->importNode($contentDoc->firstChild, true);
 			$wmsNode->appendChild($contentNode);
 			
 			# add content to doc, after info and optional quadtree_node
@@ -391,12 +401,14 @@ class MM_ForeignDataset {
 	 */
 	function setProjectionInfo($projectionInfo) {
 		$oldContent = $this->getProjectionInfo();
-		// generate new node and add to dom (without place)
-		$contentDoc = new DOMDocument();
-		if (!$contentDoc->loadXML($projectionInfo)) {
-		   throw new MM_DatasetException("cannot load projection-info");
+		if (strlen($projectionInfo)) {
+			// generate/check new node and add to dom (without place)
+			$contentDoc = new DOMDocument();
+			if (!$contentDoc->loadXML($projectionInfo)) {
+		   	throw new MM_DatasetException("cannot load projection-info, xml not well-formed");
+			}
+			$contentNode = $this->domDS->importNode($contentDoc->firstChild, true);
 		}
-		$contentNode = $this->domDS->importNode($contentDoc->firstChild, true);
 		
 		// delete old items
 		foreach ($this->xpathDS->query("/d:dataset/d:projectionInfo") as $node) {

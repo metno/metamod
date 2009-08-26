@@ -48,13 +48,30 @@ class MM_WMSSetup {
    private $wmcTemplate = "";
    const wmsInfoNS = "http://www.met.no/schema/metamod/wmcSetup";
    const wmcNS = "http://www.opengis.net/context";
+
+	static function getWMCSetupSchema() {
+		global $mmConfig;
+		return $mmConfig->getVar("TARGET_DIRECTORY") . "/schema/wmcSetup.xsd"; 	   
+	}
    
-   function __construct($str) {
+   /**
+    * create a new MM_WMSSetup from a string
+    * @param $str xml-string
+    * @param $validate boolean flag, validate xml-string, default false
+    * @throws MM_DatasetException if the string is not parseable
+    */
+   function __construct($str, $validate = false) {
       if (strlen($str)) {
                   $dom = new DOMDocument();
          if (!$dom->loadXML($str)) {
          	mm_log(MM_ERROR, "unable to parse xml-string $str", __FILE__, __LINE__);
          	throw new MM_DatasetException("unable to parse xml-string $str");
+         }
+         if ($validate) {
+            if (! @$dom->schemaValidate($this->getWMCSetupSchema())) {
+            	// PHP_ERRORMSG requires track_errors to be enabled
+               throw new MM_DatasetException("invalid xml-file: ".$PHP_ERRORMSG);
+            }
          }
          $xpath = new DomXPath($dom);
          $xpath->registerNamespace('wi', self::wmsInfoNS);

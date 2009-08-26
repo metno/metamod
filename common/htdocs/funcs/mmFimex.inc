@@ -180,17 +180,31 @@ class MM_FimexSetup {
    protected $urlReplace = false;
    protected $projections = array(); # $projections contains projection-name => array(projString => ..., xAxis => ..., yAxis => ..., method => ..., toDegree => ...)
    static $fimexProjectionNS = "http://www.met.no/schema/metamod/fimexProjections";
+
+	static function getFimexProjectionsSchema() {
+		global $mmConfig;
+		return $mmConfig->getVar("TARGET_DIRECTORY") . "/schema/fimexProjections.xsd"; 	   
+	}
+	
+
    /**
     * create a new MM_FimexSetup from a string
     * @param $str xml-string
+    * @param $validate boolean flag, validate xml-string, default false
     * @throws MM_DatasetException if the string is not parseable
     */
-   function __construct($str = "") {
+   function __construct($str = "", $validate = false) {
       if (strlen($str)) {
          $dom = new DOMDocument();
          if (!$dom->loadXML($str)) {
          	mm_log(MM_ERROR, "unable to parse xml-string $str", __FILE__, __LINE__);
          	throw new MM_DatasetException("unable to parse xml-string $str");
+         }
+         if ($validate) {
+            if (! @$dom->schemaValidate($this->getFimexProjectionsSchema())) {
+            	// PHP_ERRORMSG requires track_errors to be enabled
+               throw new MM_DatasetException("invalid xml-file: ".$PHP_ERRORMSG);
+            }
          }
          $xpath = new DomXPath($dom);
          $xpath->registerNamespace('f', MM_FimexSetup::$fimexProjectionNS);

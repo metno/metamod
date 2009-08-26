@@ -19,6 +19,8 @@ metamodInit.sh
 =schema/oai_dc.xsd
 =schema/simpledc20021212.xsd
 =schema/xml.xsd
+=schema/fimexProjections.xsd
+=schema/wmcSetup.xsd
 =lib/Metamod/DatasetTransformer.pm
 =lib/Metamod/DatasetTransformer/MM2.pm
 =lib/Metamod/DatasetTransformer/OldDataset.pm

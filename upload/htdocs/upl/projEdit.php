@@ -111,7 +111,9 @@ require_once("../funcs/mmConfig.inc");
             <p>Simply edit/add a setup according the example below:</p>
             <pre>
 <?php $input = <<<EOT
-<fimexProjections xmlns="http://www.met.no/schema/metamod/fimexProjections">
+<fimexProjections xmlns="http://www.met.no/schema/metamod/fimexProjections"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://www.met.no/schema/metamod/fimexProjections https://wiki.met.no/_media/metamod/fimexProjections.xsd">
 <dataset urlRegex="!(.*/thredds).*dataset=(.*)!" urlReplace="$1/fileServer/data/$2"/>
 <!-- see fimex-interpolation for more info on options -->
 <projection name="Lat/Long" method="nearestneighbor" 
