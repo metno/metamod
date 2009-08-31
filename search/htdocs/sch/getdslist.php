@@ -156,11 +156,13 @@ function getdslist() {
 		$j1++;
 		$partParam = addSQLParameter(formatSearchString($mmSessionState->fullTextQuery), $sqlPartParams);
 		$tsearchLanguage = $mmConfig->getVar('PG_TSEARCH_LANGUAGE');
-   	$sqlpart .= '      DS_id IN (
+   	$sqlpart .= '      ( DS_id IN (
        SELECT DISTINCT(DS_Has_MD.DS_id) FROM DS_Has_MD, Metadata
         WHERE Metadata.MD_id = DS_HAS_MD.MD_id
           AND MD_content_vector @@ to_tsquery(\''.$tsearchLanguage.'\','.$partParam.')
-      ) ';   	
+       ) OR DS_name LIKE '. addSQLParameter('%'.$mmSessionState->fullTextQuery .'%', $sqlPartParams) .
+      ' ) ';
+      
    }
    
    $dbug = strpos($mmDebug,"getdslist");
