@@ -183,6 +183,8 @@ mkdir -p target
 mkdir -p webrun
 mkdir -p ftpupload
 mkdir -p webupload
+# add osisaf dir for testing
+mkdir -p webupload/TUN/osisaf
 mkdir -p data
 mkdir -p compare
 #
@@ -234,6 +236,8 @@ sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 # ======================================
 #
 cd $basedir
+# stop metamod if it is still running
+target/metamodInit.sh stop
 rm -rf target/*
 rm -rf webrun/*
 rm -rf webupload/*
@@ -344,3 +348,6 @@ else
    cat webrun/upload_monitor.out >>t_result
    mail -s "METAMOD2 output from $idstring test" $developeremail <t_result
 fi
+
+# keep it running after testing
+su $WEBUSER -c "./metamodInit.sh start"
