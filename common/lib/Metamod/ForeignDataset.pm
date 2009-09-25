@@ -357,13 +357,8 @@ sub isXMLCharacter {
 
 sub removeUndefinedXMLCharacters {
     my ($str) = @_;
-    for (my $i = 0; $i < length($str); $i++) {
-        if (!isXMLCharacter(substr($str, $i, 1))) {
-            # remove character
-            $str = substr($str, 0, $i) . substr($str, $i+1);
-            $i--;
-        }
-    }
+    # regex for characters as used in isXMLCharacter
+    $str =~ s/[^\x09\x0A\x0D\x20-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]//go;
     return $str;
 }
 
