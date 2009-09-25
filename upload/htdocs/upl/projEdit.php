@@ -111,22 +111,22 @@ require_once("../funcs/mmConfig.inc");
             <p>Simply edit/add a setup according the example below:</p>
             <pre>
 <?php $input = <<<EOT
-<fimexProjections xmlns="http://www.met.no/schema/metamod/fimexProjections"
+<fi:fimexProjections xmlns:fi="http://www.met.no/schema/metamod/fimexProjections"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://www.met.no/schema/metamod/fimexProjections https://wiki.met.no/_media/metamod/fimexProjections.xsd">
-<dataset urlRegex="!(.*/thredds).*dataset=(.*)!" urlReplace="$1/fileServer/data/$2"/>
+<fi:dataset urlRegex="!(.*/thredds).*dataset=(.*)!" urlReplace="$1/fileServer/data/$2"/>
 <!-- see fimex-interpolation for more info on options -->
-<projection name="Lat/Long" method="nearestneighbor" 
+<fi:projection name="Lat/Long" method="nearestneighbor" 
             projString="+proj=latlong +a=6371000 +ellps=sphere +e=0" 
             xAxis="-180,-179,...,180" 
             yAxis="60,61,...,90" 
             toDegree="true"/>
-<projection name="Stereo" method="bilinear"
+<fi:projection name="Stereo" method="bilinear"
             projString="+proj=stere +lon_0=0 +lat_0=90 +lat_ts=-32 +a=6371000 +ellps=sphere +e=0" 
             xAxis="0,50000,...,x;relativeStart=0" 
             yAxis="0,50000,...,x;relativeStart=0" 
             toDegree="false" /> 
-</fimexProjections>
+</fi:fimexProjections>
 EOT;
 echo htmlentities($input);
 ?>
