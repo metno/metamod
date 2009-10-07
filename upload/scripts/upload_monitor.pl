@@ -828,12 +828,14 @@ sub process_files {
             $not_accepted{$expandedfile} = 1;
             $errors = 1;
          } elsif (defined($extension) && ($extension eq 'cdl' || $extension eq 'CDL')) {
-            my $firstline = &shcommand_scalar("head -1 $expandedfile");
-            if (length($shell_command_error) > 0) {
-               &syserror("SYS","head_command_fails_on_expandedfile",
+         	# get the first line of the file, think 'head'
+            if (!open(FH, $expandedfile)) {
+         	   &syserror("SYS","head_command_fails_on_expandedfile",
                          "", "process_files", "Expanded file: $expandedfile");
                next;
-            }
+         	}
+            my $firstline = <FH>;
+            close FH;
             if ($progress_report == 1) {
                print "         Possible CDL-file. Firstline: $firstline\n";
             }
@@ -1955,9 +1957,8 @@ sub string_found_in_file {
    my ($searchfor,$fname) = @_;
    if (-r $fname) {
       open (FH,$fname);
-      undef $/;
+      local $/ = undef;
       my $content = <FH>;
-      $/ = "\n"; 
       close (FH);
       my $found = index($content,$searchfor);
       if ($found >= 0) {
