@@ -29,9 +29,12 @@
 
 package Metamod::Utils;
 use base qw(Exporter);
-our $VERSION = 0.3;
+use strict; 
+use warnings;
 
-@EXPORT_OK = qw(findFiles isNetcdf trim getFiletype);
+our $VERSION = 0.4;
+
+our @EXPORT_OK = qw(findFiles isNetcdf trim getFiletype remove_cr_from_file);
 
 use File::Find qw();
 use POSIX qw();
@@ -92,6 +95,24 @@ sub trim {
 	$str =~ s/^\s+//;
 	$str =~ s/\s+$//;
 	return $str;
+}
+
+sub remove_cr_from_file {
+    my ($file) = @_;
+    eval {
+    	my $backupFile = $file . "~";
+        rename $file, $backupFile or die "Cannot rename $file $backupFile: $!";
+        open my $inFH, "<$backupFile" or die "Cannot read $backupFile: $!";
+        open my $outFH, ">$file" or die "Cannot write $file: $!"; 
+        while (defined (my $line = <$inFH>)) {
+        	$line =~ tr/\r//d;
+        	print $outFH $line;
+        }
+        close $outFH;
+        close $inFH;
+        unlink $backupFile or die "Cannot unlink $backupFile: $!";
+    };
+    return $@;
 }
 
 sub daemonize {
@@ -213,6 +234,11 @@ ascii and tar
 
 ascii detection works with perls -T option
 tar detection uses file-extension only for pre-POSIX tar (normally the case)
+
+=item remove_cr_from_file($file)
+
+remove \r from a file
+returns error message on error, 0 on succes because it emulates a shell-script
 
 =item trim($str)
 

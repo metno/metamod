@@ -31,9 +31,9 @@ use strict;
 use warnings;
 
 use lib "..";
-use Test::More tests => 14;
+use Test::More tests => 16;
 
-BEGIN {use_ok('Metamod::Utils', qw(findFiles isNetcdf trim getFiletype));}
+BEGIN {use_ok('Metamod::Utils', qw(findFiles isNetcdf trim getFiletype remove_cr_from_file));}
 
 my @allFiles = findFiles('.');
 ok((0 < grep {$_ =~ /00_Utils.t/} @allFiles), "finding 00_Utils.t in all");
@@ -62,3 +62,18 @@ ok(getFiletype("test.zip") eq "pkzip", "test.nc filetype is pkzip");
 ok(getFiletype("00_Utils.t") eq "ascii", "00_Utils.t is ascii");
 
 is(trim("\nhallo\t "), "hallo", "trim");
+
+ok(remove_cr_from_file('does_not_exist'), 'error when removing from n.e. file');
+{
+    my $testFile = 'remove_cr_from_file.txt';
+    open my $fh, ">$testFile" or die "Cannot write $testFile: $!\n";
+    print $fh "\rbla\r\nstring\r\nb\r\rla\r";
+    close $fh;
+    remove_cr_from_file($testFile);
+    open $fh, $testFile or die "Cannot read $testFile: $!\n";
+    local $/;
+    my $data = <$fh>;
+    close $fh;
+    is($data, "bla\nstring\nbla", 'remove_cr_from_file');
+    unlink $testFile;
+}

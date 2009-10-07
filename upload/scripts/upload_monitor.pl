@@ -50,7 +50,7 @@ use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 use Data::Dumper;
 use Mail::Mailer;
 use mmTtime;
-use Metamod::Utils qw(findFiles getFiletype);
+use Metamod::Utils qw(findFiles getFiletype remove_cr_from_file);
 use Metamod::Config;
 my $config = new Metamod::Config();
 $| = 1;
@@ -1947,25 +1947,6 @@ sub link_or_copy {
 }
 
 
-#
-#-----------------------------------------------------------------------------------
-# remove \r from a file
-# returns error message on error, 0 on succes 
-# because it emulates a shell-script
-sub remove_cr_from_file {
-	my ($file) = @_;
-	eval {
-		open (my $f, $file) or die "Cannot read file $file: $!";
-		local $/;
-		my $data = <$f>;
-		close $f;
-		$data =~ s/\r//g;
-		open ($f, ">".$file) or die "Cannot write file $file: $!";
-		print $f $data;
-		close $f;
-	};
-	return $@;
-}
 #
 #-----------------------------------------------------------------------------------
 # Check if string found in file:
