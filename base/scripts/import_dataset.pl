@@ -122,14 +122,6 @@ my $dbh =
 $dbh->{AutoCommit} = 0;
 $dbh->{RaiseError} = 1;
 
-#
-#  Set up a conversion table (hash) for
-#  converting characters >159 to HTML entities:
-#
-my %html_conversions = ();
-for ( my $jnum = 160 ; $jnum < 256 ; $jnum++ ) {
-	$html_conversions{ chr($jnum) } = '&#' . $jnum . ';';
-}
 
 #
 if ( defined($inputfile) ) {
@@ -515,8 +507,7 @@ sub update_database {
 			#
 			foreach my $mref (@metaarray) {
 				my $mtname = $mref->[0];
-				my $mdcontent =
-				  &convert_to_htmlentities( $mref->[1], \%html_conversions );
+				my $mdcontent = escapeHTML($mref->[1]);
 				my $mdid;
 				if ( exists( $shared_metadatatypes{$mtname} ) ) {
 					my $mdkey = $mtname . ':' . cleanContent($mdcontent);
@@ -623,27 +614,23 @@ sub update_database {
 	}
 }
 
-sub convert_to_htmlentities {
-	my ( $str, $conversions ) = @_;
-	my @contarr = split( //, $str );
-	my $result = "";
-	foreach my $ch1 (@contarr) {
-		if ( exists( $conversions->{$ch1} ) ) {
-			$result .= $conversions->{$ch1};
-		}
-		else {
-			$result .= $ch1;
-		}
-	}
-	return $result;
+#
+# database-fields should be free of html-tags <, >, &, "
+#
+sub escapeHTML {
+	my ($str) = @_;
+	$str =~ s/&/&amp;/gso;
+	$str =~ s/"/&quot;/gso;
+	$str =~ s/</&lt;/gso;
+	$str =~ s/>/&gt;/gso;
+	return $str;
 }
 
 sub cleanContent {
 	my ($content) = @_;
 	# trim
-	$content =~ s/^\s+//;
-	$content =~ s/\s+$//;
+	$content =~ s/(^\s+|\s+$)//go;
 	# convert several spaces to one space
-	$content =~ s/\s+/ /;
+	$content =~ s/\s+/ /go;
 	return lc($content); 
 }
