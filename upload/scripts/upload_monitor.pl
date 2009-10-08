@@ -632,7 +632,7 @@ sub process_files {
 #     Copy uploaded file to the work_start directory
 #      
       my $newpath = File::Spec->catfile($work_start, $baseupldname);
-      if (link_or_copy($uploadname, $newpath) == 0) {
+      if (copy($uploadname, $newpath) == 0) {
          die "Copy to workdir did not succeed. Uploaded file: $uploadname Error code: $!\n";
       }
 #      
@@ -1930,24 +1930,6 @@ sub decodenorm {
       return '';
    }
 };
-
-#
-#-----------------------------------------------------------------------------------
-# hardlink a $in to $out, if that files, i.e. because of different file-systems
-# really copy the file
-#
-# Reverted to just copy. Problems arise if a gzip'ed file is linked. gunzip
-# will not touch a file with more than one hard link. /egils 2009-04-15.
-#
-sub link_or_copy {
-	my ($in, $out) = @_;
-#	if (link ($in, $out)) {
-#		return 1;
-#	} else {
-		return copy($in, $out);
-#	}
-}
-
 
 #
 #-----------------------------------------------------------------------------------
