@@ -540,6 +540,7 @@ function fmDataset2ArrayData(MM_Dataset $ds) {
  * @return $html
  */
 function fmForm2XmlHtml(MM_Dataset $ds) {
+	global $mmConfig;
 	$specialTags = array(
 		"name" => true,
 		"drpath" => true, # alias for name
@@ -609,7 +610,7 @@ function fmForm2XmlHtml(MM_Dataset $ds) {
 # METAMOD XML message locally
 #
 function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
-
+	global $mmConfig;
     $mymsg = $mystdmsg;
 	
 	if (! is_dir($outputdst)) {
