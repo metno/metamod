@@ -3,3 +3,4 @@
 =htdocs/qst/config/gcmd-location-keywords.txt
 =htdocs/qst/config/gcmd-science-keywords.txt
 =htdocs/adm/fmfadm.php
+=htdocs/qst/quest.php
