@@ -14,15 +14,12 @@ type=textarea&label=Description&length=70&height=10&size=25&name=abstract&mandat
 type=text&label=URL describing/linking the data&name=dataref&length=70&size=250
 type=list&label=Topic category&name=topiccategory&value=|Biota|ClimatologyMeteorologyAtmosphere|Environment|Geoscientificinformation|ImageryBaseMapsEarthCover|InlandWaters|Oceans|Society&mandatory
 type=list&label=Activity type&name=activity_type&value=|Moored instrument|Cruise|Aircraft|Model run|Land station|Ice station|Submersible|Float|Space borne instrument|Other
-type=text&label=Northernmost latitude (decimal degrees North)&name=northernmost_latitude&length=6&size=6&mandatory
-type=text&label=Southernmost_latitude latitude (decimal degrees North)&name=southernmost_latitude&length=6&size=6&mandatory
-type=text&label=Westernmost longitude (decimal degrees East)&name=westernmost_longitude&length=6&size=8&mandatory
-type=text&label=Easternmost longitude (decimal degrees East)&name=easternmost_longitude&length=6&size=6&mandatory
-type=gcmdlist&label=Geographic area (multiple choices)&name=area[]&value=config/gcmd-location-keywords.txt&size=6&exclude=Continent|Geographic Region|Solid Earth|Space|Vertical Location|Ocean > Pacific|Ocean > Indian|Ocean > Southern|Ocean > Atlantic > South
+type=text&label=Geogr. Bounding Box (East,South,West,North) (decimal degrees North/East)&name=bounding_box&length=24&size=24&mandatory
+type=gcmdlist&label=Geographic area (multiple choices)&name=area[]&value=config/gcmd-location-keywords.txt&height=6&exclude=Continent|Geographic Region|Solid Earth|Space|Vertical Location|Ocean > Pacific|Ocean > Indian|Ocean > Southern|Ocean > Atlantic > South
 type=text&label=Data collection period - start (in the form YYYY-MM-DD HH:MM UTC)&name=datacollection_period_from&length=25&size=25
 type=text&label=Data collection period - end (in the form YYYY-MM-DD HH:MM UTC)&name=datacollection_period_to&length=25&size=25
 type=list&label=Operational status&name=operational_status&value=|Operational|Pre operational|Experimental|Scientific&mandatory
-type=gcmdlist&label=Scientific keywords (multiple choices)&name=topic[]&value=config/gcmd-science-keywords.txt&size=10&exclude=Agriculture|Biological Classification|Biosphere|Human Dimensions|Atmosphere > Atmospheric Chemistry|Land Surface > Geomorphology|Land Surface > Soils|Land Surface > Landscape|Land Surface Topography|Oceans > Aquatic|Oceans > Bathymetry|Oceans > Marine|Oceans > Ocean Chemistry|Oceans > Ocean Optics|Climate Indicators
+type=gcmdlist&label=Scientific keywords (multiple choices)&name=topic[]&value=config/gcmd-science-keywords.txt&height=10&exclude=Agriculture|Biological Classification|Biosphere|Human Dimensions|Atmosphere > Atmospheric Chemistry|Land Surface > Geomorphology|Land Surface > Soils|Land Surface > Landscape|Land Surface Topography|Oceans > Aquatic|Oceans > Bathymetry|Oceans > Marine|Oceans > Ocean Chemistry|Oceans > Ocean Optics|Climate Indicators
 type=sectionend
 #
 type=sectionstart&value=File Format Information
