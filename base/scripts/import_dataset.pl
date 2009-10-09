@@ -507,7 +507,7 @@ sub update_database {
 			#
 			foreach my $mref (@metaarray) {
 				my $mtname = $mref->[0];
-				my $mdcontent = escapeHTML($mref->[1]);
+				my $mdcontent = $mref->[1];
 				my $mdid;
 				if ( exists( $shared_metadatatypes{$mtname} ) ) {
 					my $mdkey = $mtname . ':' . cleanContent($mdcontent);
@@ -612,18 +612,6 @@ sub update_database {
         }
 
 	}
-}
-
-#
-# database-fields should be free of html-tags <, >, &, "
-#
-sub escapeHTML {
-	my ($str) = @_;
-	$str =~ s/&/&amp;/gso;
-	$str =~ s/"/&quot;/gso;
-	$str =~ s/</&lt;/gso;
-	$str =~ s/>/&gt;/gso;
-	return $str;
 }
 
 sub cleanContent {
