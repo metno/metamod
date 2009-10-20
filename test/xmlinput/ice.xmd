@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+  <quadtree_nodes>2
+3
+12
+13
+14
+41
+42
+43
+114
+441
+1124
+1134
+4421
+4431
+11224
+11234
+11324
+11334
+44221
+44231
+44321
+44331
+112222
+112223
+112224
+112232
+112233
+112234
+112322
+112323
+112324
+112332
+112333
+112334
+113222
+113223
+113224
+113232
+113233
+113234
+113322
+113323
+113324
+113332
+113333
+113334
+442221
+442222
+442223
+442231
+442232
+442233
+442321
+442322
+442323
+442331
+442332
+442333
+443221
+443222
+443223
+443231
+443232
+443233
+443321
+443322
+443323
+443331
+443332
+443333</quadtree_nodes><info name="H2x/ice" status="active" creationDate="2010-03-29T03:10:00Z" datestamp="2010-03-29T03:10:00Z" ownertag="H2x" metadataFormat="MM2"/>
+<wmsInfo xmlns:mm="http://www.met.no/schema/metamod/wmcSetup" xmlns:default="http://www.opengis.net/context" xmlns:ol="http://openlayers.org/context" xmlns:xlink="http://www.w3.org/1999/xlink"><mm:wmcSetup xmlns:mm="http://www.met.no/schema/metamod/wmcSetup" xmlns:default="http://www.opengis.net/context" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ol="http://openlayers.org/context" xmlns:xlink="http://www.w3.org/1999/xlink">
+<!-- regex to replace name from dataset-name to dianaSetup name,
+     i.e. from DAM/osisaf/file20090703 to osisaf_20090703. -->
+<mm:datasetName regex="!.*/ice_(\w+)_(\w{2})_(\w{4})(\w{2})(\w{2})(\w{2})(\w{2}).*!" replace="ice_$1_$2_$3$4$5T$6$7Z:"/>
+<default:ViewContext xmlns="http://www.opengis.net/context" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.1.0" id="OpenLayers_Context_466" xsi:schemaLocation="http://www.opengis.net/context http://schemas.opengis.net/context/1.1.0/context.xsd">
+  <default:General>
+    <default:Window width="798" height="573"/>
+    <default:BoundingBox minx="-11850000" miny="-11850000" maxx="11850000" maxy="11850000" SRS="EPSG:42000"/>
+    <default:Title>OSISAF WMS viewer</default:Title>
+    <default:Extension>
+      <ol:maxExtent xmlns:ol="http://openlayers.org/context" minx="-11850000" miny="-11850000" maxx="11850000" maxy="11850000"/>
+    </default:Extension>
+  </default:General>
+  <default:LayerList>
+    <default:Layer queryable="0" hidden="0">
+      <default:Server service="OGC:WMS" version="1.1.1">
+        <default:OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://webcache.oslo.dnmi.no/verportal/verportal.map"/>
+      </default:Server>
+      <!-- %DATASETNAME% will be replaced by the datasetName above, 
+           parameter precip_1h must be the parameter in the diana setup -->
+      <default:Name>%DATASETNAME%iceconc</default:Name>
+      <default:Title>Ice concentration</default:Title>
+      <default:Abstract>Ice concentration</default:Abstract>
+      <default:FormatList>
+        <default:Format current="1">image/png</default:Format>
+      </default:FormatList>
+      <default:StyleList>
+        <default:Style current="1">
+          <default:Name/>
+          <default:Title>Default</default:Title>
+        </default:Style>
+      </default:StyleList>
+      <default:Extension>
+        <ol:maxExtent xmlns:ol="http://openlayers.org/context" minx="-11850000" miny="-11850000" maxx="11850000" maxy="11850000"/>
+        <ol:transparent xmlns:ol="http://openlayers.org/context">true</ol:transparent>
+        <ol:numZoomLevels xmlns:ol="http://openlayers.org/context">8</ol:numZoomLevels>
+        <ol:units xmlns:ol="http://openlayers.org/context">km</ol:units>
+        <ol:isBaseLayer xmlns:ol="http://openlayers.org/context">false</ol:isBaseLayer>
+        <ol:displayInLayerSwitcher xmlns:ol="http://openlayers.org/context">true</ol:displayInLayerSwitcher>
+        <ol:singleTile xmlns:ol="http://openlayers.org/context">false</ol:singleTile>
+      </default:Extension>
+    </default:Layer>
+  </default:LayerList>
+</default:ViewContext>
+</mm:wmcSetup></wmsInfo></dataset>

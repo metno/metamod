@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+<metadata name="variable">Geographic Region &gt; Northern Hemipshere &gt; HIDDEN</metadata><metadata name="variable">Cryosphere &gt; Sea Ice &gt; Sea Ice Concentration &gt; HIDDEN</metadata><metadata name="variable">sea_ice_concentration</metadata><metadata name="variable">Ocean &gt; Sea Ice &gt; Sea Ice Concentration &gt; HIDDEN</metadata><metadata name="variable">Vertical Location &gt; Sea Surface &gt; HIDDEN</metadata><metadata name="variable">EUMETSAT/OSISAF &gt; Satellite Application Facility on Ocean and Sea Ice, European Organisation for the Exploitation of Meteorological Satellites &gt; HIDDEN</metadata><metadata name="area">Northern Hemisphere</metadata><metadata name="contact">osisaf-manager@met.no</metadata><metadata name="topiccategory">climatologyMeteorologyAtmosphere</metadata><metadata name="topiccategory">oceans</metadata><metadata name="PI_name">Rasmus Tonboe</metadata><metadata name="product_version">2.2</metadata><metadata name="keywords">Climate</metadata><metadata name="keywords">Sea Ice</metadata><metadata name="keywords">Oceanography</metadata><metadata name="keywords">Meteorology</metadata><metadata name="keywords">Sea Ice Concentration</metadata><metadata name="keywords">Remote Sensing</metadata><metadata name="references">OSI SAF Sea Ice Product Manual, Eastwood S. (editor), v3.6, September 2009
+http://saf.met.no
+http://www.osi-saf.org</metadata><metadata name="datacollection_period_from">2009-10-16</metadata><metadata name="activity_type">Space borne instrument</metadata><metadata name="project_name">EUMETSAT OSI SAF</metadata><metadata name="Conventions">CF-1.3</metadata><metadata name="history">2009-10-17 creation</metadata><metadata name="distribution_statement">Free</metadata><metadata name="software_version">4.0</metadata><metadata name="datacollection_period_to">2009-10-16</metadata><metadata name="abstract">The daily analysis of sea ice concentration are obtained from
+operation 
+satellite images of the polar regions. It is based
+on atmospherically 
+corretected signal and an optimal sea ice
+concentration algorithm. This product 
+is available for free
+from the EUMETSAT Ocean and Sea Ice Satellite 
+Application
+Facility (OSI SAF). </metadata><metadata name="title">OSI SAF Daily Sea Ice Concentration Analysis</metadata><metadata name="bounding_box">180,31.019287109375,-180,90</metadata><metadata name="institution">EUMETSAT OSI SAF</metadata><metadata name="product_name">osi_saf_ice_conc</metadata><metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/TUN/ice/catalog.html?dataset=TUN/ice/ice_conc_nh_200910161200_CF.nc</metadata></MM2>
