@@ -65,8 +65,8 @@ function htmlEncodeUtf8 ( $str ) {
 <?php
 	if (strlen($_REQUEST["file"]) && is_file($_REQUEST["file"])) {
 		echo "<pre>".$_REQUEST["file"]."</pre>";
-		$xml = html_entity_decode(raw_param($_REQUEST["xmlContent"],ENT_QUOTES, 'UTF-8'));
-		$xmd = html_entity_decode(raw_param($_REQUEST["xmdContent"],ENT_QUOTES, 'UTF-8'));	
+		$xml = html_entity_decode(raw_param($_REQUEST["xmlContent"]),ENT_QUOTES, 'UTF-8');
+		$xmd = html_entity_decode(raw_param($_REQUEST["xmdContent"]),ENT_QUOTES, 'UTF-8');	
 		if (strlen($_REQUEST["submitValue"]) && $_REQUEST["submitValue"] == "Save") {
 			mmWriteDataset(mmGetBasename($_REQUEST["file"]), $xmd, $xml);
 			echo "<p>Data successfully saved</p>";
