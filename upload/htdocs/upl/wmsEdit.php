@@ -172,6 +172,68 @@ require_once("../funcs/mmConfig.inc");
         <ol:singleTile xmlns:ol="http://openlayers.org/context">true</ol:singleTile>
       </Extension>
     </Layer>
+    <!-- the map layer -->
+    <Layer queryable="0" hidden="0">
+      <Server service="OGC:WMS" version="1.1.1">
+        <OnlineResource xlink:type="simple" xlink:href="%WMS_ONLINE_RESOURCE%"/>
+      </Server>
+      <Name>Map</Name>
+      <Title>Map</Title>
+      <Abstract>Backgroundmap</Abstract>
+      <FormatList>
+        <Format current="1">image/png</Format>
+      </FormatList>
+      <StyleList>
+        <Style current="1">
+          <Name/>
+          <Title>Default</Title>
+        </Style>
+      </StyleList>
+      <Extension>
+        <ol:maxExtent minx="-11850000" miny="-11850000" maxx="11850000" maxy="11850000"/>
+        <ol:transparent>false</ol:transparent>
+        <ol:numZoomLevels>8</ol:numZoomLevels>
+        <ol:units>m</ol:units>
+        <ol:isBaseLayer>true</ol:isBaseLayer>
+        <ol:displayInLayerSwitcher>false</ol:displayInLayerSwitcher>
+        <ol:singleTile>true</ol:singleTile>
+      </Extension>
+    </Layer>
+    <!-- latitude-longitude -->
+    <Layer queryable="0" hidden="1">
+      <Server service="OGC:WMS" version="1.1.1">
+        <OnlineResource xlink:type="simple" xlink:href="%WMS_ONLINE_RESOURCE%"/>
+      </Server>
+      <Name>base.LATLON</Name>
+      <Title>Longitudes/latitudes</Title>
+      <Abstract>Longitudes/latitudes</Abstract>
+      <FormatList>
+        <Format current="1">image/png</Format>
+      </FormatList>
+      <StyleList>
+        <Style current="0">
+          <Name>1deg</Name>
+          <Title>1deg</Title>
+        </Style>
+        <Style current="0">
+          <Name>5deg</Name>
+          <Title>5deg</Title>
+        </Style>
+        <Style current="1">
+          <Name/>
+          <Title>10deg</Title>
+        </Style>
+      </StyleList>
+      <Extension>
+        <ol:maxExtent minx="-11850000" miny="-11850000" maxx="11850000" maxy="11850000"/>
+        <ol:transparent>true</ol:transparent>
+        <ol:numZoomLevels>8</ol:numZoomLevels>
+        <ol:units>m</ol:units>
+        <ol:isBaseLayer>false</ol:isBaseLayer>
+        <ol:displayInLayerSwitcher>true</ol:displayInLayerSwitcher>
+        <ol:singleTile>true</ol:singleTile>
+      </Extension>
+    </Layer>
   </LayerList>
 </ViewContext>
 </mm:wmcSetup>
