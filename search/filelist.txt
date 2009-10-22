@@ -1,4 +1,7 @@
 =htdocs/img/orig.png
+=htdocs/img/button.gif
+=htdocs/img/button-2.gif
+=htdocs/sch/button.css
 =htdocs/sch/bk.php
 =htdocs/sch/hk.php
 =htdocs/sch/index.php

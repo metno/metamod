@@ -46,19 +46,25 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsExists = 
          $nameshown = $a1[1];
          $s1 = '<a href="' . $dataUrl . '"><b>' . $nameshown . '</b></a>';
       }
-      $s1 .= "<br/><a href=\"xmlShow.php?dsName=$dsName\" target=\"_new\">Show xml</a> ";
+      $s1 .= "<div class=\"btns\">";
+      $s1 .= " <a class=\"btn\" href=\"xmlShow.php?dsName=$dsName\" target=\"_new\"><span>Show xml</span></a> ";
+      $s1 .= "</div>";
       if ($wmsExists && strlen($mmConfig->getVar("WMS_URL"))) {
+      	$s1 .= "<div class=\"btns\">";
       	$wmcUrl = $mmConfig->getVar("WMS_URL").
       		urlencode($mmConfig->getVar("BASE_PART_OF_EXTERNAL_URL").$mmConfig->getVar("LOCAL_URL")."/sch/getWMC.php?datasetName=$dsName");
-         $s1 .= "<br /><a href=\"$wmcUrl\" >Visualize</a>";
+         $s1 .= "<a class=\"btn\" href=\"$wmcUrl\" ><span>Visualize</span></a>";
+         $s1 .= "</div>";
       }
       if ($fimexSetup && strlen($mmConfig->getVar("FIMEX_PROGRAM"))) {
+      	$s1 .= "<div class=\"btns\">";
          foreach ($fimexSetup->getProjections() as $projName) {
          	$urlParams = $fimexSetup->getProjectionAsURLParameters($projName, $dataUrl);
          	if ($urlParams) {
-            	$s1 .= '<br/><a href="getFimexReprojectedURL.php?'.$urlParams.'" target="_new">'.$projName.'</a>';
+            	$s1 .= '<a class=\"btn\" href="getFimexReprojectedURL.php?'.$urlParams.'" target="_new"><span>'.$projName.'</span></a>';
          	}
          }
+         $s1 .= "<\div>";
       }
    }
    return $s1;

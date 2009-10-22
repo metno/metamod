@@ -84,6 +84,34 @@
     </default:Extension>
   </default:General>
   <default:LayerList>
+<!-- the map layer -->
+    <default:Layer queryable="0" hidden="0">
+      <default:Server service="OGC:WMS" version="1.1.1">
+        <default:OnlineResource xlink:type="simple" xlink:href="%WMS_ONLINE_RESOURCE%"/>
+      </default:Server>
+      <default:Name>Map</default:Name>
+      <default:Title>Map</default:Title>
+      <default:Abstract>Backgroundmap</default:Abstract>
+      <default:FormatList>
+        <default:Format current="1">image/png</default:Format>
+      </default:FormatList>
+      <default:StyleList>
+        <default:Style current="1">
+          <default:Name/>
+          <default:Title>Default</default:Title>
+        </default:Style>
+      </default:StyleList>
+      <default:Extension>
+        <ol:maxExtent minx="-11850000" miny="-11850000" maxx="11850000" maxy="11850000"/>
+        <ol:transparent>false</ol:transparent>
+        <ol:numZoomLevels>8</ol:numZoomLevels>
+        <ol:units>m</ol:units>
+        <ol:isBaseLayer>true</ol:isBaseLayer>
+        <ol:displayInLayerSwitcher>false</ol:displayInLayerSwitcher>
+        <ol:singleTile>true</ol:singleTile>
+      </default:Extension>
+    </default:Layer>
+<!-- the data layer -->
     <default:Layer queryable="0" hidden="0">
       <default:Server service="OGC:WMS" version="1.1.1">
         <default:OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="%WMS_ONLINE_RESOURCE%"/>
@@ -110,33 +138,6 @@
         <ol:isBaseLayer xmlns:ol="http://openlayers.org/context">false</ol:isBaseLayer>
         <ol:displayInLayerSwitcher xmlns:ol="http://openlayers.org/context">true</ol:displayInLayerSwitcher>
         <ol:singleTile xmlns:ol="http://openlayers.org/context">true</ol:singleTile>
-      </default:Extension>
-    </default:Layer>
-<!-- the map layer -->
-    <default:Layer queryable="0" hidden="0">
-      <default:Server service="OGC:WMS" version="1.1.1">
-        <default:OnlineResource xlink:type="simple" xlink:href="%WMS_ONLINE_RESOURCE%"/>
-      </default:Server>
-      <default:Name>Map</default:Name>
-      <default:Title>Map</default:Title>
-      <default:Abstract>Backgroundmap</default:Abstract>
-      <default:FormatList>
-        <default:Format current="1">image/png</default:Format>
-      </default:FormatList>
-      <default:StyleList>
-        <default:Style current="1">
-          <default:Name/>
-          <default:Title>Default</default:Title>
-        </default:Style>
-      </default:StyleList>
-      <default:Extension>
-        <ol:maxExtent minx="-11850000" miny="-11850000" maxx="11850000" maxy="11850000"/>
-        <ol:transparent>false</ol:transparent>
-        <ol:numZoomLevels>8</ol:numZoomLevels>
-        <ol:units>m</ol:units>
-        <ol:isBaseLayer>true</ol:isBaseLayer>
-        <ol:displayInLayerSwitcher>false</ol:displayInLayerSwitcher>
-        <ol:singleTile>true</ol:singleTile>
       </default:Extension>
     </default:Layer>
     <!-- latitude-longitude -->
