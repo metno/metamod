@@ -61,10 +61,10 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsExists = 
          foreach ($fimexSetup->getProjections() as $projName) {
          	$urlParams = $fimexSetup->getProjectionAsURLParameters($projName, $dataUrl);
          	if ($urlParams) {
-            	$s1 .= '<a class=\"btn\" href="getFimexReprojectedURL.php?'.$urlParams.'" target="_new"><span>'.$projName.'</span></a>';
+            	$s1 .= '<a class="btn" href="getFimexReprojectedURL.php?'.$urlParams.'" target="_new"><span>'.$projName.'</span></a>';
          	}
          }
-         $s1 .= "<\div>";
+         $s1 .= "</div>";
       }
    }
    return $s1;
