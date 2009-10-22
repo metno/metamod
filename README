@@ -195,8 +195,8 @@ PHP CONFIGURATION
 The following values should be configured in the php.ini file 
 
 track_errors = On
-upload_max_filesize = 512M
-
+upload_max_filesize = 100M
+post_max_size = 100M
 
 METAMOD CONFIGURATION
 ---------------------
