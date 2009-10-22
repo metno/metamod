@@ -183,9 +183,6 @@ mkdir -p target
 mkdir -p webrun
 mkdir -p ftpupload
 mkdir -p webupload
-# add osisaf dir for testing
-mkdir -p webupload/TUN/osisaf
-mkdir -p webupload/TUN/ice
 mkdir -p data
 mkdir -p compare
 #
@@ -244,6 +241,12 @@ rm -rf webrun/*
 rm -rf webupload/*
 rm -rf ftpupload/*
 rm -rf data/*
+
+# and add some needed projects
+mkdir -p webupload/TUN/osisaf
+mkdir -p webupload/TUN/ice
+
+
 #
 # D. The software is installed into the target directory:
 # =======================================================
