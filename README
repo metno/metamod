@@ -190,6 +190,17 @@ Application directories may also be found outside the METAMOD 2.x source tree.
 CONFIGURATION
 -------------
 
+PHP CONFIGURATION
+-----------------
+The following values should be configured in the php.ini file 
+
+track_errors = On
+upload_max_filesize = 512M
+
+
+METAMOD CONFIGURATION
+---------------------
+
 The source files within the METAMOD 2.x directories contain a variety of file
 types (PHP, Perl, XML, HTML/XHTML, CSS and shell-script files, some of
 them with embedded SQL). The source files are not intended to be used 
