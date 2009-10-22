@@ -28,3 +28,4 @@ TEST_SUBSTITUTION = test2
 
 FIMEX_PROGRAM = fimex
 
+WMS_ONLINE_RESOURCE = http://dev-vm058/osisaf/default.map?

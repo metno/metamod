@@ -1,4 +1,4 @@
-# this is a example config file needed for testing
+# this is a example config file needed for internal testing
 # do not remove, do not install
 
 SERVER = somecomputer.somedomain.com
@@ -48,6 +48,13 @@ PG_ADMIN_USER = admin
 # PG_WEB_USER is a PostgreSQL user who may read/write data in the metadata
 # database.
 PG_WEB_USER = webuser
+
+# the location of the initialization sql-script for the full-text facilities
+PG_TSEARCH2_SCRIPT = /usr/share/postgresql/8.1/contrib/tsearch2.sql
+
+# the language to use for the data for full-text indexing, pre-installed are 'default' and 'simple' (pg <= 8.2); 'english' and 'simple' (pg >= 8.3)
+# see 'select * from pg_ts_config;'
+PG_TSEARCH_LANGUAGE = english 
 
 # PG_CONNECTSTRING_* are strings used to indicate hostname and port for
 # connecting to the PostgreSQL database. They are found in various
@@ -114,6 +121,14 @@ DROPDB = dropdb
 # List of import directories:
 IMPORTDIRS = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
 
+# locate your fimex program for reprojection of data
+FIMEX_PROGRAM = fimex
+
+# The WMS server URL to send the WMC page to
+WMS_URL = http://wms.met.no/wmcConfig?wmcDoc=
+# The WMS server mapping online resource
+WMS_ONLINE_RESOURCE = http://dev-vm058/osisaf/default.map?
+
 # ============ METAMODSEARCH configuration ==============
 # Name of web-based search application as seen by users:
 SEARCH_APP_NAME = METAMOD search
@@ -178,7 +193,8 @@ SEARCH_APP_SORT_COLUMN = datacollection_period
 
 # The sequence by which the search categories are visible in the search
 # application. The numbers are keys in the SearchCategory database table.
-SEARCH_CATEGORY_SEQUENCE = 4,1,7,2,9,8
+# In addition to the numbers, the keyword FullText may be used.
+SEARCH_CATEGORY_SEQUENCE = 4,1,7,2,9,8,FullText
 
 # Set default fontsize for the results and the two-way tables (percent):
 DEFAULT_FONTSIZE = 80
@@ -367,4 +383,3 @@ TEST_IMPORT_PROGRESS_REPORT = 1
 # uploaded files to actual users. It comments out setting the E-mail recipient
 # to [==OPERATOR_EMAIL==].
 TEST_EMAIL_RECIPIENT =
-

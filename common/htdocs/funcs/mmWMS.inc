@@ -45,6 +45,7 @@ class MM_WMSSetup {
    protected $regex = false;
    protected $replace = false;
    const datasetReplace = '%DATASETNAME%';
+   const onlineResourceReplace = '%WMS_ONLINE_RESOURCE%';
    private $wmcTemplate = "";
    const wmsInfoNS = "http://www.met.no/schema/metamod/wmcSetup";
    const wmcNS = "http://www.opengis.net/context";
@@ -115,9 +116,13 @@ class MM_WMSSetup {
     * @param $datasetName name of the dataset, must be level 2
     */
    function getDatasetWMC($datasetName) {
+		global $mmConfig;
       $dsName = preg_replace($this->getRegex(), $this->getReplace(), $datasetName);
       
+      // modify the dataset-name
       $wmc = preg_replace("!".self::datasetReplace . "!", $dsName, $this->wmcTemplate);
+      // and change the online-resource depending on the config
+      $wmc = preg_replace("!".self::onlineResourceReplace."!", $mmConfig->getVar('WMS_ONLINE_RESOURCE'), $wmc);
       return $wmc;
    }
 }

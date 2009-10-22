@@ -111,6 +111,8 @@ FIMEX_PROGRAM = fimex
 
 # The WMS server URL to send the WMC page to
 WMS_URL = http://wms.met.no/wmcConfig?wmcDoc=
+# The WMS server mapping online resource
+WMS_ONLINE_RESOURCE = http://dev-vm058/osisaf/default.map?
 
 
 # ============ METAMODBASE configuration ==============

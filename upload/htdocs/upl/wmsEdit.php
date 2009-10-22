@@ -143,7 +143,7 @@ require_once("../funcs/mmConfig.inc");
       <Server service="OGC:WMS" version="1.1.1">
         <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" 
                         xlink:type="simple" 
-                        xlink:href="http://webcache.oslo.dnmi.no/verportal/verportal.map"/>
+                        xlink:href="%WMS_ONLINE_RESOURCE%"/>
       </Server>
       <!-- %DATASETNAME% will be replaced by the datasetName above, 
            parameter precip_1h must be the parameter in the diana setup -->
@@ -166,10 +166,10 @@ require_once("../funcs/mmConfig.inc");
                                                                maxy="11850000"/>
         <ol:transparent xmlns:ol="http://openlayers.org/context">true</ol:transparent>
         <ol:numZoomLevels xmlns:ol="http://openlayers.org/context">8</ol:numZoomLevels>
-        <ol:units xmlns:ol="http://openlayers.org/context">km</ol:units>
+        <ol:units xmlns:ol="http://openlayers.org/context">m</ol:units>
         <ol:isBaseLayer xmlns:ol="http://openlayers.org/context">false</ol:isBaseLayer>
         <ol:displayInLayerSwitcher xmlns:ol="http://openlayers.org/context">true</ol:displayInLayerSwitcher>
-        <ol:singleTile xmlns:ol="http://openlayers.org/context">false</ol:singleTile>
+        <ol:singleTile xmlns:ol="http://openlayers.org/context">true</ol:singleTile>
       </Extension>
     </Layer>
   </LayerList>
