@@ -48,8 +48,9 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsExists = 
       }
       $s1 .= "<br/><a href=\"xmlShow.php?dsName=$dsName\" target=\"_new\">Show xml</a> ";
       if ($wmsExists && strlen($mmConfig->getVar("WMS_URL"))) {
-      	// TODO: eventually escape ? after getWMC.php
-         $s1 .= "<br /><a href=\"".$mmConfig->getVar("WMS_URL").urlencode($mmConfig->getVar("BASE_PART_OF_EXTERNAL_URL").$mmConfig->getVar("LOCAL_URL")."/sch/getWMC.php?datasetName=$dsName\" >Visualize</a>");
+      	$wmcUrl = $mmConfig->getVar("WMS_URL").
+      		urlencode($mmConfig->getVar("BASE_PART_OF_EXTERNAL_URL").$mmConfig->getVar("LOCAL_URL")."/sch/getWMC.php?datasetName=$dsName");
+         $s1 .= "<br /><a href=\"$wmcUrl\" >Visualize</a>";
       }
       if ($fimexSetup && strlen($mmConfig->getVar("FIMEX_PROGRAM"))) {
          foreach ($fimexSetup->getProjections() as $projName) {
