@@ -70,7 +70,7 @@
 443331
 443332
 443333</quadtree_nodes><info name="H2x/ice" status="active" creationDate="2010-03-29T03:10:00Z" datestamp="2010-03-29T03:10:00Z" ownertag="H2x" metadataFormat="MM2"/>
-<wmsInfo xmlns:mm="http://www.met.no/schema/metamod/wmcSetup" xmlns:default="http://www.opengis.net/context" xmlns:ol="http://openlayers.org/context" xmlns:xlink="http://www.w3.org/1999/xlink"><mm:wmcSetup xmlns:mm="http://www.met.no/schema/metamod/wmcSetup" xmlns:default="http://www.opengis.net/context" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ol="http://openlayers.org/context" xmlns:xlink="http://www.w3.org/1999/xlink">
+<wmsInfo xmlns:mm="http://www.met.no/schema/metamod/wmcSetup" xmlns:default="http://www.opengis.net/context" xmlns:ol="http://openlayers.org/context" xmlns:xlink="http://www.w3.org/1999/xlink"><mm:wmcSetup xmlns:mm="http://www.met.no/schema/metamod/wmcSetup" xmlns:default="http://www.opengis.net/context" xmlns="http://www.opengis.net/context" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ol="http://openlayers.org/context" xmlns:xlink="http://www.w3.org/1999/xlink">
 <!-- regex to replace name from dataset-name to dianaSetup name,
      i.e. from DAM/osisaf/file20090703 to osisaf_20090703. -->
 <mm:datasetName regex="!.*/ice_(\w+)_(\w{2})_(\w{4})(\w{2})(\w{2})(\w{2})(\w{2}).*!" replace="ice_$1_$2_$3$4$5T$6$7Z:"/>
@@ -110,6 +110,68 @@
         <ol:isBaseLayer xmlns:ol="http://openlayers.org/context">false</ol:isBaseLayer>
         <ol:displayInLayerSwitcher xmlns:ol="http://openlayers.org/context">true</ol:displayInLayerSwitcher>
         <ol:singleTile xmlns:ol="http://openlayers.org/context">true</ol:singleTile>
+      </default:Extension>
+    </default:Layer>
+<!-- the map layer -->
+    <default:Layer queryable="0" hidden="0">
+      <default:Server service="OGC:WMS" version="1.1.1">
+        <default:OnlineResource xlink:type="simple" xlink:href="%WMS_ONLINE_RESOURCE%"/>
+      </default:Server>
+      <default:Name>Map</default:Name>
+      <default:Title>Map</default:Title>
+      <default:Abstract>Backgroundmap</default:Abstract>
+      <default:FormatList>
+        <default:Format current="1">image/png</default:Format>
+      </default:FormatList>
+      <default:StyleList>
+        <default:Style current="1">
+          <default:Name/>
+          <default:Title>Default</default:Title>
+        </default:Style>
+      </default:StyleList>
+      <default:Extension>
+        <ol:maxExtent minx="-11850000" miny="-11850000" maxx="11850000" maxy="11850000"/>
+        <ol:transparent>false</ol:transparent>
+        <ol:numZoomLevels>8</ol:numZoomLevels>
+        <ol:units>m</ol:units>
+        <ol:isBaseLayer>true</ol:isBaseLayer>
+        <ol:displayInLayerSwitcher>false</ol:displayInLayerSwitcher>
+        <ol:singleTile>true</ol:singleTile>
+      </default:Extension>
+    </default:Layer>
+    <!-- latitude-longitude -->
+    <default:Layer queryable="0" hidden="1">
+      <default:Server service="OGC:WMS" version="1.1.1">
+        <default:OnlineResource xlink:type="simple" xlink:href="%WMS_ONLINE_RESOURCE%"/>
+      </default:Server>
+      <default:Name>base.LATLON</default:Name>
+      <default:Title>Longitudes/latitudes</default:Title>
+      <default:Abstract>Longitudes/latitudes</default:Abstract>
+      <default:FormatList>
+        <default:Format current="1">image/png</default:Format>
+      </default:FormatList>
+      <default:StyleList>
+        <default:Style current="0">
+          <default:Name>1deg</default:Name>
+          <default:Title>1deg</default:Title>
+        </default:Style>
+        <default:Style current="0">
+          <default:Name>5deg</default:Name>
+          <default:Title>5deg</default:Title>
+        </default:Style>
+        <default:Style current="1">
+          <default:Name/>
+          <default:Title>10deg</default:Title>
+        </default:Style>
+      </default:StyleList>
+      <default:Extension>
+        <ol:maxExtent minx="-11850000" miny="-11850000" maxx="11850000" maxy="11850000"/>
+        <ol:transparent>true</ol:transparent>
+        <ol:numZoomLevels>8</ol:numZoomLevels>
+        <ol:units>m</ol:units>
+        <ol:isBaseLayer>false</ol:isBaseLayer>
+        <ol:displayInLayerSwitcher>true</ol:displayInLayerSwitcher>
+        <ol:singleTile>true</ol:singleTile>
       </default:Extension>
     </default:Layer>
   </default:LayerList>
