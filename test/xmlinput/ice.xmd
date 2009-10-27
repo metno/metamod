@@ -69,7 +69,7 @@
 443323
 443331
 443332
-443333</quadtree_nodes><info name="H2x/ice" status="active" creationDate="2010-03-29T03:10:00Z" datestamp="2010-03-29T03:10:00Z" ownertag="H2x" metadataFormat="MM2"/>
+443333</quadtree_nodes><info name="DAMOC/ice" status="active" creationDate="2010-03-29T03:10:00Z" datestamp="2010-03-29T03:10:00Z" ownertag="DAM" metadataFormat="MM2"/>
 <wmsInfo xmlns:mm="http://www.met.no/schema/metamod/wmcSetup" xmlns:default="http://www.opengis.net/context" xmlns:ol="http://openlayers.org/context" xmlns:xlink="http://www.w3.org/1999/xlink"><mm:wmcSetup xmlns:mm="http://www.met.no/schema/metamod/wmcSetup" xmlns:default="http://www.opengis.net/context" xmlns="http://www.opengis.net/context" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ol="http://openlayers.org/context" xmlns:xlink="http://www.w3.org/1999/xlink">
 <!-- regex to replace name from dataset-name to dianaSetup name,
      i.e. from DAM/osisaf/file20090703 to osisaf_20090703. -->
