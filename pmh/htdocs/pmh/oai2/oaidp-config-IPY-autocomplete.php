@@ -476,7 +476,7 @@ function idQuery ($id = '')
 		$query = 'select distinct '.$SQL['identifier'].','.$SQL['datestamp'].','.
                          $SQL['deleted'].' FROM '.$SQL['table'];
 	}
-        $query .= " WHERE DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN ('".$mmConfig->getVar('PMH_EXPORT_TAGS')."')";
+        $query .= " WHERE DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN (".$mmConfig->getVar('PMH_EXPORT_TAGS').")";
 	
 	if ($id != '') {
 		$query .= ' AND '.$SQL['identifier']." = '$id'";
