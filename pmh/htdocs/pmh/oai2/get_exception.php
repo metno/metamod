@@ -83,8 +83,7 @@ function get_exception($mtname, $exception, $value) {
 		 if (count($parts) <= 3) {
 		 	$detail = FALSE;
 		 } else {
-		 	echo "XXXX";
-		    $detail = join(' > ', array_slice($parts, 3)); # only giving parts 1-3 as exceptions
+		   $detail = join(' > ', array_slice($parts, 3)); # only giving parts 1-3 as exceptions
 		 }
       }
       if ($exception < 0) {
