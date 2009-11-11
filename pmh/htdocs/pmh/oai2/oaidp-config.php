@@ -216,7 +216,7 @@ $DB_NAME   = 'oaipmh';
 
 // the charset you store your metadata in your database
 // currently only utf-8 and iso8859-1 are supported
-$charset = "iso8859-1";
+$metadataCharset = "utf-8";
 
 // if entities such as < > ' " in your metadata has already been escaped 
 // then set this to true (e.g. you store < as &lt; in your DB)

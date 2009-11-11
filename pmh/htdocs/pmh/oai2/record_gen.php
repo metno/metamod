@@ -126,7 +126,7 @@ if (!$gotFile) {
 	         }
    	      reset($outlist);
       	   foreach ($outlist as $tupple) {
-         	   $b1->add($tupple[0],xmlstr($tupple[1]));
+         	   $b1->add($tupple[0],xmlstr($tupple[1], $metadataCharset));
 	         }
    	   }
    	}
