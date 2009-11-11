@@ -41,7 +41,6 @@ version="1.0">
     <xsl:template match="/">
         <xsl:apply-templates select="dif:DIF"/>
     </xsl:template>
-<!-- TODO: DS_datestamp in database is XXX in info? -->
     <xsl:template match="dif:DIF">
         <xsl:element name="MM2" xmlns="http://www.met.no/schema/metamod/MM2">
             <xsl:attribute name="schemaLocation" namespace="http://www.w3.org/2001/XMLSchema-instance">http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd</xsl:attribute>

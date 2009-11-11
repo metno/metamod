@@ -41,7 +41,6 @@ version="1.0">
     <xsl:template match="/">
         <xsl:apply-templates select="dif:DIF"/>
     </xsl:template>
-<!-- TODO: DS_datestamp in database is XXX in info? -->
     <xsl:template match="dif:DIF">
         <xsl:element name="dataset" xmlns="http://www.met.no/schema/metamod/dataset">
             <xsl:attribute name="schemaLocation" namespace="http://www.w3.org/2001/XMLSchema-instance">http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd</xsl:attribute>

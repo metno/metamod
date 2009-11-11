@@ -9,9 +9,6 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:d="http://www.met.no/schema/metamod/MM2"  version="1.0">
     <xsl:output method="html"/>
 
-    <!-- TODO customize transformation rules 
-         syntax recommendation http://www.w3.org/TR/xslt 
-    -->
     <xsl:template match="/">
         <html>
             <head>

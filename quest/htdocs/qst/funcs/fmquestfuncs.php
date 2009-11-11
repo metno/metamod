@@ -50,7 +50,7 @@ function fmcreateform($outputdst, $filename, $edit=false) {
 		echo(fmcreateerrmsg("Could not open configuration file: $filename"));
 		return("No form created");
     }
-	# this quest goes defines the metadata for a metamod upload directory
+	# this quest defines the metadata for a metamod upload directory
 	# it will be written in the metamod xml directory as $uploadDir.xml
 	# not as md5 hash
 	# TODO: check for password in this case
