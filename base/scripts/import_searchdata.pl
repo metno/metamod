@@ -32,7 +32,7 @@
 #
 #  Update static search data in the database from an XML file.
 #
-# TODO use strict;
+use strict;
 use warnings;
 use File::Spec;
 # small routine to get lib-directories relative to the installed file
@@ -50,6 +50,14 @@ use mmTtime;
 # use Data::Dumper;
 use DBI;
 use Metamod::Config;
+
+# global variables
+use vars qw($dbh @logarr %searchdata @ancestors
+            $sql_insert_SC $sql_getkey_BK $sql_insert_BK $sql_insert_MT 
+            $sql_getkey_HK $sql_insert_HK $sql_insert_HKBK 
+            );
+
+
 my $config = new Metamod::Config();
 if (scalar @ARGV != 1) {
    die "\nUsage:\n\n     $0 name_of_xml_file\n\n";
@@ -60,7 +68,7 @@ my $searchdataxml = $ARGV[0];
 #
 my $dbname = $config->get("DATABASE_NAME");
 my $user = $config->get("PG_ADMIN_USER");
-local $dbh = DBI->connect("dbi:Pg:dbname=" . $dbname . " ".$config->get("PG_CONNECTSTRING_PERL"), $user, "");
+$dbh = DBI->connect("dbi:Pg:dbname=" . $dbname . " ".$config->get("PG_CONNECTSTRING_PERL"), $user, "");
 #
 #  Use full transaction mode. The changes has to be committed or rolled back:
 #
@@ -70,15 +78,8 @@ $dbh->{RaiseError} = 1;
 #  Initialize log array. This will be appended to the logfile at
 #  the end of a successful run.
 #
-local @logarr = ();
-#
-#  Set up a conversion table (hash) for 
-#  converting characters >159 to HTML entities:
-#
-my %html_conversions = ();
-for (my $jnum=160; $jnum < 256; $jnum++) {
-   $html_conversions{chr($jnum)} = '&#' . $jnum . ';';
-}
+@logarr = ();
+
 #
 #  Evaluate block to catch runtime errors
 #  (including "die()")
@@ -148,8 +149,8 @@ sub update_database {
 #
 #  Create hash with all static search data in the database:
 #
-   local %searchdata = ();
-   local @ancestors = ();
+   %searchdata = ();
+   @ancestors = ();
    my $stm;
    $stm = $dbh->prepare("SELECT SC_id FROM SearchCategory");
    $stm->execute();
@@ -187,18 +188,18 @@ sub update_database {
 #  Prepare SQL statements for repeated use.
 #  Use "?" as placeholders in the SQL statements:
 #
-   local $sql_insert_SC = $dbh->prepare(
+   $sql_insert_SC = $dbh->prepare(
       "INSERT INTO SearchCategory (SC_id, SC_type, SC_fnc) VALUES (?, ?, ?)");
-   local $sql_getkey_BK = $dbh->prepare("SELECT nextval('BasicKey_BK_id_seq')");
-   local $sql_insert_BK = $dbh->prepare(
+   $sql_getkey_BK = $dbh->prepare("SELECT nextval('BasicKey_BK_id_seq')");
+   $sql_insert_BK = $dbh->prepare(
       "INSERT INTO BasicKey (BK_id, SC_id, BK_name) VALUES (?, ?, ?)");
-   local $sql_insert_MT = $dbh->prepare(
+   $sql_insert_MT = $dbh->prepare(
       "INSERT INTO MetadataType (MT_name, MT_share, MT_def) VALUES (?, ?, ?)");
-   local $sql_getkey_HK = $dbh->prepare("SELECT nextval('HierarchicalKey_HK_id_seq')");
-   local $sql_insert_HK = $dbh->prepare(
+   $sql_getkey_HK = $dbh->prepare("SELECT nextval('HierarchicalKey_HK_id_seq')");
+   $sql_insert_HK = $dbh->prepare(
       "INSERT INTO HierarchicalKey (HK_id, HK_parent, SC_id, HK_level, HK_name) " .
       "VALUES (?, ?, ?, ?, ?)");
-   local $sql_insert_HKBK = $dbh->prepare(
+   $sql_insert_HKBK = $dbh->prepare(
       "INSERT INTO HK_Represents_BK (HK_id, BK_id) VALUES (?, ?)");
 #
 # Loop through a given level of tags 
@@ -273,7 +274,7 @@ sub update_database {
             if (ref($ref2) ne "HASH") {
                die "$0: XML hash: Error in 'bk' element at the top XML level\n";
             }
-            my $name = &convert_to_htmlentities($ref2->{'content'},\%html_conversions);
+            my $name = $ref2->{'content'};
             my $scid = $ref2->{'sc'};
             if (! exists($searchdata{"BK:" . $scid . ":" . $name})) {
 #         
@@ -302,7 +303,7 @@ sub update_database {
 #         
 #           Execute prepared SQL statement
 #         
-            my $def = &convert_to_htmlentities($ref2->{'def'},\%html_conversions);
+            my $def = $ref2->{'def'};
             my $share = $ref2->{'share'};
             if (! exists($searchdata{"MT:" . $name})) {
                $sql_insert_MT->execute($name,$share,$def);
@@ -368,7 +369,7 @@ sub hkloop {
 #                 Get primary key for BasicKey ($bkid):
 #               
                my $bkid;
-               my $name = &convert_to_htmlentities($ref4->{'content'},\%html_conversions);
+               my $name = $ref4->{'content'};
                my $scid = $ref4->{'sc'};
                my $hashkey = "BK:" . $scid . ":" . $name;
                if (! exists($searchdata{$hashkey})) {
@@ -406,19 +407,4 @@ sub hkloop {
       }
    }
 }
-#
-#---------------------------------------------------------------------------------
-#
-sub convert_to_htmlentities {
-   my ($str,$conversions) = @_;
-   my @contarr = split(//,$str);
-   my $result = "";
-   foreach my $ch1 (@contarr) {
-      if (exists($conversions->{$ch1})) {
-         $result .= $conversions->{$ch1};
-      } else {
-         $result .= $ch1;
-      }
-   }
-   return $result;
-};
+
