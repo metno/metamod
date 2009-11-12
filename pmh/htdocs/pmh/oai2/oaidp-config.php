@@ -347,9 +347,10 @@ function getRecords ($id = '', $from = '', $until = '') {
          '', 'Personnel Contact_Address City', 'Oslo','',
          '', 'Personnel Contact_Address Postal_Code', 'N-0313','',
          '', 'Personnel Contact_Address Country', 'Norway','',
-         'variable 4', '*Parameters Category', 'EARTH SCIENCE','',
-         'variable 1', 'Parameters Topic', '','',
-         'variable 2', 'Parameters Term', '','',
+
+         'variable 4', '*Parameters Category', 'EARTH SCIENCE','Not Available',
+         'variable 1', 'Parameters Topic', '','Not Available',
+         'variable 2', 'Parameters Term', '','Not Available',
          'variable 3', 'Parameters Variable_Level_1', '','',
          'variable -1', 'Parameters Detailed_Variable', '','',
          'topiccategory 1', 'ISO_Topic_Category', '','', # required by IPY
@@ -464,6 +465,8 @@ function getRecords ($id = '', $from = '', $until = '') {
                }
             }
          }
+      } else {
+         mmPutLog(__FILE__ . __LINE__ . " Query with null result: $query");
       }
    }
    return $allresults;
