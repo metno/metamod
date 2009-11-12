@@ -57,37 +57,52 @@ start() {
          rm -rf $work_expand
          rm -rf $work_flat
          rm -f $path_to_shell_error
-      fi
-      start_daemon -n 10 -p $upload_monitor_pid $target_directory/scripts/upload_monitor.pl $webrun_directory/upload_monitor.out $upload_monitor_pid
-      if [ $? -ne 0 ]; then
-         echo "upload_monitor failed: $?"
-         return $?;
+         # actually start the daemon
+         start_daemon -n 10 -p $upload_monitor_pid $target_directory/scripts/upload_monitor.pl $webrun_directory/upload_monitor.out $upload_monitor_pid
+         if [ $? -ne 0 ]; then
+            echo "upload_monitor failed: $?"
+            return $?;
+         fi
+      else
+         echo "upload_monitor already running"
       fi
    fi
    if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/import_dataset.pl ]; then
-      path_to_import_updated=$webrun_directory/import_updated
-      if [ ! -f $path_to_import_updated ]; then
-         # create/touch path to set timestamp
-         >$path_to_import_updated
-      fi
-      start_daemon -n 10 -p $import_dataset_pid $target_directory/scripts/import_dataset.pl $webrun_directory/import_dataset.out $import_dataset_pid
-      if [ $? -ne 0 ]; then
-         echo "import_dataset failed: $?"
-         return $?;
+      if ! running $import_dataset_pid; then
+         path_to_import_updated=$webrun_directory/import_updated
+         if [ ! -f $path_to_import_updated ]; then
+            # create/touch path to set timestamp
+            >$path_to_import_updated
+         fi
+         start_daemon -n 10 -p $import_dataset_pid $target_directory/scripts/import_dataset.pl $webrun_directory/import_dataset.out $import_dataset_pid
+         if [ $? -ne 0 ]; then
+            echo "import_dataset failed: $?"
+            return $?;
+         fi
+      else
+         echo "import_dataset already running"
       fi
    fi
    if [ "[==METAMODHARVEST_DIRECTORY==]" != "" -a -r $target_directory/scripts/harvester.pl ]; then
-      start_daemon -n 10 -p $harvester_pid $target_directory/scripts/harvester.pl -log $webrun_directory/harvester.out -pid $harvester_pid
-      if [ $? -ne 0 ]; then
-         echo "harvester failed: $?"
-         return $?;
+      if ! running $harvester_pid; then
+         start_daemon -n 10 -p $harvester_pid $target_directory/scripts/harvester.pl -log $webrun_directory/harvester.out -pid $harvester_pid
+         if [ $? -ne 0 ]; then
+            echo "harvester failed: $?"
+            return $?;
+         fi
+      else
+         echo "harvester already running"
       fi
    fi   
    if [ "[==METAMODTHREDDS_DIRECTORY==]" != "" -a -r $target_directory/scripts/create_thredds_catalogs.pl ]; then
-      start_daemon -n 10 -p $create_thredds_catalogs_pid $target_directory/scripts/create_thredds_catalogs.pl $webrun_directory/create_thredds_catalogs.out $create_thredds_catalogs_pid
-      if [ $? -ne 0 ]; then
-         echo "create_thredds_catalogs failed: $?"
-         return $?;
+      if ! running $create_thredds_catalogs_pid; then
+         start_daemon -n 10 -p $create_thredds_catalogs_pid $target_directory/scripts/create_thredds_catalogs.pl $webrun_directory/create_thredds_catalogs.out $create_thredds_catalogs_pid
+         if [ $? -ne 0 ]; then
+            echo "create_thredds_catalogs failed: $?"
+            return $?;
+         fi
+      else
+         echo "create_thredds_catalogs already running"
       fi
    fi   
 }
