@@ -16,3 +16,4 @@ scripts/createusers.sh
 =htdocs/adm/show_databaselog.php
 =htdocs/adm/show_xml.php
 =htdocs/adm/edit_xml.php
+=htdocs/adm/manage_datasets.php

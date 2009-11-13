@@ -158,25 +158,33 @@ if ($errors != '') {
 }
 
 $oaiStr = $xmlheader . $request . $output . "</OAI-PMH>\n";
-$mmOAI = new MM_OaiPmh($oaiStr);
-if (!$mmOAI->validateOAI()) {
-	$errors = 'oai response does not validate';
-   oai_exit();
-}
-// remove elements and check validity again
-if (@$mmOAI->removeInvalidRecords() > 0) {
-   if (!$mmOAI->validateOAI()) {
-   	$errors = 'oai response does not validate after removal of invalid records';
-   	oai_exit();
+if ($mmConfig->getVar('PMH_VALIDATION') == 'off') {
+   if ($compress) {
+	   ob_start('ob_gzhandler');
    }
-}
+   header($CONTENT_TYPE);
+   echo $oaiStr;
+} else {
+   $mmOAI = new MM_OaiPmh($oaiStr);
+   if (!$mmOAI->validateOAI()) {
+	   $errors = 'oai response does not validate';
+      oai_exit();
+   }
+// remove elements and check validity again
+   if (@$mmOAI->removeInvalidRecords() > 0) {
+      if (!$mmOAI->validateOAI()) {
+   	   $errors = 'oai response does not validate after removal of invalid records';
+   	   oai_exit();
+      }
+   }
 
 // output
-if ($compress) {
-	ob_start('ob_gzhandler');
+   if ($compress) {
+	   ob_start('ob_gzhandler');
+   }
+   header($CONTENT_TYPE);
+   echo $mmOAI->getOAI_XML();
 }
-header($CONTENT_TYPE);
-echo $mmOAI->getOAI_XML();
 if ($compress) {
    ob_end_flush();
 }

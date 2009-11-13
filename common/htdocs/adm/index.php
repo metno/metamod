@@ -35,6 +35,7 @@
 $menu = array( 'viewdbform.php' => 'View table'
    , 'highlight.html' => 'View source file'
    , 'admusers.php' => 'User administration'
+   , 'manage_datasets.php' => 'Dataset manager'
    , 'show_users.php' => 'Show File Upload users'
    , 'show_usererrors.php' => 'Show File Upload user errors'
    , 'show_syserrors.php' => 'Show File Upload system errors'

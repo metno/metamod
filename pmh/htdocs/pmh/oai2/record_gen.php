@@ -105,43 +105,73 @@ if (!$gotFile) {
 	        } else {
    	            $valueset = array("USE_DEFAULT");
       	    }
-            $count_of_values = 0; # Some XML elements are mandatory. If no items are found
-                                  # with real data, exactly one element should be output using
-                                  # the default value.
+            $found_patterns = array(); # Used to avoid multiple XML elements with same content
+                                       # due to invalid data.
+            $default_outlist = array();
 	        foreach ($valueset as $value) {
    	            $outlist = array();
+                $count_of_defaultvalues = 0; # Some XML elements are mandatory. If no items are found
+                                  # with real data, exactly one element should be output using
+                                  # the default value.
       	        foreach ($prev_keys as $keyrecord) {
          	        list($excpt,$path,$const,$dfltval) = $keyrecord;
             	    if ($const != '') {
                	        $outlist[] = array($path,htmlspecialchars($const));
-                        $count_of_values++;
+                        $count_of_defaultvalues++;
 	                } else if ($value == "USE_DEFAULT") {
    	                    if ($dfltval != '') {
       	                    $outlist[] = array($path,$dfltval);
-                            $count_of_values++;
          	            }
+                        $count_of_defaultvalues++;
             	    } else if ($excpt != 0) {
                	        $val = get_exception($prev_mtname,$excpt,$value);
 	                    if ($val !== FALSE) {
                             if ($excpt == 4) {
                                 $outlist[] = array($path,htmlspecialchars($const));
+                                $count_of_defaultvalues++;
                             } else {
    	                            $outlist[] = array($path,$val);
                             }
-                            $count_of_values++;
       	                } else {
-         	                if ($dfltval != '' && $count_of_values == 0) {
+         	                if ($dfltval != '')  { # && $count_of_values == 0
             	                $outlist[] = array($path,$dfltval);
-                                $count_of_values++;
                	            }
+                            $count_of_defaultvalues++;
 	                    }
    	                } else {
       	                $outlist[] = array($path,htmlspecialchars($value));
-                        $count_of_values++;
          	        }
 	            }
+                $new_pattern = "";
+                if ($count_of_defaultvalues == count($prev_keys)) {
+                   $new_pattern .= "ONLY_DEFAULT:";
+                }
    	            reset($outlist);
       	        foreach ($outlist as $tupple) {
+                   $new_pattern .= $tupple[0] . $tupple[1];
+                }
+                if (! in_array($new_pattern, $found_patterns)) {
+                   $found_patterns[] = $new_pattern;
+                   if (substr($new_pattern,0,13) == "ONLY_DEFAULT:") {
+                      $default_outlist = $outlist;
+                   } else {
+   	                  reset($outlist);
+      	              foreach ($outlist as $tupple) {
+                          $path_parts = explode(" ",$tupple[0]);
+                          if ($path_parts[0] == $last_mainelement && substr($last_mainelement,0,1) == "*") {
+                              $newxmlpath = substr($tupple[0],1); # Remove initial '*'
+                          } else {
+                              $newxmlpath = $tupple[0];
+                          }
+                          $b1->add($newxmlpath,xmlstr($tupple[1], $metadataCharset));
+                          $last_mainelement = $path_parts[0];
+	                  }
+                   }
+                }
+   	        }
+            if (count($default_outlist) > 0) {
+                reset($default_outlist);
+                foreach ($default_outlist as $tupple) {
                     $path_parts = explode(" ",$tupple[0]);
                     if ($path_parts[0] == $last_mainelement && substr($last_mainelement,0,1) == "*") {
                         $newxmlpath = substr($tupple[0],1); # Remove initial '*'
@@ -150,8 +180,8 @@ if (!$gotFile) {
                     }
                     $b1->add($newxmlpath,xmlstr($tupple[1], $metadataCharset));
                     $last_mainelement = $path_parts[0];
-	            }
-   	        }
+                }
+            }
    	    }
 	    if ($mtname == '') {
    	        $b1->add($xmlpath,xmlstr($constval));
