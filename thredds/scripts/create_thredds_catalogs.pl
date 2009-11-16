@@ -343,12 +343,14 @@ EOF
 EOF
       close (THREDDSCAT);
 #
+#     The following code is removed. THREDDS should be restarted
+#     independent of METAMOD.
 #     Restart the THREDDS server:
 #
-      my $datestring = &datestring();
-      print "-- $datestring: Restart the THREDDS server\n";
-      print `JAVA_HOME=$java_home $catalina_home/bin/shutdown.sh 2>&1`;
-      print `JAVA_HOME=$java_home $catalina_home/bin/startup.sh 2>&1`;
+#      my $datestring = &datestring();
+#      print "-- $datestring: Restart the THREDDS server\n";
+#      print `JAVA_HOME=$java_home $catalina_home/bin/shutdown.sh 2>&1`;
+#      print `JAVA_HOME=$java_home $catalina_home/bin/startup.sh 2>&1`;
    }
 }
 #
