@@ -384,6 +384,7 @@ function getRecords ($id = '', $from = '', $until = '') {
          'abstract', 'Summary', '','Not Available',
          '', '*IDN_Node Short_Name', 'ARCTIC/NO', '',
          '', '*IDN_Node Short_Name', 'IPY', '',
+         '', '*IDN_Node Short_Name', 'DOKIPY', '',
          '', 'Metadata_Name', 'CEOS IDN DIF','',
          '', 'Metadata_Version', '9.7','',
          '!DS_creationDate', 'DIF_Creation_Date', '','',
