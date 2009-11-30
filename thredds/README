@@ -11,7 +11,11 @@ This module comprise one script:
 
 This script runs as a daemon. It wakes up at fixed intervals to see if any
 dataset has been added to or removed from the database. If so, a new version
-of the THREDDS catalog is created, and the THREDDS data server is restarted.
+of the THREDDS catalog is created.
+
+NOTE: The changes will only be visible in the THREDDS web interface after
+      the THREDDS Data Server (TDS) has been restarted. Start and restart
+      of the TDS are done independently of this module.
 
 The script reads one configuration file that resides in the webrun directory:
 
@@ -45,6 +49,14 @@ ignored.
 Datasets with the special distribution_statement "Free" (or "free") are open
 for all users. For these datasets, a THREDDS catalog entry is created that
 do not require the user to have any specific role.
+
+NOTE: If no distribution statement is found for a dataset in the database,
+      the dataset is given a distribution statement = "forbidden" which
+      is accosiated with the rolename "FORBIDDEN". This rolename does not
+      exist in tomcat-users.xml, and accordingly it wil be impossible to
+      access the netCDF files belonging to the dataset through the THREDDS
+      interface. The existence of the dataset and the files will be visible,
+      though.
 
 The 'ignore' command will exclude the corresponding dataset from the THREDDS
 catalog. The dataset will not be visible in the THREDDS web interface at all.

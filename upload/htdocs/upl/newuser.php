@@ -38,6 +38,7 @@
 #  automatically sent to the user by E-mail.
 #
    include "funcs.inc";
+   include_once("../funcs/mmConfig.inc");
    $paw = mkpasswd(); // Create new password
    $name = conditional_decode($_POST["name"]);
    $email = conditional_decode($_POST["email"]);

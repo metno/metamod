@@ -36,8 +36,8 @@
 # catalog that makes the data repository available to users through the 
 # THREDDS Data Server (TDS) installation. 
 #
-# If this script introduces any changes in the catalog, the script will restart
-# the TDS.
+# If this script introduces any changes in the catalog, the script will NOT
+# restart the TDS. The TDS is assumed to restart at fixed periods.
 #
 use strict;
 use warnings;
@@ -77,6 +77,7 @@ my $catalina_home = $config->get("CATALINA_HOME");
 my $thredds_catalog_path = $catalina_home . "/content/thredds/catalog.xml";
 my $path_to_syserrors = $webrun_directory . "/syserrors";
 my $old_catalog_signature = "";
+my %old_catalog_hash = ();
 our $SIG_TERM = 0;
 
 eval {
@@ -158,6 +159,7 @@ sub main_body {
          die("Syntax error in thredds_config, line: $line");
       }
    }
+   $rolenames_from_config{"forbidden"} = "FORBIDDEN";
    &inner_loop(\%rolenames_from_config,\%datasets_to_ignore);
    sleep(60*$minutes_between_runs);
 }
@@ -198,17 +200,31 @@ sub inner_loop {
    }
    my %dist_statements = ();
    while (my ($dsid,$dref) = each(%datarefs)) {
+      my $distribution_stm;
+#
+#     Datasets with no distribution_statement in the metadata are given
+#     a default distribution statment = "forbidden". This is accosiated 
+#     with the rolename "FORBIDDEN" which is assumed not to exist in the
+#     in the Tomcat configuration (tomcat-users.xml).
+#
+#     This will result in a THREDDS catalog that shows the existence of a
+#     dataset, but gives a "FORBIDDEN response" when a user tries to accsess
+#     a file in the dataset.
+#
       if (exists($distrib_stm{$dsid})) {
-         if (index($dref,$opendap_url) == 0) { 
+         $distribution_stm = $distrib_stm{$dsid};
+      } else {
+         $distribution_stm = "forbidden";
+      }
+      if (index($dref,$opendap_url) == 0) { 
 #
-#           String $dref starts with the string $opendap_url.
-#           Datasets with other content in $dref (dataref field) are ignored
+#        String $dref starts with the string $opendap_url.
+#        Datasets with other content in $dref (dataref field) are ignored
 #
-            if ($dref =~ m:/([^/]+)/$:) {
-               my $dataset = $1;
-               if (!exists($datasets_to_ignore->{$dataset})) {
-                  $dist_statements{$dataset} = $distrib_stm{$dsid}
-               }
+         if ($dref =~ m:/([^/]+)/$:) {
+            my $dataset = $1;
+            if (!exists($datasets_to_ignore->{$dataset})) {
+               $dist_statements{$dataset} = $distribution_stm;
             }
          }
       }
@@ -247,7 +263,7 @@ sub inner_loop {
                if (exists($dist_statements{$dataset})) {
                   my $distribution_statement = lc($dist_statements{$dataset});
                   if (exists($rolenames_from_config->{$distribution_statement})) {
-                     my $rolename = lc($rolenames_from_config->{$distribution_statement});
+                     my $rolename = $rolenames_from_config->{$distribution_statement};
                      $catalog_signature .= "$institution/$dataset $rolename\n";
                   } else {
                   }
@@ -260,10 +276,10 @@ sub inner_loop {
    closedir(OPENDAPDIR);
 #
    if ($catalog_signature ne $old_catalog_signature) {
-      print "-- Writing new catalog.xml:\n";
+      print "-- " . &datestring() . ": Writing new catalog.xml:\n";
       if (-e $thredds_catalog_path) {
          if (move($thredds_catalog_path,$thredds_catalog_path . "_bcup") == 0) {
-            print "Copy did not succeed. Error code: $!\n";
+            die "Moving $thredds_catalog_path to backup file did not succeed. Error code: $!\n";
          }
       }
       open (THREDDSCAT,">$thredds_catalog_path");
@@ -292,7 +308,11 @@ EOF
                my $dataset = $2;
                my $rolename = $3;
                if ($institution ne "dummy") {
-                  print "    Catalog entry: $line\n";
+                  if (exists($old_catalog_hash{$line})) {
+                     delete($old_catalog_hash{$line});
+                  } else {
+                     print "    New catalog entry: $line\n";
+                  }
                }
                if ($institution ne $prev_institution and $prev_institution ne "") {
                   print THREDDSCAT <<'EOF';
@@ -342,6 +362,19 @@ EOF
 </catalog>
 EOF
       close (THREDDSCAT);
+#
+#     The remaining entries in %old_catalog_hash are those that are removed from
+#     the THREDDS catalog:
+#
+      foreach my $line (keys %old_catalog_hash) {
+          print "    Removed catalog entry: $line\n";
+      }
+      %old_catalog_hash = ();
+      foreach my $line (@scatalog) {
+          if ($line ne "dummy/dummy dummy") {
+             $old_catalog_hash{$line} = 1;
+          }
+      }
 #
 #     The following code is removed. THREDDS should be restarted
 #     independent of METAMOD.
