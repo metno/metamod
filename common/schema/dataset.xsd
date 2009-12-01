@@ -56,12 +56,12 @@
     </complexType>
    <complexType name='WMSInfo'>
       <sequence>
-         <any />
+         <any processContents="lax"/>
       </sequence>
    </complexType>
    <complexType name='ProjectionInfo'>
       <sequence>
-         <any />
+         <any processContents="lax"/>
       </sequence>
    </complexType>
 
