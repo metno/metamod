@@ -120,7 +120,7 @@
  if ($error == 0) {
     $dirpath = get_upload_path() . "/" . $institution . "/" . $dirname;
     if (file_exists($dirpath)) {
-       if (in_array($dirname,$dirinfo)) {
+       if (array_key_exists($dirname,$dirinfo)) {
           if ($dirinfo[$dirname] == $ndirkey) {
              $errmsg = "Directory already exists with the directory key you asked for";
           } else {
