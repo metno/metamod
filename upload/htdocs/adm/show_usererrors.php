@@ -43,7 +43,7 @@ require_once("../funcs/mmConfig.inc");
    reset($errfiles);
    foreach ($errfiles as $filename) {
       if (preg_match ('/\.html$/',$filename)) {
-         echo '<a href='.$mmConfig->getVar('LOCAL_URL').'/upl/uerr/' . $filename . '">' . $filename . '</a><br />' . "\n";
+         echo '<a href="'.$mmConfig->getVar('LOCAL_URL').'/upl/uerr/' . $filename . '">' . $filename . '</a><br />' . "\n";
       }
    }
 ?>
