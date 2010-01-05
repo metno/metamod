@@ -122,6 +122,13 @@ EOT;
  * @return true on success, false on failure
  */
 function mmRetrieveNcURL($url, $outputNcFile, &$errMsg = "") {
+	if (preg_match('/^file:[^\/]{2}/', $url)) {
+		// curl allowed urls like file:my/file.nc
+		// whereas php_streams require file:///full/path/to/my/file.nc (realpath())
+		// or just my/file.nc (i.e. without wrapper)
+		$url = preg_replace('/^file:/', "", $url);
+	}
+	
 	// open the filehandle
 	$tempNcFH = fopen($outputNcFile, "w+");
 	if (!$tempNcFH) {
@@ -135,10 +142,10 @@ function mmRetrieveNcURL($url, $outputNcFile, &$errMsg = "") {
 	if (!$inNcFH) {
 	   $errMsg .= "cannot retrieve url $url";
 	   mm_log(MM_WARNING, $errMsg, __FILE__, __LINE__);
-	   $retVal = false;	   
+	   return false;	   
 	}
 	stream_copy_to_stream($inNcFH, $tempNcFH);
-	close($inNcFH);
+	fclose($inNcFH);
 	
 	// check for netcdf content
 	fseek($tempNcFH, 0);
@@ -146,11 +153,11 @@ function mmRetrieveNcURL($url, $outputNcFile, &$errMsg = "") {
 	if ($ncMagic != "CDF") {
 	   $errMsg .= "file from $url not netcdf-3, but $ncMagic";
 	   mm_log(MM_WARNING, $errMsg, __FILE__, __LINE__);
-	   $retVal = false;
+	   return false;
 	}
 	
 	fclose($tempNcFH);
-	return $retVal;
+	return true;
 }
 
 
