@@ -131,16 +131,14 @@ function mmRetrieveNcURL($url, $outputNcFile, &$errMsg = "") {
 	}
 	
 	// download url to filehandle
-	$curl = curl_init($url);
-	curl_setopt($curl, CURLOPT_FILE, $tempNcFH);
-	curl_setopt($curl, CURLOPT_HEADER, 0);
-	$retVal = true;
-	if (!curl_exec($curl)) {
+	$inNcFH = fopen($url, "r");
+	if (!$inNcFH) {
 	   $errMsg .= "cannot retrieve url $url";
 	   mm_log(MM_WARNING, $errMsg, __FILE__, __LINE__);
-	   $retVal = false;
+	   $retVal = false;	   
 	}
-	curl_close($curl);
+	stream_copy_to_stream($inNcFH, $tempNcFH);
+	close($inNcFH);
 	
 	// check for netcdf content
 	fseek($tempNcFH, 0);
