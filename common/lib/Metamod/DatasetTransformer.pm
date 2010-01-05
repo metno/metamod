@@ -97,7 +97,7 @@ sub getPlugins {
     my $basePluginPath = $fullClassPath;
     $basePluginPath =~ s/\.pm$//;
     my $d;
-    opendir $d, $basePluginPath;
+    opendir $d, $basePluginPath or die "cannot read DatasetTransformer dir at $basePluginPath\n";
     my @files = grep {/\.pm$/ && -f File::Spec->catfile($basePluginPath,$_)} readdir $d;
     closedir $d;
     
