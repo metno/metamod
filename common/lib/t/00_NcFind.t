@@ -3,12 +3,16 @@ use strict;
 use warnings;
 
 use lib "..";
-use Test::More tests => 11;
+use Test::More tests => 13;
 
 BEGIN {use_ok('MetNo::NcFind')};
 
 my $nc = new MetNo::NcFind('test.nc');
 isa_ok($nc, 'MetNo::NcFind');
+
+my $ncX = new MetNo::NcFind($nc->{NCOBJ});
+isa_ok($ncX, 'MetNo::NcFind');
+
 my @globalAttributes = $nc->globatt_names;
 is($globalAttributes[0], 'Conventions', "globatt_names");
 my $globAttValue = $nc->globatt_value($globalAttributes[0]);
@@ -18,6 +22,9 @@ my @variables = sort($nc->variables);
 ok(eq_array(\@variables, ["lat","lon","test","time"]), "variables");
 my $attValue = $nc->att_value("lat", "units");
 is($attValue, "degree_north", "att_value");
+
+my @latlons = sort $nc->findVariablesByAttributeValue("units", qr/degrees?_(north|south|east|west)/);
+ok(eq_array(\@latlons, ["lat", "lon"]), "findVariablesByAttributeValue");
 
 my @dimensions = $nc->dimensions("test");
 is(scalar @dimensions, 3, "dimensions");

@@ -32,16 +32,14 @@ package MetNo::NcFind;
 use strict;
 use warnings;
 
+$MetNo::NcFind::VERSION = 0.04;
+
+
 use Fcntl qw(:DEFAULT);
 use Encode qw();
-$MetNo::NcFind::VERSION = 0.03;
-#   
-#    Use PDL module with netCDF interface
-#   
-   use PDL;
-   use PDL::Char;
-   use PDL::NetCDF;
-
+use PDL::NetCDF;
+use PDL::Lite qw();
+use UNIVERSAL qw();
 
 #
 # try encoding with utf8
@@ -70,175 +68,167 @@ sub _decode {
     return wantarray ? map {_utf8Iso8859_1Decode($_)} @_
                      : _utf8Iso8859_1Decode($_[0]);
 }
-#   
-#     Constructor function: ncfind
-#   
-   sub new {
-      my $this = shift;
-      my $class = ref($this) || $this;
-      my $self = {};
-      bless($self,$class);
-#      
-#       Open netCDF-file for reading
-#      
-      my $ncfile = shift;
-      $self->{NCOBJ} = PDL::NetCDF->new ($ncfile, {MODE => O_RDONLY, REVERSE_DIMS => 1});
-      return $self;
-   }
-#   
-#     Method: globatt_names
-#   
-   sub globatt_names {
-      my $self = shift;
-      my $ncref = $self->{NCOBJ};
-      return _decode(@{$ncref->getattributenames()});
-   }
-#   
-#     Method: globatt_value
-#   
-   sub globatt_value {
-      my $self = shift;
-      my $globattname = shift;
-      my $ncref = $self->{NCOBJ};
-      my $result = $ncref->getatt ($globattname);
-      if (ref($result)) {
-         return _decode(sclr $result);
-      } else {
-         return _decode($result);
-      }
-   }
-#   
-#     Method: variables
-#   
-   sub variables {
-      my $self = shift;
-      my $ncref = $self->{NCOBJ};
-#      
-#       Return all variable names 
-#      
-      return _decode(@{$ncref->getvariablenames()});
-   }
-#   
-#     Method: att_names
-#   
-   sub att_names {
-      my $self = shift;
-      my $varname = shift;
-      my $ncref = $self->{NCOBJ};
-      return _decode(@{$ncref->getattributenames($varname)});
-   }
-#   
-#     Method: att_value
-#   
-   sub att_value {
-      my $self = shift;
-      my $varname = shift;
-      my $attname = shift;
-      my $ncref = $self->{NCOBJ};
-      my $result = $ncref->getatt ($attname, $varname);
-      if (ref($result)) {
-         return _decode(sclr $result);
-      } else {
-         return _decode($result);
-      }
-   }
-#   
-#     Method: dimensions
-#   
-   sub dimensions {
-      my $self = shift;
-      my $varname = shift;
-      my $ncref = $self->{NCOBJ};
-#      
-#       Return the dimension names from a variable
-#      
-      return _decode(@{$ncref->getdimensionnames($varname)});
-   }
-#   
-#     Method: get_bordervalues
-#   
-   sub get_bordervalues {
-      my $self = shift;
-      my $varname = shift;
-      my $ncref = $self->{NCOBJ};
-#      
-#       Get the values of a  netCDF variable as PDL object
-#       Resulting PDL object: $pdl1. NetCDF object: $ncref,
-#       variable name: $varname. 
-#      
-      my $pdl1  = $ncref->get ($varname);
-#      
-#       Create four 1D slices as edges of a 2D pdl
-#      
-      my $upperrow = $pdl1->slice(":,(0)");
-      my $rightcol = $pdl1->slice("(-1),:");
-      my $bottomrow_reversed = $pdl1->slice("-1:0,(-1)");
-      my $leftcol_reversed = $pdl1->slice("(0),-1:0");
-#      
-#       Return the values as an array:
-#      
-      return (list($upperrow),list($rightcol), list($bottomrow_reversed), list($leftcol_reversed));
-   }
-#   
-#     Method: get_values
-#   
-   sub get_values {
-      my $self = shift;
-      my $varname = shift;
-      my $ncref = $self->{NCOBJ};
-#      
-#       Get the values of a  netCDF variable as PDL object
-#       Resulting PDL object: $pdl1. NetCDF object: $ncref,
-#       variable name: $varname. 
-#      
-      my $pdl1  = $ncref->get ($varname);
-#      
-#       Return the values as an array:
-#      
-      return (list $pdl1);
-   }
 
-   sub get_lonlats {
-      my $self = shift;
-      my $lon_name = shift;
-      my $lat_name = shift;
-      my $ncref = $self->{NCOBJ};
-      my $valid_min_lon = -180.0;
-      my $valid_max_lon = 180.0;
-      my $attlist_lon = $ncref->getattributenames($lon_name);
-      if (grep($_ eq "valid_min", @$attlist_lon) > 0) {
-         my $valid_min_lon = $ncref->getatt ("valid_min", $lon_name);
-      }
-      if (grep($_ eq "valid_max", @$attlist_lon) > 0) {
-         my $valid_max_lon = $ncref->getatt ("valid_max", $lon_name);
-      }
-      my $valid_min_lat = -90.0;
-      my $valid_max_lat = 90.0;
-      my $attlist_lat = $ncref->getattributenames($lat_name);
-      if (grep($_ eq "valid_min", @$attlist_lat) > 0) {
-         my $valid_min_lat = $ncref->getatt ("valid_min", $lat_name);
-      }
-      if (grep($_ eq "valid_max", @$attlist_lat) > 0) {
-         my $valid_max_lat = $ncref->getatt ("valid_max", $lat_name);
-      }
-      my $pdl_lon  = $ncref->get ($lon_name);
-      my $pdl_lat  = $ncref->get ($lat_name);
-      my @lon = list $pdl_lon;
-      my @lat = list $pdl_lat;
-      my @rlon = ();
-      my @rlat = ();
-      while (@lon != 0) {
-         my $plon = shift(@lon);
-         my $plat = shift(@lat);
-         if (defined($plon) && defined($plat) && $plon <= $valid_max_lon && 
-             $plat <= $valid_max_lat &&
-             $plon >= $valid_min_lon && $plat >= $valid_min_lat) {
+
+sub new {
+    my ($this, $ncfile) = @_;
+    my $class = ref($this) || $this;
+    my $self = {};
+
+    die __PACKAGE__."::new requires ncFile as argument" unless $ncfile;    
+    if (UNIVERSAL::isa($ncfile, 'PDL::NetCDF')) {
+    	$self->{NCOBJ} = $ncfile;
+    } else {
+        # Open netCDF-file for reading
+        $self->{NCOBJ} = PDL::NetCDF->new ($ncfile, {MODE => O_RDONLY, REVERSE_DIMS => 1});
+    }
+    unless (defined $self->{NCOBJ}) {
+    	return undef;
+    }
+    return bless($self,$class);
+}
+
+sub globatt_names {
+    my ($self) = @_;
+    my $ncref = $self->{NCOBJ};
+    return _decode(@{$ncref->getattributenames()});
+}
+
+sub globatt_value {
+    my ($self, $globattname) = @_;
+
+    my $ncref = $self->{NCOBJ};
+    my $result = $ncref->getatt ($globattname);
+    if (ref($result)) {
+        return _decode($result->sclr);
+    } else {
+        return _decode($result);
+    }
+}
+
+sub variables {
+    my ($self) = @_;
+    my $ncref = $self->{NCOBJ};
+    # Return all variable names 
+    return _decode(@{$ncref->getvariablenames()});
+}
+
+sub att_names {
+    my ($self, $varname) = @_;
+
+    my $ncref = $self->{NCOBJ};
+    return _decode(@{$ncref->getattributenames($varname)});
+}
+
+sub att_value {
+    my ($self, $varname, $attname) = @_;
+
+    my $ncref = $self->{NCOBJ};
+    my $result = $ncref->getatt($attname, $varname);
+    if (ref($result)) {
+        return _decode($result->sclr);
+    } else {
+        return _decode($result);
+    }
+}
+
+sub dimensions {
+    my ($self, $varname) = @_;
+
+    my $ncref = $self->{NCOBJ};
+    # Return the dimension names from a variable
+    return _decode(@{$ncref->getdimensionnames($varname)});
+}
+
+sub get_bordervalues {
+    my ($self, $varname) = @_;
+
+    my $ncref = $self->{NCOBJ};
+    # Get the values of a  netCDF variable as PDL object
+    # Resulting PDL object: $pdl1. NetCDF object: $ncref,
+    # variable name: $varname.
+    my $pdl1  = $ncref->get ($varname);
+
+    # Create four 1D slices as edges of a 2D pdl
+    my $upperrow = $pdl1->slice(":,(0)");
+    my $rightcol = $pdl1->slice("(-1),:");
+    my $bottomrow_reversed = $pdl1->slice("-1:0,(-1)");
+    my $leftcol_reversed = $pdl1->slice("(0),-1:0");
+    
+    # Return the values as an array:
+    return ($upperrow->list,$rightcol->list, $bottomrow_reversed->list, $leftcol_reversed->list);
+}
+
+sub get_values {
+    my ($self, $varname) = @_;
+
+    my $ncref = $self->{NCOBJ};    
+    # Get the values of a  netCDF variable as PDL object
+    # Resulting PDL object: $pdl1. NetCDF object: $ncref,
+    # variable name: $varname.
+    my $pdl1  = $ncref->get ($varname);
+
+    # Return the values as an array:
+    return $pdl1->list;
+}
+
+sub get_lonlats {
+    my ($self, $lon_name, $lat_name) = @_;
+
+    my $ncref = $self->{NCOBJ};
+    my $valid_min_lon = -180.0;
+    my $valid_max_lon = 180.0;
+    my $attlist_lon = $ncref->getattributenames($lon_name);
+    if (grep($_ eq "valid_min", @$attlist_lon) > 0) {
+        my $valid_min_lon = $ncref->getatt ("valid_min", $lon_name);
+    }
+    if (grep($_ eq "valid_max", @$attlist_lon) > 0) {
+        my $valid_max_lon = $ncref->getatt ("valid_max", $lon_name);
+    }
+    my $valid_min_lat = -90.0;
+    my $valid_max_lat = 90.0;
+    my $attlist_lat = $ncref->getattributenames($lat_name);
+    if (grep($_ eq "valid_min", @$attlist_lat) > 0) {
+        my $valid_min_lat = $ncref->getatt ("valid_min", $lat_name);
+    }
+    if (grep($_ eq "valid_max", @$attlist_lat) > 0) {
+        my $valid_max_lat = $ncref->getatt ("valid_max", $lat_name);
+    }
+    my $pdl_lon  = $ncref->get ($lon_name);
+    my $pdl_lat  = $ncref->get ($lat_name);
+    my @lon = $pdl_lon->list;
+    my @lat = $pdl_lat->list;
+    my @rlon = ();
+    my @rlat = ();
+    while (@lon != 0) {
+        my $plon = shift(@lon);
+        my $plat = shift(@lat);
+        if (defined($plon) && defined($plat) && $plon <= $valid_max_lon && 
+            $plat <= $valid_max_lat &&
+            $plon >= $valid_min_lon && $plat >= $valid_min_lat
+           ) {
             push(@rlon, $plon);
             push(@rlat, $plat);
-         }
-      }
-      return (\@rlon,\@rlat);
-   }
+        }
+    }
+    return (\@rlon,\@rlat);
+}
+
+sub findVariablesByAttributeValue {
+    my ($self, $attribute, $valueRegex) = @_;
+    my @variables = $self->variables;
+    my @outVars;
+    foreach my $var (@variables) {
+        my $val = $self->att_value($var, $attribute);
+        if (defined $val and ! ref $val) { # pdl-attributes not supported
+            if ($val =~ /$valueRegex/) {
+                push @outVars, $var;
+            }
+        }
+    }
+    return @outVars;
+}
+
 1;
 __END__
 =head1 NAME
@@ -264,6 +254,8 @@ MetNo::NcFind - access and search variables and attributes in a Nc-File
   
   my ($longRef, $latRef) = $nc->get_lonlats('longitude', 'latitude');
 
+  my @vars = $nc->findVariablesByAttributeValue('units', qr/degrees?_(north|east)/);
+
 =head1 DESCRIPTION
 
 This module gives read-only access to nc-files. It hides all datatype and
@@ -274,9 +266,10 @@ are assumed to be in iso8859, only if that conversion fails, utf-8 is assumed.
 
 =over 8
 
-=item new(filename)
+=item new(filename|PDL::NetCDF object)
 
-open the file and generate a new object
+open the ncfile and generate a new object
+throws exception on errors
 
 =item globalatt_names()
 
@@ -293,6 +286,11 @@ get a list of all variables
 =item att_value($varName, $attName)
 
 get the value of the attribute named $attName belonging to $varName
+
+=item findVariablesByAttributeValue($attName, $pattern)
+
+get a list of variables containing a attribute that matches $pattern. $pattern
+should be a compiled regex, i.e. qr//;
 
 =item dimensions($varName)
 
