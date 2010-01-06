@@ -46,7 +46,7 @@ use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
 use XML::Simple qw(:strict);
 use Metamod::Dataset;
 use encoding 'utf-8';
-use ncfind;
+use MetNo::NcFind;
 use quadtreeuse;
 use Data::Dumper;
 use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
@@ -1221,7 +1221,7 @@ sub get_quadtree_nodes {
             &add_errmsg("File: $fpath\nVariables: $longitudevar $latitudevar",
                         "latlon_dimension_count_mismatch");
          }
-         my $ncfindobj = ncfind->new($fpath);
+         my $ncfindobj = MetNo::NcFind->new($fpath);
          if ($longitude_dimcount == 0) {
             my ($rlons,$rlats) = $ncfindobj->get_lonlats($longitudevar,$latitudevar);
             $qtuseobj->add_lonlats("points",$rlons,$rlats);
@@ -1361,7 +1361,7 @@ sub parse_file {
 #   
 #    Open new ncfind object (see ncfind.pm):
 #   
-   my $ncfindobj = ncfind->new($fpath);
+   my $ncfindobj = MetNo::NcFind->new($fpath);
    foreach my $attname ($ncfindobj->globatt_names()) {
       my $attval = $ncfindobj->globatt_value($attname);
 #

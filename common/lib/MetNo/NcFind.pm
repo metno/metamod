@@ -1,4 +1,4 @@
-package ncfind;
+package MetNo::NcFind;
 # 
 #---------------------------------------------------------------------------- 
 #  METAMOD - Web portal for metadata search and upload 
@@ -29,11 +29,12 @@ package ncfind;
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
 #---------------------------------------------------------------------------- 
 #
-require 0.01;
 use strict;
-use Fcntl;
-use Encode;
-$ncfind::VERSION = 0.02;
+use warnings;
+
+use Fcntl qw(:DEFAULT);
+use Encode qw();
+$MetNo::NcFind::VERSION = 0.03;
 #   
 #    Use PDL module with netCDF interface
 #   
@@ -239,3 +240,91 @@ sub _decode {
       return (\@rlon,\@rlat);
    }
 1;
+__END__
+=head1 NAME
+
+MetNo::NcFind - access and search variables and attributes in a Nc-File
+
+=head1 SYNOPSIS
+
+  use MetNo::NcFind;
+  
+  my $nc = new MetNo::NcFind('my/file.nc');
+  my @globalAttributes = $nc->globatt_names;
+  foreach my $globAtt (@globalAttributes) {
+    my $globAttValue = $nc->globatt_value($globAtt);
+  }
+  my @variables = $nc->variables;
+  my $attValue = $nc->att_value($varName, $attName);
+  
+  my @dimensions = $nc->dimensions($varName);
+  
+  my @borderVals = $nc->get_bordervalues($varName);
+  my @vals = $nc->get_values($varName);
+  
+  my ($longRef, $latRef) = $nc->get_lonlats('longitude', 'latitude');
+
+=head1 DESCRIPTION
+
+This module gives read-only access to nc-files. It hides all datatype and
+encoding issues. In contrast to the netcdf-user manual (since 3.6.3), netcdf-files
+are assumed to be in iso8859, only if that conversion fails, utf-8 is assumed.
+
+=head2 METHODS
+
+=over 8
+
+=item new(filename)
+
+open the file and generate a new object
+
+=item globalatt_names()
+
+get a list of all global attributes
+
+=item globatt_value($attName)
+
+get the value of the global attribute named $attName
+
+=item variables()
+
+get a list of all variables
+
+=item att_value($varName, $attName)
+
+get the value of the attribute named $attName belonging to $varName
+
+=item dimensions($varName)
+
+get a list of dimension-names belonging to variable $varName
+
+=item get_bordervalues($varName)
+
+get a list of all values on the border of the variable-array. It will
+repeat the corner values.
+
+=item get_values($varName)
+
+get a one-dimensional list of all values of $varName
+
+=item get_lonlats('longitude', 'latitude')
+
+get lists of longitude and latitude values as array-reference of the variables
+longitude and latitude. Clean the data for eventually occuring invalid values (outside -180/180, -90/90 
+respectively)
+
+=back
+
+=head1 AUTHOR
+
+Egil Støren, E<lt>egils\@met.noE<gt>
+
+=head2 CONTRIBUTORS
+
+Heiko Klein, E<lt>heiko.klein\@met.noE<gt>
+
+=head1 SEE ALSO
+
+L<PDL::NetCDF>
+
+=cut

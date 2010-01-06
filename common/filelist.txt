@@ -29,5 +29,6 @@ metamodInit.sh
 =lib/Metamod/ForeignDataset.pm
 =lib/Metamod/Utils.pm
 =lib/Metamod/Config.pm
+=lib/MetNo/NcFind.pm
 =lib/quadtreeuse.pm
 =lib/mmTtime.pm

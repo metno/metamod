@@ -28,7 +28,7 @@
 =htdocs/adm/show_syserrors.php
 =htdocs/adm/show_users.php
 =scripts/digest_nc.pl
-=scripts/ncfind.pm
+=scripts/ncExtractLatLong.pl
 =scripts/print_usererrors.pl
 =scripts/upload_monitor.pl
 =scripts/show_time_now.pl
