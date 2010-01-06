@@ -163,7 +163,12 @@ as you initially provide the password given here.
 
 $signature
 END_TEXT;
-   mail($emailadr, "Access to $appName file upload service",$content, "From: ".$mmConfig->getVar('FROM_ADDRESS'));
+   mail($emailadr,
+        "Access to $appName file upload service",
+        $content,
+#        "From: ".$mmConfig->getVar('FROM_ADDRESS') . "\r\n" . 'Content-Type: text/plain; charset="utf-8"'
+        "From: ".$mmConfig->getVar('FROM_ADDRESS')
+       );
 }
 
 function mmGetRunPath () {
@@ -464,8 +469,8 @@ function get_buttonname()
 
 function conditional_decode($string)
 {
-	global $mmConfig;
-   if ($mmConfig->getVar('DECODE_FROM_UTF8')) {
+   global $mmConfig;
+   if ($mmConfig->getVar('DECODE_FROM_UTF8') == "TRUE") {
       return utf8_decode($string);
    } else {
       return $string;
