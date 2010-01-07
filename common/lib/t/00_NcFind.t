@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use lib "..";
-use Test::More tests => 14;
+use Test::More tests => 18;
 
 BEGIN {use_ok('MetNo::NcFind')};
 
@@ -17,14 +17,25 @@ my @globalAttributes = $nc->globatt_names;
 is($globalAttributes[0], 'Conventions', "globatt_names");
 my $globAttValue = $nc->globatt_value($globalAttributes[0]);
 is($globAttValue, 'CF-1.0', "globatt_value");
+my $voidGlobAtt = $nc->globatt_value('void');
+ok(!defined $voidGlobAtt, "reading undefined global attribute");
 
 my @variables = sort($nc->variables);
 ok(eq_array(\@variables, ["lat","lon","test","time"]), "variables");
 my $attValue = $nc->att_value("lat", "units");
 is($attValue, "degree_north", "att_value");
 
+my $voidAtt = $nc->att_value("lat", "void");
+ok(!defined $voidAtt, "reading undefined attribute");
+$voidAtt = $nc->att_value("void", "void");
+ok(!defined $voidAtt, "reading attribute ov undefined variable");
+
+
 my @latlons = sort $nc->findVariablesByAttributeValue("units", qr/degrees?_(north|south|east|west)/);
 ok(eq_array(\@latlons, ["lat", "lon"]), "findVariablesByAttributeValue");
+
+my @test = $nc->findVariablesByAttributeValue("xxx", qr/degrees?_(north|south|east|west)/);
+ok(@test == 0, "searching for non-existing attribute");
 
 my @dimensions = $nc->dimensions("test");
 is(scalar @dimensions, 3, "dimensions");

@@ -98,12 +98,18 @@ sub globatt_value {
     my ($self, $globattname) = @_;
 
     my $ncref = $self->{NCOBJ};
-    my $result = $ncref->getatt ($globattname);
-    if (ref($result)) {
-        return _decode($result->sclr);
-    } else {
-        return _decode($result);
+    my $retVal;
+    eval {
+        my $result = $ncref->getatt ($globattname);
+        if (ref($result)) {
+            $retVal =  _decode($result->sclr);
+        } else {
+            $retVal = _decode($result);
+        }
+    }; if ($@) {
+        # att-name doesn't exists, don't care
     }
+    return $retVal;
 }
 
 sub variables {
@@ -124,7 +130,12 @@ sub att_value {
     my ($self, $varname, $attname) = @_;
 
     my $ncref = $self->{NCOBJ};
-    my $result = $ncref->getatt($attname, $varname);
+    my $result;
+    eval {
+    	$result = $ncref->getatt($attname, $varname); 
+    }; if ($@) {
+    	# don't care
+    }
     if (ref($result)) {
         return _decode($result->sclr);
     } else {
@@ -286,6 +297,7 @@ get a list of all global attributes
 =item globatt_value($attName)
 
 get the value of the global attribute named $attName
+Returns undef if variable or attribute don't exist.
 
 =item variables()
 
@@ -293,7 +305,8 @@ get a list of all variables
 
 =item att_value($varName, $attName)
 
-get the value of the attribute named $attName belonging to $varName
+get the value of the attribute named $attName belonging to $varName.
+Returns undef if variable or attribute don't exist.
 
 =item findVariablesByAttributeValue($attName, $pattern)
 
