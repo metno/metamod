@@ -176,35 +176,43 @@ sub get_lonlats {
     my ($self, $lon_name, $lat_name) = @_;
 
     my $ncref = $self->{NCOBJ};
+    
+    my %variables = map {$_ => 1} $self->variables;
+    unless (exists $variables{$lon_name} and exists $variables{$lat_name}) {
+    	return ([], []);
+    }
+    
+    # check/set valid ranges
     my $valid_min_lon = -180.0;
     my $valid_max_lon = 180.0;
     my $attlist_lon = $ncref->getattributenames($lon_name);
     if (grep($_ eq "valid_min", @$attlist_lon) > 0) {
-        my $valid_min_lon = $ncref->getatt ("valid_min", $lon_name);
+        $valid_min_lon = $ncref->getatt ("valid_min", $lon_name);
     }
     if (grep($_ eq "valid_max", @$attlist_lon) > 0) {
-        my $valid_max_lon = $ncref->getatt ("valid_max", $lon_name);
+        $valid_max_lon = $ncref->getatt ("valid_max", $lon_name);
     }
     my $valid_min_lat = -90.0;
     my $valid_max_lat = 90.0;
     my $attlist_lat = $ncref->getattributenames($lat_name);
     if (grep($_ eq "valid_min", @$attlist_lat) > 0) {
-        my $valid_min_lat = $ncref->getatt ("valid_min", $lat_name);
+        $valid_min_lat = $ncref->getatt ("valid_min", $lat_name);
     }
     if (grep($_ eq "valid_max", @$attlist_lat) > 0) {
-        my $valid_max_lat = $ncref->getatt ("valid_max", $lat_name);
+        $valid_max_lat = $ncref->getatt ("valid_max", $lat_name);
     }
+    
     my $pdl_lon  = $ncref->get ($lon_name);
     my $pdl_lat  = $ncref->get ($lat_name);
-    my @lon = $pdl_lon->list;
-    my @lat = $pdl_lat->list;
+    my @lon = $pdl_lon->list if defined $pdl_lon;
+    my @lat = $pdl_lat->list if defined $pdl_lat;
     my @rlon = ();
     my @rlat = ();
-    while (@lon != 0) {
+    while (@lon != 0 and @lat != 0) {
         my $plon = shift(@lon);
         my $plat = shift(@lat);
-        if (defined($plon) && defined($plat) && $plon <= $valid_max_lon && 
-            $plat <= $valid_max_lat &&
+        if (defined($plon) && defined($plat) &&
+            $plon <= $valid_max_lon && $plat <= $valid_max_lat &&
             $plon >= $valid_min_lon && $plat >= $valid_min_lat
            ) {
             push(@rlon, $plon);
@@ -309,7 +317,7 @@ get a one-dimensional list of all values of $varName
 
 get lists of longitude and latitude values as array-reference of the variables
 longitude and latitude. Clean the data for eventually occuring invalid values (outside -180/180, -90/90 
-respectively)
+respectively). Both lists are guaranteed to be equal-sized. Returns [],[] if names are not found.
 
 =back
 

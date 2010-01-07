@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use lib "..";
-use Test::More tests => 13;
+use Test::More tests => 14;
 
 BEGIN {use_ok('MetNo::NcFind')};
 
@@ -32,6 +32,9 @@ is(scalar @dimensions, 3, "dimensions");
 my ($longRef, $latRef) = $nc->get_lonlats('lon', 'lat');
 ok(eq_array($longRef,[-180,0]), "longitude values");
 ok(eq_array($latRef, [60,90]), "latitude values");
+
+($longRef, $latRef) = $nc->get_lonlats('falselons', 'falselats');
+ok((@$longRef + @$latRef) == 0, "lons and lats empty on erroneous parameter");
 
 my @borderVals = sort {$a <=> $b} $nc->get_bordervalues("test");
 ok(eq_array(\@borderVals, [1,1,2,2,3,3,4,4]), "border-values including corners twice");
