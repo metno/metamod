@@ -102,7 +102,7 @@ sub globatt_value {
     eval {
         my $result = $ncref->getatt ($globattname);
         if (ref($result)) {
-            $retVal =  _decode($result->sclr);
+            $retVal =  $result->sclr; # scalar (numeric) value, don't decode
         } else {
             $retVal = _decode($result);
         }
@@ -137,7 +137,7 @@ sub att_value {
     	# don't care
     }
     if (ref($result)) {
-        return _decode($result->sclr);
+        return $result->sclr; # scalar (numeric) value, don't decode
     } else {
         return _decode($result);
     }
@@ -198,19 +198,19 @@ sub get_lonlats {
     my $valid_max_lon = 180.0;
     my $attlist_lon = $ncref->getattributenames($lon_name);
     if (grep($_ eq "valid_min", @$attlist_lon) > 0) {
-        $valid_min_lon = $ncref->getatt ("valid_min", $lon_name);
+        $valid_min_lon = $self->att_value($lon_name, "valid_min");
     }
     if (grep($_ eq "valid_max", @$attlist_lon) > 0) {
-        $valid_max_lon = $ncref->getatt ("valid_max", $lon_name);
+        $valid_max_lon = $self->att_value($lon_name, "valid_max");
     }
     my $valid_min_lat = -90.0;
     my $valid_max_lat = 90.0;
     my $attlist_lat = $ncref->getattributenames($lat_name);
     if (grep($_ eq "valid_min", @$attlist_lat) > 0) {
-        $valid_min_lat = $ncref->getatt ("valid_min", $lat_name);
+        $valid_min_lat = $self->att_value($lat_name, "valid_min");
     }
     if (grep($_ eq "valid_max", @$attlist_lat) > 0) {
-        $valid_max_lat = $ncref->getatt ("valid_max", $lat_name);
+        $valid_max_lat = $self->att_value($lat_name, "valid_max");
     }
     
     my $pdl_lon  = $ncref->get ($lon_name);
