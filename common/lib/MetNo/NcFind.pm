@@ -47,15 +47,15 @@ use UNIVERSAL qw();
 # if still errors, try encoding with utf8 ignoring errors
 #
 sub _utf8Iso8859_1Decode {
-	my $retVal = $_[0];
-	eval {$retVal = Encode::decode('utf8', $retVal, Encode::FB_CROAK)};
-	if ($@) {
-		eval {$retVal = Encode::decode('iso8859-1', $retVal, Encode::FB_CROAK)};
-		if ($@) {
-			$retVal = Encode::decode('utf8', $retVal);
-		} 
-	}
-	return $retVal;
+    my $retVal = $_[0];
+    eval {$retVal = Encode::decode('utf8', $retVal, Encode::FB_CROAK)};
+    if ($@) {
+        eval {$retVal = Encode::decode('iso8859-1', $retVal, Encode::FB_CROAK)};
+        if ($@) {
+            $retVal = Encode::decode('utf8', $retVal);
+        } 
+    }
+    return $retVal;
 }
 
 #   
@@ -77,13 +77,13 @@ sub new {
 
     die __PACKAGE__."::new requires ncFile as argument" unless $ncfile;    
     if (UNIVERSAL::isa($ncfile, 'PDL::NetCDF')) {
-    	$self->{NCOBJ} = $ncfile;
+        $self->{NCOBJ} = $ncfile;
     } else {
         # Open netCDF-file for reading
         $self->{NCOBJ} = PDL::NetCDF->new ($ncfile, {MODE => O_RDONLY, REVERSE_DIMS => 1});
     }
     unless (defined $self->{NCOBJ}) {
-    	return undef;
+        return undef;
     }
     return bless($self,$class);
 }
@@ -134,7 +134,7 @@ sub att_value {
     eval {
     	$result = $ncref->getatt($attname, $varname); 
     }; if ($@) {
-    	# don't care
+        # don't care
     }
     if (ref($result)) {
         return $result->sclr; # scalar (numeric) value, don't decode
