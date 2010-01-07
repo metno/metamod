@@ -37,7 +37,7 @@ use XML::LibXML;
 use XML::LibXSLT;
 use UNIVERSAL;
 
-our $VERSION = 0.3;
+our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 use constant DEBUG => 0;
 
 # single parser

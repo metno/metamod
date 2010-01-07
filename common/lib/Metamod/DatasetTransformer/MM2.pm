@@ -35,7 +35,7 @@ use warnings;
 use Carp qw(carp croak);
 use UNIVERSAL qw( );
 
-our $VERSION = 0.2;
+our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 
 sub originalFormat {
     return "MM2";

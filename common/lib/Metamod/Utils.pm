@@ -32,7 +32,7 @@ use base qw(Exporter);
 use strict; 
 use warnings;
 
-our $VERSION = 0.4;
+our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 
 our @EXPORT_OK = qw(findFiles isNetcdf trim getFiletype remove_cr_from_file);
 

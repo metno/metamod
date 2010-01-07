@@ -29,7 +29,7 @@
 
 package Metamod::Dataset;
 use base qw(Metamod::ForeignDataset);
-our $VERSION = 0.5;
+our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 
 use strict;
 use warnings;

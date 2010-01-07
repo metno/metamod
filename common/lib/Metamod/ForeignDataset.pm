@@ -27,7 +27,7 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #----------------------------------------------------------------------------
 package Metamod::ForeignDataset;
-our $VERSION = 0.5;
+our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 
 our $DEBUG = 0;
 

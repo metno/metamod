@@ -37,7 +37,7 @@ use Carp qw(carp croak);
 use 5.6.0;
 
 
-our $VERSION = 0.1;
+our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 my $config = new Metamod::Config();
 our $XSLT_FILE_MM2 = $config->get("SOURCE_DIRECTORY")."/common/schema/oldDataset2MM2.xslt";
 our $XSLT_FILE_DS =  $config->get("SOURCE_DIRECTORY")."/common/schema/oldDataset2Dataset.xslt";
