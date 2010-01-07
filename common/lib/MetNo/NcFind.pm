@@ -32,7 +32,7 @@ package MetNo::NcFind;
 use strict;
 use warnings;
 
-$MetNo::NcFind::VERSION = 0.04;
+$MetNo::NcFind::VERSION = do { my @r = (q$LastChangedRevision: 149 $ =~ /\d+/g); sprintf "0.%d", @r };
 
 
 use Fcntl qw(:DEFAULT);
