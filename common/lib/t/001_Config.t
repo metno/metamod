@@ -33,7 +33,7 @@ use warnings;
 use Data::Dumper;
 
 use lib "..";
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 BEGIN {use_ok('Metamod::Config');}
 
@@ -58,4 +58,11 @@ $config2 = new Metamod::Config();
 isa_ok($config2, 'Metamod::Config');
 ok($config2->get('TARGET_DIRECTORY'), 'get TARGET_DIRECTORY of default');
 
-
+my $cwd = Cwd::getcwd();
+chdir "/tmp";
+my $config3;
+eval {
+    $config3 = new Metamod::Config();    
+};
+isa_ok($config3, 'Metamod::Config');
+chdir $cwd;

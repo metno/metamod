@@ -37,8 +37,14 @@ use warnings;
 
 use File::Spec qw();
 use Cwd qw();
+# read ABS_PATH early, in case somebody uses a chdir
+use constant ABS_PATH => Cwd::abs_path(__FILE__);
+BEGIN {
+    die "cannot get abs_path from ".__FILE__ unless ABS_PATH;
+}
 
 our %_config; #_config{file} => $config
+
 
 sub new {
 	my ($class, $file) = @_;
@@ -64,7 +70,7 @@ sub new {
 
 # get the file in ../../master_config.txt
 sub _getDefaultConfigFile {
-    my ($vol, $dir, undef) = File::Spec->splitpath(Cwd::abs_path(__FILE__));
+    my ($vol, $dir, undef) = File::Spec->splitpath(ABS_PATH());
     my @dirs = File::Spec->splitdir($dir);
     pop @dirs; # remove last /
     print STDERR "dir of Metamod: ".scalar @dirs." ". File::Spec->catdir(@dirs). " $dir\n" if $DEBUG;
