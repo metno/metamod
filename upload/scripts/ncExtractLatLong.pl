@@ -32,7 +32,6 @@ use File::Spec;
 use PDL::NetCDF;
 use Fcntl qw(:DEFAULT);
 use File::Find;
-use MetNo::NcFind;
 use vars qw(%Args);
 
 # small routine to get lib-directories relative to the installed file
@@ -46,6 +45,7 @@ sub getTargetDir {
 # local libraries
 use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
 use Metamod::Dataset;
+use MetNo::NcFind;
 
 $Args{O} = 'http://damocles.met.no:8080/thredds/';
 $Args{D} = '/metno/damocles/data/';
@@ -63,14 +63,24 @@ foreach my $basename (@xmdFiles) {
     my $ncFile = extractNcFile($Args{O}, $Args{D}, $basename, $dataset) if $dataset;
     if ($ncFile) {
         print STDERR "working on $ncFile\n";
-        my ($latArray, $lonArray, $bb) = extractLatLong($ncFile);
+        my %lonLatInfo = extractLonLat($ncFile);
         my %info = $dataset->getInfo;
         open my $fh, ">$basename.xmlbb"
            or die "Cannot write $basename.xmlbb: $!";
         print $fh '<datasetRegion dataset="'.$info{name}.'">'."\n";
-        print $fh '<latitudeValues>'.join(" ", map {sprintf "%.3f", $_} @$latArray).'</latitudeValues>'. "\n" if @$latArray;
-        print $fh '<longitudeValues>'.join(" ", map {sprintf "%.3f", $_} @$lonArray).'</longitudeValues>'. "\n" if @$latArray;
-        print $fh '<boundingBox north="'.$bb->{north}.'" south="'.$bb->{south}.'" east="'.$bb->{east}.'" west="'.$bb->{west}.'" />'."\n" if scalar keys %$bb;
+        my $lonLatAdded;
+        foreach my $polygon (@{ $lonLatInfo{polygons} }) {
+            print $fh '<lonLatPolygon>'."\n";
+            print $fh join ',', map {sprintf "%.3f %.3f", @$_} @$polygon;
+            print $fh '</lonLatPolygon>'."\n";
+        }
+        if (@{ $lonLatInfo{points} }) {
+            print $fh '<lonLatPoints>'."\n";
+            print $fh join ',', map {sprintf "%.3f %.3f", @$_} @{$lonLatInfo{points}};
+            print $fh '</lonLatPoints>'."\n";            
+        }
+        my $bb = $lonLatInfo{boundingBox};
+        print $fh '<boundingBox north="'.$bb->{north}.'" south="'.$bb->{south}.'" east="'.$bb->{east}.'" west="'.$bb->{west}.'" />'."\n" if (scalar keys %$bb == 4);
         print $fh '</datasetRegion>'."\n";
         close $fh;
     }
@@ -106,15 +116,21 @@ sub extractNcFile {
     return $ncFile;
 }
 
-# extract lat/long from the used latitude/longitude variables
-# return list of latitude/longitude, and bb if southernmost, easternmost, westernmost, and nothernmost global attributes
-# are given
-# return \@lat, \@lon, '%boundingBox {east,north,west, south}'
-sub extractLatLong {
+# extract lat/lon information as polygons or points from the used latitude/longitude variables
+# given as CF convention
+# extracts also bounding-box if given as global northernmost_latitude, ...
+# return (errors      => \@errors,
+#         polygons    => \@lonLatPolygons,
+#         points      => \@lonLatPoints,
+#         boundingBox => \%boundingBox{east,north,west, south});
+sub extractLonLat {
     my ($ncFile) = @_;
     my $nc = new MetNo::NcFind($ncFile);
 
     my %boundingBox;
+    my @lonLatPolygons;
+    my @lonLatPoints;
+    my @errors;
     my %globAtt = map {$_ => 1} $nc->globatt_names;
     if (exists $globAtt{northernmost_latitude} &&
         exists $globAtt{southernmost_latitude} &&
@@ -127,47 +143,109 @@ sub extractLatLong {
         $boundingBox{east} = $nc->globatt_value('easternmost_longitude');
     }
     # find latitude/longitude variables (variables with units degree(s)_(north|south|east|west))    
-    my @latVars = $nc->findVariablesByAttributeValue('units', qr/degrees?_(north|south)/);
-    my @lonVars = $nc->findVariablesByAttributeValue('units', qr/degrees?_(east|west)/);    
+    my %latDims = map {$_ => 1} $nc->findVariablesByAttributeValue('units', qr/degrees?_(north|south)/);
+    my %lonDims = map {$_ => 1} $nc->findVariablesByAttributeValue('units', qr/degrees?_(east|west)/);    
+
+
+    # lat/lon pairs can, according to CF-1.3 belong in differnt ways to a variable
+    # a) var(lat,lon), lat(lat), lon(lon) (CF-1.3, 5.1)
+    # b) var(x,y), var:coordinates = "lat lon ?", lat(x,y), lon(x,y) (CF-1.3, 5.2, 5.6)
+    # c) var(t), var:coordinates = "lat lon ?", lat(t), lon(t) (CF-1.3, 5.3-5.5)
+    #
+    # a) and b) will be translated to a polygon describing the outline
+    # c) will be translated to a list of lat/lon points
     
-    # get the coordinates values to find lat/lon pairs
-    my @coordVars = $nc->findVariablesByAttributeValue('coordinates', qr/.*/);
-    my %coords;
-    foreach my $coordVar (@coordVars) {
-        $coords{$nc->att_value($coordVar, 'coordinates')}++;
+    # find variables directly related to each combination of lat/lon (a)
+    my @lonLatCombinations;
+    foreach my $lat (keys %latDims) {
+        foreach my $lon (keys %lonDims) {
+            push @lonLatCombinations, [$lon,$lat];
+        }
     }
-    my %latVars = map {$_ => 1} @latVars;
-    my %lonVars = map {$_ => 1} @lonVars;
-    my @latLonPairs;
-    foreach my $coord (keys %coords) {
-        my @coordVars = split ' ', $coord;
-        foreach my $coordVar (@coordVars) {
-            # get the latitude and longitude variables of the coordinates
-            my @lats = grep {$_ eq $coordVar} keys %latVars;
-            my @lons = grep {$_ eq $coordVar} keys %lonVars;
-            if (@lats == 0 or @lons == 0) {
-                next;
-            } elsif (@lats > 1 or @lons > 1) {
-                warn "found several lat/lon coordinates in $ncFile\n";
+    my @lonLatDimVars;
+    my @usedLonLatCombinations;
+    my @unUsedLonLatCombinations;
+    foreach my $llComb (@lonLatCombinations) {
+        my @llDimVars = $nc->findVariablesByDimensions($llComb);
+        if (@llDimVars) {
+            push @lonLatDimVars, @llDimVars;  
+            push @usedLonLatCombinations, $llComb;
+        } else {
+            push @unUsedLonLatCombinations, $llComb;
+        }
+    }
+    foreach my $llCom (@usedLonLatCombinations) {
+        # build a polygon around all outer points
+        my @lons = $nc->get_values($llCom->[0]);
+        my @lats = $nc->get_values($llCom->[1]);
+        if (@lons && @lats) {
+            my @polygon;
+            push @polygon, map{[$_, $lats[0]]} @lons;
+            push @polygon, map{[$lons[-1], $_]} @lats;
+            push @polygon, map{[$_, $lats[-1]]} reverse @lons;
+            push @polygon, map{[$lons[0], $_]} reverse @lats;
+            push @lonLatPolygons, \@polygon;            
+        }
+    }
+    
+    # get the coordinates values to find lat/lon pairs (b and c)
+    my @coordVars = $nc->findVariablesByAttributeValue('coordinates', qr/.*/);
+    # remove the variables already detected as class a)
+    my %lonLatDimVars = map {$_ => 1} @lonLatDimVars;
+    @coordVars = map {exists $lonLatDimVars{$_} ? () : $_} @coordVars;
+
+    my @lonLatCoordinates;
+    foreach my $coordVar (@coordVars) {
+        my @coordinates = split ' ', $nc->att_value($coordVar, 'coordinates');
+        my %coordinates = map {$_ => 1} @coordinates;
+        my @tempUnusedLonLatCombinations = @unUsedLonLatCombinations;
+        @unUsedLonLatCombinations = ();
+        foreach my $llComb (@tempUnusedLonLatCombinations) {
+            if (exists $coordinates{$llComb->[0]} and
+                exists $coordinates{$llComb->[1]}) {
+                push @lonLatCoordinates, $llComb;
+                push @usedLonLatCombinations, $llComb;    
             } else {
-                push @latLonPairs, [$lats[0], $lons[0]];
-                # remove the lat/lon pair
-                delete $latVars{$lats[0]};
-                delete $lonVars{$lons[0]};
+                push @unUsedLonLatCombinations, $llComb;
             }
         }
     }
-    if (scalar keys %latVars == 1 and scalar keys %lonVars == 1) {
-        # on lat/lon pair left, just add
-        push @latLonPairs, [keys %latVars, keys %lonVars];
+    foreach my $llCoord (@lonLatCoordinates) {
+        # $llCoord is a used lon/lat combination for case b and c
+        # use case b if lat and lon are 2d, case c for 1d
+        my $lonName = $llCoord->[0];
+        my $latName = $llCoord->[1];
+        my @latDims = $nc->dimensions($latName);
+        my @lonDims = $nc->dimensions($lonName);
+        if (@latDims != @lonDims) {
+            my $msg = "number $latName dimensions (@latDims) != $lonName dimensions (@lonDims), skipping ($latName,$lonName)"; 
+            warn $msg;
+            push @errors, $msg;
+        } elsif (1 == @latDims) {
+            # case c)
+            my ($lons, $lats) = $nc->get_lonlats($lonName, $latName);
+            while (@$lons) {
+                push @lonLatPoints, [shift @$lons, shift @$lats];
+            }
+        } elsif (2 == @latDims) {
+            # case b)
+            my @lonBorders = $nc->get_bordervalues($lonName);
+            my @latBorders = $nc->get_bordervalues($latName);
+            if (scalar @lonBorders == scalar @latBorders) {
+                my @polygon = map {[$_, shift @latBorders]} @lonBorders;
+                push @lonLatPolygons, \@polygon;
+            } else {
+                my $msg = "$latName dimension ".(scalar @latBorders)." != $lonName dimensions ".(scalar @lonBorders).", skipping";
+                warn $msg;
+                push @errors, $msg;
+            } 
+        } else {
+            my $msg = "$latName and $lonName are of dimension ".(scalar @latDims). ". Don't know what to do, skipping.";
+            warn $msg;
+            push @errors, $msg;
+        }
     }
-    # make a long list of lats and longs
-    my (@lat, @lon);
-    foreach my $latLonPair (@latLonPairs) {
-        my ($llon, $llat) = $nc->get_lonlats($latLonPair->[1], $latLonPair->[0]);
-        push @lat, @$llat;
-        push @lon, @$llon;
-    }
-    return (\@lat, \@lon, \%boundingBox);	
+    
+    return (errors => \@errors, polygons => \@lonLatPolygons, points => \@lonLatPoints, boundingBox => \%boundingBox);
 }
 

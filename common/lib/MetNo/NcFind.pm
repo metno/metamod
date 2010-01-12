@@ -154,6 +154,11 @@ sub dimensions {
 sub get_bordervalues {
     my ($self, $varname) = @_;
 
+    my @dims = $self->dimensions($varname);
+    if (@dims != 2) {
+        die "get_bordervalues requires variable to be of dim 2, found $varname(@dims)\n";
+    }
+
     my $ncref = $self->{NCOBJ};
     # Get the values of a  netCDF variable as PDL object
     # Resulting PDL object: $pdl1. NetCDF object: $ncref,
@@ -248,6 +253,23 @@ sub findVariablesByAttributeValue {
     return @outVars;
 }
 
+sub findVariablesByDimensions {
+    my ($self, $dimRef) = @_;
+    my %dims = map {$_ => 1} @$dimRef;
+    my @outVars;
+    foreach my $var ($self->variables) {
+        my $foundDims = 0;
+        foreach my $vDim ($self->dimensions($var)) {
+            $foundDims++ if exists $dims{$vDim};             
+        }
+        if ($foundDims == scalar keys %dims) {
+            # all requested dims found
+            push @outVars, $var;
+        }
+    }
+    return @outVars;
+}
+
 1;
 __END__
 =head1 NAME
@@ -274,6 +296,7 @@ MetNo::NcFind - access and search variables and attributes in a Nc-File
   my ($longRef, $latRef) = $nc->get_lonlats('longitude', 'latitude');
 
   my @vars = $nc->findVariablesByAttributeValue('units', qr/degrees?_(north|east)/);
+  my @lonLatVars = $nc->findVariablesByDimensions(['lon','lat']);
 
 =head1 DESCRIPTION
 
@@ -312,6 +335,11 @@ Returns undef if variable or attribute don't exist.
 
 get a list of variables containing a attribute that matches $pattern. $pattern
 should be a compiled regex, i.e. qr//;
+
+=item findVariablesByDimensions(\@dimNameList)
+
+get a list of all variables containing at least the applied dimension-names. Gives all
+variables if @dimNameList is empty.
 
 =item dimensions($varName)
 
