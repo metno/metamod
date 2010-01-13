@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use lib "..";
-use Test::More tests => 20;
+use Test::More tests => 23;
 
 BEGIN {use_ok('MetNo::NcFind')};
 
@@ -42,9 +42,15 @@ ok(eq_array(\@latLonVars, ['test','test2']), "finding var(lat,lon,??) variables"
 my @lonVars = sort $nc->findVariablesByDimensions(['lon']);
 ok(eq_array(\@lonVars, ['lon', 'test', 'test2']), "finding var('lon') variables");
 
-my @dimensions = $nc->dimensions("test");
-is(scalar @dimensions, 3, "dimensions");
-  
+my @dimensions = $nc->dimensions("test2");
+is(scalar @dimensions, 2, "dimensions");
+
+my @allDims = $nc->dimensions();
+is(scalar @allDims, 3, "all dimensions");
+
+is($nc->dimensionSize('lat'), 2, "lat dimsize");
+is($nc->dimensionSize('time'), 1, "time dimsize"); 
+
 my ($longRef, $latRef) = $nc->get_lonlats('lon', 'lat');
 ok(eq_array($longRef,[-180,0]), "longitude values");
 ok(eq_array($latRef, [60,90]), "latitude values");

@@ -151,6 +151,11 @@ sub dimensions {
     return _decode(@{$ncref->getdimensionnames($varname)});
 }
 
+sub dimensionSize {
+    my ($self, $dimName) = @_;
+    return $self->{NCOBJ}->dimsize($dimName);
+}
+
 sub get_bordervalues {
     my ($self, $varname) = @_;
 
@@ -343,7 +348,12 @@ variables if @dimNameList is empty.
 
 =item dimensions($varName)
 
-get a list of dimension-names belonging to variable $varName
+get a list of dimension-names belonging to variable $varName. If varName is missing, lists
+alls dimensions of the file.
+
+=item dimensionSize($dimName)
+
+get the integer size of the dimension $dimName
 
 =item get_bordervalues($varName)
 
