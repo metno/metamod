@@ -47,7 +47,7 @@ use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
 use Metamod::Dataset;
 use MetNo::NcFind;
 
-$Args{O} = 'http://damocles.met.no:8080/thredds/';
+$Args{O} = 'http://thredds.met.no/thredds/';
 $Args{D} = '/metno/damocles/data/';
 getopts('x:O:D:h', \%Args) or pod2usage(2);
 pod2usage(-exitval => 0,
@@ -80,7 +80,9 @@ foreach my $basename (@xmdFiles) {
             print $fh '</lonLatPoints>'."\n";            
         }
         my $bb = $lonLatInfo{boundingBox};
-        print $fh '<boundingBox north="'.$bb->{north}.'" south="'.$bb->{south}.'" east="'.$bb->{east}.'" west="'.$bb->{west}.'" />'."\n" if (scalar keys %$bb == 4);
+        if (scalar keys %$bb == 4) {
+            printf $fh '<boundingBox north="%.3f" south="%.3f" east="%.3f" west="%.3f" />'."\n", @$bb{qw(north south east west)};
+        }
         print $fh '</datasetRegion>'."\n";
         close $fh;
     }
@@ -123,9 +125,19 @@ sub extractNcFile {
 #         polygons    => \@lonLatPolygons,
 #         points      => \@lonLatPoints,
 #         boundingBox => \%boundingBox{east,north,west, south});
+# TODO: better check for valid lon/lat values
 sub extractLonLat {
     my ($ncFile) = @_;
     my $nc = new MetNo::NcFind($ncFile);
+    my @dimNames = $nc->dimensions;
+    my $realDims = 0;
+    foreach my $dim (@dimNames) {
+        if ($nc->dimensionSize($dim) > 1) {
+            # netcdf-files might be data-deleted by metamod, that is
+            # all dimensions are set to 0 (unlimited) or 1
+            $realDims++;
+        }
+    }
 
     my %boundingBox;
     my @lonLatPolygons;
@@ -142,6 +154,12 @@ sub extractLonLat {
        	$boundingBox{west} = $nc->globatt_value('westernmost_longitude');
         $boundingBox{east} = $nc->globatt_value('easternmost_longitude');
     }
+    
+    if ($realDims == 0) {
+        # no dimensions => no polygons/points, return here
+        return (errors => \@errors, polygons => \@lonLatPolygons, points => \@lonLatPoints, boundingBox => \%boundingBox);
+    }
+
     # find latitude/longitude variables (variables with units degree(s)_(north|south|east|west))    
     my %latDims = map {$_ => 1} $nc->findVariablesByAttributeValue('units', qr/degrees?_(north|south)/);
     my %lonDims = map {$_ => 1} $nc->findVariablesByAttributeValue('units', qr/degrees?_(east|west)/);    
@@ -209,6 +227,15 @@ sub extractLonLat {
                 push @unUsedLonLatCombinations, $llComb;
             }
         }
+    }
+    if (@usedLonLatCombinations == 0 and @unUsedLonLatCombinations > 0) {
+        # wrong netcdf-file? Forgotten coordinates?
+        my $llComb = shift @unUsedLonLatCombinations;
+        my $message = sprintf "Couldn't detect Longitude Latitude combination, missing coordinates? Trying (%s,%s)", @$llComb;
+        warn $message. "\n";
+        push @errors, $message;
+        push @usedLonLatCombinations, $llComb;
+        push @lonLatCoordinates, $llComb;
     }
     foreach my $llCoord (@lonLatCoordinates) {
         # $llCoord is a used lon/lat combination for case b and c

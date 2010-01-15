@@ -4,29 +4,89 @@ use warnings;
 use XML::LibXML;
 use DBI;
 use Geo::Proj4;
+use File::Find;
 
-my $file = '/disk1/damocles/testXML/DAMOC/iceconc/iceconc_2009-01.xmlbb';
+my $xmlDir = '/disk1/damocles/testXML/';
 
 # get longitude/latitude from file
 my $parser = new XML::LibXML;
-my $xml = $parser->parse_file($file);
-my $dataset = $xml->find('/datasetRegion/@dataset')->item(0)->value;
-print STDERR $dataset, "\n";
-my $latNode = $xml->findnodes('/datasetRegion/latitudeValues')->item(0);
-my @latValues = split ' ', $latNode->textContent;
-my $lonNode = $xml->findnodes('/datasetRegion/longitudeValues')->item(0);
-my @lonValues = split ' ', $lonNode->textContent;
 
-unless (scalar @latValues == scalar @lonValues) {
-    die "problems reading ".(scalar @latValues). " latitude values and ".
-        (scalar @lonValues)." longitude values\n";
-}
 
 # connect to testgis database
 my $dbh = DBI->connect("dbi:Pg:dbname=testgis;host=localhost;port=15432", "", "", {'AutoCommit' => 0, 'RaiseError' => 1});
+my $geomInsert = $dbh->prepare("INSERT INTO dataset_location (ds_name, the_geom_ps) VALUES (?,ST_TRANSFORM(ST_GeomFromText(?,4035), 93413))");
 
-# upload data, convert data from lon/lat in WGS84 (4035) to polar-stereographic, WGS84, lat0 = 70 (93413)
+
 my $time0 = time;
+
+find(\&wanted, $xmlDir);
+
+$dbh->commit;
+print STDERR "insert polygon/points in ", (time - $time0), "s\n";
+
+sub wanted {
+    if (/.xmlbb$/ && -f $_) {
+        print STDERR "$File::Find::name\n";
+        geomToDb($File::Find::name);
+    }
+}
+
+sub geomToDb {
+    my ($file) = @_; 
+    my @points;
+    
+    my $xml = $parser->parse_file($file);
+
+    my $dataset = $xml->find('/datasetRegion/@dataset')->item(0)->value;
+    foreach my $node ($xml->findnodes('/datasetRegion/lonLatPoint')) {
+        push @points, $node->textContent;
+    }
+    my @polygons;
+    foreach my $node ($xml->findnodes('/datasetRegion/lonLatPolygon')) {
+        push @polygons, $node->textContent;
+    }
+    # add boundingbox if no other data 
+    if (@polygons == 0 and @points == 0) {
+        my %bb;
+        foreach my $node ($xml->findnodes('/datasetRegion/boundingBox')) {
+            map {$bb{$_->name} = $_->value} $node->attributes;
+        }
+        if (exists $bb{west} and exists $bb{south} and exists $bb{north} and exists $bb{east}) {
+            foreach my $var (keys %bb) {
+                $bb{$var} = sprintf "%.3f", $bb{$var}; # math representation
+            }
+            my $polygon = "$bb{west} $bb{south},$bb{west} $bb{north},$bb{east} $bb{north},$bb{east} $bb{south},$bb{west} $bb{south}";
+            push @polygons, $polygon;
+        }
+    }
+
+    # upload data, convert data from lon/lat in WGS84 (4035) to polar-stereographic, WGS84, lat0 = 70 (93413)
+    foreach my $poly (@polygons) {
+        my $invalid = 0;
+        map {if ($_ and ($_ > 180 or $_ < -180)) {$invalid++}} split /[,\s+]/, $poly;
+        if ($invalid == 0) { 
+            $geomInsert->execute($dataset, 'POLYGON(('.$poly.'))');
+        } else {
+            print STDERR "invalid polygon: $poly\n";
+        }
+    }
+    foreach my $pointSet (@points) {
+        my @points;
+        foreach my $p (split ',', $pointSet) {
+            my ($lon, $lat) = split ' ', $p;
+            if ($lon <= 180 and $lon >= -180 and $lat <= 90 and $lat >= -90) {
+                push @points, sprintf ("(%.3f %.3f)", $lon, $lat);
+            }
+        }
+        if (@points) {
+            my $multipoint = 'MULTIPOINT('. join(',',@points) .')';
+            $geomInsert->execute($dataset, $multipoint);
+        }
+    }
+}
+
+
+__END__
 # postgis transform (2mio points): 881s
 #my $insert = $dbh->prepare("INSERT INTO dataset_location (ds_id, point_ps) VALUES (1, ST_TRANSFORM(ST_SetSRID(ST_MAKEPOINT(?,?),4035), 93413))");
 # geo::proj4 transform: 515s; 417s without gist index
