@@ -38,6 +38,7 @@
 #  page is produced for the operator confirming that the approvement actions
 #  has been performed.
 #
+   $debug = $mmConfig->getVar('DEBUG');
    include "../upl/funcs.inc";
    print_r($_GET);
    $normemail = $_GET["em"];
