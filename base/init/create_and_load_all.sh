@@ -1,4 +1,8 @@
 #!/bin/sh
+IMP=import
+if [ $# -eq 1 ]; then
+   IMP=$1
+fi
 PSQL=psql
 CREATEDB=createdb
 DROPDB=dropdb
@@ -15,7 +19,9 @@ cd ../staticdata
 cat >t_1 <<EOF
 [==IMPORTDIRS==]
 EOF
-for dir in `cat t_1`; do
-   ../scripts/import_dataset.pl $dir
-done
+if [ $IMP != "noimport" ]; then
+   for dir in `cat t_1`; do
+      ../scripts/import_dataset.pl $dir
+   done
+fi
 rm t_1

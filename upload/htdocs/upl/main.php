@@ -82,6 +82,8 @@ include_once("../funcs/mmConfig.inc");
          include 'BTN_retr_dir.php';
       } else if ($submit == 'BTN_creupd_dir') {
          include 'BTN_creupd_dir.php';
+      } else if ($submit == 'BTN_cancel_dir') {
+         include 'BTN_adm.php';
       } else if ($submit == 'BTN_upl') { // The user has pushed the "Upload file" link
          include 'BTN_upl.php';
       } else if ($submit == 'BTN_tfile') { // The user has pushed the "Test a file" link
@@ -89,6 +91,9 @@ include_once("../funcs/mmConfig.inc");
       } else if ($submit == 'BTN_filetest') { // The user has loaded a file for testing
          include 'BTN_dotest.php';
       } else if ($submit == 'BTN_newsession') { // The user has entered from index.php
+         if ($debug) {
+            mmPutTest("--------- User entered from index.php");
+         }
          $nextpage = 1;
          $errmsg = "";
       } else if ($submit == 'BTN_editproj_dir') { // The user has pushed the 'Edit projection' on admin page
@@ -100,6 +105,9 @@ include_once("../funcs/mmConfig.inc");
       } else if ($submit == 'BTN_writeWMS_dir') { // The user has pushed the 'Apply' on the projEdit.php
       	include 'BTN_writeWMS_dir.php';
       } else if ($submit == 'BTN_logout') { // The user has pushed the "Log out" button
+         if ($debug) {
+            mmPutTest("--------- User pushed Log out");
+         }
          $normemail = conditional_decode($_POST["normemail"]);
          $sessioncode = conditional_decode($_POST["sessioncode"]);
          $runpath = mmGetRunPath();

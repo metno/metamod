@@ -60,7 +60,7 @@ require_once("../funcs/mmConfig.inc");
             <table cellpadding="0" cellspacing="0">
                <tr>
                   <td>
-                     <p class="heading"><?php $mmConfig->getVar('UPLOAD_APP_TITLE'); ?></p>
+                     <p class="heading"><?php echo $mmConfig->getVar('UPLOAD_APP_TITLE'); ?></p>
                      <p class="heading_info">
 <?php echo $mmConfig->getVar('UPLOAD_APP_LOGIN_TEXT'); ?>
 <br /><br />

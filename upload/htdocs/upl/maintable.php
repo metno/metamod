@@ -28,6 +28,7 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
 #----------------------------------------------------------------------------
 require_once("../funcs/mmConfig.inc"); 
+$external_repository = (strtolower($mmConfig->getVar('EXTERNAL_REPOSITORY')) == "true");
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -59,9 +60,11 @@ require_once("../funcs/mmConfig.inc");
             <?php
                echo '<a class="mm_item" href="adm.php?sessioncode=' .
                   $sessioncode . '&normemail=' . $normemail . '">Administration</a>' . "\n";
-            ?>
-            <p class="xmm_item">Upload files</p>
-            <?php
+               if ($external_repository) {
+                  echo '<p class="xmm_item">Files</p>';
+               } else {
+                  echo '<p class="xmm_item">Upload files</p>';
+               }
                echo '<a class="mm_item" href="tfile.php?sessioncode=' .
                   $sessioncode . '&normemail=' . $normemail . '">Test a file</a>' . "\n";
                echo '<a class="mm_item" href="start.php?sessioncode=' .
@@ -91,10 +94,14 @@ require_once("../funcs/mmConfig.inc");
       <tr>
          <td colspan="2">
    <div class="loginform" style="border-left: 1px solid #4d4d8d;">
-   <h3>Upload file</h3>
-   <p>Use the "File name" entry or the "Browse..." button below to enter the name of
-   a file on your local file system that you want to upload to the <?php echo $mmConfig->getVar('APPLICATION_NAME'); ?> data repository.</p>
-   <p>Normally, the file should be a netCDF file (or another format accepted in the repository).
+   <?php
+      $application_name = $mmConfig->getVar('APPLICATION_NAME');
+      $maxsize = $mmConfig->getVar('MAX_UPLOAD_SIZE_BYTES')/1000000;
+      if (! $external_repository) {
+         echo <<<EOF
+   <h3>File format</h3>
+   <p>Normally, a file to be uploaded should be a netCDF file (with a ".nc" file extention),
+   or the equivalent CDL variant (".cdl" extention).
    However, if you have a large number of small files, you may pack the files into an archive
    file. Then you upload the archive file</p>
    <p>The following archive formats are accepted:</p>
@@ -105,17 +112,8 @@ require_once("../funcs/mmConfig.inc");
    <tr><td align="left">Compressed tar (gzip)</td><td align="left">.tgz or .tar.gz</td></tr>
    </table>
    </div>
-   <p>You may also re-upload a previously uploaded file. The files previously uploaded are
-   shown in the table below. If the file to be uploaded should replace any of these files,
-   please check the file name by using the radio button in the leftmost table column.</p>
-   <p>Finally, push the "Upload" button to initiate the actual upload.</p>
-   <p><b>Note:</b> Files to be uploaded must not exceed a size limit of
-   <?php $maxsize = $mmConfig->getVar('MAX_UPLOAD_SIZE_BYTES')/1000000; echo $maxsize; ?>
-   MB.
-   Only alphanumeric characters, underline (_), period (.) and hyphens (-)
-   are allowed in file names. The initial part of a file name must be the name of a
-   user directory followed by underline (_).</p>
-    <?php
+EOF;
+      }
          $metadataQuest = $mmConfig->getVar('QUEST_METADATA_UPLOAD_FORM');
          $userinfo = get_userinfo($filepath);
     	 if (!array_key_exists("institution",$userinfo)) {
@@ -127,7 +125,7 @@ require_once("../funcs/mmConfig.inc");
        		$institution = $userinfo["institution"];
     	 }
          
-         echo '<p>The table below shows all the directories owned by you.</p>' . "\n";
+         echo '<h3>Directories owned by you</h3>' . "\n";
      	 if (strlen($metadataQuest) > 0) {
             $warning_text = <<<EOF
     <p><b>Note</b>: You may edit the metadata for a directory dataset by clicking one
@@ -136,7 +134,7 @@ require_once("../funcs/mmConfig.inc");
 EOF;
             echo $warning_text;
          }
-         echo '<table border="0" cellspacing="20">' . "\n";
+         echo '<table border="0" cellspacing="1">' . "\n";
          $dirinfo_sorted = $dirinfo;
          ksort($dirinfo_sorted);
          $colcount = floor(count($dirinfo_sorted) / 3);
@@ -185,13 +183,27 @@ EOF;
    ?>
    page.</p>
 
-   <form enctype="multipart/form-data" action="main.php" method="post">
-   <p>
-      <input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $mmConfig->getVar('MAX_UPLOAD_SIZE_BYTES'); ?>" />
-      <?php
-         echo '<input type="hidden" name="normemail" value="' . $normemail . '" />' . "\n";
-         echo '<input type="hidden" name="sessioncode" value="' . $sessioncode . '" />' . "\n";
-      ?>
+   <?php
+   if (! $external_repository) {
+      $max_upload_size_bytes = $mmConfig->getVar('MAX_UPLOAD_SIZE_BYTES');
+      echo <<<EOF
+      <h3>Upload file</h3>
+      <p>Use the "Browse..." button below to enter the name of a file on your local file system
+      that you want to upload to the $application_name data repository.</p>
+      <p>You may also re-upload a previously uploaded file. The files previously uploaded are
+      shown in the table <b>Previously uploaded files</b> below. If the file to be uploaded should
+      replace any of these files,
+      please check the file name by using the radio button in the leftmost table column.</p>
+      <p>Finally, push the "Upload" button to initiate the actual upload.</p>
+      <p><b>Note:</b> Files to be uploaded must not exceed a size limit of $maxsize MB.
+      Only alphanumeric characters, underscore (_), period (.) and hyphens (-)
+      are allowed in file names. <b>The initial part of a file name must be the name of a
+      user directory followed by an underscore (_)</b>.</p>
+      <form enctype="multipart/form-data" action="main.php" method="post">
+      <p>
+      <input type="hidden" name="MAX_FILE_SIZE" value="$max_upload_size_bytes" />
+      <input type="hidden" name="normemail" value="$normemail" />
+      <input type="hidden" name="sessioncode" value="$sessioncode" />
       You may upload files to directories not owned by you (even directories owned by another
       institution). In that case you must obtain the directory key from the owner of the
       directory, and fill it into the entry field below. Otherwise, you should leave the directory
@@ -199,17 +211,24 @@ EOF;
       Directory key: <input name="dirkey" value="" size="10" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       File name: <input name="fileinfo" type="file" />
       <input class="selectbutton1" type="submit" name="BTN_upload" value="Upload" />
-   </p>
-   <h3>Previously uploaded files</h3>
-   <input type="radio" name="selrec" value="-1" checked /> Upload a new file
+      </p>
+      <h3>Previously uploaded files</h3>
+      <input type="radio" name="selrec" value="-1" checked /> Upload a new file
+EOF;
+   } else {
+      echo <<<EOF
+      <h3>Previously registered files</h3>
+EOF;
+   }
+   ?>
    <table border="1" bgcolor="white" cellspacing="0" cellpadding="8" width="100%">
-      <colgroup width="6%" />
+      <?php if (! $external_repository) { echo '<colgroup width="6%" />';} ?>
       <colgroup width="37%" />
       <colgroup width="10%" />
       <colgroup width="37%" />
       <colgroup width="10%" />
       <tr>
-         <th>Replace</th>
+         <?php if (! $external_repository) { echo '<th>Replace</th>';} ?>
          <th>File name</th>
          <th>Size</th>
          <th>Status</th>
@@ -219,7 +238,9 @@ EOF;
          $recnum = 0;
          foreach ($filecontent as $filerec) {
             echo "<tr>\n";
-            echo '<td><input type="radio" name="selrec" value="' . $recnum++ . '" />' . "\n";
+            if (! $external_repository) {
+               echo '<td><input type="radio" name="selrec" value="' . $recnum++ . '" />' . "\n";
+            }
             echo '<td>' . $filerec["name"] . '</td>' . "\n";
             echo '<td>' . $filerec["size"] . '</td>' . "\n";
             echo '<td>' . $filerec["status"] . '</td>' . "\n";

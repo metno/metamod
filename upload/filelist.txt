@@ -15,6 +15,7 @@
 =htdocs/upl/mainadm.php
 =htdocs/upl/main.php
 =htdocs/upl/maintable.php
+=htdocs/upl/newfiles.php
 =htdocs/upl/newuserok.php
 =htdocs/upl/newuser.php
 =htdocs/upl/projEdit.php
@@ -31,6 +32,8 @@
 =scripts/ncExtractLatLong.pl
 =scripts/print_usererrors.pl
 =scripts/upload_monitor.pl
+=scripts/upload_indexer.pl
+=scripts/Uploadutils.pm
 =scripts/show_time_now.pl
 =scripts/createChildDatasets.pl
 =etc/standard_name.txt

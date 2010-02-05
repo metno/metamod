@@ -31,6 +31,9 @@
 <?php
  // The user has pushed the "Upload file" link
  //
+ if ($debug) {
+    mmPutTest("--------- User pushed Upload file");
+ }
  $nextpage = 2;
  check_credentials(); // Sets $error, $errmsg, $nextpage, $normemail, $sessioncode,
                       // $runpath, $filepath and $filecontent (globals).

@@ -48,7 +48,7 @@ start() {
       > [==WEBRUN_DIRECTORY==]/userlog
       chmod 666 [==WEBRUN_DIRECTORY==]/userlog
    fi
-   if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" -a -r $target_directory/scripts/upload_monitor.pl ]; then
+   if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" -a "[==EXTERNAL_REPOSITORY==]" != "true" -a -r $target_directory/scripts/upload_monitor.pl ]; then
       if ! running $upload_monitor_pid; then
          work_directory=$webrun_directory/upl/work
          work_expand=$work_directory/expand

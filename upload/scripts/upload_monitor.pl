@@ -41,7 +41,7 @@ sub getTargetDir {
     return File::Spec->catpath($vol, $dir, "");
 }
 
-use lib ('../../common/lib', getTargetDir('lib'));
+use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'));
 
 use File::Copy;
 use File::Path;
@@ -51,8 +51,32 @@ use Data::Dumper;
 use Mail::Mailer;
 use mmTtime;
 use Metamod::Utils qw(findFiles getFiletype remove_cr_from_file);
-use Metamod::Config;
-my $config = new Metamod::Config();
+use Uploadutils qw(notify_web_system
+                   get_dataset_institution
+                   shcommand_scalar
+                   shcommand_array
+                   get_basenames
+                   intersect
+                   union
+                   subtract
+                   get_date_and_time_string
+                   string_found_in_file
+                   syserror
+                   $config
+                   $progress_report
+                   $webrun_directory
+                   $work_directory
+                   $uerr_directory
+                   $upload_ownertag
+                   $application_id
+                   $xml_directory
+                   $target_directory
+                   $opendap_directory
+                   $opendap_url
+                   $days_to_keep_errfiles
+                   $local_url
+                   $shell_command_error
+                   @user_errors);
 $| = 1;
 #
 #  upload_monitor.pl
@@ -183,24 +207,14 @@ $| = 1;
 our $SIG_TERM = 0;
 sub sigterm {++$SIG_TERM;}
 $SIG{TERM} = \&sigterm;
+#
 
-my $progress_report = $config->get("TEST_IMPORT_PROGRESS_REPORT"); # If == 1, prints what
-                                                         # is going on to stdout
 my $ftp_dir_path = $config->get('UPLOAD_FTP_DIRECTORY');
 my $upload_dir_path = $config->get('UPLOAD_DIRECTORY');
-my $webrun_directory = $config->get('WEBRUN_DIRECTORY');
-my $work_directory = $webrun_directory . "/upl/work";
-my $uerr_directory = $webrun_directory . "/upl/uerr";
 my $work_expand = $work_directory . "/expand";
 my $work_flat = $work_directory . "/flat";
 my $work_start = $work_directory . "/start";
-my $upload_ownertag = $config->get('UPLOAD_OWNERTAG');
-my $application_id = $config->get('APPLICATION_ID');
-my $xml_directory = $webrun_directory . '/XML/' . $application_id;
 my $xml_history_directory = $webrun_directory . '/XML/history';
-my $target_directory = $config->get('TARGET_DIRECTORY');
-my $opendap_directory = $config->get('OPENDAP_DIRECTORY');
-my $opendap_url = $config->get('OPENDAP_URL');
 my $sleeping_seconds = 60;
 if ($config->get('TEST_IMPORT_SPEEDUP') and $config->get('TEST_IMPORT_SPEEDUP') > 1) {
    $sleeping_seconds = 1;
@@ -210,24 +224,18 @@ my %all_ftp_datasets;     # Initialized in sub read_ftp_events. For each dataset
                           # found in the ftp_events file, this hash contains the
                           # number of days to keep the files in the repository.
                           # If this number == 0, the files are kept indefinitely.
-my $days_to_keep_errfiles = 14;
 my $problem_dir_path = $webrun_directory . "/upl/problemfiles";
-my $path_to_syserrors = $webrun_directory . "/syserrors";
-my $path_to_shell_error = $webrun_directory . "/upl/shell_command_error";
 # my $path_to_shell_log = $webrun_directory . "/upl/shell_log";
-my $local_url = $config->get('LOCAL_URL');
 #
 #  Dynamic global variables:
 #
 my %dataset_institution;     # Updated in sub get_dataset_institution
-my $shell_command_error = "";
 my %files_to_process = ();   # Hash containing, for each uploaded file to 
                              # be processed (full path), the modification
                              # time of that file. This hash is re-
                              # initialized for each new batch of files
                              # to be processed for the same dataset.
 my $file_in_error_counter;
-my @user_errors = ();
 #
 #  Action starts here:
 #  -------------------
@@ -243,9 +251,9 @@ eval {
 	}
 };
 if ($@) {
-   &syserror("SYS", "ABORTED: " . $@, "", "", "");
+   &syserrorm("SYS", "ABORTED: " . $@, "", "", "");
 } else {
-   &syserror("SYS", "NORMAL TERMINATION", "", "", "");
+   &syserrorm("SYS", "NORMAL TERMINATION", "", "", "");
 }
 #
 # ----------------------------------------------------------------------------
@@ -395,7 +403,7 @@ sub ftp_process_hour {
       my $wait_minutes = $eventsref->{$eventkey};
       my @files_found = findFiles($ftp_dir_path, eval 'sub {$_[0] =~ /^\Q$dataset_name\E_/o;}');
       if (scalar @files_found == 0 && length($shell_command_error) > 0) {
-         &syserror("SYS","find_fails", "", "ftp_process_hour", "");
+         &syserrorm("SYS","find_fails", "", "ftp_process_hour", "");
          next;
       }
       my $current_epoch_time = mmTtime::ttime(); 
@@ -439,7 +447,7 @@ sub ftp_process_hour {
 #
    my @all_files_found = findFiles($ftp_dir_path);
    if (scalar @all_files_found == 0 && length($shell_command_error) > 0) {
-      &syserror("SYS","find_fails_2", "", "ftp_process_hour", "");
+      &syserrorm("SYS","find_fails_2", "", "ftp_process_hour", "");
    } else {
       foreach my $filename (@all_files_found) {
          my $dataset_name;
@@ -453,7 +461,7 @@ sub ftp_process_hour {
 #
 # egils: Should not die, because uploaded files may have temporary names while uploading:
 #               die "Could not stat $filename\n";
-               &syserror("SYS","Could not stat $filename", "", "ftp_process_hour", "");
+               &syserrorm("SYS","Could not stat $filename", "", "ftp_process_hour", "");
             } else {
 #            
 #             Get last modification time of file
@@ -462,7 +470,7 @@ sub ftp_process_hour {
                my $current_epoch_time = mmTtime::ttime(); 
                my $modification_time = mmTtime::ttime($file_stat[9]);
                if ($current_epoch_time - $modification_time > 60*60*5) {
-                  &syserror("SYS","file_with_no_dataset", $filename, "ftp_process_hour", "");
+                  &syserrorm("SYS","file_with_no_dataset", $filename, "ftp_process_hour", "");
                }
             }
          }
@@ -479,7 +487,7 @@ sub web_process_uploaded {
    my %datasets = ();
    my @files_found = findFiles($upload_dir_path);
    if (scalar @files_found == 0 && length($shell_command_error) > 0) {
-      &syserror("SYS","find_fails", "", "web_process_uploaded", "");
+      &syserrorm("SYS","find_fails", "", "web_process_uploaded", "");
    }
    foreach my $filename (@files_found) {
       my $dataset_name;
@@ -526,7 +534,7 @@ sub testafile {
    my %datasets = ();
    my @files_found = findFiles($config->get('WEBRUN_DIRECTORY').'/upl/ftaf');
    if (scalar @files_found == 0 && length($shell_command_error) > 0) {
-      &syserror("SYS","find_fails", "", "testafile", "");
+      &syserrorm("SYS","find_fails", "", "testafile", "");
    }
    foreach my $filename (@files_found) {
       my $dataset_name;
@@ -605,7 +613,7 @@ sub process_files {
       foreach my $uploadname (keys %files_to_process) {
          &move_to_problemdir($uploadname);
       }
-      &syserror("SYSUSER","dataset_not_initialized", "", "process_files", "Dataset: $dataset_name");
+      &syserrorm("SYSUSER","dataset_not_initialized", "", "process_files", "Dataset: $dataset_name");
       return;
    }
 #
@@ -649,7 +657,7 @@ sub process_files {
 #         
          my $result = &shcommand_scalar("gunzip $newpath");
          if (!defined($result)) {
-            &syserror("SYSUSER","gunzip_problem_with_uploaded_file", $uploadname, "process_files", "");
+            &syserrorm("SYSUSER","gunzip_problem_with_uploaded_file", $uploadname, "process_files", "");
             $errors = 1;
             next;
          }
@@ -669,7 +677,7 @@ sub process_files {
             $baseupldname = substr($baseupldname,0,length($baseupldname)-3) . 'tar';
             $extension = 'tar';
          } else {
-            &syserror("SYSUSER","uploaded_filename_with_missing_gz_or_tgz", $uploadname, "process_files", "");
+            &syserrorm("SYSUSER","uploaded_filename_with_missing_gz_or_tgz", $uploadname, "process_files", "");
             $errors = 1;
             next;
          }
@@ -679,7 +687,7 @@ sub process_files {
 #
       if ($filetype eq "tar") {
          if (!defined($extension) || ($extension ne "tar" && $extension ne "TAR")) {
-            &syserror("SYSUSER","uploaded_filename_with_missing_tar_ext", $uploadname, "process_files", "");
+            &syserrorm("SYSUSER","uploaded_filename_with_missing_tar_ext", $uploadname, "process_files", "");
             $errors = 1;
             next;
          }
@@ -688,7 +696,7 @@ sub process_files {
 #         
          my @tarcomponents = &shcommand_array("tar tf $newpath");
          if (length($shell_command_error) > 0) {
-            &syserror("SYSUSER","unable_to_unpack_tar_archive", $uploadname, "process_files", "");
+            &syserrorm("SYSUSER","unable_to_unpack_tar_archive", $uploadname, "process_files", "");
             next;
          }
          if ($progress_report == 1) {
@@ -702,7 +710,7 @@ sub process_files {
 #         
          foreach my $component (@tarcomponents) {
             if (substr($component,0,1) eq "/") {
-               &syserror("USER","uploaded_tarfile_with_abs_pathes",
+               &syserrorm("USER","uploaded_tarfile_with_abs_pathes",
                          $uploadname, "process_files", "Component: $component");
                $errors = 1;
                next;
@@ -712,7 +720,7 @@ sub process_files {
                $basename = $1; # First matching ()-expression
             }
             if (exists($basenames{$basename})) {
-               &syserror("USER","uploaded_tarfile_with_duplicates",
+               &syserrorm("USER","uploaded_tarfile_with_duplicates",
                          $uploadname, "process_files", "Component: $basename");
                $errors = 1;
                next;
@@ -720,7 +728,7 @@ sub process_files {
             $basenames{$basename} = 1;
             $orignames{$basename} = $uploadname;
             if (index($basename,$dataset_name . '_') < 0) {
-               &syserror("USER","uploaded_tarfile_with_illegal_component_name",
+               &syserrorm("USER","uploaded_tarfile_with_illegal_component_name",
                          $uploadname, "process_files", "Component: $basename");
                $errors = 1;
             }
@@ -734,7 +742,7 @@ sub process_files {
             }
             my $tar_results = &shcommand_scalar("tar xf $newpath");
             if (length($shell_command_error) > 0) {
-               &syserror("SYSUSER","tar_xf_fails", $uploadname, "process_files", "");
+               &syserrorm("SYSUSER","tar_xf_fails", $uploadname, "process_files", "");
                next;
             }
 #            
@@ -748,23 +756,23 @@ sub process_files {
                   $bname = $1; # First matching ()-expression
                }
                if (-e File::Spec->catfile($work_flat, $bname)) {
-                  &syserror("USER","uploaded_tarfile_with_component_already_encountered",
+                  &syserrorm("USER","uploaded_tarfile_with_component_already_encountered",
                             $uploadname, "process_files", "Component: $bname");
                   $errors = 1;
                   next;
                }
                if (move($component,$work_flat) == 0) {
-                  &syserror("SYS","move_tar_component_did_not_succeed",
+                  &syserrorm("SYS","move_tar_component_did_not_succeed",
                             "", "process_files", "Component: $component Error code: $!");
                   next;
                }
             }
             if ($errors == 1) {
-               &syserror("SYS","uploaded_tarfile_with_components_already_encountered",
+               &syserrorm("SYS","uploaded_tarfile_with_components_already_encountered",
                          $uploadname, "process_files", "");
             }
          } else {
-            &syserror("SYS","errors_in_tar_components", $uploadname, "process_files", "");
+            &syserrorm("SYS","errors_in_tar_components", $uploadname, "process_files", "");
             next;
          }
       } else {
@@ -772,11 +780,11 @@ sub process_files {
 #        Move file directly to $work_flat:
 #         
          if (-e File::Spec->catfile($work_flat, $baseupldname)) {
-            &syserror("SYSUSER","uploaded_file_already_encountered", $uploadname, "process_files", "");
+            &syserrorm("SYSUSER","uploaded_file_already_encountered", $uploadname, "process_files", "");
             next;
          } else {
             if (move($newpath,$work_flat) == 0) {
-               &syserror("SYS","move_newpath_tp_work_flat_did_not_succeed",
+               &syserrorm("SYS","move_newpath_tp_work_flat_did_not_succeed",
                          "", "process_files", "Newpath: $newpath Error code: $!");
                next;
             }
@@ -809,7 +817,7 @@ sub process_files {
       if (exists($orignames{$expandedfile})) {
          $uploadname = $orignames{$expandedfile};
       } else {
-         &syserror("SYS","expandedfile_has_no_corresponding_upload_file",
+         &syserrorm("SYS","expandedfile_has_no_corresponding_upload_file",
                    "", "process_files", "Expanded file: $expandedfile");
          next;
       }
@@ -824,13 +832,13 @@ sub process_files {
       if ($filetype eq 'ascii') {
          my $errorMsg = remove_cr_from_file($expandedfile);
          if (length($errorMsg) > 0) {
-            &syserror("SYS","remove_cr_failed: $errorMsg",$uploadname, "process_files","");
+            &syserrorm("SYS","remove_cr_failed: $errorMsg",$uploadname, "process_files","");
             $not_accepted{$expandedfile} = 1;
             $errors = 1;
          } elsif (defined($extension) && ($extension eq 'cdl' || $extension eq 'CDL')) {
          	# get the first line of the file, think 'head'
             if (!open(FH, $expandedfile)) {
-         	   &syserror("SYS","head_command_fails_on_expandedfile",
+         	   &syserrorm("SYS","head_command_fails_on_expandedfile",
                          "", "process_files", "Expanded file: $expandedfile");
                next;
          	}
@@ -842,7 +850,7 @@ sub process_files {
             if ($firstline =~ /^\s*netcdf\s/) {
                my $ncname = substr($expandedfile,0,length($expandedfile) - 3) . 'nc';
                if (scalar grep($_ eq $ncname,@expanded_files) > 0) {
-                  &syserror("SYSUSER","cdlfile_collides_with_ncfile_already_encountered",
+                  &syserrorm("SYSUSER","cdlfile_collides_with_ncfile_already_encountered",
                             $uploadname, "process_files", "File: $expandedfile");
                   $not_accepted{$expandedfile} = 1;
                   $errors = 1;
@@ -853,11 +861,11 @@ sub process_files {
                      my $diagnostic = $shell_command_error;
                      $diagnostic =~ s/^[^\n]*\n//m;
                      $diagnostic =~ s/\n/ /mg;
-                     &syserror("SYSUSER","ncgen_fails_on_cdlfile",
+                     &syserrorm("SYSUSER","ncgen_fails_on_cdlfile",
                                $uploadname, "process_files",
                                "File: $expandedfile\nCDLfile: $expandedfile\nDiagnostic: $diagnostic");
                      if (-e $ncname && unlink($ncname) == 0) {
-                        &syserror("SYS","unlink_fails_on_ncfile",
+                        &syserrorm("SYS","unlink_fails_on_ncfile",
                                "", "process_files", "Ncfile file: $ncname");
                      }
                      $not_accepted{$expandedfile} = 1;
@@ -865,7 +873,7 @@ sub process_files {
                      next;
                   }
                   if (unlink($expandedfile) == 0) {
-                     &syserror("SYS","unlink_fails_on_expandedfile",
+                     &syserrorm("SYS","unlink_fails_on_expandedfile",
                                "", "process_files", "Expanded file: $expandedfile");
                   }
                   $filetype = getFiletype($ncname);
@@ -875,7 +883,7 @@ sub process_files {
                   }
                }
             } else {
-               &syserror("SYSUSER","text_file_with_cdl_extension_not_a_cdlfile",
+               &syserrorm("SYSUSER","text_file_with_cdl_extension_not_a_cdlfile",
                          $uploadname, "process_files", "File: $expandedfile");
                $not_accepted{$expandedfile} = 1;
                $errors = 1;
@@ -884,7 +892,7 @@ sub process_files {
          }
       }
       if ($filetype ne 'nc3') {
-         &syserror("SYSUSER","file_not_netcdf", $uploadname, "process_files",
+         &syserrorm("SYSUSER","file_not_netcdf", $uploadname, "process_files",
                    "File: $expfile\nBadfile: $expandedfile\nFiletype: $filetype");
          $not_accepted{$expandedfile} = 1;
          $errors = 1;
@@ -893,7 +901,7 @@ sub process_files {
    if ($errors == 1) {
       foreach my $expandedfile (keys %not_accepted) {
          if (unlink($expandedfile) == 0) {
-            &syserror("SYS","could_not_unlink","", "process_files", "File: $expandedfile");
+            &syserrorm("SYS","could_not_unlink","", "process_files", "File: $expandedfile");
          }
       }
    }
@@ -912,7 +920,7 @@ sub process_files {
 #   print "Uploaded files:\n";
 #   print Dumper(\@uploaded_files);
    if (length($shell_command_error) > 0) {
-      &syserror("SYS","find_fails", "", "process_files", "");
+      &syserrorm("SYS","find_fails", "", "process_files", "");
       return;
    }
    my @digest_input = ();
@@ -928,7 +936,7 @@ sub process_files {
                                             $dataset_name);
       my @existing_files = findFiles($destination_dir, eval 'sub {$_[0] =~ /\Q$dataset_name\E_/o;}');
       if (length($shell_command_error) > 0) {
-         &syserror("SYS","find_fails_2", "", "process_files", "");
+         &syserrorm("SYS","find_fails_2", "", "process_files", "");
          return;
       }
       @existing_basenames = &get_basenames(\@existing_files);
@@ -1001,7 +1009,7 @@ sub process_files {
    close (USERERRORS);
 #
    if (length($shell_command_error) > 0) {
-      &syserror("SYS","digest_nc_fails", "", "process_files", "");
+      &syserrorm("SYS","digest_nc_fails", "", "process_files", "");
       if ($ftp_or_web ne 'TAF') {
          foreach my $uploadname (keys %files_to_process) {
             &move_to_problemdir($uploadname);
@@ -1024,7 +1032,7 @@ sub process_files {
             my $xmlFileDir = substr $xmlpath, 0, length($xmlpath)-4; # remove .xml
             if (! -d $xmlFileDir) {
                if (!mkdir($xmlFileDir)) {
-               	syserror("SYS", "mkdir_fails", $filepath, "process_files", "mdkir $xmlFileDir");
+               	syserrorm("SYS", "mkdir_fails", $filepath, "process_files", "mdkir $xmlFileDir");
                	return;
                }
             }
@@ -1033,7 +1041,7 @@ sub process_files {
             print "RUN:    $digestCommand\n" if $progress_report == 1;
             shcommand_scalar($digestCommand);
             if (length($shell_command_error) > 0) {
-            	syserror("SYS", "digest_nc_file_fails", $filepath, "process_files", "");
+            	syserrorm("SYS", "digest_nc_file_fails", $filepath, "process_files", "");
                return;
             }
          }         
@@ -1048,7 +1056,7 @@ sub process_files {
             }
             if ($filepath ne $destination_dir . "/$bname") {
                if (move($filepath,$destination_dir) == 0) {
-                  &syserror("SYS","Move $filepath to destination_dir did not succeed. Error code: $!",
+                  &syserrorm("SYS","Move $filepath to destination_dir did not succeed. Error code: $!",
                             "", "process_files", "");
                }
             }
@@ -1107,7 +1115,7 @@ sub process_files {
                  "$errorinfo_path "
             );
          if (length($shell_command_error) > 0) {
-            &syserror("SYS","print_usererrors_fails", "", "process_files", "");
+            &syserrorm("SYS","print_usererrors_fails", "", "process_files", "");
             return;
          }
          if ($ftp_or_web ne 'TAF') {
@@ -1131,7 +1139,7 @@ sub process_files {
          } else {
             my $identfile = $config->get('WEBRUN_DIRECTORY').'/upl/etaf/' . $taf_basename;
             unless (-r $identfile) {
-               &syserror("SYS","email_file_not_found", "", "process_files", "File: $identfile");
+               &syserrorm("SYS","email_file_not_found", "", "process_files", "File: $identfile");
                return;
             }
             open (IDENT,$identfile);
@@ -1171,14 +1179,14 @@ sub process_files {
       }
       foreach my $uploadname (keys %files_to_process) {
          if (unlink($uploadname) == 0) {
-            &syserror("SYS","Unlink file $uploadname did not succeed","", "process_files", "");
+            &syserrorm("SYS","Unlink file $uploadname did not succeed","", "process_files", "");
          }
       }
       if ($ftp_or_web eq 'TAF') {
          my @bnames = &get_basenames(\@originally_uploaded);
          foreach my $bn (@bnames) {
             if (unlink($config->get('WEBRUN_DIRECTORY').'/upl/etaf/' . $bn) == 0) {
-               &syserror("SYS","Unlink TAF file etaf/$bn did not succeed","", "process_files", "");
+               &syserrorm("SYS","Unlink TAF file etaf/$bn did not succeed","", "process_files", "");
             }
          }
       }
@@ -1197,7 +1205,7 @@ sub purge_current_directory {
       if (! exists($files_to_process{$upldname})) {
          if (-e $basename) {
             if (unlink($basename) == 0) {
-               &syserror("SYS","Unlink file $basename did not succeed","", "purge_current_directory", "");
+               &syserrorm("SYS","Unlink file $basename did not succeed","", "purge_current_directory", "");
             }
          }
          delete $ref_orignames->{$basename};
@@ -1277,10 +1285,10 @@ sub revert_XML_history {
             print "Dataset $dataset_name : All files for this dataset has to be re-processed\n";
          }
          if (unlink($path_to_xml_file) == 0) {
-            &syserror("SYS","Unlink file $path_to_xml_file did not succeed","", "revert_XML_history", "");
+            &syserrorm("SYS","Unlink file $path_to_xml_file did not succeed","", "revert_XML_history", "");
          }
          if (unlink($xml_history_filename) == 0) {
-            &syserror("SYS","Unlink file $xml_history_filename did not succeed","", "revert_XML_history", "");
+            &syserrorm("SYS","Unlink file $xml_history_filename did not succeed","", "revert_XML_history", "");
          }
          @reprocess_basenames = &subtract($existing_basenames,$reuploaded_basenames);
       } else {
@@ -1295,9 +1303,9 @@ sub revert_XML_history {
       }
       return @reprocess_basenames;
    } else {
-      &syserror("SYS","no_XML_history_file", "", "revert_XML_history", "");
+      &syserrorm("SYS","no_XML_history_file", "", "revert_XML_history", "");
       if (unlink($path_to_xml_file) == 0) {
-         &syserror("SYS","Unlink file $path_to_xml_file did not succeed","", "revert_XML_history", "");
+         &syserrorm("SYS","Unlink file $path_to_xml_file did not succeed","", "revert_XML_history", "");
       }
       return ();
    }
@@ -1343,286 +1351,8 @@ sub update_XML_history {
       print XMLHISTORY Dumper(\@new_xml_history);
       close (XMLHISTORY);
    } else {
-      &syserror("SYS","XML file $xml_filename not found", "", "update_XML_history", "");
+      &syserrorm("SYS","XML file $xml_filename not found", "", "update_XML_history", "");
    }
-}
-#
-#---------------------------------------------------------------------------------
-#
-sub notify_web_system {
-   my ($code,$dataset_name,$ref_uploaded_files,$path_to_errors_html) = @_;
-   my @uploaded_basenames = &get_basenames($ref_uploaded_files);
-   my @user_filenames = glob($webrun_directory . '/u1/*');
-#
-#  Get file sizees for each uploaded file:
-#
-   if ($progress_report == 1) {
-      print "notify_web_system: $code,$dataset_name\n";
-      print "                   $path_to_errors_html\n";
-      print "                   Uploaded basenames:\n";
-      print Dumper(\@uploaded_basenames);
-   }
-   my %file_sizes = ();
-   my $i1 = 0;
-   foreach my $fname (@$ref_uploaded_files) {
-      my $basename = $uploaded_basenames[$i1];
-      my @filestat = stat($fname);
-      if (scalar @filestat == 0) {
-         &syserror("SYS","Could not stat $fname", "", "notify_web_system", "");
-         $file_sizes{$basename} = 0;
-      } else {
-         $file_sizes{$basename} = $filestat[7];
-      }
-      $i1++;
-   }
-#
-#  Find current time
-#
-   my @time_arr = gmtime;
-   my $year = 1900 + $time_arr[5];
-   my $mon = $time_arr[4] + 1; # 1-12
-   my $mday = $time_arr[3]; # 1-31
-   my $hour = $time_arr[2]; # 0-23
-   my $min = $time_arr[1]; # 0-59
-   my $timestring = sprintf('%04d-%02d-%02d %02d:%02d UTC',$year, $mon, $mday, $hour, $min);
-   my @found_basenames = ();
-   my $ownerfile;
-   foreach my $userfile (@user_filenames) {
-#   
-#     Slurp in the content of a file
-#   
-      unless (-r $userfile) {
-         &syserror("SYS","Can not read from file: $userfile", "", "notify_web_system", "");
-         next;
-      }
-      open (USERFILE,$userfile);
-      undef $/;
-      my $file_content = <USERFILE>;
-      my @file_content_arr = split(/\n/,$file_content);
-      $/ = "\n"; 
-      close (USERFILE);
-#
-      my $rex = '<dir dirname="' . $dataset_name . '"';
-      if ($file_content =~ /$rex/) {
-         $ownerfile = $userfile;
-      }
-#
-      my %positions = ();
-      my $pos = 0;
-      $rex = '<file name="([^"]*)"';
-      foreach my $line (@file_content_arr) {
-         if ($line =~ /$rex/) {
-            my $basename = $1; # First matching ()-expression
-            $positions{$basename} = $pos;
-         }
-         $pos++;
-      }
-      my $changes = 0;
-      foreach my $basename (@uploaded_basenames) {
-         if (exists($positions{$basename})) {
-            my $pos = $positions{$basename};
-            $file_content_arr[$pos] = '<file name="' . $basename . '" size="' .
-                                      $file_sizes{$basename} .
-                                      '" status="' . $code . $timestring . '" errurl="' .
-                                      $path_to_errors_html . '" />';
-            $changes = 1;
-            push (@found_basenames,$basename);
-         }
-      }
-      if ($changes == 1) {
-         my $new_file_content = join("\n",@file_content_arr);
-         open (USERFILE,">$userfile");
-         print USERFILE $new_file_content;
-         close (USERFILE);
-      }
-   }
-   if (defined($ownerfile)) {
-#   
-#     Add <file> elements for the rest of the file names (those that
-#     previously did not have any <file> element) to the userfile of
-#     the dataset owner:
-#
-      if ($progress_report == 1) {
-         print "                   Uploaded files:\n";
-         print Dumper($ref_uploaded_files);
-         print "                   found_basenames:\n";
-         print Dumper(\@found_basenames);
-      }
-      my @rest_basenames = &subtract(\@uploaded_basenames,\@found_basenames);
-      if ($progress_report == 1) {
-         print "                   rest_basenames:\n";
-         print Dumper(\@rest_basenames);
-      }
-      if (scalar @rest_basenames > 0) {
-#   
-#     Slurp in the content of a file
-#   
-         unless (-r $ownerfile) {
-            &syserror("SYS","Could not read from $ownerfile", "", "notify_web_system", "");
-            next;
-         }
-         open (USERFILE,$ownerfile);
-         undef $/;
-         my $file_content = <USERFILE>;
-         my @file_content_arr = split(/\n/,$file_content);
-         $/ = "\n"; 
-         close (USERFILE);
-#   
-         my @new_file_content_arr = ();
-         my $added_new_lines = 0;
-         foreach my $line (@file_content_arr) {
-            if ($line !~ /(<heading name=)|(<file name=)/) {
-               if ($added_new_lines == 0) {
-                  foreach my $basename (@rest_basenames) {
-                     my $new_line = '<file name="' . $basename . '" size="' .
-                                 $file_sizes{$basename} .
-                                 '" status="' . $code . $timestring . '" errurl="' .
-                                 $path_to_errors_html . '" />';
-                     push (@new_file_content_arr,$new_line);
-                  }
-                  $added_new_lines = 1;
-               }
-            }
-            push (@new_file_content_arr,$line);
-         }
-         my $new_file_content = join("\n",@new_file_content_arr);
-         open (USERFILE,">$ownerfile");
-         print USERFILE $new_file_content;
-         close (USERFILE);
-      }
-      if ($progress_report == 1) {
-         print "-notify_web_system\n";
-      }
-   } else {
-      &syserror("SYS","dataset_not_owned_by_any_user", "", "notify_web_system", "");
-   }
-}
-#
-#---------------------------------------------------------------------------------
-#
-sub get_dataset_institution {
-#
-# Initialize hash connecting each dataset to a reference to an array with three
-# elements:
-#
-# ->[0] Name of institution as found in an <heading> element within the webrun/u1
-#       file for the user that owns the dataset.
-# ->[1] The owners E-mail address.
-# ->[2] The owners name.
-#
-   my($ref_dataset_institution) = @_;
-#   
-#     Get all file names corresponding to a glob pattern:
-#   
-   my @files_found = glob($webrun_directory . '/u1/*');
-   foreach my $filename (@files_found) {
-#      
-#        Slurp in the content of a file
-#      
-      unless (-r $filename) {
-         &syserror("SYS","Can not read from file: $filename", "", "get_dataset_institution", "");
-         next;
-      }
-      open (INPUTFILE,$filename);
-      local $/;
-      my $content = <INPUTFILE>;
-      close (INPUTFILE);
-#
-      my $institution;
-      if ($content =~ /<heading.* institution=\"([^\"]+)\"/m) {
-         $institution = &decodenorm($1);
-      } else {
-         &syserror("SYS","institution_not_found_in_u1_file: $filename", "", "get_dataset_institution", "");
-         next;
-      }
-#
-      my $email;
-      if ($content =~ /<heading.* email=\"([^\"]+)\"/m) {
-         $email = &decodenorm($1);
-      } else {
-         &syserror("SYS","emailaddress_not_found_in_u1_file: $filename", "", "get_dataset_institution", "");
-         next;
-      }
-#
-      my $username;
-      if ($content =~ /<heading.* name=\"([^\"]+)\"/m) {
-         $username = &decodenorm($1);
-      } else {
-         &syserror("SYS","username_not_found_in_u1_file: $filename", "", "get_dataset_institution", "");
-         next;
-      }
-#      
-#        Collect all matches into an array
-#        (no substrings allowed in REGEXP)
-#      
-      my @datasets = ($content =~ /<dir dirname=\"[^\"]+\"/mg);
-      for (my $ix=0; $ix < scalar @datasets; $ix++) {
-         $datasets[$ix] =~ s/<dir dirname=\"//mg;
-         $datasets[$ix] =~ s/\"//mg;
-         my $dataset_name = $datasets[$ix];
-         $ref_dataset_institution->{$dataset_name} = [$institution,$email,$username];
-      }
-   }
-}
-#
-#---------------------------------------------------------------------------------
-#
-sub shcommand_scalar {
-   my ($command) = @_;
-#   open (SHELLLOG,">>$path_to_shell_log");
-#   print SHELLLOG "---------------------------------------------------\n";
-#   print SHELLLOG $command . "\n";
-#   print SHELLLOG "                    ------------RESULT-------------\n";
-   my $result = `$command 2>$path_to_shell_error`;
-#   print SHELLLOG $result ."\n";
-#   close (SHELLLOG);
-   if (-s $path_to_shell_error) {
-#
-#     Slurp in the content of a file
-#
-      unless (-r $path_to_shell_error) {die "Can not read from file: shell_command_error\n";}
-      open (ERROUT,$path_to_shell_error);
-      undef $/;
-      $shell_command_error = <ERROUT>;
-      $/ = "\n"; 
-      close (ERROUT);
-      if (unlink($path_to_shell_error) == 0) {
-         die "Unlink file shell_command_error did not succeed\n";
-      }
-      $shell_command_error = $command . "\n" . $shell_command_error;
-      return undef;
-   }
-   return $result;
-}
-#
-#---------------------------------------------------------------------------------
-#
-sub shcommand_array {
-   my ($command) = @_;
-#   open (SHELLLOG,">>$path_to_shell_log");
-#   print SHELLLOG "---------------------------------------------------\n";
-#   print SHELLLOG $command . "\n";
-   my $result1 = `$command 2>$path_to_shell_error`;
-#   print SHELLLOG "                    ------------RESULT-------------\n";
-#   print SHELLLOG $result1 . "\n";
-#   close (SHELLLOG);
-   my @result = split(/\n/,$result1);
-   if (scalar @result == 0 && -s $path_to_shell_error) {
-#
-#     Slurp in the content of a file
-#
-      unless (-r $path_to_shell_error) {die "Can not read from file: shell_command_error\n";}
-      open (ERROUT,$path_to_shell_error);
-      undef $/;
-      $shell_command_error = <ERROUT>;
-      $/ = "\n"; 
-      close (ERROUT);
-      if (unlink($path_to_shell_error) == 0) {
-         die "Unlink file shell_command_error did not succeed\n";
-      }
-      $shell_command_error = $command . "\n" . $shell_command_error;
-   }
-   return @result;
 }
 #
 #---------------------------------------------------------------------------------
@@ -1630,7 +1360,7 @@ sub shcommand_array {
 sub clean_up_problem_dir {
    my @files_found = findFiles($problem_dir_path, sub {$_[0] =~ /^\d/;});
    if (scalar @files_found == 0 && length($shell_command_error) > 0) {
-      &syserror("SYS","find_fails", "", "clean_up_problem_dir", "");
+      &syserrorm("SYS","find_fails", "", "clean_up_problem_dir", "");
    }
 #      
 #       Find current time (epoch)
@@ -1642,7 +1372,7 @@ sub clean_up_problem_dir {
       if (-r $filename) {
          my @file_stat = stat($filename);
          if (scalar @file_stat == 0) {
-            &syserror("SYS","Could not stat $filename", "", "clean_up_problem_dir", "");
+            &syserrorm("SYS","Could not stat $filename", "", "clean_up_problem_dir", "");
          }
 #            
 #             Get last modification time of file
@@ -1651,7 +1381,7 @@ sub clean_up_problem_dir {
          my $modification_time = mmTtime::ttime($file_stat[9]);
          if ($current_epoch_time - $modification_time > $age_seconds) {
             if (unlink($filename) == 0) {
-               &syserror("SYS","Unlink file $filename did not succeed", "", "clean_up_problem_dir", "");
+               &syserrorm("SYS","Unlink file $filename did not succeed", "", "clean_up_problem_dir", "");
             }
          }
       }
@@ -1666,7 +1396,7 @@ sub clean_up_repository {
       my $days_to_keep_files = $all_ftp_datasets{$dataset};
       if ($days_to_keep_files > 0) {
          if (!exists($dataset_institution{$dataset})) {
-            &syserror("SYS","$dataset not in any userfiler", "", "clean_up_repository", "");
+            &syserrorm("SYS","$dataset not in any userfiler", "", "clean_up_repository", "");
             next;
          }
          my $directory = $opendap_directory . "/" . 
@@ -1678,7 +1408,7 @@ sub clean_up_repository {
          foreach my $fname (@files) {
             my @file_stat = stat($fname);
             if (scalar @file_stat == 0) {
-               &syserror("SYS","Could not stat $fname", "", "clean_up_repository", "");
+               &syserrorm("SYS","Could not stat $fname", "", "clean_up_repository", "");
                next;
             }
 #            
@@ -1692,7 +1422,7 @@ sub clean_up_repository {
                }
                my @cdlcontent = &shcommand_array("ncdump -h $fname");
                if (length($shell_command_error) > 0) {
-                  &syserror("SYS","Could not ncdump -h $fname", "", "clean_up_repository", "");
+                  &syserrormm("SYS","Could not ncdump -h $fname", "", "clean_up_repository", "");
                   next;
                }
                my $lnum = 0;
@@ -1721,7 +1451,7 @@ sub clean_up_repository {
                   print "      'variables:' found at line = $lnum\n";
                }
                if ($lnum >= $lmax) {
-                  &syserror("SYS","Error while changing CDL content from $fname",
+                  &syserrorm("SYS","Error while changing CDL content from $fname",
                             "", "clean_up_repository", "");
                   next;
                }
@@ -1730,7 +1460,7 @@ sub clean_up_repository {
                close (CDLFILE);
                &shcommand_scalar("ncgen tmp_file.cdl -o $fname");
                if (length($shell_command_error) > 0) {
-                  &syserror("SYS","Could not ncgen tmp_file.cdl -o $fname", "", "clean_up_repository", "");
+                  &syserrorm("SYS","Could not ncgen tmp_file.cdl -o $fname", "", "clean_up_repository", "");
                   next;
                }
             }
@@ -1741,97 +1471,10 @@ sub clean_up_repository {
 #
 #---------------------------------------------------------------------------------
 #
-sub get_basenames {
-   my ($ref) = @_;
-   my @result = ();
-   foreach my $path1 (@$ref) {
-      my $path = $path1;
-      $path =~ s:^.*/::;
-      push (@result,$path);
-   }
-   return @result;
-}
-#
-#---------------------------------------------------------------------------------
-#
-sub intersect {
-   my ($a1,$a2) = @_;
-   my %h1 = ();
-   foreach my $elt (@$a1) {
-      $h1{$elt} = 1;
-   }
-   my @result = ();
-   foreach my $elt (@$a2) {
-      if (exists($h1{$elt})) {
-         push (@result,$elt);
-      }
-   }
-   return @result;
-}
-#
-#---------------------------------------------------------------------------------
-#
-sub union {
-   my ($a1,$a2) = @_;
-   my %h1 = ();
-   foreach my $elt (@$a1,@$a2) {
-      $h1{$elt} = 1;
-   }
-   return keys %h1;
-}
-#
-#---------------------------------------------------------------------------------
-#
-sub subtract {
-   my ($a1,$a2) = @_;
-   my %h2 = ();
-   foreach my $elt (@$a2) {
-      $h2{$elt} = 1;
-   }
-   my @result = ();
-   foreach my $elt (@$a1) {
-      if (!exists($h2{$elt})) {
-         push (@result,$elt);
-      }
-   }
-   return @result;
-}
-#
-#---------------------------------------------------------------------------------
-#
-sub syserror {
+sub syserrorm {
    my ($type,$errmsg,$uploadname,$where,$what) = @_;
 #
-#  Find current time
-#
-   my @ta = localtime();
-   my $year = 1900 + $ta[5];
-   my $mon = $ta[4] + 1; # 1-12
-   my $mday = $ta[3]; # 1-31
-   my $hour = $ta[2]; # 0-23
-   my $min = $ta[1]; # 0-59
-   my $datestring = sprintf ('%04d-%02d-%02d %02d:%02d',$year,$mon,$mday,$hour,$min);
-#
-   my (undef, undef, $baseupldname) = File::Spec->splitpath($uploadname);
-#
    if ($type eq "SYS" || $type eq "SYSUSER") {
-#
-#     Write message to error log:
-#
-      open (OUT,">>$path_to_syserrors");
-      flock (OUT, LOCK_EX);
-      print OUT "-------- $type $datestring IN: $where\n" .
-                "         $errmsg\n";
-      if ($uploadname ne "") {
-         print OUT "         Uploaded file: $uploadname\n";
-      }
-      if ($what ne "") {
-         print OUT "         $what\n";
-      }
-      if ($shell_command_error ne "") {
-         print OUT "         Stderr: $shell_command_error\n";
-      }
-      close (OUT);
       if ($uploadname ne "") {
 #
 #        Move upload file to problem file directory:
@@ -1839,28 +1482,7 @@ sub syserror {
          &move_to_problemdir($uploadname);
       }
    }
-   if ($type eq "USER" || $type eq "SYSUSER") {
-      push(@user_errors, "$errmsg\nUploadfile: $baseupldname\n$what\n\n");
-   }
-   $shell_command_error = "";
-};
-#
-#---------------------------------------------------------------------------------
-#
-sub get_date_and_time_string {
-   my @ta;
-   if (scalar @_ > 0) {
-      @ta = localtime($_[0]);
-   } else {
-      @ta = localtime(mmTtime::ttime());
-   }
-   my $year = 1900 + $ta[5];
-   my $mon = $ta[4] + 1; # 1-12
-   my $mday = $ta[3]; # 1-31
-   my $hour = $ta[2]; # 0-23
-   my $min = $ta[1]; # 0-59
-   my $datestring = sprintf ('%04d-%02d-%02d %02d:%02d',$year,$mon,$mday,$hour,$min);
-   return $datestring;
+   &syserror($type,$errmsg,$uploadname,$where,$what);
 };
 #
 #---------------------------------------------------------------------------------
@@ -1903,52 +1525,3 @@ sub move_to_problemdir {
       }
    }
 };
-#
-#---------------------------------------------------------------------------------
-#
-sub decodenorm {
-   my ($strn) = @_;
-   $strn =~ s/^\s+|\s+$//g;
-   if (length($strn) > 0) {
-      my $new = "";
-      my $numchar = "";
-      my @a1 = split(//,$strn);
-      foreach my $ch1 (@a1) {
-         if ($ch1 =~ /[0-9A-F]/) {
-            $numchar .= $ch1;
-            if (length($numchar) == 2) {
-               eval('$new .= chr(0x' . $numchar . ');');
-               $numchar = '';
-            }
-         } else {
-            $new .= $ch1;
-            $numchar = '';
-         }
-      }
-      return $new;
-   } else {
-      return '';
-   }
-};
-
-#
-#-----------------------------------------------------------------------------------
-# Check if string found in file:
-#
-sub string_found_in_file {
-   my ($searchfor,$fname) = @_;
-   if (-r $fname) {
-      open (FH,$fname);
-      local $/ = undef;
-      my $content = <FH>;
-      close (FH);
-      my $found = index($content,$searchfor);
-      if ($found >= 0) {
-         return 1;
-      } else {
-         return 0;
-      }
-   } else {
-      return 0;
-   }
-}

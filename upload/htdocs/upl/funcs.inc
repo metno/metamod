@@ -119,6 +119,26 @@ function decodenorm($strn)
    }
 }
 
+function validate_absurl($url)
+{
+   $url_regexp = '!^https?://\w+(\.\w+)+(:\d+)?/[a-zA-Z0-9="&_.?/-]+$!';
+   if (preg_match($url_regexp,$url)) {
+      return true;
+   } else {
+      return false;
+   }
+}
+
+function validate_abspath($path)
+{
+   $path_regexp = '!^/[a-zA-Z0-9/_.-]+$!';
+   if (preg_match($path_regexp,$path)) {
+      return true;
+   } else {
+      return false;
+   }
+}
+
 function normfilename($strn)
 {
    if (strlen($strn) > 0) {
@@ -250,9 +270,9 @@ function get_userinfo($filepath)
 function get_fileinfo($filepath)
 {
    global $debug;
-   if ($debug) {
-      mmPutTest("get_fileinfo:");
-   }
+#   if ($debug) {
+#      mmPutTest("get_fileinfo:");
+#   }
    $fileinfo = array();
    if (!file_exists($filepath)) {
       return FALSE;
@@ -269,9 +289,9 @@ function get_fileinfo($filepath)
          foreach ($matches[0] as $match) {
             if (preg_match('/(\w+)="([^"]*)"/',$match,$matches2) == 1) {
                $onefile[$matches2[1]] = $matches2[2];
-	       if ($debug) {
-	          mmPutTest($matches2[1] . '=' . $onefile[$matches2[1]]);
-	       }
+#	       if ($debug) {
+#	          mmPutTest($matches2[1] . '=' . $onefile[$matches2[1]]);
+#	       }
             }
          }
       }
@@ -335,8 +355,14 @@ function put_dirinfo($filepath,$dirinfo)
          $newcontent .= $line;
       } else {
          if ($found_heading) {
-            foreach ($dirinfo as $dirname => $ndirkey) {
-               $fline = '<dir dirname="' . $dirname .'" key="' . $ndirkey . '" />';
+            foreach ($dirinfo as $dirname => $dirattributes) {
+               $attrs = explode(',',$dirattributes);
+               if (count($attrs) == 1) {
+                  $fline = '<dir dirname="' . $dirname .'" key="' . $attrs[0] . '" />';
+               } else {
+                  $fline = '<dir dirname="' . $dirname .'" key="' . $attrs[0] .
+                           '" location="' . $attrs[1] . '" catalog="' . $attrs[2] . '" />';
+               }
                $newcontent .= $fline . "\n";
             }
             $found_heading = FALSE;
@@ -353,9 +379,9 @@ function put_dirinfo($filepath,$dirinfo)
 function get_dirinfo($filepath)
 {
    global $debug;
-   if ($debug) {
-      mmPutTest("get_dirinfo:");
-   }
+#   if ($debug) {
+#      mmPutTest("get_dirinfo:");
+#   }
    $dirinfo = array();
    if (!file_exists($filepath)) {
       mmPutTest("get_dirinfo returns FALSE");
@@ -367,12 +393,18 @@ function get_dirinfo($filepath)
       return FALSE;
    }
    $dirrecords = preg_grep(':<dir\b[^>]+/>:',$lines);
-   foreach ($dirrecords as $dirrec) {
-      if (preg_match('/dirname="([^"]+)" key="([^"]*)"/',$dirrec,$matches2) == 1) {
-         $dirinfo[$matches2[1]] = $matches2[2];
-         if ($debug) {
-            mmPutTest($matches2[1] . '=' . $dirinfo[$matches2[1]]);
-         }
+   foreach ($dirrecords as $dirrec){
+      if (preg_match('/dirname="([^"]+)" key="([^"]*)" location="([^"]*)" catalog="([^"]*)"/',
+                     $dirrec,$match) == 1) {
+         $dirinfo[$match[1]] = $match[2] .','. $match[3] .','. $match[4];
+#         if ($debug) {
+#            mmPutTest($match[1] . '=' . $dirinfo[$match[1]]);
+#         }
+      } elseif (preg_match('/dirname="([^"]+)" key="([^"]*)"/',$dirrec,$match) == 1) {
+         $dirinfo[$match[1]] = $match[2];
+#         if ($debug) {
+#            mmPutTest($match[1] . '=' . $dirinfo[$match[1]]);
+#         }
       }
    }
    return $dirinfo;
@@ -474,6 +506,19 @@ function conditional_decode($string)
       return utf8_decode($string);
    } else {
       return $string;
+   }
+}
+
+function get_postvar($varname)
+{
+   if (array_key_exists($varname,$_POST)) {
+      $value = $_POST[$varname];
+      if (get_magic_quotes_gpc()) {
+         $value = stripslashes($value);
+      }
+      return $value;
+   } else {
+      return "";
    }
 }
 

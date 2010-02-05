@@ -31,6 +31,9 @@
 <?php
  // Entered this page from the login form. Check user credentials
  //
+ if ($debug) {
+    mmPutTest("--------- User pushed Log in");
+ }
  $email = conditional_decode($_POST["email"]);
  $paw = conditional_decode($_POST["paw"]); // Password
  if (strlen($email) == 0 || strlen($paw) == 0) {

@@ -29,6 +29,9 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
+ if ($debug) {
+    mmPutTest("--------- User pushed Upload");
+ }
  check_credentials(); // Sets $error, $errmsg, $nextpage, $normemail, $sessioncode,
                       // $runpath, $filepath and $filecontent (globals).
  if ($error == 0) { // Check that institution exists and set $institution var.

@@ -32,6 +32,9 @@
  // The user has pushed the "Retrieve" button
  // in the Administration page
  //
+ if ($debug) {
+    mmPutTest("--------- User pushed Retrieve");
+ }
  $nextpage = 3;
  check_credentials(); // Sets $error, $errmsg, $nextpage, $normemail, $sessioncode,
                // $runpath, $filepath, $dirinfo and $filecontent (globals).
@@ -52,21 +55,23 @@
        // directory name can be in input or select box
        $dirname = conditional_decode($_POST["knownDirname"]);
     }
-#    $dirinfo = get_dirinfo($filepath);
-#    if (is_bool($dirinfo) && $dirinfo == FALSE) {
-#       mmPutLog("Function get_dirinfo returned FALSE");
-#       $errmsg = "[Retrieve] failed. Internal error";
-#       $error = 1;
-#       $nextpage = 1;
-#    }
-# }
-# if ($error == 0) {
-    if (! array_key_exists($dirname,$dirinfo)) {
+    if (strlen($dirname) == 0) {
+#
+# The user has pushed the Retrieve button with an empty directory name.
+# Reload page to fill select box.
+#
+       $dirkey = "";
+    } elseif (! array_key_exists($dirname,$dirinfo)) {
        $errmsg = "[Retrieve] failed. No such directory name";
        $error = 1;
        $nextpage = 3;
     } else {
-       $dirkey = decodenorm($dirinfo[$dirname]);
+       $dirattributes = explode(',',$dirinfo[$dirname]);
+       $dirkey = decodenorm($dirattributes[0]);
+       if (count($dirattributes) > 1) {
+          $location = decodenorm($dirattributes[1]);
+          $threddscatalog = decodenorm($dirattributes[2]);
+       }
     }
  }
 ?>

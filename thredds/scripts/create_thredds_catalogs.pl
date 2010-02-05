@@ -221,7 +221,7 @@ sub inner_loop {
 #        String $dref starts with the string $opendap_url.
 #        Datasets with other content in $dref (dataref field) are ignored
 #
-         if ($dref =~ m:/([^/]+)/$:) {
+         if ($dref =~ m:/([^/]+)/[^/]*$:) {
             my $dataset = $1;
             if (!exists($datasets_to_ignore->{$dataset})) {
                $dist_statements{$dataset} = $distribution_stm;
@@ -243,13 +243,13 @@ sub inner_loop {
 #  Loop through all dataset directories within the top
 #  OPeNDAP/THREDDS directory:
 #
-#   print "    traverse subdirectories of the top OPENDAP directory: $opendap_directory\n";
+   print "    traverse subdirectories of the top OPENDAP directory: $opendap_directory\n";
    opendir(OPENDAPDIR,$opendap_directory) || 
          die "Could not open directory $opendap_directory: $!\n";
    foreach my $institution_dir (sort readdir(OPENDAPDIR)) {
       my $inst_dir = "$opendap_directory/$institution_dir";
       if (-d $inst_dir and substr($institution_dir,0,1) ne '.') {
-#         print "   found institution directory: $inst_dir\n";
+         print "   found institution directory: $inst_dir\n";
          opendir(INSTITUTIONDIR,$inst_dir) || 
                die "Could not open directory $inst_dir: $!\n";
          my $institution = $inst_dir;
@@ -257,7 +257,7 @@ sub inner_loop {
          foreach my $dataset_dir (sort readdir(INSTITUTIONDIR)) {
             my $dset_dir = "$inst_dir/$dataset_dir";
             if (-d $dset_dir and substr($dataset_dir,0,1) ne '.') {
-#               print "   found dataset directory: $dset_dir\n";
+               print "   found dataset directory: $dset_dir\n";
                my $dataset = $dset_dir;
                $dataset =~ s|^.*/||mg;
                if (exists($dist_statements{$dataset})) {
@@ -266,7 +266,10 @@ sub inner_loop {
                      my $rolename = $rolenames_from_config->{$distribution_statement};
                      $catalog_signature .= "$institution/$dataset $rolename\n";
                   } else {
+                     print "   - No rolename\n";
                   }
+               } else {
+                  print "   - No distribution statement\n";
                }
             }
          }

@@ -1,4 +1,4 @@
-<?php 
+<?php
 #---------------------------------------------------------------------------- 
 #  METAMOD - Web portal for metadata search and upload 
 # 
@@ -27,25 +27,32 @@
 #  along with METAMOD; if not, write to the Free Software 
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
 #---------------------------------------------------------------------------- 
-?>
-<?php
- // The user has pushed the "Test a file" link
- //
- if ($debug) {
-    mmPutTest("--------- User pushed Test a file");
- }
- $nextpage = 4;
- check_credentials(); // Sets $error, $errmsg, $nextpage, $normemail, $sessioncode,
-                      // $runpath, $filepath and $filecontent (globals).
- if ($error == 0) { // Check that institution exists and set $institution var.
-    $userinfo = get_userinfo($filepath);
-    if (!array_key_exists("institution",$userinfo)) {
-       $error = 2;
-       $nextpage = 1;
-       mmPutLog('No institution in userinfo');
-       $errmsg = "Sorry. Internal error";
-    } else {
-       $institution = $userinfo["institution"];
-    }
- }
+#
+   require_once("../funcs/mmConfig.inc");
+   require_once "funcs.inc";
+   $debug = $mmConfig->getVar('DEBUG');
+   $error = 0;
+   if (!array_key_exists("dataset", $_GET)) {
+      $error = 1;
+   }
+   if (!array_key_exists("dirkey", $_GET)) {
+      $error = 1;
+   }
+   if (!array_key_exists("filenames", $_GET)) {
+      $error = 1;
+   }
+   if ($error == 0) {
+      $command = $mmConfig->getVar('TARGET_DIRECTORY') . "/scripts/upload_indexer.pl";
+      $command .= " --dataset=" . $_GET["dataset"];
+      $command .= " --dirkey=" . $_GET["dirkey"];
+      $command .= " " . str_replace(',',' ',$_GET["filenames"]);
+      $output = array();
+      mmPutLog("--------- newfiles.php: command=" . $command);
+      exec($command,$output,$error);
+   }
+   if ($error == 0) {
+      header("HTTP/1.1 200 OK");
+   } else {
+      header("HTTP/1.1 404 Not found");
+   }
 ?>

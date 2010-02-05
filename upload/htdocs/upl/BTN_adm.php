@@ -33,6 +33,9 @@
  //
  check_credentials(); // Sets $error, $errmsg, $nextpage, $normemail, $sessioncode,
                       // $runpath, $filepath and $filecontent (globals).
+ if ($debug) {
+    mmPutTest("--------- User pushed Administration");
+ }
  if ($error == 0) {
     $nextpage = 3;
     $errmsg = "";

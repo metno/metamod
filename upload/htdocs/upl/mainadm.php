@@ -75,7 +75,7 @@ require_once("../funcs/mmConfig.inc");
       <table cellpadding="0" cellspacing="0" width="100%">
          <tr>
          <td>
-            <p class="heading"><?php $mmConfig->getVar('UPLOAD_APP_TITLE'); ?></p>
+            <p class="heading"><?php echo $mmConfig->getVar('UPLOAD_APP_TITLE'); ?></p>
             <p class="heading_info">
 <?php echo $mmConfig->getVar('UPLOAD_APP_INLOGGED_TEXT'); ?>
 <br /><br />
@@ -83,7 +83,11 @@ require_once("../funcs/mmConfig.inc");
             </p>
             <?php
                if (strlen($errmsg) > 0) {
-                  echo '<p class="note">' . $errmsg . '</p>' . "\n";
+                  if ($error == 0) {
+                     echo '<p class="notegreen">' . $errmsg . '</p>' . "\n";
+                  } else {
+                     echo '<p class="note">' . $errmsg . '</p>' . "\n";
+                  }
                }
             ?>
          </td>
@@ -103,19 +107,42 @@ require_once("../funcs/mmConfig.inc");
          <colgroup width="11%" />
          <colgroup width="11%" />
          <tr>
-         <td rowspan="4">
-            <p>In this page you can create new directories in the data repository and
+         <td rowspan="6">
+            <?php 
+            $external_repository = (strtolower($mmConfig->getVar('EXTERNAL_REPOSITORY')) == "true");
+            if ($external_repository) {
+            echo '<p>In this page you can enter access information for directories in an external
+            repository. The information will be used to harvest metadata from new files in the
+            directory and to create links from the search page to the actual data.</p>
+            <p>To register a new directory, fill in the directory name and the access information
+            fields (directory key, location and catalog URL). All these fields are mandatory.
+            Then click the CREATE/UPDATE button. Some restrictions exist on the format of the
+            fields. If they are not accepted, you will be informed by a message box.</p>
+            <p>You may change the information about directories that already have been registered.
+            Select the directory name in the selection box at the right hand side, or type in
+            the name in the Directory name field. Then click the RETRIEVE button. All information
+            previously entered will be shown, and may be changed. After editing the fields, click
+            the CREATE/UPDATE button.</p>
+            <p>The CANCEL button clears the fields, and makes the selection box again available for
+            new retrievals.</p>
+            <p>Note that changing access information for directories with files already parsed
+            into the database, will not change links to these older files. Only new files will
+            be affected.</p>';
+            } else {
+            echo '<p>In this page you can create new directories in the data repository and
             control who are allowed to upload files to your directories.
             </p>
             <p>To create a new directory, fill in the directory
             name and optionally the directory key. Then click the CREATE/UPDATE
-            button. Only alphanumeric characters or '.' or '-' (hyphen) are allowed in directory
+            button. Only alphanumeric characters or "." or "-" (hyphen) are allowed in directory
             names.</p>
-            <p>To change the directory key for an existing directory, fill in the directory name
-            and click the RETRIEVE button. Then you will get this page again with the directory name
-            and directory key filled in. Make your changes and click the CREATE/UPDATE button to
-            save them on the server. You may also change the directory name as long as no files
-            have been uploaded to the directory.</p>
+            <p>To change the directory key for an existing directory, select the directory name in
+            the selection box at the right hand side, or enter the directory name in the "Directory name"
+            field. Then click the RETRIEVE button. You will then get this page again with the directory 
+            name and directory key filled in. Make your changes and click the CREATE/UPDATE button to
+            save them on the server.</p>
+            <p>The CANCEL button clears the fields, and makes the selection box again available for
+            new retrievals.</p>
             <p>
             The directory key may be provided if you want other users to upload files
             to the directory.
@@ -124,9 +151,11 @@ require_once("../funcs/mmConfig.inc");
             regain control over who have access to the directory. If you are the only user of this
             directory, you may leave the key field empty. Note that the key is only for write
             access to the directory. <i>Read access for uploaded files are regulated by metadata
-            inside each file.</i></p>
+            inside each file.</i></p>';
+            }
+            ?>
          </td>
-         <td rowspan="4">
+         <td rowspan="6">
             &nbsp;
          </td>
          <td class="inputform">
@@ -138,10 +167,14 @@ require_once("../funcs/mmConfig.inc");
          <td class="inputform" colspan="2">
          	<select name="knownDirname" size="1">
          	<?php
-         		$dirinfo_sorted = ksort($dirinfo);
-         		foreach ( $dirinfo as $di => $ki ) {
-       				echo("<option>$di</option>");
-					}         		
+                if (strlen($dirname) == 0) {
+         		   $dirinfo_sorted = ksort($dirinfo);
+         		   foreach ( $dirinfo as $di => $ki ) {
+       				   echo("<option>$di</option>");
+				   }         		
+                } else {
+                   echo "<option></option>";
+                }
          	?>
          	</select>
          </td>
@@ -152,6 +185,9 @@ require_once("../funcs/mmConfig.inc");
          </td>
          <td class="inputform">
             <input class="selectbutton1" type="submit" name="BTN_creupd_dir" value="Create/Update" />
+         </td>
+         <td class="inputform">
+            <input class="selectbutton1" type="submit" name="BTN_cancel_dir" value="Cancel" />
          </td>
          <?php
          if (strlen($mmConfig->getVar("FIMEX_PROGRAM"))) {
@@ -189,6 +225,30 @@ require_once("../funcs/mmConfig.inc");
          <td class="inputform"/>
          <td class="inputform"/>
          </tr>
+         <?php
+            if (strtolower($mmConfig->getVar("EXTERNAL_REPOSITORY")) == "true") {
+               echo '
+         <tr>
+         <td class="inputform">
+            &nbsp;Dataset location:<br />&nbsp;(absolute directory path)
+         </td>
+         <td class="inputform" colspan="3">
+            <input name="location" value="' . $location . '" size="30" />
+         </td>
+         </tr>
+         <tr>
+         <td class="inputform">
+            &nbsp;Dataset catalog:<br />&nbsp;(THREDDS URL)
+         </td>
+         <td class="inputform" colspan="3">
+            <input name="threddscatalog" value="' . $threddscatalog . '" size="30" />
+         </td>
+         </tr>
+';
+            } else {
+         	   echo '<tr rowspan="2"><td class="inputform" colspan="4" /></tr>'."\n";
+            }
+         ?>
       </table>
       </div>
    </td>
