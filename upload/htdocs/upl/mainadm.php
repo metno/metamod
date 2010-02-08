@@ -40,7 +40,10 @@ require_once("../funcs/mmConfig.inc");
 </head>
 <body>
 <div class="mybody">
-<?php echo $mmConfig->getVar('APP_HEADER_HTML'); ?>
+<?php 
+   echo $mmConfig->getVar('APP_HEADER_HTML');
+   $external_repository = (strtolower($mmConfig->getVar('EXTERNAL_REPOSITORY')) == "true");
+?>
 <form action="main.php" method="post">
 <?php
    echo '<input type="hidden" name="normemail" value="' . $normemail . '" />' . "\n";
@@ -63,8 +66,13 @@ require_once("../funcs/mmConfig.inc");
       <p>&nbsp;</p>
       <p class="xmm_item">Administration</p>
       <?php
+         if ($external_repository) {
+            $files_text = "Files";
+         } else {
+            $files_text = "Upload Files";
+         }
          echo '<a class="mm_item" href="upload.php?sessioncode=' .
-            $sessioncode . '&normemail=' . $normemail . '">Upload Files</a>' . "\n";
+            $sessioncode . '&normemail=' . $normemail . '">' . $files_text . '</a>' . "\n";
          echo '<a class="mm_item" href="tfile.php?sessioncode=' .
             $sessioncode . '&normemail=' . $normemail . '">Test a file</a>' . "\n";
          echo '<a class="mm_item" href="start.php?sessioncode=' .
@@ -109,7 +117,6 @@ require_once("../funcs/mmConfig.inc");
          <tr>
          <td rowspan="6">
             <?php 
-            $external_repository = (strtolower($mmConfig->getVar('EXTERNAL_REPOSITORY')) == "true");
             if ($external_repository) {
             echo '<p>In this page you can enter access information for directories in an external
             repository. The information will be used to harvest metadata from new files in the

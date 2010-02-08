@@ -216,7 +216,15 @@ EOF;
       <input type="radio" name="selrec" value="-1" checked /> Upload a new file
 EOF;
    } else {
+      $local_url = $mmConfig->getVar('LOCAL_URL');
       echo <<<EOF
+      <h3>File registration</h3>
+      <p>Files in the data repository can be registered under a directory dataset using a web service
+      as follows:<br /><br />
+      $local_url/upl/newfiles.php?dataset=...&amp;dirkey=...&amp;filenames=...,...,...<br /><br />
+      The dirkey is mandatory and must match the directory key entered together with dataset name and 
+      access information using the Administration page. Filenames are without directory path.<br /><br />
+      </p>
       <h3>Previously registered files</h3>
 EOF;
    }

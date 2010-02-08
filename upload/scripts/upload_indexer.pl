@@ -233,95 +233,93 @@ sub process_files {
    my $ref_datasetinfo = $dataset_institution{$dataset_name};
    if (scalar @$ref_datasetinfo < 6) {
       &syserror("SYSUSER","dataset_no_access_information", "", "process_files", "Dataset: $dataset_name");
-      return 1;
+      $errors = 1;
+   } elsif ($ref_datasetinfo->[3] ne $dirkey) {
+      &syserror("SYSUSER","wrong_directory_key", "", "process_files", "Dataset: $dataset_name");
+      $errors = 1;
    }
-   my $dirpath = $ref_datasetinfo->[4];
-   my $catalogurl = $ref_datasetinfo->[5];
+   my $path_to_etc = $target_directory . '/etc';
+   if ($errors == 0) {
+      my $dirpath = $ref_datasetinfo->[4];
+      my $catalogurl = $ref_datasetinfo->[5];
 #
-   my @digest_input = ();
-   my $filecount = scalar @files_arr;
-   for (my $ix=0; $ix < $filecount; $ix++) {
-      my $filename = $files_arr[$ix];
-      my $filepath = $filename;
-      if (substr($filepath,0,1) ne '/') {
-         $filepath = $dirpath . '/' . $filename;
-         $files_arr[$ix] = $filepath;
-      }
-      $errors = 0;
-      if (! -e $filepath) {
-         &syserror("SYSUSER","file_not_in_repository", "", "process_files", "File name: $filepath Dataset: $dataset_name");
-         $errors = 1;
-      } elsif (! -r $filepath) {
-         &syserror("SYSUSER","file_not_readable", "", "process_files", "File name: $filepath Dataset: $dataset_name");
-         $errors = 1;
-      } elsif (-d $filepath) {
-         &syserror("SYSUSER","file_is_a_directory", "", "process_files", "Path: $filepath Dataset: $dataset_name");
-         $errors = 1;
-      }
+      my @digest_input = ();
+      my $filecount = scalar @files_arr;
+      for (my $ix=0; $ix < $filecount; $ix++) {
+         my $filename = $files_arr[$ix];
+         my $filepath = $filename;
+         if (substr($filepath,0,1) ne '/') {
+            $filepath = $dirpath . '/' . $filename;
+            $files_arr[$ix] = $filepath;
+         }
+         $errors = 0;
+         if (! -e $filepath) {
+            &syserror("SYSUSER","file_not_in_repository", "", "process_files", "File name: $filepath Dataset: $dataset_name");
+            $errors = 1;
+         } elsif (! -r $filepath) {
+            &syserror("SYSUSER","file_not_readable", "", "process_files", "File name: $filepath Dataset: $dataset_name");
+            $errors = 1;
+         } elsif (-d $filepath) {
+            &syserror("SYSUSER","file_is_a_directory", "", "process_files", "Path: $filepath Dataset: $dataset_name");
+            $errors = 1;
+         }
 #      
 #     Get type of file and act accordingly:
 #      
-      my $filetype = getFiletype($filepath);
-      if ($progress_report == 1) {
-         print "     Processing $filepath Filtype: $filetype\n";
-      }
+         my $filetype = getFiletype($filepath);
+         if ($progress_report == 1) {
+            print "     Processing $filepath Filtype: $filetype\n";
+         }
 #
-      if ($filetype ne 'nc3') { # Not netCDF 3 file
-         &syserror("SYSUSER","file_is_not_netcdf3", "", "process_files", "Path: $filepath Dataset: $dataset_name");
-         $errors = 1;
+         if ($filetype ne 'nc3') { # Not netCDF 3 file
+            &syserror("SYSUSER","file_is_not_netcdf3", "", "process_files", "Path: $filepath Dataset: $dataset_name");
+            $errors = 1;
+         }
+         if ($errors == 0) {
+            push (@digest_input,$filepath);
+         }
       }
-      if ($errors == 0) {
-         push (@digest_input,$filepath);
+      if (scalar @digest_input == 0) {
+         if ($progress_report == 1) {
+            print "     No files\n";
+         }
       }
-   }
-   if (scalar @digest_input == 0) {
-      if ($progress_report == 1) {
-         print "     No files\n";
+      open (DIGEST,">digest_input");
+      my $threddscatalog = $catalogurl;
+      if ($catalogurl =~ /^([^?]*)\?/) {
+         $threddscatalog = $1; # First matching ()-expression
       }
-   }
-   open (DIGEST,">digest_input");
-   my $threddscatalog = $catalogurl;
-   if ($catalogurl =~ /^([^?]*)\?/) {
-      $threddscatalog = $1; # First matching ()-expression
-   }
-   print DIGEST $threddscatalog . "\n";
-   foreach my $fname (@digest_input) {
-      print DIGEST $fname . "\n";
-   }
-   close (DIGEST);
+      print DIGEST $threddscatalog . "\n";
+      foreach my $fname (@digest_input) {
+         print DIGEST $fname . "\n";
+      }
+      close (DIGEST);
 #
 #  Run the digest_nc.pl script and process user errors if found:
 #
-   my $path_to_etc = $target_directory . '/etc';
-   my $path_to_digest_nc = $target_directory . '/scripts/digest_nc.pl';
-   my $xmlpath = File::Spec->catfile($webrun_directory,
+      my $path_to_digest_nc = $target_directory . '/scripts/digest_nc.pl';
+      my $xmlpath = File::Spec->catfile($webrun_directory,
                                      'XML',
                                      $application_id,
                                      $dataset_name . '.xml');
 #   
 #  Run the digest_nc.pl script:
 #   
-   my $command = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlpath";
-   if ($progress_report == 1) {
-      print "RUN:    $command\n";
-   }
-   my $result = &shcommand_scalar($command);
-   if (defined($result)) {
-      open (DIGOUTPUT,">digest_out");
-      print DIGOUTPUT $result . "\n";
-      close (DIGOUTPUT);
-   }
-   my $usererrors_path = "nc_usererrors.out";
-   open (USERERRORS,">>$usererrors_path");
-   foreach my $line (@user_errors) {
-      print USERERRORS $line;
-   }
-   close (USERERRORS);
+      my $command = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlpath";
+      if ($progress_report == 1) {
+         print "RUN:    $command\n";
+      }
+      my $result = &shcommand_scalar($command);
+      if (defined($result)) {
+         open (DIGOUTPUT,">digest_out");
+         print DIGOUTPUT $result . "\n";
+         close (DIGOUTPUT);
+      }
 #
-   if (length($shell_command_error) > 0) {
-      &syserror("SYS","digest_nc_fails", "", "process_files", "");
-      return;
-   } else {   	
+      if (length($shell_command_error) > 0) {
+         &syserror("SYS","digest_nc_fails", "", "process_files", "");
+         return 1;
+      }
 #
 #     Run digest_nc again for each file with output to dataset/file.xml
 #     this creates the level 2 (children) xml-files
@@ -346,7 +344,7 @@ sub process_files {
          if (! -d $xmlFileDir) {
             if (!mkdir($xmlFileDir)) {
              	syserror("SYS", "mkdir_fails", $filepath, "process_files", "mdkir $xmlFileDir");
-               	return;
+               	return 1;
             }
          }
          my $xmlFilePath = File::Spec->catfile($xmlFileDir, $pureFile . '.xml');
@@ -355,96 +353,102 @@ sub process_files {
          shcommand_scalar($digestCommand);
          if (length($shell_command_error) > 0) {
           	syserror("SYS", "digest_nc_file_fails", $filepath, "process_files", "");
-            return;
+            return 1;
          }
       }
+   }
+   my $usererrors_path = "nc_usererrors.out";
+   open (USERERRORS,">>$usererrors_path");
+   foreach my $line (@user_errors) {
+      print USERERRORS $line;
+   }
+   close (USERERRORS);
 #
 #  Check if errors were found. Eventually send E-mail to user.
 #
-      my $url_to_errors_html = "";
-      my $mailbody;
-      my $subject = $config->get('EMAIL_SUBJECT_WHEN_UPLOAD_ERROR');
-      my $dont_send_email_to_user = 
-            &string_found_in_file($dataset_name,$webrun_directory . '/' . 'datasets_for_silent_upload');
-      if (-z $usererrors_path) {
+   my $url_to_errors_html = "";
+   my $mailbody;
+   my $subject = $config->get('EMAIL_SUBJECT_WHEN_UPLOAD_ERROR');
+   my $dont_send_email_to_user = 
+         &string_found_in_file($dataset_name,$webrun_directory . '/' . 'datasets_for_silent_upload');
+   if (-z $usererrors_path) {
 #
 #     No user errors:
 #
-            if ($dont_send_email_to_user) {
-               &notify_web_system('Operator reload ', $dataset_name, \@files_arr,"");
-            } else {
-               &notify_web_system('File accepted ', $dataset_name, \@files_arr, "");
-            }
-      } else {
-#         
-#     User errors found (by digest_nc.pl or this script):
-#         
-         $mailbody = $config->get('EMAIL_BODY_WHEN_UPLOAD_ERROR');
-         my @bnames = &get_basenames(\@files_arr);
-         my $bnames_string = join(", ",@bnames);
-         my $datestring = &current_time();
-         my $timecode = substr($datestring,8,2) . substr($datestring,11,2) . 
-                        substr($datestring,14,2);
-         my $name_html_errfile = $dataset_name . '_' . $timecode . '.html';
-         my $path_to_errors_html = File::Spec->catfile($uerr_directory, $name_html_errfile);
-         my $errorinfo_path = "errorinfo";
-         open (ERRORINFO,">$errorinfo_path");
-         print ERRORINFO $path_to_errors_html . "\n";
-         print ERRORINFO $bnames_string . "\n";
-         print ERRORINFO $datestring . "\n";
-         close (ERRORINFO);
-         $url_to_errors_html = $local_url . '/upl/uerr/' . $name_html_errfile;
-         my $path_to_print_usererrors = $target_directory . '/scripts/print_usererrors.pl';
-         my $path_to_usererrors_conf = $path_to_etc . '/usererrors.conf';
-#   
-#     Run the print_usererrors.pl script:
-#   
-         my $result = &shcommand_scalar(
-              "$path_to_print_usererrors " .
-                 "$path_to_usererrors_conf " .
-                 "$usererrors_path " .
-                 "$errorinfo_path "
-            );
-         if (length($shell_command_error) > 0) {
-            &syserror("SYS","print_usererrors_fails", "", "process_files", "");
-            return;
-         }
          if ($dont_send_email_to_user) {
             &notify_web_system('Operator reload ', $dataset_name, \@files_arr,"");
          } else {
-            &notify_web_system('Errors found ', $dataset_name, \@files_arr,
-                         $url_to_errors_html);
+            &notify_web_system('File accepted ', $dataset_name, \@files_arr, "");
          }
+   } else {
+#         
+#     User errors found (by digest_nc.pl or this script):
+#         
+      $mailbody = $config->get('EMAIL_BODY_WHEN_UPLOAD_ERROR');
+      my @bnames = &get_basenames(\@files_arr);
+      my $bnames_string = join(", ",@bnames);
+      my $datestring = &current_time();
+      my $timecode = substr($datestring,8,2) . substr($datestring,11,2) . 
+                     substr($datestring,14,2);
+      my $name_html_errfile = $dataset_name . '_' . $timecode . '.html';
+      my $path_to_errors_html = File::Spec->catfile($uerr_directory, $name_html_errfile);
+      my $errorinfo_path = "errorinfo";
+      open (ERRORINFO,">$errorinfo_path");
+      print ERRORINFO $path_to_errors_html . "\n";
+      print ERRORINFO $bnames_string . "\n";
+      print ERRORINFO $datestring . "\n";
+      close (ERRORINFO);
+      $url_to_errors_html = $local_url . '/upl/uerr/' . $name_html_errfile;
+      my $path_to_print_usererrors = $target_directory . '/scripts/print_usererrors.pl';
+      my $path_to_usererrors_conf = $path_to_etc . '/usererrors.conf';
+#   
+#     Run the print_usererrors.pl script:
+#   
+      my $result = &shcommand_scalar(
+           "$path_to_print_usererrors " .
+              "$path_to_usererrors_conf " .
+              "$usererrors_path " .
+              "$errorinfo_path "
+         );
+      if (length($shell_command_error) > 0) {
+         &syserror("SYS","print_usererrors_fails", "", "process_files", "");
+         return 1;
       }
-      if (defined($mailbody)) {
+      if ($dont_send_email_to_user) {
+         &notify_web_system('Operator reload ', $dataset_name, \@files_arr,"");
+      } else {
+         &notify_web_system('Errors found ', $dataset_name, \@files_arr,
+                      $url_to_errors_html);
+      }
+   }
+   if (defined($mailbody)) {
 #
 #     Send mail to owner of the dataset:
 #
-         my $recipient = $dataset_institution{$dataset_name}->[1];
-         my $username = $dataset_institution{$dataset_name}->[2] . " ($recipient)";
-         if ((!$config->get('TEST_EMAIL_RECIPIENT')) || $dont_send_email_to_user) {
-            $recipient = $config->get('OPERATOR_EMAIL');
+      my $recipient = $dataset_institution{$dataset_name}->[1];
+      my $username = $dataset_institution{$dataset_name}->[2] . " ($recipient)";
+      if ((!$config->get('TEST_EMAIL_RECIPIENT')) || $dont_send_email_to_user) {
+         $recipient = $config->get('OPERATOR_EMAIL');
+      }
+      if ($config->get('TEST_EMAIL_RECIPIENT') ne '0') {
+         my $external_url = $url_to_errors_html;
+         if (substr($external_url,0,7) ne 'http://') {
+            $external_url = $config->get('BASE_PART_OF_EXTERNAL_URL') . $url_to_errors_html;
          }
-         if ($config->get('TEST_EMAIL_RECIPIENT') ne '0') {
-            my $external_url = $url_to_errors_html;
-            if (substr($external_url,0,7) ne 'http://') {
-               $external_url = $config->get('BASE_PART_OF_EXTERNAL_URL') . $url_to_errors_html;
-            }
-            $mailbody =~ s/\[OWNER\]/$username/mg;
-            $mailbody =~ s/\[DATASET\]/$dataset_name/mg;
-            $mailbody =~ s/\[URL\]/$external_url/mg;
-            $mailbody .= "\n";
-            $mailbody .= $config->get('EMAIL_SIGNATURE');
-            my $sender = $config->get('FROM_ADDRESS');
-            my $mailer = Mail::Mailer->new;
-            my %headers = ( To => $recipient,
-                            Subject => $subject,
-                            From => $sender,
-                          );
-            $mailer->open(\%headers);
-            print $mailer $mailbody;
-            $mailer->close;
-         }
+         $mailbody =~ s/\[OWNER\]/$username/mg;
+         $mailbody =~ s/\[DATASET\]/$dataset_name/mg;
+         $mailbody =~ s/\[URL\]/$external_url/mg;
+         $mailbody .= "\n";
+         $mailbody .= $config->get('EMAIL_SIGNATURE');
+         my $sender = $config->get('FROM_ADDRESS');
+         my $mailer = Mail::Mailer->new;
+         my %headers = ( To => $recipient,
+                         Subject => $subject,
+                         From => $sender,
+                       );
+         $mailer->open(\%headers);
+         print $mailer $mailbody;
+         $mailer->close;
       }
    }
 };
