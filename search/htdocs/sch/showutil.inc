@@ -42,13 +42,8 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsExists = 
    }
    if ($mtname == "dataref") {
    	$dataUrl = $s1;
-      if ((substr($s1,0,7) == 'http://') && (preg_match (':/([^/]+)/catalog\.html$:',$s1,$a1))) {
-         $nameshown = $a1[1];
-         $s1 = '<a href="' . $dataUrl . '"><b>' . $nameshown . '</b></a>';
-      } else if ((substr($s1,0,7) == 'http://') && (preg_match (':/([^/]+)(/?)$:',$s1,$a1))) {
-         $nameshown = $a1[1];
-         $s1 = '<a href="' . $dataUrl . '"><b>' . $nameshown . '</b></a>';
-      }
+      $nameshown = preg_replace(':[^/]*/:','', $dsName);
+      $s1 = '<a href="' . $dataUrl . '"><b>' . $nameshown . '</b></a>';
       $s1 .= "<div class=\"btns\">";
       $s1 .= " <a class=\"btn\" href=\"xmlShow.php?dsName=$dsName\" target=\"_new\"><span>Show xml</span></a> ";
       $s1 .= "</div>";

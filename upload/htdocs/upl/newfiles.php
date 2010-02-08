@@ -45,19 +45,16 @@
       $command = $mmConfig->getVar('TARGET_DIRECTORY') . "/scripts/upload_indexer.pl";
       $command .= " --dataset=" . $_GET["dataset"];
       $command .= " --dirkey=" . $_GET["dirkey"];
-      $filenames = str_replace(',',' ',$_GET["filenames"]);
-      if (! preg_match ('/^[ A-Za-z0-9._-]+$/',$filenames)) {
-         $error = 1;
-      } else {
-         $command .= " " . $filenames;
-         $output = array();
-         mmPutLog("--------- newfiles.php: command=" . $command);
-         exec($command,$output,$error);
-      }
+      $filenames = str_replace(',',' ',$_GET["filenames[]"]);
+      $command .= " " . $filenames;
+      $command = escapeshellcmd($command);
+      $output = array();
+      mmPutLog("--------- newfiles.php: command=" . $command);
+      exec($command,$output,$error);
    }
    if ($error == 0) {
       header("HTTP/1.1 200 OK");
    } else {
-      header("HTTP/1.1 404 Not found");
+      header("HTTP/1.1 500 Internal Server Error");
    }
 ?>
