@@ -38,14 +38,18 @@
    if (!array_key_exists("dirkey", $_GET)) {
       $error = 1;
    }
-   if (!array_key_exists("filenames", $_GET)) {
+   # use filename[] as parameter to indicate array, otherwise, use filename
+   if (!array_key_exists("filename", $_GET)) {
       $error = 1;
    }
    if ($error == 0) {
       $command = $mmConfig->getVar('TARGET_DIRECTORY') . "/scripts/upload_indexer.pl";
       $command .= " --dataset=" . $_GET["dataset"];
       $command .= " --dirkey=" . $_GET["dirkey"];
-      $filenames = str_replace(',',' ',$_GET["filenames[]"]);
+      $filenames = $_GET["filename"];
+      if (is_array($filenames)) {
+         $filenames = join(' ', $filenames);
+      }
       $command .= " " . $filenames;
       $command = escapeshellcmd($command);
       $output = array();
