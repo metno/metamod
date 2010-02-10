@@ -47,9 +47,9 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = f
       $s1 .= "<div class=\"btns\">";
       $s1 .= " <a class=\"btn\" href=\"xmlShow.php?dsName=$dsName\" target=\"_new\"><span>Show xml</span></a> ";
       $s1 .= "</div>";
-      if ($wmsSetup && strlen($wmsSetup->getUrl)) {
+      if ($wmsSetup && strlen($wmsSetup->getUrl())) {
       	$s1 .= "<div class=\"btns\">";
-         $wmsUrl = urlencode($wms->getUrl($dsName));
+         $wmsUrl = urlencode($wmsSetup->getUrl($dsName));
          $s1 .= "<a class=\"btn\" href=\"wms.php?wmsurl=$wmsUrl\" ><span>Visualize</span></a>";
          $s1 .= "</div>";
       }

@@ -175,7 +175,7 @@ function getWMSSetup2FromDbById($pgDB, $datasetId) {
 'SELECT WI_content FROM WMSInfo ' .
 ' WHERE (WI_content IS NOT NULL OR WI_content != \'\') ' .
 '   AND DS_id IN (SELECT DS_parent FROM Dataset WHERE DS_id = $1) ';
-		$result = pg_query_params($pgDB, $sql, array($datasetName));
+		$result = pg_query_params($pgDB, $sql, array($datasetId));
 		if (!$result) {
    		mm_log(MM_ERROR, "Could not execute $sql", __FILE__, __LINE__);
      		die("Internal Error");
