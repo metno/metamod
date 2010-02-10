@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://www.met.no/schema/metamod/ncWmsSetup" 
+        xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified">
+                
+    <!-- root element -->
+    <element name='ncWmsSetup' type="w:NcWmsSetup" />
+ 
+    <complexType name='NcWmsSetup'>
+        <attribute name="url" type="anyURI" use="required"/>
+    </complexType>
+        
+</schema>

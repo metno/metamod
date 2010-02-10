@@ -9,7 +9,6 @@
 =htdocs/sch/bkdone.php
 =htdocs/sch/bkclear.php
 =htdocs/sch/getFimexReprojectedURL.php
-=htdocs/sch/getWMC.php
 =htdocs/sch/hkdone.php
 =htdocs/sch/hkclear.php
 =htdocs/sch/hkupdate.php

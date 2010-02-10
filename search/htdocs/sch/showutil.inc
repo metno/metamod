@@ -31,9 +31,9 @@
 <?php
 include_once 'gautil.inc';
 require_once("../funcs/mmFimex.inc");
-require_once("../funcs/mmWMS.inc");
+require_once("../funcs/mmWMS2.inc");
 
-function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsExists = false) {
+function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = false) {
 	global $mmConfig;
    $s1 = $value;
    $jpos = strpos($s1,' > HIDDEN');
@@ -47,11 +47,10 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsExists = 
       $s1 .= "<div class=\"btns\">";
       $s1 .= " <a class=\"btn\" href=\"xmlShow.php?dsName=$dsName\" target=\"_new\"><span>Show xml</span></a> ";
       $s1 .= "</div>";
-      if ($wmsExists && strlen($mmConfig->getVar("WMS_URL"))) {
+      if ($wmsSetup && strlen($wmsSetup->getUrl)) {
       	$s1 .= "<div class=\"btns\">";
-      	$wmcUrl = $mmConfig->getVar("WMS_URL").
-      		urlencode($mmConfig->getVar("BASE_PART_OF_EXTERNAL_URL").$mmConfig->getVar("LOCAL_URL")."/sch/getWMC.php?datasetName=$dsName");
-         $s1 .= "<a class=\"btn\" href=\"$wmcUrl\" ><span>Visualize</span></a>";
+         $wmsUrl = urlencode($wms->getUrl($dsName));
+         $s1 .= "<a class=\"btn\" href=\"wms.php?wmsurl=$wmsUrl\" ><span>Visualize</span></a>";
          $s1 .= "</div>";
       }
       if ($fimexSetup && strlen($mmConfig->getVar("FIMEX_PROGRAM"))) {
@@ -100,7 +99,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
       }
    }
    $fimexSetup = getFimexSetupFromDb($mmDbConnection, $parentds);
-   $wmsExists = checkWMSSetupExistsInDb($mmDbConnection, $parentds);
+   $wmsSetup = getWMSSetup2FromDb($mmDbConnection, $parentds);
    $dsarr = array();
    $dbug = strpos($mmDebug,"secondlevel");
    $tmpSqlPartParams = $sqlPartParams;
@@ -315,7 +314,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
             for ($i1=$ifirst; $i1 <= $ilast;$i1++) {
                list($mdcontent,$mtname,$dsid,$dsname) = pg_fetch_row($result,$i1);
                $jindex = $indexmtnames[$mtname];
-               $s1 = displayval($mtname,$mdcontent,$dsname,$fimexSetup, $wmsExists);
+               $s1 = displayval($mtname,$mdcontent,$dsname,$fimexSetup, $wmsSetup);
                $mdcontentall[$jindex] .= "<p>" . $s1 . "</p>\n";
             }
             $line = "<tr><td>&nbsp;</td>\n";

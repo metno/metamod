@@ -64,4 +64,8 @@
 443323
 443331
 443332
-443333</quadtree_nodes></dataset>
+443333</quadtree_nodes>
+<wmsInfo>
+<mm:ncWmsSetup xmlns:mm="http://www.met.no/schema/metamod/ncWmsSetup" url="http://dev-vm188/thredds/wms/osisaf/met.no/ice/ice_conc_nh_200911291200_CF.nc"/>
+</wmsInfo>
+</dataset>
