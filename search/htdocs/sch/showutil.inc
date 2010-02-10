@@ -99,7 +99,6 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
       }
    }
    $fimexSetup = getFimexSetupFromDb($mmDbConnection, $parentds);
-   $wmsSetup = getWMSSetup2FromDb($mmDbConnection, $parentds);
    $dsarr = array();
    $dbug = strpos($mmDebug,"secondlevel");
    $tmpSqlPartParams = $sqlPartParams;
@@ -314,6 +313,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
             for ($i1=$ifirst; $i1 <= $ilast;$i1++) {
                list($mdcontent,$mtname,$dsid,$dsname) = pg_fetch_row($result,$i1);
                $jindex = $indexmtnames[$mtname];
+               $wmsSetup = getWMSSetup2FromDb($mmDbConnection, $dsid);
                $s1 = displayval($mtname,$mdcontent,$dsname,$fimexSetup, $wmsSetup);
                $mdcontentall[$jindex] .= "<p>" . $s1 . "</p>\n";
             }
