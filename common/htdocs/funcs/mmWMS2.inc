@@ -43,7 +43,7 @@ class MM_WMSSetup2 {
    private $wmsTemplate = "";
    const wmsSetupNS = "http://www.met.no/schema/metamod/ncWmsSetup";
 
-	static function getWmsSetupSchema() {
+	static function getSchema() {
 		global $mmConfig;
 		return $mmConfig->getVar("TARGET_DIRECTORY") . "/schema/ncWmsSetup.xsd"; 	   
 	}
@@ -64,7 +64,7 @@ class MM_WMSSetup2 {
          	throw new MM_DatasetException("unable to parse xml-string $str");
          }
          if ($validate) {
-            if (! @$dom->schemaValidate($this->getWmsSetupSchema())) {
+            if (! @$dom->schemaValidate($this->getSchema())) {
             	// PHP_ERRORMSG requires track_errors to be enabled
                throw new MM_DatasetException("invalid xml-file: ".$PHP_ERRORMSG);
             }
@@ -144,7 +144,7 @@ function getWMSSetup2FromDb($pgDB, $datasetName) {
 		}
 	}
 	if ($row = pg_fetch_row($result)) {
-		return new MM_WMSSetup($row[0], $isParent);
+		return new MM_WMSSetup2($row[0], $isParent);
 	}
 	return false;
 }
@@ -182,7 +182,7 @@ function getWMSSetup2FromDbById($pgDB, $datasetId) {
 		}
 	}
 	if ($row = pg_fetch_row($result)) {
-		return new MM_WMSSetup($row[0], $isParent);
+		return new MM_WMSSetup2($row[0], $isParent);
 	}
 	return false;
 }
