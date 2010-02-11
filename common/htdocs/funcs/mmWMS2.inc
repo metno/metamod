@@ -124,7 +124,7 @@ function getWMSSetup2FromDb($pgDB, $datasetName) {
 	$sql = 'SELECT WI_content FROM WMSInfo, Dataset '.
 		    ' WHERE DS_name = $1 '.
 	     	 '   AND WMSInfo.DS_id = Dataset.DS_id '.
-	     	 '   AND (WI_content IS NOT NULL OR WI_content != \'\')';
+	     	 '   AND (WI_content IS NOT NULL AND WI_content != \'\')';
 	$result = pg_query_params($pgDB, $sql, array($datasetName));
 	if (!$result) {
 	  	mm_log(MM_ERROR, "Could not execute $sqlsentence", __FILE__, __LINE__);
@@ -135,7 +135,7 @@ function getWMSSetup2FromDb($pgDB, $datasetName) {
 		$isParent = true;
 		$sql = 
 'SELECT WI_content FROM WMSInfo ' .
-' WHERE (WI_content IS NOT NULL OR WI_content != \'\') ' .
+' WHERE (WI_content IS NOT NULL AND WI_content != \'\') ' .
 '   AND DS_id IN (SELECT DS_parent FROM Dataset WHERE DS_name = $1) ';
 		$result = pg_query_params($pgDB, $sql, array($datasetName));
 		if (!$result) {
@@ -162,7 +162,7 @@ function getWMSSetup2FromDbById($pgDB, $datasetId) {
    // retrieve WMSInfo from database
 	$sql = 'SELECT WI_content FROM WMSInfo'.
 		    ' WHERE WMSInfo.DS_id = $1 '.
-	     	 '   AND (WI_content IS NOT NULL OR WI_content != \'\')';
+	     	 '   AND (WI_content IS NOT NULL AND WI_content != \'\')';
 	$result = pg_query_params($pgDB, $sql, array($datasetId));
 	if (!$result) {
 	  	mm_log(MM_ERROR, "Could not execute $sqlsentence", __FILE__, __LINE__);
@@ -173,7 +173,7 @@ function getWMSSetup2FromDbById($pgDB, $datasetId) {
 		$isParent = true;
 		$sql = 
 'SELECT WI_content FROM WMSInfo ' .
-' WHERE (WI_content IS NOT NULL OR WI_content != \'\') ' .
+' WHERE (WI_content IS NOT NULL AND WI_content != \'\') ' .
 '   AND DS_id IN (SELECT DS_parent FROM Dataset WHERE DS_id = $1) ';
 		$result = pg_query_params($pgDB, $sql, array($datasetId));
 		if (!$result) {

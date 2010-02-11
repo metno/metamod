@@ -311,7 +311,7 @@ class MM_FimexSetup {
 function getFimexSetupFromDb($pgDb, $datasetId) {
 	$sql = 
 'SELECT PI_content FROM ProjectionInfo
-   WHERE DS_id = $1 AND (PI_content IS NOT NULL OR PI_content != \'\')';
+   WHERE DS_id = $1 AND (PI_content IS NOT NULL AND PI_content != \'\')';
 
 	$result = pg_query_params($pgDb, $sql, array($datasetId));
 	if (!$result) {
@@ -322,7 +322,7 @@ function getFimexSetupFromDb($pgDb, $datasetId) {
 		// try parent
 		$sql = 
 'SELECT PI_content FROM ProjectionInfo, Dataset ' .
-' WHERE (PI_content IS NOT NULL OR PI_content != \'\') ' .
+' WHERE (PI_content IS NOT NULL AND PI_content != \'\') ' .
 '   AND DS_parent = $1 ' .
 '   AND ProjectionInfo.DS_id = Dataset.DS_id';
 		$result = pg_query_params($pgDb, $sql, array($datasetId));
