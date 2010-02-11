@@ -14,4 +14,9 @@
 322231
 322233
 411131
-411133</quadtree_nodes></dataset>
+411133</quadtree_nodes><datasetRegion xmlns="http://www.met.no/schema/metamod/datasetRegion" xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+  <boundingBox/>
+  <lonLatPoints>
+  -146.77 84.99,-144.59 84.84,-143.87 85.24,-139.07 84.91,-134.57 85.10,-130.19 85.27,-130.80 80.47,-124.82 80.93,-125.11 80.35,12.20 86.99,13.05 86.83,13.98 86.52,10.57 86.73,-93.29 84.41,-89.92 84.16,-53.81 85.66,-45.47 85.71,-53.76 85.48,-49.65 85.50,-48.09 85.52,-45.81 85.52,-116.27 74.80,-65.22 84.85,-102.74 71.06
+  </lonLatPoints>
+</datasetRegion></dataset>

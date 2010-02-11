@@ -3,7 +3,7 @@
   <metadata name="datacollection_period_from">2005-12-01</metadata>
   <metadata name="datacollection_period_to">2007-11-26</metadata>
   <metadata name="bounding_box">180,30.9435,-180,90</metadata>
-  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/DTU/optimal/</metadata>
+  <metadata name="dataref">http://thredds.met.no/thredds/catalog/data/DTU/optimal/</metadata>
   <metadata name="area">Arctic Ocean</metadata>
   <metadata name="contact">rs@space.dtu.dk</metadata>
   <metadata name="topiccategory">oceans</metadata>

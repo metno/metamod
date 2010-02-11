@@ -3,7 +3,7 @@
   <metadata name="datacollection_period_from">2001-07-05</metadata>
   <metadata name="datacollection_period_to">2001-08-21</metadata>
   <metadata name="bounding_box">120,79,-10,90</metadata>
-  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/SU/aoe/</metadata>
+  <metadata name="dataref">http://thredds.met.no/thredds/catalog/data/SU/aoe/</metadata>
   <metadata name="product_name">AOE-2001 dataset</metadata>
   <metadata name="area">Arctic Ocean</metadata>
   <metadata name="contact">michaelt@misu.su.se</metadata>

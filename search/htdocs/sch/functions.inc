@@ -404,6 +404,52 @@ function mmShowSelectedFT() {
 	}
 }
 
+/**
+ * fetch an URL which shows an image of the selected area
+ * as stored in the global $mmSessionState. This function might also set
+ * the global $mmError and $mmErrorMessage.
+ * @param $categoryNum the category-number for GA as stored in the $mmSessionState
+ * @return image-url
+ */
+function mmGetGAImageSrc($categoryNum) {
+   global $mmConfig, $mmSessionState, $mmErrorMessage, $mmError;
+   
+   //TODO: currently only supporting the first srid mentioned   
+   list($srid) = split(' ', $mmConfig->getVar('SRID_ID_COLUMNS'));
+   $mapFile = $mmConfig->getVar('TARGET_DIRECTORY').'/htdocs/img/map_'.$srid.'.png';
+   $imgSrc = '';
+   if (! file_exists($mapFile)) {
+		mmPutLog("Error. Missing file $mapFile");
+		$mmErrorMessage = "Sorry. Internal error: missing file $mapFile";
+   	$mmError = 1;
+   } else {
+      $imgSrc = 'getMap.php?srid='.$srid;
+      if (isset($mmSessionState->sitems) &&
+          array_key_exists("$categoryNum,GA",$mmSessionState->sitems)) {
+			$stage = $mmSessionState->sitems["$categoryNum,GA"][0];
+         $mmMapnum = $mmSessionState->sitems["$categoryNum,GA"][1];
+         $x1 = $mmSessionState->sitems["$categoryNum,GA"][2];
+         $y1 = $mmSessionState->sitems["$categoryNum,GA"][3];
+         if ($stage == 1) {
+            $x1 = 5*floor(($x1+0.01)/5);
+            $y1 = 5*floor(($y1+0.01)/5);
+            $imgSrc .= "&x1=$x1&y1=$y1";
+         } else {
+            $x2 = $mmSessionState->sitems["$categoryNum,GA"][4];
+            $y2 = $mmSessionState->sitems["$categoryNum,GA"][5];
+            $x1 = 5*floor(($x1+0.01)/5);
+            $y1 = 5*floor(($y1+0.01)/5);
+            $x2 = 5*ceil(($x2+0.01)/5);
+            $y2 = 5*ceil(($y2+0.01)/5);
+            $imgSrc .= "&x1=$x1&y1=$y1&x2=$x2&y2=$y2";
+         }
+      } else {
+			# nothing 
+      }      
+   }
+   return $imgSrc;
+}
+
 function mmShowSelectedGA($category) {
    global $mmSessionState, $mmSessionId;
 
@@ -411,11 +457,10 @@ function mmShowSelectedGA($category) {
    echo mmAnchor("search.php?mmSubmitButton=ga_$category",$name,"search") . "\n";
    if (isset($mmSessionState->sitems) &&
             array_key_exists("$category,GA",$mmSessionState->sitems)) {
-      $mmMapnum = $mmSessionState->sitems["$category,GA"][1];
-      $tfname = 'maps/t' . $mmSessionId . _ . $mmMapnum . '.png';
-      if (file_exists($tfname)) {
-         echo '<p class="indented"> ' .
-            '<img src="' . $tfname . '" width="150" height="150" /></p>' . "\n";
+      $imgSrc = mmGetGAImageSrc($category);
+      if (strlen($imgSrc)) {
+      	echo '<p class="indented"> ' .
+         	'<img src="' . $imgSrc . '" width="150" height="150" /></p>' . "\n";
       }
    }
 }

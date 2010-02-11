@@ -6,4 +6,7 @@
 144442
 144443
 233311
-233313</quadtree_nodes></dataset>
+233313</quadtree_nodes><datasetRegion xmlns="http://www.met.no/schema/metamod/datasetRegion" xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+  <boundingBox north="88.16" south="87.74" east="-105.81" west="-158.42"/>
+  <lonLatPoints/>
+</datasetRegion></dataset>

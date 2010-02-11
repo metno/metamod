@@ -30,5 +30,5 @@ depth is 500m and the dataset contains hourly records (raw data) from 100m and
   <metadata name="title">Svinøy S1 mooring</metadata>
   <metadata name="institution">UiB University of Bergen</metadata>
   <metadata name="product_name">Svinøy S1 mooring 100m and 300m</metadata>
-  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/UiB/svinoy-mooring/</metadata>
+  <metadata name="dataref">http://thredds.met.no/thredds/catalog/data/UiB/svinoy-mooring/</metadata>
 </MM2>

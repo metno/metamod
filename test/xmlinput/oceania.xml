@@ -3,7 +3,7 @@
   <metadata name="datacollection_period_from">2007-06-19</metadata>
   <metadata name="datacollection_period_to">2007-07-22</metadata>
   <metadata name="bounding_box">20.004,70.5,0.044,79.831</metadata>
-  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/IOPAS/oceania/</metadata>
+  <metadata name="dataref">http://thredds.met.no/thredds/catalog/data/IOPAS/oceania/</metadata>
   <metadata name="Conventions">CF-1.0</metadata>
   <metadata name="topiccategory">oceans</metadata>
   <metadata name="area">Greenland Sea</metadata>

@@ -30,39 +30,22 @@
 ?>
 <?php
    include_once 'gautil.inc';
-   if (! file_exists("maps")) {
-      mmPutLog("Error. Directory ./maps not found");
-      $mmErrorMessage = "Sorry, internal error";
-      $mmError = 1;
-   }
    if ($mmError == 0) {
       if (isset($mmSessionState->sitems) &&
             array_key_exists("$mmCategoryNum,GA",$mmSessionState->sitems)) {
 
          $stage = $mmSessionState->sitems["$mmCategoryNum,GA"][0];
          $mmMapnum = $mmSessionState->sitems["$mmCategoryNum,GA"][1];
-         $fname = 'maps/m' . $mmSessionId . _ . $mmMapnum . '.png';
          if ($stage == 1) { # The user has only defined one point in the rectangle
             unset($mmSessionState->sitems["$mmCategoryNum,GA"]);
          } else {
-            $tfname = 'maps/t' . $mmSessionId . _ . $mmMapnum . '.png';
-            $cmd = "convert " . $fname . " -resize 150 " . $tfname;
-            system($cmd,$ier);
-            if ($ier != 0) {
-               mmPutLog("Error. Failed command: " . $cmd . " Returned errcode: " . $ier);
-               $mmErrorMessage = "Sorry, internal error";
-               $mmError = 1;
+            if (strlen($mmConfig->getVar("USE_QUADTREE"))) {
+            	$drhash = mmGetqtnodes(7,0);
+            	$mmSessionState->sitems["$mmCategoryNum,GA"][6] = count($drhash);
+            	foreach ($drhash as $did) {
+               	$mmSessionState->sitems["$mmCategoryNum,GA"][] = $did;
+            	}               
             }
-            $drhash = mmGetqtnodes(7,0);
-            $mmSessionState->sitems["$mmCategoryNum,GA"][6] = count($drhash);
-            foreach ($drhash as $did) {
-               $mmSessionState->sitems["$mmCategoryNum,GA"][] = $did;
-            }
-         }
-         if (!unlink($fname)) {
-            mmPutLog("Error. Could not unlink " . $fname);
-            $mmErrorMessage = "Sorry, internal error";
-            $mmError = 1;
          }
       }
    }

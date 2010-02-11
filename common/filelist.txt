@@ -13,6 +13,7 @@ metamodInit.sh
 =schema/dif2dataset.xslt
 =schema/MM2.xsd
 =schema/dataset.xsd
+=schema/datasetRegion.xsd
 =schema/dif2MM2.xslt
 =schema/dif_v9.7.1.xsd
 =schema/OAI-PMH.xsd
@@ -26,7 +27,10 @@ metamodInit.sh
 =lib/Metamod/DatasetTransformer/OldDataset.pm
 =lib/Metamod/DatasetTransformer/DIF.pm
 =lib/Metamod/Dataset.pm
+=lib/Metamod/DatasetRegion.pm
 =lib/Metamod/ForeignDataset.pm
+=lib/Metamod/LonLatPoint.pm
+=lib/Metamod/LonLatPolygon.pm
 =lib/Metamod/Utils.pm
 =lib/Metamod/Config.pm
 =lib/MetNo/NcFind.pm

@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
-  <info name="DAMOC/synop/synop_99950" status="active" creationDate="2009-03-20T14:07:15Z" datestamp="2009-03-20T14:07:15Z" ownertag="NDAM" metadataFormat="MM2"/>
+  <info name="DAMOC/synop/synop_99950" status="active" creationDate="2009-03-20T14:07:15Z" datestamp="2009-03-20T14:07:15Z" ownertag="NDAM" metadataFormat="MM2"/><datasetRegion xmlns="http://www.met.no/schema/metamod/datasetRegion" xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+  <boundingBox north="70.93" south="70.93" east="-8.67" west="-8.67"/>
+  <lonLatPoints/>
+</datasetRegion>
 </dataset>

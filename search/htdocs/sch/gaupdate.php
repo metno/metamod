@@ -44,23 +44,6 @@
          $stage = 2;
          $mmMapnum = 0;
       }
-      if (! file_exists("maps")) {
-         mmPutLog("Error. Directory ./maps not found");
-         $mmErrorMessage = "Sorry, internal error";
-         $mmError = 1;
-      } else {
-         $fname = 'maps/m' . $mmSessionId . _ . $mmMapnum . '.png';
-         $tfname = 'maps/t' . $mmSessionId . _ . $mmMapnum . '.png';
-         foreach (array($fname,$tfname) as $fn) {
-            if (file_exists($fn)) {
-               if (!unlink($fn)) {
-                  mmPutLog("Error. Could not unlink " . $fn);
-                  $mmErrorMessage = "Sorry, internal error";
-                  $mmError = 1;
-               }
-            }
-         }
-      }
    }
    if ($mmError == 0) {
       $mmMapnum++;

@@ -4,4 +4,7 @@
 <quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">324241
 324242
 413131
-413132</quadtree_nodes></dataset>
+413132</quadtree_nodes><datasetRegion xmlns="http://www.met.no/schema/metamod/datasetRegion" xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+  <boundingBox north="78.84" south="78.83" east="7.00" west="-0.81"/>
+  <lonLatPoints/>
+</datasetRegion></dataset>

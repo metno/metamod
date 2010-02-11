@@ -3,7 +3,7 @@
   <metadata name="datacollection_period_from">2006-10-02</metadata>
   <metadata name="datacollection_period_to">2006-10-31</metadata>
   <metadata name="bounding_box">4.29,62.8333333333,4.29,62.8333333333</metadata>
-  <metadata name="dataref">http://damocles.met.no:8080/thredds/dodsC/data/UiB/GFI/GFI_S1M10983.nc</metadata>
+  <metadata name="dataref">http://thredds.met.no/thredds/dodsC/data/UiB/GFI/GFI_S1M10983.nc</metadata>
   <metadata name="topiccategory">oceans</metadata>
   <metadata name="contact">orvik@gfi.uib.no</metadata>
   <metadata name="PI_name">Kjell Arild Orvik</metadata>

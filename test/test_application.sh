@@ -284,7 +284,7 @@ chown -R $WEBUSER $basedir/webupload
 chown -R $WEBUSER $basedir/ftpupload
 chown -R $WEBUSER $basedir/data
 cd $basedir/target
-su $WEBUSER -c "./metamodInit.sh start"
+su $WEBUSER -c "$basedir/target/metamodInit.sh start"
 
 #
 # H. Uploads to the system is simulated.
@@ -305,7 +305,7 @@ for fil in `cat $filestoupload`; do su $WEBUSER -c "cp $fil $basedir/t_dir"; su 
 #
 cd $basedir/target
 sleep 300
-su $WEBUSER -c "./metamodInit.sh stop"
+su $WEBUSER -c "$basedir/target/metamodInit.sh stop"
 sleep 100
 #
 # J. Postprocessing:
@@ -354,4 +354,4 @@ else
 fi
 
 # keep it running after testing
-su $WEBUSER -c "./metamodInit.sh start"
+su $WEBUSER -c "$basedir/target/metamodInit.sh start"

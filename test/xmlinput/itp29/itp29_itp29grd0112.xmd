@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
   <info name="DAMOC/itp29/itp29_itp29grd0112" status="active" creationDate="2009-03-20T13:58:31Z" datestamp="2009-03-20T13:58:31Z" ownertag="DAM" metadataFormat="MM2"/>
-<quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">142443</quadtree_nodes></dataset>
+<quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">142443</quadtree_nodes><datasetRegion xmlns="http://www.met.no/schema/metamod/datasetRegion" xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+  <boundingBox north="81.00" south="81.00" east="-170.50" west="-170.50"/>
+  <lonLatPoints>
+  -170.50 81.00
+  </lonLatPoints>
+</datasetRegion></dataset>

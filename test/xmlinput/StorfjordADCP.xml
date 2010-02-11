@@ -35,6 +35,6 @@ at the instrument depth.
    </metadata>
   <metadata name="title">Acoustic Doppler Current Profiler data from the Storfjorden Sill, 2003/2004</metadata>
   <metadata name="product_name">Horizontal velocity and temperature at Storfjorden Sill</metadata>
-  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/UiB/StorfjordADCP/</metadata>
+  <metadata name="dataref">http://thredds.met.no/thredds/catalog/data/UiB/StorfjordADCP/</metadata>
   <metadata name="institution">UiB University of Bergen</metadata>
 </MM2>

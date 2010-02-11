@@ -3,7 +3,7 @@
   <metadata name="datacollection_period_from">2006-10-01</metadata>
   <metadata name="datacollection_period_to">2006-10-31</metadata>
   <metadata name="bounding_box">179.956,45.2402,-179.995,89.9033</metadata>
-  <metadata name="dataref">http://damocles.met.no:8080/thredds/dodsC/data/met.no/metno/metno_arctic20.200610.nc</metadata>
+  <metadata name="dataref">http://thredds.met.no/thredds/dodsC/data/met.no/metno/metno_arctic20.200610.nc</metadata>
   <metadata name="topiccategory">oceans</metadata>
   <metadata name="area">Arctic Ocean</metadata>
   <metadata name="area">Nordic Seas</metadata>

@@ -3,7 +3,7 @@
   <metadata name="datacollection_period_from">2005-05-10</metadata>
   <metadata name="datacollection_period_to">2005-09-01</metadata>
   <metadata name="bounding_box">179.585,55.7894,-178.51,88.1978</metadata>
-  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/DMI/icedriftC2/</metadata>
+  <metadata name="dataref">http://thredds.met.no/thredds/catalog/data/DMI/icedriftC2/</metadata>
   <metadata name="abstract">
 A 9 month ice drift data set based on VIS and IR data 
    </metadata>

@@ -3,4 +3,7 @@
   <info name="DAMOC/ARTIST/ARTIST_on-ice-flow-980326" status="active" creationDate="2009-03-20T13:57:36Z" datestamp="2009-03-20T13:57:36Z" ownertag="DAM" metadataFormat="MM2"/>
 <quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">413111
 413112
-413114</quadtree_nodes></dataset>
+413114</quadtree_nodes><datasetRegion xmlns="http://www.met.no/schema/metamod/datasetRegion" xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+  <boundingBox north="81.20" south="80.30" east="6.00" west="5.00"/>
+  <lonLatPoints/>
+</datasetRegion></dataset>

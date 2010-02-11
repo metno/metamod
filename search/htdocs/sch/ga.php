@@ -51,55 +51,9 @@
       the overall search results, click the "Remove" button.</p>
       <p>
       <?php
-         if (! file_exists("maps")) {
-            if (! symlink($mmConfig->getVar('WEBRUN_DIRECTORY')."/maps","maps")) {
-               mmPutLog("Error. Could not create symlink ./maps");
-               $mmErrorMessage = "Sorry, internal error";
-               $mmError = 1;
-            }
-         }
-         if ($mmError == 0) {
-            if (isset($mmSessionState->sitems) &&
-                   array_key_exists("$mmCategoryNum,GA",$mmSessionState->sitems)) {
-
-               $stage = $mmSessionState->sitems["$mmCategoryNum,GA"][0];
-               $mmMapnum = $mmSessionState->sitems["$mmCategoryNum,GA"][1];
-               $x1 = $mmSessionState->sitems["$mmCategoryNum,GA"][2];
-               $y1 = $mmSessionState->sitems["$mmCategoryNum,GA"][3];
-               $fname = 'maps/m' . $mmSessionId . _ . $mmMapnum . '.png';
-               if ($stage == 1) {
-                  $x1 = 5*floor(($x1+0.01)/5);
-                  $y1 = 5*floor(($y1+0.01)/5);
-                  $cmd = "convert maps/orig.png -region 5x5+" . $x1 ."+" . $y1 .
-                         " -colorize 80% " . $fname;
-                  system($cmd,$ier);
-                  if ($ier != 0) {
-                     mmPutLog("Error. Could not generate stage1 map with convert. Returned errcode: " . $ier);
-                     $mmErrorMessage = "Sorry, internal error";
-                     $mmError = 1;
-                  }
-               } else {
-                  $x2 = $mmSessionState->sitems["$mmCategoryNum,GA"][4];
-                  $y2 = $mmSessionState->sitems["$mmCategoryNum,GA"][5];
-                  $x1 = 5*floor(($x1+0.01)/5);
-                  $y1 = 5*floor(($y1+0.01)/5);
-                  $x2 = 5*ceil(($x2+0.01)/5);
-                  $y2 = 5*ceil(($y2+0.01)/5);
-                  $xd = $x2 - $x1;
-                  $yd = $y2 - $y1;
-                  $cmd = "convert maps/orig.png -region " . $xd . "x" . $yd . "+" . $x1 ."+" . $y1 .
-                         " -colorize 20% " . $fname;
-                  system($cmd,$ier);
-                  if ($ier != 0) {
-                     mmPutLog("Error. Could not generate stage2 map with convert. Returned errcode: " . $ier);
-                     $mmErrorMessage = "Sorry, internal error";
-                     $mmError = 1;
-                  }
-               }
-            } else {
-               $fname = 'maps/orig.png';
-            }
-            echo '<input type="image" src="' . $fname . '" height="560" width="560" name="gacoord" align="left" />';
+         $imgSrc = mmGetGAImageSrc($mmCategoryNum);
+         if (strlen($imgSrc)) {
+            echo '<input type="image" src="' . $imgSrc . '" height="560" width="560" name="gacoord" align="left" />';
          }
       ?>
       </p><p><a name="gaform">&nbsp;</a>

@@ -30,9 +30,10 @@
 use strict;
 use warnings;
 use encoding 'utf-8';
+use Data::Dumper qw(Dumper);
 
 use lib "..";
-use Test::More tests => 12;
+use Test::More tests => 14;
 
 BEGIN {use_ok('Metamod::DatasetTransformer::DIF');}
 
@@ -51,6 +52,13 @@ require_ok "Metamod::Dataset";
 my $ds = newFromDoc Metamod::Dataset($mm2Doc, $dsDoc);
 is(scalar $ds->getQuadtree, 48, "getting quadtree");
 #$ds->writeToFile("testDatasetOut$$");
+
+# test the datasetRegion
+my $dr = $ds->getDatasetRegion;
+my %bb = $dr->getBoundingBox;
+is_deeply(\%bb, {north => '90.00', south => '-90.00', east => '180.00', west => '-180.00'}, "bounding box in datasetRegion");
+my @polygons = $dr->getPolygons;
+is(2, scalar @polygons, "two polygons transformed from DIF"); 
 
 my $obj2 = new Metamod::DatasetTransformer::DIF('bla', 'blub', 'dsXslt' => $xsltDS );
 isa_ok($obj2, 'Metamod::DatasetTransformer::DIF');

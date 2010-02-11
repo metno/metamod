@@ -33,7 +33,7 @@ use encoding 'iso8859-1';
 use Encode qw(decode encode);
 
 use lib "..";
-use Test::More tests => 49;
+use Test::More tests => 50;
 
 use Data::Dumper qw(Dumper);
 
@@ -45,8 +45,12 @@ BEGIN {use_ok('Metamod::ForeignDataset')};
 BEGIN {use_ok('Metamod::Dataset');}
 
 my $string = pack('U4',"65","66","31","67");
+
+=for deprecated
 ok(Metamod::ForeignDataset::isXMLCharacter($string), "char is valid xml");
 ok(!Metamod::ForeignDataset::isXMLCharacter(substr($string, 2)), "char invalid in xml");
+=cut
+
 is(Metamod::ForeignDataset::removeUndefinedXMLCharacters($string), "ABC", "remove undefined characters");
 is(Metamod::ForeignDataset::removeUndefinedXMLCharacters(substr($string, 2)), "C", "remove undefined characters at beginning");
 
@@ -54,7 +58,7 @@ is(Metamod::ForeignDataset::removeUndefinedXMLCharacters(substr($string, 2)), "C
 my $fds = Metamod::ForeignDataset->newFromFile('oldDataset.xml', ('format' => 'oldDataset'));
 isa_ok($fds, 'Metamod::ForeignDataset');
 ok($fds->getMETA_XML, "getMETA_XML");
-is($fds->originalFormat, 'oldDataset');
+is($fds->originalFormat, 'oldDataset', 'origFormat');
 
 my $ds = new Metamod::Dataset;
 isa_ok($ds, 'Metamod::ForeignDataset');
@@ -96,6 +100,15 @@ $testFD->setProjectionInfo($projectionInfo); # throw exception
 ok(1, 'adding ProjectionInfo'); # made it here
 ok($wmsInfo eq $testFD->getWMSInfo(), 'wmsInfo unchanged');
 ok($projectionInfo eq $testFD->getProjectionInfo(), 'projectionInfo unchanged');
+
+my $region = new Metamod::DatasetRegion();
+$region->addPoint([0, 0]);
+$testFD->setDatasetRegion($region);
+my $outRegion = $testFD->getDatasetRegion;
+isa_ok($outRegion, 'Metamod::DatasetRegion');
+ok($outRegion->equals($region), 'region put == region get');
+my $str = $testFD->getDS_XML();
+ok($str =~ /<lonLatPoints/, 'dataset contains lonLatPoints');
 
 ok(Metamod::ForeignDataset->deleteDatasetFile("test"), "delete dataset");
 ok(! -f "test.xml", "test.xml deleted");

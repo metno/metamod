@@ -153,5 +153,10 @@
 43122334
 43122343
 43124121
-   </quadtree_nodes>
+   </quadtree_nodes><datasetRegion xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.met.no/schema/metamod/datasetRegion" xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+  <boundingBox/>
+  <lonLatPoints>
+  10.00 77.47,7.50 78.13,10.42 75.00,12.20 73.50,12.00 76.50
+  </lonLatPoints>
+</datasetRegion>
 </dataset>

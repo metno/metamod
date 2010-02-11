@@ -40,11 +40,12 @@ use warnings;
 use Encode;
 use Fcntl qw(:DEFAULT :flock); # import LOCK_* constants
 use POSIX qw();
-use XML::LibXML qw();
+use Metamod::DatasetTransformer qw();
+use Metamod::DatasetRegion qw();
 use XML::LibXML::XPathContext qw();
 use UNIVERSAL qw();
 use mmTtime;
-use Carp qw();
+use Carp qw(croak);
 
 use constant NAMESPACE_DS => 'http://www.met.no/schema/metamod/dataset';
 use constant DATASET => << 'EOT';
@@ -99,6 +100,7 @@ sub _initSelf {
     die "undefined docMETA, cannot init\n" unless $docMETA;
     my $xpc = XML::LibXML::XPathContext->new();
     $xpc->registerNs('d', $class->NAMESPACE_DS);
+    $xpc->registerNs('r', Metamod::DatasetRegion->NAMESPACE_DSR);
     my $self = {
                 xpath => $xpc,
                 docDS => $docDS,
@@ -234,6 +236,30 @@ sub originalFormat {
     return $self->{originalFormat};
 }
 
+# get the last node before the named one
+# this function is useful to use $node->insertAfter
+# this works for all nodes in dataset, except the first and required 'info'
+sub _getLastNodeBefore {
+    my ($self, $nodeName) = @_;
+    my @datasetSequenceOrder = qw(d:info d:quadtree_nodes d:wmsInfo d:projectionInfo r:datasetRegion);
+    my $i = 0;
+    my %seqOrder = map {$_ => $i++} @datasetSequenceOrder;
+    unless (exists $seqOrder{$nodeName}) {
+        croak("function not defind for $nodeName, need @datasetSequenceOrder\n");
+    }
+    foreach my $lastNodeName (reverse @datasetSequenceOrder) {
+        # go reverse and return the first existing node with appears at or before the $nodeName
+        if ($seqOrder{$lastNodeName} <= $seqOrder{$nodeName}) {
+            my @lastNodesBefore = $self->{xpath}->findnodes("/d:dataset/$lastNodeName", $self->{docDS});
+            if (@lastNodesBefore) {
+                return $lastNodesBefore[-1];
+            }
+        } 
+    }
+    return undef;
+}
+
+
 sub getQuadtree {
     my ($self) = @_;
     my @retVal;
@@ -261,10 +287,7 @@ sub setQuadtree {
         my $valStr = join "\n", @$quadRef;
         my $qEl = $self->{docDS}->createElementNS($self->NAMESPACE_DS,'quadtree_nodes');
         $qEl->appendChild($self->{docDS}->createTextNode($valStr));
-        
-        # add element as first node after required info-node
-        my $infoNode = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docDS})->item(0);
-        $self->{docDS}->documentElement->insertBefore($qEl, $infoNode);
+        $self->{docDS}->documentElement->insertAfter($qEl, $self->_getLastNodeBefore('d:quadtree_nodes'));
     }
     return @oldQuadtree;
 }
@@ -297,8 +320,7 @@ sub setWMSInfo {
 		$el->appendChild($contentDoc->documentElement);
 		
 		# add content to doc, before optional projectionInfo 
-		my $piNode = $self->{xpath}->findnodes('/d:dataset/d:projectionInfo', $self->{docDS});
-		$self->{docDS}->documentElement->insertBefore($el, $piNode);
+        $self->{docDS}->documentElement->insertAfter($el, $self->_getLastNodeBefore('d:wmsInfo'));
 	}
 	return $oldContent;
 }
@@ -330,12 +352,39 @@ sub setProjectionInfo {
         my $contentDoc = $parser->parse_string($content);
         $el->appendChild($contentDoc->documentElement);
         
-        # add element to doc, as last element
-        $self->{docDS}->documentElement->appendChild($el);
+        # add element to doc
+        $self->{docDS}->documentElement->insertAfter($el, $self->_getLastNodeBefore('d:projectionInfo'));
     }
     return $oldContent;	
 }
 
+sub getDatasetRegion {
+    my ($self) = @_;
+    my ($node) = $self->{xpath}->findnodes('/d:dataset/r:datasetRegion', $self->{docDS});
+    return new Metamod::DatasetRegion($node); 
+}
+
+sub setDatasetRegion {
+    my ($self, $dsRegion) = @_;
+    my $oldRegion = $self->getDatasetRegion;
+    foreach my $node ($self->{xpath}->findnodes('/d:dataset/r:datasetRegion', $self->{docDS})) {
+        # remove old value
+        $node->parentNode->removeChild($node);
+    }
+
+    if ($dsRegion) {
+        croak("setDatasetRegion require Metamod::DatasetRegion, got $dsRegion")
+            unless UNIVERSAL::isa($dsRegion, 'Metamod::DatasetRegion');
+        my $regionXML = $dsRegion->toString;
+        my $regionDoc = Metamod::DatasetTransformer->XMLParser->parse_string($regionXML);
+        my $rNode = $regionDoc->documentElement;
+        # add element to doc
+        $self->{docDS}->documentElement->insertAfter($rNode, $self->_getLastNodeBefore('r:datasetRegion'));
+    }
+    return $oldRegion;
+}
+
+=begin deprecated
 sub isXMLCharacter {
     # see http://www.w3.org/TR/REC-xml/#dt-character
     # Char	   ::=   	#x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
@@ -354,10 +403,13 @@ sub isXMLCharacter {
     }
     return $retVal;
 }
+=end deprecated
+=cut
 
 sub removeUndefinedXMLCharacters {
     my ($str) = @_;
-    # regex for characters as used in isXMLCharacter
+    # see http://www.w3.org/TR/REC-xml/#dt-character
+    # Char     ::=      #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
     $str =~ s/[^\x09\x0A\x0D\x20-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]//go;
     return $str;
 }
@@ -405,13 +457,15 @@ perl utf8-flag switched on. Please make sure to provide such data by:
 
 =over 4
 
+=begin deprecated
 =item isXMLCharacter($str)
 
 Check if the first character in $str is a valid xml-character as defined in http://www.w3.org/TR/REC-xml/#dt-character
+=end deprecated
 
 =item removeUndefinedXMLCharacters($str)
 
-Remove all undefined xml characters from the string.
+Remove all undefined xml characters as defined in http://www.w3.org/TR/REC-xml/#dt-character from the string.
 Return: clean string in scalar context
 
 =back
@@ -510,6 +564,15 @@ Return: array with quadtree_nodes
 set the @quadtree_nodes as dataset-quadtree-nodes
 
 Return: @oldQuadtree_nodes
+
+=item getDatasetRegion()
+
+Return: a Metamod::DatasetRegion
+Warning: this is a copy of the region, when changing, a call to setDatasetRegion is required
+
+=item setDatasetRegion($region)
+
+set the Metamod::DatasetRegion to a new region.
 
 =item getWMSInfo()
 

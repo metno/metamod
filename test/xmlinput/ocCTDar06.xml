@@ -2,7 +2,7 @@
 <MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
   <metadata name="datacollection_period_from">2006-06-20</metadata>
   <metadata name="datacollection_period_to">2006-07-18</metadata>
-  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/IOPAS/ocCTDar06/</metadata>
+  <metadata name="dataref">http://thredds.met.no/thredds/catalog/data/IOPAS/ocCTDar06/</metadata>
   <metadata name="contact">ocl@iopan.gda.pl</metadata>
   <metadata name="history">2006-07-19 creation 2007-04-30 revision</metadata>
   <metadata name="operational_status">Operational</metadata>

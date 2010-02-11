@@ -316,7 +316,10 @@
 <!-- see fimex-interpolation for more info on options -->
 <default:projection name="Lat/Long" method="nearestneighbor" projString="+proj=latlong +ellps=sphere +a=6371000 +e=0" xAxis="-180,-179,...,180" yAxis="60,61,...,90" toDegree="true"/>
 <default:projection name="Stereo" method="bilinear" projString="+proj=stere +ellps=sphere +lat_0=90 +lon_0=-32 +lat_ts=60 +a=6371000 +e=0" xAxis="0,10000,...,x;relativeStart=0" yAxis="0,10000,...,x;relativeStart=0" toDegree="false"/> 
-</default:fimexProjections></projectionInfo>
+</default:fimexProjections></projectionInfo><datasetRegion xmlns="http://www.met.no/schema/metamod/datasetRegion" xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+  <boundingBox north="90.00" south="60.00" east="180.00" west="-180.00"/>
+  <lonLatPoints/>
+</datasetRegion>
 <wmsInfo xmlns:mm="http://www.met.no/schema/metamod/wmcSetup" xmlns:default="http://www.opengis.net/context" xmlns:ol="http://openlayers.org/context" xmlns:xlink="http://www.w3.org/1999/xlink"><mm:wmcSetup xmlns:mm="http://www.met.no/schema/metamod/wmcSetup" xmlns:default="http://www.opengis.net/context" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ol="http://openlayers.org/context" xmlns:xlink="http://www.w3.org/1999/xlink">
 <!-- regex to replace name from dataset-name to dianaSetup name,
      i.e. from DAM/osisaf/file20090703 to osisaf_20090703. -->

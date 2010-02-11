@@ -2,4 +2,9 @@
 <dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
   <info name="DAMOC/vagabond" status="active" creationDate="2009-07-09T13:01:12Z" datestamp="2009-07-09T13:01:12Z" ownertag="DAM" metadataFormat="MM2"/>
 <quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">413144
-413233</quadtree_nodes></dataset>
+413233</quadtree_nodes><datasetRegion xmlns="http://www.met.no/schema/metamod/datasetRegion" xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+  <boundingBox north="77.90" south="0.00" east="77.86" west="18.26"/>
+  <lonLatPoints>
+  77.86 0.00,18.26 77.89,18.50 77.49,18.32 77.90,18.47 77.86
+  </lonLatPoints>
+</datasetRegion></dataset>

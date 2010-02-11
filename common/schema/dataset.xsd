@@ -24,7 +24,11 @@
 <schema
   xmlns='http://www.w3.org/2001/XMLSchema'
   targetNamespace='http://www.met.no/schema/metamod/dataset'
-  xmlns:t='http://www.met.no/schema/metamod/dataset'>
+  xmlns:t='http://www.met.no/schema/metamod/dataset'
+  xmlns:r='http://www.met.no/schema/metamod/datasetRegion'>
+
+<import namespace="http://www.met.no/schema/metamod/datasetRegion" 
+        schemaLocation="datasetRegion.xsd"/>
       
     <complexType name='Dataset'>
         <sequence>
@@ -32,6 +36,7 @@
             <element ref='t:quadtree_nodes' minOccurs='0' maxOccurs='1'/>
             <element ref='t:wmsInfo' minOccurs='0' maxOccurs='1' />
             <element ref='t:projectionInfo' minOccurs='0' maxOccurs='1' />
+            <element ref='r:datasetRegion' minOccurs='0' maxOccurs='1' />
         </sequence>
     </complexType>
     <complexType name='Info'>

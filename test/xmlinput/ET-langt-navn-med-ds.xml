@@ -1,3 +1,3 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
-<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="dataref">http://damocles.met.no:8080/thredds/catalog/data/met.no/ET-langt-navn-med-ds/</metadata></MM2>
+<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="dataref">http://thredds.met.no/thredds/catalog/data/met.no/ET-langt-navn-med-ds/</metadata></MM2>

@@ -26,5 +26,5 @@ been through a preliminary QC and questionable data have been removed.
   <metadata name="title">Carbon sample data from ISSS08 in the Arctic Ocean</metadata>
   <metadata name="institution">UGOT Göteborg University Department of Oceanography - Earth Sciences Centre</metadata>
   <metadata name="product_name">ISSS08 carbon data</metadata>
-  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/UGOT/UGOT-data/</metadata>
+  <metadata name="dataref">http://thredds.met.no/thredds/catalog/data/UGOT/UGOT-data/</metadata>
 </MM2>

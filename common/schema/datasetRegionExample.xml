@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<datasetRegion
+   xmlns="http://www.met.no/schema/metamod/datasetRegion"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+  <boundingBox north="90.000" south="-55.000" east="40.000" west="-15.000" />
+  <lonLatPoints>
+  -10.000 0.000,-8.000 0.000,-6.000 0.000
+  </lonLatPoints>
+  <lonLatPolygon>
+  0.000 0.000,0.000 1.000,0.000 2.000,0.000 3.000,0.000 4.000,0.000 5.000,1.000 5.000,2.000 5.000,2.000 4.000,2.000 3.000,2.000 2.000,2.000 1.000,2.000 0.000,1.000 0.000,0.000 0.000
+  </lonLatPolygon>
+  <lonLatPolygon>
+  0.000 1.000,0.000 3.000,1.000 3.000,1.000 1.000,0.000 1.000
+  </lonLatPolygon>
+</datasetRegion>

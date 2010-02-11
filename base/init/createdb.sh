@@ -6,9 +6,26 @@ DROPDB=[==DROPDB==]
 $DROPDB -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] $DBNAME
 $CREATEDB -E UTF-8 -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] $DBNAME
 echo "----------------- Database $DBNAME created ------------------"
-echo "----------- Trying ot install Fulltext-search: tsearch2.sql --"
+
+echo "----------------- Allow PLSQL ------------------"
+$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<'EOF'
+-- allow plpgsql
+CREATE TRUSTED LANGUAGE plpgsql;
+EOF
+
+echo "----------- Trying to install Fulltext-search: tsearch2.sql --"
 $PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME < [==PG_TSEARCH2_SCRIPT==]
 echo "----------------- Database Fulltext-search prepared ---------"
+echo "----------- Trying to install PostGIS ---------------------"
+$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME < [==PG_POSTGIS_SCRIPT==]
+echo "----------- Trying to install PostGIS Coordinate systems ---------------------"
+$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME < [==PG_POSTGIS_SYSREF_SCRIPT==]
+echo "----------- Trying to install PostGIS Additional Coordinate systems ---------------------"
+$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<'EOT'
+[==PG_POSTGIS_ADDITIONAL_SYSREF==]
+EOT
+
+
 $PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<'EOF'
 
 -- drop eventuelly existing stuff
@@ -17,9 +34,6 @@ DROP FUNCTION IF EXISTS update_MD_content_fulltext();
 DROP FUNCTION IF EXISTS to_mmDefault_tsvector(text);
 DROP FUNCTION IF EXISTS to_mmDefault_tsquery(text);
 DROP LANGUAGE IF EXISTS plpgsql;
-
--- allow plpgsql
-CREATE TRUSTED LANGUAGE plpgsql;
 
 -- allow full-text search
 -- pg < 8.2
@@ -31,6 +45,10 @@ GRANT SELECT ON pg_ts_config_map TO "[==PG_WEB_USER==]";
 -- all pg
 GRANT SELECT ON pg_ts_parser TO "[==PG_WEB_USER==]";
 GRANT SELECT ON pg_ts_dict TO "[==PG_WEB_USER==]";
+
+-- allow postgis
+GRANT ALL ON geometry_columns TO "[==PG_WEB_USER==]";
+GRANT SELECT ON spatial_ref_sys TO "[==PG_WEB_USER==]";
 
 CREATE TABLE DataSet (
    DS_id              SERIAL,
@@ -203,6 +221,19 @@ CREATE TABLE Sessions (
    PRIMARY KEY (sessionid)
 );
 GRANT ALL ON Sessions TO "[==PG_WEB_USER==]";
+
+CREATE TABLE Dataset_Location (DS_id INTEGER NOT NULL REFERENCES DataSet ON DELETE CASCADE) WITHOUT OIDS;
+GRANT ALL ON Dataset_Location TO "[==PG_WEB_USER==]";
+
 \q
 EOF
+
+echo "----------------- ADD GEOMETRY COLUMNS FOR EACH COORD-SYSTEM -----------"
+for i in [==SRID_ID_COLUMNS==]; do
+$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<EOF
+SELECT AddGeometryColumn('public', 'dataset_location', 'geom_$i', $i, 'GEOMETRY', 2);
+CREATE INDEX Idx_Dataset_Location_geom_$i ON Dataset_Location USING GIST (geom_$i);
+EOF
+done
+
 date +'%Y-%m-%d %H:%M Database re-initialized, dynamic tables created' >>[==LOGFILE==]

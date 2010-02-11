@@ -58,34 +58,61 @@ $Args{D} .= '/' unless $Args{D} =~ m^/$^;
 
 our @xmdFiles;
 find(\&extractXML, $Args{x});
+# cache of the previous parent
+# parents will only be written, when a new parent is required
+my ($lastParentBase, $lastParent, $lastParentRegion);
 foreach my $basename (@xmdFiles) {
 	my $dataset = Metamod::Dataset->newFromFile($basename);
+    my $region = new Metamod::DatasetRegion();
     my $ncFile = extractNcFile($Args{O}, $Args{D}, $basename, $dataset) if $dataset;
     if ($ncFile) {
         print STDERR "working on $ncFile\n";
-        my %lonLatInfo = extractLonLat($ncFile);
-        my %info = $dataset->getInfo;
-        open my $fh, ">$basename.xmlbb"
-           or die "Cannot write $basename.xmlbb: $!";
-        print $fh '<datasetRegion dataset="'.$info{name}.'">'."\n";
-        my $lonLatAdded;
+        my $nc = new MetNo::NcFind($ncFile);
+        eval { 
+            my %bb = $nc->findBoundingBoxByGlobalAttributes(qw(northernmost_latitude southernmost_latitude easternmost_longitude westernmost_longitude));
+            $region->extendBoundingBox(\%bb);
+        }; if ($@) {
+            warn $@;
+        }
+        my %lonLatInfo = $nc->extractCFLonLat();
         foreach my $polygon (@{ $lonLatInfo{polygons} }) {
-            print $fh '<lonLatPolygon>'."\n";
-            print $fh join ',', map {sprintf "%.3f %.3f", @$_} @$polygon;
-            print $fh '</lonLatPolygon>'."\n";
+            $region->addPolygon($polygon);
         }
-        if (@{ $lonLatInfo{points} }) {
-            print $fh '<lonLatPoints>'."\n";
-            print $fh join ',', map {sprintf "%.3f %.3f", @$_} @{$lonLatInfo{points}};
-            print $fh '</lonLatPoints>'."\n";            
+        foreach my $p (@{ $lonLatInfo{points} }) {
+            $region->addPoint($p);
         }
-        my $bb = $lonLatInfo{boundingBox};
-        if (scalar keys %$bb == 4) {
-            printf $fh '<boundingBox north="%.3f" south="%.3f" east="%.3f" west="%.3f" />'."\n", @$bb{qw(north south east west)};
+        $dataset->setDatasetRegion($region);
+        $dataset->writeToFile($basename);
+        if ($dataset->getParentName()) {
+            my ($vol, $dir, $file) = File::Spec->splitpath(File::Spec->rel2abs($basename));
+            my @dirs = File::Spec->splitdir($dir);
+            my $pFile = pop @dirs;
+            while (($pFile eq "") and @dirs) {
+                $pFile = pop @dirs;
+            }
+            my $parentBase = File::Spec->catfile($vol,File::Spec->catdir(@dirs), $pFile);
+            if ($lastParentBase ne $parentBase) {
+                # cleanup
+                $lastParent->setDatasetRegion($lastParentRegion) if $lastParent;
+                $lastParent->writeToFile($lastParentBase) if $lastParent;
+                    
+                # and the new one
+                $lastParentBase = $parentBase;
+                $lastParent = Metamod::Dataset->newFromFile($lastParentBase);
+                $lastParentRegion = $lastParent->getDatasetRegion() if $lastParent;
+            }
+            if ($lastParent) {
+                $lastParentRegion->addRegion($region);
+            } else {
+                warn "couldn't find parent of $basename at $parentBase ($pFile)\n";
+            }
         }
-        print $fh '</datasetRegion>'."\n";
-        close $fh;
     }
+}
+# write the parent not written yet
+if ($lastParent) {
+    $lastParent->setDatasetRegion($lastParentRegion);
+    $lastParent->writeToFile($lastParentBase);
 }
 
 # find the xmd files and put them to @xmdFiles
@@ -116,163 +143,5 @@ sub extractNcFile {
         undef $ncFile;
     }
     return $ncFile;
-}
-
-# extract lat/lon information as polygons or points from the used latitude/longitude variables
-# given as CF convention
-# extracts also bounding-box if given as global northernmost_latitude, ...
-# return (errors      => \@errors,
-#         polygons    => \@lonLatPolygons,
-#         points      => \@lonLatPoints,
-#         boundingBox => \%boundingBox{east,north,west, south});
-# TODO: better check for valid lon/lat values
-sub extractLonLat {
-    my ($ncFile) = @_;
-    my $nc = new MetNo::NcFind($ncFile);
-    my @dimNames = $nc->dimensions;
-    my $realDims = 0;
-    foreach my $dim (@dimNames) {
-        if ($nc->dimensionSize($dim) > 1) {
-            # netcdf-files might be data-deleted by metamod, that is
-            # all dimensions are set to 0 (unlimited) or 1
-            $realDims++;
-        }
-    }
-
-    my %boundingBox;
-    my @lonLatPolygons;
-    my @lonLatPoints;
-    my @errors;
-    my %globAtt = map {$_ => 1} $nc->globatt_names;
-    if (exists $globAtt{northernmost_latitude} &&
-        exists $globAtt{southernmost_latitude} &&
-        exists $globAtt{westernmost_longitude} &&
-        exists $globAtt{easternmost_longitude})
-       {
-       	$boundingBox{north} = $nc->globatt_value('northernmost_latitude');
-       	$boundingBox{south} = $nc->globatt_value('southernmost_latitude');
-       	$boundingBox{west} = $nc->globatt_value('westernmost_longitude');
-        $boundingBox{east} = $nc->globatt_value('easternmost_longitude');
-    }
-    
-    if ($realDims == 0) {
-        # no dimensions => no polygons/points, return here
-        return (errors => \@errors, polygons => \@lonLatPolygons, points => \@lonLatPoints, boundingBox => \%boundingBox);
-    }
-
-    # find latitude/longitude variables (variables with units degree(s)_(north|south|east|west))    
-    my %latDims = map {$_ => 1} $nc->findVariablesByAttributeValue('units', qr/degrees?_(north|south)/);
-    my %lonDims = map {$_ => 1} $nc->findVariablesByAttributeValue('units', qr/degrees?_(east|west)/);    
-
-
-    # lat/lon pairs can, according to CF-1.3 belong in differnt ways to a variable
-    # a) var(lat,lon), lat(lat), lon(lon) (CF-1.3, 5.1)
-    # b) var(x,y), var:coordinates = "lat lon ?", lat(x,y), lon(x,y) (CF-1.3, 5.2, 5.6)
-    # c) var(t), var:coordinates = "lat lon ?", lat(t), lon(t) (CF-1.3, 5.3-5.5)
-    #
-    # a) and b) will be translated to a polygon describing the outline
-    # c) will be translated to a list of lat/lon points
-    
-    # find variables directly related to each combination of lat/lon (a)
-    my @lonLatCombinations;
-    foreach my $lat (keys %latDims) {
-        foreach my $lon (keys %lonDims) {
-            push @lonLatCombinations, [$lon,$lat];
-        }
-    }
-    my @lonLatDimVars;
-    my @usedLonLatCombinations;
-    my @unUsedLonLatCombinations;
-    foreach my $llComb (@lonLatCombinations) {
-        my @llDimVars = $nc->findVariablesByDimensions($llComb);
-        if (@llDimVars) {
-            push @lonLatDimVars, @llDimVars;  
-            push @usedLonLatCombinations, $llComb;
-        } else {
-            push @unUsedLonLatCombinations, $llComb;
-        }
-    }
-    foreach my $llCom (@usedLonLatCombinations) {
-        # build a polygon around all outer points
-        my @lons = $nc->get_values($llCom->[0]);
-        my @lats = $nc->get_values($llCom->[1]);
-        if (@lons && @lats) {
-            my @polygon;
-            push @polygon, map{[$_, $lats[0]]} @lons;
-            push @polygon, map{[$lons[-1], $_]} @lats;
-            push @polygon, map{[$_, $lats[-1]]} reverse @lons;
-            push @polygon, map{[$lons[0], $_]} reverse @lats;
-            push @lonLatPolygons, \@polygon;            
-        }
-    }
-    
-    # get the coordinates values to find lat/lon pairs (b and c)
-    my @coordVars = $nc->findVariablesByAttributeValue('coordinates', qr/.*/);
-    # remove the variables already detected as class a)
-    my %lonLatDimVars = map {$_ => 1} @lonLatDimVars;
-    @coordVars = map {exists $lonLatDimVars{$_} ? () : $_} @coordVars;
-
-    my @lonLatCoordinates;
-    foreach my $coordVar (@coordVars) {
-        my @coordinates = split ' ', $nc->att_value($coordVar, 'coordinates');
-        my %coordinates = map {$_ => 1} @coordinates;
-        my @tempUnusedLonLatCombinations = @unUsedLonLatCombinations;
-        @unUsedLonLatCombinations = ();
-        foreach my $llComb (@tempUnusedLonLatCombinations) {
-            if (exists $coordinates{$llComb->[0]} and
-                exists $coordinates{$llComb->[1]}) {
-                push @lonLatCoordinates, $llComb;
-                push @usedLonLatCombinations, $llComb;    
-            } else {
-                push @unUsedLonLatCombinations, $llComb;
-            }
-        }
-    }
-    if (@usedLonLatCombinations == 0 and @unUsedLonLatCombinations > 0) {
-        # wrong netcdf-file? Forgotten coordinates?
-        my $llComb = shift @unUsedLonLatCombinations;
-        my $message = sprintf "Couldn't detect Longitude Latitude combination, missing coordinates? Trying (%s,%s)", @$llComb;
-        warn $message. "\n";
-        push @errors, $message;
-        push @usedLonLatCombinations, $llComb;
-        push @lonLatCoordinates, $llComb;
-    }
-    foreach my $llCoord (@lonLatCoordinates) {
-        # $llCoord is a used lon/lat combination for case b and c
-        # use case b if lat and lon are 2d, case c for 1d
-        my $lonName = $llCoord->[0];
-        my $latName = $llCoord->[1];
-        my @latDims = $nc->dimensions($latName);
-        my @lonDims = $nc->dimensions($lonName);
-        if (@latDims != @lonDims) {
-            my $msg = "number $latName dimensions (@latDims) != $lonName dimensions (@lonDims), skipping ($latName,$lonName)"; 
-            warn $msg;
-            push @errors, $msg;
-        } elsif (1 == @latDims) {
-            # case c)
-            my ($lons, $lats) = $nc->get_lonlats($lonName, $latName);
-            while (@$lons) {
-                push @lonLatPoints, [shift @$lons, shift @$lats];
-            }
-        } elsif (2 == @latDims) {
-            # case b)
-            my @lonBorders = $nc->get_bordervalues($lonName);
-            my @latBorders = $nc->get_bordervalues($latName);
-            if (scalar @lonBorders == scalar @latBorders) {
-                my @polygon = map {[$_, shift @latBorders]} @lonBorders;
-                push @lonLatPolygons, \@polygon;
-            } else {
-                my $msg = "$latName dimension ".(scalar @latBorders)." != $lonName dimensions ".(scalar @lonBorders).", skipping";
-                warn $msg;
-                push @errors, $msg;
-            } 
-        } else {
-            my $msg = "$latName and $lonName are of dimension ".(scalar @latDims). ". Don't know what to do, skipping.";
-            warn $msg;
-            push @errors, $msg;
-        }
-    }
-    
-    return (errors => \@errors, polygons => \@lonLatPolygons, points => \@lonLatPoints, boundingBox => \%boundingBox);
 }
 

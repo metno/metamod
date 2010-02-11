@@ -32,6 +32,7 @@
 use strict;
 use warnings;
 use File::Spec;
+use File::Find qw();
 # small routine to get lib-directories relative to the installed file
 sub getTargetDir {
     my ($finalDir) = @_;
@@ -44,8 +45,8 @@ sub getTargetDir {
 use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
 
 use Metamod::Dataset;
-use Metamod::Utils qw(findFiles);
 use Metamod::Config;
+use Metamod::Utils qw();
 use Data::Dumper;
 use DBI;
 use File::Spec qw();
@@ -185,6 +186,31 @@ sub process_xml_loop {
 	&write_to_log("Check for new datasets stopped");
 }
 
+# callback function from File::Find for directories
+sub processFoundFile {
+    my ($last_updated) = @_;
+    my $file = $File::Find::name;
+    if ($file =~ /\.xm[ld]$/ and -f $file and (stat(_))[9] >= $last_updated) {
+        print "      $file -accepted\n" if ($progress_report == 1);
+        my $basename = substr $file, 0, length($file)-4; # remove .xm[ld]
+        if ($file eq "$basename.xml" and -f "$basename.xmd" and (stat(_))[9] >= $last_updated) {
+            # ignore .xml file, will be processed together with .xmd file            
+        } else {
+            # import to database
+            eval { &update_database( $file ); };
+            if ($@) {
+                $dbh->rollback or die $dbh->errstr;
+                my $stm = $dbh->{"Statement"};
+                &write_to_log("$file database error: $@\n   Statement: $stm");
+            }
+            else {
+                $dbh->commit or die $dbh->errstr;
+                &write_to_log("$basename successfully imported");
+            }
+        }
+    } 
+}
+
 sub process_directories {
 	my ($last_updated,@dirs) = @_;
 
@@ -194,33 +220,10 @@ sub process_directories {
 		$xmldir1 =~ s/ *$//g;
 		my @files_to_consume;
 		if ( -d $xmldir1 ) {
-			# xm[ld] files newer than $last_updated
-			@files_to_consume = findFiles( $xmldir1, sub {$_[0] =~ /\.xm[ld]$/;},
-			                                         sub {(stat(_))[9] >= $last_updated;} );
-         if ( $progress_report == 1 ) {
-			   foreach my $file (@files_to_consume) {
-					print "      $file -accepted\n";
-				}
-			}
-		}
-
-		#
-		# generate a list of unique basenames,
-		# i.e. file.xml and file.xmd will only processed once
-		my %uniqueBaseFiles;
-		@files_to_consume =
-		  map { s^\.\w*$^^; $uniqueBaseFiles{$_}++ ? $_ : () } @files_to_consume;
-		foreach my $xmlfile (@files_to_consume) {
-			eval { &update_database( $xmlfile ); };
-			if ($@) {
-				$dbh->rollback or die $dbh->errstr;
-				my $stm = $dbh->{"Statement"};
-				&write_to_log("$xmlfile database error: $@\n   Statement: $stm");
-			}
-			else {
-				$dbh->commit or die $dbh->errstr;
-				&write_to_log("$xmlfile successfully imported");
-			}
+            # xm[ld] files newer than $last_updated
+            File::Find::find({wanted => sub {processFoundFile($last_updated)},
+                              no_chdir => 1},
+                              $xmldir1);
 		}
 	}
 }
@@ -299,7 +302,7 @@ sub update_database {
 	#  The BK_name are used as lower case.
 	#
 	my %basickeys = ();
-	my $stm       = $dbh->prepare("SELECT BK_id,SC_id,BK_name FROM BasicKey");
+	my $stm       = $dbh->prepare_cached("SELECT BK_id,SC_id,BK_name FROM BasicKey");
 	$stm->execute();
 	while ( my @row = $stm->fetchrow_array ) {
 		my $key = $row[1] . ':' . cleanContent($row[2]);
@@ -313,7 +316,7 @@ sub update_database {
 #
 	my %dbMetadata = ();
 	$stm =
-	  $dbh->prepare(
+	  $dbh->prepare_cached(
 		"SELECT Metadata.MT_name,MD_content,MD_id FROM Metadata, MetadataType "
 		  . "WHERE Metadata.MT_name = MetadataType.MT_name AND "
 		  . "MetadataType.MT_share = TRUE" );
@@ -329,7 +332,7 @@ sub update_database {
 #
 	my %shared_metadatatypes = ();
 	$stm =
-	  $dbh->prepare("SELECT MT_name FROM MetadataType WHERE MT_share = TRUE");
+	  $dbh->prepare_cached("SELECT MT_name FROM MetadataType WHERE MT_share = TRUE");
 	$stm->execute();
 	while ( my @row = $stm->fetchrow_array ) {
 		$shared_metadatatypes{ $row[0] } = 1;
@@ -340,61 +343,14 @@ sub update_database {
 	#
 	my %rest_metadatatypes = ();
 	$stm =
-	  $dbh->prepare("SELECT MT_name FROM MetadataType WHERE MT_share = FALSE");
+	  $dbh->prepare_cached("SELECT MT_name FROM MetadataType WHERE MT_share = FALSE");
 	$stm->execute();
 	while ( my @row = $stm->fetchrow_array ) {
 		$rest_metadatatypes{ $row[0] } = 1;
 	}
 
-	#
-	#  Prepare SQL statements for repeated use.
-	#  Use "?" as placeholders in the SQL statements:
-	#
-	my $sql_getkey_DS = $dbh->prepare("SELECT nextval('DataSet_DS_id_seq')");
-	my $sql_getkey_GA =
-	  $dbh->prepare("SELECT nextval('GeographicalArea_GA_id_seq')");
-	my $sql_getIDByNameAndParent_DS = $dbh->prepare("SELECT DS_id FROM Dataset WHERE DS_name = ? AND DS_parent = ?");
-	my $sql_getIDByName_DS = $dbh->prepare("SELECT DS_id FROM Dataset WHERE DS_name = ?");
-	my $sql_delete_DS =
-	  $dbh->prepare("DELETE FROM DataSet WHERE DS_id = ?");
-	my $sql_delete_GA =
-	  $dbh->prepare( "DELETE FROM GeographicalArea WHERE GA_id IN "
-		  . "(SELECT GA_id FROM GA_Describes_DS AS g, DataSet AS d WHERE "
-		  . "g.DS_id = d.DS_id AND (d.DS_id = ?))" );
-	my $sql_insert_DS =
-	  $dbh->prepare(
-"INSERT INTO DataSet (DS_id, DS_name, DS_parent, DS_status, DS_datestamp, DS_ownertag, DS_creationDate, DS_metadataFormat, DS_filePath)"
-		  . " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)" );
-    my $sql_insert_ProjectionInfo = $dbh->prepare("INSERT INTO ProjectionInfo (DS_id, PI_content) VALUES (?, ?)");
-    my $sql_delete_ProjectionInfo = $dbh->prepare("DELETE FROM ProjectionInfo WHERE DS_id = ?");
-    my $sql_insert_WMSInfo = $dbh->prepare("INSERT INTO WMSInfo (DS_id, WI_content) VALUES (?, ?)");
-    my $sql_delete_WMSInfo = $dbh->prepare("DELETE FROM WMSInfo WHERE DS_id = ?");
-	my $sql_insert_GA =
-	  $dbh->prepare("INSERT INTO GeographicalArea (GA_id) VALUES (?)");
-	my $sql_insert_BKDS =
-	  $dbh->prepare("INSERT INTO BK_Describes_DS (BK_id, DS_id) VALUES (?, ?)");
-	my $sql_selectCount_BKDS=
-	  $dbh->prepare("SELECT COUNT(*) FROM BK_Describes_DS WHERE BK_id = ? AND DS_id = ?");
-	my $sql_insert_NI =
-	  $dbh->prepare(
-"INSERT INTO NumberItem (SC_id, NI_from, NI_to, DS_id) VALUES (?, ?, ?, ?)"
-	  );
-
-	#
-	my $sql_getkey_MD = $dbh->prepare("SELECT nextval('Metadata_MD_id_seq')");
-	my $sql_insert_MD = $dbh->prepare(
-		"INSERT INTO Metadata (MD_id, MT_name, MD_content) VALUES (?, ?, ?)");
-	my $sql_selectCount_DSMD = $dbh->prepare(
-		"SELECT COUNT(*) FROM DS_Has_MD WHERE DS_id = ? AND MD_id = ?");
-	my $sql_insert_DSMD =
-	  $dbh->prepare("INSERT INTO DS_Has_MD (DS_id, MD_id) VALUES (?, ?)");
-	my $sql_insert_GAGD =
-	  $dbh->prepare("INSERT INTO GA_Contains_GD (GA_id, GD_id) VALUES (?, ?)");
-	my $sql_insert_GADS =
-	  $dbh->prepare("INSERT INTO GA_Describes_DS (GA_id, DS_id) VALUES (?, ?)");
 	{
 		my %metadata      = $ds->getMetadata;
-		my @quadtreenodes = $ds->getQuadtree;
 		my $period_from;
 		my $period_to;
 		my @metaarray   = ();
@@ -458,7 +414,8 @@ sub update_database {
 			my $mref = [ 'datacollection_period', $period ];
 			push( @metaarray, $mref );
 		}
-
+		
+        my $sql_getIDByName_DS = $dbh->prepare_cached("SELECT DS_id FROM Dataset WHERE DS_name = ?");
 		$sql_getIDByName_DS->execute( $info{name} );
 		my $dsid;
 		while ( my @row = $sql_getIDByName_DS->fetchrow_array ) {
@@ -471,18 +428,25 @@ sub update_database {
 		 #  This will cascade to BK_Describes_DS, GA_Describes_DS, GD_Ispartof_GA
 		 #  and also DS_Has_MD:
 		 #
-			$sql_delete_GA->execute( $dsid );
+            my $sql_delete_GA = $dbh->prepare_cached( "DELETE FROM GeographicalArea WHERE GA_id IN "
+                                             . "(SELECT GA_id FROM GA_Describes_DS AS g, DataSet AS d WHERE "
+                                             . "g.DS_id = d.DS_id AND (d.DS_id = ?))" );
+            $sql_delete_GA->execute( $dsid );
+            my $sql_delete_DS = $dbh->prepare_cached("DELETE FROM DataSet WHERE DS_id = ?");
 			$sql_delete_DS->execute( $dsid );
 		}
 		else {
+		    my $sql_getkey_DS = $dbh->prepare_cached("SELECT nextval('DataSet_DS_id_seq')");		    
 			$sql_getkey_DS->execute();
 			my @result = $sql_getkey_DS->fetchrow_array;
 			$dsid = $result[0];
+			$sql_getkey_DS->finish;
 		}
 		my $dsStatus = ( $info{status} eq 'active' ) ? 1 : 0;
 		my $parentId = 0;
 		my $parentName = $ds->getParentName;
 		if ($parentName) {
+            my $sql_getIDByNameAndParent_DS = $dbh->prepare_cached("SELECT DS_id FROM Dataset WHERE DS_name = ? AND DS_parent = ?");
 			$sql_getIDByNameAndParent_DS->execute($parentName, 0);
 			my @result = $sql_getIDByNameAndParent_DS->fetchrow_array;
 			if (@result != 0) {
@@ -490,7 +454,11 @@ sub update_database {
 			} else {
 				die "couldn't find parent for $info{name}: $parentName";
 			}
+            $sql_getIDByNameAndParent_DS->finish;
 		}
+        my $sql_insert_DS =  $dbh->prepare_cached(
+            "INSERT INTO DataSet (DS_id, DS_name, DS_parent, DS_status, DS_datestamp, DS_ownertag, DS_creationDate, DS_metadataFormat, DS_filePath)"
+          . " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)" );
 		$sql_insert_DS->execute(
 			$dsid,               $info{name},
 			$parentId,           $dsStatus,
@@ -500,6 +468,14 @@ sub update_database {
 		);
 
 		if ($dsStatus) {
+            #  Prepare SQL statements for repeated use.
+            my $sql_getkey_MD = $dbh->prepare_cached("SELECT nextval('Metadata_MD_id_seq')");
+            my $sql_insert_MD = $dbh->prepare_cached("INSERT INTO Metadata (MD_id, MT_name, MD_content) VALUES (?, ?, ?)");
+            my $sql_insert_BKDS = $dbh->prepare_cached("INSERT INTO BK_Describes_DS (BK_id, DS_id) VALUES (?, ?)");
+            my $sql_selectCount_BKDS= $dbh->prepare_cached("SELECT COUNT(*) FROM BK_Describes_DS WHERE BK_id = ? AND DS_id = ?");
+            my $sql_insert_NI = $dbh->prepare_cached("INSERT INTO NumberItem (SC_id, NI_from, NI_to, DS_id) VALUES (?, ?, ?, ?)");
+            my $sql_selectCount_DSMD = $dbh->prepare_cached("SELECT COUNT(*) FROM DS_Has_MD WHERE DS_id = ? AND MD_id = ?");
+            my $sql_insert_DSMD = $dbh->prepare_cached("INSERT INTO DS_Has_MD (DS_id, MD_id) VALUES (?, ?)");
 
 			#
 			#  Insert metadata:
@@ -521,6 +497,7 @@ sub update_database {
 						$sql_getkey_MD->execute();
 						my @result = $sql_getkey_MD->fetchrow_array;
 						$mdid = $result[0];
+						$sql_getkey_MD->finish;
 						$sql_insert_MD->execute( $mdid, $mtname, $mdcontent );
 						$dbMetadata{$mdkey} = $mdid;
 					}
@@ -537,6 +514,7 @@ sub update_database {
 					$sql_getkey_MD->execute();
 					my @result = $sql_getkey_MD->fetchrow_array;
 					$mdid = $result[0];
+					$sql_getkey_MD->finish;
 					$sql_insert_MD->execute( $mdid, $mtname, $mdcontent );
 					$sql_insert_DSMD->execute( $dsid, $mdid );
 				}
@@ -564,10 +542,7 @@ sub update_database {
 					}
 					elsif ( $mtname eq 'datacollection_period' ) {
 						my $scid = $searchcategories{$mtname};
-						if ( $mdcontent =~
-/(\d{4,4})-(\d{2,2})-(\d{2,2}) to (\d{4,4})-(\d{2,2})-(\d{2,2})/
-						  )
-						{
+						if ( $mdcontent =~ /(\d{4,4})-(\d{2,2})-(\d{2,2}) to (\d{4,4})-(\d{2,2})-(\d{2,2})/ ) {
 							my $from = $1 . $2 . $3;
 							my $to   = $4 . $5 . $6;
 							$sql_insert_NI->execute( $scid, $from, $to, $dsid );
@@ -580,34 +555,111 @@ sub update_database {
 		#
 		#   Insert quadtree nodes:
 		#
-		if ( @quadtreenodes > 0 ) {
-			$sql_getkey_GA->execute();
-			my @result = $sql_getkey_GA->fetchrow_array;
-			my $gaid   = $result[0];
-			$sql_insert_GA->execute($gaid);
-			foreach my $node (@quadtreenodes) {
-				if ( length($node) > 0 ) {
-					$sql_insert_GAGD->execute( $gaid, $node );
-				}
-			}
-			$sql_insert_GADS->execute( $gaid, $dsid );
-		}
+        {
+            my @quadtreenodes = $ds->getQuadtree;
+            if ( @quadtreenodes > 0 ) {
+                my $sql_getkey_GA = $dbh->prepare_cached("SELECT nextval('GeographicalArea_GA_id_seq')");
+                my $sql_insert_GA = $dbh->prepare_cached("INSERT INTO GeographicalArea (GA_id) VALUES (?)");
+                my $sql_insert_GAGD = $dbh->prepare_cached("INSERT INTO GA_Contains_GD (GA_id, GD_id) VALUES (?, ?)");
+                
+                $sql_getkey_GA->execute();
+                my @result = $sql_getkey_GA->fetchrow_array;
+                my $gaid   = $result[0];
+                $sql_getkey_GA->finish;
+                $sql_insert_GA->execute($gaid);
+                foreach my $node (@quadtreenodes) {
+                    if ( length($node) > 0 ) {
+                	    $sql_insert_GAGD->execute( $gaid, $node );
+                    }
+                }
+            my $sql_insert_GADS = $dbh->prepare_cached("INSERT INTO GA_Describes_DS (GA_id, DS_id) VALUES (?, ?)");
+                $sql_insert_GADS->execute( $gaid, $dsid );
+            }
+        }
+        #
+        #  Insert new geographical location (region)
+        #
+        my $sql_delete_Location = $dbh->prepare_cached("DELETE FROM Dataset_Location where DS_id = ?");
+        $sql_delete_Location->execute($dsid);
+        if (defined (my $region = $ds->getDatasetRegion)) {
+            my @regions = split ' ', $config->get('SRID_ID_COLUMNS');
+            my $regionColumns = join ',', map {"geom_$_"} @regions;
+            my $regionValues = join ',', map {'ST_TRANSFORM(ST_GeomFromText(?,'.$config->get('LONLAT_SRID')."), $_)"} @regions;
+            my $sql_insert_Location = $dbh->prepare_cached("INSERT INTO Dataset_Location (DS_id, $regionColumns) VALUES (?, $regionValues)");
+            
+            my $regionAdded = 0;
+            foreach my $p ($region->getPolygons) {
+                my $pString = $p->toProjectablePolygon->toWKT;
+                if (length($pString) > 10  and length($pString) < 1_000_000) {
+                    my $parCound = 0;
+                    $sql_insert_Location->bind_param(++$parCound, $dsid);
+                    foreach my $srid (@regions) {
+                        $sql_insert_Location->bind_param(++$parCound, $pString);                        
+                    }
+                    $sql_insert_Location->execute();
+                    $regionAdded++;
+                }
+            }
+            my @points = $region->getPoints;
+            if (@points) {
+                my $pString = 'MULTIPOINT('. join(',', @points) . ')';
+                if (length($pString) > 10 and length($pString) < 1_000_000) {
+                    my $parCound = 0;
+                    $sql_insert_Location->bind_param(++$parCound, $dsid);
+                    foreach my $srid (@regions) {
+                        $sql_insert_Location->bind_param(++$parCound, $pString);                        
+                    }
+                    $sql_insert_Location->execute();
+                    $regionAdded++;                    
+                }
+                $regionAdded++;
+            }
+            if (!$regionAdded) {
+                # trying to add boundingBox
+                my %bb = $region->getBoundingBox;
+                if (scalar keys %bb >= 4) {
+                    my $polygon;
+                    eval {
+                        $polygon = Metamod::LonLatPolygon->new([$bb{west}, $bb{south}],
+                                                               [$bb{west}, $bb{north}],
+                                                               [$bb{east}, $bb{north}],
+                                                               [$bb{east}, $bb{south}],
+                                                               [$bb{west}, $bb{south}]);
+                    }; if (!$@) { # ignore warnings/errors
+                        my $pString = $polygon->toProjectablePolygon->toWKT;
+                        my $parCound = 0;
+                        $sql_insert_Location->bind_param(++$parCound, $dsid);
+                        foreach my $srid (@regions) {
+                            $sql_insert_Location->bind_param(++$parCound, $pString);                        
+                        }
+                        $sql_insert_Location->execute();
+                        $regionAdded++;
+                    }                                        
+                }                
+            }
+        }
 		
 		#
 		#   Insert new projectionInformation
 		#
+		
+        my $sql_delete_ProjectionInfo = $dbh->prepare_cached("DELETE FROM ProjectionInfo WHERE DS_id = ?");
+		
 		$sql_delete_ProjectionInfo->execute($dsid);
 		my $projectionInfo = $ds->getProjectionInfo;
 		if ($projectionInfo) {
+		    my $sql_insert_ProjectionInfo = $dbh->prepare_cached("INSERT INTO ProjectionInfo (DS_id, PI_content) VALUES (?, ?)");
 			$sql_insert_ProjectionInfo->execute($dsid, $projectionInfo);
 		}
 
         #
         #   Insert new wmsInformation
         #
+        my $sql_delete_WMSInfo = $dbh->prepare_cached("DELETE FROM WMSInfo WHERE DS_id = ?");
         $sql_delete_WMSInfo->execute($dsid);
         my $wmsInfo = $ds->getWMSInfo;
         if ($wmsInfo) {
+            my $sql_insert_WMSInfo = $dbh->prepare_cached("INSERT INTO WMSInfo (DS_id, WI_content) VALUES (?, ?)");
             $sql_insert_WMSInfo->execute($dsid, $wmsInfo);
         }
 

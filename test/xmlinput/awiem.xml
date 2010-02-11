@@ -23,5 +23,5 @@ Pole and 87N, 60W, in April 2007 as part of the Damocles Tara activities
   <metadata name="title">Helicopter EM ice thickness profile</metadata>
   <metadata name="institution">AWI Alfred Wegener Institute for Polar and Marine Research</metadata>
   <metadata name="product_name">HEM ice thickness</metadata>
-  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/AWI/awiem/</metadata>
+  <metadata name="dataref">http://thredds.met.no/thredds/catalog/data/AWI/awiem/</metadata>
 </MM2>

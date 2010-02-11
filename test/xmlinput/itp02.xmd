@@ -3,4 +3,7 @@
   <info name="DAMOC/itp02" status="active" creationDate="2009-03-12T16:03:06Z" datestamp="2009-03-12T16:03:06Z" ownertag="DAM" metadataFormat="MM2"/>
 <quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">141441
 141442
-142331</quadtree_nodes></dataset>
+142331</quadtree_nodes><datasetRegion xmlns="http://www.met.no/schema/metamod/datasetRegion" xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+  <boundingBox north="77.08" south="76.60" east="-134.48" west="-141.28"/>
+  <lonLatPoints/>
+</datasetRegion></dataset>

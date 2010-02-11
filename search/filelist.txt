@@ -1,4 +1,4 @@
-=htdocs/img/orig.png
+=htdocs/img/map_93995.png
 =htdocs/img/button.gif
 =htdocs/img/button-2.gif
 =htdocs/sch/button.css
@@ -27,6 +27,7 @@
 =htdocs/sch/docross.php
 =htdocs/sch/dohelp.php
 =htdocs/sch/getdslist.php
+=htdocs/sch/getMap.php
 =htdocs/sch/ni.php
 =htdocs/sch/nidone.php
 =htdocs/sch/niremove.php

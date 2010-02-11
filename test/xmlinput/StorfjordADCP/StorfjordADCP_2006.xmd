@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
-  <info name="DAMOC/StorfjordADCP/StorfjordADCP_2006" status="active" creationDate="2009-03-20T14:07:11Z" datestamp="2009-03-20T14:07:11Z" ownertag="NDAM" metadataFormat="MM2"/>
+  <info name="DAMOC/StorfjordADCP/StorfjordADCP_2006" status="active" creationDate="2009-03-20T14:07:11Z" datestamp="2009-03-20T14:07:11Z" ownertag="NDAM" metadataFormat="MM2"/><datasetRegion xmlns="http://www.met.no/schema/metamod/datasetRegion" xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+  <boundingBox/>
+  <lonLatPoints/>
+</datasetRegion>
 </dataset>

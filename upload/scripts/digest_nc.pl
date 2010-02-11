@@ -993,6 +993,16 @@ sub parse_all {
    $ds->setQuadtree(\@nodes);
    delete $metadata{'quadtree_nodes'};
 
+    #
+    # Find DatasetRegin from the files, and merge
+    # with existing datasetRegion if found in the xml-file
+    #
+    my $ncRegion = getDatasetRegion(keys %all_variables); # get a merged region from all files
+    my $dsRegion = $ds->getDatasetRegion;
+    $dsRegion->addRegion($ncRegion);
+    $ds->setDatasetRegion($dsRegion);
+    
+
    # start and stop date need special handling
    {
       my $start_date = (delete $metadata{'start_date'})->[0] if exists $metadata{'start_date'};
@@ -1299,6 +1309,33 @@ sub get_quadtree_nodes {
    }
    return $qtuseobj->get_nodes();
 };
+
+#
+#---------------------------------------------------------------------------------
+#
+sub getDatasetRegion {
+    my @ncFiles = @_;
+    my $region = new Metamod::DatasetRegion();
+    foreach my $f (@ncFiles) {
+        my $nc = MetNo::NcFind->new($f);
+        eval { 
+            my %bb = $nc->findBoundingBoxByGlobalAttributes(qw(northernmost_latitude southernmost_latitude easternmost_longitude westernmost_longitude));
+            $region->extendBoundingBox(\%bb);
+        }; if ($@) {
+            warn $@;
+        }
+        my %lonLatInfo = $nc->extractCFLonLat;
+        foreach my $polygon (@{ $lonLatInfo{polygons} }) {
+            $region->addPolygon($polygon);
+        }
+        foreach my $p (@{ $lonLatInfo{points} }) {
+            $region->addPoint($p);
+        }
+        
+    }
+    return $region;
+}
+
 #
 #---------------------------------------------------------------------------------
 #

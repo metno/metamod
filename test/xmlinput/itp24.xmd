@@ -2,4 +2,9 @@
 <dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
   <info name="DAMOC/itp24" status="active" creationDate="2009-03-12T16:03:32Z" datestamp="2009-03-12T16:03:32Z" ownertag="DAM" metadataFormat="MM2"/>
 <quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">233343
-233344</quadtree_nodes></dataset>
+233344</quadtree_nodes><datasetRegion xmlns="http://www.met.no/schema/metamod/datasetRegion" xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+  <boundingBox north="85.18" south="81.22" east="132.92" west="121.61"/>
+  <lonLatPoints>
+  132.92 85.12,132.31 85.18,126.06 83.32,121.61 81.22,124.56 84.10
+  </lonLatPoints>
+</datasetRegion></dataset>

@@ -3,4 +3,9 @@
   <info name="DAMOC/itp22" status="active" creationDate="2009-03-13T21:00:16Z" datestamp="2009-03-13T21:00:16Z" ownertag="DAM" metadataFormat="MM2"/>
 <quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">144124
 144141
-144142</quadtree_nodes></dataset>
+144142</quadtree_nodes><datasetRegion xmlns="http://www.met.no/schema/metamod/datasetRegion" xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+  <boundingBox north="82.05" south="81.98" east="-139.24" west="-140.79"/>
+  <lonLatPoints>
+  -140.79 81.99,-140.21 82.00,-139.24 82.05,-140.70 81.99,-140.02 81.99
+  </lonLatPoints>
+</datasetRegion></dataset>

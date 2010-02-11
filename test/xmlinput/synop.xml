@@ -3,7 +3,7 @@
   <metadata name="datacollection_period_from">2005-09-01</metadata>
   <metadata name="datacollection_period_to">2007-11-16</metadata>
   <metadata name="bounding_box">25.0667,70.9333,-8.6667,76.5</metadata>
-  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/met.no/synop/</metadata>
+  <metadata name="dataref">http://thredds.met.no/thredds/catalog/data/met.no/synop/</metadata>
   <metadata name="area">Barents Sea</metadata>
   <metadata name="area">Greenland Sea</metadata>
   <metadata name="contact">o.godoy@met.no</metadata>

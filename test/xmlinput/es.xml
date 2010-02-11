@@ -9,6 +9,6 @@
   <metadata name="operational_status">operational</metadata>
   <metadata name="software_version">3.2</metadata>
   <metadata name="title">Total Sea Ice Concentration from EUMETSAT OSI SAF</metadata>
-  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/met.no/es/</metadata>
+  <metadata name="dataref">http://thredds.met.no/thredds/catalog/data/met.no/es/</metadata>
   <metadata name="institution">EUMETSAT OSI SAF</metadata>
 </MM2>

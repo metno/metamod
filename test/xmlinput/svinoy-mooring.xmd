@@ -3,5 +3,8 @@
   <info name="DAMOC/svinoy-mooring" status="active" creationDate="2008-10-01T00:00:00Z" datestamp="2008-10-01T00:00:00Z" ownertag="NDAM" metadataFormat="MM2"/>
   <quadtree_nodes>
 433141
-   </quadtree_nodes>
+   </quadtree_nodes><datasetRegion xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.met.no/schema/metamod/datasetRegion" xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+  <boundingBox north="62.82" south="62.82" east="4.29" west="4.29"/>
+  <lonLatPoints/>
+</datasetRegion>
 </dataset>

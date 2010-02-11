@@ -3,7 +3,7 @@
   <metadata name="datacollection_period_from">2005-05-10</metadata>
   <metadata name="datacollection_period_to">2006-02-10</metadata>
   <metadata name="bounding_box">179.635,56.0234,-178.51,90</metadata>
-  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/DMI/icedriftC4/</metadata>
+  <metadata name="dataref">http://thredds.met.no/thredds/catalog/data/DMI/icedriftC4/</metadata>
   <metadata name="area">Arctic Ocean</metadata>
   <metadata name="contact">gd@dmi.dk</metadata>
   <metadata name="topiccategory">oceans</metadata>

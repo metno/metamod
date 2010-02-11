@@ -11,4 +11,4 @@ concentration algorithm. This product
 is available for free
 from the EUMETSAT Ocean and Sea Ice Satellite 
 Application
-Facility (OSI SAF). </metadata><metadata name="title">OSI SAF Daily Sea Ice Concentration Analysis</metadata><metadata name="bounding_box">180,31.019287109375,-180,90</metadata><metadata name="institution">EUMETSAT OSI SAF</metadata><metadata name="product_name">osi_saf_ice_conc</metadata><metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/TUN/ice/catalog.html?dataset=TUN/ice/ice_conc_nh_200910161200_CF.nc</metadata></MM2>
+Facility (OSI SAF). </metadata><metadata name="title">OSI SAF Daily Sea Ice Concentration Analysis</metadata><metadata name="bounding_box">180,31.019287109375,-180,90</metadata><metadata name="institution">EUMETSAT OSI SAF</metadata><metadata name="product_name">osi_saf_ice_conc</metadata><metadata name="dataref">http://thredds.met.no/thredds/catalog/data/TUN/ice/catalog.html?dataset=TUN/ice/ice_conc_nh_200910161200_CF.nc</metadata></MM2>

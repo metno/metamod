@@ -2,4 +2,9 @@
 <dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
   <info name="DAMOC/ARTIST/ARTIST_cold-air-over-ice-leg-4-980327" status="active" creationDate="2009-03-25T11:19:17Z" datestamp="2009-03-25T11:19:17Z" ownertag="DAM" metadataFormat="MM2"/>
 <quadtree_nodes xmlns="http://www.met.no/schema/metamod/dataset">413213
-413214</quadtree_nodes></dataset>
+413214</quadtree_nodes><datasetRegion xmlns="http://www.met.no/schema/metamod/datasetRegion" xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+  <boundingBox north="79.50" south="78.50" east="29.00" west="23.00"/>
+  <lonLatPoints>
+  24.13 78.92,24.23 78.92,24.32 78.93,24.42 78.93,24.51 78.93,24.61 78.93,24.71 78.93,24.80 78.94,24.90 78.94,24.99 78.94,25.09 78.94,25.18 78.94,25.28 78.95,25.37 78.95,25.47 78.95,25.56 78.95,25.66 78.96,25.75 78.96,25.85 78.96,25.94 78.96,26.04 78.97,26.14 78.97,26.23 78.97,26.33 78.98,26.42 78.98,26.52 78.98,26.61 78.99,26.71 78.99,26.80 78.99,26.90 78.99,26.99 79.00,27.09 79.00,27.18 79.00,27.28 79.00,27.38 79.00,27.47 79.00,27.57 79.01,27.66 79.01,27.76 79.01,27.85 79.01,27.95 79.01,28.04 79.01,28.14 79.01,28.23 79.01,28.33 79.02,28.42 79.02,28.52 79.02,28.61 79.02,28.71 79.02,28.81 79.02,28.90 79.02,29.00 79.02
+  </lonLatPoints>
+</datasetRegion></dataset>

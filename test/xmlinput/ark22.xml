@@ -3,7 +3,7 @@
   <metadata name="datacollection_period_from">2007-07-29</metadata>
   <metadata name="datacollection_period_to">2007-10-06</metadata>
   <metadata name="bounding_box">-135.,72.,26.,89.</metadata>
-  <metadata name="dataref">http://damocles.met.no:8080/thredds/catalog/data/AWI/ark22/</metadata>
+  <metadata name="dataref">http://thredds.met.no/thredds/catalog/data/AWI/ark22/</metadata>
   <metadata name="area">Arctic Ocean</metadata>
   <metadata name="contact">Andreas.Wisotzki@awi.de</metadata>
   <metadata name="topiccategory">oceans</metadata>

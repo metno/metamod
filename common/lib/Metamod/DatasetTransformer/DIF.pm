@@ -169,8 +169,11 @@ sub transform {
         }
         $ds->setInfo(\%info);
         
+        # conversion to quadtreeuse and to datasetregion
+        # TODO: remove one or the other
         require quadtreeuse;
         my %metadata = $ds->getMetadata;
+        my $datasetRegion = $ds->getDatasetRegion();
         my ($south, $north, $east, $west) = qw(southernmost_latitude northernmost_latitude 
                                                easternmost_longitude westernmost_longitude);
         if (exists $metadata{bounding_box}) {
@@ -182,22 +185,41 @@ sub transform {
                 if (@bounding_box != 4) {
                     warn "wrong defined bounding_box: $bb\n";
                 }
-                my ($eLon, $sLat, $wLon, $nLat) = @bounding_box;
-                my $qtu = new quadtreeuse(90, 0, 3667387.2, 7, "+proj=stere +lat_0=90 +datum=WGS84");
-                if (defined $sLat && defined $nLat && defined $wLon && defined $eLon) {
-                    if ($sLat <= -90) {
-                        if ($nLat <= -89.9) {
-                            warn "cannot build northern polar-stereographic quadtree on southpole\n";
-                        } else {
-                            $sLat = 89.9;
-                        }
+                my %bb;
+                @bb{qw(east south west north)} = @bounding_box;
+                eval {
+                    # datasetRegion does several check and dies on error
+                    $datasetRegion->extendBoundingBox(\%bb);
+                    # bounding box might be to big (one number for everything)
+                    # add each bounding as polygon, too
+                    my ($eLon, $sLat, $wLon, $nLat) = @bounding_box;
+                    if ($nLat == $sLat and $eLon == $wLon) {
+                        $datasetRegion->addPoint([$eLon, $nLat]);
+                    } else {
+                        $datasetRegion->addPolygon([[$eLon, $nLat], [$eLon, $sLat], [$wLon, $sLat], [$wLon, $nLat], [$eLon, $nLat]]);
                     }
-                    $qtu->add_lonlats("area",
+                    print STDERR "adding polygon [[$eLon, $nLat], [$eLon, $sLat], [$wLon, $sLat], [$wLon, $nLat], [$eLon, $nLat]]\n" if $self->DEBUG;
+                    # and now the quadtree
+                    my $qtu = new quadtreeuse(90, 0, 3667387.2, 7, "+proj=stere +lat_0=90 +datum=WGS84");
+                    if (defined $sLat && defined $nLat && defined $wLon && defined $eLon) {
+                        if ($sLat <= -90) {
+                            if ($nLat <= -89.9) {
+                                warn "cannot build northern polar-stereographic quadtree on southpole\n";
+                            } else {
+                                $sLat = 89.9;
+                            }
+                        }
+                        $qtu->add_lonlats("area",
                                       [$eLon, $wLon, $wLon, $eLon, $eLon],
                                       [$sLat, $sLat, $nLat, $nLat, $sLat]);
-                    push @nodes, $qtu->get_nodes;
+                        push @nodes, $qtu->get_nodes;
+                    }
+                }; if ($@) {
+                    my %info = $ds->getInfo();
+                    warn "problems setting boundingBox for ".$info{name}.": $@\n";
                 }
             }
+            $ds->setDatasetRegion($datasetRegion);
             if (@nodes) {
                 my %unique;
                 @nodes = map {$unique{$_}++ ? () : $_} @nodes;

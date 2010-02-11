@@ -47,7 +47,16 @@ PG_ADMIN_USER = admin
 PG_WEB_USER = webuser
 
 # the location of the initialization sql-script for the full-text facilities
-PG_TSEARCH2_SCRIPT = /usr/share/postgresql/8.1/contrib/tsearch2.sql
+PG_TSEARCH2_SCRIPT = /usr/share/postgresql/8.3/contrib/tsearch2.sql
+
+# the location of the initialization sql-script for postGIS
+PG_POSTGIS_SCRIPT = /usr/share/postgresql-8.3-postgis/lwpostgis.sql
+# the Coordinate System References
+PG_POSTGIS_SYSREF_SCRIPT = /usr/share/postgresql-8.3-postgis/spatial_ref_sys.sql
+# additional coordinate systems, retrieve from e.g. : http://spatialreference.org
+PG_POSTGIS_ADDITIONAL_SYSREF =
+  INSERT into spatial_ref_sys (srid, auth_name, auth_srid, proj4text, srtext) values ( 93995, 'epsg', 3995, '+proj=stere +lat_0=90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs ', 'PROJCS["WGS 84 / Arctic Polar Stereographic",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],UNIT["metre",1,AUTHORITY["EPSG","9001"]],PROJECTION["Polar_Stereographic"],PARAMETER["latitude_of_origin",-71],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],AUTHORITY["EPSG","3995"],AXIS["Easting",UNKNOWN],AXIS["Northing",UNKNOWN]]');
+  INSERT into spatial_ref_sys (srid, auth_name, auth_srid, proj4text, srtext) values ( 93031, 'epsg', 3031, '+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs ', 'PROJCS["WGS 84 / Antarctic Polar Stereographic",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],UNIT["metre",1,AUTHORITY["EPSG","9001"]],PROJECTION["Polar_Stereographic"],PARAMETER["latitude_of_origin",-71],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],AUTHORITY["EPSG","3031"],AXIS["Easting",UNKNOWN],AXIS["Northing",UNKNOWN]]');
 
 # the language to use for the data for full-text indexing, pre-installed are 'default' and 'simple' (pg <= 8.2); 'english' and 'simple' (pg >= 8.3)
 # see 'select * from pg_ts_config;'
@@ -117,6 +126,12 @@ DROPDB = dropdb
 
 # List of import directories:
 IMPORTDIRS = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
+
+# List the supported geographical search environments
+SRID_ID_COLUMNS = 93995 93031
+
+# Basic latitude longitude earth (4035 = WGS84)
+LONLAT_SRID = 4035
 
 # locate your fimex program for reprojection of data
 FIMEX_PROGRAM = fimex
