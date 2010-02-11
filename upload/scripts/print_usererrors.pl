@@ -133,7 +133,13 @@ foreach my $line (@errors_found_arr) {
          $errorproperties = "";
       }
    } else {
-      if ($line =~ /^([^:]+): (.+)$/) {
+      if ($errorkey eq "") {
+#
+#        The line contains the error_code:
+#
+         $errorkey = $line;
+         $errorproperties = "";
+      } elsif ($line =~ /^([^:]+): (.+)$/) {
 #
 #        The line is a property line:
 #
@@ -147,12 +153,6 @@ foreach my $line (@errors_found_arr) {
          } else {
             die '$errorproperties is undefined';
          }
-      } else {
-#
-#        The line contains the error_code:
-#
-         $errorkey = $line;
-         $errorproperties = "";
       }
    }
 }
@@ -316,7 +316,7 @@ for (my $errcode_index=0; $errcode_index < $errcode_count; $errcode_index++) {
                         if (exists($properties_hash{$property})) {
                            print HTMLOUT $properties_hash{$property};
                         } else {
-                           print HTMLOUT '&nbsp;'
+                           print HTMLOUT '&nbsp;';
                         }
                      } elsif ($piece =~ /^\$\(separator:([^():]+)\)$/) {
 #                        

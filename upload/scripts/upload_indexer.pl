@@ -147,6 +147,8 @@ $| = 1;
 #  A summary of this file is constructed in the form of a self-explaining HTML file
 #  (using the print_usererrors.pl script).
 #
+my $path_to_etc = $target_directory . '/etc';
+my $usererrors_path = "nc_usererrors.out";
 my %dataset_institution;     # Updated in sub get_dataset_institution
 my $file_in_error_counter;
 my $dataset_name = "";
@@ -154,23 +156,34 @@ my $dirkey = "";
 my $dirpath = "";
 my @files_arr = ();
 #
-#  Redirect STDOUT and STDERR:
+#  Open OUT for progress reporting, and redirect STDERR to OUT:
 #
 my $stdout_file = $webrun_directory . "/upload_indexer.out";
 my $date_and_time = &get_date_and_time_string();
-open(STDOUT,'>>',$stdout_file);
-open(STDERR,'>>&STDOUT');
-print "---------- $date_and_time: Starting upload_indexer.pl with PID= $$\n";
+open(OUT,'>>',$stdout_file);
+open(STDERR,'>>&OUT');
+print OUT "---------- $date_and_time: Starting upload_indexer.pl with PID= $$\n";
 #
 eval {
    &do_indexing();
 };
 if ($@) {
-   print "---------- PID= $$ aborted: $@\n";
-   &syserror("SYS", "upload_indexer.pl ABORTED: " . $@, "", "", "");
+   my $errmessage = $@;
+   print OUT "---------- PID= $$ aborted: $errmessage\n";
+   &syserror("SYS", "upload_indexer.pl ABORTED: " . $errmessage, "", "", "");
+   &user_report();
+   close(OUT);
+   my $jpos = index($errmessage,"!");
+   if ($jpos >= 0) {
+      $errmessage = substr($errmessage,0,$jpos);
+   }
+   print $errmessage;
    exit 1;
 } else {
-   print "---------- PID= $$ stops\n";
+   &user_report();
+   print OUT "---------- PID= $$ stops\n";
+   close(OUT);
+   print "OK, files registered";
    exit 0;
 }
 sub do_indexing {
@@ -187,10 +200,10 @@ sub do_indexing {
             } elsif ($key eq 'dirkey') {
                $dirkey = $value;
             } else {
-               die("$0 : Unknown command line option: $arg");
+               die("Internal system error!$0 : Unknown command line option: $arg");
             }
          } else {
-            die("$0 : Command line option syntax error: $arg");
+            die("Internal system error!$0 : Command line option syntax error: $arg");
          }
       } else {
          push (@files_arr,$arg);
@@ -206,7 +219,15 @@ sub do_indexing {
 #  Change to work directory
 #
    unless (chdir $work_directory) {
-      die "Could not cd to $work_directory: $!\n";
+      die "Internal system error!Could not cd to $work_directory: $!\n";
+   }
+#
+#  Remove user error file from previous run:
+#
+   if (-e $usererrors_path) {
+      if (unlink($usererrors_path) == 0) {
+         print OUT "Unlink file $usererrors_path did not succeed\n";
+      }
    }
 #
 #  Initialize hash that contain the institution code for each dataset.
@@ -223,22 +244,24 @@ sub do_indexing {
 sub process_files {
    my $errors = 0;
    if ($progress_report == 1) {
-      print "-------- Command invocation:\n";
-      print $0 . " " . join(" ",@ARGV) . "\n";
+      print OUT "-------- Command invocation:\n";
+      print OUT $0 . " " . join(" ",@ARGV) . "\n";
    }
    if (! exists($dataset_institution{$dataset_name})) {
       &syserror("SYS","dataset_not_initialized", "", "process_files", "Dataset: $dataset_name");
-      return 1;
+      @files_arr = ();
+      die "Dataset $dataset_name not found!";
    }
    my $ref_datasetinfo = $dataset_institution{$dataset_name};
    if (scalar @$ref_datasetinfo < 6) {
       &syserror("SYSUSER","dataset_no_access_information", "", "process_files", "Dataset: $dataset_name");
-      $errors = 1;
+      @files_arr = ();
+      die "No access information found for dataset $dataset_name!";
    } elsif ($ref_datasetinfo->[3] ne $dirkey) {
       &syserror("SYSUSER","wrong_directory_key", "", "process_files", "Dataset: $dataset_name");
-      $errors = 1;
+      @files_arr = ();
+      die "Wrong directory key (dirkey)!";
    }
-   my $path_to_etc = $target_directory . '/etc';
    if ($errors == 0) {
       my $dirpath = $ref_datasetinfo->[4];
       my $catalogurl = $ref_datasetinfo->[5];
@@ -254,26 +277,29 @@ sub process_files {
          }
          $errors = 0;
          if (! -e $filepath) {
-            &syserror("SYSUSER","file_not_in_repository", "", "process_files", "File name: $filepath Dataset: $dataset_name");
-            $errors = 1;
+            &syserror("SYSUSER","file_not_in_repository", "", "process_files", "File: $filepath\n Dataset: $dataset_name");
+            $files_arr[$ix] = "";
+            die "File $filepath not found!";
          } elsif (! -r $filepath) {
-            &syserror("SYSUSER","file_not_readable", "", "process_files", "File name: $filepath Dataset: $dataset_name");
-            $errors = 1;
+            &syserror("SYSUSER","file_not_readable", "", "process_files", "File: $filepath\nDataset: $dataset_name");
+            $files_arr[$ix] = "";
+            die "No read access to file $filepath!";
          } elsif (-d $filepath) {
-            &syserror("SYSUSER","file_is_a_directory", "", "process_files", "Path: $filepath Dataset: $dataset_name");
-            $errors = 1;
+            &syserror("SYSUSER","file_is_a_directory", "", "process_files", "File: $filepath\nDataset: $dataset_name");
+            $files_arr[$ix] = "";
+            die "$filepath is a directory!";
          }
 #      
 #     Get type of file and act accordingly:
 #      
          my $filetype = getFiletype($filepath);
          if ($progress_report == 1) {
-            print "     Processing $filepath Filtype: $filetype\n";
+            print OUT "     Processing $filepath Filtype: $filetype\n";
          }
 #
          if ($filetype ne 'nc3') { # Not netCDF 3 file
-            &syserror("SYSUSER","file_is_not_netcdf3", "", "process_files", "Path: $filepath Dataset: $dataset_name");
-            $errors = 1;
+            &syserror("SYSUSER","file_is_not_netcdf3", "", "process_files", "File: $filepath\nDataset: $dataset_name");
+            die "File $filepath is not a netCDF file!";
          }
          if ($errors == 0) {
             push (@digest_input,$filepath);
@@ -281,7 +307,7 @@ sub process_files {
       }
       if (scalar @digest_input == 0) {
          if ($progress_report == 1) {
-            print "     No files\n";
+            print OUT "     No files\n";
          }
       }
       open (DIGEST,">digest_input");
@@ -307,7 +333,7 @@ sub process_files {
 #   
       my $command = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlpath";
       if ($progress_report == 1) {
-         print "RUN:    $command\n";
+         print OUT "RUN:    $command\n";
       }
       my $result = &shcommand_scalar($command);
       if (defined($result)) {
@@ -318,7 +344,7 @@ sub process_files {
 #
       if (length($shell_command_error) > 0) {
          &syserror("SYS","digest_nc_fails", "", "process_files", "");
-         return 1;
+         die "Not able to parse the files (digest_nc fails)!";
       }
 #
 #     Run digest_nc again for each file with output to dataset/file.xml
@@ -344,20 +370,32 @@ sub process_files {
          if (! -d $xmlFileDir) {
             if (!mkdir($xmlFileDir)) {
              	syserror("SYS", "mkdir_fails", $filepath, "process_files", "mdkir $xmlFileDir");
-               	return 1;
+               	die "Internal system error!";
             }
          }
          my $xmlFilePath = File::Spec->catfile($xmlFileDir, $pureFile . '.xml');
          my $digestCommand = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlFilePath isChild";
-         print "RUN:    $digestCommand\n" if $progress_report == 1;
+         print OUT "RUN:    $digestCommand\n" if $progress_report == 1;
          shcommand_scalar($digestCommand);
          if (length($shell_command_error) > 0) {
           	syserror("SYS", "digest_nc_file_fails", $filepath, "process_files", "");
-            return 1;
+            die "Not able to parse a file (digest_nc fails on $filepath)!";
          }
       }
    }
-   my $usererrors_path = "nc_usererrors.out";
+}
+
+sub user_report {
+   if (! exists($dataset_institution{$dataset_name})) {
+      return 1;
+   }
+   my @old_files_arr = @files_arr;
+   @files_arr = ();
+   foreach my $fname (@old_files_arr) {
+      if ($fname ne "") {
+         push (@files_arr,$fname);
+      }
+   }
    open (USERERRORS,">>$usererrors_path");
    foreach my $line (@user_errors) {
       print USERERRORS $line;

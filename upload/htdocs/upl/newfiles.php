@@ -34,13 +34,16 @@
    $error = 0;
    if (!array_key_exists("dataset", $_GET)) {
       $error = 1;
+      $message = "Query did not contain a dataset value";
    }
    if (!array_key_exists("dirkey", $_GET)) {
       $error = 1;
+      $message = "Query did not contain a dirkey value";
    }
    # use filename[] as parameter to indicate array, otherwise, use filename
    if (!array_key_exists("filename", $_GET)) {
       $error = 1;
+      $message = "Query did not contain any files values";
    }
    if ($error == 0) {
       $command = $mmConfig->getVar('TARGET_DIRECTORY') . "/scripts/upload_indexer.pl";
@@ -54,11 +57,13 @@
       $command = escapeshellcmd($command);
       $output = array();
       mmPutLog("--------- newfiles.php: command=" . $command);
-      exec($command,$output,$error);
+      $message = exec($command,$output,$error);
    }
    if ($error == 0) {
       header("HTTP/1.1 200 OK");
+      echo $message;
    } else {
       header("HTTP/1.1 500 Internal Server Error");
+      echo $message;
    }
 ?>
