@@ -252,22 +252,23 @@ sub notify_web_system {
 #
 sub get_dataset_institution {
 #
-# Initialize hash connecting each dataset to a reference to an array with three
-# or six elements:
+# Initialize hash connecting each dataset to a reference to a hash with the following
+# elements:
 #
-# ->[0] Name of institution as found in an <heading> element within the webrun/u1
+# ->{'institution'} Name of institution as found in an <heading> element within the webrun/u1
 #       file for the user that owns the dataset.
-# ->[1] The owners E-mail address.
-# ->[2] The owners name.
-# ->[3] The directory key.
+# ->{'email'} The owners E-mail address.
+# ->{'name'} The owners name.
+# ->{'key'} The directory key.
 #
-# If found, two extra elements are included:
+# If found, extra elements are included:
 #
-# ->[4] Location
-# ->[5] Catalog
+# ->{'location'} Location
+# ->{'catalog'} Catalog
+# ->{'wmsurl'} URL to WMS
 #
-# The last two elements are taken from the line:
-# <dir ... location="..." catalog="..." />)
+# The last elements are taken from the line:
+# <dir ... location="..." catalog="..." wmsurl="..."/>)
 #
    my($ref_dataset_institution) = @_;
 #   
@@ -316,21 +317,22 @@ sub get_dataset_institution {
 #      
       my @datasets = ($content =~ /<dir dirname=[^>]+>/mg);
       for (my $ix=0; $ix < scalar @datasets; $ix++) {
-         my $rex1 = '<dir dirname="([^"]*)" key="([^"]*)" location="([^"]*)" catalog="([^"]*)"';
-         my $rex2 = '<dir dirname="([^"]*)" key="([^"]*)"';
+         my $rex1 = '<dir dirname="([^"]*)"';
          my $line = $datasets[$ix];
          if ($line =~ /$rex1/) {
             my $dataset_name = $1;
-            my $dirkey = &decodenorm($2);
-            my $location = &decodenorm($3);
-            my $catalog = &decodenorm($4);
-            $ref_dataset_institution->{$dataset_name} = 
-                 [$institution,$email,$username,$dirkey,$location,$catalog];
-         } elsif ($line =~ /$rex2/) {
-            my $dataset_name = $1;
-            my $dirkey = &decodenorm($2);
-            $ref_dataset_institution->{$dataset_name} = 
-                 [$institution,$email,$username,$dirkey];
+            $ref_dataset_institution->{$dataset_name} = {};
+            $ref_dataset_institution->{$dataset_name}->{'institution'} = $institution;
+            $ref_dataset_institution->{$dataset_name}->{'email'} = $email;
+            $ref_dataset_institution->{$dataset_name}->{'name'} = $username;
+            foreach my $k1 ('key', 'location', 'catalog', 'wmsurl') {
+               my $rex2 = $k1 . '="([^"]*)"';
+               if ($line =~ /$rex2/) {
+                  $ref_dataset_institution->{$dataset_name}->{$k1} = &decodenorm($1);
+               }
+            }
+         } else {
+            &syserror("SYS","dirname_not_found_in_dir_element: $filename", "", "get_dataset_institution", "");
          }
       }
    }

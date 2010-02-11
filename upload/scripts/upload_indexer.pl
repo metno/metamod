@@ -103,7 +103,7 @@ $| = 1;
 #  
 #  The dataset value is used to fetch information about the dataset from the
 #  %dataset_institution hash. This hash contains the directory key, location and
-#  catalog URL for the dataset.
+#  catalog URL (eventually also the WMS URL) for the dataset.
 #
 #  The location and catalog URL are assigned to variables $location and
 #  $catalogurl. The $location value represents the full path to the (locally
@@ -253,18 +253,19 @@ sub process_files {
       die "Dataset $dataset_name not found!";
    }
    my $ref_datasetinfo = $dataset_institution{$dataset_name};
-   if (scalar @$ref_datasetinfo < 6) {
-      &syserror("SYSUSER","dataset_no_access_information", "", "process_files", "Dataset: $dataset_name");
-      @files_arr = ();
-      die "No access information found for dataset $dataset_name!";
-   } elsif ($ref_datasetinfo->[3] ne $dirkey) {
+   if (exists($ref_datasetinfo->{'key'}) && $ref_datasetinfo->{'key'} ne $dirkey) {
       &syserror("SYSUSER","wrong_directory_key", "", "process_files", "Dataset: $dataset_name");
       @files_arr = ();
       die "Wrong directory key (dirkey)!";
    }
+   if (! exists($ref_datasetinfo->{'location'})) {
+      &syserror("SYSUSER","dataset_no_access_information", "", "process_files", "Dataset: $dataset_name");
+      @files_arr = ();
+      die "No access information found for dataset $dataset_name!";
+   }
    if ($errors == 0) {
-      my $dirpath = $ref_datasetinfo->[4];
-      my $catalogurl = $ref_datasetinfo->[5];
+      my $dirpath = $ref_datasetinfo->{'location'};
+      my $catalogurl = $ref_datasetinfo->{'catalog'};
 #
       my @digest_input = ();
       my $filecount = scalar @files_arr;
@@ -463,8 +464,8 @@ sub user_report {
 #
 #     Send mail to owner of the dataset:
 #
-      my $recipient = $dataset_institution{$dataset_name}->[1];
-      my $username = $dataset_institution{$dataset_name}->[2] . " ($recipient)";
+      my $recipient = $dataset_institution{$dataset_name}->{'email'};
+      my $username = $dataset_institution{$dataset_name}->{'name'} . " ($recipient)";
       if ((!$config->get('TEST_EMAIL_RECIPIENT')) || $dont_send_email_to_user) {
          $recipient = $config->get('OPERATOR_EMAIL');
       }

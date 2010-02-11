@@ -932,7 +932,7 @@ sub process_files {
    if ($ftp_or_web ne 'TAF') {
       @uploaded_basenames = &get_basenames(\@uploaded_files);
       $destination_dir = File::Spec->catdir($opendap_directory, 
-                                            $dataset_institution{$dataset_name}->[0],
+                                            $dataset_institution{$dataset_name}->{'institution'},
                                             $dataset_name);
       my @existing_files = findFiles($destination_dir, eval 'sub {$_[0] =~ /\Q$dataset_name\E_/o;}');
       if (length($shell_command_error) > 0) {
@@ -967,7 +967,7 @@ sub process_files {
          $destination_url .= '/';
       }
       $destination_url .= join ('/', 'data',
-                                     $dataset_institution{$dataset_name}->[0],
+                                     $dataset_institution{$dataset_name}->{'institution'},
                                      $dataset_name,
                                      ""); # last for for / at end
    } else {
@@ -1022,7 +1022,8 @@ sub process_files {
 #     this creates the level 2 (children) xml-files
          foreach my $filepath (@uploaded_files) {
          	my (undef, undef, $basename) = File::Spec->splitpath($filepath);
-         	my $fileURL = $destination_url . "catalog.html?dataset=". join ('/', $dataset_institution{$dataset_name}->[0], $dataset_name, $basename);
+         	my $fileURL = $destination_url . "catalog.html?dataset=". 
+                    join ('/', $dataset_institution{$dataset_name}->{'institution'}, $dataset_name, $basename);
          	open (my $digest, ">digest_input");
          	print $digest $fileURL, "\n";
             print $digest $filepath, "\n";
@@ -1134,8 +1135,8 @@ sub process_files {
          my $recipient;
          my $username;
          if ($ftp_or_web ne 'TAF') {
-            $recipient = $dataset_institution{$dataset_name}->[1];
-            $username = $dataset_institution{$dataset_name}->[2] . " ($recipient)";
+            $recipient = $dataset_institution{$dataset_name}->{'email'};
+            $username = $dataset_institution{$dataset_name}->{'name'} . " ($recipient)";
          } else {
             my $identfile = $config->get('WEBRUN_DIRECTORY').'/upl/etaf/' . $taf_basename;
             unless (-r $identfile) {
@@ -1400,7 +1401,7 @@ sub clean_up_repository {
             next;
          }
          my $directory = $opendap_directory . "/" . 
-                         $dataset_institution{$dataset}->[0] . "/" . $dataset;
+                         $dataset_institution{$dataset}->{'institution'} . "/" . $dataset;
          my @files = glob($directory . "/" . $dataset . "_*");
          if ($progress_report == 1) {
             print "\nclean_up_repository directory: $directory\n";
