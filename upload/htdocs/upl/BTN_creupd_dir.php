@@ -89,12 +89,22 @@
     $odirkey = "";
     $olocation = "";
     $othreddscatalog = "";
+    $owmsurl = "";
     if (array_key_exists($dirname,$dirinfo)) {
-       $dirattributes = explode(',',$dirinfo[$dirname]);
-       $odirkey = decodenorm($dirattributes[0]);
-       if (count($dirattributes) >= 3) {
-          $olocation = decodenorm($dirattributes[1]);
-          $othreddscatalog = decodenorm($dirattributes[2]);
+       $dirattributes = $dirinfo[$dirname];
+       foreach (array('key','location','catalog','wmsurl') as $k1) {
+          if (array_key_exists($k1, $dirattributes)) {
+             $val = decodenorm($dirattributes[$k1]);
+             if ($k1 == 'key') {
+                $odirkey = $val;
+             } else if ($k1 == 'location') {
+                $olocation = $val;
+             } else if ($k1 == 'catalog') {
+                $othreddscatalog = $val;
+             } else if ($k1 == 'wmsurl') {
+                $owmsurl = $val;
+             }
+          }
        }
     }
  }
@@ -105,6 +115,7 @@
     $dirkey = get_postvar("dirkey");
     $location = get_postvar("location");
     $threddscatalog = get_postvar("threddscatalog");
+    $wmsurl = get_postvar("wmsurl");
  }
  if ($error == 0) {
  // Get a new value for the directory key if provided by the user. Check it
@@ -168,6 +179,25 @@
     $nthreddscatalog = normstring($threddscatalog);
  }
  $repositorypath = get_repository_path();
+ if ($error == 0 && strlen($mmConfig->getVar("WMS_XML"))) {
+ // If the user has provided an URL to WMS check it and normalize:
+
+    if (strlen($wmsurl) == 0) {
+       $error = 1;
+       $nextpage = 3;
+       mmPutLog('Create/Update: User provided no value for the wmsurl field');
+       $errmsg = "[Create/Update] failed. You must provide a value for the URL to WMS field";
+    } elseif (!validate_absurl($wmsurl)) {
+       $error = 1;
+       $nextpage = 3;
+       mmPutLog('Create/Update: Illegal URL to WMS: ' . $wmsurl);
+       $errmsg = "[Create/Update] failed. URL to WMS field not accepted";
+    }
+    if ($wmsurl != $owmsurl) {
+       $update_dirinfo_needed = TRUE;
+    }
+    $nwmsurl = normstring($wmsurl);
+ }
  if ($error == 0 && ! $external_repository) {
  // Normal case. No THREDDS location and catalog information entered.
  // Check if directory name is in use by another user
@@ -251,11 +281,19 @@
  // the webrun/u1 directory:
 
     if ($update_dirinfo_needed) {
-       $attr_string = $ndirkey;
-       if (isset($nlocation) && isset($nthreddscatalog)) {
-          $attr_string .= ',' . $nlocation . ',' . $nthreddscatalog;
+       if (! array_key_exists($dirname,$dirinfo)) {
+          $dirinfo[$dirname] = array();
        }
-       $dirinfo[$dirname] = $attr_string;
+       if (isset($ndirkey)) {
+          $dirinfo[$dirname]['key'] = $ndirkey;
+       }
+       if (isset($nlocation) && isset($nthreddscatalog)) {
+          $dirinfo[$dirname]['location'] = $nlocation;
+          $dirinfo[$dirname]['catalog'] = $nthreddscatalog;
+       }
+       if (isset($nwmsurl)) {
+          $dirinfo[$dirname]['wmsurl'] = $nwmsurl;
+       }
        $bytecount = put_dirinfo($filepath,$dirinfo);
        if ($bytecount == 0) {
           mmPutLog('Could not update the user file with dir info. 0 bytes written');
@@ -279,6 +317,9 @@
     if (isset($location) && isset($threddscatalog)) {
        $location = "";
        $threddscatalog = "";
+    }
+    if (isset($wmsurl)) {
+       $wmsurl = "";
     }
  }
 ?>

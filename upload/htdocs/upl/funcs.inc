@@ -356,13 +356,13 @@ function put_dirinfo($filepath,$dirinfo)
       } else {
          if ($found_heading) {
             foreach ($dirinfo as $dirname => $dirattributes) {
-               $attrs = explode(',',$dirattributes);
-               if (count($attrs) == 1) {
-                  $fline = '<dir dirname="' . $dirname .'" key="' . $attrs[0] . '" />';
-               } else {
-                  $fline = '<dir dirname="' . $dirname .'" key="' . $attrs[0] .
-                           '" location="' . $attrs[1] . '" catalog="' . $attrs[2] . '" />';
+               $fline = '<dir dirname="' . $dirname . '" ';
+               foreach (array('key','location','catalog','wmsurl') as $k1) {
+                  if (array_key_exists($k1, $dirattributes)) {
+                     $fline .= $k1 . '="' . $dirattributes[$k1] . '" ';
+                  }
                }
+               $fline .= '/>';
                $newcontent .= $fline . "\n";
             }
             $found_heading = FALSE;
@@ -394,17 +394,16 @@ function get_dirinfo($filepath)
    }
    $dirrecords = preg_grep(':<dir\b[^>]+/>:',$lines);
    foreach ($dirrecords as $dirrec){
-      if (preg_match('/dirname="([^"]+)" key="([^"]*)" location="([^"]*)" catalog="([^"]*)"/',
-                     $dirrec,$match) == 1) {
-         $dirinfo[$match[1]] = $match[2] .','. $match[3] .','. $match[4];
-#         if ($debug) {
-#            mmPutTest($match[1] . '=' . $dirinfo[$match[1]]);
-#         }
-      } elseif (preg_match('/dirname="([^"]+)" key="([^"]*)"/',$dirrec,$match) == 1) {
-         $dirinfo[$match[1]] = $match[2];
-#         if ($debug) {
-#            mmPutTest($match[1] . '=' . $dirinfo[$match[1]]);
-#         }
+      if (preg_match('/dirname="([^"]+)"/',$dirrec,$match) == 1) {
+         $dirname = $match[1];
+         $dirinfo[$dirname] = array();
+      } else {
+         return FALSE;
+      }
+      foreach (array('key','location','catalog','wmsurl') as $k1) {
+         if (preg_match('/' . $k1 . '="([^"]+)"/',$dirrec,$match) == 1) {
+            $dirinfo[$dirname][$k1] = $match[1];
+         }
       }
    }
    return $dirinfo;
@@ -546,9 +545,10 @@ function checkDirectoryPermission($directory, $key = "", &$errMsg = "") {
 		if ($dh = opendir($userInfoDir)) {
    		while (($file = readdir($dh)) !== false) {
 				if (is_file($file) && is_readable($file)) {
-			   	$file_dirinfo = get_dirinfo($filepath);
-			   	if (array_key_exists($directory, $dirinfo)) {
-			      	if ($key == $dirinfo[$directory]) {
+			   	$file_dirinfo = get_dirinfo($file);
+			   	if (array_key_exists($directory, $file_dirinfo)) {
+                    $info_fields = $file_dirinfo[$directory];
+			      	if (array_key_exists('key',$info_fields) && $key == $info_fields['key']) {
 			      		// $key matches $directory
 			      		return true;
 				      } else {

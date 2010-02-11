@@ -115,7 +115,7 @@ require_once("../funcs/mmConfig.inc");
          <colgroup width="11%" />
          <colgroup width="11%" />
          <tr>
-         <td rowspan="6">
+         <td rowspan="7">
             <?php 
             if ($external_repository) {
             echo '<p>In this page you can enter access information for directories in an external
@@ -162,7 +162,7 @@ require_once("../funcs/mmConfig.inc");
             }
             ?>
          </td>
-         <td rowspan="6">
+         <td rowspan="7">
             &nbsp;
          </td>
          <td class="inputform">
@@ -254,6 +254,20 @@ require_once("../funcs/mmConfig.inc");
 ';
             } else {
          	   echo '<tr rowspan="2"><td class="inputform" colspan="4" /></tr>'."\n";
+            }
+            if (strlen($mmConfig->getVar("WMS_XML"))) {
+               echo '
+         <tr>
+         <td class="inputform">
+            &nbsp;URL for access to WMS:
+         </td>
+         <td class="inputform" colspan="3">
+            <input name="wmsurl" value="' . $wmsurl . '" size="30" />
+         </td>
+         </tr>
+';
+            } else {
+         	   echo '<tr><td class="inputform" colspan="4" /></tr>'."\n";
             }
          ?>
       </table>

@@ -66,11 +66,20 @@
        $error = 1;
        $nextpage = 3;
     } else {
-       $dirattributes = explode(',',$dirinfo[$dirname]);
-       $dirkey = decodenorm($dirattributes[0]);
-       if (count($dirattributes) > 1) {
-          $location = decodenorm($dirattributes[1]);
-          $threddscatalog = decodenorm($dirattributes[2]);
+       $dirattributes = $dirinfo[$dirname];
+       foreach (array('key','location','catalog','wmsurl') as $k1) {
+          if (array_key_exists($k1, $dirattributes)) {
+             $val = decodenorm($dirattributes[$k1]);
+             if ($k1 == 'key') {
+                $dirkey = $val;
+             } else if ($k1 == 'location') {
+                $location = $val;
+             } else if ($k1 == 'catalog') {
+                $threddscatalog = $val;
+             } else if ($k1 == 'wmsurl') {
+                $wmsurl = $val;
+             }
+          }
        }
     }
  }
