@@ -423,9 +423,9 @@ function mmGetGAImageSrc($categoryNum) {
 		$mmErrorMessage = "Sorry. Internal error: missing file $mapFile";
    	$mmError = 1;
    } else {
-      $imgSrc = 'getMap.php?srid='.$srid;
       if (isset($mmSessionState->sitems) &&
-          array_key_exists("$categoryNum,GA",$mmSessionState->sitems)) {
+	      $imgSrc = 'getMap.php?srid='.$srid;
+         array_key_exists("$categoryNum,GA",$mmSessionState->sitems)) {
 			$stage = $mmSessionState->sitems["$categoryNum,GA"][0];
          $mmMapnum = $mmSessionState->sitems["$categoryNum,GA"][1];
          $x1 = $mmSessionState->sitems["$categoryNum,GA"][2];
@@ -444,7 +444,7 @@ function mmGetGAImageSrc($categoryNum) {
             $imgSrc .= "&x1=$x1&y1=$y1&x2=$x2&y2=$y2";
          }
       } else {
-			# nothing 
+			$imgSrc = '../img/map_'.$srid.'.png';
       }      
    }
    return $imgSrc;
