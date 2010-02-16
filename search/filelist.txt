@@ -42,4 +42,5 @@
 =htdocs/sch/gautil.inc
 =htdocs/sch/showdone.php
 =htdocs/sch/showutil.inc
+=htdocs/sch/wmsProxy.php
 =htdocs/sch/xmlShow.php
