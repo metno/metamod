@@ -263,9 +263,18 @@ sub process_files {
       @files_arr = ();
       die "No access information found for dataset $dataset_name!";
    }
+   if ($config->get('WMS_XML') ne "" && ! exists($ref_datasetinfo->{'wmsurl'})) {
+      &syserror("SYSUSER","dataset_no_wmsurl", "", "process_files", "Dataset: $dataset_name");
+      @files_arr = ();
+      die "No URL to WMS found for dataset $dataset_name!";
+   }
    if ($errors == 0) {
       my $dirpath = $ref_datasetinfo->{'location'};
       my $catalogurl = $ref_datasetinfo->{'catalog'};
+      my $wmsurl;
+      if ($config->get('WMS_XML') ne "") {
+         $wmsurl = $ref_datasetinfo->{'wmsurl'};
+      }
 #
       my @digest_input = ();
       my $filecount = scalar @files_arr;
@@ -316,7 +325,11 @@ sub process_files {
       if ($catalogurl =~ /^([^?]*)\?/) {
          $threddscatalog = $1; # First matching ()-expression
       }
-      print DIGEST $threddscatalog . "\n";
+      if (defined($wmsurl)) {
+         print DIGEST $threddscatalog . ' ' . $wmsurl . "\n";
+      } else {
+         print DIGEST $threddscatalog . "\n";
+      }
       foreach my $fname (@digest_input) {
          print DIGEST $fname . "\n";
       }

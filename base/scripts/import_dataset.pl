@@ -658,9 +658,15 @@ sub update_database {
         my $sql_delete_WMSInfo = $dbh->prepare_cached("DELETE FROM WMSInfo WHERE DS_id = ?");
         $sql_delete_WMSInfo->execute($dsid);
         my $wmsInfo = $ds->getWMSInfo;
-        if ($wmsInfo) {
+        if (exists($info{wmsxml})) {
+            my $wmsxml = $info{wmsxml};
+            my $sql_insert_WMSInfo = $dbh->prepare_cached("INSERT INTO WMSInfo (DS_id, WI_content) VALUES (?, ?)");
+            $sql_insert_WMSInfo->execute($dsid, $wmsxml);
+        } elsif ($wmsInfo) {
             my $sql_insert_WMSInfo = $dbh->prepare_cached("INSERT INTO WMSInfo (DS_id, WI_content) VALUES (?, ?)");
             $sql_insert_WMSInfo->execute($dsid, $wmsInfo);
+        } else {
+           print "No wmsxml\n";
         }
 
 	}

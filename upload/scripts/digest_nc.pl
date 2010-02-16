@@ -50,6 +50,8 @@ use MetNo::NcFind;
 use quadtreeuse;
 use Data::Dumper;
 use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
+use Metamod::Config;
+my $masterconfig = new Metamod::Config();
 
 #
 # Check and collect metadata in netCDF files. 
@@ -783,11 +785,17 @@ sub parse_all {
    unless (-r $pathfilename) {die "Can not read from file: $pathfilename\n";}
    open (PATHLIST,$pathfilename);
    my $dataref;
+   my $wmsurl;
    while (<PATHLIST>) {
       chomp($_);
       my $fpath = $_;
       if (!defined($dataref)) {
-         $dataref = $fpath;
+         if ($fpath =~ /(\S+)\s+(\S+)/) {
+            $dataref = $1;
+            $wmsurl = $2;
+         } else {
+            $dataref = $fpath;
+         }
       } else {
          my ($vars,$atts) = &parse_file($fpath);
          $all_variables{$fpath} = $vars;
@@ -849,6 +857,27 @@ sub parse_all {
          }
       } else {
          $info{"name"} = "TESTFILE";
+      }
+   }
+#
+#  If a wmsurl has been provided in the input file (second space-separated field
+#  in the first line), then construct a wmsxml element form this based on the 
+#  WMS_XML value in master config:
+#
+   if (defined($wmsurl)) {
+      my $wmsxml = $masterconfig->get("WMS_XML");
+      if ($wmsxml =~ / url=""/) {
+         my $wmsfirst = $`; # String before match
+         my $wmslast = $'; # String after match
+         $wmsxml = $wmsfirst . ' url="' . $wmsurl . '"' . $wmslast;
+#
+#  Substitute '&', '<' and '>' with &amp;, &lt; and &gt; so that $wmsxml can appear as 
+#  normal text in a XML dokument:
+#
+#         $wmsxml =~ s/&/&amp;/mg;
+#         $wmsxml =~ s/</&lt;/mg;
+#         $wmsxml =~ s/>/&gt;/mg;
+         $info{"wmsxml"} = $wmsxml;
       }
    }
 #
