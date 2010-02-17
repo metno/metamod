@@ -16,7 +16,7 @@
 
 			// configure HTTP proxy here
 			//OpenLayers.ProxyHost = "/cgi/proxy.cgi?url=";
-			OpenLayers.ProxyHost = "/Metamod2.x/sch/wmsProxy.php?url=";"
+			OpenLayers.ProxyHost = "./wmsProxy.php?url=";
 
 			//read CGI args
 			var args = new OpenLayers.Util.getArgs();
@@ -58,7 +58,7 @@
 						controls: [
 								new OpenLayers.Control.Navigation(),
 								new OpenLayers.Control.PanZoomBar(),
-								new OpenLayers.Control.LayerSwitcher({'ascending':false}),
+								new OpenLayers.Control.LayerSwitcher({'ascending': false}),
 								new OpenLayers.Control.Permalink(),
 								new OpenLayers.Control.ScaleLine(),
 								new OpenLayers.Control.Permalink('permalink'),
@@ -122,7 +122,7 @@
 		<h1 id="title">WMS Client: </h1>
 		<div id="tags"></div>
 		<p id="shortdesc">Data file: </p>
-		<img id="legend" src="/openlayers/img/blank.gif"
+		<img id="legend" src="../img/blank.gif"
 				style="float: right;position:relative;top:350px;z-index:1000">
 		<div id="map" class="largemap"></div>
 		<div id="docs"></div>
