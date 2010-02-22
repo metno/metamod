@@ -62,7 +62,7 @@
 #  $mmDebug="POST GET mmColumns options mmSessionState mmSubmitButton getdslist secondlevel mapsearch"
 #  If no debug, set $mmDebug to the empty string.
 #
-   $mmDebug = "mmSessionState";
+   $mmDebug = "";
 #
 #  Initialize the mmButtons array:
 #
