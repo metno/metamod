@@ -366,6 +366,7 @@
 =htdocs/img/button.gif
 =htdocs/img/button-2.gif
 =htdocs/img/map_93995.png
+=htdocs/img/map_93031.png
 =htdocs/img/south-mini.png
 =htdocs/img/zoom-plus-mini.png
 =htdocs/img/zoom-world-mini.png

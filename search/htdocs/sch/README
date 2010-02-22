@@ -257,11 +257,7 @@ in index:        Value:
                  a[0] - Defining stage. =1: only one corner is defined (a[2-3]),
                         =2: two opposite corners are defined, i.e. the whole
                         rectangle.
-                 a[1] - Map number. The name of the PNG file used to display
-                        the map must change each time the map is changed.
-                        This number is incremented by 1 for each change, and
-                        is used as a part of the PNG file name to achieve
-                        this change.
+                 a[1] - SRID number. The name of the srid currently active in search.
                  a[2-3] Two numbers representing one corner of the rectangle.
                         The numbers are x and y pixel coordinates as provided
                         by the user when clicking on the PNG image (set up as
@@ -269,6 +265,8 @@ in index:        Value:
                         corner of the image, and the coordinates are increasing
                         rightwards and downwards.
                  a[4-5] Coordinates for the second rectangle-defining corner.
+                 # The following elements are only used when using quad-tree-nodes
+                 # Not needed for PostGis/Multimap search 
                  a[6] - Number of DS_ids found from element 7 and on
                  a[7-]  DS_ids representing all datasets in the database that
                         partly (or in full) cover the rectangular search area

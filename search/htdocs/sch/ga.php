@@ -61,3 +61,28 @@
    </td></tr>
 </table>
 </form>
+<form action="gaget.php#gaform" method="POST">
+
+<?php
+  $srids = preg_split('/\s+/', $mmConfig->getVar('SRID_ID_COLUMNS'));
+  if (count($srids) > 1) {
+     echo mmHiddenSessionField();
+     $name = mmGetCategoryFncValue($mmCategoryNum,"name");
+?>
+<table border="0" cellspacing="5" class="orange" width="100%">
+   <tr><td>
+<?php
+     echo("Select another area: <select name=\"gamap_srid\" size=\"1\"><option selected=\"selected\">$srids[0]</option>");
+        array_shift($srids); # remove first element
+        foreach ( $srids as $srid ) {
+           echo "<option value=\"$srid\">$srid</option>";
+        }
+        echo("</select>\n");
+     echo (mmSelectbutton($mmCategoryNum,"gaget","Switch Map"));
+?>
+   </td></tr>
+</table>
+</form>
+<?php
+  }
+?>  

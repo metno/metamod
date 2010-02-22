@@ -413,9 +413,14 @@ function mmShowSelectedFT() {
  */
 function mmGetGAImageSrc($categoryNum) {
    global $mmConfig, $mmSessionState, $mmErrorMessage, $mmError;
-   
-   //TODO: currently only supporting the first srid mentioned   
-   list($srid) = split(' ', $mmConfig->getVar('SRID_ID_COLUMNS'));
+
+   if (isset($mmSessionState->sitems) && array_key_exists("$categoryNum,GA",$mmSessionState->sitems)) {
+   	# use stored srid
+      $srid = $mmSessionState->sitems["$categoryNum,GA"][1];
+   } else {
+   	# take first available srid
+      list($srid) = preg_split('/\s+/', $mmConfig->getVar('SRID_ID_COLUMNS'));
+   }
    $mapFile = $mmConfig->getVar('TARGET_DIRECTORY').'/htdocs/img/map_'.$srid.'.png';
    $imgSrc = '';
    if (! file_exists($mapFile)) {
@@ -424,10 +429,11 @@ function mmGetGAImageSrc($categoryNum) {
    	$mmError = 1;
    } else {
       if (isset($mmSessionState->sitems)
-          && array_key_exists("$categoryNum,GA",$mmSessionState->sitems)) {
+          && array_key_exists("$categoryNum,GA",$mmSessionState->sitems)
+          && strlen($mmSessionState->sitems["$categoryNum,GA"][2])) {
          $imgSrc = 'getMap.php?srid='.$srid;
 			$stage = $mmSessionState->sitems["$categoryNum,GA"][0];
-         $mmMapnum = $mmSessionState->sitems["$categoryNum,GA"][1];
+         $srid = $mmSessionState->sitems["$categoryNum,GA"][1];
          $x1 = $mmSessionState->sitems["$categoryNum,GA"][2];
          $y1 = $mmSessionState->sitems["$categoryNum,GA"][3];
          if ($stage == 1) {

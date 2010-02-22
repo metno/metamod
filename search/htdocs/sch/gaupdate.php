@@ -29,7 +29,12 @@
 #---------------------------------------------------------------------------- 
 ?>
 <?php
-   if (!array_key_exists("gacoord_x",$_POST) || !array_key_exists("gacoord_y",$_POST)) {
+   if (array_key_exists("gamap_srid", $_POST)) {
+      # switch to a new map
+      $srid = $_POST["gamap_srid"];
+      $mmSessionState->sitems["$mmCategoryNum,GA"] = array(0,$srid);
+
+   } elseif (!array_key_exists("gacoord_x",$_POST) || !array_key_exists("gacoord_y",$_POST)) {
        mmPutLog("Error. Could not get coordinates from image type input button");
        $mmErrorMessage = "Sorry, internal error";
        $mmError = 1;
@@ -39,14 +44,14 @@
       if (isset($mmSessionState->sitems) &&
             array_key_exists("$mmCategoryNum,GA",$mmSessionState->sitems)) {
          $stage = $mmSessionState->sitems["$mmCategoryNum,GA"][0];
-         $mmMapnum = $mmSessionState->sitems["$mmCategoryNum,GA"][1];
+         $srid = $mmSessionState->sitems["$mmCategoryNum,GA"][1];
       } else {
          $stage = 2;
-         $mmMapnum = 0;
+         # set srid to first available in config
+         list($srid) = preg_split('/\s+/', $mmConfig->getVar('SRID_ID_COLUMNS'));
       }
    }
    if ($mmError == 0) {
-      $mmMapnum++;
       if ($stage == 1) {
          $newstage = 2;
          $x1 = $mmSessionState->sitems["$mmCategoryNum,GA"][2];
@@ -63,12 +68,12 @@
             $y1 = $y2;
             $y2 = $yy;
          }
-         $mmSessionState->sitems["$mmCategoryNum,GA"] = array($newstage,$mmMapnum,$x1,$y1,$x2,$y2);
+         $mmSessionState->sitems["$mmCategoryNum,GA"] = array($newstage,$srid,$x1,$y1,$x2,$y2);
       } else {
          $newstage = 1;
          $x1 = $xco;
          $y1 = $yco;
-         $mmSessionState->sitems["$mmCategoryNum,GA"] = array($newstage,$mmMapnum,$x1,$y1);
+         $mmSessionState->sitems["$mmCategoryNum,GA"] = array($newstage,$srid,$x1,$y1);
       }
    }
 ?>
