@@ -106,7 +106,7 @@ require_once("../funcs/mmConfig.inc");
    <tr>
    <td colspan="2">
       <div class="loginform" style="border-left: 1px solid #4d4d8d;">
-      <h2>Directory Administration</h2>
+      <h2>Dataset Administration</h2>
       <table border="0" cellspacing="0" cellpadding="4">
          <colgroup width="53%" />
          <colgroup width="3%" />
@@ -118,40 +118,41 @@ require_once("../funcs/mmConfig.inc");
          <td rowspan="7">
             <?php 
             if ($external_repository) {
-            echo '<p>In this page you can enter access information for directories in an external
-            repository. The information will be used to harvest metadata from new files in the
-            directory and to create links from the search page to the actual data.</p>
-            <p>To register a new directory, fill in the directory name and the access information
-            fields (directory key, location and catalog URL). All these fields are mandatory.
+            echo '<p>In this page you can create new datasets.</p>
+            <p>A dataset represents a collection of netCDF files that resides in a data repository.
+            The data repository and the netCDF files contained there are maintained independently
+            of METAMOD, but METAMOD needs to know where the files are found. This access information
+            must be entered into this dataset registration form.
+            The information will be used to harvest metadata from new files that are added to the
+            dataset and to create links from the METAMOD search page to the actual data.</p>
+            <p>To register a new dataset, fill in the dataset name and the access information
+            fields (dataset key, location and catalog URL). All these fields are mandatory.
             Then click the CREATE/UPDATE button. Some restrictions exist on the format of the
             fields. If they are not accepted, you will be informed by a message box.</p>
-            <p>You may change the information about directories that already have been registered.
-            Select the directory name in the selection box at the right hand side, or type in
-            the name in the Directory name field. Then click the RETRIEVE button. All information
+            <p>You may change the information about datasets that already have been registered.
+            Select the dataset name in the selection box at the right hand side, or type in
+            the name in the Dataset name field. Then click the RETRIEVE button. All information
             previously entered will be shown, and may be changed. After editing the fields, click
             the CREATE/UPDATE button.</p>
             <p>The CANCEL button clears the fields, and makes the selection box again available for
-            new retrievals.</p>
-            <p>Note that changing access information for directories with files already parsed
-            into the database, will not change links to these older files. Only new files will
-            be affected.</p>';
+            new retrievals.</p>';
             } else {
-            echo '<p>In this page you can create new directories in the data repository and
+            echo '<p>In this page you can create new directory datasets in the data repository and
             control who are allowed to upload files to your directories.
             </p>
-            <p>To create a new directory, fill in the directory
-            name and optionally the directory key. Then click the CREATE/UPDATE
-            button. Only alphanumeric characters or "." or "-" (hyphen) are allowed in directory
+            <p>To create a new directory dataset, fill in the dataset
+            name and optionally the dataset key. Then click the CREATE/UPDATE
+            button. Only alphanumeric characters or "." or "-" (hyphen) are allowed in dataset
             names.</p>
-            <p>To change the directory key for an existing directory, select the directory name in
-            the selection box at the right hand side, or enter the directory name in the "Directory name"
-            field. Then click the RETRIEVE button. You will then get this page again with the directory 
-            name and directory key filled in. Make your changes and click the CREATE/UPDATE button to
+            <p>To change the dataset key for an existing dataset, select the dataset name in
+            the selection box at the right hand side, or enter the dataset name in the "Dataset name"
+            field. Then click the RETRIEVE button. You will then get this page again with the dataset 
+            name and dataset key filled in. Make your changes and click the CREATE/UPDATE button to
             save them on the server.</p>
             <p>The CANCEL button clears the fields, and makes the selection box again available for
             new retrievals.</p>
             <p>
-            The directory key may be provided if you want other users to upload files
+            The dataset key may be provided if you want other users to upload files
             to the directory.
             All these users must use the same key. It is your responsibility to communicate the
             key to users that you think will need it. You may change the key at any time to
@@ -166,7 +167,7 @@ require_once("../funcs/mmConfig.inc");
             &nbsp;
          </td>
          <td class="inputform">
-            &nbsp;<b>Directory name:</b><br />&nbsp;(max <?php echo $mmConfig->getVar('MAXLENGTH_DIRNAME'); ?> characters)
+            &nbsp;<b>Dataset name:</b><br />&nbsp;(max <?php echo $mmConfig->getVar('MAXLENGTH_DIRNAME'); ?> characters)
          </td>
          <td class="inputform">
             <input name="dirname" value="<?php echo $dirname; ?>" size="10" />
@@ -224,7 +225,7 @@ require_once("../funcs/mmConfig.inc");
          </tr>
          <tr>
          <td class="inputform">
-            &nbsp;Directory key:<br />&nbsp;(max 10 characters):
+            &nbsp;Dataset key:<br />&nbsp;(max 10 characters):
          </td>
          <td class="inputform">
             <input name="dirkey" value="<?php echo $dirkey; ?>" size="10" />

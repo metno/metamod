@@ -125,10 +125,10 @@ EOF;
        		$institution = $userinfo["institution"];
     	 }
          
-         echo '<h3>Directories owned by you</h3>' . "\n";
+         echo '<h3>Datasets owned by you</h3>' . "\n";
      	 if (strlen($metadataQuest) > 0) {
             $warning_text = <<<EOF
-    <p><b>Note</b>: You may edit the metadata for a directory dataset by clicking one
+    <p><b>Note</b>: You may edit the metadata for a dataset by clicking one
     of the buttons below, but any later uploads to the repository will change the metadata
     to whatever are found in the uploaded netCDF files.</p>
 EOF;
@@ -219,11 +219,18 @@ EOF;
       $local_url = $mmConfig->getVar('LOCAL_URL');
       echo <<<EOF
       <h3>File registration</h3>
-      <p>Files in the data repository can be registered under a directory dataset using a web service
-      as follows:<br /><br />
-      $local_url/upl/newfiles.php?dataset=...&amp;dirkey=...&amp;filenames=...,...,...<br /><br />
-      The dirkey is mandatory and must match the directory key entered together with dataset name and 
-      access information using the Administration page. Filenames are without directory path.<br /><br />
+      <p>Files in the data repository can be registered under a dataset using a web service
+      as follows:<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;<span class="dirlist">
+      $local_url/upl/newfiles.php?dataset=...&amp;dirkey=...&amp;filename=...</span>
+      <br /><br />
+      More than one file can be registered by appending '[]' after the 'filename' keyword:
+      <br /><br />&nbsp;&nbsp;&nbsp;&nbsp;<span class="dirlist">
+      $local_url/upl/newfiles.php?dataset=...&amp;dirkey=...&amp;filename[]=...&amp;filename[]=...</span>
+      <br /><br />
+      The dirkey is mandatory and must match the dataset key entered together with dataset name and 
+      access information when the dataset was created. Filenames are relative to the 
+      location (absolute directory path) given in the administration page when the dataset
+      was created.<br /><br />
       </p>
       <h3>Previously registered files</h3>
 EOF;

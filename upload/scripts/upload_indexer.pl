@@ -366,13 +366,20 @@ sub process_files {
 #
       foreach my $filepath (@digest_input) {
          my (undef, undef, $basename) = File::Spec->splitpath($filepath);
+         my $localpath = $basename;
+         if (index($filepath,$dirpath) == 0) {
+            $localpath = substr($filepath,length($dirpath));
+            if (substr($localpath,0,1) eq '/') {
+               $localpath = substr($localpath,1);
+            }
+         }
          my $fileURL;
          if ($threddscatalog eq $catalogurl) {
             $fileURL = $threddscatalog; # User has not provided a complete catalog URL
                                         # (containing ?dataset=...) Use instead same URL
                                         # as for the directory level dataset.
          } else {
-            $fileURL = $catalogurl . '/' . $basename;
+            $fileURL = $catalogurl . '/' . $localpath;
          }
          open (my $digest, ">digest_input");
          print $digest $fileURL, "\n";
