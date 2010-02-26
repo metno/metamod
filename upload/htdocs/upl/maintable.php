@@ -176,7 +176,7 @@ EOF;
           }
           echo '</tr></table>' . "\n";
       ?>
-   <p>You may create new user directories in the 
+   <p>You may create new directory datasets in the 
    <?php
        echo '<a href="adm.php?sessioncode=' .
        $sessioncode . '&normemail=' . $normemail . '">Administration</a>' . "\n";
