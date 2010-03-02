@@ -7,9 +7,29 @@
                 
     <!-- root element -->
     <element name='ncWmsSetup' type="w:NcWmsSetup" />
+    <!-- embedded elements -->
+    <element name='displayArea' type="w:DisplayArea" />
+    <element name='layer' type="w:Layer" />
  
     <complexType name='NcWmsSetup'>
+        <sequence>
+            <element ref='w:displayArea' minOccurs='0' maxOccurs='1'/>
+            <element ref='w:layer' minOccurs='0' maxOccurs="unbounded"/>
+        </sequence>
         <attribute name="url" type="anyURI" use="required"/>
     </complexType>
-        
+    
+    <complexType name='DisplayArea'>
+        <attribute name="crs" type="string" use="required"/>
+        <attribute name="left" type="double" use="optional"/>
+        <attribute name="right" type="double" use="optional"/>
+        <attribute name="top" type="double" use="optional"/>
+        <attribute name="bottom" type="double" use="optional"/>
+    </complexType>
+    <complexType name='Layer'>
+        <attribute name="name" type="string" use="required"/>
+        <attribute name="style" type="string" use="optional"/>
+    </complexType>
+    
+    
 </schema>

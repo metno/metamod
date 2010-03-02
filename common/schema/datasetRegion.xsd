@@ -6,12 +6,12 @@
         
     <complexType name='DatasetRegion'>
         <!-- regions points/polygons become invalid if too many data have been added -->
-        <attribute name='isValid' use='optional' default="true">
         <sequence>
             <element ref='t:boundingBox' minOccurs='1' maxOccurs='1'/>
             <element ref='t:lonLatPoints' minOccurs='1' maxOccurs='1'/>
             <element ref='t:lonLatPolygon' minOccurs='0' maxOccurs='unbounded' />
         </sequence>
+        <attribute name='isValid' use='optional' default="true"/>
     </complexType>
     <complexType name='BoundingBox'>
         <attribute name='north' use='optional'>
