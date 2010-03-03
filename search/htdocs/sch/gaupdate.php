@@ -32,8 +32,7 @@
    if (array_key_exists("gamap_srid", $_POST)) {
       # switch to a new map
       $srid = $_POST["gamap_srid"];
-      $mmSessionState->sitems["$mmCategoryNum,GA"] = array(0,$srid);
-
+      $mmSessionState->sitems["$mmCategoryNum,GA"] = array(2,$srid);
    } elseif (!array_key_exists("gacoord_x",$_POST) || !array_key_exists("gacoord_y",$_POST)) {
        mmPutLog("Error. Could not get coordinates from image type input button");
        $mmErrorMessage = "Sorry, internal error";
@@ -50,8 +49,6 @@
          # set srid to first available in config
          list($srid) = preg_split('/\s+/', $mmConfig->getVar('SRID_ID_COLUMNS'));
       }
-   }
-   if ($mmError == 0) {
       if ($stage == 1) {
          $newstage = 2;
          $x1 = $mmSessionState->sitems["$mmCategoryNum,GA"][2];

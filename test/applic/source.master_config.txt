@@ -118,6 +118,30 @@ PHPLOGLEVEL = DEBUG
 # List the supported geographical search environments
 SRID_ID_COLUMNS = 93995 93031
 
+# Corresponding short names of SRID_ID in Web-Interface
+SRID_ID_NAMES = Artic Antarctic
+
+# Translate the map-coordinates to the SRID-coordinates
+# srid_coord = (map_coord - offset) * scale_factor
+# SRID 93995
+# pole is x=280 y=240
+# scalefactor is derived from the map, y=540 := lat=60 := ry=-3333134.03
+# scale = -3333134.03/(240-540) +- 1 pixel
+SRID_MAP_SCALE_FACTOR_X_93995 = 11120
+SRID_MAP_OFFSET_X_93995 = 280
+SRID_MAP_SCALE_FACTOR_Y_93995 = -11120
+SRID_MAP_OFFSET_Y_93995 = 240
+
+# SRID 93031
+# pole is x=280 y=280
+# scalefactor is derived from the map, y=477 := lat=-70 := ry=-2194494.25
+# scale = 2194494.25/(477-280) +- 1 pixel
+SRID_MAP_SCALE_FACTOR_X_93031 = 11120
+SRID_MAP_OFFSET_X_93031 = 280 
+SRID_MAP_SCALE_FACTOR_Y_93031 = -11120
+SRID_MAP_OFFSET_Y_93031 = 280
+
+
 # Basic latitude longitude earth (4035 = WGS84)
 LONLAT_SRID = 4035
 

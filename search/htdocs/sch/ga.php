@@ -65,6 +65,7 @@
 
 <?php
   $srids = preg_split('/\s+/', $mmConfig->getVar('SRID_ID_COLUMNS'));
+  $srid_names = preg_split('/\s+/', $mmConfig->getVar('SRID_ID_NAMES'));
   if (count($srids) > 1) {
      echo mmHiddenSessionField();
      $name = mmGetCategoryFncValue($mmCategoryNum,"name");
@@ -72,12 +73,14 @@
 <table border="0" cellspacing="5" class="orange" width="100%">
    <tr><td>
 <?php
-     echo("Select another area: <select name=\"gamap_srid\" size=\"1\"><option selected=\"selected\">$srids[0]</option>");
-        array_shift($srids); # remove first element
-        foreach ( $srids as $srid ) {
-           echo "<option value=\"$srid\">$srid</option>";
-        }
-        echo("</select>\n");
+     $srid = array_shift($srids);
+     $srid_name = count($srid_names) ? array_shift($srid_names) : $srid;
+     echo("Select another area: <select name=\"gamap_srid\" size=\"1\"><option value=\"$srid\" selected=\"selected\">$srid_name</option>");
+     foreach ( $srids as $srid ) {
+        $srid_name = count($srid_names) ? array_shift($srid_names) : $srid;
+        echo "<option value=\"$srid\">$srid_name</option>";
+     }
+     echo("</select>\n");
      echo (mmSelectbutton($mmCategoryNum,"gaget","Switch Map"));
 ?>
    </td></tr>

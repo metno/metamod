@@ -150,24 +150,26 @@ function getdslist() {
          $drsearch = array_slice($mmSessionState->sitems[$s1],7);
          $sql_gapart .= "      (DS_id IN (" . implode(', ',$drsearch) . "))\n";
       } elseif ($mmSessionState->countItems($s1) >= 5) {
-         /* search using postgis */      
+         /* search using postgis */
+         $srid = $mmSessionState->sitems[$s1][1];
+         $srid = intval($srid); // math representation
          $x1 = $mmSessionState->sitems[$s1][2];
       	$y1 = $mmSessionState->sitems[$s1][3];
       	$x2 = $mmSessionState->sitems[$s1][4];
       	$y2 = $mmSessionState->sitems[$s1][5];
       	# convert x and y in figure-plane to x and y in projection-plane
-      	# pole is x=280 y=240
-      	# scalefactor is derived from the map, y=540 := lat=60 := ry=-3333134.03
-      	// TODO: This should be configurable
-      	$scaleFactor = -3333134.03/(240-540);
-         $x1m = ($x1 - 280)*$scaleFactor;
-         $x2m = ($x2 - 280)*$scaleFactor;
-         $y1m = (240 - $y1)*$scaleFactor;
-         $y2m = (240 - $y2)*$scaleFactor;
+      	$scaleFactorX = $mmConfig->getVar("SRID_MAP_SCALE_FACTOR_X_$srid");
+         $scaleFactorY = $mmConfig->getVar("SRID_MAP_SCALE_FACTOR_Y_$srid");
+         $offsetX = $mmConfig->getVar("SRID_MAP_OFFSET_X_$srid");
+         $offsetY = $mmConfig->getVar("SRID_MAP_OFFSET_Y_$srid");
+         $x1m = ($x1 - $offsetX)*$scaleFactorX;
+         $x2m = ($x2 - $offsetX)*$scaleFactorX;
+         $y1m = ($y1 - $offsetY)*$scaleFactorY;
+         $y2m = ($y2 - $offsetY)*$scaleFactorY;
          $polygon = "ST_MakeBox2D(ST_Point($x1m, $y1m),ST_Point($x2m,$y2m))";
          $sql_gapart .= '    DS_id IN (' .
                         '       SELECT DISTINCT Dataset_Location.DS_id FROM Dataset_Location '.
-                        "         WHERE ST_DWITHIN(ST_SetSRID($polygon,93995), geom_93995, 0.1)".
+                        "         WHERE ST_DWITHIN(ST_SetSRID($polygon,$srid), geom_$srid, 0.1)".
                         "    )\n";
       }
    }
