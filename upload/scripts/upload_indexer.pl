@@ -98,8 +98,8 @@ $| = 1;
 #      - Files (residing in the directory given by the $location value - see 
 #        below) to be included in the dataset.
 #
-#  All files must be individual netCDF-files (no CDL, no tar archive, 
-#  no compression).
+#  All files must be individual netCDF-files. They may be compressed (by gzip), but
+#  CDL or tar archives are not accepted. File extentions must be '.nc' or '.nc.gz'.
 #  
 #  The dataset value is used to fetch information about the dataset from the
 #  %dataset_institution hash. This hash contains the directory key, location and
@@ -155,6 +155,7 @@ my $dataset_name = "";
 my $dirkey = "";
 my $dirpath = "";
 my @files_arr = ();
+my @temporary_files_to_remove = ();
 #
 #  Open OUT for progress reporting, and redirect STDERR to OUT:
 #
@@ -169,6 +170,7 @@ eval {
 };
 if ($@) {
    my $errmessage = $@;
+   &unlink_temporary_files();
    print OUT "---------- PID= $$ aborted: $errmessage\n";
    &syserror("SYS", "upload_indexer.pl ABORTED: " . $errmessage, "", "", "");
    &user_report();
@@ -180,6 +182,7 @@ if ($@) {
    print $errmessage;
    exit 1;
 } else {
+   &unlink_temporary_files();
    &user_report();
    print OUT "---------- PID= $$ stops\n";
    close(OUT);
@@ -307,12 +310,42 @@ sub process_files {
             print OUT "     Processing $filepath Filtype: $filetype\n";
          }
 #
+         my $newpath; # Set if the file is compressed, to the new path of the uncompressed file.
+         if ($filetype =~ /^gzip/) { # gzip or gzip-compressed
+            my (undef, undef, $baseupldname) = File::Spec->splitpath($filepath);
+#      
+#     Copy file to the work directory and uncompress:
+#      
+            $newpath = File::Spec->catfile($work_directory, $baseupldname);
+            if (copy($filepath, $newpath) == 0) {
+               die "Internal system error!Copy to workdir did not succeed. File: $filepath Error code: $!\n";
+            }
+            my $result = &shcommand_scalar("gunzip $newpath");
+            if (!defined($result)) {
+               &syserror("SYSUSER","gunzip_problem_with_uploaded_file", $filepath, "process_files", "");
+               push (@temporary_files_to_remove,$newpath);
+               die "Error when uncompressing file $filepath !";
+            }
+            my $extension;
+            if ($newpath =~ /\.([^.]+)$/) {
+               $extension = $1; # First matching ()-expression
+            }
+            if (defined($extension) && ($extension eq "gz" || $extension eq "GZ")) {
+               $newpath = substr($newpath,0,length($newpath)-3);
+            }
+            push (@temporary_files_to_remove,$newpath);
+            $filetype = getFiletype($newpath);
+         }
          if ($filetype ne 'nc3') { # Not netCDF 3 file
             &syserror("SYSUSER","file_is_not_netcdf3", "", "process_files", "File: $filepath\nDataset: $dataset_name");
             die "File $filepath is not a netCDF file!";
          }
          if ($errors == 0) {
-            push (@digest_input,$filepath);
+            if (defined($newpath)) {
+               push (@digest_input,$newpath);
+            } else {
+               push (@digest_input,$filepath);
+            }
          }
       }
       if (scalar @digest_input == 0) {
@@ -364,11 +397,13 @@ sub process_files {
 #     Run digest_nc again for each file with output to dataset/file.xml
 #     this creates the level 2 (children) xml-files
 #
+      my $ix2 = 0;
       foreach my $filepath (@digest_input) {
-         my (undef, undef, $basename) = File::Spec->splitpath($filepath);
+         my $origpath = $files_arr[$ix2];
+         my (undef, undef, $basename) = File::Spec->splitpath($origpath);
          my $localpath = $basename;
-         if (index($filepath,$dirpath) == 0) {
-            $localpath = substr($filepath,length($dirpath));
+         if (index($origpath,$dirpath) == 0) {
+            $localpath = substr($origpath,length($dirpath));
             if (substr($localpath,0,1) eq '/') {
                $localpath = substr($localpath,1);
             }
@@ -385,7 +420,7 @@ sub process_files {
          print $digest $fileURL, "\n";
          print $digest $filepath, "\n";
          close $digest;
-         my $pureFile = $basename;
+         my (undef, undef, $pureFile) = File::Spec->splitpath($filepath);
          $pureFile =~ s/\.[^.]*$//; # remove extension
          my $xmlFileDir = substr $xmlpath, 0, length($xmlpath)-4; # remove .xml
          if (! -d $xmlFileDir) {
@@ -402,7 +437,14 @@ sub process_files {
           	syserror("SYS", "digest_nc_file_fails", $filepath, "process_files", "");
             die "Not able to parse a file (digest_nc fails on $filepath)!";
          }
+         $ix2++;
       }
+   }
+}
+
+sub unlink_temporary_files {
+   foreach my $path (@temporary_files_to_remove) {
+      unlink($path);
    }
 }
 
