@@ -596,50 +596,15 @@ sub update_database {
                     push @regions, $srid;
                 }
             }
-            my $regionColumns = join ',', map {"geom_$_"} @regions;
-            my $regionValues = join ',', map {'ST_TRANSFORM(ST_GeomFromText(?,'.$config->get('LONLAT_SRID')."), $_)"} @regions;
-            my $sql_insert_Location = $dbh->prepare_cached("INSERT INTO Dataset_Location (DS_id, $regionColumns) VALUES (?, $regionValues)");
+            if (@regions) {
+                my $regionColumns = join ',', map {"geom_$_"} @regions;
+                my $regionValues = join ',', map {'ST_TRANSFORM(ST_GeomFromText(?,'.$config->get('LONLAT_SRID')."), $_)"} @regions;
+                my $sql_insert_Location = $dbh->prepare_cached("INSERT INTO Dataset_Location (DS_id, $regionColumns) VALUES (?, $regionValues)");
             
-            my $regionAdded = 0;
-            foreach my $p ($region->getPolygons) {
-                my $pString = $p->toProjectablePolygon->toWKT;
-                if (length($pString) > 10  and length($pString) < 1_000_000) {
-                    my $parCound = 0;
-                    $sql_insert_Location->bind_param(++$parCound, $dsid);
-                    foreach my $srid (@regions) {
-                        $sql_insert_Location->bind_param(++$parCound, $pString);                        
-                    }
-                    $sql_insert_Location->execute();
-                    $regionAdded++;
-                }
-            }
-            my @points = $region->getPoints;
-            if (@points) {
-                my $pString = 'MULTIPOINT('. join(',', @points) . ')';
-                if (length($pString) > 10 and length($pString) < 1_000_000) {
-                    my $parCound = 0;
-                    $sql_insert_Location->bind_param(++$parCound, $dsid);
-                    foreach my $srid (@regions) {
-                        $sql_insert_Location->bind_param(++$parCound, $pString);                        
-                    }
-                    $sql_insert_Location->execute();
-                    $regionAdded++;                    
-                }
-                $regionAdded++;
-            }
-            if (!$regionAdded) {
-                # trying to add boundingBox
-                my %bb = $region->getBoundingBox;
-                if (scalar keys %bb >= 4) {
-                    my $polygon;
-                    eval {
-                        $polygon = Metamod::LonLatPolygon->new([$bb{west}, $bb{south}],
-                                                               [$bb{west}, $bb{north}],
-                                                               [$bb{east}, $bb{north}],
-                                                               [$bb{east}, $bb{south}],
-                                                               [$bb{west}, $bb{south}]);
-                    }; if (!$@) { # ignore warnings/errors
-                        my $pString = $polygon->toProjectablePolygon->toWKT;
+                my $regionAdded = 0;
+                foreach my $p ($region->getPolygons) {
+                    my $pString = $p->toProjectablePolygon->toWKT;
+                    if (length($pString) > 10  and length($pString) < 1_000_000) {
                         my $parCound = 0;
                         $sql_insert_Location->bind_param(++$parCound, $dsid);
                         foreach my $srid (@regions) {
@@ -647,8 +612,45 @@ sub update_database {
                         }
                         $sql_insert_Location->execute();
                         $regionAdded++;
-                    }                                        
-                }                
+                    }
+                }
+                my @points = $region->getPoints;
+                if (@points) {
+                    my $pString = 'MULTIPOINT('. join(',', @points) . ')';
+                    if (length($pString) > 10 and length($pString) < 1_000_000) {
+                        my $parCound = 0;
+                        $sql_insert_Location->bind_param(++$parCound, $dsid);
+                        foreach my $srid (@regions) {
+                            $sql_insert_Location->bind_param(++$parCound, $pString);                        
+                        }
+                        $sql_insert_Location->execute();
+                        $regionAdded++;                    
+                    }
+                    $regionAdded++;
+                }
+                if (!$regionAdded) {
+                    # trying to add boundingBox
+                    my %bb = $region->getBoundingBox;
+                    if (scalar keys %bb >= 4) {
+                        my $polygon;
+                        eval {
+                            $polygon = Metamod::LonLatPolygon->new([$bb{west}, $bb{south}],
+                                                                   [$bb{west}, $bb{north}],
+                                                                   [$bb{east}, $bb{north}],
+                                                                   [$bb{east}, $bb{south}],
+                                                                   [$bb{west}, $bb{south}]);
+                        }; if (!$@) { # ignore warnings/errors
+                            my $pString = $polygon->toProjectablePolygon->toWKT;
+                            my $parCound = 0;
+                            $sql_insert_Location->bind_param(++$parCound, $dsid);
+                            foreach my $srid (@regions) {
+                                $sql_insert_Location->bind_param(++$parCound, $pString);                        
+                            }
+                            $sql_insert_Location->execute();
+                            $regionAdded++;
+                        }                                        
+                    }                
+                }
             }
         }
 		
