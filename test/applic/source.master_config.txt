@@ -121,6 +121,10 @@ SRID_ID_COLUMNS = 93995 93031
 # Corresponding short names of SRID_ID in Web-Interface
 SRID_ID_NAMES = Artic Antarctic
 
+# define a bounding box (north east south west) where each SRID is valid
+SRID_NESW_BOUNDING_BOX_93995 = 90 180 30 -180
+SRID_NESW_BOUNDING_BOX_93031 = -90 180 -30 -180
+
 # Translate the map-coordinates to the SRID-coordinates
 # srid_coord = (map_coord - offset) * scale_factor
 # SRID 93995

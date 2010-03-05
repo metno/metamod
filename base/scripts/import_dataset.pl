@@ -582,7 +582,20 @@ sub update_database {
         my $sql_delete_Location = $dbh->prepare_cached("DELETE FROM Dataset_Location where DS_id = ?");
         $sql_delete_Location->execute($dsid);
         if (defined (my $region = $ds->getDatasetRegion)) {
-            my @regions = split ' ', $config->get('SRID_ID_COLUMNS');
+            my @srids = split ' ', $config->get('SRID_ID_COLUMNS');
+            my @regions;
+            foreach my $srid (@srids) {
+                my %sridBB;
+                @sridBB{qw(north east south west)} =  split ' ', $config->get('SRID_NESW_BOUNDING_BOX_'.$srid);
+                if (defined $sridBB{west}) {
+                    if ($region->overlapsBoundingBox(\%sridBB)) {
+                        push @regions, $srid;
+                    }
+                } else {
+                    # no bounding box defined for srid, use anyway
+                    push @regions, $srid;
+                }
+            }
             my $regionColumns = join ',', map {"geom_$_"} @regions;
             my $regionValues = join ',', map {'ST_TRANSFORM(ST_GeomFromText(?,'.$config->get('LONLAT_SRID')."), $_)"} @regions;
             my $sql_insert_Location = $dbh->prepare_cached("INSERT INTO Dataset_Location (DS_id, $regionColumns) VALUES (?, $regionValues)");

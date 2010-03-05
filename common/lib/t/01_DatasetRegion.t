@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use lib "..";
-use Test::More tests => 22;
+use Test::More tests => 24;
 use Data::Dumper;
 
 BEGIN {use_ok('Metamod::DatasetRegion')};
@@ -43,6 +43,9 @@ is(scalar $obj2->getPoints, 3, "3 points after add and unique");
 $obj2->extendBoundingBox({north=>70, east=>40, west=>30, south=>-55});
 my %bb = $obj2->getBoundingBox;
 is_deeply(\%bb, {north=>90, east=>40, west=>-15, south=>-55}, "extendBoundingBox");
+
+ok($obj2->overlapsBoundingBox({north=>60, east=>50, west=>0, south=>0}), "overlapsBoundingBox");
+ok(!$obj2->overlapsBoundingBox({north=>-56, east=>50, west=>0, south=>-90}), "no overlapping BoundingBox");
 
 $obj2->addPolygon([[0,1],[0,3],[1,3],[1,1]]);
 is(scalar $obj2->getPolygons, 2, "1 polygon added");

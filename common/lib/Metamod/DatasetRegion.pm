@@ -67,6 +67,33 @@ sub getBoundingBox {
     return %{ $_[0]->{boundingBox} };
 }
 
+sub overlapsBoundingBox {
+    my ($self, $bbRef) = @_;
+    unless (ref($bbRef) eq 'HASH') {
+        croak('need hash reference for withinBoundingBox(\%bbRef)');
+    }
+    unless (defined $bbRef->{south} and defined $bbRef->{north}
+            and defined $bbRef->{east} and defined $bbRef->{west}) {
+        croak("need south east north west elements for bounding-box in reference to withinBoundingBox, got ".keys %$bbRef);
+    }
+
+    my %boundingBox = $self->getBoundingBox; 
+    if (exists $boundingBox{north} and $boundingBox{north} < $bbRef->{south}) {
+        return 0;
+    }
+    if (exists $boundingBox{south} and $boundingBox{south} > $bbRef->{north}) {
+        return 0;
+    }
+    if (exists $boundingBox{east} and $boundingBox{east} < $bbRef->{west}) {
+        return 0;
+    }
+    if (exists $boundingBox{west} and $boundingBox{west} > $bbRef->{east}) {
+        return 0;
+    }
+    
+    return 1;
+}
+
 sub valid {
     return $_[0]->{valid};
 }
@@ -411,6 +438,14 @@ Return hash with north south east west (or empty)
 extend this bounding box to surround the existing and new bounding box
 
 Dies on wrong defined %bb{north east west south}
+
+=item overlapsBoundingBox(\%otherBB)
+
+Check if this regions bounding-box has overlap with the otherBB. Returns true even if
+this bounding box is not defined. Only checks on bounding boxes, not on points/polygons.
+
+Dies on wrong defined %bb{north east west south}
+
 
 =item getPoints
 
