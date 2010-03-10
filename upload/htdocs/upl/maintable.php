@@ -268,7 +268,10 @@ EOF;
          }
       ?>
    </table>
-   </form>
+
+   <?php if (! $external_repository) {
+      echo "</form>\n";
+   } ?>
    </div>
          </td>
       </tr>
