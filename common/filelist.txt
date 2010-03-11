@@ -23,6 +23,7 @@ metamodInit.sh
 =schema/xml.xsd
 =schema/fimexProjections.xsd
 =schema/ncWmsSetup.xsd
+=schema/wmcSetup.xsd
 =lib/Metamod/DatasetTransformer.pm
 =lib/Metamod/DatasetTransformer/MM2.pm
 =lib/Metamod/DatasetTransformer/OldDataset.pm
