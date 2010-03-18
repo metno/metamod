@@ -36,6 +36,12 @@ function get_exception($mtname, $exception, $value) {
    	  $detail = $value;
       if (array_key_exists($value, $topics)) {
          $parts = explode(" > ",$topics[$value][0]);
+         if ($parts[0] == "Hydrosphere" && array_key_exists(1,$topics[$value])) {
+#
+#           Try to avoid "Hysrosphere" which is deprecated.
+#
+            $parts = explode(" > ",$topics[$value][1]);
+         }   
          if ($exception < 0) {
       	    return $detail;
          } elseif ($exception == 4) {
@@ -50,6 +56,7 @@ function get_exception($mtname, $exception, $value) {
       	if ($last != 'HIDDEN') {
       		array_push($parts, $last);
       	}
+        $detail = implode(" > ",$parts);
         if (array_key_exists($detail, $inverse_topics)) {
            if ($exception < 0) {
       	      return FALSE; # detail not required if full gcmd-keywords

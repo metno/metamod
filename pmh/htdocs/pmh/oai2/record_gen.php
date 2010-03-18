@@ -108,6 +108,9 @@ if (!$gotFile) {
             $found_patterns = array(); # Used to avoid multiple XML elements with same content
                                        # due to invalid data.
             $default_outlist = array();
+            $normal_value_count = 0; # Counts the number of values originating from real data
+                                     # i.e. not default or constants. Used to avoid output of
+                                     # default values when real data exists.
 	        foreach ($valueset as $value) {
    	            $outlist = array();
                 $count_of_defaultvalues = 0; # Some XML elements are mandatory. If no items are found
@@ -166,10 +169,11 @@ if (!$gotFile) {
                           $b1->add($newxmlpath,xmlstr($tupple[1], $metadataCharset));
                           $last_mainelement = $path_parts[0];
 	                  }
+                      $normal_value_count++;
                    }
                 }
    	        }
-            if (count($default_outlist) > 0) {
+            if (count($default_outlist) > 0 && $normal_value_count == 0) {
                 reset($default_outlist);
                 foreach ($default_outlist as $tupple) {
                     $path_parts = explode(" ",$tupple[0]);
