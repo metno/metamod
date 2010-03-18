@@ -1,6 +1,7 @@
 prepare_runtime_env.sh
 metamodInit.sh
 =htdocs/adm/index.php
+=htdocs/adm/showconfig.php
 =htdocs/funcs/mmConfig.inc
 =htdocs/funcs/mmLogging.inc
 =htdocs/funcs/mmTtime.inc
