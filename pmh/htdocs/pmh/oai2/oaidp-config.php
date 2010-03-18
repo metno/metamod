@@ -365,7 +365,7 @@ function getRecords ($id = '', $from = '', $until = '') {
          'area -1', 'Location Detailed_Location', '','',
          'latitude_resolution 1', 'Data_Resolution Latitude_Resolution', '','',
          'longitude_resolution 1', 'Data_Resolution Longitude_Resolution', '','',
-         '', 'Project Short_Name', 'Not Available', '',
+         'project_name 1', 'Project Short_Name', '', 'Not Available',
          'distribution_statement', 'Access_Constraints', '','Not Available',
          '', 'Use_Constraints', 'Not Available', '',
          '', 'Data_Set_Language', 'Not Available', '',

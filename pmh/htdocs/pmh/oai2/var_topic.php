@@ -3,6 +3,7 @@ global $topics;
 global $inverse_topics;
 global $areas;
 global $topicCategories;
+global $projectNames;
 $topics = array("aerosol_angstrom_exponent" => array("Atmosphere > Aerosols > Aerosol Particle Properties")
    ,"air_potential_temperature" => array("Atmosphere > Atmospheric Temperature > Potential Temperature")
    ,"air_pressure" => array("Atmosphere > Atmospheric Pressure > Atmospheric Pressure Measurements")
@@ -704,5 +705,15 @@ $topicCategories = array(
 "structure" => "Structure",
 "transportation" => "Transportation",
 "utilitiesCommunications" => "Utilities/Communications"
+);
+
+$projectNames = array(
+   "Damocles,TotalPoleAirship" => "DAMOCLES",
+   "Damocles, AREX 2007" => "DAMOCLES",
+   "DAMOCLES IP" => "DAMOCLES",
+   "IPY/Damocles/iAOOS" => "DAMOCLES",
+   "Hamburg Arctic Ocean Buoy Drift Experiment DAMOCLES 2008-2009" => "DAMOCLES",
+   "Hamburg Arctic Ocean Buoy Drift Experiment DAMOCLES 2007-2008" => "DAMOCLES",
+   "IPY/iAOOS/Damocles" => "DAMOCLES"
 );
 ?>

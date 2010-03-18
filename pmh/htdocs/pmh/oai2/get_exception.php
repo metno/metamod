@@ -32,6 +32,7 @@ function get_exception($mtname, $exception, $value) {
    global $inverse_topics;
    global $areas;
    global $topicCategories;
+   global $projectNames;
    if ($mtname == 'variable') {
    	  $detail = $value;
       if (array_key_exists($value, $topics)) {
@@ -127,6 +128,13 @@ function get_exception($mtname, $exception, $value) {
    elseif ($mtname == "topiccategory") {
    	  if (array_key_exists($value, $topicCategories)) {
    		 return $topicCategories[$value];
+   	  } else {
+   		 return $value;
+   	  }
+   }
+   elseif ($mtname == "project_name") {
+   	  if (array_key_exists($value, $projectNames)) {
+   		 return $projectNames[$value];
    	  } else {
    		 return $value;
    	  }
