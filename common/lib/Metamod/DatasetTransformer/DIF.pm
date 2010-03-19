@@ -182,6 +182,10 @@ sub transform {
             warn "missing name, ususally set from DIF Entry_ID, inventing one";
             $info{'name'} = 'UNKNOWN/EntryId' . int(rand(1e9));
         }
+        unless ($info{'name'} =~ m^/^) {
+            warn "mismatching datasetname from DIF Entry_ID, setting project UNKNOWN";
+            $info{'name'} = 'UNKNOWN/'.$info{'name'};
+        } 
         $ds->setInfo(\%info);
         
         # conversion to quadtreeuse and to datasetregion
