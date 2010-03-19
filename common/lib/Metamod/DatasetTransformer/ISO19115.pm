@@ -162,18 +162,55 @@ __END__
 
 =head1 NAME
 
-Metamod::DatasetTransformaer::ISO19115 - bla bla bla
+Metamod::DatasetTransformaer::ISO19115 - conversion from ISO19115 to MM2 metadata
 
 =head1 SYNOPSIS
 
+  use Metamod::DatasetTransfomer::ISO19115.pm;
+  my $dsT = new Metamod::DatasetTransfomer::ISO19115($xmdStr, $xmlStr);
+  my $datasetStr;
+  if ($dsT->test) {
+      ($ds2Doc, $mm2Doc) = $dsT->transform;
+  }
+
+
 =head1 DESCRIPTION
+
+This module is an implentation of L<Metamod::DatasetTransformer> to convert ISO19115 dataset
+format to the dataset and MM2 format. ISO19115 files may contain information from MM2 and
+Dataset, but Dataset-information may also be provided through the xmdString.
+
+This module translates first to DIF and then to MM2.
 
 =head1 METHODS
 
+For inherited options see L<Metamod::DatasetTransformer>, only differences are mentioned here.
+
 =over 4
 
-=item new()
+=item new($xmdStr, $xmlStr, %options)
 
+Initialize the transformation by the meta-metadata (optional) and the ISO19115 document as string.
+
+Options include:
+
+=over 8
+
+=item iso2difXslt => 'filename.xslt'
+
+Overwrite the default xslt transformation to convert from ISO19115 to DIF.
+
+=item dsXslt => 'filename.xslt'
+
+Overwrite the default xslt transformation to convert to the DIF to xmd. This option is forwarded to the 
+Metamod::DatasetTransformer::DIF.
+
+=item mm2Xslt => 'filename.xslt'
+
+Overwrite the default xslt transformation to convert to the DIF to MM2. This option is forwarded to the 
+Metamod::DatasetTransformer::DIF.
+
+=back
 Return: object
 Dies on 
 
@@ -184,5 +221,7 @@ Dies on
 Heiko Klein, E<lt>H.Klein@met.noE<gt>
 
 =head1 SEE ALSO
+
+L<Metamod::DatasetTransformer>, L<Metamod::DatasetTransformer::DIF>
 
 =cut

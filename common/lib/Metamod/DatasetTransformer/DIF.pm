@@ -264,8 +264,8 @@ Metamod::DatasetTransformer::DIF - transform old-dataset to dataset and MM2
 
 =head1 DESCRIPTION
 
-This module is an implentation of L<Metamod::DatasetTransformer> to convert the old
-dataset format to the dataset and MM2 format. DIF files may contain information from MM2 and
+This module is an implentation of L<Metamod::DatasetTransformer> to convert the DIF format
+to the dataset (xmd) and MM2 format. DIF files may contain information from MM2 and
 Dataset, but Dataset-information may also be provided through the xmdString.
 
 =head1 METHODS
