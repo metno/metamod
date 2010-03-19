@@ -18,7 +18,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/">
       <Entry_ID>
-        <xsl:value-of select="/gmd:MD_Metadata/@uuid"/>
+        <xsl:value-of select="/gmd:MD_Metadata/gmd:fileIdentifier/gco:CharacterString"/>
       </Entry_ID>
       <Entry_Title>
         <xsl:copy-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString/child::text()"/>
