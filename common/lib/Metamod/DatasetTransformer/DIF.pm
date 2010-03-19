@@ -29,10 +29,13 @@
 package Metamod::DatasetTransformer::DIF;
 use base qw(Metamod::DatasetTransformer);
 
+use constant DEBUG => 0;
+
 use strict;
 use warnings;
 use encoding 'utf-8';
-use Carp qw(carp croak);
+use UNIVERSAL;
+use Carp qw();
 use quadtreeuse;
 use mmTtime;
 use Metamod::Config;
@@ -73,11 +76,15 @@ sub test {
         return 0; # no data
     }
     unless ($self->{difDoc}) {
-        eval {
-            $self->{difDoc} = $self->XMLParser->parse_string($self->{xmlStr});
-        }; # do nothing on error, $doc stays empty
-        if ($@ && $self->DEBUG) {
-            warn "$@\n";
+        if (UNIVERSAL::isa($self->{xmlStr}, 'XML::LibXML::Document')) {
+            $self->{difDoc} = $self->{xmlStr};
+        } else {
+            eval {
+                $self->{difDoc} = $self->XMLParser->parse_string($self->{xmlStr});
+            }; # do nothing on error, $doc stays empty
+            if ($@ && $self->DEBUG) {
+                warn "$@\n";
+            }
         }
     }
     return 0 unless $self->{difDoc}; # $doc not initialized
@@ -101,11 +108,15 @@ sub test {
         $isDS = 0; # reset to 0, might fail
         # test optional xmdStr (if xmd file has been created earlier)
         unless ($self->{dsDoc}) {
-            eval {
-                $self->{dsDoc} = $self->XMLParser->parse_string($self->{xmdStr});
-            }; # do nothing on error, $doc stays empty
-            if ($@ && $self->DEBUG) {
-                warn "$@ during xmdStr parsing\n";
+            if (UNIVERSAL::isa($self->{xmdStr}, 'XML::LibXML::Document')) {
+                $self->{dsDoc} = $self->{xmdStr};
+            } else {
+                eval {
+                    $self->{dsDoc} = $self->XMLParser->parse_string($self->{xmdStr});
+                }; # do nothing on error, $doc stays empty
+                if ($@ && $self->DEBUG) {
+                    warn "$@ during xmdStr parsing\n";
+                }
             }
         }
         return 0 unless $self->{dsDoc};
@@ -123,7 +134,7 @@ sub test {
 
 sub transform {
     my $self = shift;
-    croak("Cannot run transform if test fails\n") unless $self->test;
+    Carp::croak("Cannot run transform if test fails\n") unless $self->test;
     
     my $mm2Doc;
     {
@@ -133,7 +144,7 @@ sub transform {
     }
     
     my $dsDoc = $self->{dsDoc};
-    unless ($dsDoc) { # no xmdStr and thus no dsDoc, extract from dif
+    unless ($self->{dsDoc}) { # no xmdStr and thus no dsDoc, extract from dif
         my $styleDoc = $self->XMLParser->parse_file($self->{dsXslt});
         my $stylesheet = $self->XSLTParser->parse_stylesheet($styleDoc);
         $dsDoc = $stylesheet->transform($self->{difDoc});
@@ -149,7 +160,7 @@ sub transform {
         $ds->addMetadata({$degName => \@vals});
     }
     
-    if (!$self->{xmdStr}) {
+    unless ($self->{dsDoc}) { # no xmdStr and thus no dsDoc, extracted from dif, postprocessing
         my %info = $ds->getInfo;
         $info{'name'} =~ s^_^/^g;
         $info{'ownertag'} = 'DAM' if ($info{'ownertag'} eq 'DAMOCLES');
@@ -166,6 +177,10 @@ sub transform {
             if (length $info{$date} != 20) {
                 warn "$date". $info{$date}." not in format YYYY-MM-DDTHH:MM:SSZ\n";
             }
+        }
+        unless ($info{'name'}) {
+            warn "missing name, ususally set from DIF Entry_ID, inventing one";
+            $info{'name'} = 'UNKNOWN/EntryId' . int(rand(1e9));
         }
         $ds->setInfo(\%info);
         
@@ -241,10 +256,10 @@ Metamod::DatasetTransformer::DIF - transform old-dataset to dataset and MM2
 =head1 SYNOPSIS
 
   use Metamod::DatasetTransfomer::DIF.pm;
-  my $dsT = new Metamod::DatasetTransfomer::Dataset($xmdStr, $xmlStr);
+  my $dsT = new Metamod::DatasetTransfomer::DIF($xmdStr, $xmlStr);
   my $datasetStr;
   if ($dsT->test) {
-      $ds2Obj = $dsT->transform;
+      ($ds2Doc, $mm2Doc) = $dsT->transform;
   }
 
 =head1 DESCRIPTION
@@ -259,7 +274,10 @@ For inherited options see L<Metamod::DatasetTransformer>, only differences are m
 
 =over 4
 
-=item new($xmlStr, %options)
+=item new($xmdStr, $xmlStr, %options)
+
+Initialize the transformation by the meta-metadata (optional) and the DIF document. Both arguments can
+be strings or XML::LibXML::Documents. 
 
 Options include:
 
@@ -271,15 +289,11 @@ Overwrite the default xslt file to convert to the actual dataset format.
 
 =item mm2Xslt => 'filename.xslt'
 
-Overwrite the default xslt file to convert to the mm2 format.
+Overwrite the default xslt file to convert from dif to the mm2 format.
 
 =back
 
 =back
-
-=head1 VERSION
-
-0.1
 
 =head1 AUTHOR
 

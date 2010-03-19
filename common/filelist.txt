@@ -29,6 +29,7 @@ metamodInit.sh
 =lib/Metamod/DatasetTransformer/MM2.pm
 =lib/Metamod/DatasetTransformer/OldDataset.pm
 =lib/Metamod/DatasetTransformer/DIF.pm
+=lib/Metamod/DatasetTransformer/ISO19115.pm
 =lib/Metamod/Dataset.pm
 =lib/Metamod/DatasetRegion.pm
 =lib/Metamod/ForeignDataset.pm

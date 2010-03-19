@@ -33,7 +33,7 @@ use encoding 'utf-8';
 use Data::Dumper qw(Dumper);
 
 use lib "..";
-use Test::More tests => 14;
+use Test::More tests => 19;
 
 BEGIN {use_ok('Metamod::DatasetTransformer::DIF');}
 
@@ -48,6 +48,7 @@ isa_ok($obj, 'Metamod::DatasetTransformer::DIF');
 ok($obj->test, "test correct file");
 my ($dsDoc, $mm2Doc) = $obj->transform;
 isa_ok($dsDoc, 'XML::LibXML::Document');
+isa_ok($mm2Doc, 'XML::LibXML::Document');
 require_ok "Metamod::Dataset";
 my $ds = newFromDoc Metamod::Dataset($mm2Doc, $dsDoc);
 is(scalar $ds->getQuadtree, 48, "getting quadtree");
@@ -73,3 +74,15 @@ eval {
     $obj3->transform;
 };
 ok($@, "die on wrong transform");
+
+{
+    my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent("exampleDIF");
+    my $xmdDoc = Metamod::DatasetTransformer->XMLParser()->parse_string($xmdStr) if $xmdStr;
+    my $xmlDoc = Metamod::DatasetTransformer->XMLParser()->parse_string($xmlStr);
+    my $obj = new Metamod::DatasetTransformer::DIF($xmdDoc, $xmlDoc, 'dsXslt' => $xsltDS, 'mm2Xslt' => $xsltMM2 );
+    isa_ok($obj, 'Metamod::DatasetTransformer');
+    isa_ok($obj, 'Metamod::DatasetTransformer::DIF');
+    ok($obj->test, "test correct file by doc");
+    my ($dsDoc, $mm2Doc) = $obj->transform;
+    isa_ok($dsDoc, 'XML::LibXML::Document');
+}
