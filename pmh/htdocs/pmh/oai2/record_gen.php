@@ -39,11 +39,15 @@
 // the correct headers should be created automatically
 
 $prefix = $metadataPrefix;
+if ($metadataPrefix == 'iso19115') {
+   $prefix = 'dif'; # iso19115 read as dif and converted afterwards 
+}
 $output .= 
 '   <metadata>'."\n";
 
 $gotFile = 0;
-if (($metadataPrefix == 'dif') && ($record[$SQL['metadataFormat']] == 'DIF')) {
+if ((($metadataPrefix == 'dif') && ($record[$SQL['metadataFormat']] == 'DIF')) ||
+    (($metadataPrefix == 'iso19115') && ($record[$SQL['metdataFormat']]) == 'ISO19115')) {
 	# read original record from file, don't create from database
 	# $output .= $mmConfig->getVar("WEBRUN_DIRECTORY").'/XML/'.mmDatasetName2FileName($record[$SQL['identifier']]);
 	$filename = $mmConfig->getVar("WEBRUN_DIRECTORY").'/XML/'.mmDatasetName2FileName($record[$SQL['identifier']]);
@@ -52,9 +56,8 @@ if (($metadataPrefix == 'dif') && ($record[$SQL['metadataFormat']] == 'DIF')) {
 		try {
 			$ds = new MM_ForeignDataset($xmdContent, $xmlContent, 1);
 			$xml =  $ds->getOther_XML();
-			$xmlArray = explode("\n", $xml);
-			$xmlArray = array_slice($xmlArray, 1); # remove first line, <?xml 
-			$output .= implode("\n", $xmlArray);
+			$xml = substr($xml, strpos($xml, "\n")); # remove first line, <?xml 
+			$output .= $xml;
 			$gotFile = 1;
 		} catch (MM_DatasetException $mde) {
 			mm_log(MM_WARNING,"unparsable xml in $filename",__FILE__, __LINE__);
@@ -64,7 +67,7 @@ if (($metadataPrefix == 'dif') && ($record[$SQL['metadataFormat']] == 'DIF')) {
 
 if (!$gotFile) {
 
-	$output .= metadataHeader($prefix);
+	$outRecord = metadataHeader($prefix);
 
 	$b1 = new buildxml(6,1);
 	$prev_mtname = '';
@@ -200,17 +203,35 @@ if (!$gotFile) {
    	    $prev_keys[] = array($exception,$xmlpath,$constval,$defaultval);
 	    $prev_mtname = $mtname;
 	}
-	$output .= $b1->get();
+	$outRecord .= $b1->get();
 
 	// Here, no changes need to be done
-	$output .=           
+	$outRecord .=           
 	'     </'.$METADATAFORMATS[$prefix]['metadataPrefix'];
 	if (isset($METADATAFORMATS[$prefix]['record_prefix'])) {
-		$output .= ':'.$METADATAFORMATS[$prefix]['record_prefix'];
+		$outRecord .= ':'.$METADATAFORMATS[$prefix]['record_prefix'];
 	}
-	$output .= ">\n";
+	$outRecord .= ">\n";
+	#$outRecord contains now the document
+	
+	if ($metadataPrefix == 'iso19115') {
+      # translate from dif to iso19115
+	   # convert dif record to DOM
+      $xmlDoc = new DOMDocument();
+      $xmlDoc->loadXML($outRecord );
+
+      # load stylesheet
+      $xslDoc = new DOMDocument();
+      $xslDoc->load($METADATAFORMATS[$metadataPrefix]['dif2isoXslt']);
+      $xslt = new XSLTProcessor();
+      $xslt->importStylesheet( $xslDoc );
+      
+      # return to string
+      $xml = $xslt->transformToXML( $xmlDoc );
+      # remove xml declaration and return to outRecord
+      $outRecord = substr($xml, strpos($xml, "\n")); # remove first line, <?xml
+   }
 }
 
-$output .= 
-'   </metadata>'."\n";
+$output .= $outRecord .'   </metadata>'."\n";
 ?>

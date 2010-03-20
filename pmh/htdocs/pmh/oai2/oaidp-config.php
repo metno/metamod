@@ -192,6 +192,14 @@ $METADATAFORMATS = 	array (
 					'metadataNamespace'=>'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/',
 					'myhandler'=>'record_gen.php',
 					'record_namespace' => ''
+			                ),
+			   'iso19115' => array(
+               'metadataPrefix' => 'gmd',
+               'schema' => 'http://www.isotc211.org/2005/gmd/gmd.xsd',
+               'metadataNamespace' => 'http://www.isotc211.org/2005/gmd',
+               'myhandler' => 'record_gen.php',
+               'record_namespace' => '',
+               'dif2isoXslt' => $mmConfig->getVar('TARGET_DIRECTORY') .'/schema/dif2iso.xslt'
 			                )
 			);
 
@@ -323,7 +331,8 @@ function getRecords ($id = '', $from = '', $until = '') {
          'area', 'dc:coverage','','',
          'distribution_statement', 'dc:rights','',''
          );
-   } else if ($metadataPrefix == 'dif') {
+   } else if ($metadataPrefix == 'dif' || $metadataPrefix == 'iso19115') {
+   	# iso19115 will use 'dif' conversion and then convert to iso19115 using xslt
       $key_conversion = array(
          '!DS_name 1', 'Entry_ID', '','',
          'title', 'Entry_Title', '','Not Available',
