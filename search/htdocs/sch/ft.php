@@ -57,6 +57,8 @@ END_TEXT;
 <?php
 echo "<tr><td>\n";
 echo  'Query-String: <input type="text" size="12" name="fullTextQuery" value="' . htmlspecialchars($mmSessionState->fullTextQuery) . '" />' ."\n";
+// add a hidden text input, otherwise IE doesn't submit the submit button-values on enter
+echo  '<input type="text" size="0" value="" style="visibility: hidden"\>';
 echo "</td></tr>\n";
 ?>
 </table>
