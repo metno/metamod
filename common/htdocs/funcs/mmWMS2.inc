@@ -225,7 +225,7 @@ function getGeneralWMSSetupFromDbById($pgDB, $datasetId) {
 		}
 	}
 	if ($row = pg_fetch_row($result)) {
-		if (preg_match('!ncWMSSetup!', $row[0])) {
+		if (preg_match('!ncWmsSetup!', $row[0])) {
 			return new MM_WMSSetup2($row[0], $isParent);
 		} elseif (preg_match('!wmcSetup!', $row[0])){
 		   return new MM_WMSSetup($row[0]);
