@@ -38,6 +38,7 @@
  * Example of WMCSetup string
  * <mm:wmcSetup xmlns:mm="http://www.met.no/schema/metamod/wmcSetup">
  *   <mm:datasetName regex="!!" replace=""/>
+ *   <mm:wmsServerURL regex="!!" replace=""/>
  *   <ViewContext xmlns="http://www.opengis.net/context">...</ViewContext>
  * </mm:wmcSetup>
  */
@@ -45,7 +46,7 @@ class MM_WMSSetup {
    protected $regex = false;
    protected $replace = false;
    const datasetReplace = '%DATASETNAME%';
-   const onlineResourceReplace = '%WMS_ONLINE_RESOURCE%';
+   const wmsServerUrlReplace = '%WMS_ONLINE_RESOURCE%';
    private $wmcTemplate = "";
    const wmsInfoNS = "http://www.met.no/schema/metamod/wmcSetup";
    const wmcNS = "http://www.opengis.net/context";
@@ -81,9 +82,18 @@ class MM_WMSSetup {
          foreach ($xpath->query('/wi:wmcSetup/wi:datasetName') as $node) {
 				foreach ($node->attributes as $att) {
 				   if ($att->name == 'regex') {
-				      $this->regex = $att->value;
+				      $this->datasetRegex = $att->value;
 				   } else if ($att->name == 'replace') {
-				      $this->replace = $att->value;
+				      $this->datasetReplace = $att->value;
+				   }
+				}            
+         }
+         foreach ($xpath->query('/wi:wmcSetup/wi:wmsServerURL') as $node) {
+				foreach ($node->attributes as $att) {
+				   if ($att->name == 'regex') {
+				      $this->wmsRegex = $att->value;
+				   } else if ($att->name == 'replace') {
+				      $this->wmsReplace = $att->value;
 				   }
 				}            
          }
@@ -99,16 +109,36 @@ class MM_WMSSetup {
    /**
     * get the regex to match the name against 
     */
-   function getRegex() {
-      return $this->regex;
+   function getDatasetRegex() {
+      return $this->datasetRegex;
    }
    /**
     * get the regex/replace to change the name with 
     */
-   function getReplace() {
-      return $this->replace;
+   function getDatasetReplace() {
+      return $this->datasetReplace;
    }
-   
+
+   /**
+    * get the regex for the wms server to match the name against 
+    */
+   function getWmsRegex() {
+      return $this->wmsRegex;
+   }
+   /**
+    * get the regex/replace for the wms serverto change the name with 
+    */
+   function getWmsReplace() {
+      return $this->wmsReplace;
+   }
+
+	/**
+	 * Get the url where the wms-client offering the wmc-page can be found
+	 */
+   function getUrl($datasetName) {
+   	$url = "getWMC.php?datasetName=".urlencode($datasetName);
+      return "wms.php?wmcurl=".$url;
+   }
    /**
     * Get the wmc-file for the dataset with the name $datasetName.
     * The datasetName is required here since the constructor doesn't 
@@ -117,12 +147,13 @@ class MM_WMSSetup {
     */
    function getDatasetWMC($datasetName) {
 		global $mmConfig;
-      $dsName = preg_replace($this->getRegex(), $this->getReplace(), $datasetName);
+      $dsName = preg_replace($this->getDatasetRegex(), $this->getDatasetReplace(), $datasetName);
+      $wmsServer = preg_replace($this->getWmsRegex(), $this->getWmsReplace(), $datasetName);
       
       // modify the dataset-name
       $wmc = preg_replace("!".self::datasetReplace . "!", $dsName, $this->wmcTemplate);
       // and change the online-resource depending on the config
-      $wmc = preg_replace("!".self::onlineResourceReplace."!", $mmConfig->getVar('WMS_ONLINE_RESOURCE'), $wmc);
+      $wmc = preg_replace("!".self::wmsServerUrlReplace."!", $wmsServer, $wmc);
       return $wmc;
    }
 }

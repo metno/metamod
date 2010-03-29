@@ -17,15 +17,15 @@ if (!$ws instanceof MM_WMSSetup2) {
 if (strlen($ws->getUrl()) == 0) {
    echo ("no url set");
 }
-if ($ws->getUrl() != "http://thredds.met.no/wms/osisaf/ice_conc.nc") {
-   echo ("incorrect url");
+if ($ws->getUrl() != "wms.php?wmsurl=http%3A%2F%2Fthredds.met.no%2Fwms%2Fosisaf%2Fice_conc.nc") {
+   echo ("incorrect url".$ws->getUrl());
 }
-if ($ws->getUrl("DAMOC/osisaf/test") != "http://thredds.met.no/wms/osisaf/test.nc") {
+if ($ws->getUrl("DAMOC/osisaf/test") != "wms.php?wmsurl=http%3A%2F%2Fthredds.met.no%2Fwms%2Fosisaf%2Ftest.nc") {
    echo ("incorrect url-replace for parent". $ws->getUrl("DAMOC/osisaf/test"));
 }
 
 $ws = new MM_WMSSetup2($xml, false);
-if ($ws->getUrl("DAMOC/osisaf/test") != "http://thredds.met.no/wms/osisaf/ice_conc.nc") {
+if ($ws->getUrl("DAMOC/osisaf/test") != "wms.php?wmsurl=http%3A%2F%2Fthredds.met.no%2Fwms%2Fosisaf%2Fice_conc.nc") {
    echo ("incorrect url-replace for child". $ws->getUrl("DAMOC/osisaf/test"));
 }
 

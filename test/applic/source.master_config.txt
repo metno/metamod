@@ -153,9 +153,7 @@ LONLAT_SRID = 4035
 FIMEX_PROGRAM = fimex
 
 # The WMS server URL to send the WMC page to
-WMS_URL = http://dev-vm058/osisaf/index.cgi?wmcDoc=
-# The WMS server mapping online resource
-WMS_ONLINE_RESOURCE = http://dev-vm058.oslo.dnmi.no/osisaf/default.map?
+WMS_URL = [==LOCAL_URL==]/sch/wms.php?wmcDoc=
 
 
 # ============ METAMODBASE configuration ==============

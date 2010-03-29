@@ -31,6 +31,8 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
  *--------------------------------------------------------------------------- 
  */
+
+include_once "mmWMS.inc";
 ?>
 <?php
 /** Class for hiding the xml-structure and giving easy access to the WMSInfo string.
@@ -89,20 +91,23 @@ class MM_WMSSetup2 {
     * http://wms.met.no/my/path/datasetFile.nc
     */
    function getUrl($datasetName = '') {
+   	$wmsServerUrl = '';
    	if (!$this->isParent) {
-   	   return $this->url;
+   	   $wmsServerUrl = $this->url;
    	} else {
 	   	if (strlen($datasetName) == 0) {
-   	   	return $this->url;
+   	   	$wmsServerUrl = $this->url;
    		} else {
    			if (preg_match(':/([^/]+)$:', $datasetName, $matches)) {
-   	   		return preg_replace(':/[^/]+.nc$:', '/'. $matches[1] . '.nc', $this->url);
+   	   		$wmsServerUrl = preg_replace(':/[^/]+.nc$:', '/'. $matches[1] . '.nc', $this->url);
    			} else {
    				echo "doesn't match";
-   		   	return $this->url;
+   		   	$wmsServerUrl = $this->url;
    			}
    		}
    	}
+   	$wmsServerUrl = urlencode($wmsServerUrl);
+   	return "wms.php?wmsurl=".$wmsServerUrl;
    }
    
    /**
@@ -183,6 +188,48 @@ function getWMSSetup2FromDbById($pgDB, $datasetId) {
 	}
 	if ($row = pg_fetch_row($result)) {
 		return new MM_WMSSetup2($row[0], $isParent);
+	}
+	return false;
+}
+
+/**
+ * get a MM_WMSSetup2 or a MM_WMSSetup from the postgres database $dbh and the id $datasetId
+ * @param $pgDB postgres database handle
+ * @param $datasetId of the dataset, may be level 1 or 2
+ */
+function getGeneralWMSSetupFromDbById($pgDB, $datasetId) {
+	if (strlen($datasetId) == 0) {
+	   return false;
+	}
+	$isParent = false;
+   // retrieve WMSInfo from database
+	$sql = 'SELECT WI_content FROM WMSInfo'.
+		    ' WHERE WMSInfo.DS_id = $1 '.
+	     	 '   AND (WI_content IS NOT NULL AND WI_content != \'\')';
+	$result = pg_query_params($pgDB, $sql, array($datasetId));
+	if (!$result) {
+	  	mm_log(MM_ERROR, "Could not execute $sqlsentence", __FILE__, __LINE__);
+     	die("Internal Error");
+	}
+	if (pg_num_rows($result) != 1) {
+		// try parent
+		$isParent = true;
+		$sql = 
+'SELECT WI_content FROM WMSInfo ' .
+' WHERE (WI_content IS NOT NULL AND WI_content != \'\') ' .
+'   AND DS_id IN (SELECT DS_parent FROM Dataset WHERE DS_id = $1) ';
+		$result = pg_query_params($pgDB, $sql, array($datasetId));
+		if (!$result) {
+   		mm_log(MM_ERROR, "Could not execute $sql", __FILE__, __LINE__);
+     		die("Internal Error");
+		}
+	}
+	if ($row = pg_fetch_row($result)) {
+		if (preg_match('!ncWMSSetup!', $row[0])) {
+			return new MM_WMSSetup2($row[0], $isParent);
+		} elseif (preg_match('!wmcSetup!', $row[0])){
+		   return new MM_WMSSetup($row[0]);
+		}
 	}
 	return false;
 }

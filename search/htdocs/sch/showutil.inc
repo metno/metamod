@@ -47,10 +47,10 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = f
       $s1 .= "<div class=\"btns\">";
       $s1 .= " <a class=\"btn\" href=\"xmlShow.php?dsName=$dsName\" target=\"_new\"><span>Show xml</span></a> ";
       $s1 .= "</div>";
-      if ($wmsSetup && strlen($wmsSetup->getUrl())) {
+      if ($wmsSetup) {
+      	$wmsUrl = $wmsSetup->getUrl($dsName);
       	$s1 .= "<div class=\"btns\">";
-         $wmsUrl = urlencode($wmsSetup->getUrl($dsName));
-         $s1 .= "<a class=\"btn\" href=\"wms.php?wmsurl=$wmsUrl\" ><span>Visualize</span></a>";
+         $s1 .= "<a class=\"btn\" href=\"$wmsUrl\" ><span>Visualize</span></a>";
          $s1 .= "</div>";
       }
       if ($fimexSetup && strlen($mmConfig->getVar("FIMEX_PROGRAM"))) {
@@ -313,7 +313,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
             for ($i1=$ifirst; $i1 <= $ilast;$i1++) {
                list($mdcontent,$mtname,$dsid,$dsname) = pg_fetch_row($result,$i1);
                $jindex = $indexmtnames[$mtname];
-               $wmsSetup = getWMSSetup2FromDbById($mmDbConnection, $dsid);
+               $wmsSetup = getGeneralWMSSetupFromDbById($mmDbConnection, $dsid);
                $s1 = displayval($mtname,$mdcontent,$dsname,$fimexSetup, $wmsSetup);
                $mdcontentall[$jindex] .= "<p>" . $s1 . "</p>\n";
             }

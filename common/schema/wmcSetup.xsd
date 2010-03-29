@@ -14,6 +14,7 @@
     <element name='wmcSetup' type="w:WmcSetup" />
      <!-- embedded elements -->
     <element name='datasetName' type="w:DatasetName" />
+    <element name='wmsServerURL' type="w:WmsServerURL" />
  
     <complexType name='WmcSetup'>
         <sequence>
@@ -24,6 +25,11 @@
     </complexType>
 
     <complexType name='DatasetName'>
+        <attribute name="regex" type="string" use="required"/>
+        <attribute name="replace" type="string" use="required"/>
+    </complexType>
+
+    <complexType name='WmsServerURL'>
         <attribute name="regex" type="string" use="required"/>
         <attribute name="replace" type="string" use="required"/>
     </complexType>
