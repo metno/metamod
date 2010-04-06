@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<w:ncWmsSetup url="http://tempuri.org?%DATASET_PARENT%/%DATASET%.nc"
+<w:ncWmsSetup url="http://tempuri.org/wms/%DATASET_PARENT%/%DATASET%.nc"
           xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://www.met.no/schema/metamod/ncWmsSetup ncWmsSetup.xsd ">

@@ -58,30 +58,49 @@ class MM_WMSSetup2 {
     * @throws MM_DatasetException if the string is not parseable
     */
    function __construct($str, $isParent = true, $validate = false) {
+   	// contains attributes: isParent, isComplex, dom, xpath, rul
    	$this->isParent = $isParent;
       if (strlen($str)) {
-                  $dom = new DOMDocument();
-         if (!$dom->loadXML($str)) {
+         $this->dom = new DOMDocument();
+         if (!$this->dom->loadXML($str)) {
          	mm_log(MM_ERROR, "unable to parse xml-string $str", __FILE__, __LINE__);
          	throw new MM_DatasetException("unable to parse xml-string $str");
          }
          if ($validate) {
-            if (! @$dom->schemaValidate($this->getSchema())) {
+            if (! @$this->dom->schemaValidate($this->getSchema())) {
             	// PHP_ERRORMSG requires track_errors to be enabled
                throw new MM_DatasetException("invalid xml-file: ".$PHP_ERRORMSG);
             }
          }
-         $xpath = new DomXPath($dom);
-         $xpath->registerNamespace('wi', self::wmsSetupNS);
+         $this->xpath = new DomXPath($this->dom);
+         $this->xpath->registerNamespace('wi', self::wmsSetupNS);
          
-         foreach ($xpath->query('/wi:ncWmsSetup') as $node) {
-				foreach ($node->attributes as $att) {
-				   if ($att->name == 'url') {
-				      $this->url = $att->value;
-				   }
-				}            
-         }
+       }
+   }
+   
+   /**
+    * get the real url, (replacing %DATASET_PARENT% and %DATASET% with the $datasetName)
+    */
+   function getUrl($datasetName = '') {
+      $url = "";
+      foreach ($this->xpath->query('/wi:ncWmsSetup') as $node) {
+         foreach ($node->attributes as $att) {
+            if ($att->name == 'url') {
+               $url = $att->value;
+               if (strlen($datasetName)) {
+               	list($tag, $parent, $dataset) = preg_split('^/^', $datasetName);
+               	if (strlen($dataset) == 0) {
+               		// no parent
+               	   $dataset = $parent;
+               	}
+               	$url = preg_replace('/%DATASET%/', $dataset, $url);
+               	$url = preg_replace('/%DATASET_PARENT%/', $parent, $url);
+                  $att->nodeValue = $url;
+               }
+				}
+         }          
       }
+      return $url;
    }
    
    /**
@@ -90,29 +109,47 @@ class MM_WMSSetup2 {
     * http://wms.met.no/my/path/file.nc to
     * http://wms.met.no/my/path/datasetFile.nc
     */
-   function getUrl($datasetName = '') {
-   	$wmsServerUrl = '';
-   	if (!$this->isParent) {
-   	   $wmsServerUrl = $this->url;
+   function getClientUrl($datasetName = '') {
+   	if ($this->xpath->query('/wi:displayArea')->length) {
+   		if (strlen($datasetName) == 0) {
+   		   echo "internal error, require dataset for getClientUrl: ".$this->xpath->query('/wi:displayArea')->length;
+   		}
+   	   // deliver as wmssetup
+   		$wmssetupUrl = 'getWMSSetup.php?dataset=$datasetName';
+   		return "wms.php?wmssetup=". urlencode($wmssetupUrl);
    	} else {
-	   	if (strlen($datasetName) == 0) {
-   	   	$wmsServerUrl = $this->url;
+   		// deliver server-url only
+	   	$wmsServerUrl = '';
+   		if (!$this->isParent) {
+   		   $wmsServerUrl = $this->getUrl();
    		} else {
-   			if (preg_match(':/([^/]+)$:', $datasetName, $matches)) {
-   	   		$wmsServerUrl = preg_replace(':/[^/]+.nc$:', '/'. $matches[1] . '.nc', $this->url);
+	   		if (strlen($datasetName) == 0) {
+   	   		$wmsServerUrl = $this->getUrl();
    			} else {
-   				echo "doesn't match";
-   		   	$wmsServerUrl = $this->url;
+   				if (preg_match(':/([^/]+)$:', $datasetName, $matches)) {
+   	   			$wmsServerUrl = preg_replace(':/[^/]+.nc$:', '/'. $matches[1] . '.nc', $this->getUrl());
+   				} else {
+	   				echo "doesn't match";
+   			   	$wmsServerUrl = $this->getUrl();
+   				}
    			}
    		}
+   		$wmsServerUrl = urlencode($wmsServerUrl);
+   		return "wms.php?wmsurl=".$wmsServerUrl;
    	}
-   	$wmsServerUrl = urlencode($wmsServerUrl);
-   	return "wms.php?wmsurl=".$wmsServerUrl;
    }
    
    /**
     * isParent: check if the wmsSetup is derived from a parent dataset or a child
     */
+
+	/**
+	 * return the xml-document refering to this dataset
+	 * @param dataset (optional dataset name)
+	 */
+	 function getDocument($dataset = "") {
+	    return $this->dom->saveXML();
+	 }
 }
 
 /**

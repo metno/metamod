@@ -135,7 +135,7 @@ class MM_WMSSetup {
 	/**
 	 * Get the url where the wms-client offering the wmc-page can be found
 	 */
-   function getUrl($datasetName) {
+   function getClientUrl($datasetName) {
    	$url = "getWMC.php?datasetName=".urlencode($datasetName);
       return "wms.php?wmcurl=".$url;
    }
