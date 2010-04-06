@@ -39,7 +39,7 @@
 // @param $wmsInfo
 //
 require_once("../funcs/mmDataset.inc");
-require_once("../funcs/mmWMS.inc");
+require_once("../funcs/mmWMS2.inc");
 check_credentials(); // Sets $error, $errmsg, $nextpage, $normemail, $sessioncode,
                      // $runpath, $filepath, $filecontent and $dirinfo (globals).
 if ($error == 0) {
@@ -52,7 +52,12 @@ if ($error == 0) {
 			try {
 				if (strlen($wmsInput)) {
 					// validate, throws on error
-				   new MM_WMSSetup($wmsInput, true);
+					try {
+				   	new MM_WMSSetup($wmsInput, true);
+					} catch (MM_DatasetException $mde) {
+					   // do nothing, try next one
+					   new MM_WMSSetup2($mwsInput, true);
+					}
 				}
 				list($xmdContent, $xmlContent) = mmGetDatasetFileContent($wmsDatasetFile);
 				$wmsDataset = new MM_ForeignDataset($xmdContent, $xmlContent, true);
@@ -61,7 +66,7 @@ if ($error == 0) {
 				$errmsg .= "Successfully updated $directory";
 		   	$nextpage = 3;
 			} catch (MM_DatasetException $mde) {
-			   $errmsg .= "Error or writing dataset $directory:". $mde->getMessage();
+			   $errmsg .= "Error on writing dataset $directory:". $mde->getMessage();
 		   	mmPutLog("WMSInfo: $wmsInput");
 			   $error = 2;
 			}
