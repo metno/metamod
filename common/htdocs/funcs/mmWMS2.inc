@@ -80,6 +80,7 @@ class MM_WMSSetup2 {
    
    /**
     * get the real url, (replacing %DATASET_PARENT% and %DATASET% with the $datasetName)
+    * change the url of this if required
     */
    function getUrl($datasetName = '') {
       $url = "";
@@ -103,6 +104,13 @@ class MM_WMSSetup2 {
       return $url;
    }
    
+   function isComplex() {
+   	if ($this->xpath->query('/wi:ncWmsSetup/wi:displayArea')->length > 0) {
+   		return true;
+   	}
+   	return false;
+   }
+   
    /**
     * get the url
     * if 'isParent', replaced by datasetName as project/parent/datasetFile, i.e.
@@ -110,12 +118,12 @@ class MM_WMSSetup2 {
     * http://wms.met.no/my/path/datasetFile.nc
     */
    function getClientUrl($datasetName = '') {
-   	if ($this->xpath->query('/wi:displayArea')->length) {
+   	if ($this->isComplex()) {
    		if (strlen($datasetName) == 0) {
    		   echo "internal error, require dataset for getClientUrl: ".$this->xpath->query('/wi:displayArea')->length;
    		}
    	   // deliver as wmssetup
-   		$wmssetupUrl = 'getWMSSetup.php?dataset=$datasetName';
+   		$wmssetupUrl = 'getWMSSetup.php?datasetName='.$datasetName;
    		return "wms.php?wmssetup=". urlencode($wmssetupUrl);
    	} else {
    		// deliver server-url only
@@ -148,6 +156,9 @@ class MM_WMSSetup2 {
 	 * @param dataset (optional dataset name)
 	 */
 	 function getDocument($dataset = "") {
+	 	 if (strlen($dataset) > 0) {
+	 	    $this->getUrl($dataset);
+	 	 }
 	    return $this->dom->saveXML();
 	 }
 }

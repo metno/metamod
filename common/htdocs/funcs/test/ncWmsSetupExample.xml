@@ -3,7 +3,7 @@
           xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://www.met.no/schema/metamod/ncWmsSetup ncWmsSetup.xsd ">
-          <w:displayArea crs="EPSG:2033" left="-700000" right="8000000" bottom="1500" top="17000"/>
+          <w:displayArea crs="EPSG:32661" left="-700000" right="8000000" bottom="1500" top="17000"/>
           <w:layer name="ice_conc" style="BOXFILL/redblue"/>
           <w:layer name="lat"/>
 </w:ncWmsSetup>

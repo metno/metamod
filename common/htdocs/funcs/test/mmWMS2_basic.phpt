@@ -34,6 +34,9 @@ $ws2 = new MM_WMSSetup2($xml2, false);
 if ($ws2->getUrl("DAMOC/osisaf/test") != "http://tempuri.org/wms/osisaf/test.nc") {
    echo ("incorrect url for dataset". $ws2->getUrl("DAMOC/osisaf/test"));
 }
+if (!$ws2->isComplex()) {
+   echo "ncWmsSetupExample should be complex";
+}
 if (!preg_match("^osisaf/test^", $ws2->getDocument("DAMOC/osisaf/test"))) {
    echo ("incorrect url in wmsSetup.xml: " . $ws2->getDocument("DAMOC/osisaf/test"));
 }
