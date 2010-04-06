@@ -33,6 +33,8 @@
  */
 
 include_once "mmWMS.inc";
+include_once "mmConfig.inc"
+
 ?>
 <?php
 /** Class for hiding the xml-structure and giving easy access to the WMSInfo string.
@@ -118,12 +120,15 @@ class MM_WMSSetup2 {
     * http://wms.met.no/my/path/datasetFile.nc
     */
    function getClientUrl($datasetName = '') {
+   	global $mmConfig;
    	if ($this->isComplex()) {
    		if (strlen($datasetName) == 0) {
    		   echo "internal error, require dataset for getClientUrl: ".$this->xpath->query('/wi:displayArea')->length;
    		}
    	   // deliver as wmssetup
-   		$wmssetupUrl = 'getWMSSetup.php?datasetName='.$datasetName;
+   	   $wmssetupUrl = ($_SERVER['HTTPS'] ? 'https://': 'http://') . $_SERVER['SERVER_NAME'].
+   	   	($_SERVER['SERVER_PORT'] == 80 ? '' : ':'.$_SERVER['SERVER_PORT']) . $mmConfig->getVar('LOCAL_URL');
+   		$wmssetupUrl .= '/getWMSSetup.php?datasetName='.$datasetName;
    		return "wms.php?wmssetup=". urlencode($wmssetupUrl);
    	} else {
    		// deliver server-url only
