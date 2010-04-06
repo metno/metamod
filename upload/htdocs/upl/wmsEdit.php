@@ -111,132 +111,20 @@ require_once("../funcs/mmConfig.inc");
             diana-WMS server</b>.  
             </p>
             <p>The setup will be uploaded within the next 10 minutes. <b>Please test your setup!</b></p>
-            <p>Simply edit/add a setup according the example below. The most important parameters are the regex in the beginng,
-            and the parameter setup under ViewContext->LayerList->Layer->[Name,Title,Abstract]. A complete 'Layer'-section per parameter is required:</p>
+            <p>Simply edit/add a setup according the example below. The most important parameters are the url in the begining 
+            (using the DATASET_PARENT and DATASET), and the displayArea (EPSG:32661 (northpole), EPSG:32761 (southpole) and EPSG:4326 (lat/lon))
+				The layer/palette setup is optional.
             <pre>
 <?php $input = <<<EOT
-<mm:wmcSetup xmlns:mm="http://www.met.no/schema/metamod/wmcSetup">
-<!-- regex to replace name from dataset-name to dianaSetup name,
-     i.e. from DAM/osisaf/file20090703 to osisaf_20090703. -->
-<mm:datasetName regex="!.*/file(\d{8})!" replace="osisaf_$1."/>
-<ViewContext xmlns="http://www.opengis.net/context" 
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-             version="1.1.0" id="OpenLayers_Context_466" 
-             xsi:schemaLocation="http://www.opengis.net/context http://schemas.opengis.net/context/1.1.0/context.xsd">
-  <General>
-    <Window width="798" height="573"/>
-    <BoundingBox minx="-11850000" 
-                 miny="-11850000" 
-                 maxx="11850000" 
-                 maxy="11850000" 
-                 SRS="EPSG:42000"/>
-    <Title>OSISAF WMS viewer</Title>
-    <Extension>
-      <ol:maxExtent xmlns:ol="http://openlayers.org/context" minx="-11850000" 
-                                                             miny="-11850000" 
-                                                             maxx="11850000" 
-                                                             maxy="11850000" />
-    </Extension>
-  </General>
-  <LayerList>
-    <Layer queryable="0" hidden="0">
-      <Server service="OGC:WMS" version="1.1.1">
-        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" 
-                        xlink:type="simple" 
-                        xlink:href="%WMS_ONLINE_RESOURCE%"/>
-      </Server>
-      <!-- %DATASETNAME% will be replaced by the datasetName above, 
-           parameter precip_1h must be the parameter in the diana setup -->
-      <Name>%DATASETNAME%precip_1h</Name>
-      <Title>Precipitation 1h</Title>
-      <Abstract>Accumulated precipitation over 1 hour</Abstract>
-      <FormatList>
-        <Format current="1">image/png</Format>
-      </FormatList>
-      <StyleList>
-        <Style current="1">
-          <Name/>
-          <Title>Default</Title>
-        </Style>
-      </StyleList>
-      <Extension>
-        <ol:maxExtent xmlns:ol="http://openlayers.org/context" minx="-11850000" 
-                                                               miny="-11850000" 
-                                                               maxx="11850000" 
-                                                               maxy="11850000"/>
-        <ol:transparent xmlns:ol="http://openlayers.org/context">true</ol:transparent>
-        <ol:numZoomLevels xmlns:ol="http://openlayers.org/context">8</ol:numZoomLevels>
-        <ol:units xmlns:ol="http://openlayers.org/context">m</ol:units>
-        <ol:isBaseLayer xmlns:ol="http://openlayers.org/context">false</ol:isBaseLayer>
-        <ol:displayInLayerSwitcher xmlns:ol="http://openlayers.org/context">true</ol:displayInLayerSwitcher>
-        <ol:singleTile xmlns:ol="http://openlayers.org/context">true</ol:singleTile>
-      </Extension>
-    </Layer>
-    <!-- the map layer -->
-    <Layer queryable="0" hidden="0">
-      <Server service="OGC:WMS" version="1.1.1">
-        <OnlineResource xlink:type="simple" xlink:href="%WMS_ONLINE_RESOURCE%"/>
-      </Server>
-      <Name>Map</Name>
-      <Title>Map</Title>
-      <Abstract>Backgroundmap</Abstract>
-      <FormatList>
-        <Format current="1">image/png</Format>
-      </FormatList>
-      <StyleList>
-        <Style current="1">
-          <Name/>
-          <Title>Default</Title>
-        </Style>
-      </StyleList>
-      <Extension>
-        <ol:maxExtent minx="-11850000" miny="-11850000" maxx="11850000" maxy="11850000"/>
-        <ol:transparent>false</ol:transparent>
-        <ol:numZoomLevels>8</ol:numZoomLevels>
-        <ol:units>m</ol:units>
-        <ol:isBaseLayer>true</ol:isBaseLayer>
-        <ol:displayInLayerSwitcher>false</ol:displayInLayerSwitcher>
-        <ol:singleTile>true</ol:singleTile>
-      </Extension>
-    </Layer>
-    <!-- latitude-longitude -->
-    <Layer queryable="0" hidden="1">
-      <Server service="OGC:WMS" version="1.1.1">
-        <OnlineResource xlink:type="simple" xlink:href="%WMS_ONLINE_RESOURCE%"/>
-      </Server>
-      <Name>base.LATLON</Name>
-      <Title>Longitudes/latitudes</Title>
-      <Abstract>Longitudes/latitudes</Abstract>
-      <FormatList>
-        <Format current="1">image/png</Format>
-      </FormatList>
-      <StyleList>
-        <Style current="0">
-          <Name>1deg</Name>
-          <Title>1deg</Title>
-        </Style>
-        <Style current="0">
-          <Name>5deg</Name>
-          <Title>5deg</Title>
-        </Style>
-        <Style current="1">
-          <Name/>
-          <Title>10deg</Title>
-        </Style>
-      </StyleList>
-      <Extension>
-        <ol:maxExtent minx="-11850000" miny="-11850000" maxx="11850000" maxy="11850000"/>
-        <ol:transparent>true</ol:transparent>
-        <ol:numZoomLevels>8</ol:numZoomLevels>
-        <ol:units>m</ol:units>
-        <ol:isBaseLayer>false</ol:isBaseLayer>
-        <ol:displayInLayerSwitcher>true</ol:displayInLayerSwitcher>
-        <ol:singleTile>true</ol:singleTile>
-      </Extension>
-    </Layer>
-  </LayerList>
-</ViewContext>
-</mm:wmcSetup>
+<?xml version="1.0" encoding="UTF-8"?>
+<w:ncWmsSetup url="http://dev-vm188/thredds/wms/osisaf/met.no/%DATASET_PARENT%/%DATASET%.nc"
+          xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.met.no/schema/metamod/ncWmsSetup ncWmsSetup.xsd ">
+          <w:displayArea crs="EPSG:32661" left="-3000000" right="7000000" bottom="-3000000" top="7000000"/>
+          <w:layer name="ice_conc" style="BOXFILL/greyscale"/>
+          <w:layer name="lat"/>
+</w:ncWmsSetup>
 EOT;
 echo htmlentities($input);
 ?>

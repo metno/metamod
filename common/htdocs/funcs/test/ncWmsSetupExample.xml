@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<w:ncWmsSetup url="http://tempuri.org/wms/%DATASET_PARENT%/%DATASET%.nc"
+<w:ncWmsSetup url="http://dev-vm188/thredds/wms/osisaf/met.no/%DATASET_PARENT%/%DATASET%.nc"
           xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://www.met.no/schema/metamod/ncWmsSetup ncWmsSetup.xsd ">
-          <w:displayArea crs="EPSG:32661" left="-700000" right="8000000" bottom="1500" top="17000"/>
-          <w:layer name="ice_conc" style="BOXFILL/redblue"/>
+          <w:displayArea crs="EPSG:32661" left="-3000000" right="7000000" bottom="-3000000" top="7000000"/>
+          <w:layer name="ice_conc" style="BOXFILL/greyscale"/>
           <w:layer name="lat"/>
 </w:ncWmsSetup>
