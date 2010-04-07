@@ -128,7 +128,7 @@ class MM_WMSSetup2 {
    	   // deliver as wmssetup
    	   $wmssetupUrl = ($_SERVER['HTTPS'] ? 'https://': 'http://') . $_SERVER['SERVER_NAME'].
    	   	($_SERVER['SERVER_PORT'] == 80 ? '' : ':'.$_SERVER['SERVER_PORT']) . $mmConfig->getVar('LOCAL_URL');
-   		$wmssetupUrl .= '/getWMSSetup.php?datasetName='.$datasetName;
+   		$wmssetupUrl .= '/sch/getWMSSetup.php?datasetName='.$datasetName;
    		return "wms.php?wmssetup=". urlencode($wmssetupUrl);
    	} else {
    		// deliver server-url only
