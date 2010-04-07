@@ -4,14 +4,8 @@ use LWP::UserAgent;
 use XML::LibXSLT;
 use XML::LibXML;
 use CGI;
-use Data::Dumper;
+#use Data::Dumper;
 
-####################
-# info from metamod
-#
-my @p_layers = qw(lat lon);
-my @p_styles = qw(BOXFILL/ferret BOXFILL/greyscale);
-my $wmcns = "http://www.opengis.net/context";
 
 ################
 # init
@@ -22,7 +16,8 @@ my $xslt = XML::LibXSLT->new();
 my $q = CGI->new;
 my $setup_url = $q->param('setup') or die "Missing setup file URL";
 
-printf STDERR "*** setup = '%s'\n*** url = '%s'\n", $setup_url || '-', $q->param('url') || '-';
+#printf STDERR "*** setup = '%s'\n*** url = '%s'\n", $setup_url || '-', $q->param('url') || '-';
+
 
 ####################
 # webservice client
@@ -45,6 +40,7 @@ sub getXML {
     }
 }
 
+
 #################################
 # read setup document
 #
@@ -59,41 +55,20 @@ foreach ($sxc->findnodes('/*/s:displayArea/@*')) {
 }
 #print STDERR Dumper( \%bbox );
 
+
 #################################
 # transform Capabilities to WMC
 #
+my $wmcns = "http://www.opengis.net/context";
 my $getcap = $q->param('url') || $setup->documentElement->getAttribute('url') or die "Missing URL";
-printf STDERR "XML: %s\n", $getcap;
+#printf STDERR "XML: %s\n", $getcap;
 $getcap .= '?service=WMS&version=1.3.0&request=GetCapabilities';
-my $stylesheet = $xslt->parse_stylesheet( $parser->parse_file('cc-wmc.xsl') );
+my $stylesheet = $xslt->parse_stylesheet( $parser->parse_file('gc2wmc.xsl') );
 my $results = $stylesheet->transform( getXML($getcap), XML::LibXSLT::xpath_to_string(%bbox) );
 my $xc = XML::LibXML::XPathContext->new( $results->documentElement() );
 $xc->registerNs('v', $wmcns);
 $xc->registerNs('w', "http://www.opengis.net/wms"); # only used to work around bug in XSL
 my ($layerlist) = $xc->findnodes('/*/v:LayerList');
-
-
-##############
-# sort styles
-#
-#foreach my $stylelist ($xc->findnodes("v:Layer/v:StyleList", $layerlist)) {
-#
-#    my $newstyles = $results->createElementNS($wmcns, 'StyleList');
-#    foreach my $sname ( @p_styles ) {
-#        #move priority styles
-#        foreach ($xc->findnodes("w:Style[w:Name = '$sname']", $stylelist)) {
-#            $newstyles->appendChild( $stylelist->removeChild($_));
-#        }
-#    }
-#    #move rest of styles
-#    foreach ($xc->findnodes("w:Style", $stylelist)) {
-#        $newstyles->appendChild( $stylelist->removeChild($_));
-#    }
-#    # replace old (empty) styles list with new sorted
-#    $stylelist->addSibling($newstyles);
-#    $stylelist->unbindNode;
-#
-#}
 
 
 ######################
@@ -137,3 +112,48 @@ $out =~ s|( xmlns:xlink="http://www.w3.org/1999/xlink"){2}|$1|g;
 # another hack to work around bug suddenly appearing for no logical reason
 print $out;
 
+=end
+
+=head1 TITLE
+
+gc2wmc.pl - WMS GetCapabilities to Web Map Context converter/proxy
+
+=head1 SYNOPSIS
+
+ http://hostname/cgi-bin/gc2wmc.pl?setup=<url>
+
+where <url> is an encoded URL to the WMS data file (without query string)
+
+=head1 DESCRIPTION
+
+WMS GetCapabilities to Web Map Context converter/proxy. Run as CGI script.
+
+=head1 AUTHOR
+
+Copyright (C) 2009 met.no
+
+  Norwegian Meteorological Institute
+  Box 43 Blindern
+  0313 OSLO
+  NORWAY
+  email: geir.aalberg@met.no
+
+=head1 LICENSE
+
+This file is part of METAMOD
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+METAMOD is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with METAMOD; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=cut
