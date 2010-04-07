@@ -39,6 +39,7 @@
 =htdocs/sch/gadone.php
 =htdocs/sch/garemove.php
 =htdocs/sch/gautil.inc
+=htdocs/sch/getWMC.php
 =htdocs/sch/showdone.php
 =htdocs/sch/showutil.inc
 =htdocs/sch/wmsProxy.php
@@ -392,3 +393,6 @@
 =htdocs/img/east-mini.png
 =htdocs/img/drag-rectangle-off.png
 =htdocs/img/drag-rectangle-on.png
+=cgi-bin/gc2wmc.pl
+=cgi-bin/gc2wmc.xsl
+
