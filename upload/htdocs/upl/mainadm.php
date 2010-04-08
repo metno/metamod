@@ -115,7 +115,7 @@ require_once("../funcs/mmConfig.inc");
          <colgroup width="11%" />
          <colgroup width="11%" />
          <tr>
-         <td rowspan="7">
+         <td rowspan="8">
             <?php 
             if ($external_repository) {
             echo '<p>In this page you can create new datasets.</p>
@@ -163,7 +163,7 @@ require_once("../funcs/mmConfig.inc");
             }
             ?>
          </td>
-         <td rowspan="7">
+         <td rowspan="8">
             &nbsp;
          </td>
          <td class="inputform">
@@ -197,6 +197,9 @@ require_once("../funcs/mmConfig.inc");
          <td class="inputform">
             <input class="selectbutton1" type="submit" name="BTN_cancel_dir" value="Cancel" />
          </td>
+         <td class="inputform" />
+         </tr>
+         <tr>
          <?php
          if (strlen($mmConfig->getVar("FIMEX_PROGRAM"))) {
          	echo '<td class="inputform">
@@ -215,6 +218,8 @@ require_once("../funcs/mmConfig.inc");
          	echo '<td class="inputform" />'."\n";
          }
          ?>
+         <td class="inputform" />
+         <td class="inputform" />
          </tr>
          <tr>
          <td class="inputform" colspan="4">
@@ -241,7 +246,7 @@ require_once("../funcs/mmConfig.inc");
             &nbsp;Dataset location:<br />&nbsp;(absolute directory path)
          </td>
          <td class="inputform" colspan="3">
-            <input name="location" value="' . $location . '" size="30" />
+            <input name="location" value="' . $location . '" size="35" />
          </td>
          </tr>
          <tr>
@@ -249,7 +254,7 @@ require_once("../funcs/mmConfig.inc");
             &nbsp;Dataset catalog:<br />&nbsp;(THREDDS URL)
          </td>
          <td class="inputform" colspan="3">
-            <input name="threddscatalog" value="' . $threddscatalog . '" size="30" />
+            <input name="threddscatalog" value="' . $threddscatalog . '" size="35" />
          </td>
          </tr>
 ';
@@ -263,7 +268,7 @@ require_once("../funcs/mmConfig.inc");
             &nbsp;URL for access to WMS:
          </td>
          <td class="inputform" colspan="3">
-            <input name="wmsurl" value="' . $wmsurl . '" size="30" />
+            <input name="wmsurl" value="' . $wmsurl . '" size="35" />
          </td>
          </tr>
 ';

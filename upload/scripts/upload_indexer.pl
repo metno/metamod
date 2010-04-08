@@ -414,10 +414,20 @@ sub process_files {
                                         # (containing ?dataset=...) Use instead same URL
                                         # as for the directory level dataset.
          } else {
-            $fileURL = $catalogurl . '/' . $localpath;
+            my $new_catalogurl = $catalogurl;
+            if ($localpath =~ m:^(.*/)[^/]*$:) {
+               my $localdir = $1; # First matching ()-expression
+               my $substval = $localdir . 'catalog.html';
+               $new_catalogurl =~ s/catalog\.html/$substval/;
+            }
+            $fileURL = $new_catalogurl . '/' . $localpath;
          }
          open (my $digest, ">digest_input");
-         print $digest $fileURL, "\n";
+         if (defined($wmsurl)) {
+            print $digest $fileURL . ' ' . $wmsurl . '/' . $localpath . "\n";
+         } else {
+            print $digest $fileURL, "\n";
+         }
          print $digest $filepath, "\n";
          close $digest;
          my (undef, undef, $pureFile) = File::Spec->splitpath($filepath);
