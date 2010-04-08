@@ -726,7 +726,7 @@ OpenLayers.Format.WMC.v1 = OpenLayers.Class(OpenLayers.Format.XML, {
             nearestVal:  node.getAttribute("nearestValue")   === "1",
             multipleVal: node.getAttribute("multipleValues") === "1",
             current:     node.getAttribute("current")        === "1",
-            "default":   node.getAttribute("default")        ||  "",
+            "default":   node.getAttribute("default")        ||  ""
         };
         var values = this.getChildValue(node);
         dim.values = values.split(",");
