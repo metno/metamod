@@ -83,6 +83,7 @@ foreach ( $sxc->findnodes('/*/s:layer') ) {
     # find matching layer nodes in Capabilities
     foreach my $layer ($xc->findnodes("v:Layer[v:Name = '$lname']", $layerlist)) {
         foreach ( $xc->findnodes("v:StyleList/w:Style[w:Name = '$style']", $layer) ) { # FIXME: wrong namespace
+             $_->setAttribute('current', 1);
             # move preferred style node to top of list
             my $pn = $_->parentNode;
             $pn->insertBefore( $pn->removeChild($_), $pn->firstChild);
