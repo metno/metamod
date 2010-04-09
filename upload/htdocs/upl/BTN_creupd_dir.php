@@ -133,7 +133,7 @@
        $errmsg = "[Create/Update] failed. Directory access key too long." .
                  " Max ".$mmConfig->getVar('MAXLENGTH_DIRKEY')." characters allowed";
     }
-    if ($dirkey != $odirkey) {
+    if ($dirkey != $odirkey || $dirkey == "") {
        $update_dirinfo_needed = TRUE;
     }
     $ndirkey = normstring($dirkey);

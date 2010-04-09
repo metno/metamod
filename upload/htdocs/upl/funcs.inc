@@ -401,7 +401,7 @@ function get_dirinfo($filepath)
          return FALSE;
       }
       foreach (array('key','location','catalog','wmsurl') as $k1) {
-         if (preg_match('/' . $k1 . '="([^"]+)"/',$dirrec,$match) == 1) {
+         if (preg_match('/' . $k1 . '="([^"]*)"/',$dirrec,$match) == 1) {
             $dirinfo[$dirname][$k1] = $match[1];
          }
       }
