@@ -255,16 +255,18 @@
 				document.getElementById('legend').src = map.layers[0].styles[0].legend.href + '&LAYERS=' + layer0;
 
 				// set page headings
-				var heading = map.layers[0].name;
-				document.title = heading;
-				document.getElementById('title').appendChild( document.createTextNode(heading) );
+				//var heading = map.layers[0].name;
+				//document.title = heading;
+				//document.getElementById('title').appendChild( document.createTextNode(heading) );
 
 			}
 
 		</script>
 	</head>
-	<body onload="init()">
-		<h1 id="title" style="font-size: large">WMS Client: </h1>
+	<body onload="init()" style="background-image:url(../img/metamod_wms_logo.png); background-repeat:no-repeat; background-position:16em 0px;">
+	   <p style="margin-bottom: 30px">
+		<a href="javascript:history.back()">Back to Search</a>
+		</p>
 		<form name="form1" action="#">
 			Style:
 			<select name="wmsstyle" id="wmsstyle" onChange="changeStyle(this[this.selectedIndex].value)"></select>
