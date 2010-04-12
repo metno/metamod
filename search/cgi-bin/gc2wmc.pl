@@ -24,7 +24,7 @@ my $setup_url = $q->param('setup') or die "Missing setup file URL";
 #
 sub getXML {
     my $url = shift or die "Missing URL";
-    printf STDERR "GET %s\n", $url;
+    #printf STDERR "GET %s\n", $url;
     my $ua = LWP::UserAgent->new;
     $ua->timeout(100);
     #$ua->env_proxy;
@@ -48,7 +48,8 @@ my $setup = getXML($setup_url);
 my $sxc = XML::LibXML::XPathContext->new( $setup->documentElement() );
 $sxc->registerNs('s', "http://www.met.no/schema/metamod/ncWmsSetup");
 #print STDERR $setup->toString;
-my %bbox = ();
+my $time = localtime();
+my %bbox = ( time => $time );
 foreach ($sxc->findnodes('/*/s:displayArea/@*')) {
     my ($k, $v) = ($_->localname, $_->getValue);
     $bbox{ $k } = $v; #( $v != 0 ) ? $v : "'$v'";
@@ -67,7 +68,6 @@ my $stylesheet = $xslt->parse_stylesheet( $parser->parse_file('gc2wmc.xsl') );
 my $results = $stylesheet->transform( getXML($getcap), XML::LibXSLT::xpath_to_string(%bbox) );
 my $xc = XML::LibXML::XPathContext->new( $results->documentElement() );
 $xc->registerNs('v', $wmcns);
-$xc->registerNs('w', "http://www.opengis.net/wms"); # only used to work around bug in XSL
 my ($layerlist) = $xc->findnodes('/*/v:LayerList');
 
 
@@ -82,7 +82,7 @@ foreach ( $sxc->findnodes('/*/s:layer') ) {
     my $style = $_->getAttribute('style') || '';
     # find matching layer nodes in Capabilities
     foreach my $layer ($xc->findnodes("v:Layer[v:Name = '$lname']", $layerlist)) {
-        foreach ( $xc->findnodes("v:StyleList/w:Style[w:Name = '$style']", $layer) ) { # FIXME: wrong namespace
+        foreach ( $xc->findnodes("v:StyleList/v:Style[v:Name = '$style']", $layer) ) { # FIXME: wrong namespace
              $_->setAttribute('current', 1);
             # move preferred style node to top of list
             my $pn = $_->parentNode;
@@ -108,9 +108,8 @@ $layerlist->unbindNode;
 #
 print $q->header('application/xml');
 my $out = $stylesheet->output_as_bytes($results);
-$out =~ s| xmlns="http://www.opengis.net/wms"||g; # hack... fix in xsl
 $out =~ s|( xmlns:xlink="http://www.w3.org/1999/xlink"){2}|$1|g;
-# another hack to work around bug suddenly appearing for no logical reason
+# another hack to work around inexplainable namespace bug
 print $out;
 
 =end
