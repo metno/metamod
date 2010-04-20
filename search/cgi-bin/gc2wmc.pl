@@ -14,9 +14,30 @@ our $parser = XML::LibXML->new();
 my $xslt = XML::LibXSLT->new();
 
 my $q = CGI->new;
-my $setup_url = $q->param('setup') or die "Missing setup file URL";
+my $setup_url = $q->param('setup') or giveup( "Missing parameter 'setup' containg file URL", 400);
 
 #printf STDERR "*** setup = '%s'\n*** url = '%s'\n", $setup_url || '-', $q->param('url') || '-';
+
+####################
+# report error
+#
+sub giveup {
+    my $text = shift || 'Something went wrong';
+    my $status = shift || 500;
+    print $q->header('text/html', $status);
+    print <<EOT;
+<html>
+<head>
+    <title>WMC generator error</title>
+</head>
+<body>
+    <h1>WMC generator error</h1>
+    <p>$text</p>
+</body>
+</html>
+EOT
+    exit;
+}
 
 
 ####################
@@ -36,7 +57,7 @@ sub getXML {
         return $parser->parse_string($response->content);
     }
     else {
-        die $response->status_line;
+        giveup($response->status_line . ': ' . $url, 502);
     }
 }
 
