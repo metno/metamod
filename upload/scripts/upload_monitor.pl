@@ -966,7 +966,11 @@ sub process_files {
       if ($destination_url !~ /\/$/) {
          $destination_url .= '/';
       }
-      $destination_url .= join ('/', 'data',
+      my $opendap_basedir = $config->get('OPENDAP_BASEDIR');
+      if ($opendap_basedir eq "") {
+         $opendap_basedir = 'data';
+      }
+      $destination_url .= join ('/', $opendap_basedir,
                                      $dataset_institution{$dataset_name}->{'institution'},
                                      $dataset_name,
                                      ""); # last for for / at end
