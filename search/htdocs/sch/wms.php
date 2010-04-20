@@ -40,13 +40,8 @@
 					// do nothing if query string is empty
 					OpenLayers.loadURL(wms_setup,
 						"",
-						this, drawMap);
-					// Print resource link for debugging
-					var a = document.createElement("a");
-					//a.href = wms_url + "?service=WMS&version=1.3.0&request=GetCapabilities";
-					a.href = wms_setup;
-					a.appendChild( document.createTextNode(wms_setup) );
-					document.getElementById('shortdesc').appendChild(a);
+						this, drawMap, showError);
+
 				}
 			}
 
@@ -254,11 +249,22 @@
 				// set legend URL (have to set both LAYER and LAYERS due to bug in ncWMS)
 				document.getElementById('legend').src = map.layers[0].styles[0].legend.href + '&LAYERS=' + layer0;
 
+				// Print resource link for debugging
+				var a = document.createElement("a");
+				//a.href = wms_url + "?service=WMS&version=1.3.0&request=GetCapabilities";
+				a.href = wms_setup;
+				a.appendChild( document.createTextNode(wms_setup) );
+				document.getElementById('shortdesc').appendChild(a);
+
 				// set page headings
 				//var heading = map.layers[0].name;
 				//document.title = heading;
 				//document.getElementById('title').appendChild( document.createTextNode(heading) );
 
+			}
+
+			function showError(response) {
+				document.getElementById('shortdesc').appendChild(document.createTextNode("Could not contact WMS server!"));
 			}
 
 		</script>
