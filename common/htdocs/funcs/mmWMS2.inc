@@ -125,9 +125,14 @@ class MM_WMSSetup2 {
    		if (strlen($datasetName) == 0) {
    		   echo "internal error, require dataset for getClientUrl: ".$this->xpath->query('/wi:displayArea')->length;
    		}
-   	   // deliver as wmssetup
-   	   $wmssetupUrl = ($_SERVER['HTTPS'] ? 'https://': 'http://') . $_SERVER['SERVER_NAME'].
-   	   	($_SERVER['SERVER_PORT'] == 80 ? '' : ':'.$_SERVER['SERVER_PORT']) . $mmConfig->getVar('LOCAL_URL');
+       // Fix by Egil: If LOCAL_URL contains http://servername, remove it before appending to $wmssetupUrl:
+       $localurl = $mmConfig->getVar('LOCAL_URL');
+       if (preg_match ('/^https?\/\/[^\/:]+:?\d*(\/.*)$/',$localurl,$localurl_matches)) {
+          $localurl = $localurl_matches[1];
+       }
+       // deliver as wmssetup
+       $wmssetupUrl = ($_SERVER['HTTPS'] ? 'https://': 'http://') . $_SERVER['SERVER_NAME'].
+        ($_SERVER['SERVER_PORT'] == 80 ? '' : ':'.$_SERVER['SERVER_PORT']) . $localurl;
    		$wmssetupUrl .= '/sch/getWMSSetup.php?datasetName='.$datasetName;
    		return "wms.php?wmssetup=". urlencode($wmssetupUrl);
    	} else {
