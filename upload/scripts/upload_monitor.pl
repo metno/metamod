@@ -51,6 +51,7 @@ use Data::Dumper;
 use Mail::Mailer;
 use mmTtime;
 use Metamod::Utils qw(findFiles getFiletype remove_cr_from_file);
+use Metamod::Dataset;
 use Uploadutils qw(notify_web_system
                    get_dataset_institution
                    shcommand_scalar
@@ -1289,8 +1290,8 @@ sub revert_XML_history {
          if ($progress_report == 1) {
             print "Dataset $dataset_name : All files for this dataset has to be re-processed\n";
          }
-         if (unlink($path_to_xml_file) == 0) {
-            &syserrorm("SYS","Unlink file $path_to_xml_file did not succeed","", "revert_XML_history", "");
+         if (clearXmlFile($path_to_xml_file) == 0) {
+            &syserrorm("SYS","clearXmlFile file $path_to_xml_file did not succeed","", "revert_XML_history", "");
          }
          if (unlink($xml_history_filename) == 0) {
             &syserrorm("SYS","Unlink file $xml_history_filename did not succeed","", "revert_XML_history", "");
@@ -1315,6 +1316,24 @@ sub revert_XML_history {
       return ();
    }
 }
+
+sub clearXmlFile {
+    my ($xmlFile) = @_;
+    if (-r $xmlFile) {
+        eval {
+            my $ds = Metamod::Dataset->newFromFile($xmlFile);
+            $ds->removeMetadata;
+            $ds->deleteDatasetRegion;
+            $ds->writeToFile($xmlFile);
+        }; if ($@) {
+            return 0;
+        }
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 #
 #---------------------------------------------------------------------------------
 #

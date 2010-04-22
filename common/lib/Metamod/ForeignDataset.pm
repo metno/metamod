@@ -364,14 +364,19 @@ sub getDatasetRegion {
     return new Metamod::DatasetRegion($node); 
 }
 
-sub setDatasetRegion {
-    my ($self, $dsRegion) = @_;
+sub deleteDatasetRegion {
+    my ($self) = @_;
     my $oldRegion = $self->getDatasetRegion;
     foreach my $node ($self->{xpath}->findnodes('/d:dataset/r:datasetRegion', $self->{docDS})) {
         # remove old value
         $node->parentNode->removeChild($node);
     }
+    return $oldRegion;    
+}
 
+sub setDatasetRegion {
+    my ($self, $dsRegion) = @_;
+    my $oldRegion = $self->deleteDatasetRegion;
     if ($dsRegion) {
         croak("setDatasetRegion require Metamod::DatasetRegion, got $dsRegion")
             unless UNIVERSAL::isa($dsRegion, 'Metamod::DatasetRegion');
@@ -569,6 +574,10 @@ Return: @oldQuadtree_nodes
 
 Return: a Metamod::DatasetRegion
 Warning: this is a copy of the region, when changing, a call to setDatasetRegion is required
+
+=item deleteDatasetRegion()
+
+Return: the old region
 
 =item setDatasetRegion($region)
 
