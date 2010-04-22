@@ -54,7 +54,12 @@
       <Abstract><xsl:value-of select="wms:Abstract"/></Abstract>
       <FormatList>
         <xsl:for-each select="/*/wms:Capability/wms:Request/wms:GetMap/wms:Format">
-          <Format><xsl:value-of select="."/></Format>
+          <Format>
+            <xsl:if test="text() = 'image/png'">
+              <xsl:attribute name="current">1</xsl:attribute>
+            </xsl:if>
+            <xsl:value-of select="."/>
+          </Format>
         </xsl:for-each>
       </FormatList>
       <StyleList>
