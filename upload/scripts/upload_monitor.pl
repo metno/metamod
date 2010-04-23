@@ -1027,7 +1027,7 @@ sub process_files {
 #     this creates the level 2 (children) xml-files
          foreach my $filepath (@uploaded_files) {
          	my (undef, undef, $basename) = File::Spec->splitpath($filepath);
-         	my $fileURL = $destination_url . "catalog.html?dataset=". 
+         	my $fileURL = $destination_url . "catalog.html?dataset=". $config->get('THREDDS_DATASET_PREFIX') .
                     join ('/', $dataset_institution{$dataset_name}->{'institution'}, $dataset_name, $basename);
          	open (my $digest, ">digest_input");
          	print $digest $fileURL, "\n";
