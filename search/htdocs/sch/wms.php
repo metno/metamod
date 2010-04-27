@@ -47,7 +47,7 @@
 
 			function buildStyleSelector(styles, layername) {
 				// called every time layer or style is changed
-				current = map.baseLayer.params["STYLES"];
+				current = map.baseLayer.params["STYLES"] || styles[0].name;
 				var sel = document.forms["form1"].wmsstyle;
 				sel.length = 0;
 				for (i = 0; i < styles.length; i++) {
@@ -57,7 +57,7 @@
 					option.appendChild(document.createTextNode(opt.slice(8))); // remove BOXFILL prefix
 					sel.appendChild(option);
 					if (opt == current) {
-//						alert(opt);
+						//alert(opt);
 						// set current option as selected
 						sel.selectedIndex = i;
 						// change legend URL (have to set both LAYER and LAYERS due to bug in ncWMS)
@@ -69,7 +69,7 @@
 			function changeLayer(event) {
 				// triggered when user changes layer
 //				alert("layer = " + event.layer.name);
-				foo = event.layer;
+				document.getElementById('legend').src = "../img/blank.gif";
 				if (event.layer.isBaseLayer && event.layer.visibility) {
 					buildStyleSelector(event.layer.styles, event.layer.params.LAYERS);
 				}
@@ -238,9 +238,9 @@
 					return 0;
 				}
 
-				//map.zoomToExtent(map.maxExtent);
 				document.getElementById('map').style.height = map.getSize().h - 100;
 				map.updateSize();
+				//map.zoomToExtent(map.maxExtent);
 
 				layersw.maximizeControl(true);
 				var layer0 = map.layers[0].params.LAYERS;
