@@ -63,6 +63,13 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = f
          }
          $s1 .= "</div>";
       }
+   } else {
+   	// insert spaces brackets around urls
+   	$s1 = preg_replace("/\(((https?|ftp|irc|mailto):\S+)\)([.,;]?(\s|$))/", "($1 )$3", $s1);
+      // make long (>20 chars) urls short  and clickable
+      $s1 = preg_replace("/(((https?|ftp|irc|mailto):\S{20})\S+)(\s|$)/", "<a href=\"$1\" target=\"_new\">$2...</a>", $s1);
+      // make short (<=20chars) urls clickable
+      $s1 = preg_replace("/((https?|ftp|irc|mailto):\S{1,20})(\s|$)/", "<a href=\"$1\" target=\"_new\">$0</a>", $s1);
    }
    return $s1;
 }
