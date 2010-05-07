@@ -264,7 +264,11 @@
 			}
 
 			function showError(response) {
-				document.getElementById('shortdesc').appendChild(document.createTextNode("Could not contact WMS server!"));
+				var b = document.createElement('b');
+				b.appendChild( document.createTextNode("Could not contact WMS server! ") );
+				document.getElementById('shortdesc').appendChild(b);
+				document.getElementById('shortdesc').appendChild( document.createElement('br') );
+				document.getElementById('shortdesc').appendChild( document.createTextNode("Error from backend is: " + response.status + " " + response.statusText) );
 			}
 
 		</script>
