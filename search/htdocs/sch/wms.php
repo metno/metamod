@@ -36,12 +36,11 @@
 				// remove js warning
 				document.getElementById('docs').removeChild( document.getElementById('warning') );
 
-				if (wms_setup != '') {
-					// do nothing if query string is empty
-					OpenLayers.loadURL(wms_setup,
-						"",
-						this, drawMap, showError);
+				if (typeof wms_setup != 'undefined') {
+					OpenLayers.loadURL(wms_setup, "", this, drawMap, showError);
 
+				} else {
+					alert("Missing wmssetup parameter!");
 				}
 			}
 
