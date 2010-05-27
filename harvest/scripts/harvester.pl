@@ -45,7 +45,8 @@ use lib ('../../common/lib', getTargetDir('lib'));
 
 use POSIX;
 use LWP::UserAgent;
-use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
+use URI::Escape qw(uri_escape);
+use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX SEEK_SET);
 use quadtreeuse;
 use mmTtime;
 use XML::LibXML;
@@ -207,14 +208,13 @@ sub do_harvest {
             print "harvesting $ownertag $url\n";
          }
          my $status_content = "";
-         if (-r $status_file) {
-            open (STATUS,$status_file);
-            flock(STATUS, LOCK_SH);
-            undef $/;
-            $status_content = <STATUS>;
-            $/ = "\n"; 
-            close (STATUS); # Also unlocks
-         }
+         open (STATUS,$status_file) or die "cannot read $status_file: $!\n";
+         flock(STATUS, LOCK_SH);
+         undef $/;
+         $status_content = <STATUS>;
+         $/ = "\n"; 
+         close (STATUS); # Also unlocks
+         
          my $date_last_upd;
          if ($progress_report == 1) {
             print "Status content:\n\n";
@@ -233,41 +233,33 @@ sub do_harvest {
              defined($hash_set_specifications{$ownertag})) {
             $urlsent .= '&set=' . $hash_set_specifications{$ownertag};
          }
-#         
-#          Send GET request 
-#          and receive response object in $getrequest:
-#         
-         if ($progress_report == 1) {
-            print "Send GET request: $urlsent\n";
-         }
-         my $getrequest = $useragent->get($urlsent);
-         my $content_from_get;
-         if ($getrequest->is_success) {
-            $content_from_get = $getrequest->decoded_content;
-         } else {
-            &syserror("","GET did not succeed: " . $getrequest->status_line, $content_from_get);
-            next;
-         }
-         if ($progress_report == 1) {
-            print "GET request returned " . length($content_from_get) . " bytes\n";
-         }
+         my $content_from_get = getContentFromUrl($urlsent);
+         next unless $content_from_get;
 #
 #        Process DIF records:
 #
-         &process_DIF_records($ownertag, $content_from_get);
+         my $resumptionToken = process_DIF_records($ownertag, $content_from_get);
+         while ($resumptionToken) {
+            # continue reading records
+            my $resumptionUrl = $url . '?verb=ListRecord&resumptionToken='. uri_escape($resumptionToken); 
+            my $content_from_get = getContentFromUrl($resumptionUrl);
+            last unless $content_from_get;
+            $resumptionToken = process_DIF_records($ownertag, $content_from_get);
+         }
 #
 #        Update the status file:
 #
-         if (-e $status_file) {
-            open (STATUS,"+<$status_file");
-            flock (STATUS, LOCK_EX);
-            undef $/;
-            $status_content = <STATUS>;
-            $/ = "\n"; 
+         open(STATUS,"+>>$status_file") or die "cannot create/append to $status_file: $!\n";
+         flock(STATUS, LOCK_EX);
+         my $lastPos = tell(STATUS);
+         seek(STATUS, 0, SEEK_SET);
+         read(STATUS, $status_content, $lastPos);
+         if ($lastPos > 0) {
+             $status_content .= "\n";
          } else {
-            open (STATUS,">$status_file");
-            $status_content = "";
+             $status_content = "";
          }
+         
          my $j2 = index($status_content,$url);
          if ($progress_report == 1) {
             print "j2 = $j2\n";
@@ -288,7 +280,7 @@ sub do_harvest {
             my $updated = sprintf('%04d-%02d-%02d',$year,$mon+1,$mday);
             $new_status_content .= $url . ' ' . $updated . "\n";
          }
-         seek(STATUS,0,0);
+         seek(STATUS,0,SEEK_SET);
          print STATUS $new_status_content;
          close (STATUS);
       }
@@ -320,7 +312,9 @@ sub process_DIF_records {
    }
    my $xpath = XML::LibXML::XPathContext->new();
    $xpath->registerNs('oai', 'http://www.openarchives.org/OAI/2.0/');
-   
+   #
+   # TODO: check for one of the oai error-codes before parsing the records
+   #
    my @records = $xpath->findnodes("/oai:OAI-PMH/oai:ListRecords/oai:record", $oaiDoc);
    print "found ", scalar @records, " records\n" if $progress_report;
    my $i;
@@ -395,7 +389,41 @@ sub process_DIF_records {
       print "Write $base_filename.xm[ld]\n" if ($progress_report == 1);
       $fds->writeToFile($base_filename);
    }
+   
+   # check for resumptionToken
+   my $resumptionToken;
+   foreach my $resumptionNode ($xpath->findnodes("oai:resumptionToken", $oaiDoc)) {
+       # should be max one
+       $resumptionToken = $resumptionNode->textContent;
+   }
+   return $resumptionToken;
 }
+
+#
+#-----------------------------------------------------------------------
+# get the decoded content from an url
+#
+sub getContentFromUrl {
+    my ($urlsent) = @_;
+    # Send GET request 
+    # and receive response object in $getrequest:
+    if ($progress_report == 1) {
+       print "Send GET request: $urlsent\n";
+    }
+    my $getrequest = $useragent->get($urlsent);
+    my $content_from_get;
+    if ($getrequest->is_success) {
+       $content_from_get = $getrequest->decoded_content;
+    } else {
+       &syserror("","GET did not succeed: " . $getrequest->status_line, $content_from_get);
+       return;
+    }
+    if ($progress_report == 1) {
+       print "GET request returned " . length($content_from_get) . " bytes\n";
+    }
+    return $content_from_get;
+}
+
 #
 #-----------------------------------------------------------------------
 #

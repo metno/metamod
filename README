@@ -67,7 +67,8 @@ of the METAMOD 2.x distribution:
 
 - Perl v5.8 with the following Perl modules:
   XML::Simple, XML::LibXML, XML::LibXSLT, DBI, DBD::Pg
-  Geo::Proj4, Mail::Mailer, PDL, PDL::Char, PDL::NetCDF
+  Geo::Proj4, Mail::Mailer, PDL, PDL::Char, PDL::NetCDF,
+  LWP* (libwww-perl), URI::Escape
 
 METAMOD 2.x has been developed and tested using Fedora and Debian Linux, but
 should work on most operating systems supporting the mentioned libraries.
