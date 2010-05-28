@@ -420,4 +420,5 @@
 =htdocs/img/drag-rectangle-on.png
 =cgi-bin/gc2wmc.pl
 =cgi-bin/gc2wmc.xsl
+=cgi-bin/wmsthmb.pl
 
