@@ -1,0 +1,19 @@
+Source: metamod2-database
+Priority: extra
+Maintainer: Heiko Klein <heiko.klein@met.no>
+Build-Depends: debhelper (>=5)
+Standards-Version: 3.7.3
+Section: web
+
+Package: metamod2-database
+Section: web 
+Priority: optional
+Architecture: all
+Essential: no
+Depends: postgresql-8.3, postgresql-contrib-8.3, postgresql-8.3-postgis
+Recommends: postgresql-client-8.3 
+Suggests:  
+Conflicts: 
+Replaces: 
+Provides: 
+Description: Virtual package for postgres database for metamod2.

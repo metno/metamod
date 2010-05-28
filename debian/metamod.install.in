@@ -1,0 +1,14 @@
+app/example/* /usr/share/metamod-2.x/exampleApplication/
+base/ /usr/share/metamod-2.x/base/
+common/ /usr/share/metamod-2.x/common/
+harvest/ /usr/share/metamod-2.x/harvest/
+pmh/ /usr/share/metamod-2.x/pmh/
+search/ /usr/share/metamod-2.x/search/
+thredds/ /usr/share/metamod-2.x/thredds/
+upload/ /usr/share/metamod-2.x/upload/
+update_target.pl /usr/share/metamod-2.x/
+LICENCE /usr/share/metamod-2.x/
+README /usr/share/metamod-2.x/
+VERSION /usr/share/metamod-2.x/
+TODO /usr/share/metamod-2.x/
+

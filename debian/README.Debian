@@ -1,0 +1,17 @@
+Metamod-2.x for Debian
+----------------
+
+To create a new release - debian-package of metamod, edit the changelog file.
+Then run from the main directory (the one above debian):
+
+  $ make -f debian/rules build-version
+
+to actually build the (binary) package, run:
+
+  $ debuild -i -us -uc -b
+
+To clean, run
+  $ fakeroot make -f debian/rules clean
+  
+
+ -- Heiko Klein <heiko.klein@met.no>  Thu, 27 May 2010 15:21:55 +0100
