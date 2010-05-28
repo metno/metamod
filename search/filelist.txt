@@ -317,7 +317,6 @@
 =htdocs/lib/Firebug/firebug.html
 =htdocs/lib/Rico/Color.js
 =htdocs/lib/Rico/Corner.js
-=htdocs/lib/fancybox
 =htdocs/lib/fancybox/blank.gif
 =htdocs/lib/fancybox/fancybox-x.png
 =htdocs/lib/fancybox/fancybox-y.png
