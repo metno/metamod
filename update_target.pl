@@ -32,6 +32,9 @@
 use strict;
 use File::Copy;
 use File::Path;
+use File::Spec;
+use FindBin qw($Bin);
+
 #
 #  Check number of command line arguments
 #
@@ -47,6 +50,25 @@ my $appdir = $ARGV[0];
 my $configMaster = 'master_config.txt';
 my $configfile = "$appdir/$configMaster";
 my $appfilelist = $appdir . '/filelist.txt';
+my $appName = (File::Spec->splitdir( $appdir))[-1];
+my $version;
+my $majorVersion;
+{
+    open my $verFH, "$Bin/VERSION" or die "cannot read VERSION-file at $Bin/VERSION: $!\n";
+    while (defined (my $line = <$verFH>)) {
+        if ($line =~ /version\s+(\d+\.\w+)\.(\w+)\s+/i) {
+            $version = $1 . '.' . $2;
+            $majorVersion = $1;
+            last; 
+        }
+    }
+    unless (defined $majorVersion) {
+        die "could not read version from VERSION file\n";
+    } 
+}
+print "\nConfiguring application '$appName' with Metamod $majorVersion ($version)\n\n";
+
+
 my %conf;
 my $missing_variables = 0;
 #
@@ -117,6 +139,19 @@ if (! -f "$targetdir/$configMaster" or ($config_modified > (stat _)[9])) {
    copy($configfile, "$targetdir/$configMaster") or
       die "Could not copy $configfile to $targetdir: $!";
 }
+# install link from /etc/metamod-$majorVersoin/$appName.cfg to $targetdir/$configMaster
+{
+    my $etcDir = "/etc/metamod-$majorVersion";
+    if (-d $etcDir) {
+        my $etcConfig = "$etcDir/$appName.cfg";
+        unlink $etcConfig;
+        symlink("$targetdir/$configMaster", $etcConfig)
+            or print STDERR "unable to create symlink from $etcConfig -> $targetdir/$configMaster\n";
+    } else {
+        print STDERR "Cannot create configuration-symlink in $etcDir: no such directory\n\n";
+    }
+}
+    
 
 if (!exists($conf{'SOURCE_DIRECTORY'})) {
    die "SOURCE_DIRECTORY is not defined in $configfile";
