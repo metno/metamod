@@ -208,12 +208,13 @@ sub do_harvest {
             print "harvesting $ownertag $url\n";
          }
          my $status_content = "";
-         open (STATUS,$status_file) or die "cannot read $status_file: $!\n";
-         flock(STATUS, LOCK_SH);
-         undef $/;
-         $status_content = <STATUS>;
-         $/ = "\n"; 
-         close (STATUS); # Also unlocks
+         if (-r $status_file) {
+            open(STATUS,"$status_file") or die "cannot read $status_file: $!\n";
+            flock(STATUS, LOCK_SH);
+            local $/ = undef;
+            $status_content = <STATUS>;
+            close (STATUS); # Also unlocks
+         }
          
          my $date_last_upd;
          if ($progress_report == 1) {
