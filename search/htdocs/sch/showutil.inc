@@ -1,32 +1,32 @@
-<?php 
-#---------------------------------------------------------------------------- 
-#  METAMOD - Web portal for metadata search and upload 
-# 
-#  Copyright (C) 2008 met.no 
-# 
-#  Contact information: 
-#  Norwegian Meteorological Institute 
-#  Box 43 Blindern 
-#  0313 OSLO 
-#  NORWAY 
-#  email: egil.storen@met.no 
-#   
-#  This file is part of METAMOD 
-# 
-#  METAMOD is free software; you can redistribute it and/or modify 
-#  it under the terms of the GNU General Public License as published by 
-#  the Free Software Foundation; either version 2 of the License, or 
-#  (at your option) any later version. 
-# 
-#  METAMOD is distributed in the hope that it will be useful, 
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-#  GNU General Public License for more details. 
-#   
-#  You should have received a copy of the GNU General Public License 
-#  along with METAMOD; if not, write to the Free Software 
-#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
-#---------------------------------------------------------------------------- 
+<?php
+#----------------------------------------------------------------------------
+#  METAMOD - Web portal for metadata search and upload
+#
+#  Copyright (C) 2008 met.no
+#
+#  Contact information:
+#  Norwegian Meteorological Institute
+#  Box 43 Blindern
+#  0313 OSLO
+#  NORWAY
+#  email: egil.storen@met.no
+#
+#  This file is part of METAMOD
+#
+#  METAMOD is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  METAMOD is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with METAMOD; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#----------------------------------------------------------------------------
 ?>
 <?php
 include_once 'gautil.inc';
@@ -50,7 +50,7 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = f
       if ($wmsSetup) {
       	$wmsUrl = $wmsSetup->getClientUrl($dsName);
       	$s1 .= "<div class=\"btns\">";
-         $s1 .= "<a class=\"btn\" href=\"$wmsUrl\" ><span>Visualize</span></a>";
+         $s1 .= "<a class=\"visual\" href=\"$wmsUrl\" ><span>Visualize</span></a>";
          $s1 .= "</div>";
       }
       if ($fimexSetup && strlen($mmConfig->getVar("FIMEX_PROGRAM"))) {
@@ -75,7 +75,7 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = f
 }
 function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
 #
-#  Show table of file level datasets (children of one directory level dataset) 
+#  Show table of file level datasets (children of one directory level dataset)
 #  selected by the search criteria.
 #
 #  $parentds     - DS_id of the directory level dataset
@@ -85,7 +85,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
 #                  starts from 1). The number of rows allowed to show in one invocation
 #                  is defined by the constant $max_secondlevel_rows below.
 #  $columns      - Column names (see doshow.php)
-#  $sqlpart      - Part of WHERE-clause in SQL sentence corresponding to the selected 
+#  $sqlpart      - Part of WHERE-clause in SQL sentence corresponding to the selected
 #                  search criteria.
 # $sqlPartParams - list of parameters connected to the $sqlpart, e.g. WHERE DS_id = $1 AND DS_name = $2
 #
@@ -156,7 +156,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
 #
 #  $valuecounts  - Array indexed by MT_name. Each value is an array indexed by MD_content.
 #                  The parent dataset and all its children datasets are investigated.
-#                  $valuecounts[mtname][mdcontent] is increased by one for each 
+#                  $valuecounts[mtname][mdcontent] is increased by one for each
 #                  dataset having metadata of type mtname with value mdcontent.
 #                  This array is used to find columns with values equal to the parent
 #                  value for all rows. Such columns are not displayed.

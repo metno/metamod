@@ -1,32 +1,32 @@
-<?php 
-#---------------------------------------------------------------------------- 
-#  METAMOD - Web portal for metadata search and upload 
-# 
-#  Copyright (C) 2008 met.no 
-# 
-#  Contact information: 
-#  Norwegian Meteorological Institute 
-#  Box 43 Blindern 
-#  0313 OSLO 
-#  NORWAY 
-#  email: egil.storen@met.no 
-#   
-#  This file is part of METAMOD 
-# 
-#  METAMOD is free software; you can redistribute it and/or modify 
-#  it under the terms of the GNU General Public License as published by 
-#  the Free Software Foundation; either version 2 of the License, or 
-#  (at your option) any later version. 
-# 
-#  METAMOD is distributed in the hope that it will be useful, 
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-#  GNU General Public License for more details. 
-#   
-#  You should have received a copy of the GNU General Public License 
-#  along with METAMOD; if not, write to the Free Software 
-#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
-#---------------------------------------------------------------------------- 
+<?php
+#----------------------------------------------------------------------------
+#  METAMOD - Web portal for metadata search and upload
+#
+#  Copyright (C) 2008 met.no
+#
+#  Contact information:
+#  Norwegian Meteorological Institute
+#  Box 43 Blindern
+#  0313 OSLO
+#  NORWAY
+#  email: egil.storen@met.no
+#
+#  This file is part of METAMOD
+#
+#  METAMOD is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  METAMOD is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with METAMOD; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#----------------------------------------------------------------------------
 ?>
 <?php
 	require_once("../funcs/mmConfig.inc");
@@ -111,12 +111,30 @@
    <link href="style.css" rel="stylesheet" type="text/css" />
    <link href="<?php echo $mmConfig->getVar('LOCAL_URL'); ?>/style.css" rel="stylesheet" type="text/css" />
    <link href="button.css" rel="stylesheet" type="text/css" />
+   <!-- below is needed for fancybox  -->
+   <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
+   <script type="text/javascript" src="/lib/fancybox/jquery.mousewheel-3.0.2.pack.js"></script>
+   <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-1.3.1.js"></script>
+   <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox-1.3.1.css" media="screen" />
+   <script type="text/javascript">
+		$(document).ready(function() {
+			$(".visual").fancybox({
+				'width'				: '90%',
+				'height'			: '90%',
+				'autoScale'			: false,
+				'transitionIn'		: 'none',
+				'transitionOut'		: 'none',
+				'type'				: 'iframe'
+			});
+
+		});
+   </script>
 </head>
 <body>
 <?php
 if (strpos($mmDebug,"POST") !== false) {
 #
-#  DEBUG: List all POST variables: 
+#  DEBUG: List all POST variables:
 #
    echo '========= POST-variables =========<BR />';
    while (list($key, $var) = each ($_POST)) {
@@ -126,7 +144,7 @@ if (strpos($mmDebug,"POST") !== false) {
 }
 if (strpos($mmDebug,"GET") !== false) {
 #
-#  DEBUG: List all GET variables: 
+#  DEBUG: List all GET variables:
 #
    echo '========= GET-variables =========<BR />';
    while (list($key, $var) = each ($_GET)) {
@@ -143,7 +161,7 @@ if (strpos($mmDebug,"GET") !== false) {
    } else {
 #
 #  Include updsession.php for processing user input (through POST and GET data) and
-#  for updating the session state accordingly. This file do not normally generate 
+#  for updating the session state accordingly. This file do not normally generate
 #  any HTML output.
 #
       include "updsession.php";
@@ -155,7 +173,7 @@ if (strpos($mmDebug,"GET") !== false) {
             echo "</pre>\n";
          }
 #
-#  DEBUG: List all key - value pairs in the $mmSessionState object: 
+#  DEBUG: List all key - value pairs in the $mmSessionState object:
 #
          if (isset($mmSessionState) && strpos($mmDebug,"mmSessionState") !== false) {
 	    echo "<P>mmSessionState:<BR>\n";
