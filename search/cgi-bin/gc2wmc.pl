@@ -10,8 +10,6 @@ use CGI;
 ################
 # init
 #
-our $parser = XML::LibXML->new();
-my $xslt = XML::LibXSLT->new();
 
 my $q = CGI->new;
 my $setup_url = $q->param('setup') or giveup( "Missing parameter 'setup' containg file URL", 400);
@@ -54,7 +52,7 @@ sub getXML {
 
     if ($response->is_success) {
         #print STDERR $response->content;
-        return $parser->parse_string($response->content);
+        return XML::LibXML->parse_string($response->content);
     }
     else {
         giveup($response->status_line . ': ' . $url, 502);
@@ -71,7 +69,7 @@ $sxc->registerNs('s', "http://www.met.no/schema/metamod/ncWmsSetup");
 #print STDERR $setup->toString;
 my $time = localtime();
 my %bbox = ( time => $time );
-foreach ($sxc->findnodes('/*/s:displayArea/@*')) {
+foreach ( $sxc->findnodes('/*/s:displayArea/@*') ) {
     my ($k, $v) = ($_->localname, $_->getValue);
     $bbox{ $k } = $v; #( $v != 0 ) ? $v : "'$v'";
 }
@@ -81,11 +79,12 @@ foreach ($sxc->findnodes('/*/s:displayArea/@*')) {
 #################################
 # transform Capabilities to WMC
 #
+my $xslt = XML::LibXSLT->new();
 my $wmcns = "http://www.opengis.net/context";
 my $getcap = $q->param('url') || $setup->documentElement->getAttribute('url') or die "Missing URL";
 #printf STDERR "XML: %s\n", $getcap;
 $getcap .= '?service=WMS&version=1.3.0&request=GetCapabilities';
-my $stylesheet = $xslt->parse_stylesheet( $parser->parse_file('gc2wmc.xsl') );
+my $stylesheet = $xslt->parse_stylesheet_file('gc2wmc.xsl');
 my $results = $stylesheet->transform( getXML($getcap), XML::LibXSLT::xpath_to_string(%bbox) );
 my $xc = XML::LibXML::XPathContext->new( $results->documentElement() );
 $xc->registerNs('v', $wmcns);
