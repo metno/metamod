@@ -26,7 +26,7 @@ div.btns a.visual
 div.btns a.btn:hover span,
 div.btns a.visual:hover span
 {
-	
+
 	opacity:0.6;
 	filter:alpha(opacity:80);
 }
@@ -35,7 +35,7 @@ div.btns a.btn span,
 div.btns a.visual span
 {
 	padding:3px 8px 4px 8px;
-	
+
 	text-align:center;
 	position:relative;
 	left:1px;top:1px;
@@ -44,6 +44,12 @@ div.btns a.visual span
 	background:url(../img/button.gif) right bottom no-repeat;
 	font:small/1 Verdana;
 	color:#222;
-	
+
 }
 
+iframe.thumbmap
+{
+	height: 64px;
+	width:  64px;
+	float:  left;
+}

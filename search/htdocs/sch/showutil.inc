@@ -41,18 +41,21 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = f
       $s1 = substr($s1,0,$jpos);
    }
    if ($mtname == "dataref") {
-   	$dataUrl = $s1;
+      $dataUrl = $s1;
       $nameshown = preg_replace(':[^/]*/:','', $dsName);
       $s1 = '<a href="' . $dataUrl . '"><b>' . $nameshown . '</b></a>';
       $s1 .= "<div class=\"btns\">";
+      if ($wmsSetup) {
+	$wmsUrl = $wmsSetup->getClientUrl($dsName);
+	 if (preg_match('/wmssetup/', $wmsUrl)) {
+	    $s1 .= "<iframe class=\"thumbmap\" src=\""
+	    . preg_replace('/^wms.php/', '/cgi-bin/wmsthmb.pl', $wmsUrl)
+	    . "&size=64\"></iframe>";
+	 }
+	 $s1 .= "<a class=\"visual\" href=\"$wmsUrl\" ><span>Visualize</span></a><br/>";
+      }
       $s1 .= " <a class=\"btn\" href=\"xmlShow.php?dsName=$dsName\" target=\"_new\"><span>Show xml</span></a> ";
       $s1 .= "</div>";
-      if ($wmsSetup) {
-      	$wmsUrl = $wmsSetup->getClientUrl($dsName);
-      	$s1 .= "<div class=\"btns\">";
-         $s1 .= "<a class=\"visual\" href=\"$wmsUrl\" ><span>Visualize</span></a>";
-         $s1 .= "</div>";
-      }
       if ($fimexSetup && strlen($mmConfig->getVar("FIMEX_PROGRAM"))) {
       	$s1 .= "<div class=\"btns\">";
          foreach ($fimexSetup->getProjections() as $projName) {
