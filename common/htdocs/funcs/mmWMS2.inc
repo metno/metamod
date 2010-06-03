@@ -131,7 +131,7 @@ class MM_WMSSetup2 {
    		$wmssetupUrl .= '/sch/getWMSSetup.php?datasetName='.$datasetName;
    		return "wms.php?wmssetup=". urlencode($wmssetupUrl);
    	} else {
-   		// deliver server-url only
+   		// deliver server-url only *** THIS IS OBSOLETE AND DOES NOT WORK ***
 	   	$wmsServerUrl = '';
    		if (!$this->isParent) {
    		   $wmsServerUrl = $this->getUrl();
