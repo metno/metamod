@@ -2,39 +2,39 @@
 /*
  * Created on Aug 21, 2009
  *
- *---------------------------------------------------------------------------- 
- * METAMOD - Web portal for metadata search and upload 
+ *----------------------------------------------------------------------------
+ * METAMOD - Web portal for metadata search and upload
  *
- * Copyright (C) 2009 met.no 
+ * Copyright (C) 2009 met.no
  *
- * Contact information: 
- * Norwegian Meteorological Institute 
- * Box 43 Blindern 
- * 0313 OSLO 
- * NORWAY 
- * email: heiko.klein@met.no 
- *  
- * This file is part of METAMOD 
+ * Contact information:
+ * Norwegian Meteorological Institute
+ * Box 43 Blindern
+ * 0313 OSLO
+ * NORWAY
+ * email: heiko.klein@met.no
  *
- * METAMOD is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 2 of the License, or 
- * (at your option) any later version. 
+ * This file is part of METAMOD
  *
- * METAMOD is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
- * GNU General Public License for more details. 
- *  
- * You should have received a copy of the GNU General Public License 
- * along with METAMOD; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
- *--------------------------------------------------------------------------- 
+ * METAMOD is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * METAMOD is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with METAMOD; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *---------------------------------------------------------------------------
  */
 ?>
 <?php
 /** Class for hiding the xml-structure and giving easy access to the WMSInfo string.
- * 
+ *
  * Example of WMCSetup string
  * <mm:wmcSetup xmlns:mm="http://www.met.no/schema/metamod/wmcSetup">
  *   <mm:datasetName regex="!!" replace=""/>
@@ -53,9 +53,9 @@ class MM_WMSSetup {
 
 	static function getWMCSetupSchema() {
 		global $mmConfig;
-		return $mmConfig->getVar("TARGET_DIRECTORY") . "/schema/wmcSetup.xsd"; 	   
+		return $mmConfig->getVar("TARGET_DIRECTORY") . "/schema/wmcSetup.xsd";
 	}
-   
+
    /**
     * create a new MM_WMSSetup from a string
     * @param $str xml-string
@@ -78,7 +78,7 @@ class MM_WMSSetup {
          $xpath = new DomXPath($dom);
          $xpath->registerNamespace('wi', self::wmsInfoNS);
          $xpath->registerNamespace('wmc', self::wmcNS);
-         
+
          foreach ($xpath->query('/wi:wmcSetup/wi:datasetName') as $node) {
 				foreach ($node->attributes as $att) {
 				   if ($att->name == 'regex') {
@@ -86,7 +86,7 @@ class MM_WMSSetup {
 				   } else if ($att->name == 'replace') {
 				      $this->datasetReplace = $att->value;
 				   }
-				}            
+				}
          }
          foreach ($xpath->query('/wi:wmcSetup/wi:wmsServerURL') as $node) {
 				foreach ($node->attributes as $att) {
@@ -95,7 +95,7 @@ class MM_WMSSetup {
 				   } else if ($att->name == 'replace') {
 				      $this->wmsReplace = $att->value;
 				   }
-				}            
+				}
          }
          foreach ($xpath->query('/wi:wmcSetup/wmc:ViewContext') as $node) {
             $wcsDom = new DOMDocument();
@@ -105,28 +105,28 @@ class MM_WMSSetup {
          }
       }
    }
-   
+
    /**
-    * get the regex to match the name against 
+    * get the regex to match the name against
     */
    function getDatasetRegex() {
       return $this->datasetRegex;
    }
    /**
-    * get the regex/replace to change the name with 
+    * get the regex/replace to change the name with
     */
    function getDatasetReplace() {
       return $this->datasetReplace;
    }
 
    /**
-    * get the regex for the wms server to match the name against 
+    * get the regex for the wms server to match the name against
     */
    function getWmsRegex() {
       return $this->wmsRegex;
    }
    /**
-    * get the regex/replace for the wms serverto change the name with 
+    * get the regex/replace for the wms serverto change the name with
     */
    function getWmsReplace() {
       return $this->wmsReplace;
@@ -135,13 +135,13 @@ class MM_WMSSetup {
 	/**
 	 * Get the url where the wms-client offering the wmc-page can be found
 	 */
-   function getClientUrl($datasetName) {
+   function getClientQuery($datasetName) {
    	$url = "getWMC.php?datasetName=".urlencode($datasetName);
-      return "wms.php?wmcurl=".$url;
+      return "wmcurl=".$url;
    }
    /**
     * Get the wmc-file for the dataset with the name $datasetName.
-    * The datasetName is required here since the constructor doesn't 
+    * The datasetName is required here since the constructor doesn't
     * require it.
     * @param $datasetName name of the dataset, must be level 2
     */
@@ -149,7 +149,7 @@ class MM_WMSSetup {
 		global $mmConfig;
       $dsName = preg_replace($this->getDatasetRegex(), $this->getDatasetReplace(), $datasetName);
       $wmsServer = preg_replace($this->getWmsRegex(), $this->getWmsReplace(), $datasetName);
-      
+
       // modify the dataset-name
       $wmc = preg_replace("!".self::datasetReplace . "!", $dsName, $this->wmcTemplate);
       // and change the online-resource depending on the config
@@ -179,7 +179,7 @@ function getWMSSetupFromDb($pgDB, $datasetName) {
 	}
 	if (pg_num_rows($result) != 1) {
 		// try parent
-		$sql = 
+		$sql =
 'SELECT WI_content FROM WMSInfo ' .
 ' WHERE (WI_content IS NOT NULL AND WI_content != \'\') ' .
 '   AND DS_id IN (SELECT DS_parent FROM Dataset WHERE DS_name = $1) ';
@@ -203,7 +203,7 @@ function getWMSSetupFromDb($pgDB, $datasetName) {
 function checkWMSSetupExistsInDb($pgDB, $dsid) {
    $sql = 'SELECT WMSInfo.DS_id FROM WMSInfo, Dataset '.
           ' WHERE WMSInfo.DS_id = Dataset.DS_id '.
-	     	 '   AND (WI_content IS NOT NULL AND WI_content != \'\')'.          
+	     	 '   AND (WI_content IS NOT NULL AND WI_content != \'\')'.
           '   AND (Dataset.DS_id = $1 OR Dataset.DS_parent = $1 )';
 	$result = pg_query_params($pgDB, $sql, array($dsid));
 	if (!$result) {

@@ -46,13 +46,11 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = f
       $s1 = '<a href="' . $dataUrl . '"><b>' . $nameshown . '</b></a>';
       $s1 .= "<div class=\"btns\">";
       if ($wmsSetup) {
-	$wmsUrl = $wmsSetup->getClientUrl($dsName);
-	 if (preg_match('/wmssetup/', $wmsUrl)) {
-	    $s1 .= "<iframe class=\"thumbmap\" src=\""
-	    . preg_replace('/^wms.php/', '/cgi-bin/wmsthmb.pl', $wmsUrl)
-	    . "&size=64\"></iframe>";
+	$wmsQuery = $wmsSetup->getClientQuery($dsName);
+	 if (preg_match('/wmssetup/', $wmsQuery)) {
+	    $s1 .= "<iframe class=\"thumbmap\" src=\"/cgi-bin/wmsthmb.pl?$wmsQuery&size=64\"></iframe>";
 	 }
-	 $s1 .= "<a class=\"visual\" href=\"$wmsUrl\" ><span>Visualize</span></a><br/>";
+	 $s1 .= "<a class=\"visual\" href=\"wms.php?$wmsQuery\" ><span>Visualize</span></a><br/>";
       }
       $s1 .= " <a class=\"btn\" href=\"xmlShow.php?dsName=$dsName\" target=\"_new\"><span>Show xml</span></a> ";
       $s1 .= "</div>";

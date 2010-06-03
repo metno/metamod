@@ -2,34 +2,34 @@
 /*
  * Created on Feb 10, 2010
  *
- *---------------------------------------------------------------------------- 
- * METAMOD - Web portal for metadata search and upload 
+ *----------------------------------------------------------------------------
+ * METAMOD - Web portal for metadata search and upload
  *
- * Copyright (C) 2010 met.no 
+ * Copyright (C) 2010 met.no
  *
- * Contact information: 
- * Norwegian Meteorological Institute 
- * Box 43 Blindern 
- * 0313 OSLO 
- * NORWAY 
- * email: heiko.klein@met.no 
- *  
- * This file is part of METAMOD 
+ * Contact information:
+ * Norwegian Meteorological Institute
+ * Box 43 Blindern
+ * 0313 OSLO
+ * NORWAY
+ * email: heiko.klein@met.no
  *
- * METAMOD is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 2 of the License, or 
- * (at your option) any later version. 
+ * This file is part of METAMOD
  *
- * METAMOD is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
- * GNU General Public License for more details. 
- *  
- * You should have received a copy of the GNU General Public License 
- * along with METAMOD; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
- *--------------------------------------------------------------------------- 
+ * METAMOD is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * METAMOD is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with METAMOD; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *---------------------------------------------------------------------------
  */
 
 include_once "mmWMS.inc";
@@ -38,7 +38,7 @@ include_once "mmConfig.inc"
 ?>
 <?php
 /** Class for hiding the xml-structure and giving easy access to the WMSInfo string.
- * 
+ *
  * Example of WMSInfo string
  * <mm:ncWmsSetup xmlns:mm="http://www.met.no/schema/metamod/ncWmsSetup" url="http://thredds.met.no/wms/osisaf/ice_conc.nc"/>
  *
@@ -49,9 +49,9 @@ class MM_WMSSetup2 {
 
 	static function getSchema() {
 		global $mmConfig;
-		return $mmConfig->getVar("TARGET_DIRECTORY") . "/schema/ncWmsSetup.xsd"; 	   
+		return $mmConfig->getVar("TARGET_DIRECTORY") . "/schema/ncWmsSetup.xsd";
 	}
-   
+
    /**
     * create a new MM_WMSSetup2 from a string
     * @param $str xml-string
@@ -76,10 +76,10 @@ class MM_WMSSetup2 {
          }
          $this->xpath = new DomXPath($this->dom);
          $this->xpath->registerNamespace('wi', self::wmsSetupNS);
-         
+
        }
    }
-   
+
    /**
     * get the real url, (replacing %DATASET_PARENT% and %DATASET% with the $datasetName)
     * change the url of this if required
@@ -101,35 +101,35 @@ class MM_WMSSetup2 {
                   $att->nodeValue = $url;
                }
 				}
-         }          
+         }
       }
       return $url;
    }
-   
+
    function isComplex() {
    	if ($this->xpath->query('/wi:ncWmsSetup/wi:displayArea')->length > 0) {
    		return true;
    	}
    	return false;
    }
-   
+
    /**
     * get the url
     * if 'isParent', replaced by datasetName as project/parent/datasetFile, i.e.
     * http://wms.met.no/my/path/file.nc to
     * http://wms.met.no/my/path/datasetFile.nc
     */
-   function getClientUrl($datasetName = '') {
+   function getClientQuery($datasetName = '') {
    	global $mmConfig;
    	if ($this->isComplex()) {
    		if (strlen($datasetName) == 0) {
-   		   echo "internal error, require dataset for getClientUrl: ".$this->xpath->query('/wi:displayArea')->length;
+   		   echo "internal error, require dataset for getClientParams: ".$this->xpath->query('/wi:displayArea')->length;
    		}
    	   // deliver as wmssetup
    	   $wmssetupUrl = ($_SERVER['HTTPS'] ? 'https://': 'http://') . $_SERVER['SERVER_NAME'].
    	   	($_SERVER['SERVER_PORT'] == 80 ? '' : ':'.$_SERVER['SERVER_PORT']) . $mmConfig->getVar('LOCAL_URL');
    		$wmssetupUrl .= '/sch/getWMSSetup.php?datasetName='.$datasetName;
-   		return "wms.php?wmssetup=". urlencode($wmssetupUrl);
+   		return "wmssetup=". urlencode($wmssetupUrl);
    	} else {
    		// deliver server-url only *** THIS IS OBSOLETE AND DOES NOT WORK ***
 	   	$wmsServerUrl = '';
@@ -148,10 +148,10 @@ class MM_WMSSetup2 {
    			}
    		}
    		$wmsServerUrl = urlencode($wmsServerUrl);
-   		return "wms.php?wmsurl=".$wmsServerUrl;
+   		return "wmsurl=".$wmsServerUrl;
    	}
    }
-   
+
    /**
     * isParent: check if the wmsSetup is derived from a parent dataset or a child
     */
@@ -191,7 +191,7 @@ function getWMSSetup2FromDb($pgDB, $datasetName) {
 	if (pg_num_rows($result) != 1) {
 		// try parent
 		$isParent = true;
-		$sql = 
+		$sql =
 'SELECT WI_content FROM WMSInfo ' .
 ' WHERE (WI_content IS NOT NULL AND WI_content != \'\') ' .
 '   AND DS_id IN (SELECT DS_parent FROM Dataset WHERE DS_name = $1) ';
@@ -229,7 +229,7 @@ function getWMSSetup2FromDbById($pgDB, $datasetId) {
 	if (pg_num_rows($result) != 1) {
 		// try parent
 		$isParent = true;
-		$sql = 
+		$sql =
 'SELECT WI_content FROM WMSInfo ' .
 ' WHERE (WI_content IS NOT NULL AND WI_content != \'\') ' .
 '   AND DS_id IN (SELECT DS_parent FROM Dataset WHERE DS_id = $1) ';
@@ -267,7 +267,7 @@ function getGeneralWMSSetupFromDbById($pgDB, $datasetId) {
 	if (pg_num_rows($result) != 1) {
 		// try parent
 		$isParent = true;
-		$sql = 
+		$sql =
 'SELECT WI_content FROM WMSInfo ' .
 ' WHERE (WI_content IS NOT NULL AND WI_content != \'\') ' .
 '   AND DS_id IN (SELECT DS_parent FROM Dataset WHERE DS_id = $1) ';

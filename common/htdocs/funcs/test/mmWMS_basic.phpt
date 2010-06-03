@@ -50,8 +50,8 @@ if (!preg_match("!http://my.wms.server.com/wms/dataset/ecmwf20090810!", $wmc)) {
    echo ("wrong wmsurl in wmc: ". $wmc);
 }
 
-if ($ws->getClientUrl("bla/blub") != "wms.php?wmcurl=getWMC.php?datasetName=bla%2Fblub") {
-   echo ("incorrect wmc url: " . $ws->getClientUrl("bla/blub"));
+if ($ws->getClientQuery("bla/blub") != "wms.php?wmcurl=getWMC.php?datasetName=bla%2Fblub") {
+   echo ("incorrect wmc query: " . $ws->getClientQuery("bla/blub"));
 }
 
 ?>

@@ -14,19 +14,19 @@ $ws = new MM_WMSSetup2($xml, true);
 if (!$ws instanceof MM_WMSSetup2) {
    die ("cannot init MM_WMSSetup2, got $ws");
 }
-if (strlen($ws->getClientUrl()) == 0) {
+if (strlen($ws->getClientQuery()) == 0) {
    echo ("no url set");
 }
-if ($ws->getClientUrl() != "wms.php?wmsurl=http%3A%2F%2Fthredds.met.no%2Fwms%2Fosisaf%2Fice_conc.nc") {
-   echo ("incorrect url".$ws->getClientUrl());
+if ($ws->getClientQuery() != "wmsurl=http%3A%2F%2Fthredds.met.no%2Fwms%2Fosisaf%2Fice_conc.nc") {
+   echo ("incorrect query".$ws->getClientQuery());
 }
-if ($ws->getClientUrl("DAMOC/osisaf/test") != "wms.php?wmsurl=http%3A%2F%2Fthredds.met.no%2Fwms%2Fosisaf%2Ftest.nc") {
-   echo ("incorrect url-replace for parent". $ws->getClientUrl("DAMOC/osisaf/test"));
+if ($ws->getClientQuery("DAMOC/osisaf/test") != "wmsurl=http%3A%2F%2Fthredds.met.no%2Fwms%2Fosisaf%2Ftest.nc") {
+   echo ("incorrect query-replace for parent". $ws->getClientQuery("DAMOC/osisaf/test"));
 }
 
 $ws = new MM_WMSSetup2($xml, false);
-if ($ws->getClientUrl("DAMOC/osisaf/test") != "wms.php?wmsurl=http%3A%2F%2Fthredds.met.no%2Fwms%2Fosisaf%2Fice_conc.nc") {
-   echo ("incorrect url-replace for child". $ws->getClientUrl("DAMOC/osisaf/test"));
+if ($ws->getClientQuery("DAMOC/osisaf/test") != "wmsurl=http%3A%2F%2Fthredds.met.no%2Fwms%2Fosisaf%2Fice_conc.nc") {
+   echo ("incorrect query-replace for child". $ws->getClientQuery("DAMOC/osisaf/test"));
 }
 
 $xml2 = file_get_contents("ncWmsSetupExample.xml");
