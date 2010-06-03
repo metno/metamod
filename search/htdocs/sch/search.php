@@ -113,9 +113,9 @@
    <link href="button.css" rel="stylesheet" type="text/css" />
    <!-- below is needed for fancybox  -->
    <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
-   <script type="text/javascript" src="/lib/fancybox/jquery.mousewheel-3.0.2.pack.js"></script>
-   <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-1.3.1.js"></script>
-   <link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox-1.3.1.css" media="screen" />
+   <script type="text/javascript" src="../lib/fancybox/jquery.mousewheel-3.0.2.pack.js"></script>
+   <script type="text/javascript" src="../lib/fancybox/jquery.fancybox-1.3.1.js"></script>
+   <link rel="stylesheet" type="text/css" href="../lib/fancybox/jquery.fancybox-1.3.1.css" media="screen" />
    <script type="text/javascript">
 		$(document).ready(function() {
 			$(".visual").fancybox({

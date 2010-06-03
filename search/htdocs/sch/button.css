@@ -10,7 +10,9 @@ div.btns:after
 	content:'';
 }
 
-div.btns a.btn{
+div.btns a.btn,
+div.btns a.visual
+{
 	float:left;
 	background:buttonface url(../img/button-2.gif) no-repeat;cursor:pointer;font-size:0;text-align:center;
 	text-align:center;
@@ -21,13 +23,16 @@ div.btns a.btn{
 	margin:3px 2px;
 }
 
-div.btns a.btn:hover span{
+div.btns a.btn:hover span,
+div.btns a.visual:hover span
+{
 	
 	opacity:0.6;
 	filter:alpha(opacity:80);
 }
 
-div.btns a.btn span
+div.btns a.btn span,
+div.btns a.visual span
 {
 	padding:3px 8px 4px 8px;
 	
