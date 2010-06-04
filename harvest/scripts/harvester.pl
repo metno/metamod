@@ -100,7 +100,7 @@ my $config = Metamod::Config->new();
 my $xmldirectory = $config->get('WEBRUN_DIRECTORY').'/XML/'.$config->get('APPLICATION_ID').'/';
 my $applicationid = $config->get('APPLICATION_ID');
 my $status_file = $config->get('WEBRUN_DIRECTORY').'/oai_harvest_status';
-my $path_to_syserrors = $config->get('WEBRUN_DIRECTORY').'syserrors';
+my $path_to_syserrors = $config->get('WEBRUN_DIRECTORY').'/syserrors';
 my $progress_report = $config->get('TEST_IMPORT_PROGRESS_REPORT'); # If == 1, prints what's
                                                          # going on to STDOUT
 if ($progress_report == 1) {
