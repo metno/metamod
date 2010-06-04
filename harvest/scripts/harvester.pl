@@ -136,7 +136,10 @@ if (@ARGV == 4) {
    local $/ = undef;
    my $content_from_get = <$f>;
    close $f;
-   process_DIF_records($ownertag, $content_from_get);
+   my $resumptionToken = process_DIF_records($ownertag, $content_from_get);
+   if ($resumptionToken) {
+       print STDERR "resumptionTag found, please provide file with resumptionToken=". uri_escape($resumptionToken);
+   }
    exit(0); # do not continue
 } else {
    print STDERR "commandline-usage: harvester.pl\ntest-usage: harvester.pl OWNERTAG FILE\ndaemon-usage: harvester.pl -log logfile -pid pidfile\n";
@@ -393,9 +396,11 @@ sub process_DIF_records {
    
    # check for resumptionToken
    my $resumptionToken;
-   foreach my $resumptionNode ($xpath->findnodes("oai:resumptionToken", $oaiDoc)) {
+   foreach my $resumptionNode ($xpath->findnodes("//oai:resumptionToken", $oaiDoc)) {
+       print "found resumptionNode with token: " if ($progress_report == 1) ;
        # should be max one
        $resumptionToken = $resumptionNode->textContent;
+       print STDERR $resumptionToken, "\n" if ($progress_report == 1) ;
    }
    return $resumptionToken;
 }
