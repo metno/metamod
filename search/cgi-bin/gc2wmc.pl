@@ -52,7 +52,7 @@ sub getXML {
 
     if ($response->is_success) {
         #print STDERR $response->content;
-        return XML::LibXML->parse_string($response->content);
+        return XML::LibXML->new->parse_string($response->content);
     }
     else {
         giveup($response->status_line . ': ' . $url, 502);
