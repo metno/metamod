@@ -12,9 +12,23 @@ use CGI;
 #
 
 my $q = CGI->new;
-my $setup_url = $q->param('setup') or giveup( "Missing parameter 'setup' containg file URL", 400);
+my $parser = XML::LibXML->new;
+my $setup_url = $q->param('setup'); # or giveup( "Missing parameter 'setup' containg file URL", 400);
+$setup_url =~ s/\&wmssetup=.+$// if $setup_url; # no idea why this is necessary, but OpenLayers keep sending a junk query string
+my $wmsurl = $q->param('wmsurl');
+$wmsurl =~ s/\?.+$// if $wmsurl; # no idea why this is necessary, but OpenLayers keep sending a junk query string
 
-#printf STDERR "*** setup = '%s'\n*** url = '%s'\n", $setup_url || '-', $q->param('url') || '-';
+printf STDERR "*** setup = '%s'\n*** wmsurl = '%s'\n", $setup_url || '-', $wmsurl || '-';
+
+my $default_wmc = <<EOT;
+<?xml version="1.0"?>
+<w:ncWmsSetup
+    xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.met.no/schema/metamod/ncWmsSetup ncWmsSetup.xsd ">
+    <w:displayArea crs="EPSG:32661" left="-3000000" right="7000000" bottom="-3000000" top="7000000"/>
+</w:ncWmsSetup>
+EOT
 
 ####################
 # report error
@@ -52,7 +66,7 @@ sub getXML {
 
     if ($response->is_success) {
         #print STDERR $response->content;
-        return XML::LibXML->new->parse_string($response->content);
+        return $parser->parse_string($response->content);
     }
     else {
         giveup($response->status_line . ': ' . $url, 502);
@@ -63,7 +77,7 @@ sub getXML {
 #################################
 # read setup document
 #
-my $setup = getXML($setup_url);
+my $setup = $setup_url ? getXML($setup_url) : $parser->parse_string($default_wmc);
 my $sxc = XML::LibXML::XPathContext->new( $setup->documentElement() );
 $sxc->registerNs('s', "http://www.met.no/schema/metamod/ncWmsSetup");
 #print STDERR $setup->toString;
@@ -81,7 +95,7 @@ foreach ( $sxc->findnodes('/*/s:displayArea/@*') ) {
 #
 my $xslt = XML::LibXSLT->new();
 my $wmcns = "http://www.opengis.net/context";
-my $getcap = $q->param('url') || $setup->documentElement->getAttribute('url') or die "Missing URL";
+my $getcap = $wmsurl || $setup->documentElement->getAttribute('url') or giveup("Missing setup or WMS url");
 #printf STDERR "XML: %s\n", $getcap;
 $getcap .= '?service=WMS&version=1.3.0&request=GetCapabilities';
 my $stylesheet = $xslt->parse_stylesheet_file('gc2wmc.xsl');
@@ -130,6 +144,7 @@ print $q->header('application/xml');
 my $out = $stylesheet->output_as_bytes($results);
 $out =~ s|( xmlns:xlink="http://www.w3.org/1999/xlink"){2}|$1|g;
 # another hack to work around inexplainable namespace bug
+#print STDERR $out;
 print $out;
 
 =end
