@@ -16,16 +16,11 @@
 			// debugging/inspecting in Firebug
 			var map = null;
 
-			// configure HTTP proxy here
-			//OpenLayers.ProxyHost = "/cgi/proxy.cgi?url=";
-			//OpenLayers.ProxyHost = "./wmsProxy.php?url=";
-			OpenLayers.ProxyHost = "/cgi-bin/gc2wmc.pl?setup=";
-
 			//read CGI args
 			var args = new OpenLayers.Util.getArgs();
-			//var wms_url = args.wmsurl; // currently ignored
-			//alert(wms_url);
 			var wms_setup = args.wmssetup;
+			var wms_url = args.wmsurl;
+			//alert(wms_url);
 
 			var wmsCapabilities;
 			var wmsLayers;
@@ -38,10 +33,13 @@
 				document.getElementById('docs').removeChild( document.getElementById('warning') );
 
 				if (typeof wms_setup != 'undefined') {
+					OpenLayers.ProxyHost = "/cgi-bin/gc2wmc.pl?setup=";
 					OpenLayers.loadURL(wms_setup, "", this, drawMap, showError);
-
+				} else if (typeof wms_url != 'undefined') {
+					OpenLayers.ProxyHost = "/cgi-bin/gc2wmc.pl?wmsurl=";
+					OpenLayers.loadURL(wms_url, "", this, drawMap, showError);
 				} else {
-					alert("Missing wmssetup parameter!");
+					alert("Missing wmssetup or wmsurl parameter!");
 				}
 			}
 
