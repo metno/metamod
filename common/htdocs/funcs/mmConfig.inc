@@ -144,7 +144,7 @@ class MMConfig {
 		} else {
 			$val = $this->vars[$var];
 		}
-		$maxSubst = 20;
+		$maxSubst = 40;
 		$substNo = 0;
 		$count = 1;
 		while ($count > 0 && ($substNo < $maxSubst)) {

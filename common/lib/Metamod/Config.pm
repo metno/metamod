@@ -166,7 +166,7 @@ sub _substituteVariable {
 
     my $textline = $conf{$var};
     
-    my $maxSubst = 20; 
+    my $maxSubst = 40; 
     my $substNo = 0;
     # replace variable with the config-values recursively
     while ($textline =~ s/\[==([A-Z0-9_]+)==\]/$conf{$1}/ && (++$substNo < $maxSubst)) {
