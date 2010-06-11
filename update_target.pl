@@ -36,14 +36,35 @@ use File::Spec;
 use FindBin qw($Bin);
 
 #
-#  Check number of command line arguments
+#  Check command line arguments
 #
-if (scalar @ARGV != 1) {
-   die "\nUsage:\n\n     $0 application_directory\n\n" .
-       "where 'application_directory' is the name of a directory containing the application\n" .
-       "specific files. Inside this directory, there must be a master_config.txt file.\n\n";
+my %commandline_options = (); # Hash containing commandline options of the form --opt or --opt=val
+                              # $commandline_options{"--opt"} == "val" (or empty)
+my $appdir;
+my $argcount = 0; # Counts number of normal arguments (not containing '=')
+my $optcount = 0; # Counts number of option arguments (containing '=')
+foreach my $cmdarg (@ARGV) {
+   if ($cmdarg =~ /^([^=]+)=(.*)$/) {
+      my $opt = $1;
+      my $val = $2;
+      $commandline_options{$opt} = $val;
+      $optcount++;
+   } else {
+      $appdir = $cmdarg;
+      $argcount++;
+   }
 }
-my $appdir = $ARGV[0];
+if ($argcount != 1 || ($optcount > 0 && $optcount != 2) || 
+      ($optcount > 0 && !exists($commandline_options{'--from'})) ||
+      ($optcount > 0 && !exists($commandline_options{'--to'}))) {
+   die "\nUsage:\n\n1.     $0 application_directory\n\n" .
+       "where 'application_directory' is the name of a directory containing the application\n" .
+       "specific files. Inside this directory, there must be a master_config.txt file.\n\n" .
+       "2.     $0 --from=sourcefile --to=targetfile application_directory\n\n" .
+       "If these two options are present, the normal behaviour is suspended. The only thing\n" .
+       "that happens are copying with substitutions (according to the master_config.txt file)" .
+       "from the sourcefile to the targetfile.\n\n";
+}
 #
 #   Read the configuration file:
 #
@@ -120,6 +141,18 @@ if ($varname ne "") {
    $conf{$varname} = $value;
 }
 close (CONFIG);
+#
+if ($optcount > 0) {
+#
+#   Only copy (with substitutions) one file to a targetfile. Then exit:
+#
+   my $sourcefile = $commandline_options{'--from'};
+   my $targetfile = $commandline_options{'--to'};
+   print "Copy and substitute from $sourcefile to $targetfile\n";
+   &substcopy($sourcefile,$targetfile);
+   exit;
+}
+#
 if (!exists($conf{'TARGET_DIRECTORY'})) {
    die "TARGET_DIRECTORY is not defined in $configfile";
 }
@@ -252,26 +285,38 @@ if ($missing_variables > 0) {
 #
 #----------------------------------------------------------------------
 sub substcopy {
+   my $inputdir;
+   my $inputfile = "";
+   my $inputpath;
+   my $outputdir;
+   my $outputfile = "";
+   my $outputpath;
 #
 #  Check number of arguments
 #
-   if (scalar @_ != 4) {
+   if (scalar @_ == 4) {
+      $inputdir = $_[0];
+      $inputfile = $_[1];
+      $outputdir = $_[2];
+      $outputfile = $_[3];
+      $inputpath = "$inputdir/$inputfile";
+      $outputpath = "$outputdir/$outputfile";
+   } elsif (scalar @_ == 2) {
+      $inputpath = $_[0];
+      $outputpath = $_[1];
+   } else {
       die "\nsubstcopy:     Wrong number of arguments\n\n";
    }
-   my $inputdir = $_[0];
-   my $inputfile = $_[1];
-   my $outputdir = $_[2];
-   my $outputfile = $_[3];
 #
 #  Open file for writing
 #
-   open (OUT,">$outputdir/$outputfile");
+   open (OUT,">$outputpath");
 #
 #  Open file for reading
 #
-   unless (-r "$inputdir/$inputfile") 
-          {die "Can not read from file: $inputdir/$inputfile\n";}
-   open (IN,"$inputdir/$inputfile");
+   unless (-r "$inputpath") 
+          {die "Can not read from file: $inputpath\n";}
+   open (IN,"$inputpath");
    while (<IN>) {
       chomp($_);
       my $sline = $_;
@@ -317,8 +362,7 @@ sub substituteval {
 #           Substitute all occurences of a match:
 #         
             $textline =~ s/$reg/$value/mg;
-         }
-         else {
+         } else {
             if (length($ifil) > 0) {
                print "WARNING: [==" . $vname . "==] in $ifil not found\n";
             } else {
