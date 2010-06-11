@@ -151,16 +151,22 @@ if ($mmError == 0) {
             echo $maintablestart;
             $in_table = TRUE;
             $current_ds = -1;
+            $current_dsname = "";
             for ($i1=0; $i1 <= $num;$i1++) {
                if ($i1 < $num) {
                   if ($use_only_ds == 0) {
                      $rowarr = pg_fetch_row($result,$i1);
                      $new_ds = $rowarr[2];
+                     $new_dsname = $rowarr[3];
                   } else {
                      $new_ds = $ds_arr[$i1];
                   }
                }
                if ($i1 == $num || ($current_ds >= 0 && $new_ds != $current_ds)) {
+                  if (!array_key_exists("dataref", $mdcontent) || $mdcontent["dataref"] == "") {
+                     $s1 = displayval("dataref",$current_dsname,$current_dsname);
+                     $mdcontent["dataref"] = "<p>" . $s1 . "</p>\n";
+                  }
                   $line = "<tr>";
                   if (array_key_exists($current_ds, $mmSessionState->exploded)) {
                      $btext = '-';
@@ -208,6 +214,7 @@ if ($mmError == 0) {
                }
                if ($i1 < $num) {
                   $current_ds = $new_ds;
+                  $current_dsname = $new_dsname;
                   if ($use_only_ds == 0) {
                      $s1 = displayval($rowarr[1],$rowarr[0],$rowarr[3]);
                      $mdcontent[$rowarr[1]] .= "<p>" . $s1 . "</p>\n";
