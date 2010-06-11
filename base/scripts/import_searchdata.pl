@@ -283,6 +283,7 @@ sub update_database {
                $sql_getkey_BK->execute();
                my @result = $sql_getkey_BK->fetchrow_array;
                my $bkid = $result[0];
+               $sql_getkey_BK->finish();
                $sql_insert_BK->execute($bkid,$scid,$name);
                $searchdata{"BK:" . $scid . ":" . $name} = $bkid;
 #               push (@logarr,"Added to BK: $bkid,$scid,$name");
@@ -339,6 +340,7 @@ sub hkloop {
          $sql_getkey_HK->execute();
          my @result = $sql_getkey_HK->fetchrow_array;
          $hkid = $result[0];
+         $sql_getkey_HK->finish();
          $sql_insert_HK->execute($hkid,$hkparent,$scid,$level,$name);
          $searchdata{$hashkey} = $hkid;
 #         push (@logarr,"Added to HK: $hkid,$hkparent,$scid,$level,$name");
@@ -376,6 +378,7 @@ sub hkloop {
                   $sql_getkey_BK->execute();
                   my @result = $sql_getkey_BK->fetchrow_array;
                   $bkid = $result[0];
+                  $sql_getkey_BK->finish();
                   $sql_insert_BK->execute($bkid,$scid,$name);
                   $searchdata{$hashkey} = $bkid;
 #                  push (@logarr,"Added to BK: $bkid,$scid,$name");
