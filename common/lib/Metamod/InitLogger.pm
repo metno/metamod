@@ -46,23 +46,13 @@ sub init_logger {
 
     my $config = Metamod::Config->new();
 
-    my $log_config = $config->get( 'LOG4P_CONFIG' );
-    my $log_file = $config->get( 'LOG4P_FILE' );
+    my $log_config = $config->get( 'LOG4PERL_CONFIG' );
+    my $system_log = $config->get( 'LOG4ALL_SYSTEM_LOG' );
+    my $reinit_period = $config->get( 'LOG4PERL_WATCH_TIME' ) || 10;
 
-    open my $CONFIG_FILE, '<', $log_config or die "Could not open log config file '$log_config': $!";
+    $ENV{ 'METAMOD_SYSTEM_LOG' } = $system_log;
 
-    #slurp whole file
-    my $config_contents = do { local $/; <$CONFIG_FILE> };
-
-    $ENV{ 'METAMOD_LOG_FILE' } = $log_file;
-
-    # convert from a PHP config to a Perl config
-    $config_contents =~ s/log4php\./log4perl\./g;
-    $config_contents =~ s/LoggerAppenderFile/Log::Log4perl::Appender::File/g;
-    $config_contents =~ s/LoggerLayoutPattern/Log::Log4perl::Layout::PatternLayout/g;
-    $config_contents =~ s/ConversionPattern="(.*)"/ConversionPattern=$1/g;
-
-    Log::Log4perl->init_once( \$config_contents );
+    Log::Log4perl->init_and_watch( $log_config, $reinit_period );
 
     $init_performed = 1;
     return 1;
