@@ -46,8 +46,8 @@ use 5.6.0;
 
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 my $config = Metamod::Config->new();
-our $XSLT_FILE_MM2 = $config->get("SOURCE_DIRECTORY") . '/common/schema/dif2MM2.xslt';
-our $XSLT_FILE_DS  = $config->get("SOURCE_DIRECTORY") . '/common/schema/dif2dataset.xslt';
+our $XSLT_FILE_MM2 = $Metamod::DatasetTransformer::XSLT_DIR.'dif2MM2.xslt';
+our $XSLT_FILE_DS  = $Metamod::DatasetTransformer::XSLT_DIR.'dif2dataset.xslt';
 
 sub originalFormat {
     return "DIF";

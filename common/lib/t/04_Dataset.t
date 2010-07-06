@@ -37,9 +37,7 @@ use Test::More tests => 50;
 
 use Data::Dumper qw(Dumper);
 
-# test-xslt location
-my $xsltDS = "../../schema/oldDataset2Dataset.xslt";
-my $xsltMM2 = "../../schema/oldDataset2MM2.xslt";
+BEGIN{$ENV{METAMOD_XSLT_DIR} = '../../schema/';}
 
 BEGIN {use_ok('Metamod::ForeignDataset')};
 BEGIN {use_ok('Metamod::Dataset');}
@@ -143,7 +141,7 @@ ok(eq_array(\@oldVals, \@metaVals), "removeMetadataName, oldValues");
 @oldVals = $ds->removeMetadataName('abc');
 ok(eq_array(\@oldVals, []), "removeMetadataName, really gone");
 
-my $oldDs = newFromFile Metamod::Dataset('oldDataset.xml', 'dsXslt' => $xsltDS, 'mm2Xslt' => $xsltMM2);
+my $oldDs = newFromFile Metamod::Dataset('oldDataset.xml');
 isa_ok($oldDs, 'Metamod::Dataset');
 is($oldDs->originalFormat, 'OldDataset', "old dataset: orignal format");
 %metadata = $oldDs->getMetadata;

@@ -40,9 +40,7 @@ use Carp qw();
 use Metamod::Config;
 use 5.6.0;
 
-my $config = Metamod::Config->new();
-
-our $XSLT_ISO_DIF = $config->get("SOURCE_DIRECTORY") . '/common/schema/iso2dif.xslt';
+our $XSLT_ISO_DIF = $Metamod::DatasetTransformer::XSLT_DIR . 'iso2dif.xslt';
 
 sub originalFormat {
     return "ISO19115"; 

@@ -29,7 +29,6 @@
 package Metamod::DatasetTransformer::OldDataset;
 use base qw(Metamod::DatasetTransformer);
 
-use Metamod::Config;
 use strict;
 use warnings;
 use Carp qw(carp croak);
@@ -38,9 +37,9 @@ use 5.6.0;
 
 
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
-my $config = new Metamod::Config();
-our $XSLT_FILE_MM2 = $config->get("SOURCE_DIRECTORY")."/common/schema/oldDataset2MM2.xslt";
-our $XSLT_FILE_DS =  $config->get("SOURCE_DIRECTORY")."/common/schema/oldDataset2Dataset.xslt";
+
+our $XSLT_FILE_MM2 = $Metamod::DatasetTransformer::XSLT_DIR.'oldDataset2MM2.xslt';
+our $XSLT_FILE_DS =  $Metamod::DatasetTransformer::XSLT_DIR.'oldDataset2Dataset.xslt';
 
 sub originalFormat {
     return "OldDataset";

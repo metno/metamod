@@ -36,6 +36,8 @@ use File::Spec;
 use XML::LibXML;
 use XML::LibXSLT;
 use UNIVERSAL;
+use Metamod::Config;
+
 
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 use constant DEBUG => 0;
@@ -43,6 +45,15 @@ use constant DEBUG => 0;
 # single parser
 use constant XMLParser => new XML::LibXML();
 use constant XSLTParser => new XML::LibXSLT();
+
+our $XSLT_DIR;
+if ($ENV{METAMOD_XSLT_DIR}) {
+    $XSLT_DIR = $ENV{METAMOD_XSLT_DIR}    
+} else {
+    my $config = Metamod::Config->new();
+    $XSLT_DIR = $config->get("SOURCE_DIRECTORY") . '/common/schema/';   
+}
+ 
 
 sub new {
     die "'new' not implemented yet in $_[0]: new(\$dataStr)\n";
@@ -115,6 +126,26 @@ sub getPlugins {
     return @plugins;
 }
 
+# difficult to unit-test, since options for $plugin->new are unknown (xslt files)
+sub autodetect {
+    my ($arg) = @_;
+    return unless $arg;
+    my $fds;
+    if (UNIVERSAL::isa($arg, "Metamod::ForeignDataset")) {
+        $fds = $arg;
+    } else {
+        $fds = Metamod::ForeignDataset->newFromFile($arg);
+    }
+    my @plugins = Metamod::DatasetTransformer::getPlugins();
+    foreach my $plugin (@plugins) {
+        my $p = $plugin->new($fds->getDS_XML(), $fds->getMETA_XML());
+        if ($p->test) {
+            return $p;
+        }
+    }
+    return undef;
+}
+
 sub test {
     die "'test' not implemented in $_[0] yet\n";
 }
@@ -132,7 +163,7 @@ __END__
 
 =head1 NAME
 
-Metamod::DatasetTransformer - interface to transform datasets
+Metamod::DatasetTransformer - interface to transform datasets to internal MM2 presentation
 
 =head1 SYNOPSIS
 
@@ -143,10 +174,29 @@ Metamod::DatasetTransformer - interface to transform datasets
   if ($implX->test) {
       my ($dsDoc, $mm2Doc) = $implX->transform;
   }
+  
+  # or
+  my $implX = autodetect Metamod::DatasetTransfomer("filename");
+  ...
 
 =head1 DESCRIPTION
 
-=head1 FUNCTIONS
+The DatasetTransformer transform datasets from different plugin formats
+to the internally used MM2 format.
+
+=head2 VARIABLES
+
+=over 4
+
+=item $XSLT_DIR
+
+Default directory of XSLT files. Uses ENV{METAMOD_XSLT_DIR} or 
+$config->get("SOURCE_DIRECTORY") . '/common/schema/'. The ENV part
+is mainly thought for testing independently of config.
+
+=back
+
+=head2 FUNCTIONS
 
 =over 4
 
@@ -177,6 +227,15 @@ Return: ($xmdContent, $xmlContent)
 load and return list of plugins
 
 Return: @array = (Metamod::DatasetTransformer::Impl1, Metamod::DatasetTransformer::Impl2, ...)
+
+=back
+
+=item autodetect($foreignDataset|$baseFileName)
+
+Create a datasettransformer from a Metamod::ForeignDataset or from a file. Try to autodetect
+the plugin from all available plugins.
+
+Return: $datasetTransformer
 
 =back
 

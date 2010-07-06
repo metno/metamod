@@ -35,14 +35,13 @@ use Data::Dumper qw(Dumper);
 use lib "..";
 use Test::More tests => 19;
 
-BEGIN {use_ok('Metamod::DatasetTransformer::DIF');}
+BEGIN{$ENV{METAMOD_XSLT_DIR} = '../../schema/';}
 
-my $xsltDS = "../../schema/dif2dataset.xslt";
-my $xsltMM2 = "../../schema/dif2MM2.xslt";
+BEGIN {use_ok('Metamod::DatasetTransformer::DIF');}
 
 my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent("exampleDIF");
 
-my $obj = new Metamod::DatasetTransformer::DIF($xmdStr, $xmlStr, 'dsXslt' => $xsltDS, 'mm2Xslt' => $xsltMM2 );
+my $obj = new Metamod::DatasetTransformer::DIF($xmdStr, $xmlStr);
 isa_ok($obj, 'Metamod::DatasetTransformer');
 isa_ok($obj, 'Metamod::DatasetTransformer::DIF');
 ok($obj->test, "test correct file");
@@ -61,13 +60,13 @@ is_deeply(\%bb, {north => '90.00', south => '-90.00', east => '180.00', west => 
 my @polygons = $dr->getPolygons;
 is(2, scalar @polygons, "two polygons transformed from DIF"); 
 
-my $obj2 = new Metamod::DatasetTransformer::DIF('bla', 'blub', 'dsXslt' => $xsltDS );
+my $obj2 = new Metamod::DatasetTransformer::DIF('bla', 'blub');
 isa_ok($obj2, 'Metamod::DatasetTransformer::DIF');
 is($obj2->test, 0, "test invalid file");
 
 
 my ($xmdStr2, $xmlStr2) = Metamod::DatasetTransformer::getFileContent("exampleMM2");
-my $obj3 = new Metamod::DatasetTransformer::DIF($xmdStr2, $xmlStr2, 'dsXslt' => $xsltDS, 'mm2Xslt' => $xsltMM2  );
+my $obj3 = new Metamod::DatasetTransformer::DIF($xmdStr2, $xmlStr2);
 isa_ok($obj3, 'Metamod::DatasetTransformer::DIF');
 is($obj3->test, 0, "test dataset2 file");
 eval {
@@ -79,7 +78,7 @@ ok($@, "die on wrong transform");
     my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent("exampleDIF");
     my $xmdDoc = Metamod::DatasetTransformer->XMLParser()->parse_string($xmdStr) if $xmdStr;
     my $xmlDoc = Metamod::DatasetTransformer->XMLParser()->parse_string($xmlStr);
-    my $obj = new Metamod::DatasetTransformer::DIF($xmdDoc, $xmlDoc, 'dsXslt' => $xsltDS, 'mm2Xslt' => $xsltMM2 );
+    my $obj = new Metamod::DatasetTransformer::DIF($xmdDoc, $xmlDoc);
     isa_ok($obj, 'Metamod::DatasetTransformer');
     isa_ok($obj, 'Metamod::DatasetTransformer::DIF');
     ok($obj->test, "test correct file by doc");
