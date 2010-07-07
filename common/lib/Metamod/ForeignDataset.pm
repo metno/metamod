@@ -519,7 +519,7 @@ The xml file is mapped to foreign and the xmd file is mapped to $dataset. See L<
 Return: $dataset object
 Dies on missing xml-file, or on invalid xml-strings in xml or xmd files.
 
-=item newFromFileAutodetect($basename)
+=item newFromFileAutocomplete($basename)
 
 Read a dataset from a file. If only a .xml file is given without .xml file,
 try to autdetect the DatasetTransformer plugin and let it generate the xmd information. 
