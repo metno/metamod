@@ -46,6 +46,7 @@ sub getTargetDir {
 use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
 use Metamod::Dataset;
 use MetNo::NcFind;
+use Metamod::Config qw(:init_logger);
 
 $Args{O} = 'http://thredds.met.no/thredds/';
 $Args{D} = '/metno/damocles/data/';

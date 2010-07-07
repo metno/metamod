@@ -54,7 +54,7 @@ use Metamod::Dataset;
 use Metamod::ForeignDataset;
 use Metamod::DatasetTransformer::DIF;
 use Metamod::Utils qw();
-use Metamod::Config;
+use Metamod::Config qw(:init_logger);
 my $config = Metamod::Config->new();
 # use encoding 'utf8';
 #

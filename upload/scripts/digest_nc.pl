@@ -50,7 +50,7 @@ use MetNo::NcFind;
 use quadtreeuse;
 use Data::Dumper;
 use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
-use Metamod::Config;
+use Metamod::Config qw(:init_logger);
 my $masterconfig = new Metamod::Config();
 
 #

@@ -57,7 +57,7 @@ use File::Path qw(mkpath);
 use Metamod::Utils qw(findFiles isNetcdf trim);
 use Metamod::Dataset;
 use Metamod::DatasetTransformer;
-use Metamod::Config;
+use Metamod::Config qw(:init_logger);
 my $config = new Metamod::Config;
 
 use constant DEBUG => 0;

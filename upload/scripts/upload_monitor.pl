@@ -52,6 +52,7 @@ use Mail::Mailer;
 use mmTtime;
 use Metamod::Utils qw(findFiles getFiletype remove_cr_from_file);
 use Metamod::Dataset;
+use Metamod::Config qw(:init_logger);
 use Uploadutils qw(notify_web_system
                    get_dataset_institution
                    shcommand_scalar
