@@ -45,6 +45,9 @@ BEGIN {
 
 our %_config; #_config{file} => $config
 
+# we only initialise the logger once during the entire run. Different configuration
+# files cannot have their own logger config.
+our $_logger_initialised;
 
 sub new {
 	my ($class, $file) = @_;
@@ -54,7 +57,7 @@ sub new {
 		$fileFlag = "default";
 	}
 	if ((! -f $file) and (! -r _)) {
-        die "Cannot read $fileFlag config-file: $file";		
+        die "Cannot read $fileFlag config-file: $file";
 	}
     $file = _normalizeFile($file);
 	unless (exists $_config{$file}) {
@@ -75,7 +78,7 @@ sub _getDefaultConfigFile {
     pop @dirs; # remove last /
     print STDERR "dir of Metamod: ".scalar @dirs." ". File::Spec->catdir(@dirs). " $dir\n" if $DEBUG;
     # go up to dirs
-    pop @dirs; 
+    pop @dirs;
     print STDERR "dir of intermediate: ".scalar @dirs." ". File::Spec->catdir(@dirs)."\n" if $DEBUG;
     pop @dirs;
     print STDERR "dir of master_config: ".scalar @dirs." ". File::Spec->catdir(@dirs)."\n" if $DEBUG;
@@ -91,7 +94,7 @@ sub _normalizeFile {
 sub get {
 	my ($self, $var) = @_;
 	return undef unless $var;
-	
+
 	$self->_checkFile();
 	return $self->_substituteVariable($var);
 }
@@ -122,9 +125,9 @@ sub _readConfig {
     my $line = "";
     while (defined (my $line = <$fh>)) {
         chomp($line);
-        #   
+        #
         #     Check if expression matches RE:
-        #   
+        #
         if ($line =~ /^[A-Z0-9_#!]/ && $varname ne "") {
             if (length($origname) > 0) {
                 $conf{$varname . ':' . $origname . ':' . $newname} = $value;
@@ -152,7 +155,7 @@ sub _readConfig {
     if ($varname ne "") {
         $conf{$varname} = $value;
     }
-    
+
 
 	$self->{vars} = \%conf;
 	close $fh;
@@ -165,8 +168,8 @@ sub _substituteVariable {
 	return $conf{$var} unless $conf{$var}; # return undef/empty
 
     my $textline = $conf{$var};
-    
-    my $maxSubst = 40; 
+
+    my $maxSubst = 40;
     my $substNo = 0;
     # replace variable with the config-values recursively
     while ($textline =~ s/\[==([A-Z0-9_]+)==\]/$conf{$1}/ && (++$substNo < $maxSubst)) {
@@ -178,6 +181,62 @@ sub _substituteVariable {
     return $textline;
 }
 
+sub initLogger {
+    my ($self, $filename) = @_;
+
+    return if( $_logger_initialised );
+
+    my $log_config = $self->get( 'LOG4PERL_CONFIG' );
+    my $system_log = $self->get( 'LOG4ALL_SYSTEM_LOG' );
+    my $reinit_period = $self->get( 'LOG4PERL_WATCH_TIME' ) || 10;
+
+    if( !$log_config ) {
+        die 'Missing LOG4PERL_CONFIG variable in the config file';
+    }
+
+    if( !( -r $log_config ) ){
+        die "Cannot read from '$log_config'";
+    }
+
+    $ENV{ 'METAMOD_SYSTEM_LOG' } = $system_log;
+
+    require Log::Log4perl;
+    Log::Log4perl->init_and_watch( $log_config, $reinit_period );
+
+    $_logger_initialised = 1;
+    return 1;
+
+
+}
+
+sub staticInitLogger {
+    my ($filename) = @_;
+
+    my $config = __PACKAGE__->new($filename);
+
+    return $config->initLogger();
+
+}
+
+sub import {
+    my $package = shift;
+
+    foreach my $parameter ( @_ ){
+
+        if( $parameter =~ /:init_logger/ ){
+
+            my $config_file;
+
+            # allow the use of none standard location of the config file. This is functionality
+            # is meant primarily for unit testing purposes
+            if( exists $ENV{ METAMOD_MASTER_CONFIG } ){
+                $config_file = $ENV{ METAMOD_MASTER_CONFIG };
+            }
+
+            staticInitLogger($config_file);
+        }
+    }
+}
 
 1;
 __END__
@@ -189,14 +248,16 @@ Metamod::Config - get runtime configuration environment
 =head1 SYNOPSIS
 
   use Metamod::Config;
-  
+
   my $config = new Metamod::Config("configFilePath");
-  my $var = $config->get("configVar"); 
-  
+  my $var = $config->get("configVar");
+
+  # initialise the logger at compile time
+  use Metamod::Config qw( :init_logger );
 
 =head1 DESCRIPTION
 
-This module can be used to read the con
+This module can be used to read the configuration file.
 
 =head1 FUNCTIONS
 
@@ -219,10 +280,24 @@ if the same config file is opened several times.
 
 =item get("configVar")
 
-return the configuration variable configVar as currently set. This will reread the 
+return the configuration variable configVar as currently set. This will reread the
 config-file each time it has been changed.
 
+=item initLogger()
+
+Initialise a Log::Log4perl logger.
+
+=item staticInitLogger([$path_to_master_config])
+
+Static/class version of C<initLogger()>. Will first create a config object
+and then initialise the logger with C<initLogger()>.
+
+The $path_to_master_config parameter is optional and if not supplied the default master config
+will be used.
+
 =back
+
+
 
 
 =head1 AUTHOR
