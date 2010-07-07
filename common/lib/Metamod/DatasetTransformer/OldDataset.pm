@@ -32,11 +32,13 @@ use base qw(Metamod::DatasetTransformer);
 use strict;
 use warnings;
 use Carp qw(carp croak);
+use Log::Log4perl;
 
 use 5.6.0;
 
 
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
+my $logger = Log::Log4perl::get_logger('metamod::common::DatasetTransformer::OldDataset');
 
 our $XSLT_FILE_MM2 = $Metamod::DatasetTransformer::XSLT_DIR.'oldDataset2MM2.xslt';
 our $XSLT_FILE_DS =  $Metamod::DatasetTransformer::XSLT_DIR.'oldDataset2Dataset.xslt';
@@ -63,15 +65,15 @@ sub test {
     my $self = shift;
     # test on xml-file of xmlStr
     unless ($self->{xmlStr}) {
-        warn "no data" if ($self->DEBUG);
+        $logger->debug("no data");
         return 0; # no data
     }
     unless ($self->{oldDoc}) {
         eval {
             $self->{oldDoc} = $self->XMLParser->parse_string($self->{xmlStr});
         }; # do nothing on error, $doc stays empty
-        if ($@ && $self->DEBUG) {
-            warn "$@\n";
+        if ($@) {
+            $logger->debug("$@");
         }
     }
     return 0 unless $self->{oldDoc}; # $doc not initialized
@@ -81,8 +83,8 @@ sub test {
     my $nodeList = $root->findnodes('/dataset/@ownertag');
     if ($nodeList->size() == 1) {
         return 1;
-    } elsif ($self->DEBUG) {
-        warn "found ".$nodeList->size." nodes with /dataset/\@ownertag\n";
+    } else {
+        $logger->debug("found ".$nodeList->size." nodes with /dataset/\@ownertag\n");
     }
     return 0;
 }

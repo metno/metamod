@@ -41,6 +41,7 @@ BEGIN{$ENV{METAMOD_XSLT_DIR} = '../../schema/';}
 
 BEGIN {use_ok('Metamod::ForeignDataset')};
 BEGIN {use_ok('Metamod::Dataset');}
+Log::Log4perl::init( "log4perl_config.ini" );
 
 my $string = pack('U4',"65","66","31","67");
 

@@ -37,10 +37,11 @@ use XML::LibXML;
 use XML::LibXSLT;
 use UNIVERSAL;
 use Metamod::Config;
-
+use Log::Log4perl;
 
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
-use constant DEBUG => 0;
+
+my $logger = Log::Log4perl::get_logger('metamod::common::Metamod::DatasetTransformer');
 
 # single parser
 use constant XMLParser => new XML::LibXML();
@@ -77,9 +78,9 @@ sub getFileContent {
         $self = __PACKAGE__;
     }
     $file = $self->getBasename($file);
-    my $xmdFile = "$file.xmd" if -f "$file.xmd";
-    my $xmlFile = "$file.xml" if -f "$file.xml";
-    warn "Base + xml + xmd: $file : $xmdFile : $xmlFile" if $self->DEBUG;
+    my $xmdFile = -f "$file.xmd" ? "$file.xmd" : '';
+    my $xmlFile = -f "$file.xml" ? "$file.xml" : '';
+    $logger->debug("Base + xml + xmd: $file : $xmdFile : $xmlFile");
     my ($md, $ml);
     if ($xmdFile) {
         open $md, $xmdFile or die "cannot read $xmdFile: $!\n";
@@ -114,6 +115,7 @@ sub getPlugins {
     
     my @plugins;
     foreach my $file (@files) {
+        next if substr($file, 0, 2) eq 'To'; # Ignore modules To other formats 
         my $plugin = __PACKAGE__ . "::$file";
         $plugin =~ s/\.pm$//;
         eval "require $plugin";
@@ -224,7 +226,8 @@ Return: ($xmdContent, $xmlContent)
 
 =item getPlugins
 
-load and return list of plugins
+load and return list of plugins, that are packages below Metamod::DatasetTransformer, not starting
+with "To"
 
 Return: @array = (Metamod::DatasetTransformer::Impl1, Metamod::DatasetTransformer::Impl2, ...)
 

@@ -29,7 +29,6 @@
 package Metamod::DatasetTransformer::DIF;
 use base qw(Metamod::DatasetTransformer);
 
-use constant DEBUG => 0;
 
 use strict;
 use warnings;
@@ -39,6 +38,7 @@ use Carp qw();
 use quadtreeuse;
 use mmTtime;
 use Metamod::Config;
+use Log::Log4perl;
 #use Dataset; # required later, so we don't have circular 'use'
 
 use 5.6.0;
@@ -48,6 +48,7 @@ our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", 
 my $config = Metamod::Config->new();
 our $XSLT_FILE_MM2 = $Metamod::DatasetTransformer::XSLT_DIR.'dif2MM2.xslt';
 our $XSLT_FILE_DS  = $Metamod::DatasetTransformer::XSLT_DIR.'dif2dataset.xslt';
+my $logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
 
 sub originalFormat {
     return "DIF";
@@ -72,7 +73,7 @@ sub test {
     my $self = shift;
     # test on xml-file of xmlStr
     unless ($self->{xmlStr}) {
-        warn "no data" if ($self->DEBUG);
+        $logger->debug("no data");
         return 0; # no data
     }
     unless ($self->{difDoc}) {
@@ -82,8 +83,8 @@ sub test {
             eval {
                 $self->{difDoc} = $self->XMLParser->parse_string($self->{xmlStr});
             }; # do nothing on error, $doc stays empty
-            if ($@ && $self->DEBUG) {
-                warn "$@\n";
+            if ($@) {
+                $logger->debug("$@\n");
             }
         }
     }
@@ -99,8 +100,8 @@ sub test {
     my $nodeList = $xpc->findnodes('/dif:DIF', $root);
     if ($nodeList->size() == 1) {
         $isDIF = 1;
-    } elsif ($self->DEBUG) {
-        warn "found ".$nodeList->size." nodes with /dif:DIF\n";
+    } else {
+        $logger->debug("found ".$nodeList->size." nodes with /dif:DIF\n");
     }
     
     my $isDS = 1;
@@ -114,8 +115,8 @@ sub test {
                 eval {
                     $self->{dsDoc} = $self->XMLParser->parse_string($self->{xmdStr});
                 }; # do nothing on error, $doc stays empty
-                if ($@ && $self->DEBUG) {
-                    warn "$@ during xmdStr parsing\n";
+                if ($@) {
+                    $logger->debug("$@ during xmdStr parsing\n");
                 }
             }
         }
@@ -125,8 +126,8 @@ sub test {
         my $nList = $xpc->findnodes('/d:dataset/d:info/@ownertag', $root);
         if ($nodeList->size() == 1) {
             $isDS = 1;
-        } elsif ($self->DEBUG) {
-            warn "could not find /d:dataset/d:info/\@ownertag\n";
+        } else {
+            $logger->debug("could not find /d:dataset/d:info/\@ownertag\n");
         }
     }
     return $isDS && $isDIF;
@@ -217,7 +218,7 @@ sub transform {
                     } else {
                         $datasetRegion->addPolygon([[$eLon, $nLat], [$eLon, $sLat], [$wLon, $sLat], [$wLon, $nLat], [$eLon, $nLat]]);
                     }
-                    print STDERR "adding polygon [[$eLon, $nLat], [$eLon, $sLat], [$wLon, $sLat], [$wLon, $nLat], [$eLon, $nLat]]\n" if $self->DEBUG;
+                    $logger->debug("adding polygon [[$eLon, $nLat], [$eLon, $sLat], [$wLon, $sLat], [$wLon, $nLat], [$eLon, $nLat]]\n");
                     # and now the quadtree
                     my $qtu = new quadtreeuse(90, 0, 3667387.2, 7, "+proj=stere +lat_0=90 +datum=WGS84");
                     if (defined $sLat && defined $nLat && defined $wLon && defined $eLon) {

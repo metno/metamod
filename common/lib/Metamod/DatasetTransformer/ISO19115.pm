@@ -31,16 +31,16 @@ use base qw(Metamod::DatasetTransformer);
 
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 
-use constant DEBUG => 0;
-
 use strict;
 use warnings;
 use encoding 'utf-8';
 use Carp qw();
 use Metamod::Config;
+use Log::Log4perl;
 use 5.6.0;
 
 our $XSLT_ISO_DIF = $Metamod::DatasetTransformer::XSLT_DIR . 'iso2dif.xslt';
+my $logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
 
 sub originalFormat {
     return "ISO19115"; 
@@ -69,7 +69,7 @@ sub test {
     my $self = shift;
     # test on xml-file of xmlStr
     unless ($self->{xmlStr}) {
-        warn "no data" if ($self->DEBUG);
+        $logger->debug("no data");
         return 0; # no data
     }
     
@@ -77,8 +77,8 @@ sub test {
         eval {
             $self->{isoDoc} = $self->XMLParser->parse_string($self->{xmlStr});
         }; # do nothing on error, $doc stays empty
-        if ($@ && $self->DEBUG) {
-            warn "$@\n";
+        if ($@) {
+            $logger->debug("$@\n");
         }
     }
     return 0 unless $self->{isoDoc}; # $doc not initialized
@@ -93,8 +93,8 @@ sub test {
     my $nodeList = $xpc->findnodes('/gmd:MD_Metadata', $root);
     if ($nodeList->size() == 1) {
         $isISO = 1;
-    } elsif ($self->DEBUG) {
-        warn "found ".$nodeList->size." nodes with /gmd:MD_Metadata\n";
+    } else {
+        $logger->debug("found ".$nodeList->size." nodes with /gmd:MD_Metadata\n");
     }
     
     my $isDS = 1;
@@ -105,8 +105,8 @@ sub test {
             eval {
                 $self->{dsDoc} = $self->XMLParser->parse_string($self->{xmdStr});
             }; # do nothing on error, $doc stays empty
-            if ($@ && $self->DEBUG) {
-                warn "$@ during xmdStr parsing\n";
+            if ($@) {
+                $logger->debug("$@ during xmdStr parsing\n");
             }
         }
         return 0 unless $self->{dsDoc};
@@ -115,16 +115,16 @@ sub test {
         my $nList = $xpc->findnodes('/d:dataset/d:info/@ownertag', $root);
         if ($nodeList->size() == 1) {
             $isDS = 1;
-        } elsif ($self->DEBUG) {
-            warn "could not find /d:dataset/d:info/\@ownertag\n";
+        } else {
+            $logger->debug("could not find /d:dataset/d:info/\@ownertag\n");
         }
     }
     if ($isDS && $isISO) {
         # convert iso to dif already in test, to make sure DIF2MM2-test succeeds
-        warn "testing dif-conversion" if $self->DEBUG;
+        $logger->debug("testing dif-conversion");
         my $difDoc;
         {
-            warn "reading file: ". $self->{iso2difXslt} if $self->DEBUG;
+            $logger->debug("reading file: ". $self->{iso2difXslt});
             my $styleDoc = $self->XMLParser->parse_file($self->{iso2difXslt});
             my $stylesheet = $self->XSLTParser->parse_stylesheet($styleDoc);
             $difDoc = $stylesheet->transform($self->{isoDoc});
@@ -137,10 +137,10 @@ sub test {
         $self->{difTransformer} = $difDT;
         
         my $difTestResult = $difDT->test;
-        warn "dif-conversionn result: $difTestResult\n" if $self->DEBUG; 
+        $logger->debug(warn "dif-conversionn result: $difTestResult\n"); 
         return $difTestResult; 
     } else {
-        warn "isDataset, isISO: $isDS, $isISO\n" if $self->DEBUG; 
+        $logger->debug("isDataset, isISO: $isDS, $isISO\n"); 
         return 0;
     }
 }

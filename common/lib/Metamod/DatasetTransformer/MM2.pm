@@ -34,8 +34,10 @@ use strict;
 use warnings;
 use Carp qw(carp croak);
 use UNIVERSAL qw( );
+use Log::Log4perl;
 
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
+my $logger = Log::Log4perl::get_logger('metamod::common::Metamod::DatasetTransformer::MM2');
 
 sub originalFormat {
     return "MM2";
@@ -70,12 +72,12 @@ sub test {
             $self->{dsDoc} = $self->XMLParser->parse_string($self->{xmdStr}) if $self->{xmdStr};
             $self->{mm2Doc} = $self->XMLParser->parse_string($self->{xmlStr}) if $self->{xmlStr};
         }; # do nothing on error, doc stays empty
-        if ($self->DEBUG && $@) {
-            warn "$@\n";
+        if ($@) {
+            $logger->debug("$@\n");
         }
     }
     unless ($self->{dsDoc} && $self->{mm2Doc}) {
-        warn "not both documents initialized" if $self->DEBUG;
+        $logger->debug("not both documents initialized");
         return 0;
     }
 
@@ -89,8 +91,8 @@ sub test {
         my $nodeList = $xpc->findnodes('/d:dataset/d:info/@ownertag', $root);
         if ($nodeList->size() == 1) {
             $success++;
-        } elsif ($self->DEBUG) {
-            warn "could not find /d:dataset/d:info/\@ownertag\n";
+        } else {
+            $logger->debug("could not find /d:dataset/d:info/\@ownertag\n");
         }
     }
     { # test MM2
@@ -98,8 +100,8 @@ sub test {
         my $nodeList = $xpc->findnodes('/m:MM2', $root);
         if ($nodeList->size() == 1) {
             $success++;
-        } elsif ($self->DEBUG) {
-           warn "could not find /m:MM2\n";
+        } else {
+           $logger->debug("could not find /m:MM2\n");
         }
     }
     return 1 if $success == 2;

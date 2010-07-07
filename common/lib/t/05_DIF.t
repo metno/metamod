@@ -38,6 +38,7 @@ use Test::More tests => 19;
 BEGIN{$ENV{METAMOD_XSLT_DIR} = '../../schema/';}
 
 BEGIN {use_ok('Metamod::DatasetTransformer::DIF');}
+Log::Log4perl::init( "log4perl_config.ini" );
 
 my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent("exampleDIF");
 

@@ -8,6 +8,7 @@ use Data::Dumper;
 
 BEGIN{$ENV{METAMOD_XSLT_DIR} = '../../schema/';}
 BEGIN {use_ok('Metamod::DatasetTransformer::ISO19115')};
+Log::Log4perl::init( "log4perl_config.ini" );
 
 my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent("exampleISO19115");
 

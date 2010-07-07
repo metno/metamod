@@ -34,6 +34,7 @@ use lib "..";
 use Test::More tests => 10;
 
 BEGIN {use_ok('Metamod::DatasetTransformer::MM2');}
+Log::Log4perl::init( "log4perl_config.ini" );
 
 my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent("exampleMM2");
 
