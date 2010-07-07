@@ -45,7 +45,10 @@ class MMConfig {
 	static private $_configs = array(); # storage of filename => MMConfig
 	private $filename;
 	private $vars = array();
-	
+
+	# flag to ensure that the logger is only initialised once
+	private static $loggerInitialised = false;
+
 	/**
 	 * Retrieve an MMConfig object for the filename.
 	 * 
@@ -155,6 +158,41 @@ class MMConfig {
 			trigger_error("Circular substitution in ".$this->filename." for $var", E_USER_ERROR);		
 		}
 		return $val;
+	}
+
+	/**
+	 * Initialise the logger defined in the configuration file.
+	 */
+	public function initLogger(){
+
+        require_once("../log4php/Logger.php");
+
+		if( MMConfig::$loggerInitialised ){
+			return;
+		}
+		# we manipulate the environment so that LoggerConfiguratorIni will use the log file
+		# specified in the master_config.txt
+		putenv( "METAMOD_SYSTEM_LOG=" . $this->getVar('LOG4ALL_SYSTEM_LOG') );
+
+		$config_file = $this->getVar('LOG4PHP_CONFIG');
+		Logger::configure( $config_file );
+
+		MMConfig::$loggerInitialised = true;
+
+	}
+
+	/**
+	 * Initialise a logger without having a MMConfig object first.
+	 *
+	 * Will automatically create a MMConfig object for you which is returned.
+	 *
+	 * @param string $file Optional parameter containing the name of the master config file.
+	 */
+	public static function getInstanceWithLogger($file = ''){
+		$config = MMConfig::getInstance($file);
+		$config->initLogger();
+
+		return $config;
 	}
 }
 
