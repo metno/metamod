@@ -106,7 +106,7 @@ $testFD->setDatasetRegion($region);
 my $outRegion = $testFD->getDatasetRegion;
 isa_ok($outRegion, 'Metamod::DatasetRegion');
 ok($outRegion->equals($region), 'region put == region get');
-my $str = $testFD->getDS_XML();
+my $str = $testFD->getXMD_XML();
 ok($str =~ /<lonLatPoints/, 'dataset contains lonLatPoints');
 
 ok(Metamod::ForeignDataset->deleteDatasetFile("test"), "delete dataset");
@@ -127,7 +127,7 @@ ok(ref $ds, "reading dataset with umlauts");
 is($newMeta{umlauts}[0], $umlauts, "correctly reading umlauts");
 unlink "test.xml"; unlink "test.xmd";
 
-my $dsClone = $ds->getDS_DOC;
+my $dsClone = $ds->getXMD_DOC;
 my $mmClone = $ds->getMETA_DOC;
 my $dsc = Metamod::Dataset->newFromDoc($mmClone, $dsClone);
 my %oldHash = $ds->getInfo;

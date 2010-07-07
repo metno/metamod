@@ -48,9 +48,9 @@ sub new {
         croak ("new " . __PACKAGE__ . " needs argument (package, xmdStr, xmlStr), got: @_\n");
     }
     my ($class, $xmd, $xml, %options) = @_; # %options not used yet
-    my ($xmdStr, $xmlStr, $mm2Doc, $dsDoc);
+    my ($xmdStr, $xmlStr, $mm2Doc, $xmdDoc);
     if (UNIVERSAL::isa($xmd, 'XML::LibXML::Node') and UNIVERSAL::isa($xml, 'XML::LibXML::Node')) {
-        $dsDoc = $xmd;
+        $xmdDoc = $xmd;
         $mm2Doc = $xml;
     } else {
         $xmdStr = $xmd;
@@ -59,7 +59,7 @@ sub new {
     my $self = {xmdStr => $xmdStr,
                 xmlStr => $xmlStr,
                 mm2Doc => $mm2Doc, # init in test, unless given as doc
-                dsDoc =>  $dsDoc,  # init in test, unless given as doc
+                xmdDoc =>  $xmdDoc,  # init in test, unless given as doc
                };
     return bless $self, $class;
 }
@@ -67,16 +67,16 @@ sub new {
 sub test {
     my $self = shift;
 
-    if (!$self->{dsDoc}) { # start initializing
+    if (!$self->{xmdDoc}) { # start initializing
         eval {
-            $self->{dsDoc} = $self->XMLParser->parse_string($self->{xmdStr}) if $self->{xmdStr};
+            $self->{xmdDoc} = $self->XMLParser->parse_string($self->{xmdStr}) if $self->{xmdStr};
             $self->{mm2Doc} = $self->XMLParser->parse_string($self->{xmlStr}) if $self->{xmlStr};
         }; # do nothing on error, doc stays empty
         if ($@) {
             $logger->debug("$@\n");
         }
     }
-    unless ($self->{dsDoc} && $self->{mm2Doc}) {
+    unless ($self->{xmdDoc} && $self->{mm2Doc}) {
         $logger->debug("not both documents initialized");
         return 0;
     }
@@ -87,7 +87,7 @@ sub test {
 
     my $success = 0;
     { # test dataset
-        my $root = $self->{dsDoc}->getDocumentElement();
+        my $root = $self->{xmdDoc}->getDocumentElement();
         my $nodeList = $xpc->findnodes('/d:dataset/d:info/@ownertag', $root);
         if ($nodeList->size() == 1) {
             $success++;
@@ -98,10 +98,9 @@ sub test {
     { # test MM2
         my $root = $self->{mm2Doc}->getDocumentElement();
         my $nodeList = $xpc->findnodes('/m:MM2', $root);
+        $logger->debug("found ".$nodeList->size()." elements of /m:MM2\n");
         if ($nodeList->size() == 1) {
             $success++;
-        } else {
-           $logger->debug("could not find /m:MM2\n");
         }
     }
     return 1 if $success == 2;
@@ -112,7 +111,7 @@ sub transform {
     my $self = shift;
     croak("Cannot run transform if test fails\n") unless $self->test;
     
-    return ($self->{dsDoc}, $self->{mm2Doc});
+    return ($self->{xmdDoc}, $self->{mm2Doc});
 }
 
 1;

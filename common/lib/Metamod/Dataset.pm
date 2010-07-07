@@ -58,16 +58,16 @@ sub new {
 }
 
 sub newFromDoc {
-    my ($class, $foreign, $dataset, %options) = @_;
+    my ($class, $foreign, $xmdXML, %options) = @_;
     die "no metadata" unless $foreign;
-    unless ($dataset) {
+    unless ($xmdXML) {
         my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime(mmTtime::ttime()));
-        my $dataset = $class->DATASET;
-        $dataset =~ s/\Q1970-01-01T00:00:00Z\E/$sDate/g; # changes datestamp and creationDate
-        $dataset =~ s/metadataFormat=""/metadataFormat="MM2"/g;
+        my $xmdXML = $class->DATASET;
+        $xmdXML =~ s/\Q1970-01-01T00:00:00Z\E/$sDate/g; # changes datestamp and creationDate
+        $xmdXML =~ s/metadataFormat=""/metadataFormat="MM2"/g;
     }
     my $parser = Metamod::DatasetTransformer->XMLParser;
-    my $docDS = UNIVERSAL::isa($dataset, 'XML::LibXML::Document') ? $dataset : $parser->parse_string($dataset);
+    my $docDS = UNIVERSAL::isa($xmdXML, 'XML::LibXML::Document') ? $xmdXML : $parser->parse_string($xmdXML);
     my $docMETA = UNIVERSAL::isa($foreign, 'XML::LibXML::Document') ? $foreign : $parser->parse_string($foreign);
     my $mdmm2 = new Metamod::DatasetTransformer::MM2($docDS, $docMETA, %options);
     die "not MM2 metadata" unless $mdmm2->test;
@@ -231,7 +231,7 @@ Return: $dataset object
 
 see L<Metamod::ForeignDataset>
 
-=item getDS_XML
+=item getXMD_XML
 
 see L<Metamod::ForeignDataset>
 

@@ -54,12 +54,12 @@ sub new {
     my $self = {xmdStr => $xmdStr,
                 xmlStr => $xmlStr,
                 isoDoc => undef, # init by test
-                dsDoc => undef,
+                xmdDoc => undef,
                 iso2difXslt => $options{iso2difXslt} || $XSLT_ISO_DIF,
                 difTransformer => undef,
                };
     # options to be forwarded to DIF2MM2 conversion
-    $self->{dsXslt} = $options{dsXslt} if exists $options{dsXslt};
+    $self->{xmdXslt} = $options{xmdXslt} if exists $options{xmdXslt};
     $self->{mm2Xslt} = $options{mm2Xslt} if exists $options{mm2Xslt};
     
     return bless $self, $class;
@@ -91,25 +91,24 @@ sub test {
     my $isISO = 0;
     my $root = $self->{isoDoc}->getDocumentElement();
     my $nodeList = $xpc->findnodes('/gmd:MD_Metadata', $root);
+    $logger->debug("found ".$nodeList->size." nodes with /gmd:MD_Metadata\n");
     if ($nodeList->size() == 1) {
         $isISO = 1;
-    } else {
-        $logger->debug("found ".$nodeList->size." nodes with /gmd:MD_Metadata\n");
     }
     
     my $isDS = 1;
     if ($self->{xmdStr}) {
         $isDS = 0; # reset to 0, might fail
         # test optional xmdStr (if xmd file has been created earlier)
-        unless ($self->{dsDoc}) {
+        unless ($self->{xmdDoc}) {
             eval {
-                $self->{dsDoc} = $self->XMLParser->parse_string($self->{xmdStr});
+                $self->{xmdDoc} = $self->XMLParser->parse_string($self->{xmdStr});
             }; # do nothing on error, $doc stays empty
             if ($@) {
                 $logger->debug("$@ during xmdStr parsing\n");
             }
         }
-        return 0 unless $self->{dsDoc};
+        return 0 unless $self->{xmdDoc};
         
         my $dsRoot = $self->{isoDoc}->getDocumentElement();
         my $nList = $xpc->findnodes('/d:dataset/d:info/@ownertag', $root);
@@ -131,9 +130,9 @@ sub test {
         }
         my %options;
         $options{mm2Xslt} = $self->{mm2Xslt} if exists $self->{mm2Xslt};
-        $options{dsXslt} = $self->{dsXslt} if exists $self->{dsXslt};
+        $options{xmdXslt} = $self->{xmdXslt} if exists $self->{xmdXslt};
         require Metamod::DatasetTransformer::DIF;
-        my $difDT = new Metamod::DatasetTransformer::DIF($self->{dsDoc}, $difDoc, %options);
+        my $difDT = new Metamod::DatasetTransformer::DIF($self->{xmdDoc}, $difDoc, %options);
         $self->{difTransformer} = $difDT;
         
         my $difTestResult = $difDT->test;
@@ -168,7 +167,7 @@ Metamod::DatasetTransformaer::ISO19115 - conversion from ISO19115 to MM2 metadat
   my $dsT = new Metamod::DatasetTransfomer::ISO19115($xmdStr, $xmlStr);
   my $datasetStr;
   if ($dsT->test) {
-      ($ds2Doc, $mm2Doc) = $dsT->transform;
+      ($xmd2Doc, $mm2Doc) = $dsT->transform;
   }
 
 
@@ -198,7 +197,7 @@ Options include:
 
 Overwrite the default xslt transformation to convert from ISO19115 to DIF.
 
-=item dsXslt => 'filename.xslt'
+=item xmdXslt => 'filename.xslt'
 
 Overwrite the default xslt transformation to convert to the DIF to xmd. This option is forwarded to the 
 Metamod::DatasetTransformer::DIF.

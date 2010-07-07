@@ -47,7 +47,7 @@ use 5.6.0;
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 my $config = Metamod::Config->new();
 our $XSLT_FILE_MM2 = $Metamod::DatasetTransformer::XSLT_DIR.'dif2MM2.xslt';
-our $XSLT_FILE_DS  = $Metamod::DatasetTransformer::XSLT_DIR.'dif2dataset.xslt';
+our $XSLT_FILE_XMD  = $Metamod::DatasetTransformer::XSLT_DIR.'dif2dataset.xslt';
 my $logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
 
 sub originalFormat {
@@ -62,8 +62,8 @@ sub new {
     my $self = {xmdStr => $xmdStr,
                 xmlStr => $xmlStr,
                 difDoc => undef, # init by test
-                dsDoc => undef,
-                dsXslt => $options{dsXslt} || $XSLT_FILE_DS,
+                xmdDoc => undef,
+                xmdXslt => $options{xmdXslt} || $XSLT_FILE_XMD,
                 mm2Xslt => $options{mm2Xslt} || $XSLT_FILE_MM2,
                };
     return bless $self, $class;
@@ -98,39 +98,38 @@ sub test {
     my $isDIF = 0;
     my $root = $self->{difDoc}->getDocumentElement();
     my $nodeList = $xpc->findnodes('/dif:DIF', $root);
+    $logger->debug("found ".$nodeList->size." nodes with /dif:DIF\n");
     if ($nodeList->size() == 1) {
         $isDIF = 1;
-    } else {
-        $logger->debug("found ".$nodeList->size." nodes with /dif:DIF\n");
     }
     
-    my $isDS = 1;
+    my $isXMD = 1;
     if ($self->{xmdStr}) {
-        $isDS = 0; # reset to 0, might fail
+        $isXMD = 0; # reset to 0, might fail
         # test optional xmdStr (if xmd file has been created earlier)
-        unless ($self->{dsDoc}) {
+        unless ($self->{xmdDoc}) {
             if (UNIVERSAL::isa($self->{xmdStr}, 'XML::LibXML::Document')) {
-                $self->{dsDoc} = $self->{xmdStr};
+                $self->{xmdDoc} = $self->{xmdStr};
             } else {
                 eval {
-                    $self->{dsDoc} = $self->XMLParser->parse_string($self->{xmdStr});
+                    $self->{xmdDoc} = $self->XMLParser->parse_string($self->{xmdStr});
                 }; # do nothing on error, $doc stays empty
                 if ($@) {
                     $logger->debug("$@ during xmdStr parsing\n");
                 }
             }
         }
-        return 0 unless $self->{dsDoc};
+        return 0 unless $self->{xmdDoc};
         
         my $dsRoot = $self->{difDoc}->getDocumentElement();
         my $nList = $xpc->findnodes('/d:dataset/d:info/@ownertag', $root);
         if ($nodeList->size() == 1) {
-            $isDS = 1;
+            $isXMD = 1;
         } else {
             $logger->debug("could not find /d:dataset/d:info/\@ownertag\n");
         }
     }
-    return $isDS && $isDIF;
+    return $isXMD && $isDIF;
 }
 
 sub transform {
@@ -144,16 +143,16 @@ sub transform {
         $mm2Doc = $stylesheet->transform($self->{difDoc});
     }
     
-    my $dsDoc = $self->{dsDoc};
-    unless ($self->{dsDoc}) { # no xmdStr and thus no dsDoc, extract from dif
-        my $styleDoc = $self->XMLParser->parse_file($self->{dsXslt});
+    my $xmdDoc = $self->{xmdDoc};
+    unless ($self->{xmdDoc}) { # no xmdStr and thus no xmdDoc, extract from dif
+        my $styleDoc = $self->XMLParser->parse_file($self->{xmdXslt});
         my $stylesheet = $self->XSLTParser->parse_stylesheet($styleDoc);
-        $dsDoc = $stylesheet->transform($self->{difDoc});
+        $xmdDoc = $stylesheet->transform($self->{difDoc});
     }
 
     # postprocess results / exceptions
     require Metamod::Dataset;
-    my $ds = newFromDoc Metamod::Dataset($mm2Doc, $dsDoc);
+    my $ds = newFromDoc Metamod::Dataset($mm2Doc, $xmdDoc);
     for my $degName (qw(latitude_resolution longitude_resolution)) {
         # remove 'degree' units
         my @vals = $ds->removeMetadataName($degName);
@@ -161,7 +160,7 @@ sub transform {
         $ds->addMetadata({$degName => \@vals});
     }
     
-    unless ($self->{dsDoc}) { # no xmdStr and thus no dsDoc, extracted from dif, postprocessing
+    unless ($self->{xmdDoc}) { # no xmdStr and thus no xmdDoc, extracted from dif, postprocessing
         my %info = $ds->getInfo;
         $info{'name'} =~ s^_^/^g;
         $info{'ownertag'} = 'DAM' if ($info{'ownertag'} eq 'DAMOCLES');
@@ -248,7 +247,7 @@ sub transform {
         }
     }
     
-    return ($ds->getDS_DOC, $ds->getMETA_DOC);
+    return ($ds->getXMD_DOC, $ds->getMETA_DOC);
 }
 
 1;
@@ -264,7 +263,7 @@ Metamod::DatasetTransformer::DIF - transform old-dataset to dataset and MM2
   my $dsT = new Metamod::DatasetTransfomer::DIF($xmdStr, $xmlStr);
   my $datasetStr;
   if ($dsT->test) {
-      ($ds2Doc, $mm2Doc) = $dsT->transform;
+      ($xmd2Doc, $mm2Doc) = $dsT->transform;
   }
 
 =head1 DESCRIPTION
@@ -288,7 +287,7 @@ Options include:
 
 =over 8
 
-=item dsXslt => 'filename.xslt'
+=item xmdXslt => 'filename.xslt'
 
 Overwrite the default xslt file to convert to the actual dataset format.
 

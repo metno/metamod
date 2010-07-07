@@ -66,7 +66,11 @@ sub getBasename {
         # called as function, not method
         $file = $self; 
     }
-    $file =~ s/\.xm[dl]$//;
+    if ($file) {
+        $file =~ s/\.xm[dl]$//;
+    } else {
+        $logger->logcarp('getBasename called without filename');
+    }
     return $file;
 }
 
@@ -140,7 +144,7 @@ sub autodetect {
     }
     my @plugins = Metamod::DatasetTransformer::getPlugins();
     foreach my $plugin (@plugins) {
-        my $p = $plugin->new($fds->getDS_XML(), $fds->getMETA_XML());
+        my $p = $plugin->new($fds->getXMD_XML(), $fds->getMETA_XML());
         if ($p->test) {
             return $p;
         }
@@ -178,7 +182,7 @@ Metamod::DatasetTransformer - interface to transform datasets to internal MM2 pr
   }
   
   # or
-  my $implX = autodetect Metamod::DatasetTransfomer("filename");
+  my $implX = Metamod::DatasetTransfomer::autodetect("filename");
   ...
 
 =head1 DESCRIPTION

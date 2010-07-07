@@ -41,7 +41,7 @@ our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", 
 my $logger = Log::Log4perl::get_logger('metamod::common::DatasetTransformer::OldDataset');
 
 our $XSLT_FILE_MM2 = $Metamod::DatasetTransformer::XSLT_DIR.'oldDataset2MM2.xslt';
-our $XSLT_FILE_DS =  $Metamod::DatasetTransformer::XSLT_DIR.'oldDataset2Dataset.xslt';
+our $XSLT_FILE_XMD =  $Metamod::DatasetTransformer::XSLT_DIR.'oldDataset2Dataset.xslt';
 
 sub originalFormat {
     return "OldDataset";
@@ -55,7 +55,7 @@ sub new {
     my $self = {xmdStr => $xmdStr,
                 xmlStr => $xmlStr,
                 oldDoc => undef, # init by test
-                dsXslt => $options{dsXslt} || $XSLT_FILE_DS,
+                xmdXslt => $options{xmdXslt} || $XSLT_FILE_XMD,
                 mm2Xslt => $options{mm2Xslt} || $XSLT_FILE_MM2,
                };
     return bless $self, $class;
@@ -100,13 +100,13 @@ sub transform {
         $mm2Doc = $stylesheet->transform($self->{oldDoc});
     }
     
-    my $dsDoc;
+    my $xmdDoc;
     {
-        my $styleDoc = $self->XMLParser->parse_file($self->{dsXslt});
+        my $styleDoc = $self->XMLParser->parse_file($self->{xmdXslt});
         my $stylesheet = $self->XSLTParser->parse_stylesheet($styleDoc);
-        $dsDoc = $stylesheet->transform($self->{oldDoc});
+        $xmdDoc = $stylesheet->transform($self->{oldDoc});
     }
-    return ($dsDoc, $mm2Doc);
+    return ($xmdDoc, $mm2Doc);
 }
 
 1;

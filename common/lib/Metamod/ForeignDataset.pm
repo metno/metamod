@@ -73,39 +73,41 @@ sub _decode {
 }
 
 sub newFromDoc {
-    my ($class, $foreign, $dataset, %options) = @_;
-    die "no metadata" unless $foreign;
-    my $parser = Metamod::DatasetTransformer->XMLParser;
-    unless ($dataset) {
-        $dataset = $class->DATASET();
-        my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime(mmTtime::ttime()));
-        $dataset =~ s/\Q1970-01-01T00:00:00Z\E/$sDate/g; # changes datestamp and creationDate
+    my ($class, $metaXML, $xmdXML, %options) = @_;
+    unless ($metaXML) {
+        $logger->logconfess("no metadata"); 
     }
-    my $docDS = UNIVERSAL::isa($dataset, 'XML::LibXML::Document') ? $dataset : $parser->parse_string($dataset);
-    my $docMETA = UNIVERSAL::isa($foreign, 'XML::LibXML::Document') ? $foreign : $parser->parse_string($foreign);
+    my $parser = Metamod::DatasetTransformer->XMLParser;
+    unless ($xmdXML) {
+        $xmdXML = $class->DATASET();
+        my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime(mmTtime::ttime()));
+        $xmdXML =~ s/\Q1970-01-01T00:00:00Z\E/$sDate/g; # changes datestamp and creationDate
+    }
+    my $docXMD = UNIVERSAL::isa($xmdXML, 'XML::LibXML::Document') ? $xmdXML : $parser->parse_string($xmdXML);
+    my $docMETA = UNIVERSAL::isa($metaXML, 'XML::LibXML::Document') ? $metaXML : $parser->parse_string($metaXML);
     my $format = exists $options{format} ? delete $options{format} : 'unknown';
-    return $class->_initSelf($format, $docDS, $docMETA, %options);
+    return $class->_initSelf($format, $docXMD, $docMETA, %options);
 }
 
 sub newFromFile {
     my ($class, $basename, %options) = @_;
-    my ($dsXML, $metaXML) = Metamod::DatasetTransformer::getFileContent($basename);
-    return $class->newFromDoc($metaXML, $dsXML, %options);
+    my ($xmdXML, $metaXML) = Metamod::DatasetTransformer::getFileContent($basename);
+    return $class->newFromDoc($metaXML, $xmdXML, %options);
 }
 
 sub newFromFileAutocomplete {
     my ($class, $basename, %options) = @_;
-    my ($dsXML, $metaXML) = Metamod::DatasetTransformer::getFileContent($basename);
+    my ($xmdXML, $metaXML) = Metamod::DatasetTransformer::getFileContent($basename);
     my $retVal;
-    if ($dsXML) {
+    if ($xmdXML) {
         # autocomplete not required
-        $retVal = $class->newFromDoc($metaXML, $dsXML, %options);
+        $retVal = $class->newFromDoc($xmdXML, $metaXML, %options);
     } else {
         my $transformer = Metamod::DatasetTransformer::autodetect($basename);
         if ($transformer) {
             $logger->debug('autocompleting file with '.ref($transformer));
-            my ($dsDoc, $metaDoc) = $transformer->transform();
-            $retVal = $class->newFromDoc($metaXML, $dsDoc, %options);            
+            my ($xmdDoc, $metaDoc) = $transformer->transform();
+            $retVal = $class->newFromDoc($xmdDoc, $metaXML, %options);            
         } else {
             $logger->error('cannot read/autocomplete file: '.$basename);
         }
@@ -114,15 +116,15 @@ sub newFromFileAutocomplete {
 }
 
 sub _initSelf {
-    my ($class, $orgFormat, $docDS, $docMETA, %options) = @_;
-    die "undefined docDS, cannot init\n" unless $docDS;
+    my ($class, $orgFormat, $docXMD, $docMETA, %options) = @_;
+    die "undefined docXMD, cannot init\n" unless $docXMD;
     die "undefined docMETA, cannot init\n" unless $docMETA;
     my $xpc = XML::LibXML::XPathContext->new();
     $xpc->registerNs('d', $class->NAMESPACE_DS);
     $xpc->registerNs('r', Metamod::DatasetRegion->NAMESPACE_DSR);
     my $self = {
                 xpath => $xpc,
-                docDS => $docDS,
+                docXMD => $docXMD,
                 docMETA => $docMETA,
                 originalFormat => $orgFormat,
                };
@@ -145,7 +147,7 @@ sub writeToFile {
     binmode $xmdF; # drop all PerlIO layers possibly created by a use open pragma
     binmode $xmlF;
     # use libxml to write the file, avoid any interference by perl (possible character conversion)
-    $self->{docDS}->toFH($xmdF, 1);
+    $self->{docXMD}->toFH($xmdF, 1);
     $self->{docMETA}->toFH($xmlF, 1);
     close $xmlF;
     close $xmdF;
@@ -171,9 +173,9 @@ sub deleteDatasetFile {
     return $err1 && $err2;
 }
 
-sub getDS_XML {
+sub getXMD_XML {
     my ($self) = @_;
-    return $self->{docDS}->toString(1);
+    return $self->{docXMD}->toString(1);
 }
 
 sub getMETA_XML {
@@ -181,9 +183,9 @@ sub getMETA_XML {
     return $self->{docMETA}->toString(1);
 }
 
-sub getDS_DOC {
+sub getXMD_DOC {
     my ($self) = @_;
-    my $doc = $self->{docDS};
+    my $doc = $self->{docXMD};
     my $out = new XML::LibXML::Document($doc->version, $doc->encoding);
     $out->setDocumentElement($doc->getDocumentElement->cloneNode(1));
     return $out;
@@ -202,7 +204,7 @@ sub getMETA_DOC {
 sub getInfo {
     my ($self) = @_;
     my %retVal;
-    my $info = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docDS})->item(0);
+    my $info = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docXMD})->item(0);
     foreach my $attr ($info->attributes) {
         $retVal{$attr->name} = $attr->value;
     }
@@ -225,7 +227,7 @@ sub replaceInfo {
     	   Carp::croak("Cannot set name to $infoName, need project/[parent/]filename");
         }
     }
-    my $infoNode = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docDS})->item(0);
+    my $infoNode = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docXMD})->item(0);
     while (my ($name, $val) = each %oldInfo) {
         $infoNode->removeAttribute($self->_decode($name)) unless $newInfo{$name};
     }
@@ -269,7 +271,7 @@ sub _getLastNodeBefore {
     foreach my $lastNodeName (reverse @datasetSequenceOrder) {
         # go reverse and return the first existing node with appears at or before the $nodeName
         if ($seqOrder{$lastNodeName} <= $seqOrder{$nodeName}) {
-            my @lastNodesBefore = $self->{xpath}->findnodes("/d:dataset/$lastNodeName", $self->{docDS});
+            my @lastNodesBefore = $self->{xpath}->findnodes("/d:dataset/$lastNodeName", $self->{docXMD});
             if (@lastNodesBefore) {
                 return $lastNodesBefore[-1];
             }
@@ -282,7 +284,7 @@ sub _getLastNodeBefore {
 sub getQuadtree {
     my ($self) = @_;
     my @retVal;
-    my ($q) = $self->{xpath}->findnodes('/d:dataset/d:quadtree_nodes', $self->{docDS});
+    my ($q) = $self->{xpath}->findnodes('/d:dataset/d:quadtree_nodes', $self->{docXMD});
     if ($q) {
         foreach my $child ($q->childNodes) {
             if ($child->nodeType == XML::LibXML::XML_TEXT_NODE) {
@@ -297,16 +299,16 @@ sub getQuadtree {
 sub setQuadtree {
     my ($self, $quadRef) = @_;
     my @oldQuadtree = $self->getQuadtree;
-    foreach my $node ($self->{xpath}->findnodes('/d:dataset/d:quadtree_nodes', $self->{docDS})) {
+    foreach my $node ($self->{xpath}->findnodes('/d:dataset/d:quadtree_nodes', $self->{docXMD})) {
         # remove old value
         $node->parentNode->removeChild($node);
     }
     if (@$quadRef > 0) {
         # create node with new content
         my $valStr = join "\n", @$quadRef;
-        my $qEl = $self->{docDS}->createElementNS($self->NAMESPACE_DS,'quadtree_nodes');
-        $qEl->appendChild($self->{docDS}->createTextNode($valStr));
-        $self->{docDS}->documentElement->insertAfter($qEl, $self->_getLastNodeBefore('d:quadtree_nodes'));
+        my $qEl = $self->{docXMD}->createElementNS($self->NAMESPACE_DS,'quadtree_nodes');
+        $qEl->appendChild($self->{docXMD}->createTextNode($valStr));
+        $self->{docXMD}->documentElement->insertAfter($qEl, $self->_getLastNodeBefore('d:quadtree_nodes'));
     }
     return @oldQuadtree;
 }
@@ -314,7 +316,7 @@ sub setQuadtree {
 sub getWMSInfo {
 	my ($self) = @_;
 	my $retVal;
-	my ($node) = $self->{xpath}->findnodes('/d:dataset/d:wmsInfo', $self->{docDS});
+	my ($node) = $self->{xpath}->findnodes('/d:dataset/d:wmsInfo', $self->{docXMD});
 	if ($node) {
 		$retVal = "";
 		foreach my $child ($node->childNodes) {
@@ -327,19 +329,19 @@ sub getWMSInfo {
 sub setWMSInfo {
 	my ($self, $content) = @_;
 	my $oldContent = $self->getWMSInfo;
-    foreach my $node ($self->{xpath}->findnodes('/d:dataset/d:wmsInfo', $self->{docDS})) {
+    foreach my $node ($self->{xpath}->findnodes('/d:dataset/d:wmsInfo', $self->{docXMD})) {
         # remove old value
         $node->parentNode->removeChild($node);
     }
 	if ($content) {
 		# create node with new content
-		my $el = $self->{docDS}->createElementNS($self->NAMESPACE_DS, 'wmsInfo');
+		my $el = $self->{docXMD}->createElementNS($self->NAMESPACE_DS, 'wmsInfo');
 		my $parser = Metamod::DatasetTransformer->XMLParser;
 		my $contentDoc = $parser->parse_string($content);
 		$el->appendChild($contentDoc->documentElement);
 		
 		# add content to doc, before optional projectionInfo 
-        $self->{docDS}->documentElement->insertAfter($el, $self->_getLastNodeBefore('d:wmsInfo'));
+        $self->{docXMD}->documentElement->insertAfter($el, $self->_getLastNodeBefore('d:wmsInfo'));
 	}
 	return $oldContent;
 }
@@ -347,7 +349,7 @@ sub setWMSInfo {
 sub getProjectionInfo {
     my ($self) = @_;
     my $retVal;
-    my ($node) = $self->{xpath}->findnodes('/d:dataset/d:projectionInfo', $self->{docDS});
+    my ($node) = $self->{xpath}->findnodes('/d:dataset/d:projectionInfo', $self->{docXMD});
     if ($node) {
         $retVal = "";
         foreach my $child ($node->childNodes) {
@@ -360,33 +362,33 @@ sub getProjectionInfo {
 sub setProjectionInfo {
     my ($self, $content) = @_;
     my $oldContent = $self->getProjectionInfo;
-    foreach my $node ($self->{xpath}->findnodes('/d:dataset/d:projectionInfo', $self->{docDS})) {
+    foreach my $node ($self->{xpath}->findnodes('/d:dataset/d:projectionInfo', $self->{docXMD})) {
         # remove old value
         $node->parentNode->removeChild($node);
     }
     if ($content) {
         # create node with new content
-        my $el = $self->{docDS}->createElementNS($self->NAMESPACE_DS, 'projectionInfo');
+        my $el = $self->{docXMD}->createElementNS($self->NAMESPACE_DS, 'projectionInfo');
         my $parser = Metamod::DatasetTransformer->XMLParser;
         my $contentDoc = $parser->parse_string($content);
         $el->appendChild($contentDoc->documentElement);
         
         # add element to doc
-        $self->{docDS}->documentElement->insertAfter($el, $self->_getLastNodeBefore('d:projectionInfo'));
+        $self->{docXMD}->documentElement->insertAfter($el, $self->_getLastNodeBefore('d:projectionInfo'));
     }
     return $oldContent;	
 }
 
 sub getDatasetRegion {
     my ($self) = @_;
-    my ($node) = $self->{xpath}->findnodes('/d:dataset/r:datasetRegion', $self->{docDS});
+    my ($node) = $self->{xpath}->findnodes('/d:dataset/r:datasetRegion', $self->{docXMD});
     return new Metamod::DatasetRegion($node); 
 }
 
 sub deleteDatasetRegion {
     my ($self) = @_;
     my $oldRegion = $self->getDatasetRegion;
-    foreach my $node ($self->{xpath}->findnodes('/d:dataset/r:datasetRegion', $self->{docDS})) {
+    foreach my $node ($self->{xpath}->findnodes('/d:dataset/r:datasetRegion', $self->{docXMD})) {
         # remove old value
         $node->parentNode->removeChild($node);
     }
@@ -403,7 +405,7 @@ sub setDatasetRegion {
         my $regionDoc = Metamod::DatasetTransformer->XMLParser->parse_string($regionXML);
         my $rNode = $regionDoc->documentElement;
         # add element to doc
-        $self->{docDS}->documentElement->insertAfter($rNode, $self->_getLastNodeBefore('r:datasetRegion'));
+        $self->{docXMD}->documentElement->insertAfter($rNode, $self->_getLastNodeBefore('r:datasetRegion'));
     }
     return $oldRegion;
 }
@@ -500,23 +502,23 @@ These methods need to be implemented by the extending modules.
 
 =over 4
 
-=item newFromDoc($foreign, [$dataset, %options])
+=item newFromDoc($metaXML, [$xmdXML, %options])
 
-Create a dataset from L<XML::LibXML::Document> or xml-string. The foreign-(metadata) document needs to be set. If $dataset is empty, new dataset information will be created.
+Create a dataset from L<XML::LibXML::Document> or xml-string. The foreign-(metadata) document needs to be set. If $xmdXML is empty, new dataset information will be created.
 In that case the creationDate-info will be set to currentDate, status-info is active, everything
 else is empty.
 
 Currently known options: 'format', this will set the originalFormat of the dataset.
 
-Return: $dataset object
-Dies on missing $foreign, or on invalid xml-strings.
+Return: $xmdXML object
+Dies on missing $metaXML, or on invalid xml-strings.
 
 =item newFromFile($basename)
 
 read a dataset from a file. The file may or may not end with .xml or .xmd. The xml-file needs to exist.
-The xml file is mapped to foreign and the xmd file is mapped to $dataset. See L<newFromDoc> for more information.
+The xml file is mapped to foreign and the xmd file is mapped to $xmdXML. See L<newFromDoc> for more information.
 
-Return: $dataset object
+Return: $xmdXML object
 Dies on missing xml-file, or on invalid xml-strings in xml or xmd files.
 
 =item newFromFileAutocomplete($basename)
@@ -535,17 +537,17 @@ delete the files belonging to the dataset $basename (.xml and .xmd).
 Return false on failure, true on success. 
 This is a class rather than a object-method.
 
-=item getDS_XML
+=item getXMD_XML
 
-Return: xml-string of dataset as byte stream in the original document encoding
+Return: xml-string of xmd-file as byte stream
 
 =item getMETA_XML
 
 Return: xml-string of MM2 as byte stream in the original document encoding
 
-=item getDS_DOC
+=item getXMD_DOC
 
-Get a clone of the internal metadata document.
+Get a clone of the internal xmd document.
 
 Return: XML::LibXML::Document of dataset
 
