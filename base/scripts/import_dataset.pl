@@ -45,7 +45,7 @@ sub getTargetDir {
 use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
 
 use Metamod::Dataset;
-use Metamod::Config;
+use Metamod::Config qw(:init_logger);
 use Metamod::Utils qw();
 use Data::Dumper;
 use DBI;
