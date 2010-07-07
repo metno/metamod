@@ -29,8 +29,6 @@
 package Metamod::ForeignDataset;
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 
-our $DEBUG = 0;
-
 use strict;
 use warnings;
 use encoding 'utf-8';
@@ -43,6 +41,7 @@ use POSIX qw();
 use Metamod::DatasetTransformer qw();
 use Metamod::DatasetRegion qw();
 use XML::LibXML::XPathContext qw();
+use Log::Log4perl;
 use UNIVERSAL qw();
 use mmTtime;
 use Carp qw(croak);
@@ -57,16 +56,16 @@ use constant DATASET => << 'EOT';
   <info name="/" status="active" creationDate="1970-01-01T00:00:00Z" datestamp="1970-01-01T00:00:00Z" ownertag="" metadataFormat=""/>
 </dataset>
 EOT
-
+my $logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
 my $nameReg = qr{^([^/]*)/([^/]*/)?([^/]*)$}; # project/[parent/]name where parent is optional
 
 sub _decode {
 	my ($self, $string) = @_;
 	if (!Encode::is_utf8($string)) {
-		print STDERR "String not properly encoded, assuming utf8: $string\n" if $DEBUG;
+		$logger->debug("String not properly encoded, assuming utf8: $string\n");
         eval {$string = Encode::decode('utf8', $string, Encode::FB_CROAK);};
         if ($@) {
-        	print STDERR "Unable to properly decode string: $string\n";
+        	$logger->warn("Unable to properly decode string: $string\n");
         	$string = Encode::decode('utf8', $string);
         }
 	}
@@ -92,6 +91,26 @@ sub newFromFile {
     my ($class, $basename, %options) = @_;
     my ($dsXML, $metaXML) = Metamod::DatasetTransformer::getFileContent($basename);
     return $class->newFromDoc($metaXML, $dsXML, %options);
+}
+
+sub newFromFileAutocomplete {
+    my ($class, $basename, %options) = @_;
+    my ($dsXML, $metaXML) = Metamod::DatasetTransformer::getFileContent($basename);
+    my $retVal;
+    if ($dsXML) {
+        # autocomplete not required
+        $retVal = $class->newFromDoc($metaXML, $dsXML, %options);
+    } else {
+        my $transformer = Metamod::DatasetTransformer::autodetect($basename);
+        if ($transformer) {
+            $logger->debug('autocompleting file with '.ref($transformer));
+            my ($dsDoc, $metaDoc) = $transformer->transform();
+            $retVal = $class->newFromDoc($metaXML, $dsDoc, %options);            
+        } else {
+            $logger->error('cannot read/autocomplete file: '.$basename);
+        }
+    }
+    return $retVal;
 }
 
 sub _initSelf {
@@ -499,6 +518,11 @@ The xml file is mapped to foreign and the xmd file is mapped to $dataset. See L<
 
 Return: $dataset object
 Dies on missing xml-file, or on invalid xml-strings in xml or xmd files.
+
+=item newFromFileAutodetect($basename)
+
+Read a dataset from a file. If only a .xml file is given without .xml file,
+try to autdetect the DatasetTransformer plugin and let it generate the xmd information. 
 
 =item writeToFile($basename)
 

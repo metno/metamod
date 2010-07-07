@@ -33,7 +33,7 @@ use encoding 'iso8859-1';
 use Encode qw(decode encode);
 
 use lib "..";
-use Test::More tests => 50;
+use Test::More tests => 51;
 
 use Data::Dumper qw(Dumper);
 
@@ -156,3 +156,6 @@ is($newDs->originalFormat, 'MM2', "MM2 dataset: orignal format");
 %metadata = $newDs->getMetadata;
 is (scalar keys %metadata, 1, "reading MM2 datasets metadata");
 is (scalar $newDs->getQuadtree, 3, "reading quadtree of exampleMM2");
+
+my $difDS = Metamod::ForeignDataset->newFromFileAutocomplete('exampleDIF');
+isa_ok($difDS, 'Metamod::ForeignDataset');
