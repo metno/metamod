@@ -35,6 +35,9 @@ use File::Path;
 use File::Spec;
 use FindBin qw($Bin);
 
+use lib "$Bin/common/lib";
+use Metamod::LoggerConfigParser;
+
 #
 #  Check command line arguments
 #
@@ -278,6 +281,13 @@ foreach my $filelistpath (@flistpathes) {
    }
    close (FILES);
 }
+
+
+my $logger_config = File::Spec->catfile( $targetdir, 'logger_config.ini' );
+my $lcp = Metamod::LoggerConfigParser->new( { verbose => 1 } );
+$lcp->create_and_write_configs($configfile,$logger_config);
+
+
 if ($missing_variables > 0) {
    print "NOTE: All [==...==] constructs found that were not defined in the configuration file\n" .
                 "      were substituted with empty values\n";
