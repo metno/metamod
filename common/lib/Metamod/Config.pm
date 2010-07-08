@@ -181,6 +181,21 @@ sub _substituteVariable {
     return $textline;
 }
 
+sub getDBH() {
+    my ($self) = @_;
+    require DBI;
+    my $dbname = $self->get("DATABASE_NAME");
+    my $user   = $self->get("PG_ADMIN_USER");
+    my $connect = "dbi:Pg:dbname=" .
+                  $dbname .
+                  " ".
+                  $self->get("PG_CONNECTSTRING_PERL");
+    my $dbh =  DBI->connect_cached($connect,
+                                   $user, "",
+                                   {AutoCommit => 0, RaiseError => 1} );
+    return $dbh;
+}
+
 sub initLogger {
     my ($self, $filename) = @_;
 
@@ -297,9 +312,16 @@ will be used.
 
 =back
 
+=item getDBH()
+
+<<<<<<< .mine
+Return a cached/pooled DBI-handler to the default database of metamod. The handler is in 
+AutoCommit = 0 and RaiseError = 1 mode. This function will die on error. (DBI-connect error)
+
+=======
 
 
-
+>>>>>>> .r694
 =head1 AUTHOR
 
 Heiko Klein, E<lt>H.Klein@met.noE<gt>
