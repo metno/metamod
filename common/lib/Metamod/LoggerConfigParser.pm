@@ -53,7 +53,7 @@ sub read_meta_files {
     my $config_string = '';
     foreach my $filename ( @meta_files ){
 
-        print "Reading meta file '$filename'\n" if $self->{ _verbose };
+        $self->_info("Reading meta file '$filename'");
         my $success = open my $META_FILE, '<', $filename;
         if( !$success ){
             print STDERR "Failed to open the meta file '$filename': $!\n";
@@ -70,6 +70,8 @@ sub read_meta_files {
 
 sub create_perl_config {
     my ($self,$config_string) = @_;
+
+    $self->_info("Generating Perl config");
 
     $config_string =~ s/^log4all/log4perl/mg;
 
@@ -89,6 +91,8 @@ sub create_perl_config {
 
 sub create_php_config {
     my ($self,$config_string) = @_;
+
+    $self->_info("Generating PHP config");
 
     $config_string =~ s/^log4all/log4php/mg;
 
@@ -112,14 +116,24 @@ sub _timestamp {
 
 }
 
+sub _info {
+    my ($self,$msg) = @_;
+
+    print "$msg\n" if $self->{_verbose};
+
+
+}
+
 sub write_perl_config {
     my ($self,$config,$filename) = @_;
+
+    $self->_info("Writing Perl config");
 
     my $success = open my $PERL_CONFIG, '>', $filename;
     if(!$success){
         die "Could not write Perl logger config to '$filename': $!";
     }
-    print $PERL_CONFIG, $config;
+    print $PERL_CONFIG $config;
     close $PERL_CONFIG;
 
 }
@@ -127,11 +141,13 @@ sub write_perl_config {
 sub write_php_config {
     my ($self,$config,$filename) = @_;
 
+    $self->_info("Writing PHP config");
+
     my $success = open my $PHP_CONFIG, '>', $filename;
     if(!$success){
         die "Could not write PHP logger config to '$filename': $!";
     }
-    print $PHP_CONFIG, $config;
+    print $PHP_CONFIG $config;
     close $PHP_CONFIG;
 
 }
@@ -144,13 +160,33 @@ sub create_and_write_configs {
     my $log4php_config_file = $mm_config->get('LOG4PHP_CONFIG');
 
     my $config_string = $self->read_meta_files(@meta_files);
-    my $log4perl_config = $self->create_perl_config($config_string);
-    my $log4php_config = $self->create_php_config($config_string);
 
-    $self->write_perl_config($log4perl_config,$log4perl_config_file);
-    $self->write_php_config($log4php_config,$log4php_config_file);
+    if($log4perl_config_file){
 
-    return;
+        if( -d $log4perl_config_file ){
+            $log4perl_config_file = File::Spec->catfile($log4perl_config_file, 'log4perl_config.ini');
+        }
+
+        my $log4perl_config = $self->create_perl_config($config_string);
+        $self->write_perl_config($log4perl_config,$log4perl_config_file);
+
+    } else {
+        warn "LOG4PERL_CONFIG missing from master config. log4perl config not created\n";
+    }
+
+    if($log4php_config_file){
+
+        if( -d $log4php_config_file ){
+            $log4php_config_file = File::Spec->catfile($log4php_config_file, 'log4php_config.ini');
+        }
+
+        my $log4php_config = $self->create_php_config($config_string);
+        $self->write_php_config($log4php_config,$log4php_config_file);
+    } else {
+        warn "LOG4PHP_CONFIG missing from master config. log4php config not created\n";
+    }
+
+    return 1;
 
 }
 
