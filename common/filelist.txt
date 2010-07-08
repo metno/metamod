@@ -1,6 +1,6 @@
 prepare_runtime_env.sh
 metamodInit.sh
-logger-config.ini
+logger_config.ini
 =htdocs/adm/index.php
 =htdocs/adm/showconfig.php
 =htdocs/funcs/mmConfig.inc
