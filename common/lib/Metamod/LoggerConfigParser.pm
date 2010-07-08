@@ -34,6 +34,8 @@ use warnings;
 
 use POSIX qw( strftime );
 
+use Metamod::Config;
+
 sub new {
     my ($class, $options) = @_;
 
@@ -109,6 +111,50 @@ sub _timestamp {
     return strftime('%Y-%m-%d %H:%M:%S', localtime);
 
 }
+
+sub write_perl_config {
+    my ($self,$config,$filename) = @_;
+
+    my $success = open my $PERL_CONFIG, '>', $filename;
+    if(!$success){
+        die "Could not write Perl logger config to '$filename': $!";
+    }
+    print $PERL_CONFIG, $config;
+    close $PERL_CONFIG;
+
+}
+
+sub write_php_config {
+    my ($self,$config,$filename) = @_;
+
+    my $success = open my $PHP_CONFIG, '>', $filename;
+    if(!$success){
+        die "Could not write PHP logger config to '$filename': $!";
+    }
+    print $PHP_CONFIG, $config;
+    close $PHP_CONFIG;
+
+}
+
+sub create_and_write_configs {
+    my ($self,$master_config,@meta_files) = @_;
+
+    my $mm_config = Metamod::Config->new($master_config);
+    my $log4perl_config_file = $mm_config->get('LOG4PERL_CONFIG');
+    my $log4php_config_file = $mm_config->get('LOG4PHP_CONFIG');
+
+    my $config_string = $self->read_meta_files(@meta_files);
+    my $log4perl_config = $self->create_perl_config($config_string);
+    my $log4php_config = $self->create_php_config($config_string);
+
+    $self->write_perl_config($log4perl_config,$log4perl_config_file);
+    $self->write_php_config($log4php_config,$log4php_config_file);
+
+    return;
+
+}
+
+
 
 
 1;
