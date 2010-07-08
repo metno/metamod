@@ -107,7 +107,7 @@ sub newFromFileAutocomplete {
         if ($transformer) {
             $logger->debug('autocompleting file with '.ref($transformer));
             my ($xmdDoc, $metaDoc) = $transformer->transform();
-            $retVal = $class->newFromDoc($xmdDoc, $metaXML, %options);            
+            $retVal = $class->newFromDoc($metaXML, $xmdDoc, %options);            
         } else {
             $logger->error('cannot read/autocomplete file: '.$basename);
         }
@@ -128,6 +128,12 @@ sub _initSelf {
                 docMETA => $docMETA,
                 originalFormat => $orgFormat,
                };
+                   # test correct xmd
+    my $infoNodeList = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docXMD});
+    if ($infoNodeList->size() != 1) {
+        $logger->error_die("could not find /d:dataset/d:info in xmd");
+    }
+               
     return bless $self, $class;
 }
 

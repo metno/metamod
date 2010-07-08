@@ -48,7 +48,7 @@ sub originalFormat {
 
 sub new {
     if (@_ < 3 || (scalar @_ % 2 != 1)) {
-        croak ("new " . __PACKAGE__ . " needs argument (package, file), got: @_\n");
+        croak ("new " . __PACKAGE__ . " needs argument (package, file), got: @_");
     }
     my ($class, $xmdStr, $xmlStr, %options) = @_;
     my $self = {xmdStr => $xmdStr,
@@ -78,7 +78,7 @@ sub test {
             $self->{isoDoc} = $self->XMLParser->parse_string($self->{xmlStr});
         }; # do nothing on error, $doc stays empty
         if ($@) {
-            $logger->debug("$@\n");
+            $logger->debug("$@");
         }
     }
     return 0 unless $self->{isoDoc}; # $doc not initialized
@@ -91,21 +91,21 @@ sub test {
     my $isISO = 0;
     my $root = $self->{isoDoc}->getDocumentElement();
     my $nodeList = $xpc->findnodes('/gmd:MD_Metadata', $root);
-    $logger->debug("found ".$nodeList->size." nodes with /gmd:MD_Metadata\n");
+    $logger->debug("found ".$nodeList->size." nodes with /gmd:MD_Metadata");
     if ($nodeList->size() == 1) {
         $isISO = 1;
     }
     
-    my $isDS = 1;
+    my $isXMD = 1;
     if ($self->{xmdStr}) {
-        $isDS = 0; # reset to 0, might fail
+        $isXMD = 0; # reset to 0, might fail
         # test optional xmdStr (if xmd file has been created earlier)
         unless ($self->{xmdDoc}) {
             eval {
                 $self->{xmdDoc} = $self->XMLParser->parse_string($self->{xmdStr});
             }; # do nothing on error, $doc stays empty
             if ($@) {
-                $logger->debug("$@ during xmdStr parsing\n");
+                $logger->debug("$@ during xmdStr parsing");
             }
         }
         return 0 unless $self->{xmdDoc};
@@ -113,12 +113,12 @@ sub test {
         my $dsRoot = $self->{isoDoc}->getDocumentElement();
         my $nList = $xpc->findnodes('/d:dataset/d:info/@ownertag', $root);
         if ($nodeList->size() == 1) {
-            $isDS = 1;
+            $isXMD = 1;
         } else {
-            $logger->debug("could not find /d:dataset/d:info/\@ownertag\n");
+            $logger->debug("could not find /d:dataset/d:info/\@ownertag");
         }
     }
-    if ($isDS && $isISO) {
+    if ($isXMD && $isISO) {
         # convert iso to dif already in test, to make sure DIF2MM2-test succeeds
         $logger->debug("testing dif-conversion");
         my $difDoc;
@@ -136,22 +136,22 @@ sub test {
         $self->{difTransformer} = $difDT;
         
         my $difTestResult = $difDT->test;
-        $logger->debug(warn "dif-conversionn result: $difTestResult\n"); 
+        $logger->debug("dif-conversionn result: $difTestResult"); 
         return $difTestResult; 
     } else {
-        $logger->debug("isDataset, isISO: $isDS, $isISO\n"); 
+        $logger->debug("isDataset, isISO: $isXMD, $isISO"); 
         return 0;
     }
 }
 
 sub transform {
     my $self = shift;
-    Carp::croak("Cannot run transform if test fails\n") unless $self->test;
+    $logger->logcroak("Cannot run transform if test fails") unless $self->test;
     
     # convert from dif to mm2
-    my ($metaDoc, $mm2Doc) = $self->{difTransformer}->transform;
+    my ($xmdDoc, $mm2Doc) = $self->{difTransformer}->transform;
 
-    return ($metaDoc, $mm2Doc);
+    return ($xmdDoc, $mm2Doc);
 }
 
 1;
