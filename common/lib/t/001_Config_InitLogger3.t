@@ -39,6 +39,7 @@ use lib "..";
 use Log::Log4perl qw( get_logger );
 
 use Test::More tests => 1;
+use Test::Files;
 
 use Metamod::Config;
 
@@ -49,10 +50,4 @@ my $logger = get_logger( 'test' );
 $logger->info( 'Test 1' );
 $logger->error( 'Test 2' );
 
-open my $EXPECTED_FILE, '<', "$FindBin::Bin/expected_log.log";
-my $expected = do { local $/; <$EXPECTED_FILE> };
-
-open my $RESULT_FILE, '<', "$FindBin::Bin/log4perl_test.log";
-my $result = do { local $/; <$RESULT_FILE> };
-
-is( $result, $expected, 'Output from logger initialised from staticInitLogger' );
+compare_ok( "$FindBin::Bin/expected_log.log", "$FindBin::Bin/log4perl_test.log", 'Output from logger initialised from staticInitLogger' );
