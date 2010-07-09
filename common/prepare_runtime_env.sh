@@ -66,14 +66,6 @@ if [ -d [==TARGET_DIRECTORY==]/htdocs/upl ]; then
 EOF
    fi
 fi
-if [ -d [==TARGET_DIRECTORY==]/htdocs/sch ]; then
-#
-#  Initialise maps directory:
-#
-   rm -rf [==WEBRUN_DIRECTORY==]/maps
-   mkdir [==WEBRUN_DIRECTORY==]/maps
-   cp [==TARGET_DIRECTORY==]/htdocs/img/orig.png [==WEBRUN_DIRECTORY==]/maps
-fi
 if [ -d [==TARGET_DIRECTORY==]/htdocs/upl -o -d [==TARGET_DIRECTORY==]/htdocs/qst ]; then
 #
 #  Initialise XML directory:
