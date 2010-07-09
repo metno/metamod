@@ -163,10 +163,6 @@ sub create_and_write_configs {
 
     if($log4perl_config_file){
 
-        if( -d $log4perl_config_file ){
-            $log4perl_config_file = File::Spec->catfile($log4perl_config_file, 'log4perl_config.ini');
-        }
-
         my $log4perl_config = $self->create_perl_config($config_string);
         $self->write_perl_config($log4perl_config,$log4perl_config_file);
 
@@ -175,10 +171,6 @@ sub create_and_write_configs {
     }
 
     if($log4php_config_file){
-
-        if( -d $log4php_config_file ){
-            $log4php_config_file = File::Spec->catfile($log4php_config_file, 'log4php_config.ini');
-        }
 
         my $log4php_config = $self->create_php_config($config_string);
         $self->write_php_config($log4php_config,$log4php_config_file);
