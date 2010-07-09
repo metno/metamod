@@ -39,9 +39,9 @@ APPLICATION_ID = EXAMPLE
 WEBRUN_DIRECTORY = [==BASE_DIRECTORY==]/webrun
 
 # Logging configuration
-LOG4PERL_CONFIG = [==TARGET_DIRECTORY==]
+LOG4PERL_CONFIG = [==TARGET_DIRECTORY==]/log4perl_config.ini
 LOG4PERL_WATCH_TIME = 30
-LOG4PHP_CONFIG = [==TARGET_DIRECTORY==]
+LOG4PHP_CONFIG = [==TARGET_DIRECTORY==]/log4php_config.ini
 LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
 
 # PG_ADMIN_USER is the PostgreSQL user who may freely create, modify and
