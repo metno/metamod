@@ -197,7 +197,7 @@ sub getDBH() {
 }
 
 sub initLogger {
-    my ($self, $filename) = @_;
+    my ($self) = @_;
 
     return if( $_logger_initialised );
 
