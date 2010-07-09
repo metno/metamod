@@ -383,3 +383,8 @@ TEST_IMPORT_PROGRESS_REPORT = 1
 # uploaded files to actual users. It comments out setting the E-mail recipient
 # to [==OPERATOR_EMAIL==].
 TEST_EMAIL_RECIPIENT =
+
+LOG4PERL_CONFIG = [==TARGET_DIRECTORY==]/log4perl_config.ini
+LOG4PERL_WATCH_TIME = 30
+LOG4PHP_CONFIG = [==TARGET_DIRECTORY==]/log4php_config.ini
+LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
