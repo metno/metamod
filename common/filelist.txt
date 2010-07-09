@@ -4,7 +4,6 @@ logger_config.ini
 =htdocs/adm/index.php
 =htdocs/adm/showconfig.php
 =htdocs/funcs/mmConfig.inc
-=htdocs/funcs/mmInitLogger.inc
 =htdocs/funcs/mmLogging.inc
 =htdocs/funcs/mmTtime.inc
 =htdocs/funcs/mmDataset.inc
@@ -97,7 +96,7 @@ logger_config.ini
 =lib/Metamod/LonLatPolygon.pm
 =lib/Metamod/Utils.pm
 =lib/Metamod/Config.pm
-=lib/Metamod/InitLogger.pm
+=lib/Metamod/LoggerConfigParser.pm
 =lib/MetNo/NcFind.pm
 =lib/quadtreeuse.pm
 =lib/mmTtime.pm
