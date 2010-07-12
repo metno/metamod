@@ -218,7 +218,7 @@ sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 /^BASE_PART_OF_EXTERNAL_URL *=/s|=.*$|= http://'$servername$appendport'|
 /^LOCAL_URL *=/s|=.*$|= /'$basedirbasename'|
 /^PMH_PORT_NUMBER *=/s|=.*$|= '$pmhport'|
-/^PMH_REPOSITORY_IDENTIFIER *=/s|=.*$|= '$idstring'|
+/^PMH_REPOSITORY_IDENTIFIER *=/s|=.*$|= '$idstring.met.no'|
 /^PMH_EXPORT_TAGS *=/s|=.*$|= '"'$idstring'"'|
 /^OAI_HARVEST_SOURCES *=/s|=.*$|= '$oaiharvesttag' '$oaiharvestsource' '$oaiharvestset'|
 /^UPLOAD_DIRECTORY *=/s|=.*$|= '$basedir/webupload'|
