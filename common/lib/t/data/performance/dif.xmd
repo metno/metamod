@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset" xmlns:ns_1="http://www.w3.org/2001/XMLSchema-instance" ns_1:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+  <info name="DOKIPY/NP_org.polarresearch-210" status="active" creationDate="2008-06-19T00:00:00Z" datestamp="2009-03-30" ownertag="NP" metadataFormat="DIF"/>
+</dataset>
