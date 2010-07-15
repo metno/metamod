@@ -50,24 +50,59 @@ use JSON::Any;
 use Test::Builder;
 use Time::HiRes qw( gettimeofday tv_interval );
 
+# Test::Builder->new() will always return a Singleton so for easy access
+# we declare the variable here event if its not very OO
 my $tester = Test::Builder->new();
 
+=head2 new( $params_hash )
+
+=over
+
+=item accepted_error (optional, default = 10)
+
+The percentage that you accepted the measured running time to deviate from the previously
+recorded running time.
+
+=item result_file (optional)
+
+The name of the file that stores the previous running times. By default it will name the result
+file after the test script ending with "-perf.log"
+
+=item statistic_confidence (optional, default = 95)
+
+The statistical confidence that you are have now achieced the real running time within a margin
+of error. Used when running C<statistic_perf_ok>.
+
+=item statistic_error (optional, default = 10)
+
+The statistical error accepted when running C<statistic_perf_ok>. See C<Benchmark::Timer> for
+more information.
+
+=item statistic_minimum (optional, default = 5)
+
+The minimum number of iterations to execute code when using C<statistic_perf_ok>. If this parameter
+is set to 1 the tested code will only run once and it that is likely not what you want. Then
+you should instead use C<perf_ok>.
+
+=back
+
+=cut
 sub new {
-    my ( $class, $options ) = @_;
+    my ( $class, $params ) = @_;
 
     my $self = bless {}, $class;
     
-    my $accepted_error = $options->{ accepted_error } || 10;
+    my $accepted_error = $params->{ accepted_error } || 10;
     $self->accepted_error($accepted_error);
-    my $statistic_error = $options->{ statistic_error } || 10;    
+    my $statistic_error = $params->{ statistic_error } || 10;    
     $self->statistic_error($statistic_error);
-    my $statistict_confidence = $options->{ statistic_confidence } || 95;
+    my $statistict_confidence = $params->{ statistic_confidence } || 95;
     $self->statistic_confidence($statistict_confidence);
-    my $statistic_minimum = $options->{sdf};
-    $self->statistic_minimum(5);
-    $self->{_result_file} = $self->_default_filename();
-
-    $self->{_previous_result} = $self->_read_result( $self->{_result_file} );
+    my $statistic_minimum = $params->{ statistic_minimum } || 5;
+    $self->statistic_minimum($statistic_minimum);
+    
+    $self->{_result_file} = $params->{ result_file } || $self->_default_filename();
+    $self->{_previous_result} = $self->_read_result();
 
     $self->{_new_result} = {};
 
@@ -119,6 +154,8 @@ test first about the correctness of the result returned by the sub.
 If the previous running time of the sub has not been recorded the test will be skipped, but
 the sub will still be run and the running time recorded for the next time the test is run.
 
+=over
+
 =item $code
 
 A reference to the sub to execute.
@@ -148,6 +185,7 @@ for you.
 Returns false if the test was not run either because $pre_test failed, because a previous
 running time was available or because the test failed. Otherwise it returns 1.
 
+=back
 
 =cut
 
@@ -181,6 +219,8 @@ additional test first about the correctness of the result returned by the sub.
 If the previous running time of the sub has not been recorded the test will be skipped, but
 the sub will still be run and the running time recorded for the next time the test is run.
 
+=over
+
 =item $code
 
 A reference to the sub to execute.
@@ -209,6 +249,8 @@ for you.
 
 Returns false if the test was not run either because $pre_test failed, because a previous
 running time was available or because the test failed. Otherwise it returns 1.
+
+=back
 
 =cut
 
@@ -304,7 +346,6 @@ sub _accepted_performance {
 }
 
 sub _default_filename {
-    my $self = shift;
 
     my ( $volume, $directories, $filename ) = File::Spec->splitpath($0);
     my $path = File::Spec->catpath( $volume, $directories, "$filename-perf.log" );
@@ -315,14 +356,13 @@ sub _default_filename {
 sub _read_result {
     my $self = shift;
 
-    my ($result_file) = @_;
+    my $result_file = $self->{ _result_file };
 
     if ( -e $result_file ) {
 
         my $success = open my $FILE, '<', $result_file;
         if ( !$success ) {
             $self->_fatal_error("Failed to open '$result_file': $!");
-
         }
 
         my $result_string = do { local $/; <$FILE> };
@@ -341,7 +381,7 @@ sub _read_result {
 sub _write_result {
     my $self = shift;
 
-    my ($result_file) = @_;
+    my $result_file = $self->{ _result_file };
 
     my $new_result    = $self->{_new_result};
     my $prev_result   = $self->{_previous_result};
@@ -400,8 +440,30 @@ sub _fatal_error {
 sub DESTROY {
     my $self = shift;
 
-    $self->_write_result( $self->{_result_file} );
+    $self->_write_result();
 
 }
+
+=head2 (Class) remove_performance_log( $filename )
+
+Removes the specified files.
+
+=over
+
+=item $filename (optional)
+
+The name of the file to remove. If a file is not specified it will remove the default file.
+
+=back
+
+=cut
+sub remove_performance_log {
+    my ($filename) = @_;
+    
+    $filename = _default_filename() if !defined $filename;
+    
+    unlink $filename;
+    
+} 
 
 1;
