@@ -102,7 +102,7 @@ sub new {
     $self->statistic_minimum($statistic_minimum);
     
     $self->{_result_file} = $params->{ result_file } || $self->_default_filename();
-    $self->{_previous_result} = $self->_read_result();
+    $self->previous_result( $self->_read_result() );
 
     $self->{_new_result} = {};
 
@@ -144,6 +144,16 @@ sub statistic_minimum {
         $self->{_statistic_minimum} = shift;
     }
     return $self->{_statistic_minimum};
+}
+
+sub previous_result {
+    my $self = shift;
+
+    if ( defined $_[0] ) {
+        $self->{_previous_result} = shift;
+    }
+    return $self->{_previous_result};
+    
 }
 
 =head2 $self->perf_ok($code, $pre_test, $tag, $testname)
