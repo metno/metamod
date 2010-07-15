@@ -7,9 +7,9 @@ use FindBin;
 
 use lib "$FindBin::Bin/../../";
 
-
 use Test::PerformanceRegression;
 
+use File::Find;
 use Test::More;
 use Test::Files;
 use Test::Exception;
@@ -60,10 +60,16 @@ END {
 }
 
 sub dir_contents {
+
+    my @files = ();
+    my $start_path_length = length( $FindBin::Bin ) + 1;
+    my $wanted = sub { 
+        return if $_ eq '.';
+        push @files, substr( $File::Find::name, $start_path_length );  
+    };
+
+    find( $wanted, $FindBin::Bin );
     
-    opendir my $DIR, $FindBin::Bin;
-    my @files = readdir $DIR;
-    close $DIR;
     return @files; 
     
 }
