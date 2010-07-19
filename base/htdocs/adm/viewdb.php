@@ -33,6 +33,7 @@ require_once('../funcs/mmConfig.inc');
 <head>
 </head><body>
 <?php
+$path_to_createdb_script = "../../init/createdb.sh";
 include "gettables.php";
 $mmDbConnection = @pg_Connect ("dbname=".$mmConfig->getVar('DATABASE_NAME')." user=".$mmConfig->getVar('PG_ADMIN_USER')." ".$mmConfig->getVar('PG_CONNECTSTRING_PHP'));
 if ( $mmDbConnection ) {

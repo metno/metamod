@@ -32,6 +32,7 @@
 </head><body>
 <h2>View tables in the DAMOCLES database</h2>
 <?php
+   $path_to_createdb_script = "../../init/createdb.sh";
    include "gettables.php";
    echo "<table border=0>\n";
 #

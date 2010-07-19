@@ -2,7 +2,8 @@ init/create_and_load_all.sh
 init/createdb.sh
 init/update2.2To2.3.sql
 init/update_to_Fulltext.sh
-userinit/createdb.sh
+userinit/createuserdb.sh
+userinit/run_createuserdb.sh
 scripts/createusers.sh
 =scripts/import_searchdata.pl
 =scripts/import_dataset.pl
@@ -14,6 +15,7 @@ scripts/createusers.sh
 =htdocs/adm/phptest.php
 =htdocs/adm/viewdb.php
 =htdocs/adm/dosql.php
+=htdocs/adm/userbase_sql.php
 =htdocs/adm/show_databaselog.php
 =htdocs/adm/show_xml.php
 =htdocs/adm/edit_xml.php

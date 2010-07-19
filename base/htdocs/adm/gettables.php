@@ -33,10 +33,11 @@
 #   PHP code
 #
 #   
-#     Read all lines in a file into an array:
+#   $path_to_createdb_script must be defined in the script where this file is
+#   included.
 #   
-   $createdb = "../../init/createdb.sh";
-   $createdbarr = file($createdb);
+#   $createdb = "../../init/createdb.sh";
+   $createdbarr = file($path_to_createdb_script);
    $getrowname = 0;
 #   
 #     Create an empty array

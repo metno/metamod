@@ -2,7 +2,7 @@
 #---------------------------------------------------------------------------- 
 #  METAMOD - Web portal for metadata search and upload 
 # 
-#  Copyright (C) 2008 met.no 
+#  Copyright (C) 2010 met.no 
 # 
 #  Contact information: 
 #  Norwegian Meteorological Institute 
@@ -34,7 +34,7 @@
 <?php
 require_once("../funcs/mmConfig.inc");
 if (array_key_exists("sqlsentence", $_POST)) {
-   $mmDbConnection = @pg_Connect ("dbname=".$mmConfig->getVar('DATABASE_NAME')." user=".$mmConfig->getVar('PG_ADMIN_USER')." ".$mmConfig->getVar('PG_CONNECTSTRING_PHP'));
+   $mmDbConnection = @pg_Connect ("dbname=".$mmConfig->getVar('USERBASE_NAME')." user=".$mmConfig->getVar('PG_ADMIN_USER')." ".$mmConfig->getVar('PG_CONNECTSTRING_PHP'));
    if ( $mmDbConnection ) {
       $sqlsentence = stripslashes($_POST["sqlsentence"]);
       echo "<p>Connection OK</p>\n";
@@ -59,13 +59,13 @@ if (array_key_exists("sqlsentence", $_POST)) {
 } else {
 ?>
 <h3>Enter SQL sentence to perform:</h3>
-<form action="dosql.php" method="post">
+<form action="userbase_sql.php" method="post">
 <textarea name="sqlsentence" rows="4" cols="120">
 </textarea>
 <input type="submit" value="Submit">
 </form>
 <?php
-   $path_to_createdb_script = "../../init/createdb.sh";
+   $path_to_createdb_script = "../../userinit/createuserdb.sh";
    include "gettables.php";
    echo "<table border=0>\n";
 #
