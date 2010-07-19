@@ -11,6 +11,7 @@ logger_config.ini
 =htdocs/funcs/mmWMS.inc
 =htdocs/funcs/mmWMS2.inc
 =htdocs/funcs/mmOAIPMH.inc
+=htdocs/funcs/mmUserbase.inc
 =htdocs/log4php/Logger.php
 =htdocs/log4php/LoggerAppender.php
 =htdocs/log4php/LoggerAppenderPool.php

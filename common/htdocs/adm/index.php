@@ -43,6 +43,7 @@ $menu = array( 'viewdbform.php' => 'View table'
    , 'show_databaselog.php' => 'Database log'
    , 'show_xml.php' => 'Show XML dataset files'
    , 'dosql.php' => 'Perform SQL sentence'
+   , 'userbase_sql.php' => 'Perform SQL sentence on userbase'
    , 'xxx.php' => 'Do xxx'
    , 'phptest.php' => 'Show PHP installation'
 )
