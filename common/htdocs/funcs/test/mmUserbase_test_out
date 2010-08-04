@@ -1,0 +1,52 @@
+$userbase->user_find('email_address','APPID')
+   INFO:    No such user
+$userbase->user_create('email_address',"AP'PID")
+   OK
+$userbase->user_set('u_name','Peder')
+   OK
+$userbase->user_create('bingo@barcelona.com',"SPONG")
+   OK
+$userbase->user_first()
+   OK
+$userbase->user_get('u_name')
+   OK
+$userbase->user_next()
+   OK
+$userbase->user_get('u_name')
+   OK
+$userbase->user_next()
+   INFO:    No more users in the database
+$userbase->user_find('email_address','AP\'PID')
+   OK
+$userbase->dset_create('DSET','KEY')
+   OK
+$userbase->user_create('viggo@barcelona.com',"SPONG")
+   OK
+$userbase->user_set('u_name','Viggo Hansen')
+   OK
+$userbase->dset_find('AP\'PID','DSET')
+   OK
+$userbase->dset_first()
+   OK
+$userbase->dset_next()
+   INFO:    No more datasets found for current user
+$userbase->info_put('LOCATION','/my/directory')
+   OK
+$userbase->info_get('LOCATION')
+   OK
+$userbase->file_find('myfile')
+   INFO:    No such file
+$userbase->file_create('myfile')
+   OK
+$userbase->file_set('f_timestamp','2011-01-01')
+   OK
+$userbase->file_first()
+   OK
+$userbase->file_get('f_timestamp')
+   OK
+$userbase->file_next()
+   INFO:    No more files for the current dataset
+$userbase->file_find('myfile')
+   OK
+$userbase->close()
+   OK

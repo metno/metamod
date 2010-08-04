@@ -68,6 +68,10 @@ logger_config.ini
 =htdocs/log4php/renderers/LoggerRendererDefault.php
 =htdocs/log4php/renderers/LoggerRendererMap.php
 =htdocs/log4php/renderers/LoggerRendererObject.php
+=htdocs/funcs/test/mmUserbase_test.sh
+=htdocs/funcs/test/mmUserbase_test.php
+=htdocs/funcs/test/mmUserbase_commands
+=htdocs/funcs/test/mmUserbase_test_out
 =schema/oldDataset2Dataset.xslt
 =schema/oldDataset2MM2.xslt
 =schema/dif2dataset.xslt
