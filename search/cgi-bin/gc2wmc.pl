@@ -1,86 +1,41 @@
 #!/usr/bin/perl -w
 use strict;
-use LWP::UserAgent;
 use XML::LibXSLT;
-use XML::LibXML;
-use CGI;
-#use Data::Dumper;
+use File::Spec;
 
+# small routine to get lib-directories relative to the installed file
+sub getTargetDir {
+    my ($finalDir) = @_;
+    my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
+    $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
+    $dir = File::Spec->catdir($dir, $finalDir);
+    return File::Spec->catpath($vol, $dir, "");
+}
+
+use lib ('../common/lib', getTargetDir('lib'));
+
+use Metamod::WMS;
 
 ################
 # init
 #
 
-my $q = CGI->new;
-my $parser = XML::LibXML->new;
-my $setup_url = $q->param('setup'); # or giveup( "Missing parameter 'setup' containg file URL", 400);
-$setup_url =~ s/\&wmssetup=.+$// if $setup_url; # no idea why this is necessary, but OpenLayers keep sending a junk query string
-my $wmsurl = $q->param('wmsurl');
-$wmsurl =~ s/\?.+$// if $wmsurl; # no idea why this is necessary, but OpenLayers keep sending a junk query string
+my $setup_url = param('setup');
+my $wmsurl = param('wmsurl');
+#logger->debug(sprintf "\n setup = '%s'\n wmsurl = '%s'", $setup_url || '-', $wmsurl || '-');
+$setup_url =~ s/\&wmssetup=.+$// if $setup_url; # hack
+$wmsurl =~ s/\?.+$// if $wmsurl;                # another hack
+# no idea why these hacks are necessary, but OpenLayers keep sending a junk query string
 
-printf STDERR "*** setup = '%s'\n*** wmsurl = '%s'\n", $setup_url || '-', $wmsurl || '-';
+logger->debug(sprintf "\n setup = '%s'\n wmsurl = '%s'", $setup_url || '-', $wmsurl || '-');
 
-my $default_wmc = <<EOT;
-<?xml version="1.0"?>
-<w:ncWmsSetup
-    xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.met.no/schema/metamod/ncWmsSetup ncWmsSetup.xsd ">
-    <w:displayArea crs="EPSG:32661" left="-3000000" right="7000000" bottom="-3000000" top="7000000"/>
-</w:ncWmsSetup>
-EOT
-
-####################
-# report error
-#
-sub giveup {
-    my $text = shift || 'Something went wrong';
-    my $status = shift || 500;
-    print $q->header('text/html', $status);
-    print <<EOT;
-<html>
-<head>
-    <title>WMC generator error</title>
-</head>
-<body>
-    <h1>WMC generator error</h1>
-    <p>$text</p>
-</body>
-</html>
-EOT
-    exit;
-}
-
-
-####################
-# webservice client
-#
-sub getXML {
-    my $url = shift or die "Missing URL";
-    #printf STDERR "GET %s\n", $url;
-    my $ua = LWP::UserAgent->new;
-    $ua->timeout(100);
-    #$ua->env_proxy;
-
-    my $response = $ua->get($url);
-
-    if ($response->is_success) {
-        #print STDERR $response->content;
-        return $parser->parse_string($response->content);
-    }
-    else {
-        giveup($response->status_line . ': ' . $url, 502);
-    }
-}
-
+# must use either one of params to work
+abandon("Missing parameter 'setup' or 'wmsurl'", 400) unless $setup_url || $wmsurl;
 
 #################################
 # read setup document
 #
-my $setup = $setup_url ? getXML($setup_url) : $parser->parse_string($default_wmc);
-my $sxc = XML::LibXML::XPathContext->new( $setup->documentElement() );
-$sxc->registerNs('s', "http://www.met.no/schema/metamod/ncWmsSetup");
-#print STDERR $setup->toString;
+my ($setup, $sxc) = getSetup($setup_url);
 my $time = localtime();
 my %bbox = ( time => $time );
 foreach ( $sxc->findnodes('/*/s:displayArea/@*') ) {
@@ -95,7 +50,7 @@ foreach ( $sxc->findnodes('/*/s:displayArea/@*') ) {
 #
 my $xslt = XML::LibXSLT->new();
 my $wmcns = "http://www.opengis.net/context";
-my $getcap = $wmsurl || $setup->documentElement->getAttribute('url') or giveup("Missing setup or WMS url");
+my $getcap = $wmsurl || $setup->documentElement->getAttribute('url') or abandon("Missing setup or WMS url");
 #printf STDERR "XML: %s\n", $getcap;
 $getcap .= '?service=WMS&version=1.3.0&request=GetCapabilities';
 my $stylesheet = $xslt->parse_stylesheet_file('gc2wmc.xsl');
@@ -136,16 +91,14 @@ foreach ($xc->findnodes("v:Layer", $layerlist)) {
 $layerlist->addSibling($newlayers);
 $layerlist->unbindNode;
 
-
 #############
 # output XML
 #
-print $q->header('application/xml');
+
 my $out = $stylesheet->output_as_bytes($results);
-$out =~ s|( xmlns:xlink="http://www.w3.org/1999/xlink"){2}|$1|g;
 # another hack to work around inexplainable namespace bug
-#print STDERR $out;
-print $out;
+$out =~ s|( xmlns:xlink="http://www.w3.org/1999/xlink"){2}|$1|g;
+outputXML('application/xml', $out);
 
 =end
 

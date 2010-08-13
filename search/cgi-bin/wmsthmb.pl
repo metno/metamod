@@ -1,89 +1,50 @@
 #!/usr/bin/perl -w
 use strict;
-use LWP::UserAgent;
 use XML::LibXSLT;
-use XML::LibXML;
-use CGI;
-use Data::Dumper;
+use File::Spec;
 
+# small routine to get lib-directories relative to the installed file
+sub getTargetDir {
+    my ($finalDir) = @_;
+    my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
+    $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
+    $dir = File::Spec->catdir($dir, $finalDir);
+    return File::Spec->catpath($vol, $dir, "");
+}
+
+use lib ('../common/lib', getTargetDir('lib'));
+
+use Metamod::WMS;
 
 ################
 # init
 #
-our $parser = XML::LibXML->new();
 my $xslt = XML::LibXSLT->new();
+my $setup_url = param('wmssetup') or abandon("Missing parameter 'wmssetup' containg file URL", 400);
+my $size = param('size') || 96;
 
-my $q = CGI->new;
-my $setup_url = $q->param('wmssetup') or giveup( "Missing parameter 'wmssetup' containg file URL", 400);
-my $size = $q->param('size') || 96;
+logger->debug(sprintf "\n setup = '%s'", $setup_url || '-');
 
-#printf STDERR "*** setup = '%s'\n*** url = '%s'\n", $setup_url || '-', $q->param('url') || '-';
-
-####################
-# report error
-#
-sub giveup {
-    my $text = shift || 'Something went wrong';
-    my $status = shift || 500;
-    print $q->header('text/html', $status);
-    print <<EOT;
-<html>
-<head>
-    <title>Thumbnail generator error</title>
-</head>
-<body>
-    <h1>Thumbnail generator error</h1>
-    <p>$text</p>
-</body>
-</html>
-EOT
-    exit;
-}
-
-
-####################
-# webservice client
-#
-sub getXML {
-    my $url = shift or die "Missing URL";
-    #printf STDERR "GET %s\n", $url;
-    my $ua = LWP::UserAgent->new;
-    $ua->timeout(100);
-    #$ua->env_proxy;
-
-    my $response = $ua->get($url);
-
-    if ($response->is_success) {
-        #print STDERR $response->content;
-        return $parser->parse_string($response->content);
-    }
-    else {
-        giveup($response->status_line . ': ' . $url, 502);
-    }
-}
-
-
-#################################
-# read setup document
-#
-my $setup = getXML($setup_url);
-my $sxc = XML::LibXML::XPathContext->new( $setup->documentElement() );
-$sxc->registerNs('s', "http://www.met.no/schema/metamod/ncWmsSetup");
-
+# read setup document etc.
+my ($setup, $sxc) = getSetup($setup_url);
 my $wms_url = $sxc->findvalue('/*/@url');
 
+# find area info (dimensions, projection)
 my (%area, %layer);
 foreach ( $sxc->findnodes('/*/s:displayArea[1]/@*') ) {
     $area{$_->nodeName} = $_->getValue;
 }
+# find metadata of first layer (name, style)
 foreach ( $sxc->findnodes('/*/s:layer[1]/@*') ) {
     $layer{$_->nodeName} = $_->getValue;
 }
 
+# build WMS params for maps
 my $wmsparams = "SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&FORMAT=image%2Fpng"
     . "&SRS=$area{crs}&BBOX=$area{left},$area{bottom},$area{right},$area{top}&WIDTH=$size&HEIGHT=$size"
     . "&EXCEPTIONS=application%2Fvnd.ogc.se_inimage";
 
+# these map url's should really be configured somewhere else
 my $coast_url = "http://wms.met.no/maps/world.map?";
 if ($area{crs} eq "EPSG:32661") {
     $coast_url = "http://wms.met.no/maps/northpole.map?";
@@ -96,8 +57,7 @@ if ($area{crs} eq "EPSG:32661") {
 #############
 # output HTML
 #
-print $q->header('text/html');
-print <<EOT;
+my $body = <<EOT;
 <html>
     <head>
         <style type="text/css">
@@ -111,6 +71,7 @@ print <<EOT;
 </html>
 EOT
 
+outputXML('text/html', $body);
 
 =end
 

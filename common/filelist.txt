@@ -102,6 +102,7 @@ logger_config.ini
 =lib/Metamod/Utils.pm
 =lib/Metamod/Config.pm
 =lib/Metamod/LoggerConfigParser.pm
+=lib/Metamod/WMS.pm
 =lib/MetNo/NcFind.pm
 =lib/MetNo/NcDigest.pm
 =lib/quadtreeuse.pm
