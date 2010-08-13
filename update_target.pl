@@ -1,34 +1,40 @@
 #!/usr/bin/perl -w
-# 
-#---------------------------------------------------------------------------- 
-#  METAMOD - Web portal for metadata search and upload 
-# 
-#  Copyright (C) 2008 met.no 
-# 
-#  Contact information: 
-#  Norwegian Meteorological Institute 
-#  Box 43 Blindern 
-#  0313 OSLO 
-#  NORWAY 
-#  email: egil.storen@met.no 
-#   
-#  This file is part of METAMOD 
-# 
-#  METAMOD is free software; you can redistribute it and/or modify 
-#  it under the terms of the GNU General Public License as published by 
-#  the Free Software Foundation; either version 2 of the License, or 
-#  (at your option) any later version. 
-# 
-#  METAMOD is distributed in the hope that it will be useful, 
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-#  GNU General Public License for more details. 
-#   
-#  You should have received a copy of the GNU General Public License 
-#  along with METAMOD; if not, write to the Free Software 
-#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
-#---------------------------------------------------------------------------- 
-#
+
+=begin LICENCE
+
+----------------------------------------------------------------------------
+  METAMOD - Web portal for metadata search and upload
+
+  Copyright (C) 2008 met.no
+
+  Contact information:
+  Norwegian Meteorological Institute
+  Box 43 Blindern
+  0313 OSLO
+  NORWAY
+  email: egil.storen@met.no
+
+  This file is part of METAMOD
+
+  METAMOD is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  METAMOD is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with METAMOD; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+----------------------------------------------------------------------------
+
+=end LICENCE
+
+=cut
+
 use strict;
 use File::Copy;
 use File::Path;
@@ -57,7 +63,7 @@ foreach my $cmdarg (@ARGV) {
       $argcount++;
    }
 }
-if ($argcount != 1 || ($optcount > 0 && $optcount != 2) || 
+if ($argcount != 1 || ($optcount > 0 && $optcount != 2) ||
       ($optcount > 0 && !exists($commandline_options{'--from'})) ||
       ($optcount > 0 && !exists($commandline_options{'--to'}))) {
    die "\nUsage:\n\n1.     $0 application_directory\n\n" .
@@ -83,12 +89,12 @@ my $majorVersion;
         if ($line =~ /version\s+(\d+\.\w+)\.(\w+)\s+/i) {
             $version = $1 . '.' . $2;
             $majorVersion = $1;
-            last; 
+            last;
         }
     }
     unless (defined $majorVersion) {
         die "could not read version from VERSION file\n";
-    } 
+    }
 }
 print "\nConfiguring application '$appName' with Metamod $majorVersion ($version)\n\n";
 
@@ -113,9 +119,9 @@ my $line = "";
 while (<CONFIG>) {
    chomp($_);
    $line = $_;
-#   
+#
 #     Check if expression matches RE:
-#   
+#
    if ($line =~ /^[A-Z0-9_#!]/ && $varname ne "") {
       if (length($origname) > 0) {
          $conf{$varname . ':' . $origname . ':' . $newname} = $value;
@@ -187,7 +193,7 @@ if (! -f "$targetdir/$configMaster" or ($config_modified > (stat _)[9])) {
         print STDERR "Cannot create configuration-symlink in $etcDir: no such directory\n\n";
     }
 }
-    
+
 
 if (!exists($conf{'SOURCE_DIRECTORY'})) {
    die "SOURCE_DIRECTORY is not defined in $configfile";
@@ -209,14 +215,14 @@ push (@flistpathes, $appdir . '/filelist.txt');
 my %copied_targetnames = ();
 foreach my $filelistpath (@flistpathes) {
 #
-#  Read the list of file names to be copied. 
+#  Read the list of file names to be copied.
 #  For each of these files where the modification time is larger
 #  than the corresponding file in the target directory tree,
 #  the file is copied to the target directory tree. While copying,
 #  substitutions are made according to the configuration file.
 #
    my $topdir = $filelistpath;
-   $topdir =~ s:/[^/]*$::; # $topdir is the directory containing the 
+   $topdir =~ s:/[^/]*$::; # $topdir is the directory containing the
                            # current filelist.txt file
 #
 #  Open file for reading
@@ -257,7 +263,7 @@ foreach my $filelistpath (@flistpathes) {
 #        (or the file has already been copied from another filelist - this
 #        ensures that files from the lattermost part of the sequence of filelists
 #        are chosen).
-#      
+#
                my $dirpath = $targetdir . '/' . $targetname;
                $dirpath =~ s/\/[^\/]*$//;
                mkpath($dirpath);
@@ -324,7 +330,7 @@ sub substcopy {
 #
 #  Open file for reading
 #
-   unless (-r "$inputpath") 
+   unless (-r "$inputpath")
           {die "Can not read from file: $inputpath\n";}
    open (IN,"$inputpath");
    while (<IN>) {
@@ -355,9 +361,9 @@ sub substituteval {
       if ($textline =~ /\[==([A-Z0-9_]+)==\]/) {
          $vname = $1; # First matching ()-expression
          my $value = "";
-#      
+#
 #        Check if key exists in hash
-#      
+#
          if (length($ifil) > 0 &&
                   exists($conf{$vname . ':' . $ifil . ':' . $ofil})) {
             $value = $conf{$vname . ':' . $ifil . ':' . $ofil};
@@ -368,9 +374,9 @@ sub substituteval {
          }
          my $reg = "\\[==" . $vname . "==\\]";
          if ($valuefound) {
-#         
+#
 #           Substitute all occurences of a match:
-#         
+#
             $textline =~ s/$reg/$value/mg;
          } else {
             if (length($ifil) > 0) {
@@ -392,3 +398,52 @@ sub substituteval {
    return $textline;
 }
 #----------------------------------------------------------------------
+
+=head1 NAME
+
+B<update_target.pl> - Metamod installer/tester
+
+=head1 VERSION
+
+[% VERSION %], last modified $Date: 2008-10-06 11:28:08 $
+
+=head1 DESCRIPTION
+
+Longer description of what facilities the software offers.
+
+=head1 USAGE
+
+ trunk/update_target.pl application_directory
+ trunk/update_target.pl --from=sourcefile --to=targetfile application_directory
+
+=head1 OPTIONS
+
+=head2 Parameters
+
+=over 4
+
+=item application_directory
+
+'application_directory' is the name of a directory containing the application
+specific files. Inside this directory, there must be a master_config.txt file.
+
+=item --from
+
+=item --to
+
+If these two options are present, the normal behaviour is suspended. The only thing
+that happens are copying with substitutions (according to the master_config.txt file)
+from the sourcefile to the targetfile.
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) 2010 The Norwegian Meteorological Institute.
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+=cut
