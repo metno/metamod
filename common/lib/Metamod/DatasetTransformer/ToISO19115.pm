@@ -31,8 +31,6 @@ use base('Exporter');
 
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 
-our $DEBUG = 0;
-
 use strict;
 use warnings;
 use Metamod::ForeignDataset;
@@ -44,26 +42,24 @@ our @EXPORT_OK = qw(foreignDataset2iso19115);
 our $_logger = Log::Log4perl->get_logger('metamod::common::Metamod::DatasetTransformer::ToISO19115');
 
 my $difToIsoXslt = $Metamod::DatasetTransformer::XSLT_DIR . 'dif2iso.xslt';
-my $mm2ToDif = $Metamod::DatasetTransformer::XSLT_DIR . 'mm2dif.xslt';
 
 my $difToIsoStyle;
 my $_init = 0;
 sub _init {
-    return if $_init;
+    return if $_init++;
     
     my $styleDoc = Metamod::DatasetTransformer->XMLParser->parse_file($difToIsoXslt);
     $difToIsoStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet($styleDoc);
     if (!$difToIsoStyle) {
         $_logger->logcroak("cannot parse stylesheet $difToIsoXslt");   
     }
-    $_init++;
 }
 
 sub foreignDataset2iso19115 {
     my ($foreignDataset) = @_;
     _init();
     if (!UNIVERSAL::isa($foreignDataset, 'Metamod::ForeignDataset')) {
-        $_logger->logcroak("foreignDataset2iso19115 requires Metamod::ForeignDataset, got: " . ref($foreignDataset));
+        $_logger->error_log("foreignDataset2iso19115 requires Metamod::ForeignDataset, got: " . ref($foreignDataset));
     }
     my $difFds;
     # get a DatasetTransformer-plugin

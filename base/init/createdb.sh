@@ -236,4 +236,8 @@ CREATE INDEX Idx_Dataset_Location_geom_$i ON Dataset_Location USING GIST (geom_$
 EOF
 done
 
+echo "----------------- ADDING SRU2JDBC SUPPORT -----------"
+$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME < sruSchema.sql
+
+
 date +'%Y-%m-%d %H:%M Database re-initialized, dynamic tables created' >>[==LOGFILE==]
