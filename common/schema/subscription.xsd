@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="subscription">
+    	<xs:complexType>
+    		<xs:sequence maxOccurs="unbounded" minOccurs="1">
+    			<xs:element name="param"
+    				type="subscription-parameter">
+    			</xs:element>
+    		</xs:sequence>
+    		<xs:attribute name="type" type="subscription-type" use="required"></xs:attribute>
+    	</xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="subscription-parameter">
+    	<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+    	<xs:attribute name="value" type="xs:string" use="required"></xs:attribute>
+    </xs:complexType>
+
+    <xs:simpleType name="subscription-type">
+    	<xs:restriction base="xs:string">
+    		<xs:enumeration value="email"></xs:enumeration>
+    		<xs:enumeration value="sms"></xs:enumeration>
+    	</xs:restriction>
+    </xs:simpleType>
+</xs:schema>
