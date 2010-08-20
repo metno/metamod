@@ -44,6 +44,19 @@ function fmquestversion() {
     return($questversion);
 }
 
+function fmquestmenu() {
+
+    global $mmConfig;
+
+    $mybasepage = $mmConfig->getVar('METADATA_SEARCH_URL');
+    
+    $mytext = "<FORM METHOD=\"LINK\" ACTION=\"$mybasepage\">";
+    $mytext .= "<INPUT TYPE=\"submit\" VALUE=\"Return to Search menu\">";
+    $mytext .= "</FORM>\n";
+
+    return($mytext);
+}
+
 function fmcreateform($outputdst, $filename, $edit=false) {
 
     if (! file_exists($filename)) {
@@ -120,6 +133,7 @@ function fmcreateform($outputdst, $filename, $edit=false) {
     echo(fmcreatebutton("Submit","Check form"));
     echo(fmcreatebutton("Reset","Clear form"));
     echo(fmendform());
+    echo(fmquestmenu());
     echo(fmquestversion());
 
     return;
