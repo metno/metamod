@@ -71,8 +71,13 @@ sub new {
 	return $_config{$file};
 }
 
-# get the file in ../../master_config.txt
+# get the file from METAMOD_MASTER_CONFIG or in ../../master_config.txt
 sub _getDefaultConfigFile {
+    # allow the use of none standard location of the config file. This is functionality
+    # is meant primarily for unit testing purposes
+    if ( exists $ENV{ METAMOD_MASTER_CONFIG } ) {
+        return $ENV{ METAMOD_MASTER_CONFIG };
+    }
     my ($vol, $dir, undef) = File::Spec->splitpath(ABS_PATH());
     my @dirs = File::Spec->splitdir($dir);
     pop @dirs; # remove last /
@@ -192,7 +197,10 @@ sub getDBH() {
                   $self->get("PG_CONNECTSTRING_PERL");
     my $dbh =  DBI->connect_cached($connect,
                                    $user, "",
-                                   {AutoCommit => 0, RaiseError => 1} );
+                                   {AutoCommit => 0,
+                                    RaiseError => 1,
+                                    FetchHashKeyName => 'NAME_lc',
+                                   } );
     return $dbh;
 }
 
@@ -237,18 +245,8 @@ sub import {
     my $package = shift;
 
     foreach my $parameter ( @_ ){
-
         if( $parameter =~ /:init_logger/ ){
-
-            my $config_file;
-
-            # allow the use of none standard location of the config file. This is functionality
-            # is meant primarily for unit testing purposes
-            if( exists $ENV{ METAMOD_MASTER_CONFIG } ){
-                $config_file = $ENV{ METAMOD_MASTER_CONFIG };
-            }
-
-            staticInitLogger($config_file);
+            staticInitLogger();
         }
     }
 }
@@ -281,7 +279,8 @@ This module can be used to read the configuration file.
 =item new([configfilename])
 
 Initialize the configuration with a config-file. If no config-file is given,
-the default config-file located in '../../master_config.txt' relative to the
+the environment-variable METAMOD_MASTER_CONFIG will be used (useful for testing),
+otherwise, the default config-file located in '../../master_config.txt' relative to the
 installation of Metamod::Config will be used.
 
 This function will die if the config-file cannot be found.
@@ -314,14 +313,9 @@ will be used.
 
 =item getDBH()
 
-<<<<<<< .mine
 Return a cached/pooled DBI-handler to the default database of metamod. The handler is in 
-AutoCommit = 0 and RaiseError = 1 mode. This function will die on error. (DBI-connect error)
+AutoCommit = 0 and RaiseError = 1, FetchHash mode. This function will die on error. (DBI-connect error)
 
-=======
-
-
->>>>>>> .r694
 =head1 AUTHOR
 
 Heiko Klein, E<lt>H.Klein@met.noE<gt>
