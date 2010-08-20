@@ -64,10 +64,10 @@ PG_CONNECTSTRING_PHP =
 
 # String used in Perl DBI->connect function to connect to the
 # database:
-PG_CONNECTSTRING_PERL =
+PG_CONNECTSTRING_PERL = host=localhost;port=15432;
 
 # Name of the PostgreSQL database:
-DATABASE_NAME = example
+DATABASE_NAME = damocles
 
 # URL of Metadata Search application:
 METADATA_SEARCH_URL = [==LOCAL_URL==]/sch/index.php
@@ -92,7 +92,7 @@ APP_HEADER_HTML =
 APP_FOOTER_HTML =
 
 # Comma-separated list of dataset tags accessible from this application:
-DATASET_TAGS = 'MM'
+DATASET_TAGS = 'DAM', 'NP', 'HI', 'XXX', 'MM'
 
 # ============ METAMODBASE configuration ==============
 # Path for logfile for logging important operations on the database:
