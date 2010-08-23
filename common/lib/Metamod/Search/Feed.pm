@@ -27,7 +27,7 @@ sub new {
     my $class = shift;
 
     my $self = bless {}, $class;
-    $self->{ _dataset_db } = Metamod::DatasetDb->new();
+    $self->{_dataset_db} = Metamod::DatasetDb->new();
 
     return $self;
 
@@ -109,15 +109,15 @@ sub _create_all_feeds_page {
     my ($url_rewrite) = @_;
 
     my $dataset_db = $self->{_dataset_db};
-    my $datasets  = $dataset_db->get_level1_datasets();
+    my $datasets   = $dataset_db->get_level1_datasets();
 
     my $feeds_html = $self->_create_html_header('Available feeds');
     $feeds_html .= q{<ul>};
     foreach my $dataset (@$datasets) {
         my $ds_name = $dataset->{ds_name};
 
-        my $unqualified_name = $self->_get_unqualified_name( $ds_name );
-        
+        my $unqualified_name = $self->_get_unqualified_name($ds_name);
+
         next if !$unqualified_name;
 
         my $link = $unqualified_name;
@@ -139,38 +139,40 @@ sub _create_feed {
 
     my ($ds) = @_;
 
-    my $ds_name    = $ds->{ ds_name };    
-    my $unqualified_name = $self->_get_unqualified_name( $ds_name );
+    my $ds_name          = $ds->{ds_name};
+    my $unqualified_name = $self->_get_unqualified_name($ds_name);
     $unqualified_name = $ds_name if !$unqualified_name;
-    
+
     my $rss = XML::RSS::LibXML->new( version => '2.0' );
     $rss->channel(
-        title       => "METAMOD Dataset feed for $unqualified_name",
-        description => "METAMOD dataset feed for $unqualified_name. Provides updates when new files are available in the dataset.",
-        link        => 'Link to the METAMOD instance',
-        generator   => 'METAMOD',
+        title => "METAMOD Dataset feed for $unqualified_name",
+        description =>
+            "METAMOD dataset feed for $unqualified_name. Provides updates when new files are available in the dataset.",
+        link      => 'Link to the METAMOD instance',
+        generator => 'METAMOD',
     );
 
     my $dataset_db = $self->{_dataset_db};
-    my $level2_datasets = $dataset_db->get_level2_datasets( { ds_id => $ds->{ ds_id } } );
+    my $level2_datasets = $dataset_db->get_level2_datasets( { ds_id => $ds->{ds_id} } );
 
     # generate a RSS item for each of the level2 datasets that belongs to the level1 dataset.
-    my @level2_ids = map { $_->{ ds_id } } @$level2_datasets;
-    if( @level2_ids ){
-    my $metadata = $dataset_db->get_metadata( \@level2_ids, [ 'title', 'abstract' ] );
+    my @level2_ids = map { $_->{ds_id} } @$level2_datasets;
+    if (@level2_ids) {
+        my $metadata = $dataset_db->get_metadata( \@level2_ids, [qw( title abstract dataref )] );
         foreach my $sub_ds (@$level2_datasets) {
-            my $md = $metadata->{ $sub_ds->{ ds_id } };
-            my $title = join " ", @{ $md->{ title } };
-            my $abstract = join " ", @{ $md->{ abstract } };
-            get_logger( 'metamod.search' )->warn( $sub_ds->{ds_filepath} );
+            my $md       = $metadata->{ $sub_ds->{ds_id} };
+            my $title    = join " ", @{ $md->{title} };
+            my $abstract = join " ", @{ $md->{abstract} };
+            my $link     = $md->{dataref}->[0];               #assume one dataref. Concating links does not make sense.
+            get_logger('metamod.search')->warn( $sub_ds->{ds_filepath} );
             $rss->add_item(
                 title       => $title,
-                link        => $sub_ds->{ds_filepath},
+                link        => $link,
                 description => $abstract,
             );
         }
     }
-    
+
     return $rss->as_string();
 
 }
@@ -257,18 +259,19 @@ Returns the unqualified name part of a ds_name. Returns false if $ds_name does
 not have the expected format. 
 
 =cut
+
 sub _get_unqualified_name {
-    my ($self, $ds_name) = @_;
+    my ( $self, $ds_name ) = @_;
 
     my $unqualified_name;
-    if( $ds_name =~ /^.+\/(.+)$/ ){
+    if ( $ds_name =~ /^.+\/(.+)$/ ) {
         $unqualified_name = $1;
     } else {
-        get_logger( 'metamod.search' )->warn( "Dataset name $ds_name does not have correct format" );
+        get_logger('metamod.search')->warn("Dataset name $ds_name does not have correct format");
     }
-    
+
     return $unqualified_name;
-    
+
 }
 
 1;
