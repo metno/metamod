@@ -9,7 +9,7 @@ use CGI;
 use Log::Log4perl qw( get_logger );
 use XML::RSS::LibXML;
 
-use Metamod::Search::FeedData;
+use Metamod::DatasetDb;
 
 =head1 NAME
 
@@ -27,9 +27,7 @@ sub new {
     my $class = shift;
 
     my $self = bless {}, $class;
-
-    my $feed_data = Metamod::Search::FeedData->new();
-    $self->{_feed_data} = $feed_data;
+    $self->{ _dataset_db } = Metamod::DatasetDb->new();
 
     return $self;
 
@@ -77,9 +75,9 @@ sub process_request {
     my $content;
     eval {
 
-        my $feed_data = $self->{_feed_data};
+        my $dataset_db = $self->{_dataset_db};
         if ($ds_name) {
-            my $ds = $feed_data->find_dataset($ds_name);
+            my $ds = $dataset_db->find_dataset($ds_name);
 
             if ( !defined $ds ) {
                 $content = $self->_create_not_found_page($ds_name);
@@ -110,20 +108,24 @@ sub _create_all_feeds_page {
 
     my ($url_rewrite) = @_;
 
-    my $feed_data = $self->{_feed_data};
-    my $datasets  = $feed_data->get_datasets();
+    my $dataset_db = $self->{_dataset_db};
+    my $datasets  = $dataset_db->get_level1_datasets();
 
     my $feeds_html = $self->_create_html_header('Available feeds');
-    $feeds_html = q{<ul>};
+    $feeds_html .= q{<ul>};
     foreach my $dataset (@$datasets) {
-        my $name = $dataset->{name};
+        my $ds_name = $dataset->{ds_name};
 
-        my $link = $name;
+        my $unqualified_name = $self->_get_unqualified_name( $ds_name );
+        
+        next if !$unqualified_name;
+
+        my $link = $unqualified_name;
         if ( !$url_rewrite ) {
-            $link = "feed.pl?dataset=$name";
+            $link = "feed.pl?dataset=$unqualified_name";
         }
 
-        $feeds_html .= qq{<li><a href="$link">$name</a></li>};
+        $feeds_html .= qq{<li><a href="$link">$unqualified_name</a></li>};
     }
     $feeds_html .= q{</ul>};
 
@@ -135,29 +137,40 @@ sub _create_all_feeds_page {
 sub _create_feed {
     my $self = shift;
 
-    my ($dataset) = @_;
+    my ($ds) = @_;
 
-    my $ds_name   = $dataset->{name};
-    my $feed      = {};
-    my $feed_data = $self->{_feed_data};
-    my $files     = $feed_data->get_files( { ds_name => $ds_name } );
-
+    my $ds_name    = $ds->{ ds_name };    
+    my $unqualified_name = $self->_get_unqualified_name( $ds_name );
+    $unqualified_name = $ds_name if !$unqualified_name;
+    
     my $rss = XML::RSS::LibXML->new( version => '2.0' );
     $rss->channel(
-        title       => "METAMOD Dataset feed for $ds_name",
-        description => "METAMOD dataset feed for $ds_name. Provides updates when new files are available in the feed.",
+        title       => "METAMOD Dataset feed for $unqualified_name",
+        description => "METAMOD dataset feed for $unqualified_name. Provides updates when new files are available in the dataset.",
         link        => 'Link to the METAMOD instance',
         generator   => 'METAMOD',
     );
 
-    foreach my $file (@$files) {
-        $rss->add_item(
-            title       => $file->{title},
-            link        => $file->{url},
-            description => $file->{abstract},
-        );
-    }
+    my $dataset_db = $self->{_dataset_db};
+    my $level2_datasets = $dataset_db->get_level2_datasets( { ds_id => $ds->{ ds_id } } );
 
+    # generate a RSS item for each of the level2 datasets that belongs to the level1 dataset.
+    my @level2_ids = map { $_->{ ds_id } } @$level2_datasets;
+    if( @level2_ids ){
+    my $metadata = $dataset_db->get_metadata( \@level2_ids, [ 'title', 'abstract' ] );
+        foreach my $sub_ds (@$level2_datasets) {
+            my $md = $metadata->{ $sub_ds->{ ds_id } };
+            my $title = join " ", @{ $md->{ title } };
+            my $abstract = join " ", @{ $md->{ abstract } };
+            get_logger( 'metamod.search' )->warn( $sub_ds->{ds_filepath} );
+            $rss->add_item(
+                title       => $title,
+                link        => $sub_ds->{ds_filepath},
+                description => $abstract,
+            );
+        }
+    }
+    
     return $rss->as_string();
 
 }
@@ -232,6 +245,30 @@ sub _create_html_footer {
 </html>
 END_HTML
 
+}
+
+=head2 $self->_get_unqualified_name( $ds_name )
+
+=over
+
+=item return
+
+Returns the unqualified name part of a ds_name. Returns false if $ds_name does
+not have the expected format. 
+
+=cut
+sub _get_unqualified_name {
+    my ($self, $ds_name) = @_;
+
+    my $unqualified_name;
+    if( $ds_name =~ /^.+\/(.+)$/ ){
+        $unqualified_name = $1;
+    } else {
+        get_logger( 'metamod.search' )->warn( "Dataset name $ds_name does not have correct format" );
+    }
+    
+    return $unqualified_name;
+    
 }
 
 1;
