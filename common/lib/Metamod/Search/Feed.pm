@@ -164,7 +164,7 @@ sub _create_feed {
             my $title    = join " ", @{ $md->{title} };
             my $abstract = join " ", @{ $md->{abstract} };
             my $link     = $md->{dataref}->[0];               #assume one dataref. Concating links does not make sense.
-            get_logger('metamod.search')->warn( $sub_ds->{ds_filepath} );
+            
             $rss->add_item(
                 title       => $title,
                 link        => $link,
