@@ -9,7 +9,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../";
 
 my $num_tests = 0; 
-use File::Path qw( make_path );
+use File::Path;
 use Test::More;
 use Test::Files;
 
@@ -20,7 +20,7 @@ my $out_dir = "$FindBin::Bin/xml_output/xml_output";
 my $baseline_dir = "$FindBin::Bin/../data/MetNo"; # dir with the correct xml files
 
 if( !( -e $out_dir ) ){
-    make_path( $out_dir ) or die $!;
+    mkpath( $out_dir ) or die $!;
 }
  
 my $digest_file = "$FindBin::Bin/../data/MetNo/nc_files_to_digest.txt";
