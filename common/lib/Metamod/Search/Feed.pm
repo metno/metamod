@@ -112,7 +112,7 @@ sub _create_all_feeds_page {
     my $datasets   = $dataset_db->get_level1_datasets();
 
     my $feeds_html = $self->_create_html_header('Available feeds');
-    $feeds_html .= q{<ul>};
+    $feeds_html .= qq{<ul>\n};
     foreach my $dataset (@$datasets) {
         my $ds_name = $dataset->{ds_name};
 
@@ -120,14 +120,14 @@ sub _create_all_feeds_page {
 
         next if !$unqualified_name;
 
-        my $link = $unqualified_name;
+        my $link = "feed/$unqualified_name";
         if ( !$url_rewrite ) {
             $link = "feed.pl?dataset=$unqualified_name";
         }
 
-        $feeds_html .= qq{<li><a href="$link">$unqualified_name</a></li>};
+        $feeds_html .= qq{<li><a href="$link">$unqualified_name</a></li>\n};
     }
-    $feeds_html .= q{</ul>};
+    $feeds_html .= qq{</ul>\n};
 
     $feeds_html .= $self->_create_html_footer();
     return $feeds_html;
