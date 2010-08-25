@@ -104,7 +104,8 @@ logger_config.ini
 =lib/Metamod/Config.pm
 =lib/Metamod/LoggerConfigParser.pm
 =lib/Metamod/Search/Feed.pm
-=lib/Metamod/Search/FeedData.pm
+=lib/Metamod/Subscription.pm
+=lib/Metamod/SubscriptionHandler.pm
 =lib/Metamod/WMS.pm
 =lib/MetNo/NcFind.pm
 =lib/MetNo/NcDigest.pm
