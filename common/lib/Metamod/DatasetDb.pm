@@ -200,7 +200,10 @@ EOT
 ORDER BY DS_datestamp DESC
 EOT
     $newestSth->execute($parameters{ds_id}, $cutOffDate);
-    my $datasets = $newestSth->fetchall_arrayref;
+    my $datasets = [];
+    while (defined (my $row = $newestSth->fetchrow_hashref)) {
+        push @$datasets, $row;
+    }
     
     if (@$datasets < $parameters{max_files}) {
         # add more datasets until max_files

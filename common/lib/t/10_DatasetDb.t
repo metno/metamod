@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use lib "..";
-use Test::More tests => 8;
+use Test::More tests => 9;
 use Data::Dumper;
 
 BEGIN {$ENV{METAMOD_MASTER_CONFIG} = 'master_config.txt' unless exists $ENV{METAMOD_MASTER_CONFIG};}
@@ -31,6 +31,11 @@ SKIP: {
     
     my $level2hirlam = $obj->get_level2_datasets(ds_id => $hirlam12->{ds_id}, max_files => 30);
     is (scalar @$level2hirlam, 30, "get_level2_datasets with max_files restriction"); 
+    my $countHash;
+    foreach my $row (@$level2hirlam) {
+        $countHash++ if (ref $row eq 'HASH');
+    }
+    is ($countHash, 30, "all level2 datasets are hash-refs");
 
     my @ds_ids = map {$_->{ds_id}} @$level2hirlam;
     my $metadata = $obj->get_metadata(\@ds_ids, ['title', 'PI_name']);
