@@ -35,26 +35,24 @@ data.
 =back
 
 =cut
+
 sub init_test {
-	my ( $dump_file ) = @_;
-	
+    my ($dump_file) = @_;
+
     my $config = Metamod::Config->new();
     $config->initLogger();
-    
-    my $dbh;
-    eval {
-      $dbh = $config->getDBH();      
-    };
-    
-    if( $@ ) {
-        return 'Cannot connect to the database: ' . $@;    
-    }
-    
-    my $result = populate_database($dump_file, $config);
-    return $result;	
-	   
-}
 
+    my $dbh;
+    eval { $dbh = $config->getDBH(); };
+
+    if ($@) {
+        return 'Cannot connect to the database: ' . $@;
+    }
+
+    my $result = populate_database( $dump_file, $config );
+    return $result;
+
+}
 
 =head2 populate_database( $dump_file, $config )
 
@@ -74,25 +72,25 @@ A reference to a L<Metamod::Config> object.
 Returns false on success and an error message otherwise.
 
 =cut
+
 sub populate_database {
     my ( $dump_file, $config ) = @_;
 
-    my $user = $config->get('PG_ADMIN_USER');
-    my $db_name = $config->get('DATABASE_NAME');
+    my $user        = $config->get('PG_ADMIN_USER');
+    my $db_name     = $config->get('DATABASE_NAME');
     my $output_file = "$FindBin::Bin/postgresql.out";
 
     my $command = "psql -U $user --dbname $db_name --file $dump_file -o $output_file";
     my $success = system $command;
 
-    if ($? == -1) {
+    if ( $? == -1 ) {
         return "Failed to execute '$command': $!\n";
-    } elsif ($? & 127) {
+    } elsif ( $? & 127 ) {
         return "PostgreSQL command died with a signal\n";
     } else {
         return;
     }
 }
-
 
 =head2 empty_database( $dbh )
 
@@ -108,9 +106,10 @@ Always returns false.
 =back
 
 =cut
+
 sub empty_database {
     my $config = Metamod::Config->new();
-    my $dbh = $config->getDBH();
+    my $dbh    = $config->getDBH();
 
     my @tables = qw(
         basickey
@@ -149,7 +148,7 @@ sub empty_database {
         $dbh->do("SELECT setval('$sequences', 1, false)") or print STDERR $dbh->errstr();
     }
     $dbh->commit();
-    
+
     return;
 }
 
