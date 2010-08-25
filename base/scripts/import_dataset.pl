@@ -161,7 +161,8 @@ sub process_xml_loop {
         my $last_updated = $status[9];    # Seconds since the epoch
         my $checkTime = time();
         process_directories($last_updated, @importdirs);
-        utime($checkTime, $checkTime, $path_to_import_updated);
+        utime($checkTime, $checkTime, $path_to_import_updated)
+            or die "Cannot touch $path_to_import_updated";
         # disconnect database before sleep
         $config->getDBH()->disconnect;
         sleep($sleeping_seconds);
