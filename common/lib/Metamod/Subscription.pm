@@ -32,21 +32,17 @@ sub new {
 }
 
 
-=head2 $self->activate_subscription_handlers( $ds_name, $file_path )
+=head2 $self->activate_subscription_handlers( $ds_id )
 
 Find all subscriptions to the dataset and activate the corresponding
 subscription handler for pushing the new file to the subscribers.
 
 =over
 
-=item $ds_name
+=item $ds_id
 
-The name of the dataset that the new file belongs to. Used to find the
-subscribers that should be notified.
-
-=item $file_path
-
-The path to where the file can be found for the subscription handler.
+The DS_id of the new dataset. Used to look up data about the dataset in the
+database.
 
 =item return
 
@@ -56,7 +52,12 @@ Returns the number of subscriptions to the dataset.
 
 =cut
 sub activate_subscription_handlers {
-	my $self = shift;   
+	my $self = shift;
+	
+	my ( $ds_id ) = @_;
+	
+	print "I just got called. I am soooo happy! Welcome id: $ds_id\n";
+	   
 }
 
 1;
