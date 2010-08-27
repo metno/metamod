@@ -73,9 +73,9 @@ sub foreignDataset2iso19115 {
     } elsif (UNIVERSAL::isa($transformer,'Metamod::DatasetTransformer')) {
         $_logger->debug("foreignDataset is does map to internal, converting to internal->DIF->ISO");
         my ($xmdDoc, $xmlDoc) = $transformer->transform();
-        # TODO: transform to dif
-        $_logger->logcroak('transform of MM2 to DIF not implemented in perl yet');
-        $difFds = transformMM2ToDif($xmdDoc, $xmlDoc);
+        # transform to dif
+        require Metamod::DatasetTransformer::ToDIF;
+        $difFds = Metamod::DatasetTransformer::ToDIF::foreignDataset2Dif($foreignDataset);
     } else {
         my %info = $foreignDataset->getInfo();
         $_logger->error_die('cannot translate dataset '.$info{name}.' to internal format');
