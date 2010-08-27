@@ -26,7 +26,7 @@
 #  along with METAMOD; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #----------------------------------------------------------------------------
-package Metamod::DatasetTransformer::ToDif;
+package Metamod::DatasetTransformer::ToDIF;
 use base('Exporter');
 
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
@@ -40,7 +40,7 @@ use Metamod::ForeignDataset;
 our @EXPORT_OK = qw(foreignDataset2Dif);
 our $_logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
 
-my $mm2ToDifXslt = $Metamod::DatasetTransformer::XSLT_DIR . 'mm2dif.xslt';
+my $mm2ToDifXslt = $Metamod::DatasetTransformer::XSLT_DIR . 'mm2dif.xsl';
 my $isoToDifXslt = $Metamod::DatasetTransformer::XSLT_DIR . 'iso2dif.xslt';
 
 my $mm2ToDifStyle;
@@ -74,7 +74,7 @@ sub foreignDataset2Dif {
         return $foreignDataset;
     } elsif (UNIVERSAL::isa($transformer,'Metamod::DatasetTransformer::ISO19115')) {
         $_logger->debug("foreignDataset is ISO19115, only simple transformation needed");
-        my $isoDoc = $foreignDataset->getXML_DOC();
+        my $isoDoc = $foreignDataset->getMETA_DOC();
         my $difDoc = $isoToDifStyle->transform($isoDoc);
         return Metamod::ForeignDataset->newFromDoc($difDoc, $foreignDataset->getXMD_DOC());
     } elsif (UNIVERSAL::isa($transformer,'Metamod::DatasetTransformer')) {
@@ -87,10 +87,27 @@ sub foreignDataset2Dif {
             $_logger->debug("foreignDataset is does map to internal, converting to internal->DIF->ISO");
             ($xmdDoc, $xmlDoc) = $transformer->transform();
         }
-        # TODO: transform to dif
-        $_logger->logcroak('transform of MM2 to DIF not implemented in perl yet');
-        # ...
-        return ;
+        # transform to dif
+        my %info = $foreignDataset->getInfo();
+        my %params = (
+            DS_name => $info{name},
+            DS_creationdate => $info{creationDate},
+            DS_datestamp => $info{datestamp},
+        );
+        my $mm2Doc = $foreignDataset->getMETA_DOC();
+        my $difDoc = $mm2ToDifStyle->transform(
+            $mm2Doc,
+            XML::LibXSLT::xpath_to_string(%params) # always double quote strings for XSLT
+        );
+        # post-transform processing
+        my $xc = XML::LibXML::XPathContext->new( $difDoc->documentElement() );
+        $xc->registerNs('topic', "foo");
+
+        foreach ($xc->findnodes('//*[@topic:default]')) {
+            $_->appendTextNode( $_->getAttribute('topic:default') ) unless $_->textContent;
+            $_->removeAttribute('topic:default');
+        }
+        return Metamod::ForeignDataset->newFromDoc($difDoc, $foreignDataset->getXMD_DOC());
     }
     
     # each working case returns with result, throw exception
@@ -103,11 +120,11 @@ __END__
 
 =head1 NAME
 
-Metamod::DatasetTransformer::ToDif - transform foreign datasets to DIF
+Metamod::DatasetTransformer::ToDIF - transform foreign datasets to DIF
 
 =head1 SYNOPSIS
 
-  use Metamod::DatasetTransformer::ToDif qw(foreignDataset2Dif);
+  use Metamod::DatasetTransformer::ToDIF qw(foreignDataset2Dif);
   my $foreignDataset = ...;
   my $dif;
   eval { $dif = foreignDataset2Dif($foreignDataset) };

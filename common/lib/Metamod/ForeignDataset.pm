@@ -101,7 +101,7 @@ sub newFromFileAutocomplete {
     my $retVal;
     if ($xmdXML) {
         # autocomplete not required
-        $retVal = $class->newFromDoc($xmdXML, $metaXML, %options);
+        $retVal = $class->newFromDoc($metaXML, $xmdXML, %options);
     } else {
         my $transformer = Metamod::DatasetTransformer::autodetect($basename);
         if ($transformer) {
@@ -131,7 +131,7 @@ sub _initSelf {
                    # test correct xmd
     my $infoNodeList = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docXMD});
     if ($infoNodeList->size() != 1) {
-        $logger->error_die("could not find /d:dataset/d:info in xmd");
+        $logger->error_die("could not find /d:dataset/d:info in xmd ". $self->{docXMD}->toString);
     }
                
     return bless $self, $class;
@@ -566,7 +566,7 @@ Return: XML::LibXML::Document of the metadata
 
 =item getInfo()
 
-read the info attributes (name, ownertag, status, metadataFormat, creationDate) from the dataset
+read the info attributes (name, ownertag, status, metadataFormat, creationDate, datestamp) from the dataset
 
 Return: %info
 
