@@ -79,19 +79,20 @@ outputXML('text/html', $body);
 
 wmsthmb.pl
 
+=head1 SYNOPSIS
+
+ http://hostname/sch/gc2wmc?wmssetup=<url>
+
+where <url> is an encoded URL to the WMS data file (without query string)
+
 =head1 PARAMETERS
 
   wmssetup= link to setup file
-  size= thumbnail size in pixels (square)
+  size= thumbnail size in pixels (square) [optional]
 
 =head1 DESCRIPTION
 
 Generate HTML for WMS thumbnail iframes
-
-=head1 TODO
-
-  EITHER combine with ec2wmc and rename
-  OR separate common funcs in library
 
 =head1 AUTHOR
 

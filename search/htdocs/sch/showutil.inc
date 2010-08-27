@@ -48,7 +48,7 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = f
       if ($wmsSetup) {
 	$wmsQuery = $wmsSetup->getClientQuery($dsName);
 	 if (preg_match('/wmssetup/', $wmsQuery)) {
-	    $s1 .= "<iframe class=\"thumbmap\" src=\"/cgi-bin/wmsthmb.pl?$wmsQuery&size=64\"></iframe>";
+	    $s1 .= "<iframe class=\"thumbmap\" src=\"wmsthmb?$wmsQuery&size=64\"></iframe>";
 	 }
 	 $s1 .= "<a class=\"visual\" href=\"wms.php?$wmsQuery\" ><span>Visualize</span></a><br/>";
       }

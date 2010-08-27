@@ -108,7 +108,7 @@ gc2wmc.pl - WMS GetCapabilities to Web Map Context converter/proxy
 
 =head1 SYNOPSIS
 
- http://hostname/cgi-bin/gc2wmc.pl?setup=<url>
+ http://hostname/sch/gc2wmc?setup=<url>
 
 where <url> is an encoded URL to the WMS data file (without query string)
 
