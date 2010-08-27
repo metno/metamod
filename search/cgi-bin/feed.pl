@@ -3,27 +3,28 @@
 use strict;
 use File::Spec;
 
-=head1
+=head1 NAME
 
-CGI script for generating RSS 2.0 feeds.
+B<feed.pl> - CGI script for generating RSS 2.0 feeds.
 
-The script can be reached both as a CGI script and from the feed/ adress using
-mod_rewrite
+=head1 DESCRIPTION
 
-=head2 Parameters
 
-=over
+=head1 USAGE
 
-=item dataset
+ http://hostname/app/feed/      - list of all dataset feeds
+ http://hostname/app/feed/foo   - RSS feed for dataset foo
 
-The dataset to create a feed for.
+=head1 INSTALLATION
 
-=item url_rewrite
+To work, this must be configured in Apache as follows
 
-A boolean parameter used to tell the script that mod_rewrite has been used and
-it was access via the feed/ URL
+ # note slash after "feed"
+ ScriptAlias     /app/sch/feed/    /path/to/target/cgi-bin/feed.pl/
+ RedirectMatch   /app/sch/feed\$   http://hostname/app/sch/feed/
 
-=back
+This is generated automatically from master_config.txt if you run
+C<trunk/gen_httpd_conf.pl>.
 
 =cut
 
@@ -45,7 +46,9 @@ use Metamod::Search::Feed;
 
 my $query = CGI->new();
 
-my $dataset = $query->param( 'dataset' );
+my $tail = $query->path_info;
+$tail =~ s|^/||;
+my $dataset = $tail || $query->param( 'dataset' );
 my $url_rewrite = $query->param( 'url_rewrite' );
 
 my $feed = Metamod::Search::Feed->new();
