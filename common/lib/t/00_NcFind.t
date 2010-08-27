@@ -2,13 +2,17 @@
 use strict;
 use warnings;
 
-use lib "..";
+use FindBin;
+use lib "$FindBin::Bin/../";
+
 use Test::More tests => 27;
 use Data::Dumper;
 
 BEGIN {use_ok('MetNo::NcFind')};
 
-my $nc = new MetNo::NcFind('test.nc');
+my $DataDir = $FindBin::Bin . '/data/';
+
+my $nc = new MetNo::NcFind($DataDir.'test.nc');
 isa_ok($nc, 'MetNo::NcFind');
 
 my $ncX = new MetNo::NcFind($nc->{NCOBJ});

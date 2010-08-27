@@ -30,42 +30,47 @@
 use strict;
 use warnings;
 
-use lib "..";
+use FindBin;
+use lib "$FindBin::Bin/../";
+
 use Test::More tests => 16;
 
 BEGIN {use_ok('Metamod::Utils', qw(findFiles isNetcdf trim getFiletype remove_cr_from_file));}
 
-my @allFiles = findFiles('.');
+my $DataDir = $FindBin::Bin . '/data/';
+
+
+my @allFiles = findFiles($FindBin::Bin);
 ok((0 < grep {$_ =~ /00_Utils.t/} @allFiles), "finding 00_Utils.t in all");
-my @numberFiles = findFiles('.', sub {$_[0] =~ /^\d/});
+my @numberFiles = findFiles($FindBin::Bin, sub {$_[0] =~ /^\d/});
 ok((0 < grep {$_ =~ /00_Utils.t/} @numberFiles), "finding 00_Utils.t in files starting with number");
 foreach my $var (qw(.pl .t)) {
-   my @files = findFiles('.', eval 'sub {$_[0] =~ /\Q$var\E$/o;}');
+   my @files = findFiles($FindBin::Bin, eval 'sub {$_[0] =~ /\Q$var\E$/o;}');
    if ($var eq ".pl") {
       ok((0 == grep {$_ =~ /00_Utils.t/} @files), "not finding 00_Utils.t in files ending with .pl");
    } elsif ($var eq ".t") {
       ok((0 < grep {$_ =~ /00_Utils.t/} @files), "finding 00_Utils.t in files ending with .t");
    }
 }
-chmod 0755, '00_Utils.t';
+chmod 0755, $FindBin::Bin.'/00_Utils.t';
 my $var = '.t';
-my @execFiles = findFiles('.', eval 'sub {$_[0] =~ /\Q$var\E$/o;}', sub {-x _});
+my @execFiles = findFiles($FindBin::Bin, eval 'sub {$_[0] =~ /\Q$var\E$/o;}', sub {-x _});
 is(scalar @execFiles, 1, "00_Utils.t only executable .t - file");
 
-ok(isNetcdf("test.nc"), "test.nc is netcdf");
-ok(!isNetcdf("00_Utils.t"), "test.nc is no netcdf");
+ok(isNetcdf($DataDir."test.nc"), "test.nc is netcdf");
+ok(!isNetcdf($FindBin::Bin."/00_Utils.t"), "00_Utils.t is no netcdf");
 
-ok(getFiletype("test.nc") eq "nc3", "test.nc filetype is nc3");
-ok(getFiletype("test.gz") eq "gzip", "test.gz filetype is gzip");
-ok(getFiletype("test.bz2") eq "bzip2", "test.bz2 filetype is bzip2");
-ok(getFiletype("test.zip") eq "pkzip", "test.nc filetype is pkzip");
-ok(getFiletype("00_Utils.t") eq "ascii", "00_Utils.t is ascii");
+ok(getFiletype($DataDir."test.nc") eq "nc3", "test.nc filetype is nc3");
+ok(getFiletype($DataDir."test.gz") eq "gzip", "test.gz filetype is gzip");
+ok(getFiletype($DataDir."test.bz2") eq "bzip2", "test.bz2 filetype is bzip2");
+ok(getFiletype($DataDir."test.zip") eq "pkzip", "test.nc filetype is pkzip");
+ok(getFiletype($FindBin::Bin."/00_Utils.t") eq "ascii", "00_Utils.t is ascii");
 
 is(trim("\nhallo\t "), "hallo", "trim");
 
 ok(remove_cr_from_file('does_not_exist'), 'error when removing from n.e. file');
 {
-    my $testFile = 'remove_cr_from_file.txt';
+    my $testFile = $FindBin::Bin.'/remove_cr_from_file.txt';
     open my $fh, ">$testFile" or die "Cannot write $testFile: $!\n";
     print $fh "\rbla\r\nstring\r\nb\r\rla\r";
     close $fh;

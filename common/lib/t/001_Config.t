@@ -32,13 +32,16 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-use lib "..";
+use FindBin;
+use lib "$FindBin::Bin/../";
+
+
 use Test::More tests => 11;
 
 BEGIN {use_ok('Metamod::Config');}
 
-my $confFile = 'master_config.txt';
-my $config = new Metamod::Config('master_config.txt');
+my $confFile = $FindBin::Bin.'/master_config.txt';
+my $config = new Metamod::Config($confFile);
 isa_ok($config, 'Metamod::Config');
 can_ok($config, 'get');
 ok($config->get('TARGET_DIRECTORY'), 'get TARGET_DIRECTORY');
@@ -46,7 +49,7 @@ ok($config->get('TARGET_DIRECTORY'), 'get TARGET_DIRECTORY');
 ok(!$config->get('NOT_THERE'), 'getting false value on NOT_THERE');
 ok(index($config->get("SOURCE_DIRECTORY"), $config->get("BASE_DIRECTORY")) == 0, "get sustitutes variables");
 
-my $config2 = new Metamod::Config('../t/master_config.txt');
+my $config2 = new Metamod::Config($FindBin::Bin.'/../t/master_config.txt');
 is($config, $config2, "config-singleton on same file");
 
 eval {

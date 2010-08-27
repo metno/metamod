@@ -2,7 +2,10 @@
 use strict;
 use warnings;
 
-use lib "..";
+use FindBin;
+use lib "$FindBin::Bin/../";
+
+
 use Test::More tests => 24;
 use Data::Dumper;
 

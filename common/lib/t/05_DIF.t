@@ -32,7 +32,9 @@ use warnings;
 use encoding 'utf-8';
 use Data::Dumper qw(Dumper);
 
-use lib "..";
+use FindBin;
+use lib "$FindBin::Bin/../";
+
 use Test::More tests => 19;
 
 BEGIN{$ENV{METAMOD_XSLT_DIR} = '../../schema/';}
@@ -40,7 +42,8 @@ BEGIN{$ENV{METAMOD_XSLT_DIR} = '../../schema/';}
 BEGIN {use_ok('Metamod::DatasetTransformer::DIF');}
 Log::Log4perl::init( "log4perl_config.ini" );
 
-my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent("exampleDIF");
+my $DataDir = $FindBin::Bin.'/data/XML/';
+my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent($DataDir."exampleDIF");
 
 my $obj = new Metamod::DatasetTransformer::DIF($xmdStr, $xmlStr);
 isa_ok($obj, 'Metamod::DatasetTransformer');
@@ -66,7 +69,7 @@ isa_ok($obj2, 'Metamod::DatasetTransformer::DIF');
 is($obj2->test, 0, "test invalid file");
 
 
-my ($xmdStr2, $xmlStr2) = Metamod::DatasetTransformer::getFileContent("exampleMM2");
+my ($xmdStr2, $xmlStr2) = Metamod::DatasetTransformer::getFileContent($DataDir."exampleMM2");
 my $obj3 = new Metamod::DatasetTransformer::DIF($xmdStr2, $xmlStr2);
 isa_ok($obj3, 'Metamod::DatasetTransformer::DIF');
 is($obj3->test, 0, "test dataset2 file");
@@ -76,7 +79,7 @@ eval {
 ok($@, "die on wrong transform");
 
 {
-    my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent("exampleDIF");
+    my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent($DataDir."exampleDIF");
     my $xmdDoc = Metamod::DatasetTransformer->XMLParser()->parse_string($xmdStr) if $xmdStr;
     my $xmlDoc = Metamod::DatasetTransformer->XMLParser()->parse_string($xmlStr);
     my $obj = new Metamod::DatasetTransformer::DIF($xmdDoc, $xmlDoc);

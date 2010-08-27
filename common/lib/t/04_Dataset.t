@@ -32,7 +32,9 @@ use warnings;
 use encoding 'iso8859-1';
 use Encode qw(decode encode);
 
-use lib "..";
+use FindBin;
+use lib "$FindBin::Bin/../";
+
 use Test::More tests => 51;
 
 use Data::Dumper qw(Dumper);
@@ -53,8 +55,9 @@ ok(!Metamod::ForeignDataset::isXMLCharacter(substr($string, 2)), "char invalid i
 is(Metamod::ForeignDataset::removeUndefinedXMLCharacters($string), "ABC", "remove undefined characters");
 is(Metamod::ForeignDataset::removeUndefinedXMLCharacters(substr($string, 2)), "C", "remove undefined characters at beginning");
 
+my $DataDir = $FindBin::Bin.'/data/XML/';
 # short test of ForeignDataset, most tests in submodule Dataset
-my $fds = Metamod::ForeignDataset->newFromFile('oldDataset.xml', ('format' => 'oldDataset'));
+my $fds = Metamod::ForeignDataset->newFromFile($DataDir.'oldDataset.xml', ('format' => 'oldDataset'));
 isa_ok($fds, 'Metamod::ForeignDataset');
 ok($fds->getMETA_XML, "getMETA_XML");
 is($fds->originalFormat, 'oldDataset', 'origFormat');
@@ -142,7 +145,7 @@ ok(eq_array(\@oldVals, \@metaVals), "removeMetadataName, oldValues");
 @oldVals = $ds->removeMetadataName('abc');
 ok(eq_array(\@oldVals, []), "removeMetadataName, really gone");
 
-my $oldDs = newFromFile Metamod::Dataset('oldDataset.xml');
+my $oldDs = newFromFile Metamod::Dataset($DataDir.'oldDataset.xml');
 isa_ok($oldDs, 'Metamod::Dataset');
 is($oldDs->originalFormat, 'OldDataset', "old dataset: orignal format");
 %metadata = $oldDs->getMetadata;
@@ -150,12 +153,12 @@ is (scalar keys %metadata, 2, "reading old datasets metadata");
 @quadTree = $oldDs->getQuadtree;
 is (scalar @quadTree, 4, "quadtree of old dataset");
 
-my $newDs = newFromFile Metamod::Dataset('exampleMM2.xml');
+my $newDs = newFromFile Metamod::Dataset($DataDir.'exampleMM2.xml');
 isa_ok($newDs, 'Metamod::Dataset');
 is($newDs->originalFormat, 'MM2', "MM2 dataset: orignal format");
 %metadata = $newDs->getMetadata;
 is (scalar keys %metadata, 1, "reading MM2 datasets metadata");
 is (scalar $newDs->getQuadtree, 3, "reading quadtree of exampleMM2");
 
-my $difDS = Metamod::ForeignDataset->newFromFileAutocomplete('exampleDIF');
+my $difDS = Metamod::ForeignDataset->newFromFileAutocomplete($DataDir.'exampleDIF');
 isa_ok($difDS, 'Metamod::ForeignDataset');

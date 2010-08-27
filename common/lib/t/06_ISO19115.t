@@ -2,7 +2,9 @@
 use strict;
 use warnings;
 
-use lib "..";
+use FindBin;
+use lib "$FindBin::Bin/../";
+
 use Test::More tests => 8;
 use Data::Dumper;
 
@@ -10,7 +12,8 @@ BEGIN{$ENV{METAMOD_XSLT_DIR} = '../../schema/';}
 BEGIN {use_ok('Metamod::DatasetTransformer::ISO19115')};
 Log::Log4perl::init( "log4perl_config.ini" );
 
-my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent("exampleISO19115");
+my $DataDir = $FindBin::Bin.'/data/XML/';
+my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent($DataDir."exampleISO19115");
 
 my $obj = new Metamod::DatasetTransformer::ISO19115($xmdStr, $xmlStr);
 isa_ok($obj, 'Metamod::DatasetTransformer::ISO19115');

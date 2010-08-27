@@ -33,8 +33,9 @@ use warnings;
 
 use Data::Dumper;
 use FindBin;
+use lib "$FindBin::Bin/../";
 
-use lib "..";
+
 
 use Log::Log4perl qw( get_logger );
 

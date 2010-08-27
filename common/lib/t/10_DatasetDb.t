@@ -2,11 +2,13 @@
 use strict;
 use warnings;
 
-use lib "..";
+use FindBin;
+use lib "$FindBin::Bin/../";
+
 use Test::More tests => 9;
 use Data::Dumper;
 
-BEGIN {$ENV{METAMOD_MASTER_CONFIG} = 'master_config.txt' unless exists $ENV{METAMOD_MASTER_CONFIG};}
+BEGIN {$ENV{METAMOD_MASTER_CONFIG} = "$FindBin::Bin/master_config.txt" unless exists $ENV{METAMOD_MASTER_CONFIG};}
 use Metamod::Config qw(:init_logger);
 
 BEGIN {use_ok('Metamod::DatasetDb')};
@@ -20,7 +22,7 @@ my $haveDb = 0;
 my $config = new Metamod::Config();
 eval {$config->getDBH(); $haveDb = 1;};
 SKIP: {
-    skip "no database-connection", 5 unless $haveDb;
+    skip "no database-connection", 6 unless $haveDb;
     
     my $hirlam12 = $obj->find_dataset('hirlam12');
     ok (defined $hirlam12, "find_dataset(hirlam12)");

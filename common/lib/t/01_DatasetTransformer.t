@@ -30,7 +30,9 @@
 use strict;
 use warnings;
 
-use lib "..";
+use FindBin;
+use lib "$FindBin::Bin/../";
+
 use Test::More tests => 2;
 
 BEGIN {use_ok('Metamod::DatasetTransformer');}

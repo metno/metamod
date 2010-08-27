@@ -30,13 +30,16 @@
 use strict;
 use warnings;
 
-use lib "..";
+use FindBin;
+use lib "$FindBin::Bin/../";
+
 use Test::More tests => 10;
 
 BEGIN {use_ok('Metamod::DatasetTransformer::MM2');}
 Log::Log4perl::init( "log4perl_config.ini" );
 
-my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent("exampleMM2");
+my $DataDir = $FindBin::Bin.'/data/XML/';
+my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent($DataDir."exampleMM2");
 
 my $obj = new Metamod::DatasetTransformer::MM2($xmdStr, $xmlStr);
 isa_ok($obj, 'Metamod::DatasetTransformer');
@@ -49,7 +52,7 @@ isa_ok($obj2, 'Metamod::DatasetTransformer::MM2');
 is($obj2->test, 0, "test invalid file");
 
 
-my ($xmdStr2, $xmlStr2) = Metamod::DatasetTransformer::getFileContent("oldDataset");
+my ($xmdStr2, $xmlStr2) = Metamod::DatasetTransformer::getFileContent($DataDir."oldDataset");
 my $obj3 = new Metamod::DatasetTransformer::MM2($xmdStr2, $xmlStr2);
 isa_ok($obj3, 'Metamod::DatasetTransformer::MM2');
 is($obj3->test, 0, "test dataset file");

@@ -2,17 +2,20 @@
 use strict;
 use warnings;
 
-use lib "..";
+use FindBin;
+use lib "$FindBin::Bin/../";
+
 use Test::More tests => 12;
 use Data::Dumper;
 
-BEGIN {$ENV{METAMOD_XSLT_DIR} = '../../schema/';}
+BEGIN {$ENV{METAMOD_XSLT_DIR} = "$FindBin::Bin/../../schema/";}
 
 BEGIN {use_ok('Metamod::DatasetTransformer::ToDIF', "foreignDataset2Dif")};
 
 Log::Log4perl::init( "log4perl_config.ini" );
 
-my $fds = Metamod::ForeignDataset->newFromFileAutocomplete("exampleDIF");
+my $DataDir = $FindBin::Bin.'/data/XML/';
+my $fds = Metamod::ForeignDataset->newFromFileAutocomplete($DataDir."exampleDIF");
 isa_ok($fds, 'Metamod::ForeignDataset');
 isa_ok(Metamod::DatasetTransformer::autodetect($fds), 'Metamod::DatasetTransformer::DIF');
 
@@ -21,7 +24,7 @@ my $difFds = foreignDataset2Dif($fds);
 is($difFds, $fds, "dif returns without conversion");
 
 # iso -> dif
-$fds = Metamod::ForeignDataset->newFromFileAutocomplete("exampleISO19115");
+$fds = Metamod::ForeignDataset->newFromFileAutocomplete($DataDir."exampleISO19115");
 isa_ok($fds, 'Metamod::ForeignDataset');
 isa_ok(Metamod::DatasetTransformer::autodetect($fds), 'Metamod::DatasetTransformer::ISO19115');
 
@@ -31,7 +34,7 @@ my $dti = Metamod::DatasetTransformer::autodetect($difFromISO);
 isa_ok($dti, 'Metamod::DatasetTransformer::DIF'); 
 
 # mm2 -> dif
-$fds = Metamod::ForeignDataset->newFromFileAutocomplete("exampleMM2");
+$fds = Metamod::ForeignDataset->newFromFileAutocomplete($DataDir."exampleMM2");
 isa_ok($fds, 'Metamod::ForeignDataset');
 isa_ok(Metamod::DatasetTransformer::autodetect($fds), 'Metamod::DatasetTransformer::MM2');
 
