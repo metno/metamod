@@ -29,7 +29,8 @@
             echo '   INFO:    ' . $userbase->get_exception() . "\n";
          }
       } else {
-         echo "   OK\n";
+         echo "   OK   Result: ".$result."\n";
       }
+#      echo "   STATUS: ".$userbase->debug_status()."\n";
    }
 ?>

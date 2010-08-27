@@ -1,52 +1,118 @@
 $userbase->user_find('email_address','APPID')
    INFO:    No such user
 $userbase->user_create('email_address',"AP'PID")
-   OK
+   OK   Result: 1
 $userbase->user_set('u_name','Peder')
-   OK
+   OK   Result: 1
 $userbase->user_create('bingo@barcelona.com',"SPONG")
-   OK
+   OK   Result: 1
 $userbase->user_first()
-   OK
+   OK   Result: 1
 $userbase->user_get('u_name')
-   OK
+   OK   Result: Peder
 $userbase->user_next()
-   OK
+   OK   Result: 1
 $userbase->user_get('u_name')
-   OK
+   OK   Result: 
 $userbase->user_next()
    INFO:    No more users in the database
 $userbase->user_find('email_address','AP\'PID')
-   OK
+   OK   Result: 1
 $userbase->dset_create('DSET','KEY')
-   OK
+   OK   Result: 1
 $userbase->user_create('viggo@barcelona.com',"SPONG")
-   OK
+   OK   Result: 1
 $userbase->user_set('u_name','Viggo Hansen')
-   OK
+   OK   Result: 1
 $userbase->dset_find('AP\'PID','DSET')
-   OK
+   OK   Result: 1
 $userbase->dset_first()
-   OK
+   INFO:    No datasets found for current user
 $userbase->dset_next()
    INFO:    No more datasets found for current user
-$userbase->info_put('LOCATION','/my/directory')
-   OK
-$userbase->info_get('LOCATION')
-   OK
+$userbase->infoDS_put('LOCATION','/my/directory')
+   OK   Result: 1
+$userbase->infoDS_get('LOCATION')
+   OK   Result: /my/directory
 $userbase->file_find('myfile')
    INFO:    No such file
 $userbase->file_create('myfile')
-   OK
+   OK   Result: 1
 $userbase->file_set('f_timestamp','2011-01-01')
-   OK
+   OK   Result: 1
 $userbase->file_first()
-   OK
+   OK   Result: 1
 $userbase->file_get('f_timestamp')
-   OK
+   OK   Result: 2011-01-01
 $userbase->file_next()
    INFO:    No more files for the current dataset
 $userbase->file_find('myfile')
-   OK
+   OK   Result: 1
+$userbase->dset_create('DS-NEW','KEY')
+   OK   Result: 1
+$userbase->infoDS_put('LOCATION','/my/somewhere')
+   OK   Result: 1
+$userbase->infoDS_put('CATALOG','http://thredds/somewhere')
+   OK   Result: 1
+$userbase->dset_first()
+   OK   Result: 1
+$userbase->infoDS_get('LOCATION')
+   OK   Result: /my/somewhere
+$userbase->infoDS_put('CATALOG','http://thredds/somewhereelse')
+   OK   Result: 1
+$userbase->user_find('email_address','AP\'PID')
+   OK   Result: 1
+$userbase->infoUDS_set("SUBSCRIPTION_XML","USER_AND_DATASET")
+   INFO:    No infoUDS rows for SUBSCRIPTION_XML spanning USER_AND_DATASET
+$userbase->infoUDS_new("<XML>with an embedded apostrophe: '</XML>")
+   OK   Result: 1
+$userbase->infoUDS_new("<subs>Another XML</subs>")
+   OK   Result: 1
+$userbase->user_find('bingo@barcelona.com','SPONG')
+   OK   Result: 1
+$userbase->infoUDS_set("SUBSCRIPTION_XML","USER")
+   INFO:    No infoUDS rows for SUBSCRIPTION_XML spanning USER
+$userbase->infoUDS_new("<XML>for a new user</XML>")
+   OK   Result: 1
+$userbase->infoUDS_new("<subs>Another XML for user bingo@barcelona.com</subs>")
+   OK   Result: 1
+$userbase->dset_next()
+   INFO:    No more datasets found for current user
+$userbase->infoUDS_new("<subs>This is for dataset 'DS-NEW'</subs>")
+   OK   Result: 1
+$userbase->dset_find('AP\'PID','DSET')
+   OK   Result: 1
+$userbase->infoUDS_new("<subs>This is for dataset 'DSET'</subs>")
+   OK   Result: 1
+$userbase->infoUDS_set("SUBSCRIPTION_XML","DATASET")
+   OK   Result: 1
+$userbase->user_isync()
+   OK   Result: 1
+$userbase->infoUDS_get()
+   OK   Result: <subs>This is for dataset 'DSET'</subs>
+$userbase->user_get('u_name')
+   OK   Result: 
+$userbase->infoUDS_next()
+   INFO:    No more rows in the set of infoUDS rows
+$userbase->user_isync()
+   OK   Result: 1
+$userbase->infoUDS_get()
+   OK   Result: <subs>This is for dataset 'DSET'</subs>
+$userbase->user_get('u_name')
+   OK   Result: 
+$userbase->infoUDS_set("SUBSCRIPTION_XML","USER")
+   OK   Result: 4
+$userbase->dset_isync()
+   OK   Result: 1
+$userbase->infoUDS_get()
+   OK   Result: <XML>for a new user</XML>
+$userbase->infoUDS_next()
+   OK   Result: 1
+$userbase->dset_isync()
+   OK   Result: 1
+$userbase->infoUDS_get()
+   OK   Result: <subs>Another XML for user bingo@barcelona.com</subs>
+$userbase->user_dsync()
+   OK   Result: 1
 $userbase->close()
-   OK
+   OK   Result: 1

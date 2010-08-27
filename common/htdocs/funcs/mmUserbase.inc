@@ -40,6 +40,8 @@ class MM_Userbase {
                                          # written to the database
    protected $pending_file_updates;   # TRUE if changes in current file are not written to 
                                       # the database
+   protected $pending_infoUDS_updates;   # TRUE if changes in current infoUDS record are not
+                                         # written to the database
    protected $in_transaction;         # TRUE if a database transaction is in progress
    protected $transaction_triggers;   # Array with SQL commands that will start a
                                       # transaction (if not already started)
@@ -47,7 +49,7 @@ class MM_Userbase {
    protected $file_array;   # Accosiative array with all file attributes of the current file
    protected $allusers;   # Array with u_id's for all users sorted on increasing u_id's
    protected $current_user_ix;   # Index in the allusers array containing the u_id of current user
-   protected $user_ordinary_fields;   # Commaseparated list of fields in the User
+   protected $user_ordinary_fields;   # Commaseparated list of fields in the UserTable
                                       # database table (except u_id, a_id and u_email).
    protected $file_ordinary_fields;   # Commaseparated list of fields in the File
                                       # database table (except ds_id and f_name).
@@ -60,9 +62,22 @@ class MM_Userbase {
                                # dataset for the current user
    protected $current_file_ix;   # Index in the dataset_files array representing the current
                                # file for the current dataset
-   protected $current_ds_id;   # ds_id of the current dataset for the current user
-   protected $current_ds_name;   # ds_name of the current dataset for the current user
+   protected $current_ds_id;   # ds_id of the current dataset
+   protected $current_ds_name;   # ds_name of the current dataset
+   protected $current_ds_uid;   # U_id of user owning the current dataset
    protected $dataset_infotypes;   # Array with information types accepted by the system
+   protected $infoUDS_rows;   # Array with I_id's corresponding to the current set of InfoUDS rows
+                              # For deleted rows, the I_id is substituted with NULL
+   protected $infoUDS_row_ix;   # Index into $infoUDS_rows corresponding to the current InfoUDS row
+   protected $infoUDS_record;   # Accosiative array with all fields in the current InfoUDS row
+   protected $infoUDS_fields;   # Comma-separated list of all fields in the infoUDS table
+   protected $infoUDS_uid;   # U_id of user connected to the current set of InfoUDS rows.
+                             # === FALSE if the current set of InfoUDS rows are only connected 
+                             # to a dataset
+   protected $infoUDS_dsid;   #  DS_id of dataset connected to the current set of InfoUDS rows.
+                              # === FALSE if the current set of InfoUDS rows are only connected
+                              # to a user
+   protected $infoUDS_itype;  # Info_type for the current set of InfoUDS rows
    protected $exception_string;   # Text string containing an error message or informational
                                   # message
    protected $exception_level;   # Number representing the current exception:
@@ -78,12 +93,17 @@ class MM_Userbase {
       $this->pending_user_updates = FALSE;
       $this->pending_dataset_updates = FALSE;
       $this->pending_file_updates = FALSE;
+      $this->pending_infoUDS_updates = FALSE;
       $this->in_transaction = FALSE;
       $this->transaction_triggers = array('INSERT','UPDATE','DELETE');
       $this->user_ordinary_fields = "u_name, u_password, u_institution, u_telephone, u_session";
       $this->dataset_infotypes = array('DSKEY','LOCATION','CATALOG','WMS_URL','WMS_XML');
+      $this->infoUDS_infotypes = array('SUBSCRIPTION_XML');
+      $this->infoUDS_fields = "i_id, u_id, ds_id, i_type, i_content";
+      $this->infoUDS_uid = FALSE;
+      $this->infoUDS_dsid = FALSE;
       $this->file_ordinary_fields = "f_timestamp, f_size, f_status, f_errurl";
-      $this->integer_fields = array('u_id', 'ds_id');
+      $this->integer_fields = array('u_id', 'ds_id', 'i_id');
       $this->exception_string = "";
       $this->exception_level = 0;
    }
@@ -97,7 +117,9 @@ class MM_Userbase {
    }
 #
 #      Construct a value list to be used in an SQL INSERT statement corresponding to
-#      a list of field names. The values are taken from the $value_array. Except for integer
+#      a list of field names. The values are taken from the $value_array,
+#      which is either indexed by positional indices (i.e. 0,1,2,...) or by using the field
+#      name as index. Except for integer
 #      fields, apostrophes are added around each value. Enclosinq paranthesis are not added
 #      around the resulting list. String fields are escaped using pg_escape_string that
 #      changes single apostrophes in the value into two concecutive apostrophes. The database
@@ -108,6 +130,7 @@ class MM_Userbase {
       $fieldnames = preg_split('/\s*,\s*/',$list_of_fields);
       $values = array();
       if (isset($value_array)) {
+         $i1 = 0;
          foreach ($fieldnames as $field) {
             if (array_key_exists($field, $value_array) and isset($value_array[$field])) {
                if (in_array($field,$this->integer_fields)) {
@@ -115,9 +138,16 @@ class MM_Userbase {
                } else {
                   $values[] = "'" . pg_escape_string($value_array[$field]) . "'";
                }
+            } else if (array_key_exists($i1, $value_array) and isset($value_array[$i1])) {
+               if (in_array($field,$this->integer_fields)) {
+                  $values[] = $value_array[$i1];
+               } else {
+                  $values[] = "'" . pg_escape_string($value_array[$i1]) . "'";
+               }
             } else {
                $values[] = "NULL";
             }
+            $i1++;
          }
       } else {
          foreach ($fieldnames as $field) {
@@ -470,6 +500,72 @@ class MM_Userbase {
       $this->current_user_ix = $ix;
       return TRUE;
    }
+#   
+#      Make the user corresponding to the current infoUDS-row the current user.
+#   
+   public function user_isync() {
+      if ($this->pending_user_updates) {
+         if ($this->update_user() === FALSE) {
+            return FALSE;
+         }
+      }
+      if (!isset($this->infoUDS_record)) {
+         $this->note_exception(1,"No current infoUDS record");
+         return FALSE;
+      }
+      if (!array_key_exists("u_id", $this->infoUDS_record)) {
+         $this->note_exception(1,"The current infoUDS record have no u_id field");
+         return FALSE;
+      }
+      $uid = $this->infoUDS_record["u_id"];
+      $sql1 = "SELECT u_id, a_id, u_email, " . $this->user_ordinary_fields . " FROM UserTable WHERE u_id = ".
+              $uid . "\n";
+      $qhandle = $this->do_query($sql1);
+      if ($qhandle === FALSE) {
+         return FALSE;
+      }
+      $rowcount = pg_num_rows($qhandle);
+      if ($rowcount == 0) {
+         $this->note_exception(1,"User with u_id = " . $uid . " not found in the database");
+         return FALSE;
+      }
+      $this->user_array = pg_fetch_assoc($qhandle,0);
+      if ($this->user_array === FALSE) {
+         $this->note_exception(1,"pg_fetch_assoc returns FALSE");
+         return FALSE;
+      }
+      return TRUE;
+   }
+#   
+#      Make the user owning the current dataset the current user.
+#   
+   public function user_dsync() {
+      if ($this->pending_user_updates) {
+         if ($this->update_user() === FALSE) {
+            return FALSE;
+         }
+      }
+      $userid = $this->current_ds_uid;
+      $sql1 = "SELECT u_email, a_id, " . $this->user_ordinary_fields . " FROM UserTable WHERE u_id = ".
+              $userid."\n";
+      $qhandle = $this->do_query($sql1);
+      if ($qhandle === FALSE) {
+         return FALSE;
+      }
+      $rowcount = pg_num_rows($qhandle);
+      if ($rowcount == 0) {
+        $this->note_exception(1,"User with u_id = " . $userid . " not found in database. " .
+                           "But the DataSet table contains an entry with this u_id.");
+        return FALSE;
+      }
+      $this->user_array = pg_fetch_assoc($qhandle,0);
+      if ($this->user_array === FALSE) {
+         $this->note_exception(1,"pg_fetch_assoc returns FALSE");
+         return FALSE;
+      }
+      $this->user_array["u_id"] = $userid;
+      return TRUE;
+   }
 #
 #      Create dataset entry
 #
@@ -503,7 +599,8 @@ class MM_Userbase {
       $rowarr = pg_fetch_row($qhandle,0);
       $this->current_ds_id = $rowarr[0];
       $this->current_ds_name = $dataset_name;
-      if (!$this->info_put("DSKEY",$dataset_key)) {
+      $this->current_ds_uid = $this->user_array['u_id'];
+      if (!$this->infoDS_put("DSKEY",$dataset_key)) {
          return FALSE;
       }
       return TRUE;
@@ -525,32 +622,8 @@ class MM_Userbase {
          return FALSE;
       }
       $rowarr = pg_fetch_row($qhandle,0);
-      $dsid = $rowarr[0];
-      $userid = $rowarr[1];
-      if ($this->pending_user_updates) {
-         if ($this->update_user() === FALSE) {
-            return FALSE;
-         }
-      }
-      $sql1 = "SELECT u_email, a_id, " . $this->user_ordinary_fields . " FROM UserTable WHERE u_id = ".
-              $userid."\n";
-      $qhandle = $this->do_query($sql1);
-      if ($qhandle === FALSE) {
-         return FALSE;
-      }
-      $rowcount = pg_num_rows($qhandle);
-      if ($rowcount == 0) {
-        $this->note_exception(1,"User with u_id = " . $userid . " not found in database. " .
-                           "But the DataSet table contains an entry with this u_id.");
-        return FALSE;
-      }
-      $this->user_array = pg_fetch_assoc($qhandle,0);
-      if ($this->user_array === FALSE) {
-         $this->note_exception(1,"pg_fetch_assoc returns FALSE");
-         return FALSE;
-      }
-      $this->user_array["u_id"] = $userid;
-      $this->current_ds_id = $dsid;
+      $this->current_ds_id = $rowarr[0];
+      $this->current_ds_uid = $rowarr[1];
       $this->current_ds_name = $dataset_name;
       return TRUE;
    }
@@ -590,6 +663,7 @@ class MM_Userbase {
       $this->current_ds_name = $rowarr[0];
       $this->current_ds_ix = 0;
       $this->current_ds_id = $this->users_datasets[$this->current_ds_ix];
+      $this->current_ds_uid = $this->user_array['u_id'];
       return TRUE;
    }
 #
@@ -620,12 +694,42 @@ class MM_Userbase {
       $this->current_ds_name = $rowarr[0];
       $this->current_ds_ix = $ix;
       $this->current_ds_id = $dsid;
+      $this->current_ds_uid = $this->user_array['u_id'];
+      return TRUE;
+   }
+#   
+#      Make the dataset corresponding to the current infoUDS-row the current dataset.
+#   
+   public function dset_isync() {
+      if (!isset($this->infoUDS_record)) {
+         $this->note_exception(1,"No current infoUDS record");
+         return FALSE;
+      }
+      if (!array_key_exists("ds_id", $this->infoUDS_record)) {
+         $this->note_exception(1,"The current infoUDS record have no ds_id field");
+         return FALSE;
+      }
+      $dsid = $this->infoUDS_record["ds_id"];
+      $sql1 = "SELECT ds_name, u_id FROM DataSet WHERE ds_id = " . $dsid . "\n";
+      $qhandle = $this->do_query($sql1);
+      if ($qhandle === FALSE) {
+         return FALSE;
+      }
+      $rowcount = pg_num_rows($qhandle);
+      if ($rowcount == 0) {
+         $this->note_exception(1,"Found no datasets with ds_id = " . $dsid);
+         return FALSE;
+      }
+      $rowarr = pg_fetch_row($qhandle,0);
+      $this->current_ds_name = $rowarr[0];
+      $this->current_ds_uid = $rowarr[1];
+      $this->current_ds_id = $dsid;
       return TRUE;
    }
 #
 #      Add or replace content fields in the current dataset
 #
-   public function info_put($info_type, $info_content) {
+   public function infoDS_put($info_type, $info_content) {
       if (!isset($this->current_ds_id)) {
          $this->note_exception(1,"No current dataset");
          return FALSE;
@@ -634,12 +738,12 @@ class MM_Userbase {
          $this->note_exception(1,"Wrong information type: " . $info_type);
          return FALSE;
       }
-      $sql1 = "DELETE FROM Info WHERE ds_id = " . $this->current_ds_id . " AND i_type = '" . $info_type . "'\n";
+      $sql1 = "DELETE FROM InfoDS WHERE ds_id = " . $this->current_ds_id . " AND i_type = '" . $info_type . "'\n";
       $qhandle = $this->do_query($sql1);
       if ($qhandle === FALSE) {
          return FALSE;
       }
-      $sql1 = "INSERT INTO Info (ds_id, i_type, i_content)\n" .
+      $sql1 = "INSERT INTO InfoDS (ds_id, i_type, i_content)\n" .
               "   VALUES (" . $this->current_ds_id . ", '" . $info_type . "', '" . 
               pg_escape_string($info_content) . "')";
       $qhandle = $this->do_query($sql1);
@@ -651,7 +755,7 @@ class MM_Userbase {
 #
 #      Get information from the current dataset
 #
-   public function info_get($info_type) {
+   public function infoDS_get($info_type) {
       if (!isset($this->current_ds_id)) {
          $this->note_exception(1,"No current dataset");
          return FALSE;
@@ -660,20 +764,279 @@ class MM_Userbase {
          $this->note_exception(1,"Wrong information type: " . $info_type);
          return FALSE;
       }
-      $sql1 = "SELECT i_content FROM Info WHERE ds_id = " .
+      $sql1 = "SELECT i_content FROM InfoDS WHERE ds_id = " .
               $this->current_ds_id . " AND i_type = '" . $info_type . "'\n";
       $qhandle = $this->do_query($sql1);
       if ($qhandle === FALSE) {
          return FALSE;
       }
       $rowcount = pg_num_rows($qhandle);
-      if ($rowcount != 1) {
+      if ($rowcount == 0) {
          $this->note_exception(0,"No info on " . $info_type . " for dataset " . 
+                             $this->current_ds_name . " in database");
+         return FALSE;
+      }
+      if ($rowcount != 1) {
+         $this->note_exception(0,"Multiple values for " . $info_type . " for dataset " . 
                              $this->current_ds_name . " in database");
          return FALSE;
       }
       $rowarr = pg_fetch_row($qhandle,0);
       return $rowarr[0];
+   }
+#
+#      Read information from the current set of infoUDS rows
+#
+   protected function infoUDS_read() {
+      if (!isset($this->infoUDS_rows)) {
+         $this->note_exception(1,"No set of infoUDS rows defined");
+         return FALSE;
+      }
+      if ($this->infoUDS_row_ix < 0 || $this->infoUDS_row_ix >= count($this->infoUDS_rows)) {
+         $this->note_exception(1,"Current row off array limits: " . $this->infoUDS_row_ix);
+         return FALSE;
+      }
+      $iid = $this->infoUDS_rows[$this->infoUDS_row_ix];
+      $sql1 = "SELECT " . $this->infoUDS_fields . " FROM InfoUDS WHERE i_id = " . $iid . "\n";
+      $qhandle = $this->do_query($sql1);
+      if ($qhandle === FALSE) {
+         return FALSE;
+      }
+      $rowcount = pg_num_rows($qhandle);
+      if ($rowcount == 0) {
+         $this->note_exception(0,"InfoUDS record with i_id=" . $iid . " not found");
+         return FALSE;
+      }
+      $this->infoUDS_record = pg_fetch_assoc($qhandle,0);
+      if ($this->infoUDS_record === FALSE) {
+         $this->note_exception(1,"pg_fetch_assoc returns FALSE");
+         return FALSE;
+      }
+      return TRUE;
+   }
+#
+#      Write information to the current set of infoUDS rows
+#
+   protected function infoUDS_write() {
+      if (!isset($this->infoUDS_record)) {
+         $this->note_exception(1,"No infoUDS record defined");
+         return FALSE;
+      }
+      $sql1 = "DELETE FROM InfoUDS WHERE i_id = " . $this->infoUDS_record['i_id'] . "\n";
+      $qhandle = $this->do_query($sql1);
+      if ($qhandle === FALSE) {
+         return FALSE;
+      }
+      $sql1 = "INSERT INTO InfoUDS (" . $this->infoUDS_fields . ")\n" .
+              "   VALUES (" . $this->get_SQL_value_list($this->infoUDS_fields, $this->infoUDS_record) . ")";
+      $qhandle = $this->do_query($sql1);
+      if ($qhandle === FALSE) {
+         return FALSE;
+      }
+      $this->pending_infoUDS_updates = FALSE;
+      return TRUE;
+   }
+#
+#      Define the current set of infoUDS rows and set the first row as the current row.
+#      $info_type: Informatioon type (I_type field in the database table)
+#      $info_span: Keyword telling which rows the set shall span:
+#                  DATASET: All rows pertaining to the current dataset
+#                  USER:  All rows pertaining to the current user
+#                  USER_AND_DATASET: All rows pertaining to both the current user and 
+#                                    current dataset.
+#
+   public function infoUDS_set($info_type, $info_span) {
+      if ($this->pending_infoUDS_updates) {
+         if (!$this->infoUDS_write()) {
+            return FALSE;
+         }
+      }
+      $infouds_uid = FALSE;
+      $infouds_dsid = FALSE;
+      if (!in_array($info_type, $this->infoUDS_infotypes)) {
+         $this->note_exception(1,"Wrong information type for infoUDS: " . $info_type);
+         return FALSE;
+      }
+      if (!in_array($info_span, array('USER','DATASET','USER_AND_DATASET'))) {
+         $this->note_exception(1,"Wrong value for info_span: " . $info_span);
+         return FALSE;
+      }
+      $whereclause = "WHERE ";
+      if ($info_span == 'DATASET' or $info_span == 'USER_AND_DATASET') {
+         if (!isset($this->current_ds_id)) {
+            $this->note_exception(1,"No current dataset when searching for infoUDS rows");
+            return FALSE;
+         }
+         $infouds_dsid = $this->current_ds_id;
+         $whereclause .= "ds_id = " . $infouds_dsid;
+      }
+      if ($info_span == 'USER' or $info_span == 'USER_AND_DATASET') {
+         if (!isset($this->user_array)) {
+            $this->note_exception(1,"No current user when searching for infoUDS rows");
+            return FALSE;
+         }
+         if (strlen($whereclause) > 7) {
+            $whereclause .= " AND ";
+         }
+         $infouds_uid = $this->user_array['u_id'];
+         $whereclause .= "u_id = " . $infouds_uid;
+      }
+      $sql1 = "SELECT i_id FROM InfoUDS " . $whereclause . "\n";
+      $qhandle = $this->do_query($sql1);
+      if ($qhandle === FALSE) {
+         return FALSE;
+      }
+      $this->infoUDS_uid = $infouds_uid;
+      $this->infoUDS_dsid = $infouds_dsid;
+      $this->infoUDS_itype = $info_type;
+      $this->infoUDS_rows = array();
+      $rowcount = pg_num_rows($qhandle);
+      if ($rowcount == 0) {
+         $this->note_exception(0,"No infoUDS rows for " . $info_type . " spanning " . 
+                             $info_span);
+         return FALSE;
+      }
+      $i1 = 0;
+      while ($i1 < $rowcount) {
+         $rowarr = pg_fetch_row($qhandle,$i1);
+         $this->infoUDS_rows[$i1] = $rowarr[0];
+         $i1++;
+      }
+      $this->infoUDS_row_ix = 0;
+      if (!$this->infoUDS_read()) {
+         return FALSE;
+      }
+      return $rowcount;
+   }
+#
+#      Replace the content field in the current infoUDS row
+#
+   public function infoUDS_put($content) {
+      if (!isset($this->infoUDS_record)) {
+         $this->note_exception(1,"No infoUDS record defined");
+         return FALSE;
+      }
+      $this->infoUDS_record["i_content"] = $content;
+      $this->pending_infoUDS_updates = TRUE;
+      return TRUE;
+   }
+#
+#      Get information from the current set of infoUDS rows
+#
+   public function infoUDS_get() {
+      if (!isset($this->infoUDS_record)) {
+         $this->note_exception(1,"No infoUDS record defined");
+         return FALSE;
+      }
+      return $this->infoUDS_record["i_content"];
+   }
+#
+#      Define the next row in the set of infoUDS rows as the current row
+#
+   public function infoUDS_next() {
+      if (!isset($this->infoUDS_rows)) {
+         $this->note_exception(1,"No set of infoUDS rows defined");
+         return FALSE;
+      }
+      if (!isset($this->infoUDS_row_ix)) {
+         $this->note_exception(1,"Index (infoUDS_row_ix) not defined");
+         return FALSE;
+      }
+      $ix = $this->infoUDS_row_ix + 1;
+      if ($ix >= count($this->infoUDS_rows)) {
+         $this->note_exception(0,"No more rows in the set of infoUDS rows");
+         return FALSE;
+      }
+      if ($this->pending_infoUDS_updates) {
+         if (!$this->infoUDS_write()) {
+            return FALSE;
+         }
+      }
+      $this->infoUDS_row_ix = $ix;
+      if (!$this->infoUDS_read()) {
+         return FALSE;
+      }
+      return TRUE;
+   }
+#
+#      Create a new row in the infoUDS set and define it as the current row
+#
+   public function infoUDS_new($content) {
+      if (!isset($this->infoUDS_rows)) {
+         $this->note_exception(1,"No set of infoUDS rows defined");
+         return FALSE;
+      }
+      if ($this->pending_infoUDS_updates) {
+         if (!$this->infoUDS_write()) {
+            return FALSE;
+         }
+      }
+      $ix = count($this->infoUDS_rows);
+      if ($this->infoUDS_uid !== FALSE) {
+         $uid = $this->infoUDS_uid;
+      } else if (isset($this->user_array)) {
+         $uid = $this->user_array['u_id'];
+      } else {
+         $this->note_exception(1,"Not able to connect a user to the new infoUDS row");
+         return FALSE;
+      }
+      if ($this->infoUDS_dsid !== FALSE) {
+         $dsid = $this->infoUDS_dsid;
+      } else if (isset($this->current_ds_id)) {
+         $dsid = $this->current_ds_id;
+      } else {
+         $this->note_exception(1,"Not able to connect a dataset to the new infoUDS row");
+         return FALSE;
+      }
+      $fields = 'u_id, ds_id, i_type, i_content';
+      $values = $this->get_SQL_value_list($fields, array($uid, $dsid, $this->infoUDS_itype, $content));
+      $sql1 = "INSERT INTO InfoUDS (" . $fields . ") VALUES (" . $values . ") returning i_id\n";
+      $qhandle = $this->do_query($sql1);
+      if ($qhandle === FALSE) {
+         return FALSE;
+      }
+      $rowcount = pg_num_rows($qhandle);
+      if ($rowcount != 1) {
+         $this->note_exception(1,"Unexpected rowcount (".$rowcount.") from query: " . $sql1);
+         return FALSE;
+      }
+      $rowarr = pg_fetch_row($qhandle,0);
+      $iid = $rowarr[0];
+      $this->infoUDS_record = array( i_id => $iid,
+          u_id => $uid,
+          ds_id => $dsid,
+          i_type => $this->infoUDS_itype,
+          i_content => $content
+      );
+      $this->infoUDS_rows[$ix] = $iid;
+      $this->infoUDS_row_ix = $ix;
+      return TRUE;
+   }
+#   
+#      Delete the current row
+#   
+   public function infoUDS_delete() {
+      if (!isset($this->infoUDS_rows)) {
+         $this->note_exception(1,"No set of infoUDS rows defined");
+         return FALSE;
+      }
+      if (!isset($this->infoUDS_row_ix)) {
+         $this->note_exception(1,"Index (infoUDS_row_ix) not defined");
+         return FALSE;
+      }
+      if (!isset($this->infoUDS_record)) {
+         $this->note_exception(1,"No infoUDS record defined");
+         return FALSE;
+      }
+      $sql1 = "DELETE FROM InfoUDS WHERE i_id = " . $this->infoUDS_record['i_id'] . "\n";
+      $qhandle = $this->do_query($sql1);
+      if ($qhandle === FALSE) {
+         return FALSE;
+      }
+      $this->infoUDS_record = NULL;
+      $this->infoUDS_rows[$this->infoUDS_row_ix] = NULL;
+      $this->pending_infoUDS_updates = FALSE;
+      return TRUE;
    }
 #   
 #      Write pending changes to current file to the database
@@ -698,7 +1061,7 @@ class MM_Userbase {
          return FALSE;
       }
       $rowcount = pg_num_rows($qhandle);
-      if ($rowcount > 0) {
+      if ($rowcount > 1) {
          $this->note_exception(1,"update_file() found multiple files (".$rowcount.") with same f_name= ".
                                $this->file_array['f_name']." for dataset ".$this->current_ds_name);
          return FALSE;
@@ -740,8 +1103,8 @@ class MM_Userbase {
             return FALSE;
          }
       }
-      $sql1 = "SELECT f_name, " . $this->file_ordinary_fields . " FROM File ".
-          $this->get_SQL_WHERE_clause('ds_id, f_name',array($this->current_ds_id,$this->file_array['f_name']));
+      $sql1 = "SELECT " . $this->file_ordinary_fields . " FROM File ".
+          $this->get_SQL_WHERE_clause('ds_id, f_name',array($this->current_ds_id,$file_name));
       $qhandle = $this->do_query($sql1);
       if ($qhandle === FALSE) {
          return FALSE;
@@ -752,7 +1115,7 @@ class MM_Userbase {
         return FALSE;
       }
       if ($rowcount != 1) {
-        $this->note_exception(1,"Multiple files (".$rowcount.") with same f_name= ".$email_address.
+        $this->note_exception(1,"Multiple files (".$rowcount.") with same f_name= ".$file_name.
                             " for dataset ".$this->current_ds_name);
         return FALSE;
       }
@@ -777,7 +1140,7 @@ class MM_Userbase {
 #       Check if the file entry already exists:
 #      
       $sql1 = "SELECT ds_id, f_name FROM File\n" .
-          $this->get_SQL_WHERE_clause('ds_id, f_name',array($this->current_ds_id,$this->file_array['f_name']));
+          $this->get_SQL_WHERE_clause('ds_id, f_name',array($this->current_ds_id,$file_name));
       $qhandle = $this->do_query($sql1);
       if ($qhandle === FALSE) {
          return FALSE;
@@ -920,6 +1283,28 @@ class MM_Userbase {
       $this->file_array['ds_id'] = $this->current_ds_id;
       $this->current_file_ix = $ix;
       return TRUE;
+   }
+#
+#      Get internal status
+#
+   public function debug_status() {
+      $current_ds_id = "UNSET";
+      $uid = "UNSET";
+      $fname = "UNSET";
+      $iid = "UNSET";
+      if (isset($this->current_ds_id)) {
+         $current_ds_id =  sprintf('%5d',$this->current_ds_id);
+      }
+      if (isset($this->user_array)) {
+         $uid = sprintf('%5d',$this->user_array['u_id']);
+      }
+      if (isset($this->file_array)) {
+         $fname = $this->file_array['f_name'];
+      }
+      if (isset($this->infoUDS_record)) {
+         $iid = sprintf('%5d',$this->infoUDS_record['i_id']);
+      }
+      return "user=$uid   dset=$current_ds_id   iid=$iid   file=$fname";
    }
 }
 ?>

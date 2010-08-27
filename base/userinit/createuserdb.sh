@@ -34,14 +34,25 @@ CREATE TABLE DataSet (
 GRANT ALL PRIVILEGES ON DataSet TO "[==PG_WEB_USER==]";
 GRANT ALL PRIVILEGES ON DataSet_ds_id_seq TO "[==PG_WEB_USER==]";
 
-CREATE TABLE Info (
+CREATE TABLE InfoDS (
    ds_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
    i_type             VARCHAR(9999) NOT NULL,
    i_content          TEXT NOT NULL,
    PRIMARY KEY (ds_id, i_type)
 );
-GRANT ALL PRIVILEGES ON Info TO "[==PG_WEB_USER==]";
-GRANT ALL PRIVILEGES ON Info_ds_id_seq TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON InfoDS TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON InfoDS_ds_id_seq TO "[==PG_WEB_USER==]";
+
+CREATE TABLE InfoUDS (
+   i_id               SERIAL,
+   u_id               INTEGER       NOT NULL REFERENCES UserTable ON DELETE CASCADE,
+   ds_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
+   i_type             VARCHAR(9999) NOT NULL,
+   i_content          TEXT NOT NULL,
+   PRIMARY KEY (i_id)
+);
+GRANT ALL PRIVILEGES ON InfoUDS TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON InfoUDS_i_id_seq TO "[==PG_WEB_USER==]";
 
 CREATE TABLE File (
    ds_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
