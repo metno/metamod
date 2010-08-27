@@ -4,7 +4,8 @@ package Metamod::DatasetDb;
 
 Metamod::DatasetDb - API for accessing dataset from indexed database
 
-=for LICENCE
+=begin LICENCE
+
 METAMOD - Web portal for metadata search and upload
 Copyright (C) 2008 met.no
 
@@ -29,6 +30,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with METAMOD; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=end LICENCE
+
 =cut
 
 use strict;
@@ -46,11 +50,11 @@ my $logger = Log::Log4perl::get_logger('metamod::common::Metamod::DatasetDb');
 
   use Metamod::DatasetDb;
   my $db = new Metamod::DatasetDb;
-  
+
   my $dsRef = $db->find_dataset('hirlam12');
   my $level2Ref = $db->get_level2_datasets(ds_id => $dsRef->{ds_id});
   my $metaRef = $db->get_metadata($dsRef->{ds_id}, ['title', 'PI_name']);
-  
+
   my $dsList = $db->get_level1_datasets();
 
 =head1 DESCRIPTION
@@ -62,7 +66,7 @@ All function will die on (database) errors.
 
 =head2 new
 
-create a handle to the 
+create a handle to the
 
 =cut
 {
@@ -82,7 +86,7 @@ Search the database for a dataset
 
 The unqualified name of the dataset, i.e. hirlam12 (not DAMOC/hirlam12
 
-=item return 
+=item return
 
 Returns undef if the dataset cannot be found in the database. Otherwise it
 returns a hashref with information about the dataset. Information is:
@@ -96,7 +100,7 @@ sub find_dataset {
     my ($self, $name) = @_;
 
     my @ownertags = $self->_get_ownertags;
-    my $ownertag_placeholder = join ',', map {'?'} @ownertags; 
+    my $ownertag_placeholder = join ',', map {'?'} @ownertags;
 
     my $dbh = $self->{config}->getDBH();
     my $sth = $dbh->prepare_cached(<< "EOT");
@@ -109,7 +113,7 @@ EOT
     $sth->execute('%/'.$name, @ownertags);
     my $hashref = $sth->fetchrow_hashref();
     $sth->finish;
-    
+
     return $hashref;
 }
 
@@ -129,10 +133,10 @@ information about the dataset.
 =cut
 sub get_level1_datasets {
     my $self = shift;
-    
+
     my @ownertags = $self->_get_ownertags;
-    my $ownertag_placeholder = join ',', map {'?'} @ownertags; 
-    
+    my $ownertag_placeholder = join ',', map {'?'} @ownertags;
+
     my $dbh = $self->{config}->getDBH();
     my $sth = $dbh->prepare_cached(<< "EOT");
 SELECT DS_id, DS_name, DS_parent, DS_status, DS_datestamp, DS_ownertag, DS_creationDate, DS_metadataFormat, DS_filePath
@@ -146,7 +150,7 @@ EOT
     while (defined (my $row = $sth->fetchrow_hashref)) {
         push @rows, $row;
     }
-        
+
     return \@rows;
 
 }
@@ -174,7 +178,7 @@ the dataset is larger than this, all files older than C<max_age> will be removed
 =item return
 
 A date-ordered reference to an array of hash references. Each hashreference contains the
-following information if available: 
+following information if available:
 ds_id, ds_name, ds_parent, ds_status, ds_datestamp, ds_ownertag, ds_creationDate, ds_metadataFormat, ds_filePath
 
 =back
@@ -182,7 +186,7 @@ ds_id, ds_name, ds_parent, ds_status, ds_datestamp, ds_ownertag, ds_creationDate
 =cut
 sub get_level2_datasets {
     my $self = shift @_;
-    
+
     my %parameters = Params::Validate::validate( @_, { ds_id => 1, max_files => { default => 100, }, max_age => { default => 90 } } );
 
     my $dbh = $self->{config}->getDBH();
@@ -190,13 +194,13 @@ sub get_level2_datasets {
     my ($cutOffDate) = $dbh->selectrow_array("SELECT now() - interval '$days days'");
 
     my $baseQuery = << 'EOT';
-SELECT DS_id, DS_name, DS_parent, DS_status, DS_datestamp, DS_ownertag, DS_creationDate, DS_metadataFormat, DS_filePath 
-  FROM Dataset 
- WHERE DS_parent = ? 
+SELECT DS_id, DS_name, DS_parent, DS_status, DS_datestamp, DS_ownertag, DS_creationDate, DS_metadataFormat, DS_filePath
+  FROM Dataset
+ WHERE DS_parent = ?
    AND DS_status = '1'
 EOT
     my $newestSth = $dbh->prepare_cached($baseQuery . << 'EOT');
-   AND DS_datestamp > ? 
+   AND DS_datestamp > ?
 ORDER BY DS_datestamp DESC
 EOT
     $newestSth->execute($parameters{ds_id}, $cutOffDate);
@@ -204,7 +208,7 @@ EOT
     while (defined (my $row = $newestSth->fetchrow_hashref)) {
         push @$datasets, $row;
     }
-    
+
     if (@$datasets < $parameters{max_files}) {
         # add more datasets until max_files
         my $limit = $parameters{max_files} - @$datasets;
@@ -217,7 +221,7 @@ EOT
         while (defined (my $row = $olderSth->fetchrow_hashref)) {
             push @$datasets, $row;
         }
-    } 
+    }
 
     return $datasets;
 }
@@ -240,7 +244,7 @@ contact, bounding_box
 
 =item return
 
-an hashref (key ds_id) of hashrefs (key metadataname) of arrayrefs (metadata-values), 
+an hashref (key ds_id) of hashrefs (key metadataname) of arrayrefs (metadata-values),
 e.g. {$ds_id1 => {'title' => ["my title"], 'abstract' => ["my abstract"], 'variable' => ["snow", "ice"]}
 
 All metadatanames-keys and arrayref-values are guaranteed to exist, so they might
@@ -267,7 +271,7 @@ sub get_metadata {
             $retVal{$ds_id}{$md_name} = [];
         }
     }
-    
+
     # read the metadata information for each dataset
     my $dbh = $self->{config}->getDBH;
     my $sth = $dbh->prepare_cached(<< "EOT");
@@ -278,11 +282,11 @@ SELECT DS_id, MT_name, MD_content
    AND MT_name IN ($md_names_placeholder)
 EOT
     $sth->execute(@ds_ids, @$md_names);
-    
+
     while (defined (my $row = $sth->fetchrow_hashref)) {
         push @{ $retVal{$row->{ds_id}}{$row->{mt_name}} }, $row->{md_content};
     }
-    
+
     return \%retVal;
 }
 
@@ -291,8 +295,8 @@ EOT
 # small function to get a list of ownertags from config
 sub _get_ownertags {
     my $self = shift;
-    
-    my @ownertags; 
+
+    my @ownertags;
     my $ownertags = $self->{config}->get('DATASET_TAGS');
     if (defined $ownertags) {
         # comma-separated string
@@ -315,4 +319,3 @@ Heiko Klein, E<lt>H.Klein@met.noE<gt>
 L<Metamod::Config>
 
 =cut
-
