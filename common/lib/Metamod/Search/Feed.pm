@@ -8,7 +8,7 @@ use warnings;
 use CGI;
 use Log::Log4perl qw( get_logger );
 use XML::RSS::LibXML;
-
+use Data::Dumper;
 use Metamod::DatasetDb;
 
 =head1 NAME
@@ -17,7 +17,7 @@ Metamod::Search::Feed; - Module for generating a RSS feed.
 
 =head1 DESCRIPTION
 
-This process CGI requests and generates XML for dataset RSS feeds. 
+This process CGI requests and generates XML for dataset RSS feeds.
 
 =head1 FUNCTIONS/METHODS
 
@@ -50,7 +50,7 @@ In case an exception occurs the error will be logged and 500 header generated.
 
 The name of the dataset to create a feed for.
 
-=item $url_rewrite 
+=item $url_rewrite
 
 A boolean parameter used to indicate if mod_rewrite has been used on the URL.
 This parameter is used to control the links on HTML page with links to all
@@ -120,10 +120,10 @@ sub _create_all_feeds_page {
 
         next if !$unqualified_name;
 
-        my $link = "feed/$unqualified_name";
-        if ( !$url_rewrite ) {
-            $link = "feed.pl?dataset=$unqualified_name";
-        }
+        my $link = "$unqualified_name";
+        #if ( !$url_rewrite ) {
+        #    $link = "feed.pl?dataset=$unqualified_name";
+        #}
 
         $feeds_html .= qq{<li><a href="$link">$unqualified_name</a></li>\n};
     }
@@ -156,7 +156,9 @@ sub _create_feed {
     my $level2_datasets = $dataset_db->get_level2_datasets( { ds_id => $ds->{ds_id} } );
 
     # generate a RSS item for each of the level2 datasets that belongs to the level1 dataset.
+    get_logger('metamod.search')->debug(Dumper $level2_datasets);
     my @level2_ids = map { $_->{ds_id} } @$level2_datasets;
+    get_logger('metamod.search')->debug(Dumper \@level2_ids);
     if (@level2_ids) {
         my $metadata = $dataset_db->get_metadata( \@level2_ids, [qw( title abstract dataref )] );
         foreach my $sub_ds (@$level2_datasets) {
@@ -164,7 +166,7 @@ sub _create_feed {
             my $title    = join " ", @{ $md->{title} };
             my $abstract = join " ", @{ $md->{abstract} };
             my $link     = $md->{dataref}->[0];               #assume one dataref. Concating links does not make sense.
-            
+
             $rss->add_item(
                 title       => $title,
                 link        => $link,
@@ -256,7 +258,7 @@ END_HTML
 =item return
 
 Returns the unqualified name part of a ds_name. Returns false if $ds_name does
-not have the expected format. 
+not have the expected format.
 
 =cut
 
