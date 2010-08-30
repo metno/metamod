@@ -2,44 +2,44 @@
 /*
  * Created on May 7, 2009
  *
- *---------------------------------------------------------------------------- 
- * METAMOD - Web portal for metadata search and upload 
+ *----------------------------------------------------------------------------
+ * METAMOD - Web portal for metadata search and upload
  *
- * Copyright (C) 2009 met.no 
+ * Copyright (C) 2009 met.no
  *
- * Contact information: 
- * Norwegian Meteorological Institute 
- * Box 43 Blindern 
- * 0313 OSLO 
- * NORWAY 
- * email: heiko.klein@met.no 
- *  
- * This file is part of METAMOD 
+ * Contact information:
+ * Norwegian Meteorological Institute
+ * Box 43 Blindern
+ * 0313 OSLO
+ * NORWAY
+ * email: heiko.klein@met.no
  *
- * METAMOD is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 2 of the License, or 
- * (at your option) any later version. 
+ * This file is part of METAMOD
  *
- * METAMOD is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
- * GNU General Public License for more details. 
- *  
- * You should have received a copy of the GNU General Public License 
- * along with METAMOD; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
- *--------------------------------------------------------------------------- 
+ * METAMOD is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * METAMOD is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with METAMOD; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *---------------------------------------------------------------------------
  */
 
 /**
  * @brief Runtime Config-file access
- * 
+ *
  * The mmConfig class enables to read the configuration file in runtime and
- * to access the variables in a php-way. 
- * 
+ * to access the variables in a php-way.
+ *
  * Including this file will also initialize the $mmConfig variable.
- * 
+ *
  */
 class MMConfig {
 	static private $_configs = array(); # storage of filename => MMConfig
@@ -51,7 +51,7 @@ class MMConfig {
 
 	/**
 	 * Retrieve an MMConfig object for the filename.
-	 * 
+	 *
 	 * @param file The filename of the config-file, if not given, the default config-file.
 	 *             The default config file only works if you are in the htdocs directory, not in subdirectories.
 	 */
@@ -62,33 +62,33 @@ class MMConfig {
 		if (!array_key_exists($file, self::$_configs)) {
 			self::$_configs[$file] = new MMConfig($file);
 		}
-		return self::$_configs[$file]; 
+		return self::$_configs[$file];
 	}
-	
+
 	/**
 	 * Get the filename of the default config file.
 	 */
 	static function getDefaultConfigFile() {
 		return '../../master_config.txt';
 	}
-	
+
 	/**
 	 * Construct a new MMConfig
-	 * 
+	 *
 	 * @param file The filename of the config-file.
 	 */
 	private function __construct($file) {
 		$this->filename = realpath($file);
 		$this->vars  = $this->_readConfig();
 	}
-	
+
 	private function _readConfig() {
 		// parse the file
 		$conf = array();
 		# get the filesystem prefix to installed base
 		$prefix = __FILE__;
 		$prefix = preg_replace("/htdocs\/funcs\/mmConfig.inc$/", "", $prefix);
-		
+
 		$fh = fopen($this->filename,'r');
 		if (!$fh) trigger_error("cannot open config-file at: ".$this->filename, E_USER_ERROR);
 		$origname = "";
@@ -124,12 +124,12 @@ class MMConfig {
 		if ($varname != "") {
 			$conf[$varname] = $value;
 		}
-		return $conf;	
+		return $conf;
 	}
-	
+
 	/**
 	 * Read a variable from the configuration
-	 * 
+	 *
 	 * @param var the variable-key
 	 * @param origName This can optionally be used for substitutions. (!substitute_to_file in master_config)
 	 *        The scripts original filename, i.e. htdocs/qst/quest.php, usually, this should be left empty
@@ -140,22 +140,34 @@ class MMConfig {
 		$val = $this->substituteVariable($var, $origName, $myFile);
 		return $val;
 	}
-	
+
+	/**
+	 * Read a variable without substitution from the env or config
+	 * @param var the variable key
+	 */
+	private function _getVar($var) {
+	   $str = getenv('METAMOD_'+$var);
+	   if (!$str) {
+	      $str = $this->vars[$var];
+	   }
+	   return $str;
+	}
+
 	private function substituteVariable($var, $origName, $myFile) {
 		if (strlen($myFile)) {
 			$val = $this->vars["$var:$origName:$myFile"];
 		} else {
-			$val = $this->vars[$var];
+			$val = $this->_getVar($var);
 		}
 		$maxSubst = 40;
 		$substNo = 0;
 		$count = 1;
 		while ($count > 0 && ($substNo < $maxSubst)) {
-			$val = preg_replace('/\[==([A-Z0-9_]+)==\]/e', '$this->vars[\'$1\']', $val, -1, $count);
+			$val = preg_replace('/\[==([A-Z0-9_]+)==\]/e', '$this->_getVar(\'$1\')', $val, -1, $count);
 			$substNo += $count;
 		}
 		if ($substNo >= $maxSubst) {
-			trigger_error("Circular substitution in ".$this->filename." for $var", E_USER_ERROR);		
+			trigger_error("Circular substitution in ".$this->filename." for $var", E_USER_ERROR);
 		}
 		return $val;
 	}

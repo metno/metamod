@@ -166,18 +166,28 @@ sub _readConfig {
 	close $fh;
 }
 
+# get a variable from env or the internal hash, without substitution
+sub _getVar {
+    my ($self, $var) = @_;
+    
+    if (exists $ENV{"METAMOD_".$var}) {
+        return $ENV{"METAMOD_".$var};
+    }
+    return $self->{vars}{$var};
+}
+
 # substitute intrinsic values from config
 sub _substituteVariable {
 	my ($self, $var) = @_;
-	my %conf = %{ $self->{vars} };
-	return $conf{$var} unless $conf{$var}; # return undef/empty
 
-    my $textline = $conf{$var};
+	return $self->_getVar($var) unless $self->_getVar($var); # return undef/empty
+
+    my $textline = $self->_getVar($var);
 
     my $maxSubst = 40;
     my $substNo = 0;
     # replace variable with the config-values recursively
-    while ($textline =~ s/\[==([A-Z0-9_]+)==\]/$conf{$1}/ && (++$substNo < $maxSubst)) {
+    while ($textline =~ s/\[==([A-Z0-9_]+)==\]/$self->_getVar($1)/e && (++$substNo < $maxSubst)) {
         # everything done in loop-header
     }
     if ($substNo >= $maxSubst) {
