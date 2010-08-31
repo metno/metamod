@@ -44,6 +44,15 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = f
       $dataUrl = $s1;
       $nameshown = preg_replace(':[^/]*/:','', $dsName);
       $s1 = '<a href="' . $dataUrl . '"><b>' . $nameshown . '</b></a>';
+      
+      # This seems to be the only way to determine if we have level 1 or level 2
+      # dataset. It does not seem to rely on the name for something like this however
+      $name_parts = explode( '/', $dsName );
+      if( 2 == count($name_parts)){
+         $s1 .= ' <a href="../../sch/feed/' . $nameshown . '">';
+         $s1 .= '<img style="border: 0px;" src="../img/feed.png" alt="RSS feed" /></a>';
+      }
+      
       $s1 .= "<div class=\"btns\">";
       if ($wmsSetup) {
 	$wmsQuery = $wmsSetup->getClientQuery($dsName);
