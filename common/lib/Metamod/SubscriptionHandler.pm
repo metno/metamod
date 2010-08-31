@@ -6,6 +6,9 @@ use strict;
 use warnings;
 
 use Carp;
+use Log::Log4perl qw( get_logger );
+
+use Metamod::Config;
 
 =head1 NAME
 
@@ -23,24 +26,21 @@ sub new {
     my $class = shift;
     
     my $self = bless {}, $class;
+    $self->{ _config } = Metamod::Config->new();
+    $self->{ _logger } = get_logger('metamod.subscription');
     
     return $self;    
 }
 
-=head2 $self->push_to_subscribers( $ds_name, $file_path, $subscribers )
+=head2 $self->push_to_subscribers( $ds, $subscribers )
 
 Push the new file to the subscripers.
 
 =over
 
-=item $ds_name
+=item $ds
 
-The name of the dataset that the new file belongs to. Used to find the
-subscribers that should be notified.
-
-=item $file_path
-
-The path to where the file can be found for the subscription handler.
+A reference to L<Metamod::Dataset> object
 
 =item $subscribers
 
