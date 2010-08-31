@@ -24,7 +24,7 @@ my $error = init_test( "$FindBin::Bin/feed_test_data.sql" );
 if( $error ){
     plan skip_all => $error;
 } else {
-    plan tests => 10;
+    plan tests => 8;
 }
 
 my $feed = Metamod::Search::Feed->new();
@@ -40,9 +40,9 @@ my $feed = Metamod::Search::Feed->new();
 </head>
 <body>
 <ul>
-<li><a href="feed.pl?dataset=DTU">DTU</a></li>
-<li><a href="feed.pl?dataset=AWI_1">AWI_1</a></li>
-<li><a href="feed.pl?dataset=itp04">itp04</a></li>
+<li><a href="DTU">DTU</a></li>
+<li><a href="AWI_1">AWI_1</a></li>
+<li><a href="itp04">itp04</a></li>
 </ul>
 </body>
 </html>
@@ -50,37 +50,10 @@ END_HTML
 
     my ($header, $content) = $feed->process_request('');
     
-    is_string( $header, $expected_header, 'Header for RSS list. No URL rewriting.' );
-    is_string( $content, $expected_content, 'Content for RSS list. No URL rewriting.' );
+    is_string( $header, $expected_header, 'Header for RSS list.' );
+    is_string( $content, $expected_content, 'Content for RSS list.' );
 
 }
-
-# No dataset name given. URL rewriting should be taken info account.
-{
-    my $expected_header = "Content-Type: text/html; charset=ISO-8859-1\r\n\r\n";
-
-    my $expected_content = <<END_HTML;
-<html>
-<head>
-<title>Available feeds</title>
-</head>
-<body>
-<ul>
-<li><a href="feed/DTU">DTU</a></li>
-<li><a href="feed/AWI_1">AWI_1</a></li>
-<li><a href="feed/itp04">itp04</a></li>
-</ul>
-</body>
-</html>
-END_HTML
-
-    my ($header, $content) = $feed->process_request(undef, 1);
-    
-    is_string( $header, $expected_header, 'Header for RSS list. URL rewriting' );
-    is_string( $content, $expected_content, 'Content for RSS list. URL rewriting' );
-
-}
-
 
 # dataset that is not in the database
 {

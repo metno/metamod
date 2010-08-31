@@ -49,10 +49,9 @@ my $query = CGI->new();
 my $tail = $query->path_info;
 $tail =~ s|^/||;
 my $dataset = $tail || $query->param( 'dataset' );
-my $url_rewrite = $query->param( 'url_rewrite' );
 
 my $feed = Metamod::Search::Feed->new();
-my ( $header, $content ) = $feed->process_request( $dataset, $url_rewrite );
+my ( $header, $content ) = $feed->process_request( $dataset );
 
 print $header;
 print $content if defined $content;

@@ -50,12 +50,6 @@ In case an exception occurs the error will be logged and 500 header generated.
 
 The name of the dataset to create a feed for.
 
-=item $url_rewrite
-
-A boolean parameter used to indicate if mod_rewrite has been used on the URL.
-This parameter is used to control the links on HTML page with links to all
-available RSS feeds.
-
 =item return
 
 This function returns to scalar values. The first value is the HTTP header that
@@ -69,7 +63,7 @@ returned to the browser.
 sub process_request {
     my $self = shift;
 
-    my ( $ds_name, $url_rewrite ) = @_;
+    my ( $ds_name ) = @_;
 
     my $header;
     my $content;
@@ -87,7 +81,7 @@ sub process_request {
                 $header  = $self->_create_rss_http();
             }
         } else {
-            $content = $self->_create_all_feeds_page($url_rewrite);
+            $content = $self->_create_all_feeds_page();
             $header  = $self->_create_std_http();
         }
 
@@ -106,8 +100,6 @@ sub process_request {
 sub _create_all_feeds_page {
     my $self = shift;
 
-    my ($url_rewrite) = @_;
-
     my $dataset_db = $self->{_dataset_db};
     my $datasets   = $dataset_db->get_level1_datasets();
 
@@ -121,9 +113,6 @@ sub _create_all_feeds_page {
         next if !$unqualified_name;
 
         my $link = "$unqualified_name";
-        #if ( !$url_rewrite ) {
-        #    $link = "feed.pl?dataset=$unqualified_name";
-        #}
 
         $feeds_html .= qq{<li><a href="$link">$unqualified_name</a></li>\n};
     }
