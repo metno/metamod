@@ -216,7 +216,7 @@ if ($mmError == 0) {
                   $current_ds = $new_ds;
                   $current_dsname = $new_dsname;
                   if ($use_only_ds == 0) {
-                     $s1 = displayval($rowarr[1],$rowarr[0],$rowarr[3]);
+                     $s1 = displayval($rowarr[1],$rowarr[0],$rowarr[3], false, false, true);
                      $mdcontent[$rowarr[1]] .= "<p>" . $s1 . "</p>\n";
                   }
                }

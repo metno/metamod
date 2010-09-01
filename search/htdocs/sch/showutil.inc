@@ -33,7 +33,7 @@ include_once 'gautil.inc';
 require_once("../funcs/mmFimex.inc");
 require_once("../funcs/mmWMS2.inc");
 
-function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = false) {
+function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = false, $level1 = false ) {
 	global $mmConfig;
    $s1 = $value;
    $jpos = strpos($s1,' > HIDDEN');
@@ -44,11 +44,9 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = f
       $dataUrl = $s1;
       $nameshown = preg_replace(':[^/]*/:','', $dsName);
       $s1 = '<a href="' . $dataUrl . '"><b>' . $nameshown . '</b></a>';
-      
-      # This seems to be the only way to determine if we have level 1 or level 2
-      # dataset. It does not seem to rely on the name for something like this however
-      $name_parts = explode( '/', $dsName );
-      if( 2 == count($name_parts)){
+
+      # feeds should only be shown for level 1 datasets
+      if( $level1 ){
          $s1 .= ' <a href="../../sch/feed/' . $nameshown . '">';
          $s1 .= '<img style="border: 0px;" src="../img/feed.png" alt="RSS feed" /></a>';
       }
