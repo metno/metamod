@@ -48,42 +48,44 @@ sub findFiles {
 }
 
 sub _execFuncs {
-	my ($file, @funcs) = @_;
-	foreach my $func (@funcs) {
-		return 0 unless $func->($file);
-	}
-	return 1;
+    my ($file, @funcs) = @_;
+    foreach my $func (@funcs) {
+        return 0 unless $func->($file);
+    }
+    return 1;
 }
 
 # name, offset, magic-number
 my %magicNumber = (
-    'gzip' => [0, pack("C2", 0x1f, 0x8b)],
-    'bzip2' => [0, "BZh"],
-    'gzip-compress' => [0, pack("C2", 0x1f, 0x9d)],
-    'pkzip' => [0, pack("C4", 0x50, 0x4b, 0x03, 0x04)], # PK..
-    'tar' => [257, "ustar"],
-    'nc3' => [0, "CDF\1"],
+    'gzip' => [[0, pack("C2", 0x1f, 0x8b)]],
+    'bzip2' => [[0, "BZh"]],
+    'gzip-compress' => [[0, pack("C2", 0x1f, 0x9d)]],
+    'pkzip' => [[0, pack("C4", 0x50, 0x4b, 0x03, 0x04)]], # PK..
+    'tar' => [[257, "ustar"]],
+    'nc3' => [[0, "CDF\1"], [0, "CDF\2"]],
 );
 sub getFiletype {
-	my ($filename) = @_;
-	# simple 'file' replacement
-	if ($filename =~ /\.tar$/i) {
-		return 'tar'; # pre-posix tar files don't have a magic number
-	}
-	if (-T $filename) {
-		return 'ascii'
-	}
-	open (my $f, $filename) or die "Cannot read $filename: $!";
-	my $maxLength = sysread($f, my $buffer, 1024); # setting 1024 as max offset
-	foreach my $type (keys %magicNumber) {
-		my ($offset, $magic) = @{$magicNumber{$type}};
-		if ((length($magic) + $offset) < $maxLength) {
-			if (substr($buffer, $offset, length($magic)) eq $magic) {
-				return $type;
-			}  
-		}
-	}
-	return "";
+    my ($filename) = @_;
+    # simple 'file' replacement
+    if ($filename =~ /\.tar$/i) {
+        return 'tar'; # pre-posix tar files don't have a magic number
+    }
+    if (-T $filename) {
+        return 'ascii'
+    }
+    open (my $f, $filename) or die "Cannot read $filename: $!";
+    my $maxLength = sysread($f, my $buffer, 1024); # setting 1024 as max offset
+    foreach my $type (keys %magicNumber) {
+        foreach my $magics (@{$magicNumber{$type}}) {
+            my ($offset, $magic) = @$magics;
+            if ((length($magic) + $offset) < $maxLength) {
+                if (substr($buffer, $offset, length($magic)) eq $magic) {
+                    return $type;
+                }
+            }  
+        }
+    }
+    return "";
 }
 
 sub isNetcdf {
@@ -91,22 +93,22 @@ sub isNetcdf {
 }
 
 sub trim {
-	my ($str) = @_;
-	$str =~ s/^\s+//;
-	$str =~ s/\s+$//;
-	return $str;
+    my ($str) = @_;
+    $str =~ s/^\s+//;
+    $str =~ s/\s+$//;
+    return $str;
 }
 
 sub remove_cr_from_file {
     my ($file) = @_;
     eval {
-    	my $backupFile = $file . "~";
+        my $backupFile = $file . "~";
         rename $file, $backupFile or die "Cannot rename $file $backupFile: $!";
         open my $inFH, "<$backupFile" or die "Cannot read $backupFile: $!";
         open my $outFH, ">$file" or die "Cannot write $file: $!"; 
         while (defined (my $line = <$inFH>)) {
-        	$line =~ tr/\r//d;
-        	print $outFH $line;
+            $line =~ tr/\r//d;
+            print $outFH $line;
         }
         close $outFH;
         close $inFH;
@@ -116,7 +118,7 @@ sub remove_cr_from_file {
 }
 
 sub daemonize {
-	my ($logFile, $pidFile) = @_;
+    my ($logFile, $pidFile) = @_;
     # check if writing to pidFile is possible
     my $pidFH;
     if ($pidFile) {
@@ -182,12 +184,12 @@ Metamod::Utils - utilities for metamod
 
   # precompile pattern with variables
   foreach my $var (qw(.x .y .z)) {
-  	   my @files = findFiles('/tmp', eval 'sub{$_[0] =~ m/$var$/o}');
-  	   print scalar @files , " files ending with $var\n";
+         my @files = findFiles('/tmp', eval 'sub{$_[0] =~ m/$var$/o}');
+         print scalar @files , " files ending with $var\n";
   }
 
   if (isNetcdf("file.nc")) {
-  	   # ... do something with a nc file
+         # ... do something with a nc file
   }
   
   my $trimmed = trim("  string  "); # $trimmed = "string"
