@@ -47,7 +47,7 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = f
 
       # feeds should only be shown for level 1 datasets
       if( $level1 ){
-         $s1 .= ' <a href="../../sch/feed/' . $nameshown . '">';
+         $s1 .= ' <a href="feed/' . $nameshown . '">';
          $s1 .= '<img style="border: 0px;" src="../img/feed.png" alt="RSS feed" /></a>';
       }
       
