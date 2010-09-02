@@ -6,7 +6,7 @@ DROP SCHEMA sru CASCADE;
 CREATE SCHEMA sru;
 
 -- contacts
-CREATE TABLE  (
+CREATE TABLE sru.meta_contact (
     id_contact      SERIAL,
     organization    TEXT, -- UPPER
     author          TEXT, -- UPPER
@@ -59,6 +59,6 @@ CREATE FUNCTION sru.update_metatext_fulltext() RETURNS trigger AS $$
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER update_metatext_fulltext BEFORE INSERT OR UPDATE ON Metadata
+CREATE TRIGGER update_metatext_fulltext BEFORE INSERT OR UPDATE ON sru.products
     FOR EACH ROW EXECUTE PROCEDURE sru.update_metatext_fulltext();
 

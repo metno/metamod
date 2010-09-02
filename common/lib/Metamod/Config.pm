@@ -175,7 +175,7 @@ sub _getVar {
     }
     if (!exists $self->{vars}{$var}) {
         if ($_logger_initialised) {
-            Log::Log4perl::get_logger('metamod::common::Config')->warn("missing config variable in master_config.txt: $var");
+            Log::Log4perl::get_logger('metamod::common::Metamod::Config')->warn("missing config variable in master_config.txt: $var");
         } else {
             warn("missing config variable in master_config.txt: $var");
         }
