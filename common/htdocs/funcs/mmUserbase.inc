@@ -606,8 +606,7 @@ class MM_Userbase {
       return TRUE;
    }
 #
-#      Find a dataset in the database and make it the current dataset. Also make
-#      the user that owns the dataset the current user
+#      Find a dataset in the database and make it the current dataset.
 #
    public function dset_find($applic_id, $dataset_name) {
       $sql1 = "SELECT ds_id, u_id FROM DataSet " .
@@ -670,8 +669,8 @@ class MM_Userbase {
 #      Get the next dataset owned by the current user in ds_id order.
 #
    public function dset_next() {
-      if (!isset($this->user_array)) {
-         $this->note_exception(1,"No current user");
+      if (!isset($this->users_datasets)) {
+         $this->note_exception(1,"No current set. Dset_first not called?");
          return FALSE;
       }
       $ix = $this->current_ds_ix + 1;
@@ -694,7 +693,6 @@ class MM_Userbase {
       $this->current_ds_name = $rowarr[0];
       $this->current_ds_ix = $ix;
       $this->current_ds_id = $dsid;
-      $this->current_ds_uid = $this->user_array['u_id'];
       return TRUE;
    }
 #   
@@ -804,7 +802,7 @@ class MM_Userbase {
       }
       $rowcount = pg_num_rows($qhandle);
       if ($rowcount == 0) {
-         $this->note_exception(0,"InfoUDS record with i_id=" . $iid . " not found");
+         $this->note_exception(1,"InfoUDS record with i_id=" . $iid . " not found");
          return FALSE;
       }
       $this->infoUDS_record = pg_fetch_assoc($qhandle,0);
@@ -1091,7 +1089,7 @@ class MM_Userbase {
       return TRUE;
    }
 #   
-#      Find user based on E-mail address and application id:
+#      Find file within current dataset
 #   
    public function file_find($file_name) {
       if (!isset($this->current_ds_id)) {

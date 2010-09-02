@@ -35,13 +35,14 @@ GRANT ALL PRIVILEGES ON DataSet TO "[==PG_WEB_USER==]";
 GRANT ALL PRIVILEGES ON DataSet_ds_id_seq TO "[==PG_WEB_USER==]";
 
 CREATE TABLE InfoDS (
+   i_id               SERIAL,
    ds_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
    i_type             VARCHAR(9999) NOT NULL,
    i_content          TEXT NOT NULL,
    PRIMARY KEY (ds_id, i_type)
 );
 GRANT ALL PRIVILEGES ON InfoDS TO "[==PG_WEB_USER==]";
-GRANT ALL PRIVILEGES ON InfoDS_ds_id_seq TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON InfoDS_i_id_seq TO "[==PG_WEB_USER==]";
 
 CREATE TABLE InfoUDS (
    i_id               SERIAL,
