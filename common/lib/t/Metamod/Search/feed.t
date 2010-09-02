@@ -18,9 +18,9 @@ BEGIN {
 
 use Metamod::Config qw( :init_logger );
 use Metamod::Search::Feed;
-use Metamod::TestUtils qw( populate_database empty_database init_test );
+use Metamod::TestUtils qw( populate_database empty_metadb init_metadb_test );
 
-my $error = init_test( "$FindBin::Bin/feed_test_data.sql" );
+my $error = init_metadb_test( "$FindBin::Bin/feed_test_data.sql" );
 if( $error ){
     plan skip_all => $error;
 } else {
@@ -138,7 +138,7 @@ END_RSS
 }
 
 END {
-    empty_database();
+    empty_metadb();
 }
  
 

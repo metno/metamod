@@ -7,9 +7,11 @@ use FindBin;
 
 use base 'Exporter';
 
+use DBI;
+
 use Metamod::Config;
 
-our @EXPORT_OK = qw( populate_database empty_database init_test );
+our @EXPORT_OK = qw( populate_database empty_metadb empty_userdb init_metadb_test init_userdb_test );
 
 =head1 NAME
 
@@ -23,20 +25,22 @@ This module contains some utility functions for performing automatic testing.
 
 =cut
 
-=head2 init_test( $dump_file )
+=head2 init_metadb_test( $dump_file )
 
-Initialise a test script by connecting to the database and populating it with
-data.
+Initialise a test script by connecting to the metadata database and populating
+it with data.
 
 =over
 
 =item return
 
+Returns undef on error. On error it returns an error message.
+
 =back
 
 =cut
 
-sub init_test {
+sub init_metadb_test {
     my ($dump_file) = @_;
 
     my $config = Metamod::Config->new();
@@ -49,7 +53,37 @@ sub init_test {
         return 'Cannot connect to the database: ' . $@;
     }
 
-    my $result = populate_database( $dump_file, $config );
+    my $user    = $config->get('PG_ADMIN_USER');
+    my $db_name = $config->get('DATABASE_NAME');
+    my $result  = populate_database( $dump_file, $user, $db_name );
+    return $result;
+
+}
+
+=head2 init_userdb_test( $dump_file )
+
+Initialise a test script by connecting to the user database and populating
+it with data.
+
+=over
+
+=item return
+
+Returns undef on error. On error it returns an error message.
+
+=back
+
+=cut
+
+sub init_userdb_test {
+    my ($dump_file) = @_;
+
+    my $config = Metamod::Config->new();
+    $config->initLogger();
+
+    my $user    = $config->get('PG_WEB_USER');
+    my $db_name = $config->get('USERBASE_NAME');
+    my $result  = populate_database( $dump_file, $user, $db_name );
     return $result;
 
 }
@@ -63,9 +97,13 @@ Populate the database based on a PostgreSQL dump file.
 A PostgreSQL dump file that is used to populate the database. This dump file
 should B<NOT> contain any structure commands (DDL), only data.
 
-=item $config
+=item $user
 
-A reference to a L<Metamod::Config> object.
+The name of the user that is connecting to the database.
+
+=item $db_name
+
+The name of the database.
 
 =item return
 
@@ -74,10 +112,8 @@ Returns false on success and an error message otherwise.
 =cut
 
 sub populate_database {
-    my ( $dump_file, $config ) = @_;
+    my ( $dump_file, $user, $db_name ) = @_;
 
-    my $user        = $config->get('PG_ADMIN_USER');
-    my $db_name     = $config->get('DATABASE_NAME');
     my $output_file = "$FindBin::Bin/postgresql.out";
 
     my $command = "psql -U $user --dbname $db_name --file $dump_file -o $output_file";
@@ -92,10 +128,10 @@ sub populate_database {
     }
 }
 
-=head2 empty_database( $dbh )
+=head2 empty_metadb( $dbh )
 
-Empty the database completely by deleting all the data in tables and resetting
-all sequences back to 1.
+Empty the metadata database completely by deleting all the data in tables and
+resetting all sequences back to 1.
 
 =over
 
@@ -107,7 +143,7 @@ Always returns false.
 
 =cut
 
-sub empty_database {
+sub empty_metadb {
     my $config = Metamod::Config->new();
     my $dbh    = $config->getDBH();
 
@@ -150,6 +186,65 @@ sub empty_database {
     $dbh->commit();
 
     return;
+}
+
+=head2 empty_userdb( $dbh )
+
+Empty the metadata database completely by deleting all the data in tables and
+resetting all sequences back to 1.
+
+=over
+
+=item return
+
+Always returns false.
+
+=back
+
+=cut
+
+sub empty_userdb {
+    my $config = Metamod::Config->new();
+
+    my $dbname  = $config->get("USERBASE_NAME");
+    my $user    = $config->get("PG_WEB_USER");
+    my $connect = "dbi:Pg:dbname=" . $dbname . " " . $config->get("PG_CONNECTSTRING_PERL");
+    my $dbh     = DBI->connect_cached(
+        $connect, $user, "",
+        {
+            AutoCommit       => 0,
+            RaiseError       => 1,
+            FetchHashKeyName => 'NAME_lc',
+        }
+    );
+
+    my @tables = qw(
+        dataset
+        file
+        infods
+        infouds
+        usertable
+    );
+
+    my @sequences = qw(
+        dataset_ds_id_seq
+        infods_i_id_seq
+        infouds_i_id_seq
+        usertable_u_id_seq
+    );
+
+    foreach my $table (@tables) {
+        $dbh->do("DELETE FROM $table")
+            or print STDERR $dbh->errstr();
+    }
+
+    foreach my $sequences (@sequences) {
+        $dbh->do("SELECT setval('$sequences', 1, false)") or print STDERR $dbh->errstr();
+    }
+    $dbh->commit();
+
+    return;
+
 }
 
 1;
