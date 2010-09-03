@@ -17,7 +17,7 @@ GRANT SELECT ON sru.meta_contact TO "[==PG_WEB_USER==]";
 
 -- main table
 CREATE TABLE sru.products (
-    id_product      SERIAL,
+    id_product      INTEGER NOT NULL REFERENCES DataSet ON DELETE CASCADE,
     dataset_name    TEXT,
     ownertag        TEXT, -- UPPER
     title           TEXT, -- UPPER

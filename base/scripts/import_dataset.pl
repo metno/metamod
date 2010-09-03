@@ -691,7 +691,7 @@ sub updateSru2Jdbc {
             my $fds = Metamod::ForeignDataset->newFromFileAutocomplete($inputBaseFile);
             eval {
                 $fds = foreignDataset2iso19115($fds);
-                isoDoc2SruDb($fds);
+                isoDoc2SruDb($fds, $dsid);
             }; if ($@) {
                 write_to_log("problems converting to iso19115 and adding to sru-db: $@");
             }
@@ -706,7 +706,7 @@ sub updateSru2Jdbc {
 # read a parsed iso19115 libxml document
 # and put it into the sru database 
 sub isoDoc2SruDb {
-    my ($isods) = @_;
+    my ($isods, $dsid) = @_;
     my %info = $isods->getInfo;
     return unless $info{status} eq 'active';
         
@@ -716,6 +716,10 @@ sub isoDoc2SruDb {
     $xpc->registerNs('d', 'http://www.met.no/schema/metamod/dataset');
         
     my (@params, @values);
+    
+    push @params, "id_product";
+    push @values, $dsid;
+    
     push @params, "dataset_name";
     push @values, $info{name};
 
@@ -728,8 +732,10 @@ sub isoDoc2SruDb {
     push @params, "updated";
     push @values, $info{datestamp};
     
+    my $xml = $isods->getMETA_XML();
+    $xml =~ s/<\?xml[^>]*>//g; # remove xml-processing strings
     push @params, "metaxml";
-    push @values, $isods->getMETA_XML();
+    push @values, $xml;
     
     push @params, "metatext";
     push @values, $isods->getMETA_DOC()->textContent();
