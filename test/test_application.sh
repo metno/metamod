@@ -271,6 +271,10 @@ done
 # F. The database is initialized and filled with static data.
 # ===========================================================
 #
+# disable tomcat (SRU2jdbc) connection to database
+# this is a hack, TODO: make configurable
+/root/apache-tomcat-6.0.16/bin/catalina.sh stop
+#
 cp -r $basedir/source/test/xmlinput/* $basedir/webrun/XML/$idstring/
 find $basedir/webrun/XML/$idstring -name '*.xmd' | xargs perl -pi -e "s/name=\"DAMOC/name=\"$idstring/g; s/ownertag=\"DAM/ownertag=\"$idstring/"
 cd $basedir/target/init
@@ -355,3 +359,7 @@ fi
 
 # keep it running after testing
 su $WEBUSER -c "$basedir/target/metamodInit.sh start"
+
+# enable tomcat (SRU2jdbc) connection to database
+# this is a hack, TODO: make configurable
+/root/apache-tomcat-6.0.16/bin/catalina.sh start
