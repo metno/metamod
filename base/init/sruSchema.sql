@@ -4,6 +4,7 @@
 
 DROP SCHEMA sru CASCADE;
 CREATE SCHEMA sru;
+GRANT USAGE ON SCHEMA sru TO "[==PG_WEB_USER==]";
 
 -- contacts
 CREATE TABLE sru.meta_contact (
