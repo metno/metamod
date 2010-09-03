@@ -116,7 +116,7 @@ DATASET_TAGS = 'MM'
 # SRU/ISO23950-searchable datasets
 # if a database is shared among different projects
 # the tags of all projects will be searchable from each project
-SRU2JDBC_TAGS = 'MM'
+SRU2JDBC_TAGS = [==DATASET_TAGS==]
 
 # ============ METAMODBASE configuration ==============
 # Path for logfile for logging important operations on the database:

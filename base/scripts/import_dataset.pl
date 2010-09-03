@@ -45,6 +45,7 @@ sub getTargetDir {
 use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
 
 use Metamod::Dataset;
+use Metamod::DatasetTransformer::ToISO19115 qw(foreignDataset2iso19115);
 use Metamod::Config qw(:init_logger);
 use Metamod::Utils qw();
 use Data::Dumper;
@@ -658,17 +659,27 @@ sub update_database {
         } else {
            print "No wmsxml\n";
         }
-        updateSru2Jdbc($ds, $dsid);
+        updateSru2Jdbc($ds, $dsid, $inputBaseFile);
+    }
+}
+
+{
+    my $ownertags;
+    sub _get_sru_ownertags {
+        unless ($ownertags) {
+            my $sru2jdbc_tags = $config->get('SRU2JDBC_TAGS');
+            %{ $ownertags } = map {cleanContent($_) => 1} map {s/'//g; $_} split (',', $sru2jdbc_tags);
+        }
+        return $ownertags;
     }
 }
 
 sub updateSru2Jdbc {
-    my ($ds, $dsid) = @_;
+    my ($ds, $dsid, $inputBaseFile) = @_;
+    my $ownertag = _get_sru_ownertags();
     my $dbh = $config->getDBH();
-    my $sru2jdbc_tags = $config->get('SRU2JDBC_TAGS');
-    my %ownertag = map {cleanContent($_) => 1} map {s/'//g; $_} split (',', $sru2jdbc_tags);
     my %info = $ds->getInfo();
-    if ($ownertag{cleanContent($info{ownertag})} and not $ds->getParentName()) {
+    if ($ownertag->{cleanContent($info{ownertag})} and not $ds->getParentName()) {
         print "running updateSru2Jdbc on $info{name}\n" if $progress_report == 1;
         # ownertag matches and not a child (no parent)
         # delete existing metadata
@@ -676,23 +687,18 @@ sub updateSru2Jdbc {
         $deleteSth->execute($dsid);
         # check status
         if ($info{status} eq 'active') {
-            # convert to ISO19115
-            my $transformer = new Metamod::DatasetTransformer::ISO19115($ds->getXMD_XML(), $ds->getMETA_XML());
-            if ($transformer->test) {
-                my $isoDoc;
-                (undef, $isoDoc) = $transformer->transform();
-                eval {
-                    isoDoc2SruDb($ds, $isoDoc);
-                }; if ($@) {
-                    write_to_log("problems writing to sru-db: $@");
-                }   
-            } else {
-                write_to_log("cannot convert $info{name} to iso19115");
+            # convert to ISO19115 by reading original format from disk
+            my $fds = Metamod::ForeignDataset->newFromFileAutocomplete($inputBaseFile);
+            eval {
+                $fds = foreignDataset2iso19115($fds);
+                isoDoc2SruDb($fds);
+            }; if ($@) {
+                write_to_log("problems converting to iso19115 and adding to sru-db: $@");
             }
         }
     } else {
         if ( $progress_report == 1 ) {
-            print "not including sru-searchdata for $info{name}, $info{ownertag}, parentName", $ds->getParentName(), "\n";
+            print "not including sru-searchdata for $info{name}, $info{ownertag}\n";
         }
     }
 }
@@ -700,8 +706,8 @@ sub updateSru2Jdbc {
 # read a parsed iso19115 libxml document
 # and put it into the sru database 
 sub isoDoc2SruDb {
-    my ($ds, $isoDoc) = @_;
-    my %info = $ds->getInfo;
+    my ($isods) = @_;
+    my %info = $isods->getInfo;
     return unless $info{status} eq 'active';
         
     # find elements
@@ -723,39 +729,39 @@ sub isoDoc2SruDb {
     push @values, $info{datestamp};
     
     push @params, "metaxml";
-    push @values, $ds->getMETA_XML();
+    push @values, $isods->getMETA_XML();
     
     push @params, "metatext";
-    push @values, $ds->getMETA_DOC()->textContent();
+    push @values, $isods->getMETA_DOC()->textContent();
 
     push @params, "title";
-    push @values, uc(scalar _get_text_content_from_doc($ds->getMETA_DOC(), '//gmd:title', $xpc));
+    push @values, uc(scalar _get_text_from_doc($isods->getMETA_DOC(), '//gmd:title', $xpc));
 
     push @params, "abstract";
-    push @values, uc(scalar _get_text_content_from_doc($ds->getMETA_DOC(), '//gmd:abstract', $xpc));
+    push @values, uc(scalar _get_text_from_doc($isods->getMETA_DOC(), '//gmd:abstract', $xpc));
 
     push @params, "subject";
-    push @values, uc(scalar _get_text_content_from_doc($ds->getMETA_DOC(), '//gmd:subject', $xpc)); # TODO: does this exist?
+    push @values, uc(scalar _get_text_from_doc($isods->getMETA_DOC(), '//gmd:subject', $xpc)); # TODO: does this exist?
     
     push @params, "search_strings";
-    push @values, uc(scalar _get_text_content_from_doc($ds->getMETA_DOC(), '//gmd:keyword', $xpc)); # TODO: word separator?
+    push @values, uc(scalar _get_text_from_doc($isods->getMETA_DOC(), '//gmd:keyword', $xpc)); # TODO: word separator?
     
     # TODO, not in document yet ???
     #push @params, "begin_date";
-    #push @values, uc(scalar _get_text_content_from_doc($ds->getMETA_DOC(), '//gmd:XXXX', $xpc));
+    #push @values, uc(scalar _get_text_from_doc($isods->getMETA_DOC(), '//gmd:XXXX', $xpc));
     
     # TODO, not in document yet ???
     #push @params, "end_date";
-    #push @values, uc(scalar _get_text_content_from_doc($ds->getMETA_DOC(), '//gmd:XXXX', $xpc));
+    #push @values, uc(scalar _get_text_from_doc($isods->getMETA_DOC(), '//gmd:XXXX', $xpc));
 
     push @params, "west";
-    push @values, min(_get_text_content_from_doc($ds->getMETA_DOC(), '//gmd:westBoundLongitude', $xpc));
+    push @values, min(_get_text_from_doc($isods->getMETA_DOC(), '//gmd:westBoundLongitude', $xpc));
     push @params, "east";
-    push @values, max(_get_text_content_from_doc($ds->getMETA_DOC(), '//gmd:eastBoundLongitude', $xpc));
+    push @values, max(_get_text_from_doc($isods->getMETA_DOC(), '//gmd:eastBoundLongitude', $xpc));
     push @params, "south";
-    push @values, min(_get_text_content_from_doc($ds->getMETA_DOC(), '//gmd:southBoundLatitude', $xpc));
+    push @values, min(_get_text_from_doc($isods->getMETA_DOC(), '//gmd:southBoundLatitude', $xpc));
     push @params, "north";
-    push @values, max(_get_text_content_from_doc($ds->getMETA_DOC(), '//gmd:northBoundLatitude', $xpc));
+    push @values, max(_get_text_from_doc($isods->getMETA_DOC(), '//gmd:northBoundLatitude', $xpc));
 
     # TODO: id_contact parameter
 

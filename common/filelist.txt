@@ -94,6 +94,8 @@ logger_config.ini
 =lib/Metamod/DatasetTransformer/OldDataset.pm
 =lib/Metamod/DatasetTransformer/DIF.pm
 =lib/Metamod/DatasetTransformer/ISO19115.pm
+=lib/Metamod/DatasetTransformer/ToDIF.pm
+=lib/Metamod/DatasetTransformer/ToISO19115.pm
 =lib/Metamod/Dataset.pm
 =lib/Metamod/DatasetDb.pm
 =lib/Metamod/DatasetRegion.pm

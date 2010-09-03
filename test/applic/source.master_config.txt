@@ -197,6 +197,9 @@ SEARCH_APP_DESCRIPTION =
 # Comma-separated list of dataset tags accessible from this application:
 DATASET_TAGS = Substituted by test_application.sh
 
+# SRU/ISO23950-searchable datasets
+SRU2JDBC_TAGS = [==DATASET_TAGS==]
+
 # HTML to fill an initial page where no results are shown (can be empty):
 SEARCH_APP_PRESENTATION_HTML =
 
