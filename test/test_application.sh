@@ -223,7 +223,7 @@ sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 /^OAI_HARVEST_SOURCES *=/s|=.*$|= '$oaiharvesttag' '$oaiharvestsource' '$oaiharvestset'|
 /^UPLOAD_DIRECTORY *=/s|=.*$|= '$basedir/webupload'|
 /^UPLOAD_FTP_DIRECTORY *=/s|=.*$|= '$basedir/ftpupload'|
-/^OPENDAP_DIRECTORY *=/s|=.*$|= '$basedir/data'|
+/^OPENDAP_DIRECTORY *=/s|=.*$|= '$basedir/[==OPENDAP_BASEDIR==]'|
 /^OPENDAP_URL *=/s|=.*$|= '$opendapurl'|
 /^OPERATOR_EMAIL *=/s|=.*$|= '$operatoremail'|
 /^DATASET_TAGS *=/s|=.*$|= '"'$idstring','$oaiharvesttag'"'|

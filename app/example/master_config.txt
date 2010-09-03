@@ -5,6 +5,7 @@ TARGET_DIRECTORY = [==BASE_DIRECTORY==]/example
 METAMODBASE_DIRECTORY = [==SOURCE_DIRECTORY==]/base
 METAMODSEARCH_DIRECTORY = [==SOURCE_DIRECTORY==]/search
 METAMODUPLOAD_DIRECTORY = [==SOURCE_DIRECTORY==]/upload
+METAMODHARVEST_DIRECTORY = [==SOURCE_DIRECTORY==]/harvest
 METAMODQUEST_DIRECTORY = [==SOURCE_DIRECTORY==]/quest
 
 # ============ General configuration ==============
@@ -300,7 +301,8 @@ UPLOAD_AGE_THRESHOLD = 10
 # If no OPeNDAP server is installed, links in the web interface pointing to
 # data files may be faulty. This dependence on OPeNDAP will be corrected in
 # a future version of the software.
-OPENDAP_DIRECTORY = [==WEBRUN_DIRECTORY==]/data
+OPENDAP_BASEDIR = data
+OPENDAP_DIRECTORY = [==WEBRUN_DIRECTORY==]/[==OPENDAP_BASEDIR==]
 
 # URL of OPeNDAP server. If no OPeNDAP server is installed, use an URL that
 # gives access to the data repository by HTTP download.
@@ -404,6 +406,23 @@ QUEST_ADM_BACKGROUND = [==LOCAL_URL==]/img/ipydis_background.jpg
 
 # Top directory for the file administration utility:
 QUEST_ADM_TOPDIR = [==WEBRUN_DIRECTORY==]/XML
+
+
+# ============ Metamod HARVEST configuration
+OAI_HARVEST_VALIDATION_SCHEMA = [==TARGET_DIRECTORY==]/schema/OAI-PMH.xsd
+OAI_HARVEST_SOURCES =
+ NP http://risapi.data.npolar.no/oai
+ HI http://pegasus.nodc.no:8080/ipy_oai/oai.jsp
+HARVEST_HOUR = 1
+
+
+# ============ Metamod OAI_PMH configuration (highly experimental)
+PMH_CONTENT_TYPE = text/xml
+PMH_REPOSITORY_NAME = TEST
+PMH_EARLIEST_DATESTAMP = 1900-01-01
+PMH_REPOSITORY_IDENTIFIER = met.no-TEST
+PMH_MAXRECORDS = 1000
+PMH_EXPORT_TAGS = [==DATASET_TAGS==]
 
 
 # ============ Test configuration ==============

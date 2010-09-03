@@ -301,6 +301,7 @@ UPLOAD_AGE_THRESHOLD = 20
 # If no OPeNDAP server is installed, links in the web interface pointing to
 # data files may be faulty. This dependence on OPeNDAP will be corrected in
 # a future version of the software.
+OPENDAP_BASEDIR = data
 OPENDAP_DIRECTORY = Substituted by test_application.sh
 
 # Ownertag for uploaded datasets:
@@ -449,6 +450,8 @@ HARVEST_HOUR = 16
 # (without embedded spaces) which will serve as a short identification for
 # the source. Each source (given by the base URL) must have its own ownertag,
 OAI_HARVEST_SOURCES = Substituted by test_application.sh
+# Strict validation of schema. Leave empty to switch off. 
+OAI_HARVEST_VALIDATION_SCHEMA = [==TARGET_DIRECTORY==]/schema/OAI-PMH.xsd
 
 # ============ Test configuration ==============
 #

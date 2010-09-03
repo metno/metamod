@@ -969,8 +969,8 @@ sub process_files {
          $destination_url .= '/';
       }
       my $opendap_basedir = $config->get('OPENDAP_BASEDIR');
-      if ($opendap_basedir eq "") {
-         $opendap_basedir = 'data';
+      unless ($opendap_basedir) {
+          die "undefined OPENDAP_BASEDIR variable\n";
       }
       $destination_url .= join ('/', $opendap_basedir,
                                      $dataset_institution{$dataset_name}->{'institution'},
