@@ -1,14 +1,13 @@
 init/create_and_load_all.sh
 init/createdb.sh
+init/createusers.sh
+=init/import_searchdata.pl
 init/update2.2To2.3.sql
 init/update_to_Fulltext.sh
 init/sruSchema.sql
 userinit/createuserdb.sh
 userinit/run_createuserdb.sh
-scripts/createusers.sh
-=scripts/import_searchdata.pl
 =scripts/import_dataset.pl
-=scripts/makeDatabaseFulltextAware_2.2-2.3.pl
 =htdocs/adm/highlight.html
 =htdocs/adm/highlight.php
 =htdocs/adm/gettables.php

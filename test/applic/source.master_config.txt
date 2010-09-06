@@ -163,9 +163,6 @@ WMS_URL = [==LOCAL_URL==]/sch/wms.php?wmcDoc=
 
 
 # ============ METAMODBASE configuration ==============
-# Path for logfile for logging important operations on the database:
-LOGFILE = [==WEBRUN_DIRECTORY==]/databaselog
-
 # Name of psql executable:
 PSQL = psql
 

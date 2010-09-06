@@ -412,8 +412,7 @@ cd to the target directory
 cd init
 run:    ./create_and_load_all.sh
 You may check the output of this script in the create_and_load_all.out
-file in the same init directory. Also check the databaselog (path given by
-the LOGFILE variable in master_config.txt).
+file in the same init directory.
 
 6. Ensure that you have a working Apache 2.x installation with PHP 5.x.
 The httpd daemon should run as the same user as the METAMOD 2.x perl scripts.

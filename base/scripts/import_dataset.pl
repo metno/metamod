@@ -1,34 +1,34 @@
 #!/usr/bin/perl -w
-#
-#----------------------------------------------------------------------------
-#  METAMOD - Web portal for metadata search and upload
-#
-#  Copyright (C) 2008 met.no
-#
-#  Contact information:
-#  Norwegian Meteorological Institute
-#  Box 43 Blindern
-#  0313 OSLO
-#  NORWAY
-#  email: egil.storen@met.no
-#
-#  This file is part of METAMOD
-#
-#  METAMOD is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  METAMOD is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with METAMOD; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-#----------------------------------------------------------------------------
-#
+
+=for LICENSE
+METAMOD - Web portal for metadata search and upload
+
+Copyright (C) 2008 met.no
+
+Contact information:
+Norwegian Meteorological Institute
+Box 43 Blindern
+0313 OSLO
+NORWAY
+email: egil.storen@met.no
+
+This file is part of METAMOD
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+METAMOD is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with METAMOD; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+=cut
+
 use strict;
 use warnings;
 use File::Spec;
@@ -47,6 +47,7 @@ use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
 use Metamod::Dataset;
 use Metamod::DatasetTransformer::ToISO19115 qw(foreignDataset2iso19115);
 use Metamod::Config qw(:init_logger);
+use Log::Log4perl qw();
 use Metamod::Utils qw();
 use Data::Dumper;
 use DBI;
@@ -55,6 +56,7 @@ use File::Spec qw();
 use mmTtime;
 
 my $config = new Metamod::Config();
+my $logger = Log::Log4perl->get_logger('metamod.base.import_dataset');
 
 #
 #  Import datasets from XML files into the database.
@@ -69,8 +71,6 @@ my $config = new Metamod::Config();
 #  given by this argument.
 #
 
-my $progress_report = $config->get("TEST_IMPORT_PROGRESS_REPORT");    # If == 1, prints what
-                                                            # happens to stdout
 my $sleeping_seconds = 600; # check every 10 minutes for new files
 if ( $config->get('TEST_IMPORT_SPEEDUP') > 1 ) {
     $sleeping_seconds = 1; # don't wait in test-case
@@ -79,7 +79,7 @@ my $importdirs_string          = $config->get("IMPORTDIRS");
 my @importdirs                 = split( /\n/, $importdirs_string );
 my $path_to_import_updated     = $config->get("WEBRUN_DIRECTORY").'/import_updated';
 my $path_to_import_updated_new = $config->get("WEBRUN_DIRECTORY").'/import_updated.new';
-my $path_to_logfile            = $config->get("LOGFILE");
+my $path_to_logfile            = $config->get("LOG4ALL_SYSTEM_LOG");
 
 #
 #  Check number of command line arguments
@@ -124,13 +124,12 @@ if ( defined($inputfile) ) {
     #  If not empty, an error has occured
     #
     if ($@) {
-        warn $@;
+        $logger->error("$inputfile (single file) database error: $@\n");
         $dbh->rollback or die $dbh->errstr;
-        &write_to_log("$inputfile (single file) database error: $@");
     }
     else {
         $dbh->commit or die $dbh->errstr;
-        &write_to_log("$inputfile successfully imported (single file)");
+        $logger->info("$inputfile successfully imported (single file)\n");
     }
 }
 elsif ( defined($inputDir) ) {
@@ -147,7 +146,7 @@ sub process_xml_loop {
     #  Infinite loop that checks for new or modified XML files as long as
     #  SIG_TERM (standard kill, Ctrl-C) has not been called.
     #
-    &write_to_log("Check for new datasets in @importdirs");
+    $logger->info("Check for new datasets in @importdirs\n");
     while ( ! $SIG_TERM ) {
 
 #    The file $path_to_import_updated was last modified in the previous
@@ -157,7 +156,7 @@ sub process_xml_loop {
 #
         my @status = stat($path_to_import_updated);
         if ( scalar @status == 0 ) {
-            die "Could not stat $path_to_import_updated\n";
+            $logger->logdie("Could not stat $path_to_import_updated\n");
         }
         my $last_updated = $status[9];    # Seconds since the epoch
         my $checkTime = time();
@@ -168,11 +167,7 @@ sub process_xml_loop {
         $config->getDBH()->disconnect;
         sleep($sleeping_seconds);
     }
-
-    #
-    #     Subroutine call: write_to_log
-    #
-    &write_to_log("Check for new datasets stopped");
+    $logger->info("Check for new datasets stopped\n");
 }
 
 # callback function from File::Find for directories
@@ -180,7 +175,7 @@ sub processFoundFile {
     my ($last_updated) = @_;
     my $file = $File::Find::name;
     if ($file =~ /\.xm[ld]$/ and -f $file and (stat(_))[9] >= $last_updated) {
-        print "      $file -accepted\n" if ($progress_report == 1);
+        $logger->info("$file -accepted\n");
         my $basename = substr $file, 0, length($file)-4; # remove .xm[ld]
         if ($file eq "$basename.xml" and -f "$basename.xmd" and (stat(_))[9] >= $last_updated) {
             # ignore .xml file, will be processed together with .xmd file            
@@ -189,13 +184,13 @@ sub processFoundFile {
             my $dbh = $config->getDBH();
             eval { &update_database( $file, $dbh ); };
             if ($@) {
-                $dbh->rollback or die $dbh->errstr;
+                $dbh->rollback or $logger->logdie( $dbh->errstr . "\n");
                 my $stm = $dbh->{"Statement"};
-                &write_to_log("$file database error: $@\n   Statement: $stm");
+                $logger->error("$file database error: $@\n   Statement: $stm\n");
             }
             else {
-                $dbh->commit or die $dbh->errstr;
-                &write_to_log("$basename successfully imported");
+                $dbh->commit or $logger->logdie( $dbh->errstr . "\n");
+                $logger->info("$basename successfully imported\n");
             }
         }
     } 
@@ -216,38 +211,6 @@ sub process_directories {
                               $xmldir1);
         }
     }
-}
-
-# ------------------------------------------------------------------
-sub write_to_log {
-
-    #
-    #     Split argument array into variables
-    #
-    my ($message) = @_;
-
-    #
-    #     Open file for writing
-    #
-    open( LOG, ">>$path_to_logfile" );
-
-    #
-    #     Find current time
-    #
-    my @timearr = localtime;
-    my $year    = 1900 + $timearr[5];
-    my $mon     = $timearr[4] + 1;      # 1-12
-    my $mday    = $timearr[3];          # 1-31
-    my $hour    = $timearr[2];          # 0-23
-    my $min     = $timearr[1];          # 0-59
-
-    #
-    #     Create a string using printf-compatible format:
-    #
-    my $datetime =
-      sprintf( '%04d-%02d-%02d %02d:%02d', $year, $mon, $mday, $hour, $min );
-    print LOG "$datetime\n   $message\n";
-    close(LOG);
 }
 
 # ------------------------------------------------------------------
@@ -467,9 +430,7 @@ sub update_database {
                 my $mdid;
                 if ( exists( $shared_metadatatypes{$mtname} ) ) {
                     my $mdkey = $mtname . ':' . cleanContent($mdcontent);
-                    if ( $progress_report >= 1 ) {
-                        print "mdkey: " . $mdkey . "\n";
-                    }
+                    $logger->debug("mdkey: $mdkey\n");
                     if ( exists( $dbMetadata{$mdkey} ) ) {
                         $mdid = $dbMetadata{$mdkey};
                     } else {
@@ -485,7 +446,7 @@ sub update_database {
                     if ( $count == 0 ) {
                         $sql_insert_DSMD->execute( $dsid, $mdid );
                     } else {
-                        write_to_log("duplicate metadata: $mdkey");
+                        $logger->warn("duplicate metadata: $mdkey\n");
                     }
                 } elsif ( exists( $rest_metadatatypes{$mtname} ) ) {
                     $sql_getkey_MD->execute();
@@ -501,9 +462,7 @@ sub update_database {
                 #
                 if ( exists( $searchcategories{$mtname} ) ) {
                     my $skey = $searchcategories{$mtname} . ':' . cleanContent($mdcontent);
-                    if ( $progress_report == 1 ) {
-                        print "Insert searchdata. Try: '$skey'\n";
-                    }
+                    $logger->debug("Insert searchdata. Try: '$skey'");
                     if ( exists( $basickeys{$skey} ) ) {
                         my $bkid = $basickeys{$skey};
                         $sql_selectCount_BKDS->execute( $bkid, $dsid);
@@ -511,11 +470,9 @@ sub update_database {
                         if ( $count == 0 ) {
                             $sql_insert_BKDS->execute( $bkid, $dsid );
                         } else {
-                            write_to_log("duplicate basic key: $skey");
+                            $logger->warn("duplicate basic key: '$skey'\n");
                         }
-                        if ( $progress_report == 1 ) {
-                            print " -OK: $bkid,$dsid\n";
-                        }
+                        $logger->debug(" -OK: $bkid,$dsid\n");
                     } elsif ( $mtname eq 'datacollection_period' ) {
                         my $scid = $searchcategories{$mtname};
                         if ( $mdcontent =~ /(\d{4,4})-(\d{2,2})-(\d{2,2}) to (\d{4,4})-(\d{2,2})-(\d{2,2})/ ) {
@@ -657,7 +614,7 @@ sub update_database {
             my $sql_insert_WMSInfo = $dbh->prepare_cached("INSERT INTO WMSInfo (DS_id, WI_content) VALUES (?, ?)");
             $sql_insert_WMSInfo->execute($dsid, $wmsInfo);
         } else {
-           print "No wmsxml\n";
+           $logger->debug("No wmsxml\n");
         }
         updateSru2Jdbc($ds, $dsid, $inputBaseFile);
     }
@@ -680,7 +637,7 @@ sub updateSru2Jdbc {
     my $dbh = $config->getDBH();
     my %info = $ds->getInfo();
     if ($ownertag->{cleanContent($info{ownertag})} and not $ds->getParentName()) {
-        print "running updateSru2Jdbc on $info{name}\n" if $progress_report == 1;
+        $logger->debug("running updateSru2Jdbc on $info{name}\n");
         # ownertag matches and not a child (no parent)
         # delete existing metadata
         my $deleteSth = $dbh->prepare_cached('DELETE FROM sru.products where id_product = ?');
@@ -693,13 +650,11 @@ sub updateSru2Jdbc {
                 $fds = foreignDataset2iso19115($fds);
                 isoDoc2SruDb($fds, $dsid);
             }; if ($@) {
-                write_to_log("problems converting to iso19115 and adding to sru-db: $@");
+                $logger->warn("problems converting to iso19115 and adding to sru-db: $@\n");
             }
         }
     } else {
-        if ( $progress_report == 1 ) {
-            print "not including sru-searchdata for $info{name}, $info{ownertag}\n";
-        }
+        $logger->debug("not including sru-searchdata for $info{name}, $info{ownertag}\n");
     }
 }
 
@@ -772,19 +727,14 @@ sub isoDoc2SruDb {
     # TODO: id_contact parameter
 
     # insert into db
-    if ( $progress_report == 1 ) {
-        print "Insert sru-searchdata...";
-    }
+    $logger->debug("Insert sru-searchdata...");
     my $paramNames = join ', ', @params;
     my $placeholder = join ', ', map {'?'} @values;
     my $sth = $config->getDBH()->prepare_cached(<<"SQL");
 INSERT INTO sru.products ( $paramNames ) VALUES ( $placeholder )
 SQL
     $sth->execute(@values);
-    if ( $progress_report == 1 ) {
-        print "Ok\n";
-    }
-
+    $logger->debug("Ok\n");
 }
 
 

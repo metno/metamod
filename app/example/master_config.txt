@@ -120,8 +120,6 @@ DATASET_TAGS = 'MM'
 SRU2JDBC_TAGS = [==DATASET_TAGS==]
 
 # ============ METAMODBASE configuration ==============
-# Path for logfile for logging important operations on the database:
-LOGFILE = [==WEBRUN_DIRECTORY==]/databaselog
 # Path for logfile of php-messages (leave empty to log to webserver-errorlogfile)
 PHPLOGFILE = [==WEBRUN_DIRECTORY==]/phplog
 # Minimum log level, one of ERROR, WARNING, INFO, DEBUG

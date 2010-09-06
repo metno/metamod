@@ -14,8 +14,7 @@ echo "------------ Reinitialize the database, create dynamic tables:"
 . ./createdb.sh
 echo ""
 echo "------------ Run cload scripts:"
-cd ../staticdata
-../scripts/import_searchdata.pl searchdata.xml
+./import_searchdata.pl ../staticdata/searchdata.xml
 cat >t_1 <<EOF
 [==IMPORTDIRS==]
 EOF

@@ -107,7 +107,7 @@ if ($@) {
    $dbh->disconnect or warn $dbh->errstr;
    push (@logarr,"========= Load static searchdata finished");
 }
-open (LOG,">>".$config->get("LOGFILE"));
+open (LOG,">> create_and_load_all.out");
 foreach my $line (@logarr) {
    print LOG $line . "\n";
 }
