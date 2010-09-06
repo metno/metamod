@@ -446,7 +446,8 @@ sub update_database {
                     if ( $count == 0 ) {
                         $sql_insert_DSMD->execute( $dsid, $mdid );
                     } else {
-                        $logger->warn("duplicate metadata: $mdkey\n");
+                        # duplicate key happens all the times, in particular when converting formats
+                        $logger->debug("duplicate metadata: $mdkey\n");
                     }
                 } elsif ( exists( $rest_metadatatypes{$mtname} ) ) {
                     $sql_getkey_MD->execute();
