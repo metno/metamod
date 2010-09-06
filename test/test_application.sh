@@ -104,7 +104,6 @@
 #------------------------------------------------------------------------
 WEBUSER=www-data
 
-logfiles='syserrors databaselog'
 if [ $# -eq 2 -a $1 = '-i' ]; then
    mkdir -p $2
    cd $2
@@ -316,11 +315,17 @@ sleep 100
 # ==================
 #
 cd $basedir
+# split INFO and WARN/ERROR log
+grep '\[INFO\]' webrun/metamod.log > webrun/metamod.log_info
+grep -v '\[INFO\]' webrun/metamod.log | grep -v '\[DEBUG\]' > webrun/metamod.log_warnerror
+# 
+# compare info logs
+logfiles='syserrors metamod.log_info'
 if [ -z "`ls compare`" ]; then
    for fil in $logfiles; do
       if [ -r webrun/$fil ]; then
-         sed '1,$s/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]/_TIMESTAMP_/' webrun/$fil >t_log
-         sed '1,$s/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/_DATE_/' t_log >compare/$fil
+         perl -pe 's/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2},\d+)?/_TIMESTAMP_/g' webrun/$fil >t_log
+         perl -pe 's/\d{4}-\d{2}-\d{2}/_DATE_/g' t_log >compare/$fil
          rm t_log
       else
          echo "Missing file: webrun/$fil"
@@ -329,10 +334,13 @@ if [ -z "`ls compare`" ]; then
 elif [ 1 -eq 1 ]; then
    echo "`whoami`@`uname -n`:`pwd`" >t_result
    count=1
+   echo "========== metamod.log warnings:" >>t_result
+   cat webrun/metamod.log_warnerror >> t_result
+   count=`expr $count + 1`
    for fil in $logfiles; do
       if [ -r webrun/$fil ]; then
-         sed '1,$s/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]/_TIMESTAMP_/' webrun/$fil >t_log1
-         sed '1,$s/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/_DATE_/' t_log1 | sort | uniq >t_log2
+         perl -pe 's/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2},\d+)?/_TIMESTAMP_/g' webrun/$fil >t_log1
+         perl -pe 's/\d{4}-\d{2}-\d{2}/_DATE_/g' t_log1 | sort | uniq >t_log2
          rm t_log1
          echo "========== diff for $fil (new vs. old):" >>t_result
          sort compare/$fil | uniq >t_log3
