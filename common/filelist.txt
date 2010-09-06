@@ -109,6 +109,11 @@ logger_config.ini
 =lib/Metamod/Subscription.pm
 =lib/Metamod/SubscriptionHandler.pm
 =lib/Metamod/WMS.pm
+=lib/Metamod/mmUserbase.pm
+=lib/Metamod/test/mmUserbase_commands
+=lib/Metamod/test/mmUserbase_test_out
+=lib/Metamod/test/mmUserbase_test.pl
+=lib/Metamod/test/mmUserbase_test.sh
 =lib/MetNo/NcFind.pm
 =lib/MetNo/NcDigest.pm
 =lib/quadtreeuse.pm

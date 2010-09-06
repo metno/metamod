@@ -13,7 +13,7 @@ $userbase->user_get('u_name')
 $userbase->user_next()
    OK   Result: 1
 $userbase->user_get('u_name')
-   OK   Result: 
+   ERROR:   Property 'u_name' not set
 $userbase->user_next()
    INFO:    No more users in the database
 $userbase->user_find('email_address','AP\'PID')
@@ -29,7 +29,7 @@ $userbase->dset_find('AP\'PID','DSET')
 $userbase->dset_first()
    INFO:    No datasets found for current user
 $userbase->dset_next()
-   INFO:    No more datasets found for current user
+   ERROR:   No current set. Dset_first not called?
 $userbase->infoDS_put('LOCATION','/my/directory')
    OK   Result: 1
 $userbase->infoDS_get('LOCATION')
@@ -74,7 +74,7 @@ $userbase->infoUDS_set("SUBSCRIPTION_XML","USER")
    INFO:    No infoUDS rows for SUBSCRIPTION_XML spanning USER
 $userbase->infoUDS_new("<XML>for a new user</XML>")
    OK   Result: 1
-$userbase->infoUDS_new("<subs>Another XML for user bingo@barcelona.com</subs>")
+$userbase->infoUDS_new('<subs>Another XML for user bingo@barcelona.com</subs>')
    OK   Result: 1
 $userbase->dset_next()
    INFO:    No more datasets found for current user
@@ -91,7 +91,7 @@ $userbase->user_isync()
 $userbase->infoUDS_get()
    OK   Result: <subs>This is for dataset 'DSET'</subs>
 $userbase->user_get('u_name')
-   OK   Result: 
+   ERROR:   Property 'u_name' not set
 $userbase->infoUDS_next()
    INFO:    No more rows in the set of infoUDS rows
 $userbase->user_isync()
@@ -99,15 +99,21 @@ $userbase->user_isync()
 $userbase->infoUDS_get()
    OK   Result: <subs>This is for dataset 'DSET'</subs>
 $userbase->user_get('u_name')
-   OK   Result: 
+   ERROR:   Property 'u_name' not set
 $userbase->infoUDS_set("SUBSCRIPTION_XML","USER")
    OK   Result: 4
 $userbase->dset_isync()
    OK   Result: 1
 $userbase->infoUDS_get()
    OK   Result: <XML>for a new user</XML>
+$userbase->infoUDS_delete()
+   OK   Result: 1
 $userbase->infoUDS_next()
    OK   Result: 1
+$userbase->infoUDS_set("SUBSCRIPTION_XML","USER")
+   OK   Result: 3
+$userbase->infoUDS_get()
+   OK   Result: <subs>Another XML for user bingo@barcelona.com</subs>
 $userbase->dset_isync()
    OK   Result: 1
 $userbase->infoUDS_get()

@@ -423,6 +423,10 @@ class MM_Userbase {
          $this->note_exception(1,"Property '".$property."' not known");
          return FALSE;
       }
+      if (!isset($this->user_array[$property])) {
+         $this->note_exception(1,"Property '".$property."' not set");
+         return FALSE;
+      }
       return $this->user_array[$property];
    }
 #
@@ -644,6 +648,7 @@ class MM_Userbase {
       }
       $rowcount = pg_num_rows($qhandle);
       if ($rowcount == 0) {
+         unset($this->users_datasets);
          $this->note_exception(0,"No datasets found for current user");
          return FALSE;
       }
