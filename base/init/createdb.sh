@@ -240,4 +240,4 @@ echo "----------------- ADDING SRU2JDBC SUPPORT -----------"
 $PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME < sruSchema.sql
 
 
-date +'%Y-%m-%d %H:%M Database re-initialized, dynamic tables created' >>[==LOGFILE==]
+date +'%Y-%m-%d %H:%M Database re-initialized, dynamic tables created' 
