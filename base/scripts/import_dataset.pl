@@ -471,7 +471,8 @@ sub update_database {
                         if ( $count == 0 ) {
                             $sql_insert_BKDS->execute( $bkid, $dsid );
                         } else {
-                            $logger->warn("duplicate basic key: '$skey'\n");
+                            # duplicate key happens all the times, in particular when converting formats
+                            $logger->debug("duplicate basic key: '$skey'\n");
                         }
                         $logger->debug(" -OK: $bkid,$dsid\n");
                     } elsif ( $mtname eq 'datacollection_period' ) {
