@@ -53,8 +53,8 @@ sub init_metadb_test {
         return 'Cannot connect to the database: ' . $@;
     }
 
-    my $user    = $config->get('PG_ADMIN_USER');
-    my $db_name = $config->get('DATABASE_NAME');
+    my $user    = $config->get('PG_ADMIN_USER') || die 'Missing PG_ADMING_USER in master_config.txt';
+    my $db_name = $config->get('DATABASE_NAME') || die 'Missing DDATABASE_NAME in master_config.txt';
     my $result  = populate_database( $dump_file, $user, $db_name );
     return $result;
 
@@ -81,8 +81,9 @@ sub init_userdb_test {
     my $config = Metamod::Config->new();
     $config->initLogger();
 
-    my $user    = $config->get('PG_WEB_USER');
-    my $db_name = $config->get('USERBASE_NAME');
+    my $user    = $config->get('PG_WEB_USER') || die 'Missing PG_WEB_USER in master_config.txt';
+    my $db_name = $config->get('USERBASE_NAME') || die 'Missing USERBASE_NAME in master_config.txt';
+    
     my $result  = populate_database( $dump_file, $user, $db_name );
     return $result;
 
