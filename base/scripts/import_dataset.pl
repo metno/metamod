@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
-=for LICENSE
+=begin LICENSE
+
 METAMOD - Web portal for metadata search and upload
 
 Copyright (C) 2008 met.no
@@ -27,6 +28,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with METAMOD; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=end LICENSE
 =cut
 
 use strict;
