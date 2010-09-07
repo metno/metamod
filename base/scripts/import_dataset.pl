@@ -132,6 +132,7 @@ if ( defined($inputfile) ) {
         $dbh->commit or die $dbh->errstr;
         $logger->info("$inputfile successfully imported (single file)\n");
     }
+    $dbh->disconnect;
 }
 elsif ( defined($inputDir) ) {
    process_directories(-1, $inputDir);
@@ -164,8 +165,6 @@ sub process_xml_loop {
         process_directories($last_updated, @importdirs);
         utime($checkTime, $checkTime, $path_to_import_updated)
             or die "Cannot touch $path_to_import_updated";
-        # disconnect database before sleep
-        $config->getDBH()->disconnect;
         sleep($sleeping_seconds);
     }
     $logger->info("Check for new datasets stopped\n");
@@ -173,7 +172,7 @@ sub process_xml_loop {
 
 # callback function from File::Find for directories
 sub processFoundFile {
-    my ($last_updated) = @_;
+    my ($dbh, $last_updated) = @_;
     my $file = $File::Find::name;
     if ($file =~ /\.xm[ld]$/ and -f $file and (stat(_))[9] >= $last_updated) {
         $logger->info("$file -accepted\n");
@@ -182,7 +181,6 @@ sub processFoundFile {
             # ignore .xml file, will be processed together with .xmd file            
         } else {
             # import to database
-            my $dbh = $config->getDBH();
             eval { &update_database( $file, $dbh ); };
             if ($@) {
                 $dbh->rollback or $logger->logdie( $dbh->errstr . "\n");
@@ -200,6 +198,7 @@ sub processFoundFile {
 sub process_directories {
     my ($last_updated,@dirs) = @_;
 
+    my $dbh = $config->getDBH();
     foreach my $xmldir (@dirs) {
         my $xmldir1          = $xmldir;
         $xmldir1 =~ s/^ *//g;
@@ -207,11 +206,13 @@ sub process_directories {
         my @files_to_consume;
         if ( -d $xmldir1 ) {
             # xm[ld] files newer than $last_updated
-            File::Find::find({wanted => sub {processFoundFile($last_updated)},
+            File::Find::find({wanted => sub {processFoundFile($dbh, $last_updated)},
                               no_chdir => 1},
                               $xmldir1);
         }
     }
+    # disconnect database after done work
+    $dbh->disconnect;
 }
 
 # ------------------------------------------------------------------
@@ -619,7 +620,7 @@ sub update_database {
         } else {
            $logger->debug("No wmsxml\n");
         }
-        updateSru2Jdbc($ds, $dsid, $inputBaseFile);
+        updateSru2Jdbc($dbh, $ds, $dsid, $inputBaseFile);
     }
 }
 
@@ -640,9 +641,8 @@ sub update_database {
 }
 
 sub updateSru2Jdbc {
-    my ($ds, $dsid, $inputBaseFile) = @_;
+    my ($dbh, $ds, $dsid, $inputBaseFile) = @_;
     my $ownertag = _get_sru_ownertags();
-    my $dbh = $config->getDBH();
     my %info = $ds->getInfo();
     if ($ownertag->{cleanContent($info{ownertag})} and not $ds->getParentName()) {
         $logger->debug("running updateSru2Jdbc on $info{name}\n");
@@ -656,7 +656,7 @@ sub updateSru2Jdbc {
             my $fds = Metamod::ForeignDataset->newFromFileAutocomplete($inputBaseFile);
             eval {
                 $fds = foreignDataset2iso19115($fds);
-                isoDoc2SruDb($fds, $dsid);
+                isoDoc2SruDb($dbh, $fds, $dsid);
             }; if ($@) {
                 $logger->warn("problems converting to iso19115 and adding to sru-db: $@\n");
             }
@@ -669,7 +669,7 @@ sub updateSru2Jdbc {
 # read a parsed iso19115 libxml document
 # and put it into the sru database 
 sub isoDoc2SruDb {
-    my ($isods, $dsid) = @_;
+    my ($dbh, $isods, $dsid) = @_;
     my %info = $isods->getInfo;
     return unless $info{status} eq 'active';
         
@@ -738,7 +738,7 @@ sub isoDoc2SruDb {
     $logger->debug("Insert sru-searchdata...");
     my $paramNames = join ', ', @params;
     my $placeholder = join ', ', map {'?'} @values;
-    my $sth = $config->getDBH()->prepare_cached(<<"SQL");
+    my $sth = $dbh->prepare_cached(<<"SQL");
 INSERT INTO sru.products ( $paramNames ) VALUES ( $placeholder )
 SQL
     $sth->execute(@values);

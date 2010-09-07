@@ -333,6 +333,10 @@ will be used.
 Return a cached/pooled DBI-handler to the default database of metamod. The handler is in 
 AutoCommit = 0 and RaiseError = 1, FetchHash mode. This function will die on error. (DBI-connect error)
 
+disconnect will free the database. Be careful when using getDBH and transactions.
+A call to getDBH will commit a transaction, and cached connections might be used
+several places.
+
 =head1 AUTHOR
 
 Heiko Klein, E<lt>H.Klein@met.noE<gt>
