@@ -36,9 +36,8 @@ use Scalar::Util;
 BEGIN { *ident = \&Scalar::Util::refaddr; }
 use DBI;
 use Metamod::Config;
-use Readonly;
-Readonly my $TRUE  => 1;
-Readonly my $FALSE => 0;
+use constant TRUE => 1;
+use constant FALSE => 0;
 {
 
     #
@@ -102,11 +101,11 @@ Readonly my $FALSE => 0;
         my $user   = $config->get("PG_ADMIN_USER");
         $dbh{$ident} =
             DBI->connect( "dbi:Pg:dbname=" . $dbname . " " . $config->get("PG_CONNECTSTRING_PERL"), $user, "" );
-        $pending_user_updates{$ident}    = $FALSE;
-        $pending_dataset_updates{$ident} = $FALSE;
-        $pending_file_updates{$ident}    = $FALSE;
-        $pending_infoUDS_updates{$ident} = $FALSE;
-        $in_transaction{$ident}          = $FALSE;
+        $pending_user_updates{$ident}    = FALSE();
+        $pending_dataset_updates{$ident} = FALSE();
+        $pending_file_updates{$ident}    = FALSE();
+        $pending_infoUDS_updates{$ident} = FALSE();
+        $in_transaction{$ident}          = FALSE();
         $transaction_triggers{$ident}    = [ 'INSERT', 'UPDATE', 'DELETE' ];
         $user_ordinary_fields{$ident}    = "u_name, u_password, u_institution, u_telephone, u_session";
         $dataset_infotypes{$ident}       = [ 'DSKEY', 'LOCATION', 'CATALOG', 'WMS_URL', 'WMS_XML' ];
@@ -141,7 +140,7 @@ Readonly my $FALSE => 0;
         my $ident = ident($self);
         $exception_level{$ident}  = shift;
         $exception_string{$ident} = shift;
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -278,11 +277,11 @@ Readonly my $FALSE => 0;
             if ( !$dbh->begin_work ) {
                 $pg_error = $dbh->errstr;
                 $self->_note_exception( 1, "Failed to begin transaction. " . $pg_error );
-                return $FALSE;
+                return FALSE();
             }
 
             # print "FROM _do_query: Started transaction\n";
-            $in_transaction{$ident} = $TRUE;
+            $in_transaction{$ident} = TRUE();
         }
         my $sth = $dbh->prepare_cached($sql_query);
 
@@ -293,7 +292,7 @@ Readonly my $FALSE => 0;
         if ( !$sth_returned ) {
             $pg_error = $sth->errstr;
             $self->_note_exception( 1, "DBI execute method returns FALSE on '" . $sql_query . "'. " . $pg_error );
-            return $FALSE;
+            return FALSE();
         }
 
         # print "FROM _do_query: execute finished, returned: $sth_returned\n";
@@ -309,13 +308,13 @@ Readonly my $FALSE => 0;
             if ( defined($errcode) ) {
                 $self->_note_exception( 1,
                     "_do_query: fetchall_arrayref did not succeed on query '" . $sql_query . "': " . $sth->errstr );
-                return $FALSE;
+                return FALSE();
             }
 
             # print "FROM _do_query: fetchall_arrayref returned " . scalar @{$select_buffer} . " rows\n";
             $selected_count{$ident} = scalar @{$select_buffer};
             $select_buffer{$ident}  = $select_buffer;
-            return $TRUE;
+            return TRUE();
         }
         return $sth;
     }
@@ -331,7 +330,7 @@ Readonly my $FALSE => 0;
         my $select_buffer  = $select_buffer{$ident};
         if ( $rownum < 0 or $rownum >= $selected_count ) {
             $self->_note_exception( 1, "Row number outside allowed range" );
-            return $FALSE;
+            return FALSE();
         }
         return $select_buffer->[$rownum];
     }
@@ -409,14 +408,14 @@ Readonly my $FALSE => 0;
         my $dbh                  = $dbh{$ident};
         if ($pending_file_updates) {
             if ( !( $self->_update_file() ) ) {
-                return $FALSE;
+                return FALSE();
             }
         }
 
         # print "FROM close: passed pending_file_updates\n";
         if ($pending_user_updates) {
             if ( !( $self->_update_user() ) ) {
-                return $FALSE;
+                return FALSE();
             }
         }
 
@@ -427,9 +426,9 @@ Readonly my $FALSE => 0;
             if ( !$dbh->commit ) {
                 my $pg_error = $dbh->errstr;
                 $self->_note_exception( 1, "Failed to commit transaction. " . $pg_error );
-                return $FALSE;
+                return FALSE();
             }
-            $in_transaction{$ident} = $FALSE;
+            $in_transaction{$ident} = FALSE();
         }
 
         # print "FROM close: disconnecting\n";
@@ -437,7 +436,7 @@ Readonly my $FALSE => 0;
 
         # print "FROM close: deleting attributes\n";
         $self->_delete_attributes();
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -452,13 +451,13 @@ Readonly my $FALSE => 0;
             if ( !$dbh->rollback ) {
                 my $pg_error = $dbh->errstr;
                 $self->_note_exception( 1, "Failed to rollback transaction. " . $pg_error );
-                return $FALSE;
+                return FALSE();
             }
-            $in_transaction{$ident} = $FALSE;
+            $in_transaction{$ident} = FALSE();
         }
         $dbh->disconnect;
         $self->_delete_attributes();
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -486,7 +485,7 @@ Readonly my $FALSE => 0;
 
         # print "FROM _update_user: sql1=$sql1\n";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
 
@@ -500,7 +499,7 @@ Readonly my $FALSE => 0;
                     . " and a_id= '"
                     . $user_array->{"a_id"}
                     . "'" );
-            return $FALSE;
+            return FALSE();
         }
         my $valuelist;
         my $sql2;
@@ -514,7 +513,7 @@ Readonly my $FALSE => 0;
 
             # print "FROM _update_user: sql2=$sql2\n";
             if ( !$self->_do_query($sql2) ) {
-                return $FALSE;
+                return FALSE();
             }
         } else {
             $valuelist = $self->_get_SQL_value_list( $user_ordinary_fields, $user_array );
@@ -528,13 +527,13 @@ Readonly my $FALSE => 0;
 
             # print "FROM _update_user: sql2=$sql2\n";
             if ( !$self->_do_query($sql2) ) {
-                return $FALSE;
+                return FALSE();
             }
         }
-        $pending_user_updates{$ident} = $FALSE;
+        $pending_user_updates{$ident} = FALSE();
 
         # print "FROM _update_user: Normal return\n";
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -550,7 +549,7 @@ Readonly my $FALSE => 0;
         my $user_ordinary_fields = $user_ordinary_fields{$ident};
         if ($pending_user_updates) {
             if ( !$self->_update_user() ) {
-                return $FALSE;
+                return FALSE();
             }
         }
         my $sql1 =
@@ -559,12 +558,12 @@ Readonly my $FALSE => 0;
             . " FROM UserTable "
             . $self->_get_SQL_WHERE_clause( 'u_email, a_id', [ $email_address, $application_id ] );
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount == 0 ) {
             $self->_note_exception( 0, "No such user" );
-            return $FALSE;
+            return FALSE();
         }
         if ( $rowcount != 1 ) {
             $self->_note_exception( 1,
@@ -574,16 +573,16 @@ Readonly my $FALSE => 0;
                     . $email_address
                     . " and a_id= "
                     . $application_id );
-            return $FALSE;
+            return FALSE();
         }
         my $user_array = $self->_fetch_row_as_hashref(0);
         if ( !$user_array ) {
-            return $FALSE;
+            return FALSE();
         }
         $user_array->{"u_email"} = $email_address;
         $user_array->{"a_id"}    = $application_id;
         $user_array{$ident}      = $user_array;
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -599,16 +598,16 @@ Readonly my $FALSE => 0;
         my $sql_select_uid       = "SELECT u_id FROM UserTable "
             . $self->_get_SQL_WHERE_clause( 'u_email, a_id', [ $email_address, $application_id ] );
         if ( !$self->_do_query($sql_select_uid) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount > 0 ) {
             $self->_note_exception( 0, "User already exists in database" );
-            return $FALSE;
+            return FALSE();
         }
         if ($pending_user_updates) {
             if ( !$self->_update_user() ) {
-                return $FALSE;
+                return FALSE();
             }
         }
 
@@ -621,21 +620,21 @@ Readonly my $FALSE => 0;
         my $valuelist = $self->_get_SQL_value_list( "a_id, u_email", $user_array );
         my $sql2 = "INSERT INTO UserTable (a_id, u_email) VALUES (" . $valuelist . ")";
         if ( !$self->_do_query($sql2) ) {
-            return $FALSE;
+            return FALSE();
         }
         if ( !$self->_do_query($sql_select_uid) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount2 = $self->_pg_num_rows();
         if ( $rowcount2 == 0 ) {
             $self->_note_exception( 1,
                 "Could not find newly created user ($application_id / $email_address) in database" );
-            return $FALSE;
+            return FALSE();
         }
         my $href = $self->_fetch_row_as_hashref(0);
         $user_array->{"u_id"} = $href->{"u_id"};
         $user_array{$ident} = $user_array;
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -651,16 +650,16 @@ Readonly my $FALSE => 0;
         my $user_ordinary_fields = $user_ordinary_fields{$ident};
         if ( !defined($user_array) ) {
             $self->_note_exception( 1, "No current user" );
-            return $FALSE;
+            return FALSE();
         }
         my @fieldnames = split( /\s*,\s*/, $user_ordinary_fields );
         if ( !grep( $_ eq $property, @fieldnames ) ) {
             $self->_note_exception( 1, "Property '" . $property . "' not known" );
-            return $FALSE;
+            return FALSE();
         }
         $user_array->{$property} = $value;
-        $pending_user_updates{$ident} = $TRUE;
-        return $TRUE;
+        $pending_user_updates{$ident} = TRUE();
+        return TRUE();
     }
 
     #
@@ -676,13 +675,13 @@ Readonly my $FALSE => 0;
         my @fieldnames           = split( /\s*,\s*/, $user_ordinary_fields );
         if ( !grep( $_ eq $property, @fieldnames ) ) {
             $self->_note_exception( 1, "Property '" . $property . "' not known" );
-            return $FALSE;
+            return FALSE();
         }
         if ( defined( $user_array->{$property} ) ) {
             return $user_array->{$property};
         } else {
             $self->_note_exception( 1, "Property '" . $property . "' not set" );
-            return $FALSE;
+            return FALSE();
         }
     }
 
@@ -698,13 +697,13 @@ Readonly my $FALSE => 0;
         my $user_ordinary_fields = $user_ordinary_fields{$ident};
         if ($pending_user_updates) {
             if ( !$self->_update_user() ) {
-                return $FALSE;
+                return FALSE();
             }
         }
         my $allusers = [];
         my $sql1     = "SELECT u_id FROM UserTable ORDER BY u_id\n";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
         my $i1       = 0;
@@ -719,16 +718,16 @@ Readonly my $FALSE => 0;
             . " FROM UserTable WHERE u_id = "
             . $allusers->[0] . "\n";
         if ( !$self->_do_query($sql2) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $user_array = $self->_fetch_row_as_hashref(0);
         if ( !$user_array ) {
-            return $FALSE;
+            return FALSE();
         }
         $user_array{$ident}      = $user_array;
         $allusers{$ident}        = $allusers;
         $current_user_ix{$ident} = 0;
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -746,7 +745,7 @@ Readonly my $FALSE => 0;
         my $allusers             = $allusers{$ident};
         if ($pending_user_updates) {
             if ( !$self->_update_user() ) {
-                return $FALSE;
+                return FALSE();
             }
         }
         my $ix = $current_user_ix + 1;
@@ -756,7 +755,7 @@ Readonly my $FALSE => 0;
 
             # print "FROM user_next: No more users in the database\n";
             $self->_note_exception( 0, "No more users in the database" );
-            return $FALSE;
+            return FALSE();
         }
         my $uid = $allusers->[$ix];
         my $sql1 =
@@ -764,26 +763,26 @@ Readonly my $FALSE => 0;
 
         # print "FROM user_next: Make query: $sql1\n";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
 
         # print "FROM user_next: Rows found: $rowcount\n";
         if ( $rowcount == 0 ) {
             $self->_note_exception( 1, "User with u_id = " . $uid . " not found in the database" );
-            return $FALSE;
+            return FALSE();
         }
         my $user_array = $self->_fetch_row_as_hashref(0);
         if ( !$user_array ) {
 
             # print "FROM user_next: _fetch_row_as_hashref did not succeed\n";
-            return $FALSE;
+            return FALSE();
         }
         $user_array{$ident}      = $user_array;
         $current_user_ix{$ident} = $ix;
 
-        # print "FROM user_next: Returning TRUE=$TRUE\n";
-        return $TRUE;
+        # print "FROM user_next: Returning TRUE=TRUE()\n";
+        return TRUE();
     }
 
     #
@@ -800,20 +799,20 @@ Readonly my $FALSE => 0;
         my $infoUDS_record       = $infoUDS_record{$ident};
         if ($pending_user_updates) {
             if ( !$self->_update_user() ) {
-                return $FALSE;
+                return FALSE();
             }
         }
 
         # print "FROM user_isync: 2\n";
         if ( !defined($infoUDS_record) ) {
             $self->_note_exception( 1, "No current infoUDS record" );
-            return $FALSE;
+            return FALSE();
         }
 
         # print "FROM user_isync: 3\n";
         if ( !defined( $infoUDS_record->{"u_id"} ) ) {
             $self->_note_exception( 1, "The current infoUDS record have no u_id field" );
-            return $FALSE;
+            return FALSE();
         }
 
         # print "FROM user_isync: 4\n";
@@ -821,27 +820,27 @@ Readonly my $FALSE => 0;
         my $sql1 =
             "SELECT u_id, a_id, u_email, " . $user_ordinary_fields . " FROM UserTable WHERE u_id = " . $uid . "\n";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
 
         # print "FROM user_isync: 5\n";
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount == 0 ) {
             $self->_note_exception( 1, "User with u_id = " . $uid . " not found in the database" );
-            return $FALSE;
+            return FALSE();
         }
 
         # print "FROM user_isync: 6\n";
         my $user_array = $self->_fetch_row_as_hashref(0);
         if ( !$user_array ) {
-            return $FALSE;
+            return FALSE();
         }
 
         # print "FROM user_isync: 7\n";
         $user_array{$ident} = $user_array;
 
         # print "FROM user_isync: 8\n";
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -856,7 +855,7 @@ Readonly my $FALSE => 0;
         my $current_ds_uid       = $current_ds_uid{$ident};
         if ($pending_user_updates) {
             if ( !$self->_update_user() ) {
-                return $FALSE;
+                return FALSE();
             }
         }
         my $sql1 =
@@ -865,7 +864,7 @@ Readonly my $FALSE => 0;
             . " FROM UserTable WHERE u_id = "
             . $current_ds_uid . "\n";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount == 0 ) {
@@ -874,14 +873,14 @@ Readonly my $FALSE => 0;
                     . $current_ds_uid
                     . " not found in the database. "
                     . "But the DataSet table contains an entry with this u_id." );
-            return $FALSE;
+            return FALSE();
         }
         my $user_array = $self->_fetch_row_as_hashref(0);
         if ( !$user_array ) {
-            return $FALSE;
+            return FALSE();
         }
         $user_array{$ident} = $user_array;
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -896,17 +895,17 @@ Readonly my $FALSE => 0;
         my $user_array   = $user_array{$ident};
         if ( !defined($user_array) ) {
             $self->_note_exception( 1, "No current user" );
-            return $FALSE;
+            return FALSE();
         }
         my $sql_ds = "SELECT ds_id FROM DataSet "
             . $self->_get_SQL_WHERE_clause( 'ds_name, a_id', [ $dataset_name, $user_array->{"a_id"} ] );
         if ( !$self->_do_query($sql_ds) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount > 0 ) {
             $self->_note_exception( 0, "DataSet " . $dataset_name . " already exists in database" );
-            return $FALSE;
+            return FALSE();
         }
         my $sql1 =
               "INSERT INTO DataSet (u_id, a_id, ds_name)\n"
@@ -914,19 +913,19 @@ Readonly my $FALSE => 0;
             . $self->_get_SQL_value_list( 'u_id, a_id', $user_array ) . ", '"
             . $self->_pg_escape_string($dataset_name) . "')";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         if ( !$self->_do_query($sql_ds) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $href = $self->_fetch_row_as_hashref(0);
         $current_ds_id{$ident}   = $href->{"ds_id"};
         $current_ds_name{$ident} = $dataset_name;
         $current_ds_uid{$ident}  = $user_array->{"u_id"};
         if ( !$self->info_put( "DSKEY", $dataset_key ) ) {
-            return $FALSE;
+            return FALSE();
         }
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -941,18 +940,18 @@ Readonly my $FALSE => 0;
         my $sql1         = "SELECT ds_id, u_id FROM DataSet "
             . $self->_get_SQL_WHERE_clause( 'ds_name, a_id', [ $dataset_name, $applic_id ] );
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount != 1 ) {
             $self->_note_exception( 0, "DataSet " . $applic_id . " / " . $dataset_name . " not found" );
-            return $FALSE;
+            return FALSE();
         }
         my $href = $self->_fetch_row_as_hashref(0);
         $current_ds_id{$ident}   = $href->{"ds_id"};
         $current_ds_uid{$ident}  = $href->{"u_id"};
         $current_ds_name{$ident} = $dataset_name;
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -967,17 +966,17 @@ Readonly my $FALSE => 0;
         my $user_array = $user_array{$ident};
         if ( !defined($user_array) ) {
             $self->_note_exception( 1, "No current user" );
-            return $FALSE;
+            return FALSE();
         }
         my $users_datasets = [];
         my $sql1           = "SELECT ds_id FROM DataSet WHERE u_id = " . $user_array->{"u_id"} . " ORDER BY ds_id\n";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount == 0 ) {
             $self->_note_exception( 0, "No datasets found for current user" );
-            return $FALSE;
+            return FALSE();
         }
         my $i1 = 0;
         while ( $i1 < $rowcount ) {
@@ -987,7 +986,7 @@ Readonly my $FALSE => 0;
         }
         my $sql2 = "SELECT ds_name FROM DataSet WHERE ds_id = " . $users_datasets->[0] . "\n";
         if ( !$self->_do_query($sql2) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $href2 = $self->_fetch_row_as_hashref(0);
         $current_ds_name{$ident} = $href2->{"ds_name"};
@@ -995,7 +994,7 @@ Readonly my $FALSE => 0;
         $current_ds_id{$ident}   = $users_datasets->[0];
         $current_ds_uid{$ident}  = $user_array->{"u_id"};
         $users_datasets{$ident}  = $users_datasets;
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -1010,28 +1009,28 @@ Readonly my $FALSE => 0;
         my $current_ds_ix  = $current_ds_ix{$ident};
         if ( !defined($users_datasets) ) {
             $self->_note_exception( 1, "No current set. Dset_first not called?" );
-            return $FALSE;
+            return FALSE();
         }
         my $ix = $current_ds_ix + 1;
         if ( $ix >= scalar @{$users_datasets} ) {
             $self->_note_exception( 0, "No more datasets found for current user" );
-            return $FALSE;
+            return FALSE();
         }
         my $dsid = $users_datasets->[$ix];
         my $sql1 = "SELECT ds_name FROM DataSet WHERE ds_id = " . $dsid . "\n";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount == 0 ) {
             $self->_note_exception( 1, "Expected another dataset, but found no datasets with ds_id = " . $dsid );
-            return $FALSE;
+            return FALSE();
         }
         my $href = $self->_fetch_row_as_hashref(0);
         $current_ds_name{$ident} = $href->{"ds_name"};
         $current_ds_ix{$ident}   = $ix;
         $current_ds_id{$ident}   = $dsid;
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -1045,30 +1044,30 @@ Readonly my $FALSE => 0;
         my $infoUDS_record       = $infoUDS_record{$ident};
         if ( !defined($infoUDS_record) ) {
             $self->_note_exception( 1, "No current infoUDS record" );
-            return $FALSE;
+            return FALSE();
         }
         if ( !defined( $infoUDS_record->{"ds_id"} ) ) {
             $self->_note_exception( 1, "The current infoUDS record have no ds_id field" );
-            return $FALSE;
+            return FALSE();
         }
         my $dsid = $infoUDS_record->{"ds_id"};
         $sql1 = "SELECT ds_name, u_id FROM DataSet WHERE ds_id = " . $dsid . "\n";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount == 0 ) {
             $self->_note_exception( 1, "Found no datasets with ds_id = " . $dsid );
-            return $FALSE;
+            return FALSE();
         }
         my $href = $self->_fetch_row_as_hashref(0);
         if ( !$href ) {
-            return $FALSE;
+            return FALSE();
         }
         $current_ds_name{$ident} = $href->{"ds_name"};
         $current_ds_uid{$ident}  = $href->{"u_id"};
         $current_ds_id{$ident}   = $dsid;
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -1084,15 +1083,15 @@ Readonly my $FALSE => 0;
         my $dataset_infotypes = $dataset_infotypes{$ident};
         if ( !defined($current_ds_id) ) {
             $self->_note_exception( 1, "No current dataset" );
-            return $FALSE;
+            return FALSE();
         }
         if ( !grep( $_ eq $info_type, @{$dataset_infotypes} ) ) {
             $self->_note_exception( 1, "Wrong information type: " . $info_type );
-            return $FALSE;
+            return FALSE();
         }
         my $sql1 = "DELETE FROM InfoDS WHERE ds_id = " . $current_ds_id . " AND i_type = '" . $info_type . "'\n";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $sql2 =
               "INSERT INTO InfoDS (ds_id, i_type, i_content)\n"
@@ -1101,9 +1100,9 @@ Readonly my $FALSE => 0;
             . $info_type . "', '"
             . $self->_pg_escape_string($info_content) . "')";
         if ( !$self->_do_query($sql2) ) {
-            return $FALSE;
+            return FALSE();
         }
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -1118,30 +1117,30 @@ Readonly my $FALSE => 0;
         my $dataset_infotypes = $dataset_infotypes{$ident};
         if ( !defined($current_ds_id) ) {
             $self->_note_exception( 1, "No current dataset" );
-            return $FALSE;
+            return FALSE();
         }
         if ( !grep( $_ eq $info_type, @{$dataset_infotypes} ) ) {
             $self->_note_exception( 1, "Wrong information type: " . $info_type );
-            return $FALSE;
+            return FALSE();
         }
         $sql1 = "SELECT i_content FROM InfoDS WHERE ds_id = " . $current_ds_id . " AND i_type = '" . $info_type . "'\n";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount == 0 ) {
             $self->_note_exception( 0,
                 "No info on " . $info_type . " for dataset " . $current_ds_name . " in database" );
-            return $FALSE;
+            return FALSE();
         }
         if ( $rowcount != 1 ) {
             $self->_note_exception( 1,
                 "Multiple values for " . $info_type . " for dataset " . $current_ds_name . " in database" );
-            return $FALSE;
+            return FALSE();
         }
         my $href = $self->_fetch_row_as_hashref(0);
         if ( !$href ) {
-            return $FALSE;
+            return FALSE();
         }
         return $href->{"i_content"};
     }
@@ -1158,28 +1157,28 @@ Readonly my $FALSE => 0;
         my $infoUDS_fields = $infoUDS_fields{$ident};
         if ( !defined($infoUDS_rows) ) {
             $self->_note_exception( 1, "No set of infoUDS rows defined" );
-            return $FALSE;
+            return FALSE();
         }
         if ( $infoUDS_row_ix < 0 || $infoUDS_row_ix >= scalar @{$infoUDS_rows} ) {
             $self->_note_exception( 1, "Current row off array limits: " . $infoUDS_row_ix );
-            return $FALSE;
+            return FALSE();
         }
         my $iid = $infoUDS_rows->[$infoUDS_row_ix];
         $sql1 = "SELECT " . $infoUDS_fields . " FROM InfoUDS WHERE i_id = " . $iid . "\n";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount == 0 ) {
             $self->_note_exception( 1, "InfoUDS record with i_id=" . $iid . " not found" );
-            return $FALSE;
+            return FALSE();
         }
         my $href = $self->_fetch_row_as_hashref(0);
         if ( !$href ) {
-            return $FALSE;
+            return FALSE();
         }
         $infoUDS_record{$ident} = $href;
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -1195,12 +1194,12 @@ Readonly my $FALSE => 0;
         my $infoUDS_record = $infoUDS_record{$ident};
         if ( !defined($infoUDS_record) ) {
             $self->_note_exception( 1, "No infoUDS record defined" );
-            return $FALSE;
+            return FALSE();
         }
         my $iid = $infoUDS_record->{"i_id"};
         $sql1 = "DELETE FROM InfoUDS WHERE i_id = " . $iid . "\n";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         $sql1 =
               "INSERT INTO InfoUDS ("
@@ -1208,10 +1207,10 @@ Readonly my $FALSE => 0;
             . "   VALUES ("
             . $self->_get_SQL_value_list( $nfoUDS_fields, $infoUDS_record ) . ")";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
-        $pending_infoUDS_updates{$ident} = $FALSE;
-        return $TRUE;
+        $pending_infoUDS_updates{$ident} = FALSE();
+        return TRUE();
     }
 
     #
@@ -1236,16 +1235,16 @@ Readonly my $FALSE => 0;
 
         if ($pending_infoUDS_updates) {
             if ( !$self->_infoUDS_write() ) {
-                return $FALSE;
+                return FALSE();
             }
         }
         if ( !grep( $_ eq $info_type, @{$infoUDS_infotypes} ) ) {
             $self->_note_exception( 1, "Wrong info_type in call to infoUDS_set: " . $info_type );
-            return $FALSE;
+            return FALSE();
         }
         if ( !grep( $_ eq $info_span, ( 'USER', 'DATASET', 'USER_AND_DATASET' ) ) ) {
             $self->_note_exception( 1, "Wrong info_span in call to infoUDS_set: " . $info_span );
-            return $FALSE;
+            return FALSE();
         }
         my $infouds_dsid = -1;
         my $infouds_uid  = -1;
@@ -1253,7 +1252,7 @@ Readonly my $FALSE => 0;
         if ( $info_span eq 'DATASET' or $info_span eq 'USER_AND_DATASET' ) {
             if ( !defined($current_ds_id) ) {
                 $self->_note_exception( 1, "No current dataset when searching for infoUDS rows" );
-                return $FALSE;
+                return FALSE();
             }
             $infouds_dsid = $current_ds_id;
             $whereclause .= "ds_id = " . $infouds_dsid;
@@ -1261,7 +1260,7 @@ Readonly my $FALSE => 0;
         if ( $info_span eq 'USER' or $info_span eq 'USER_AND_DATASET' ) {
             if ( !defined($user_array) ) {
                 $self->_note_exception( 1, "No current user when searching for infoUDS rows" );
-                return $FALSE;
+                return FALSE();
             }
             if ( length($whereclause) > 7 ) {
                 $whereclause .= " AND ";
@@ -1271,7 +1270,7 @@ Readonly my $FALSE => 0;
         }
         $sql1 = "SELECT i_id FROM InfoUDS " . $whereclause . "\n";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         $infoUDS_uid{$ident}   = $infoUDS_uid;
         $infoUDS_dsid{$ident}  = $infoUDS_dsid;
@@ -1280,7 +1279,7 @@ Readonly my $FALSE => 0;
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount == 0 ) {
             $self->_note_exception( 0, "No infoUDS rows for " . $info_type . " spanning " . $info_span );
-            return $FALSE;
+            return FALSE();
         }
         my $i1 = 0;
         while ( $i1 < $rowcount ) {
@@ -1290,7 +1289,7 @@ Readonly my $FALSE => 0;
         }
         $infoUDS_row_ix{$ident} = 0;
         if ( !$self->_infoUDS_read() ) {
-            return $FALSE;
+            return FALSE();
         }
         return $rowcount;
     }
@@ -1307,11 +1306,11 @@ Readonly my $FALSE => 0;
         my $pending_infoUDS_updates = $pending_infoUDS_updates{$ident};
         if ( !defined($infoUDS_record) ) {
             $self->_note_exception( 1, "No infoUDS record defined" );
-            return $FALSE;
+            return FALSE();
         }
         $infoUDS_record->{"i_content"} = $content;
-        $pending_infoUDS_updates{$ident} = $TRUE;
-        return $TRUE;
+        $pending_infoUDS_updates{$ident} = TRUE();
+        return TRUE();
     }
 
     #
@@ -1324,7 +1323,7 @@ Readonly my $FALSE => 0;
         my $infoUDS_record = $infoUDS_record{$ident};
         if ( !defined($infoUDS_record) ) {
             $self->_note_exception( 1, "No infoUDS record defined" );
-            return $FALSE;
+            return FALSE();
         }
         return $infoUDS_record->{"i_content"};
     }
@@ -1341,23 +1340,23 @@ Readonly my $FALSE => 0;
         my $pending_infoUDS_updates = $pending_infoUDS_updates{$ident};
         if ( !defined($infoUDS_rows) ) {
             $self->_note_exception( 1, "No set of infoUDS rows defined" );
-            return $FALSE;
+            return FALSE();
         }
         my $ix = $infoUDS_row_ix + 1;
         if ( $ix >= scalar @{$infoUDS_rows} ) {
             $self->_note_exception( 0, "No more rows in the set of infoUDS rows" );
-            return $FALSE;
+            return FALSE();
         }
         if ($pending_infoUDS_updates) {
             if ( !$self->_infoUDS_write() ) {
-                return $FALSE;
+                return FALSE();
             }
         }
         $infoUDS_row_ix{$ident} = $ix;
         if ( !$self->_infoUDS_read() ) {
-            return $FALSE;
+            return FALSE();
         }
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -1377,12 +1376,12 @@ Readonly my $FALSE => 0;
         my $pending_infoUDS_updates = $pending_infoUDS_updates{$ident};
         if ( !defined($infoUDS_rows) ) {
             $self->_note_exception( 1, "No set of infoUDS rows defined" );
-            return $FALSE;
+            return FALSE();
         }
         my $ix = scalar @{$infoUDS_rows};
         if ($pending_infoUDS_updates) {
             if ( !$self->_infoUDS_write() ) {
-                return $FALSE;
+                return FALSE();
             }
         }
         my $uid;
@@ -1392,7 +1391,7 @@ Readonly my $FALSE => 0;
             $uid = $user_array->{"u_id"};
         } else {
             $self->_note_exception( 1, "Not able to connect a user to the new infoUDS row" );
-            return $FALSE;
+            return FALSE();
         }
         my $dsid;
         if ( defined($infoUDS_dsid) && $infoUDS_dsid >= 0 ) {
@@ -1401,17 +1400,17 @@ Readonly my $FALSE => 0;
             $dsid = $current_ds_id;
         } else {
             $self->_note_exception( 1, "Not able to connect a dataset to the new infoUDS row" );
-            return $FALSE;
+            return FALSE();
         }
         my $fields = 'u_id, ds_id, i_type, i_content';
         my $values = $self->_get_SQL_value_list( $fields, [ $uid, $dsid, $infoUDS_itype, $content ] );
         $sql1 = "INSERT INTO InfoUDS (" . $fields . ") VALUES (" . $values . ") returning i_id\n";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $href = $self->_fetch_row_as_hashref(0);
         if ( !$href ) {
-            return $FALSE;
+            return FALSE();
         }
         my $iid            = $href->{"i_id"};
         my $infoUDS_record = {
@@ -1424,7 +1423,7 @@ Readonly my $FALSE => 0;
         $infoUDS_rows->[$ix]    = $iid;
         $infoUDS_rows{$ident}   = $infoUDS_rows;
         $infoUDS_row_ix{$ident} = $ix;
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -1439,20 +1438,20 @@ Readonly my $FALSE => 0;
         my $infoUDS_row_ix = $infoUDS_row_ix{$ident};
         if ( !defined($infoUDS_rows) ) {
             $self->_note_exception( 1, "No set of infoUDS rows defined" );
-            return $FALSE;
+            return FALSE();
         }
         if ( !defined($infoUDS_record) ) {
             $self->_note_exception( 1, "No current infoUDS row defined" );
-            return $FALSE;
+            return FALSE();
         }
         $sql1 = "DELETE FROM InfoUDS WHERE i_id = " . $infoUDS_record->{'i_id'} . "\n";
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         $infoUDS_record{$ident}                  = undef;
         $infoUDS_rows{$ident}->[$infoUDS_row_ix] = undef;
-        $pending_infoUDS_updates{$ident}         = $FALSE;
-        return $TRUE;
+        $pending_infoUDS_updates{$ident}         = FALSE();
+        return TRUE();
     }
 
     #
@@ -1468,20 +1467,20 @@ Readonly my $FALSE => 0;
         my $file_ordinary_fields = $file_ordinary_fields{$ident};
         if ( !defined($file_array) ) {
             $self->_note_exception( 1, "_update_file() found no current file" );
-            return $FALSE;
+            return FALSE();
         }
         if ( !defined( $file_array->{"f_name"} ) ) {
             $self->_note_exception( 1, "_update_file() found no f_name in file_array" );
-            return $FALSE;
+            return FALSE();
         }
         if ( !defined($current_ds_id) ) {
             $self->_note_exception( 1, "_update_file() found no current dataset" );
-            return $FALSE;
+            return FALSE();
         }
         my $sql1 = "SELECT ds_id, f_name FROM File\n"
             . $self->_get_SQL_WHERE_clause( 'ds_id, f_name', [ $current_ds_id, $file_array->{'f_name'} ] );
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount > 1 ) {
@@ -1492,7 +1491,7 @@ Readonly my $FALSE => 0;
                     . $file_array->{"f_name"}
                     . " for dataset "
                     . $current_ds_name );
-            return $FALSE;
+            return FALSE();
         }
         my $valuelist;
         if ( $rowcount == 0 ) {
@@ -1501,7 +1500,7 @@ Readonly my $FALSE => 0;
             my $sql2 =
                 "INSERT INTO File (ds_id, f_name, " . $file_ordinary_fields . ")\n" . "   VALUES (" . $valuelist . ")";
             if ( !$self->_do_query($sql2) ) {
-                return $FALSE;
+                return FALSE();
             }
         } else {    #   ($rowcount == 1)
             $valuelist = $self->_get_SQL_value_list( $file_ordinary_fields, $file_array );
@@ -1514,11 +1513,11 @@ Readonly my $FALSE => 0;
                 . $valuelist . ")\n"
                 . $self->_get_SQL_WHERE_clause( 'ds_id, f_name', [ $current_ds_id, $file_array->{'f_name'} ] );
             if ( !$self->_do_query($sql3) ) {
-                return $FALSE;
+                return FALSE();
             }
         }
-        $pending_file_updates{$ident} = $FALSE;
-        return $TRUE;
+        $pending_file_updates{$ident} = FALSE();
+        return TRUE();
     }
 
     #
@@ -1535,11 +1534,11 @@ Readonly my $FALSE => 0;
         my $file_ordinary_fields = $file_ordinary_fields{$ident};
         if ( !defined($current_ds_id) ) {
             $self->_note_exception( 1, "No current dataset" );
-            return $FALSE;
+            return FALSE();
         }
         if ($pending_file_updates) {
             if ( !$self->_update_file() ) {
-                return $FALSE;
+                return FALSE();
             }
         }
         my $sql1 =
@@ -1548,12 +1547,12 @@ Readonly my $FALSE => 0;
             . " FROM File "
             . $self->_get_SQL_WHERE_clause( 'ds_id, f_name', [ $current_ds_id, $file_name ] );
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount == 0 ) {
             $self->_note_exception( 0, "No such file" );
-            return $FALSE;
+            return FALSE();
         }
         if ( $rowcount != 1 ) {
             $self->_note_exception( 1,
@@ -1563,13 +1562,13 @@ Readonly my $FALSE => 0;
                     . $file_name
                     . " for dataset "
                     . $current_ds_name );
-            return $FALSE;
+            return FALSE();
         }
         my $file_array = $self->_fetch_row_as_hashref(0);
         $file_array->{"ds_id"}  = $current_ds_id;
         $file_array->{"f_name"} = $file_name;
         $file_array{$ident}     = $file_array;
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -1585,29 +1584,29 @@ Readonly my $FALSE => 0;
         my $pending_file_updates = $pending_file_updates{$ident};
         if ( !defined($current_ds_id) ) {
             $self->_note_exception( 1, "No current dataset" );
-            return $FALSE;
+            return FALSE();
         }
         my $sql1 = "SELECT ds_id, f_name FROM File "
             . $self->_get_SQL_WHERE_clause( 'ds_id, f_name', [ $current_ds_id, $file_name ] );
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount > 0 ) {
             $self->_note_exception( 0, "File already exists in database" );
-            return $FALSE;
+            return FALSE();
         }
         if ($pending_file_updates) {
             if ( !$self->_update_file() ) {
-                return $FALSE;
+                return FALSE();
             }
         }
         my $file_array = {};
         $file_array->{"ds_id"}        = $current_ds_id;
         $file_array->{"f_name"}       = $file_name;
         $file_array{$ident}           = $file_array;
-        $pending_file_updates{$ident} = $TRUE;
-        return $TRUE;
+        $pending_file_updates{$ident} = TRUE();
+        return TRUE();
     }
 
     #
@@ -1623,16 +1622,16 @@ Readonly my $FALSE => 0;
         my $file_ordinary_fields = $file_ordinary_fields{$ident};
         if ( !defined($file_array) ) {
             $self->_note_exception( 1, "No current file" );
-            return $FALSE;
+            return FALSE();
         }
         my @fieldnames = split( /\s*,\s*/, $file_ordinary_fields );
         if ( !grep( $_ eq $property, @fieldnames ) ) {
             $self->_note_exception( 1, "Property '" . $property . "' not known" );
-            return $FALSE;
+            return FALSE();
         }
         $file_array->{$property} = $value;
-        $pending_file_updates{$ident} = $TRUE;
-        return $TRUE;
+        $pending_file_updates{$ident} = TRUE();
+        return TRUE();
     }
 
     #
@@ -1647,12 +1646,12 @@ Readonly my $FALSE => 0;
         my $file_ordinary_fields = $file_ordinary_fields{$ident};
         if ( !defined($file_array) ) {
             $self->_note_exception( 1, "No current file" );
-            return $FALSE;
+            return FALSE();
         }
         my @fieldnames = split( /\s*,\s*/, "ds_id, f_name, " . $file_ordinary_fields );
         if ( !grep( $_ eq $property, @fieldnames ) ) {
             $self->_note_exception( 1, "Property '" . $property . "' not known" );
-            return $FALSE;
+            return FALSE();
         }
         return $file_array->{$property};
     }
@@ -1673,28 +1672,28 @@ Readonly my $FALSE => 0;
         my $file_ordinary_fields = $file_ordinary_fields{$ident};
         if ($pending_file_updates) {
             if ( !$self->_update_file() ) {
-                return $FALSE;
+                return FALSE();
             }
         }
 
         # print "FROM file_first: initialisation finished\n";
         if ( !defined($current_ds_id) ) {
             $self->_note_exception( 1, "No current dataset" );
-            return $FALSE;
+            return FALSE();
         }
         my $dataset_files = [];
 
         # print "FROM file_first: local dataset_files arrayref created\n";
         my $sql1 = "SELECT f_name FROM File WHERE ds_id = " . $current_ds_id;
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
 
         # print "FROM file_first: Successfully done: $sql1\n";
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount == 0 ) {
             $self->_note_exception( 0, "No files in the database for dataset " . $current_ds_name );
-            return $FALSE;
+            return FALSE();
         }
 
         # print "FROM file_first: rowcount: $rowcount\n";
@@ -1710,13 +1709,13 @@ Readonly my $FALSE => 0;
             . " FROM File "
             . $self->_get_SQL_WHERE_clause( 'ds_id, f_name', [ $current_ds_id, $dataset_files->[0] ] );
         if ( !$self->_do_query($sql2) ) {
-            return $FALSE;
+            return FALSE();
         }
 
         # print "FROM file_first: Successfully done: $sql2\n";
         my $file_array = $self->_fetch_row_as_hashref(0);
         if ( !$file_array ) {
-            return $FALSE;
+            return FALSE();
         }
 
         # print "FROM file_first: Successfully run: _fetch_row_as_hashref(0)\n";
@@ -1726,7 +1725,7 @@ Readonly my $FALSE => 0;
         $dataset_files{$ident}   = $dataset_files;
 
         # print "FROM file_first: returning TRUE\n";
-        return $TRUE;
+        return TRUE();
     }
 
     #
@@ -1744,21 +1743,21 @@ Readonly my $FALSE => 0;
         if ($pending_file_updates) {
 
             if ( !$self->_update_file() ) {
-                return $FALSE;
+                return FALSE();
             }
         }
         if ( !defined($current_ds_id) ) {
             $self->_note_exception( 1, "No current dataset" );
-            return $FALSE;
+            return FALSE();
         }
         if ( !defined($dataset_files) ) {
             $self->_note_exception( 1, "No current set of files. File_first not called?" );
-            return $FALSE;
+            return FALSE();
         }
         my $ix = $current_file_ix + 1;
         if ( $ix >= scalar @{$dataset_files} ) {
             $self->_note_exception( 0, "No more files for the current dataset" );
-            return $FALSE;
+            return FALSE();
         }
         my $file_name = $dataset_files->[$ix];
         my $sql1 =
@@ -1767,21 +1766,21 @@ Readonly my $FALSE => 0;
             . " FROM File "
             . $self->_get_SQL_WHERE_clause( 'ds_id, f_name', [ $current_ds_id, $file_name ] );
         if ( !$self->_do_query($sql1) ) {
-            return $FALSE;
+            return FALSE();
         }
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount == 0 ) {
             $self->_note_exception( 1, "File " . $file_name . " not found in the database" );
-            return $FALSE;
+            return FALSE();
         }
         my $file_array = $self->_fetch_row_as_hashref(0);
         if ( !$file_array ) {
-            return $FALSE;
+            return FALSE();
         }
         $file_array->{'ds_id'}   = $current_ds_id;
         $current_file_ix{$ident} = $ix;
         $file_array{$ident}      = $file_array;
-        return $TRUE;
+        return TRUE();
     }
 }
 1;
