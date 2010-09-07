@@ -672,7 +672,7 @@ use constant FALSE => 0;
         my $property             = shift;
         my $user_array           = $user_array{$ident};
         my $user_ordinary_fields = $user_ordinary_fields{$ident};
-        my @fieldnames           = split( /\s*,\s*/, $user_ordinary_fields );
+        my @fieldnames           = split( /\s*,\s*/, 'u_id, u_email, a_id, ' . $user_ordinary_fields );
         if ( !grep( $_ eq $property, @fieldnames ) ) {
             $self->_note_exception( 1, "Property '" . $property . "' not known" );
             return FALSE();

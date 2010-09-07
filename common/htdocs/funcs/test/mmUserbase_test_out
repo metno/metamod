@@ -10,6 +10,8 @@ $userbase->user_first()
    OK   Result: 1
 $userbase->user_get('u_name')
    OK   Result: Peder
+$userbase->user_get('u_email')
+   OK   Result: email_address
 $userbase->user_next()
    OK   Result: 1
 $userbase->user_get('u_name')
