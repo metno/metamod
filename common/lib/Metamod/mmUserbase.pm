@@ -26,6 +26,7 @@
 #  along with METAMOD; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #----------------------------------------------------------------------------
+use strict;
 package Metamod::mmUserbase;
 
 #
@@ -235,6 +236,7 @@ use constant FALSE => 0;
                 and defined( $value_array->{$field} ) ) {
                 $val = $value_array->{$field};
             }
+            my $comparision_operator;
             if ( $val eq "NULL" ) {
                 $comparision_operator = ' IS ';
             } else {
@@ -1051,7 +1053,7 @@ use constant FALSE => 0;
             return FALSE();
         }
         my $dsid = $infoUDS_record->{"ds_id"};
-        $sql1 = "SELECT ds_name, u_id FROM DataSet WHERE ds_id = " . $dsid . "\n";
+        my $sql1 = "SELECT ds_name, u_id FROM DataSet WHERE ds_id = " . $dsid . "\n";
         if ( !$self->_do_query($sql1) ) {
             return FALSE();
         }
@@ -1114,6 +1116,7 @@ use constant FALSE => 0;
         my $ident             = ident($self);
         my $info_type         = shift;
         my $current_ds_id     = $current_ds_id{$ident};
+        my $current_ds_name   = $current_ds_name{$ident};
         my $dataset_infotypes = $dataset_infotypes{$ident};
         if ( !defined($current_ds_id) ) {
             $self->_note_exception( 1, "No current dataset" );
@@ -1123,7 +1126,7 @@ use constant FALSE => 0;
             $self->_note_exception( 1, "Wrong information type: " . $info_type );
             return FALSE();
         }
-        $sql1 = "SELECT i_content FROM InfoDS WHERE ds_id = " . $current_ds_id . " AND i_type = '" . $info_type . "'\n";
+        my $sql1 = "SELECT i_content FROM InfoDS WHERE ds_id = " . $current_ds_id . " AND i_type = '" . $info_type . "'\n";
         if ( !$self->_do_query($sql1) ) {
             return FALSE();
         }
@@ -1197,16 +1200,16 @@ use constant FALSE => 0;
             return FALSE();
         }
         my $iid = $infoUDS_record->{"i_id"};
-        $sql1 = "DELETE FROM InfoUDS WHERE i_id = " . $iid . "\n";
+        my $sql1 = "DELETE FROM InfoUDS WHERE i_id = " . $iid . "\n";
         if ( !$self->_do_query($sql1) ) {
             return FALSE();
         }
-        $sql1 =
+        my $sql2 =
               "INSERT INTO InfoUDS ("
             . $infoUDS_fields . ")\n"
             . "   VALUES ("
             . $self->_get_SQL_value_list( $nfoUDS_fields, $infoUDS_record ) . ")";
-        if ( !$self->_do_query($sql1) ) {
+        if ( !$self->_do_query($sql2) ) {
             return FALSE();
         }
         $pending_infoUDS_updates{$ident} = FALSE();
@@ -1246,16 +1249,16 @@ use constant FALSE => 0;
             $self->_note_exception( 1, "Wrong info_span in call to infoUDS_set: " . $info_span );
             return FALSE();
         }
-        my $infouds_dsid = -1;
-        my $infouds_uid  = -1;
+        my $infoUDS_dsid = -1;
+        my $infoUDS_uid  = -1;
         my $whereclause  = "WHERE ";
         if ( $info_span eq 'DATASET' or $info_span eq 'USER_AND_DATASET' ) {
             if ( !defined($current_ds_id) ) {
                 $self->_note_exception( 1, "No current dataset when searching for infoUDS rows" );
                 return FALSE();
             }
-            $infouds_dsid = $current_ds_id;
-            $whereclause .= "ds_id = " . $infouds_dsid;
+            $infoUDS_dsid = $current_ds_id;
+            $whereclause .= "ds_id = " . $infoUDS_dsid;
         }
         if ( $info_span eq 'USER' or $info_span eq 'USER_AND_DATASET' ) {
             if ( !defined($user_array) ) {
@@ -1265,10 +1268,10 @@ use constant FALSE => 0;
             if ( length($whereclause) > 7 ) {
                 $whereclause .= " AND ";
             }
-            $infouds_uid = $user_array->{"u_id"};
-            $whereclause .= "u_id = " . $infouds_uid;
+            $infoUDS_uid = $user_array->{"u_id"};
+            $whereclause .= "u_id = " . $infoUDS_uid;
         }
-        $sql1 = "SELECT i_id FROM InfoUDS " . $whereclause . "\n";
+        my $sql1 = "SELECT i_id FROM InfoUDS " . $whereclause . "\n";
         if ( !$self->_do_query($sql1) ) {
             return FALSE();
         }
@@ -1404,7 +1407,7 @@ use constant FALSE => 0;
         }
         my $fields = 'u_id, ds_id, i_type, i_content';
         my $values = $self->_get_SQL_value_list( $fields, [ $uid, $dsid, $infoUDS_itype, $content ] );
-        $sql1 = "INSERT INTO InfoUDS (" . $fields . ") VALUES (" . $values . ") returning i_id\n";
+        my $sql1 = "INSERT INTO InfoUDS (" . $fields . ") VALUES (" . $values . ") returning i_id\n";
         if ( !$self->_do_query($sql1) ) {
             return FALSE();
         }
@@ -1444,7 +1447,7 @@ use constant FALSE => 0;
             $self->_note_exception( 1, "No current infoUDS row defined" );
             return FALSE();
         }
-        $sql1 = "DELETE FROM InfoUDS WHERE i_id = " . $infoUDS_record->{'i_id'} . "\n";
+        my $sql1 = "DELETE FROM InfoUDS WHERE i_id = " . $infoUDS_record->{'i_id'} . "\n";
         if ( !$self->_do_query($sql1) ) {
             return FALSE();
         }
@@ -1465,6 +1468,7 @@ use constant FALSE => 0;
         my $current_ds_id        = $current_ds_id{$ident};
         my $current_ds_name      = $current_ds_name{$ident};
         my $file_ordinary_fields = $file_ordinary_fields{$ident};
+        my $user_ordinary_fields = $user_ordinary_fields{$ident};
         if ( !defined($file_array) ) {
             $self->_note_exception( 1, "_update_file() found no current file" );
             return FALSE();
