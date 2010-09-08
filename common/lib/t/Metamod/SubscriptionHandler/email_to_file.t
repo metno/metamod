@@ -55,13 +55,13 @@ test 1 TIMESTAMP
 from: oysteint@pc2988
 to:  oysteint@met.no, oystein.torget@met.no
 
-Subject: METAMOD: New dataset available for DAMOC/itp04
+Subject: METAMOD: New dataset available for TEST/itp04
 From: someuser@somedomain.com
 Bcc: oysteint@met.no, oystein.torget@met.no
 
-A new data file has just become available for the dataset DAMOC/itp04
+A new data file has just become available for the dataset TEST/itp04
 
-You can download it here: http://thredds.met.no/thredds/catalog/data/met.no/itp04/catalog.html?dataset=met.no/itp04/itp04_itp4grd0013.nc
+You can download it here: http://thredds.met.no/thredds/catalog/data/met.no/itp04/catalog.html?dataset=data/Metamod/SubscriptionHandler/subdir/subdir2/itp04_itp4grd0013.nc
 END_MAIL
     
     file_filter_ok( $mail_file, $expected_mail, \&remove_timestamp, 'Email to multiple recipients' );
