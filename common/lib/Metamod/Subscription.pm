@@ -71,7 +71,7 @@ Returns the number of subscriptions to the dataset on success. If an error is en
 sub activate_subscription_handlers {
     my $self = shift;
 
-    my ($ds) = validate_pos( @_, { isa => 'Metamod::ForeignDataset' } );
+    my ($ds) = validate_pos( @_, { isa => 'Metamod::Dataset' } );
 
     my $subscriptions = $self->_get_subscriptions($ds);
     if ( !defined $subscriptions ) {
