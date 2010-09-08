@@ -64,13 +64,18 @@ The basename part of the name. E.g hirlam1220100909.
 
 =cut
 sub get_basename {
-	my ( $ds_name ) = @_;   
+	my ( $ds_name ) = @_;
+
+    if( !defined $ds_name ){
+        $logger->warn("Dataset name is not defined");
+        return;
+    }
 
     my $basename;
     if ( $ds_name =~ /^.+\/(.+)$/ ) {
         $basename = $1;
     } else {
-        $logger->warn("Dataset name $ds_name does not have correct format");
+        $logger->warn("Dataset name '$ds_name' does not have correct format");
     }
 
     return $basename;
