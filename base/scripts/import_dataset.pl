@@ -625,12 +625,13 @@ sub update_database {
         }
         updateSru2Jdbc($dbh, $ds, $dsid, $inputBaseFile);
     }
+
+    if($ds->getParentName()){
+        my $subscription = Metamod::Subscription->new();
+        my $num_subscribers = $subscription->activate_subscription_handlers($ds);
+    }    
 }
 
-        if($ds->getParentName()){
-            my $subscription = Metamod::Subscription->new();
-            my $num_subscribers = $subscription->activate_subscription_handlers($ds);
-        }
 
 {
     my $ownertags;
