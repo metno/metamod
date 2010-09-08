@@ -1167,7 +1167,7 @@ use constant FALSE => 0;
             return FALSE();
         }
         my $iid = $infoUDS_rows->[$infoUDS_row_ix];
-        $sql1 = "SELECT " . $infoUDS_fields . " FROM InfoUDS WHERE i_id = " . $iid . "\n";
+        my $sql1 = "SELECT " . $infoUDS_fields . " FROM InfoUDS WHERE i_id = " . $iid . "\n";
         if ( !$self->_do_query($sql1) ) {
             return FALSE();
         }
@@ -1208,7 +1208,7 @@ use constant FALSE => 0;
               "INSERT INTO InfoUDS ("
             . $infoUDS_fields . ")\n"
             . "   VALUES ("
-            . $self->_get_SQL_value_list( $nfoUDS_fields, $infoUDS_record ) . ")";
+            . $self->_get_SQL_value_list( $infoUDS_fields, $infoUDS_record ) . ")";
         if ( !$self->_do_query($sql2) ) {
             return FALSE();
         }
