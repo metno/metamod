@@ -111,6 +111,7 @@ logger_config.ini
 =lib/Metamod/SubscriptionHandler/Email.pm
 =lib/Metamod/SubscriptionHandler/EmailToFile.pm
 =lib/Metamod/SubscriptionHandler/SMS.pm
+=lib/Metamod/SubscriptionUtils.pm
 =lib/Metamod/WMS.pm
 =lib/Metamod/mmUserbase.pm
 =lib/Metamod/test/mmUserbase_commands
