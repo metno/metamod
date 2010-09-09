@@ -6,6 +6,7 @@ use strict;
 use warnings;
 
 use Log::Log4perl qw( get_logger );
+use Params::Validate qw( :all );
 use XML::LibXML;
 
 use Metamod::SubscriptionHandler::Email;
