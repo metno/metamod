@@ -88,6 +88,9 @@ PG_CONNECTSTRING_PERL =
 # Name of the PostgreSQL database:
 DATABASE_NAME = Substituted by test_application.sh
 
+# Name of the PostgreSQL user database:
+USERBASE_NAME = Substituted by test_application.sh
+
 # URL of OPeNDAP server:
 OPENDAP_URL = Substituted by test_application.sh
 
