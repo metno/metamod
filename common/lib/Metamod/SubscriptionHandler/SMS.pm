@@ -191,7 +191,10 @@ sub _get_file_location {
 
     my ( $applic_id, $ds_name ) = split_parent_name( $ds->getParentName() );
 
-    my $userbase = Metamod::mmUserbase->new();
+    my $userbase = $self->_get_userbase();
+    if ( !defined $userbase ) {
+        return;
+    }
     my $dataset_found = $userbase->dset_find( $applic_id, $ds_name );
 
     if ( !$dataset_found ) {

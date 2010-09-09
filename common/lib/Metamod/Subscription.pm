@@ -82,11 +82,11 @@ sub activate_subscription_handlers {
     my $num_subscriptions = 0;
     while ( my ( $type, $subs ) = each %$subscriptions ) {
         my $handler = $self->_get_subscription_handler($type);
-        if( !defined $handler ){
-            $self->{ _logger }->error("Handler is not defined for type '$type'");
+        if ( !defined $handler ) {
+            $self->{_logger}->error("Handler is not defined for type '$type'");
             next;
         }
-        
+
         my $error = $handler->push_to_subscribers( $ds, $subs );
         if ($error) {
             $self->{_logger}->error("Failed to push to subscribers for type '$type': $error");
@@ -176,12 +176,14 @@ sub _get_subscriptions {
 
     if ( !$dataset_found ) {
         $self->{_logger}->debug("No dataset for '$applic_id' and '$ds_name' in the user database");
+        $userbase->close();
         return {};
     }
 
     my $num_subscriptions = $userbase->infoUDS_set( 'SUBSCRIPTION_XML', 'DATASET' );
     if ( !$num_subscriptions ) {
         $self->{_logger}->debug("Found no subscriptions for the dataset '$applic_id', '$ds_name'");
+        $userbase->close();
         return {};
     }
 
@@ -211,6 +213,8 @@ sub _get_subscriptions {
         push @{ $subscriptions{$type} }, $sub_info;
 
     } while ( $userbase->infoUDS_next() );
+
+    $userbase->close();
 
     return \%subscriptions;
 }
