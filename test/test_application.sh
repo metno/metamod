@@ -325,9 +325,8 @@ logfiles='syserrors metamod.log_info'
 if [ -z "`ls compare`" ]; then
    for fil in $logfiles; do
       if [ -r webrun/$fil ]; then
-         perl -pe 's/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2},\d+)?/_TIMESTAMP_/g' webrun/$fil >t_log
-         perl -pe 's/\d{4}-\d{2}-\d{2}/_DATE_/g' t_log >compare/$fil
-         rm t_log
+         # remove line-number and time/date
+         perl -pe 's/on\s+line:\s+\d+/_LINENO_/g; s/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2},\d+)?/_TIMESTAMP_/g; s/\d{4}-\d{2}-\d{2}/_DATE_/g' >compare/$fil
       else
          echo "Missing file: webrun/$fil"
       fi
@@ -340,9 +339,8 @@ elif [ 1 -eq 1 ]; then
    count=`expr $count + 1`
    for fil in $logfiles; do
       if [ -r webrun/$fil ]; then
-         perl -pe 's/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2},\d+)?/_TIMESTAMP_/g' webrun/$fil >t_log1
-         perl -pe 's/\d{4}-\d{2}-\d{2}/_DATE_/g' t_log1 | sort | uniq >t_log2
-         rm t_log1
+         # remove line-number and time/date
+         perl -pe 's/on\s+line:\s+\d+/_LINENO_/g; s/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2},\d+)?/_TIMESTAMP_/g; s/\d{4}-\d{2}-\d{2}/_DATE_/g' webrun/$fil | sort | uniq >t_log2 
          echo "========== diff for $fil (new vs. old):" >>t_result
          sort compare/$fil | uniq >t_log3
          diff t_log2 t_log3 >>t_result
