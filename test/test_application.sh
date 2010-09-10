@@ -213,7 +213,7 @@ sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 /^WEBRUN_DIRECTORY *=/s|=.*$|= '$basedir/webrun'|
 /^ADMIN_DOMAIN *=/s|=.*$|= '$admindomain'|
 /^DATABASE_NAME *=/s|=.*$|= '$idstring'|
-/^USERBASE_NAME *=/s|=.*$|= '$id_string-userbase'|
+/^USERBASE_NAME *=/s|=.*$|= '$idstring-userbase'|
 /^APPLICATION_ID *=/s|=.*$|= '$idstring'|
 /^BASE_PART_OF_EXTERNAL_URL *=/s|=.*$|= http://'$servername$appendport'|
 /^LOCAL_URL *=/s|=.*$|= /'$basedirbasename'|
