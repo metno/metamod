@@ -302,6 +302,12 @@ UPLOAD_AGE_THRESHOLD = 10
 OPENDAP_BASEDIR = data
 OPENDAP_DIRECTORY = [==WEBRUN_DIRECTORY==]/[==OPENDAP_BASEDIR==]
 
+# String (PREFIX below) used to build the URL pointing to the THREDDS dataset
+# corresponding to a file (METAMOD dataset, level 2). This URL has a structure like
+# "http://threddsserver/path_to_thredds_catalog?dataset=PREFIXinstitution/dir/file"
+# The PREFIX can be empty. It depends on the THREDDS configuration.
+THREDDS_DATASET_PREFIX =
+
 # URL of OPeNDAP server. If no OPeNDAP server is installed, use an URL that
 # gives access to the data repository by HTTP download.
 OPENDAP_URL = http://[==SERVER==]:8081/thredds/catalog/data
@@ -421,6 +427,19 @@ PMH_EARLIEST_DATESTAMP = 1900-01-01
 PMH_REPOSITORY_IDENTIFIER = met.no-TEST
 PMH_MAXRECORDS = 1000
 PMH_EXPORT_TAGS = [==DATASET_TAGS==]
+
+
+# ============ METAMODTHREDDS configuration ==============
+# Name of the THREDDS catalog (the name attribute in the catalog element in
+# the THREDDS catalog):
+THREDDS_CATALOG_NAME = THREDDS catalog for EXAMPLE data
+
+# Name of the topmost dataset (the name attribute in the topmost dataset
+# element in the THREDDS catalog):
+THREDDS_TOP_DATASET_NAME = EXAMPLE
+
+# Top directory of the Apache-tomcat installation:
+CATALINA_HOME =
 
 
 # ============ Test configuration ==============

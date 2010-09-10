@@ -304,6 +304,12 @@ UPLOAD_AGE_THRESHOLD = 20
 OPENDAP_BASEDIR = data
 OPENDAP_DIRECTORY = Substituted by test_application.sh
 
+# String (PREFIX below) used to build the URL pointing to the THREDDS dataset
+# corresponding to a file (METAMOD dataset, level 2). This URL has a structure like
+# "http://threddsserver/path_to_thredds_catalog?dataset=PREFIXinstitution/dir/file"
+# The PREFIX can be empty. It depends on the THREDDS configuration.
+THREDDS_DATASET_PREFIX =
+
 # Ownertag for uploaded datasets:
 UPLOAD_OWNERTAG = Substituted by test_application.sh
 
@@ -452,6 +458,18 @@ HARVEST_HOUR = 16
 OAI_HARVEST_SOURCES = Substituted by test_application.sh
 # Strict validation of schema. Leave empty to switch off. 
 OAI_HARVEST_VALIDATION_SCHEMA = [==TARGET_DIRECTORY==]/schema/OAI-PMH.xsd
+
+# ============ METAMODTHREDDS configuration ==============
+# Name of the THREDDS catalog (the name attribute in the catalog element in
+# the THREDDS catalog):
+THREDDS_CATALOG_NAME = THREDDS catalog for Test application data
+
+# Name of the topmost dataset (the name attribute in the topmost dataset
+# element in the THREDDS catalog):
+THREDDS_TOP_DATASET_NAME = TEST
+
+# Top directory of the Apache-tomcat installation:
+CATALINA_HOME =
 
 # ============ Test configuration ==============
 #
