@@ -29,6 +29,50 @@
 use strict;
 package Metamod::mmUserbase;
 
+=head1 NAME
+
+Metamod::mmUserbase - Perl API against the METAMOD User Database
+
+=head1 SYNOPSIS
+
+ # Initialize an mmUserbase object and create a new user,
+ # illustrating error handling:
+ my $userbase = Metamod::mmUserbase->new();
+ unless ($userbase->user_create('email_address','DIRKEY')) {
+     if ($userbase->exception_is_error()) {
+         print '   ERROR:   ' . $userbase->get_exception() . "\n";
+     } else {
+         print '   INFO:   ' . $userbase->get_exception() . "\n";
+     }
+ }
+ $userbase->close();
+
+ # Find an existing user:
+ $userbase->user_find('email_address','DIRKEY');
+
+ # Loop through all users:
+ $userbase->user_first();
+ do {
+     my $name = $userbase->user_get('u_name');
+     $userbase->user_set('u_name','Some Other Name');
+ } until (! $userbase->user_next());
+
+ # Many more possibilities. See the METHODS paragraph.
+
+=head1 DESCRIPTION
+
+API for accessing and updating the METAMOD User database. The database contains information
+about users, datasets and files. A user owns one or more dataset, and a dataset owns one or
+more file. The database also contain information that are connected to both dataset
+and user, but not neccessarily the user that owns the dataset (the infoUDS table). 
+
+The database will contain a complete inventory of the datasets that are also found in
+the Metadata database (and the XML files that are sources for the Metadata database).
+The Files table in the User database will not be complete. It is only intended for users
+to look at the status of recently uploaded files.
+
+=cut
+
 #
 # Class definition according to the "inside-out" method
 # described in Perl Best Practices, chapter 15.
@@ -85,6 +129,12 @@ use constant FALSE => 0;
                               # 1 : Error
     my %selected_count;       # Number of rows selected by the latest SELECT query
     my %select_buffer;        # Buffer containing result of last SELECT select statement (ref to array of hash refs)
+
+=head1 METHODS
+
+=over
+
+=cut
 
     #
     #     Constructor function:
@@ -337,18 +387,25 @@ use constant FALSE => 0;
         return $select_buffer->[$rownum];
     }
 
-    #
-    #     Method: get_exception
-    #
+=item get_exception()
+
+Return value: A text string explaining the last exception encountered.
+
+=cut
+
     sub get_exception {
         my $self  = shift;
         my $ident = ident($self);
         return $exception_string{$ident};
     }
 
-    #
-    #     Method: exception_is_error
-    #
+=item exception_is_error()
+
+Return value: TRUE if last exception was an error (and not just an info like "no more users").
+Othervise FALSE.
+
+=cut
+
     sub exception_is_error {
         my $self  = shift;
         my $ident = ident($self);
@@ -396,9 +453,13 @@ use constant FALSE => 0;
         delete $select_buffer{$ident};
     }
 
-    #
-    #     Method: close
-    #
+=item close()
+
+Submit any pending changes to the database, then disconnect the database handle.
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
     sub close {
 
         # print "FROM close: start\n";
@@ -441,9 +502,13 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: revert
-    #
+=item revert()
+
+Revert any changes to the database made by this Userbase object. Disconnect the database handle.
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
     sub revert {
         my $self           = shift;
         my $ident          = ident($self);
@@ -538,10 +603,16 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: user_find
-    #     Find user based on E-mail address and application id
-    #
+=item user_find($email_address,$application_id)
+
+Search for an existing user in the database and make him/her the current user.
+
+IN: User E-mail address, application id (a_id).
+
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
     sub user_find {
         my $self                 = shift;
         my $ident                = ident($self);
@@ -587,10 +658,16 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: user_create
-    #     Create new user
-    #
+=item user_create(email_address,application_id)
+
+IN: User E-mail address, application id (a_id).
+
+Create a new user and make it the current user.
+
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
     sub user_create {
         my $self                 = shift;
         my $ident                = ident($self);
@@ -639,10 +716,17 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: user_set
-    #     Set user property
-    #
+=item user_set($property,$value)
+
+Set user properties for the current user.
+
+IN: Property name (one of 'u_name', 'u_password', 'u_institution', 'u_telephone', 'u_session'),
+property value
+
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
     sub user_set {
         my $self                 = shift;
         my $ident                = ident($self);
@@ -664,10 +748,17 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: user_get
-    #     Get user property
-    #
+=item user_get($property)
+
+Get user properties for the current user.
+
+IN: Property name (one of 'u_id', 'u_email', 'a_id' 'u_name', 'u_password', 'u_institution',
+'u_telephone', 'u_session')
+
+Return value: Property value on success, FALSE on error.
+
+=cut
+
     sub user_get {
         my $self                 = shift;
         my $ident                = ident($self);
@@ -687,11 +778,14 @@ use constant FALSE => 0;
         }
     }
 
-    #
-    #     Method: user_first
-    #     Get first user in u_id order. This method updates the internal 'allusers'
-    #     array that contains the u_id's of all users in the database.
-    #
+=item user_first()
+
+Make the first user in the database the current user.
+
+Return value: TRUE on success, FALSE on error / no user in database.
+
+=cut
+
     sub user_first {
         my $self                 = shift;
         my $ident                = ident($self);
@@ -732,10 +826,14 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: user_next
-    #     Get next user in u_id order.
-    #
+=item user_next()
+
+Make the next user in the database the current one.
+
+Return value: TRUE on success, FALSE on error / already last user.
+
+=cut
+
     sub user_next {
 
         # print "FROM user_next: start\n";
@@ -787,10 +885,14 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: user_isync
-    #     Make the user corresponding to the current infoUDS-row the current user
-    #
+=item user_isync()
+
+Make the user corresponding to the current infoUDS-row (see below) the current user.
+
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
     sub user_isync {
 
         # print "FROM user_isync: 1\n";
@@ -845,10 +947,14 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: user_dsync
-    #     Make the user corresponding to the current dataset the current user
-    #
+=item user_dsync()
+
+Make the user owning the current dataset the current user.
+
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
     sub user_dsync {
         my $self                 = shift;
         my $ident                = ident($self);
@@ -885,10 +991,17 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: dset_create
-    #     Create dataset entry
-    #
+=item dset_create($dataset_name,$dataset_key)
+
+Create a new dataset and make it the current dataset. The current user will be
+the owner of the new dataset.
+
+IN: Dataset name, dataset key.
+
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
     sub dset_create {
         my $self         = shift;
         my $ident        = ident($self);
@@ -930,10 +1043,16 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: dset_find
-    #     Find a dataset in the database and make it the current dataset.
-    #
+=item dset_find($applic_id,$dataset_name)
+
+Find a dataset in the database and make it the current dataset.
+
+IN: Application id, dataset name.
+
+Return value: TRUE on success, FALSE on error / no such dataset.
+
+=cut
+
     sub dset_find {
         my $self         = shift;
         my $ident        = ident($self);
@@ -956,8 +1075,14 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: dset_first
+=item dset_first()
+
+Make the first dataset (owned by the current user) the current dataset.
+
+Return value: TRUE on success, FALSE on error / no dataset owned by the current user.
+
+=cut
+
     #     Get the first dataset owned by the current user in ds_id order. This method
     #     updates the internal 'users_datasets' array that contains the ds_id's of all datasets
     #     owned by the current user.
@@ -999,10 +1124,14 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: dset_next
-    #     Get the next dataset owned by the current user in ds_id order.
-    #
+=item dset_next()
+
+Make the next dataset (owned by the current user) the current dataset.
+
+Return value: TRUE on success, FALSE on error / no more datasets.
+
+=cut
+
     sub dset_next {
         my $self           = shift;
         my $ident          = ident($self);
@@ -1035,10 +1164,14 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: dset_isync
-    #     Make the dataset corresponding to the current infoUDS-row the current dataset
-    #
+=item dset_isync()
+
+Make the dataset corresponding to the current infoUDS-row (see below) the current dataset.
+
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
     sub dset_isync {
         my $self                 = shift;
         my $ident                = ident($self);
@@ -1072,10 +1205,16 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: info_put
-    #     Add or replace content fields in the current dataset
-    #
+=item infoDS_put($info_type,$info_content)
+
+Add or replace content fields in the current dataset.
+
+IN: Information type (I_type), value of I_content field (single entity or XML).
+
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
     sub infoDS_put {
         my $self              = shift;
         my $ident             = ident($self);
@@ -1107,10 +1246,16 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: infoDS_get
-    #     Get information from the current dataset
-    #
+=item infoDS_get($info_type)
+
+Get information from the current dataset.
+
+IN: Information type (I_type).
+
+Return value: Value of I_content field (single entity or XML), FALSE on error.
+
+=cut
+
     sub infoDS_get {
         my $self              = shift;
         my $ident             = ident($self);
@@ -1216,16 +1361,22 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: infoUDS_set
-    #     Define the current set of infoUDS rows and set the first row as the current row.
-    #     $info_type: Informatioon type (I_type field in the database table)
-    #     $info_span: Keyword telling which rows the set shall span:
-    #                 DATASET: All rows pertaining to the current dataset
-    #                 USER:  All rows pertaining to the current user
-    #                 USER_AND_DATASET: All rows pertaining to both the current user and
-    #                                   current dataset.
-    #
+=item infoUDS_set($info_type,$info_span)
+
+Define a set of rows from the InfoUDS table and set the first row as the current row.
+
+ IN:
+ 1. Information type. (Currently only SUBSCRIPTION_XML).
+ 2. Keyword that tells how the set shall relate to the current user and/or current dataset
+    (values: USER, DATASET, USER_AND_DATASET).
+    DATASET: All rows pertaining to the current dataset
+    USER:  All rows pertaining to the current user
+    USER_AND_DATASET: All rows pertaining to both the current user and current dataset.
+
+ Return value: Number of rows (N) in the set, or FALSE on error / empty set.
+
+=cut
+
     sub infoUDS_set {
         my $self                    = shift;
         my $ident                   = ident($self);
@@ -1297,10 +1448,16 @@ use constant FALSE => 0;
         return $rowcount;
     }
 
-    #
-    #     Method: infoUDS_put
-    #     Replace the content field in the current infoUDS row
-    #
+=item infoUDS_put($content)
+
+Replace the content field in the current row.
+
+IN: Value of I_content field (single entity or XML).
+
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
     sub infoUDS_put {
         my $self                    = shift;
         my $ident                   = ident($self);
@@ -1316,10 +1473,14 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: infoUDS_get
-    #     Get information from the current set of infoUDS rows
-    #
+=item infoUDS_get()
+
+Get information from the current row in the current set.
+
+Return value: Value of I_content field (single entity or XML).
+
+=cut
+
     sub infoUDS_get {
         my $self           = shift;
         my $ident          = ident($self);
@@ -1331,10 +1492,14 @@ use constant FALSE => 0;
         return $infoUDS_record->{"i_content"};
     }
 
-    #
-    #     Method: infoUDS_next
-    #     Define the next row in the set of infoUDS rows as the current row
-    #
+=item infoUDS_next()
+
+Define the next row in the set as the current row.
+
+Return value: TRUE on success, FALSE on error / no more rows in the set.
+
+=cut
+
     sub infoUDS_next {
         my $self                    = shift;
         my $ident                   = ident($self);
@@ -1362,10 +1527,21 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: infoUDS_new
-    #     Create a new row in the infoUDS set and define it as the current row
-    #
+=item infoUDS_new($content)
+
+Create a new row in the set and define it as the current row. The row will belong to the user
+and/or dataset that defines the set. If the set is only defined by user, the current dataset
+will be used to connect the row to a dataset. Similarly, if the set is only defined by dataset,
+the current user will be used. NOTE: The new row will be set up as the last row in the current
+set. Used inside a loop with infoUDS_next, this method will accordingly break out of the
+sequential visiting of rows from the set.
+
+IN: Value of I_content field (single entity or XML).
+
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
     sub infoUDS_new {
         my $self                    = shift;
         my $ident                   = ident($self);
@@ -1429,10 +1605,14 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: infoUDS_delete
-    #     Delete the current infoUDS row
-    #
+=item infoUDS_delete()
+
+Delete the current InfoUDS row.
+
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
     sub infoUDS_delete {
         my $self           = shift;
         my $ident          = ident($self);
@@ -1524,10 +1704,16 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: file_find
-    #     Find file within current dataset
-    #
+=item file_find($file_name)
+
+Search for an existing file (owned by the curent dataset) and make it the current file.
+
+IN: File name (F_name).
+
+Return value: TRUE on success, FALSE on error / no such file.
+
+=cut
+
     sub file_find {
         my $self                 = shift;
         my $ident                = ident($self);
@@ -1575,10 +1761,16 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: file_create
-    #     Create new entry in the File table
-    #
+=item file_create($file_name)
+
+Create a new file (for the current dataset) and make it the current file.
+
+IN: File name (F_name)
+
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
     sub file_create {
         my $self                 = shift;
         my $ident                = ident($self);
@@ -1613,10 +1805,16 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: file_set
-    #     Set file property for the current file
-    #
+=item file_set($property,$value)
+
+Set file properties for the current file.
+
+IN: Property name (one of f_timestamp, f_size, f_status, f_errurl), property value
+
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
     sub file_set {
         my $self                 = shift;
         my $ident                = ident($self);
@@ -1638,10 +1836,16 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: file_get
-    #     Get file property for the current file
-    #
+=item file_get($property)
+
+Get file properties for the current file.
+
+IN: Property name (one of f_timestamp, f_size, f_status, f_errurl).
+
+Return value: Property value or FALSE on error.
+
+=cut
+
     sub file_get {
         my $self                 = shift;
         my $ident                = ident($self);
@@ -1660,9 +1864,15 @@ use constant FALSE => 0;
         return $file_array->{$property};
     }
 
-    #
-    #     Method: file_first
-    #     Get first file for the current dataset. This method updates the internal 'dataset_files'
+=item file_first()
+
+Make the first file (in the current dataset) the current file.
+
+Return value: TRUE on success, FALSE on error / no files owned by the current dataset.
+
+=cut
+
+    #     This method updates the internal 'dataset_files'
     #     array that contains the f_name's of all files owned by the current dataset.
     #
     sub file_first {
@@ -1732,10 +1942,14 @@ use constant FALSE => 0;
         return TRUE();
     }
 
-    #
-    #     Method: file_next
-    #     Get next file
-    #
+=item file_next()
+
+Make the next file in the database the current one.
+
+Return value: TRUE on success, FALSE on error / no more files.
+
+=cut
+
     sub file_next {
         my $self                 = shift;
         my $ident                = ident($self);
@@ -1787,4 +2001,13 @@ use constant FALSE => 0;
         return TRUE();
     }
 }
+
+=back
+
+=head1 AUTHOR
+
+Egil Støren <egil.storen@met.no>
+
+=cut
+
 1;
