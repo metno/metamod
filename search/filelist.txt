@@ -1,3 +1,4 @@
+=etc/subscription_email_template.txt
 =htdocs/sch/button.css
 =htdocs/sch/bk.php
 =htdocs/sch/hk.php
@@ -42,6 +43,7 @@
 =htdocs/sch/getWMC.php
 =htdocs/sch/showdone.php
 =htdocs/sch/showutil.inc
+=htdocs/sch/subscription.php
 =htdocs/sch/wmsProxy.php
 =htdocs/sch/wms.php
 =htdocs/sch/xmlShow.php

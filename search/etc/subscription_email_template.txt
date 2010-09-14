@@ -1,0 +1,9 @@
+Subject: [METAMOD] New dataset available for [==DATASET_NAME==]
+
+A new data file has just become available for the dataset [==DATASET_NAME==]
+
+You can download it here: [==FILE_URL==]
+
+If you wish to cancel your subscription go to the following address: 
+
+[==CANCEL_URL==]
