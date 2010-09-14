@@ -2,7 +2,9 @@ prepare_runtime_env.sh
 metamodInit.sh
 logger_config.ini
 =htdocs/adm/index.php
+=htdocs/adm/login.php
 =htdocs/adm/showconfig.php
+=htdocs/funcs/mmAuth.inc
 =htdocs/funcs/mmConfig.inc
 =htdocs/funcs/mmLogging.inc
 =htdocs/funcs/mmTtime.inc
