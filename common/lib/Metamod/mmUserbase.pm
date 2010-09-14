@@ -54,7 +54,7 @@ Metamod::mmUserbase - Perl API against the METAMOD User Database
  $userbase->user_first();
  do {
      my $name = $userbase->user_get('u_name');
-     $userbase->user_set('u_name','Some Other Name');
+     $userbase->user_put('u_name','Some Other Name');
  } until (! $userbase->user_next());
 
  # Many more possibilities. See the METHODS paragraph.
@@ -158,7 +158,7 @@ use constant FALSE => 0;
         $pending_infoUDS_updates{$ident} = FALSE();
         $in_transaction{$ident}          = FALSE();
         $transaction_triggers{$ident}    = [ 'INSERT', 'UPDATE', 'DELETE' ];
-        $user_ordinary_fields{$ident}    = "u_name, u_password, u_institution, u_telephone, u_session";
+        $user_ordinary_fields{$ident}    = "u_name, u_password, u_loginname, u_institution, u_telephone, u_session";
         $dataset_infotypes{$ident}       = [ 'DSKEY', 'LOCATION', 'CATALOG', 'WMS_URL', 'WMS_XML' ];
         $infoUDS_infotypes{$ident}       = ['SUBSCRIPTION_XML'];
         $infoUDS_fields{$ident}          = "i_id, u_id, ds_id, i_type, i_content";
@@ -658,11 +658,67 @@ Return value: TRUE on success, FALSE on error.
         return TRUE();
     }
 
+=item user_lfind($login_name,$application_id)
+
+Search for an existing user in the database and make him/her the current user.
+
+IN: User login name, application id (a_id).
+
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
+    sub user_lfind {
+        my $self                 = shift;
+        my $ident                = ident($self);
+        my $login_name           = shift;
+        my $application_id       = shift;
+        my $pending_user_updates = $pending_user_updates{$ident};
+        my $user_ordinary_fields = $user_ordinary_fields{$ident};
+        if ($pending_user_updates) {
+            if ( !$self->_update_user() ) {
+                return FALSE();
+            }
+        }
+        my $sql1 =
+              "SELECT u_id, u_email, "
+            . $user_ordinary_fields
+            . " FROM UserTable "
+            . $self->_get_SQL_WHERE_clause( 'u_loginname, a_id', [ $login_name, $application_id ] );
+        if ( !$self->_do_query($sql1) ) {
+            return FALSE();
+        }
+        my $rowcount = $self->_pg_num_rows();
+        if ( $rowcount == 0 ) {
+            $self->_note_exception( 0, "No such user" );
+            return FALSE();
+        }
+        if ( $rowcount != 1 ) {
+            $self->_note_exception( 1,
+                      "Multiple users ("
+                    . $rowcount
+                    . ") with same u_loginname= "
+                    . $login_name
+                    . " and a_id= "
+                    . $application_id );
+            return FALSE();
+        }
+        my $user_array = $self->_fetch_row_as_hashref(0);
+        if ( !$user_array ) {
+            return FALSE();
+        }
+        $user_array->{"a_id"}    = $application_id;
+        $user_array{$ident}      = $user_array;
+        return TRUE();
+    }
+
 =item user_create(email_address,application_id)
 
 IN: User E-mail address, application id (a_id).
 
-Create a new user and make it the current user.
+Create a new user and make it the current user. Initially, the value of the mandatory 
+U_loginname field will be set to the E-mail address, but this can be changed using the
+user_put method.
 
 Return value: TRUE on success, FALSE on error.
 
@@ -695,9 +751,10 @@ Return value: TRUE on success, FALSE on error.
         #
         my $user_array = {};
         $user_array->{"u_email"} = $email_address;
+        $user_array->{"u_loginname"} = $email_address;
         $user_array->{"a_id"}    = $application_id;
-        my $valuelist = $self->_get_SQL_value_list( "a_id, u_email", $user_array );
-        my $sql2 = "INSERT INTO UserTable (a_id, u_email) VALUES (" . $valuelist . ")";
+        my $valuelist = $self->_get_SQL_value_list( "a_id, u_email, u_loginname", $user_array );
+        my $sql2 = "INSERT INTO UserTable (a_id, u_email, u_loginname) VALUES (" . $valuelist . ")";
         if ( !$self->_do_query($sql2) ) {
             return FALSE();
         }
@@ -716,7 +773,7 @@ Return value: TRUE on success, FALSE on error.
         return TRUE();
     }
 
-=item user_set($property,$value)
+=item user_put($property,$value)
 
 Set user properties for the current user.
 
@@ -727,7 +784,7 @@ Return value: TRUE on success, FALSE on error.
 
 =cut
 
-    sub user_set {
+    sub user_put {
         my $self                 = shift;
         my $ident                = ident($self);
         my $property             = shift;
@@ -752,8 +809,8 @@ Return value: TRUE on success, FALSE on error.
 
 Get user properties for the current user.
 
-IN: Property name (one of 'u_id', 'u_email', 'a_id' 'u_name', 'u_password', 'u_institution',
-'u_telephone', 'u_session')
+IN: Property name (one of 'u_id', 'u_email', 'a_id' 'u_name', 'u_password', 'u_loginname',
+'u_institution', 'u_telephone', 'u_session')
 
 Return value: Property value on success, FALSE on error.
 
@@ -1205,7 +1262,7 @@ Return value: TRUE on success, FALSE on error.
         return TRUE();
     }
 
-=item infoDS_put($info_type,$info_content)
+=item dset_put($info_type,$info_content)
 
 Add or replace content fields in the current dataset.
 
@@ -1215,7 +1272,7 @@ Return value: TRUE on success, FALSE on error.
 
 =cut
 
-    sub infoDS_put {
+    sub dset_put {
         my $self              = shift;
         my $ident             = ident($self);
         my $info_type         = shift;
@@ -1246,28 +1303,36 @@ Return value: TRUE on success, FALSE on error.
         return TRUE();
     }
 
-=item infoDS_get($info_type)
+=item dset_get($info_type)
 
 Get information from the current dataset.
 
-IN: Information type (I_type).
+IN: Information type (I_type). Currently one of 'ds_name', 'ds_id', 'u_id',
+'DSKEY', 'LOCATION', 'CATALOG', 'WMS_URL', 'WMS_XML'
 
-Return value: Value of I_content field (single entity or XML), FALSE on error.
+Return value: Value of field (single entity or XML), FALSE on error.
 
 =cut
 
-    sub infoDS_get {
+    sub dset_get {
         my $self              = shift;
         my $ident             = ident($self);
         my $info_type         = shift;
         my $current_ds_id     = $current_ds_id{$ident};
         my $current_ds_name   = $current_ds_name{$ident};
+        my $current_ds_uid    = $current_ds_uid{$ident};
         my $dataset_infotypes = $dataset_infotypes{$ident};
         if ( !defined($current_ds_id) ) {
             $self->_note_exception( 1, "No current dataset" );
             return FALSE();
         }
-        if ( !grep( $_ eq $info_type, @{$dataset_infotypes} ) ) {
+        if ($info_type eq 'ds_name') {
+           return $current_ds_name;
+        } elsif ($info_type eq 'ds_id') {
+           return $current_ds_id;
+        } elsif ($info_type eq 'u_id') {
+           return $current_ds_uid;
+        } elsif ( !grep( $_ eq $info_type, @{$dataset_infotypes} ) ) {
             $self->_note_exception( 1, "Wrong information type: " . $info_type );
             return FALSE();
         }
@@ -1805,7 +1870,7 @@ Return value: TRUE on success, FALSE on error.
         return TRUE();
     }
 
-=item file_set($property,$value)
+=item file_put($property,$value)
 
 Set file properties for the current file.
 
@@ -1815,7 +1880,7 @@ Return value: TRUE on success, FALSE on error.
 
 =cut
 
-    sub file_set {
+    sub file_put {
         my $self                 = shift;
         my $ident                = ident($self);
         my $property             = shift;

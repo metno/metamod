@@ -14,10 +14,12 @@ CREATE TABLE UserTable (
    a_id               VARCHAR(9999) NOT NULL,
    u_name             VARCHAR(9999),
    u_email            VARCHAR(9999) NOT NULL,
+   u_loginname        VARCHAR(9999) NOT NULL,
    u_password         VARCHAR(9999),
    u_institution      VARCHAR(9999),
    u_telephone        VARCHAR(9999),
    u_session          VARCHAR(9999),
+   UNIQUE (a_id, u_loginname),
    PRIMARY KEY (u_id)
 );
 GRANT ALL PRIVILEGES ON UserTable TO "[==PG_WEB_USER==]";

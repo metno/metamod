@@ -96,7 +96,7 @@ class MM_Userbase {
       $this->pending_infoUDS_updates = FALSE;
       $this->in_transaction = FALSE;
       $this->transaction_triggers = array('INSERT','UPDATE','DELETE');
-      $this->user_ordinary_fields = "u_name, u_password, u_institution, u_telephone, u_session";
+      $this->user_ordinary_fields = "u_name, u_password, u_loginname, u_institution, u_telephone, u_session";
       $this->dataset_infotypes = array('DSKEY','LOCATION','CATALOG','WMS_URL','WMS_XML');
       $this->infoUDS_infotypes = array('SUBSCRIPTION_XML');
       $this->infoUDS_fields = "i_id, u_id, ds_id, i_type, i_content";
@@ -343,7 +343,42 @@ class MM_Userbase {
       return TRUE;
    }
 #   
-#      Create new user:
+#      Search for an existing user in the database and make him/her the current user:
+#   
+   public function user_lfind($login_name, $application_id) {
+      if ($this->pending_user_updates) {
+         if ($this->update_user() === FALSE) {
+            return FALSE;
+         }
+      }
+      $sql1 = "SELECT u_id, u_email, " . $this->user_ordinary_fields . " FROM UserTable ".
+              $this->get_SQL_WHERE_clause('u_loginname, a_id',array($login_name,$application_id));
+      $qhandle = $this->do_query($sql1);
+      if ($qhandle === FALSE) {
+         return FALSE;
+      }
+      $rowcount = pg_num_rows($qhandle);
+      if ($rowcount == 0) {
+        $this->note_exception(0,"No such user");
+        return FALSE;
+      }
+      if ($rowcount != 1) {
+        $this->note_exception(1,"Multiple users (".$rowcount.") with same u_loginname= ".$login_name.
+                            " and a_id= ".$application_id);
+        return FALSE;
+      }
+      $this->user_array = pg_fetch_assoc($qhandle,0);
+      if ($this->user_array === FALSE) {
+         $this->note_exception(1,"pg_fetch_assoc returns FALSE");
+         return FALSE;
+      }
+      $this->user_array["a_id"] = $application_id;
+      return TRUE;
+   }
+#   
+#      Create a new user and make it the current user. Initially, the value of the mandatory
+#      U_loginname field will be set to the E-mail address, but this can be changed using the
+#      user_put method.
 #   
    public function user_create($email_address, $application_id) {
 #      
@@ -370,9 +405,10 @@ class MM_Userbase {
 #      
       $this->user_array = array();
       $this->user_array['u_email'] = $email_address;
+      $this->user_array['u_loginname'] = $email_address;
       $this->user_array['a_id'] = $application_id;
-      $valuelist = $this->get_SQL_value_list("a_id, u_email", $this->user_array);
-      $sql2 = "INSERT INTO UserTable (a_id, u_email) VALUES (" . $valuelist . ")";
+      $valuelist = $this->get_SQL_value_list("a_id, u_email, u_loginname", $this->user_array);
+      $sql2 = "INSERT INTO UserTable (a_id, u_email, u_loginname) VALUES (" . $valuelist . ")";
       $qhandle = $this->do_query($sql2);
       if ($qhandle === FALSE) {
          return FALSE;
@@ -391,9 +427,9 @@ class MM_Userbase {
       return TRUE;
    }
 #   
-#      Public member function (user_set):
+#      Public member function (user_put):
 #   
-   public function user_set($property, $value) {
+   public function user_put($property, $value) {
       if (!isset($this->user_array)) {
          $this->note_exception(1,"No current user");
          return FALSE;
@@ -604,7 +640,7 @@ class MM_Userbase {
       $this->current_ds_id = $rowarr[0];
       $this->current_ds_name = $dataset_name;
       $this->current_ds_uid = $this->user_array['u_id'];
-      if (!$this->infoDS_put("DSKEY",$dataset_key)) {
+      if (!$this->dset_put("DSKEY",$dataset_key)) {
          return FALSE;
       }
       return TRUE;
@@ -732,7 +768,7 @@ class MM_Userbase {
 #
 #      Add or replace content fields in the current dataset
 #
-   public function infoDS_put($info_type, $info_content) {
+   public function dset_put($info_type, $info_content) {
       if (!isset($this->current_ds_id)) {
          $this->note_exception(1,"No current dataset");
          return FALSE;
@@ -758,12 +794,18 @@ class MM_Userbase {
 #
 #      Get information from the current dataset
 #
-   public function infoDS_get($info_type) {
+   public function dset_get($info_type) {
       if (!isset($this->current_ds_id)) {
          $this->note_exception(1,"No current dataset");
          return FALSE;
       }
-      if (!in_array($info_type, $this->dataset_infotypes)) {
+      if ($info_type == 'ds_name') {
+         return $this->current_ds_name;
+      } else if ($info_type == 'ds_id') {
+         return $this->current_ds_id;
+      } else if ($info_type == 'u_id') {
+         return $this->current_ds_uid;
+      } else if (!in_array($info_type, $this->dataset_infotypes)) {
          $this->note_exception(1,"Wrong information type: " . $info_type);
          return FALSE;
       }
@@ -1170,7 +1212,7 @@ class MM_Userbase {
 #   
 #      Set file property for the current file
 #   
-   public function file_set($property, $value) {
+   public function file_put($property, $value) {
       if (!isset($this->file_array)) {
          $this->note_exception(1,"No current file");
          return FALSE;

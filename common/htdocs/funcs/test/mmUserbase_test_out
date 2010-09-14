@@ -2,7 +2,7 @@ $userbase->user_find('email_address','APPID')
    INFO:    No such user
 $userbase->user_create('email_address',"AP'PID")
    OK   Result: 1
-$userbase->user_set('u_name','Peder')
+$userbase->user_put('u_name','Peder')
    OK   Result: 1
 $userbase->user_create('bingo@barcelona.com',"SPONG")
    OK   Result: 1
@@ -24,7 +24,7 @@ $userbase->dset_create('DSET','KEY')
    OK   Result: 1
 $userbase->user_create('viggo@barcelona.com',"SPONG")
    OK   Result: 1
-$userbase->user_set('u_name','Viggo Hansen')
+$userbase->user_put('u_name','Viggo Hansen')
    OK   Result: 1
 $userbase->dset_find('AP\'PID','DSET')
    OK   Result: 1
@@ -32,15 +32,15 @@ $userbase->dset_first()
    INFO:    No datasets found for current user
 $userbase->dset_next()
    ERROR:   No current set. Dset_first not called?
-$userbase->infoDS_put('LOCATION','/my/directory')
+$userbase->dset_put('LOCATION','/my/directory')
    OK   Result: 1
-$userbase->infoDS_get('LOCATION')
+$userbase->dset_get('LOCATION')
    OK   Result: /my/directory
 $userbase->file_find('myfile')
    INFO:    No such file
 $userbase->file_create('myfile')
    OK   Result: 1
-$userbase->file_set('f_timestamp','2011-01-01')
+$userbase->file_put('f_timestamp','2011-01-01')
    OK   Result: 1
 $userbase->file_first()
    OK   Result: 1
@@ -52,15 +52,21 @@ $userbase->file_find('myfile')
    OK   Result: 1
 $userbase->dset_create('DS-NEW','KEY')
    OK   Result: 1
-$userbase->infoDS_put('LOCATION','/my/somewhere')
+$userbase->dset_put('LOCATION','/my/somewhere')
    OK   Result: 1
-$userbase->infoDS_put('CATALOG','http://thredds/somewhere')
+$userbase->dset_put('CATALOG','http://thredds/somewhere')
    OK   Result: 1
 $userbase->dset_first()
    OK   Result: 1
-$userbase->infoDS_get('LOCATION')
+$userbase->dset_get('LOCATION')
    OK   Result: /my/somewhere
-$userbase->infoDS_put('CATALOG','http://thredds/somewhereelse')
+$userbase->dset_get('ds_name')
+   OK   Result: DS-NEW
+$userbase->dset_get('ds_id')
+   OK   Result: 2
+$userbase->dset_get('u_id')
+   OK   Result: 3
+$userbase->dset_put('CATALOG','http://thredds/somewhereelse')
    OK   Result: 1
 $userbase->user_find('email_address','AP\'PID')
    OK   Result: 1
