@@ -102,6 +102,7 @@ function mmAuthenticate() {
     mmRegisterAuthLogger($auth);
     $auth->start();   
     
+    return $auth;
 }
 
 /**
