@@ -511,3 +511,12 @@ AUTH_TYPE = DB
 
 # The LDAP DN where you should start search for the user. Example: dc=met,dc=no
 #AUTH_LDAP_BASE_DN=
+
+# ============ Subscription configuration ==============
+#
+# Configuration of the METAMOD subscription services
+
+# The directory where SMS will look for new transfers to perform.
+SUBSCRIPTION_SMS_DIRECTORY = some dir
+
+SUBSCRIPTION_ENABLED = ENABLED
