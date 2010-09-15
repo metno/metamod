@@ -497,3 +497,17 @@ TEST_IMPORT_PROGRESS_REPORT = 1
 # is disabled completely. If this value is empty, all E-mails are sent
 # to [==OPERATOR_EMAIL==].
 TEST_EMAIL_RECIPIENT = 0
+
+# ============ Authentication configuration ============
+#
+# Configuration of METAMOD configuration
+
+# The type of authentication to perform. The types DB and LDAP are supported
+AUTH_TYPE = DB 
+
+# The URL used to connect to the LDAP server. Only used when AUTH_TYPE is LDAP.
+# Examples: ldaps://ldap-dev.met.no and ldaps://ldap-dev.met.no
+#AUTH_LDAP_URL = 
+
+# The LDAP DN where you should start search for the user. Example: dc=met,dc=no
+#AUTH_LDAP_BASE_DN=
