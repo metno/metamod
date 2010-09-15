@@ -379,7 +379,6 @@ td.header {
 <div id="page">
 
 <div id="menu">
-<div class="menu_item"><a href="subscription.php?action=display_email_form">New subscription</a></div>
 <div class="menu_item"><a href="subscription.php?action=list_subscriptions">My subscriptions</a></div>
 <div class="menu_item"><a href="subscription.php?action=logout">Logout</a></div>
 </div>
