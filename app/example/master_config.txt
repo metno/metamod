@@ -474,3 +474,18 @@ TEST_EMAIL_RECIPIENT =
 
 # The directory where SMS will look for new transfers to perform.
 SUBSCRIPTION_SMS_DIRECTORY = some dir
+
+
+# ============ Authentication configuration ============
+#
+# Configuration of METAMOD configuration
+
+# The type of authentication to perform. The types DB and LDAP are supported
+AUTH_TYPE = DB 
+
+# The URL used to connect to the LDAP server. Only used when AUTH_TYPE is LDAP.
+# Examples: ldaps://ldap-dev.met.no and ldaps://ldap-dev.met.no
+#AUTH_LDAP_URL = 
+
+# The LDAP DN where you should start search for the user. Example: dc=met,dc=no
+#AUTH_LDAP_BASE_DN=
