@@ -52,6 +52,11 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = f
       }
       
       $s1 .= "<div class=\"btns\">";
+      
+      if( $level1 && $mmConfig->getVar('SUBSCRIPTION_ENABLED') == 'ENABLED' ){
+          $s1 .= "<a class=\"btn\" href=\"subscription.php?action=display_email_form&dataset_name=$nameshown\"><span>Subscribe</span></a><br/>";          
+      }
+      
       if ($wmsSetup) {
 	$wmsQuery = $wmsSetup->getClientQuery($dsName);
 	 if (preg_match('/wmssetup/', $wmsQuery)) {
