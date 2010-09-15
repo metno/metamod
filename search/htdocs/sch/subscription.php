@@ -4,6 +4,11 @@ require_once '../funcs/mmConfig.inc';
 require_once '../funcs/mmUserbase.inc';
 require_once '../funcs/mmAuth.inc';
 
+/**
+ * Class that implements user subscription administration.
+ * @author oysteint
+ *
+ */
 class SubscriptionPage {
     
     private $config;
@@ -69,10 +74,6 @@ class SubscriptionPage {
     function displayEmailForm( $storeError = '' ) {
     
         $datasetName = $_REQUEST['dataset_name'];
-        if( !$datasetName ){
-            $errorHtml = $this->_createErrorHTML( 'Cannot create a subscription without a dataset name' );
-            return $this->_html_page( 'New email subscription', '', $errorHtml );
-        }
         
         $emailAddress = $_REQUEST['email_address'];
         $repeatedEmailAddress = $_REQUEST['repeated_email_address'];
@@ -112,8 +113,7 @@ class SubscriptionPage {
         $success = $this->userbase->dset_find( $applicationId, $datasetName );
         if( !$success ){
             $this->logger->error( "Failed to find dataset in userbase: " . $this->userbase->get_exception() );
-            $errorHtml = $this->_createErrorHTML( 'Cannot find the selected dataset.' );
-            return $this->_html_page( 'Store email subscription', '', $errorHtml );        
+            return $this->displayEmailForm( "The dataset name '$datasetName' was not found in the database." );        
         }
         
         # cannot determine success by logging at return value since false is both used for empty set and error.
@@ -275,7 +275,7 @@ END_HTML;
 
 <tr>
 <td>Dataset name</td>
-<td><input type="text" readonly="readonly" size="35" name="dataset_name" value="$dataset_name" /></td>
+<td><input type="text" size="35" name="dataset_name" value="$dataset_name" /></td>
 </tr>
 
 <tr>
@@ -481,17 +481,7 @@ END_HTML;
 }
 
 
-
-
-
 $subscription_page = new SubscriptionPage();
 echo $subscription_page->dispatch();
-
-
-
-
-
-
-
 
 ?>
