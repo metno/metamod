@@ -15,7 +15,10 @@ $auth->start();
 
 if( $auth->checkAuth() ){    
     if( isset( $_REQUEST['return'] ) ){
-        echo header( "Location: http://" . $_REQUEST['return'] );
+        
+        $get_string = urldecode( $_REQUEST['params'] );
+        
+        echo header( "Location: http://" . $_REQUEST['return'] . '?' . $get_string );
     } else {
         //do not have a good place to send the user. Send them to the search page
         echo header( 'Location: ../sch/' );        
@@ -27,6 +30,7 @@ function createLoginPage( $username = null, $status = null, &$auth = null ){
 
     $login_page = $_SERVER['SCRIPT_NAME'];
     $return = $_REQUEST['return'];
+    $params = $_REQUEST['params'];
 
     $status_message = '';
     if ($status == AUTH_EXPIRED) {
@@ -43,6 +47,7 @@ function createLoginPage( $username = null, $status = null, &$auth = null ){
     $form = <<<END_FORM
 <form name="login" method="POST" action="$login_page">
 <input type="hidden" name="return" value="$return" />
+<input type="hidden" name="params" value="$params" />
 
 <table>
 

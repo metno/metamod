@@ -111,8 +111,17 @@ function mmAuthenticate() {
  */
 function mmRedirectToLogin(){
     
+    $get_string = '';
+    foreach ($_GET as $param_name => $param_value) {        
+        $get_string .= urlencode("&$param_name=$param_value");
+    }
+    
     $orig_uri = $_SERVER['SERVER_NAME'] . $_SERVER['SCRIPT_NAME'];
-    echo header("Location: ../adm/login.php?return=$orig_uri");
+    echo header("Location: ../adm/login.php?return=$orig_uri&params=$get_string");
+}
+
+function mmRedirectToSearch(){    
+    echo header("Location: ../sch/");
 }
 
 /**
@@ -123,7 +132,7 @@ function mmLogout(){
     $type = mmGetAuthType();
     $options = mmGetAuthOptions();
     
-    $auth = new Auth( $type, $options, 'mmRedirectToLogin' );
+    $auth = new Auth( $type, $options, 'mmRedirectToSearch' );
     $auth->start();
     
     if( $auth->checkAuth() ){
