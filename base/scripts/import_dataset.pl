@@ -736,17 +736,19 @@ sub isoDoc2SruDb {
     push @params, "north";
     push @values, max(_get_text_from_doc($isods->getMETA_DOC(), '//gmd:northBoundLatitude', $xpc));
 
-    # TODO: id_contact parameter
+    # id_contact parameter
+    push @params, "contact_id";
+    push @values, _get_contact_id($dbh, $isods->getMETA_DOC(), $xpc);
 
     # insert into db
-    $logger->debug("Insert sru-searchdata...");
+    $logger->debug("Trying to insert sru-searchdata\n");
     my $paramNames = join ', ', @params;
     my $placeholder = join ', ', map {'?'} @values;
     my $sth = $dbh->prepare_cached(<<"SQL");
 INSERT INTO sru.products ( $paramNames ) VALUES ( $placeholder )
 SQL
     $sth->execute(@values);
-    $logger->debug("Ok\n");
+    $logger->debug("Inserted sru-searchdata\n");
 }
 
 
@@ -772,6 +774,48 @@ sub max {
     return $val;
 }
 
+#
+# get the author and organisation from the document
+# and find an possibly existing contact_id in the database
+# or create one
+#
+sub _get_contact_id {
+    my ($dbh, $doc, $xpc) = @_;
+    # fetch author and org from document, publisher or principalInvestigator 
+    my $authorXP = '//gmd:pointOfContact/gmd:CI_ResponsibleParty[ gmd:role/gmd:CI_RoleCode[ @codeListValue="publisher" or @codeListValue="principalInvestigator" ] ]/gmd:individualName';
+    my $author = _get_text_from_doc($doc, $authorXP, $xpc);
+    my $orgXP = '//gmd:pointOfContact/gmd:CI_ResponsibleParty[ gmd:role/gmd:CI_RoleCode[ @codeListValue="publisher" or @codeListValue="principalInvestigator" ] ]/gmd:organisationName';
+    my $organisation = _get_text_from_doc($doc, $orgXP, $xpc);
+    
+    # TODO: get author from other places if other code-list is used
+    
+    
+    # search for existing author/organization
+    my $sth_search = $dbh->prepare_cache(<<"SQL");
+SELECT contact_id
+  FROM sru.meta_contact
+ WHERE organisation = ?
+   AND author = ? 
+SQL
+    $sth_search->excecute($author, $organisation);
+    my $contact_id;
+    while (my $row = $sth_search->selectrow_arrayref) {
+        $contact_id = $row[0]; # max one row, schema enforces uniqueness
+    }
+    return $contact_id if defined $contact_id;
+
+
+    # insert new author/organization
+    my $sth = $dbh->prepare_cached(<<"SQL");
+INSERT INTO sru.products ( 'author', 'organisation' ) VALUES ( ?, ? )
+SQL
+    $sth->execute($author, $organisation);
+    $contact_id = $dbh->last_insert_id(undf, 'sru', 'products', undef);
+    if (! defined $contact_id) {
+        $logger->error("cannot determine contact id from database\n");
+    }
+    return $contact_id;
+}
 
 # 
 # get all text-contents from a LibXML document
