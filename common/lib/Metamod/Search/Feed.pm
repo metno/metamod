@@ -135,13 +135,15 @@ sub _create_feed {
 
     my $config = Metamod::Config->new();
     my $application_name = $config->get('APPLICATION_NAME');
+    my $base_url = $config->get('BASE_PART_OF_EXTERNAL_URL');
+    my $local_url = $config->get('LOCAL_URL');
 
     my $rss = XML::RSS::LibXML->new( version => '2.0' );
     $rss->channel(
         title => "$application_name Dataset feed for $unqualified_name",
         description =>
-            "METAMOD dataset feed for $unqualified_name. Provides updates when new files are available in the dataset.",
-        link      => 'Link to the METAMOD instance',
+            "$application_name dataset feed for $unqualified_name. Provides updates when new files are available in the dataset.",
+        link      => $base_url . $local_url,
         generator => 'METAMOD',
     );
 
