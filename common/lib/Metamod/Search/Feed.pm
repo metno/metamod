@@ -9,6 +9,7 @@ use CGI;
 use Log::Log4perl qw( get_logger );
 use XML::RSS::LibXML;
 use Data::Dumper;
+use Metamod::Config;
 use Metamod::DatasetDb;
 
 =head1 NAME
@@ -132,9 +133,12 @@ sub _create_feed {
     my $unqualified_name = $self->_get_unqualified_name($ds_name);
     $unqualified_name = $ds_name if !$unqualified_name;
 
+    my $config = Metamod::Config->new();
+    my $application_name = $config->get('APPLICATION_NAME');
+
     my $rss = XML::RSS::LibXML->new( version => '2.0' );
     $rss->channel(
-        title => "METAMOD Dataset feed for $unqualified_name",
+        title => "$application_name Dataset feed for $unqualified_name",
         description =>
             "METAMOD dataset feed for $unqualified_name. Provides updates when new files are available in the dataset.",
         link      => 'Link to the METAMOD instance',
