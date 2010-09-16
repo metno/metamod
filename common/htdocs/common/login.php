@@ -69,12 +69,21 @@ class LoginPage extends MMWebApp {
     }
     
     function sendRegistrationEmail(){
-           
+
+        
         $applicationId = $this->config->getVar('APPLICATION_ID');
         $name = $_REQUEST['name'];
         $email = $_REQUEST['email'];
         $institutionCode =  $_REQUEST['institution_name'];
         $telephoneNumber = $_REQUEST['telephone_number'];
+
+        $baseURL = $this->config->getVar('BASE_PART_OF_EXTERNAL_URL');
+        $localURL = $this->config->getVar('LOCAL_URL');    
+        $fullURL = $baseURL . $localURL . "/adm/user_admin.php?action=display_new_user";
+        $fullURL .= '&name=' . urlencode( $name );
+        $fullURL .= '&email=' . urlencode( $email );
+        $fullURL .= '&institution_code=' . $institutionCode;
+        $fullURL .= '&telephone_number=' . $telephoneNumber;        
         
         $emailSubject = 'New METAMOD user requested';
         $emailBody = <<<END_MSG
@@ -83,9 +92,15 @@ Name: $name
 Email address: $email
 Institution code: $institutionCode
 Telephone number: $telephoneNumber
+
+Administrator click this link for registration (users do not have access to this URL):
+
+$fullURL
+
 END_MSG;
 
-        $requestAddress = 'oysteint@met.no';
+        # the address to send the request to
+        $requestAddress = $this->config->getVar('OPERATOR_EMAIL');
         $emailHeader = "From: $email\r\n";
             
         $success = mail( $requestAddress, $emailSubject, $emailBody, $emailHeader );    
