@@ -1,5 +1,7 @@
 <?php 
 
+require_once '../funcs/mmConfig.inc';
+
 /**
  * A simple web application "framework" inspired by the Perl module CGI::Application.
  * This class however is a lot simpler and does not contain as much functionality.
@@ -46,7 +48,8 @@ class MMWebApp {
     
     public function __construct( &$logger ){
 
-        $this->config = MMConfig::getInstance();        
+        $this->config = MMConfig::getInstance();
+        $this->config->initLogger();  
         
         $this->logger = $logger;
         
