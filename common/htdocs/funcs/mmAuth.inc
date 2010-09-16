@@ -117,7 +117,7 @@ function mmRedirectToLogin(){
     }
     
     $orig_uri = $_SERVER['SERVER_NAME'] . $_SERVER['SCRIPT_NAME'];
-    echo header("Location: ../adm/login.php?return=$orig_uri&params=$get_string");
+    echo header("Location: ../common/login.php?return=$orig_uri&params=$get_string");
 }
 
 function mmRedirectToSearch(){    
