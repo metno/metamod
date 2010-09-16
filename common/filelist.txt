@@ -3,6 +3,7 @@ metamodInit.sh
 logger_config.ini
 =htdocs/adm/index.php
 =htdocs/adm/showconfig.php
+=htdocs/adm/user_admin.php
 =htdocs/common/login.php
 =htdocs/funcs/mmAuth.inc
 =htdocs/funcs/mmConfig.inc
