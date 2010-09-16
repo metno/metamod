@@ -1,5 +1,6 @@
 <?php 
 
+require_once '../funcs/mmWebApp.inc';
 require_once '../funcs/mmConfig.inc';
 require_once '../funcs/mmUserbase.inc';
 require_once '../funcs/mmAuth.inc';
@@ -9,26 +10,20 @@ require_once '../funcs/mmAuth.inc';
  * @author oysteint
  *
  */
-class SubscriptionPage {
+class SubscriptionPage extends MMWebApp {
     
-    private $config;
-    private $logger;
-    private $action;
-    private $auth;
-    private $userbase;
+    protected $action;
+    protected $auth;
+    protected $userbase;
     
-    function __construct() {
+    public function __construct( &$logger ) {
         
-        $this->config = MMConfig::getInstance();
-        $this->config->initLogger();
-        
-        $this->logger = Logger::getLogger('metamod.search.subscription');
-        
+        parent::__construct( $logger );
         $this->userbase = new MM_Userbase();
         
     }
     
-    function __destruct() {
+    public function __destruct() {
         
         if( isset( $this->userbase ) ){
             $success = $this->userbase->close();           
@@ -39,37 +34,26 @@ class SubscriptionPage {
         
     }
     
-    public function dispatch() {
+    public function init(){
+
+        parent::init();
         
-        # mmAuthenticate will redirect to login page if not logged in.
         $auth = mmAuthenticate();
         $this->auth = $auth;
+
+        $this->setDefaultAction('list_subscriptions');
         
-        $action = $_REQUEST['action'];
-        if( !$action ){
-            $action = 'list_subscriptions';
-        }
+        $dispatchRules = array(
+            'display_email_form' => 'displayEmailForm',
+            'store_email_subscription' => 'storeEmailSubscription',
+            'list_subscriptions' => 'listSubscriptions',
+            'display_remove_subscription' =>'displayRemoveSubscription',
+            'remove_subscription' => 'removeSubscription',
+            'logout' => 'logout',        
+        );
+        $this->addDispatchRules( $dispatchRules );
         
-        $html = '';
-        if( 'display_email_form' == $action ){
-            $html = $this->displayEmailForm();
-        } elseif ( 'store_email_subscription' == $action ){
-            $html = $this->storeEmailSubscription();
-        } elseif ( 'list_subscriptions' == $action ){
-            $html = $this->listSubscriptions();
-        } elseif( 'display_remove_subscription' == $action ){
-            $html = $this->displayRemoveSubscription();
-        } elseif( 'remove_subscription' == $action ){
-            $html = $this->removeSubscription();
-        } elseif( 'logout' == $action ){
-            mmLogout();
-        } else {
-            $html = 'Invalid action';
-        }
-        
-        return $html;
-        
-    }
+    }    
 
     function displayEmailForm( $storeError = '' ) {
     
@@ -479,8 +463,8 @@ END_HTML;
     
 }
 
-
-$subscription_page = new SubscriptionPage();
-echo $subscription_page->dispatch();
+$logger = Logger::getLogger('metamod.search.subscription');
+$subscription_page = new SubscriptionPage($logger);
+echo $subscription_page->run();
 
 ?>
