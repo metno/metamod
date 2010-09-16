@@ -60,10 +60,11 @@ class LoginPage extends MMWebApp {
         $success = $this->sendRegistrationEmail();
         
         if( $success ){
-            return 'Success';
+            $this->registrationSuccess = 'You registration has been sent.';
+            return $this->createLoginPage();            
         } else {
             $this->registrationFailure = 'An error occurred when sending your request. Please try again.';
-            return 'Failure';
+            return $this->createLoginPage();
         }
         
     }
@@ -242,6 +243,9 @@ label {
 <div id="registerform">
 
     <h2>Request new user</h2>
+    
+    <span style="font-weight: bolder">$this->registrationSuccess</span>
+    
     <p class="form">
     If you do not already have a username and password you can send a request for one. Be aware that it can take
     some time to process your request as it has to be manually approved.    
@@ -255,6 +259,7 @@ label {
             <tr>
             <td class="error" colspan="2">$this->registrationFailure</td>
             </tr>
+            
             
             <tr>
             <td><label for="name">Name</label></td>
