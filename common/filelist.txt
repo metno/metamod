@@ -10,6 +10,7 @@ logger_config.ini
 =htdocs/funcs/mmTtime.inc
 =htdocs/funcs/mmDataset.inc
 =htdocs/funcs/mmFimex.inc
+=htdocs/funcs/mmWebApp.inc
 =htdocs/funcs/mmWMS.inc
 =htdocs/funcs/mmWMS2.inc
 =htdocs/funcs/mmOAIPMH.inc
