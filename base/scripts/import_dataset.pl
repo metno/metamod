@@ -737,7 +737,7 @@ sub isoDoc2SruDb {
     push @values, max(_get_text_from_doc($isods->getMETA_DOC(), '//gmd:northBoundLatitude', $xpc));
 
     # id_contact parameter
-    push @params, "contact_id";
+    push @params, "id_contact";
     push @values, _get_contact_id($dbh, $isods->getMETA_DOC(), $xpc);
 
     # insert into db
@@ -775,7 +775,7 @@ sub max {
 }
 
 #
-# get the author and organisation from the document
+# get the author and organization from the document
 # and find an possibly existing contact_id in the database
 # or create one
 #
@@ -785,35 +785,41 @@ sub _get_contact_id {
     my $authorXP = '//gmd:pointOfContact/gmd:CI_ResponsibleParty[ gmd:role/gmd:CI_RoleCode[ @codeListValue="publisher" or @codeListValue="principalInvestigator" ] ]/gmd:individualName';
     my $author = _get_text_from_doc($doc, $authorXP, $xpc);
     my $orgXP = '//gmd:pointOfContact/gmd:CI_ResponsibleParty[ gmd:role/gmd:CI_RoleCode[ @codeListValue="publisher" or @codeListValue="principalInvestigator" ] ]/gmd:organisationName';
-    my $organisation = _get_text_from_doc($doc, $orgXP, $xpc);
+    my $organization = _get_text_from_doc($doc, $orgXP, $xpc);
     
     # TODO: get author from other places if other code-list is used
     
+    $logger->debug("found contact-(author,organization)=($author,$organization) in sru/iso19115\n") if $logger->is_debug();
     
     # search for existing author/organization
-    my $sth_search = $dbh->prepare_cache(<<"SQL");
-SELECT contact_id
+    my $authorSQL = defined $author ? "author = ?" : "author IS NULL";
+    my $orgSQL = defined $organization ? "organization = ?" : "organization IS NULL";
+    my $sth_search = $dbh->prepare_cached(<<"SQL");
+SELECT id_contact
   FROM sru.meta_contact
- WHERE organisation = ?
-   AND author = ? 
+ WHERE $authorSQL
+   AND $orgSQL 
 SQL
-    $sth_search->excecute($author, $organisation);
+    $sth_search->execute(defined $author ? $author : (),
+                         defined $organization ? $organization : ());
     my $contact_id;
-    while (my $row = $sth_search->selectrow_arrayref) {
-        $contact_id = $row[0]; # max one row, schema enforces uniqueness
+    while (my $row = $sth_search->fetchrow_arrayref) {
+        $contact_id = $row->[0]; # max one row, schema enforces uniqueness
+        $logger->debug("found contact_id for $author, $organization: $contact_id\n");
     }
     return $contact_id if defined $contact_id;
 
 
     # insert new author/organization
     my $sth = $dbh->prepare_cached(<<"SQL");
-INSERT INTO sru.products ( 'author', 'organisation' ) VALUES ( ?, ? )
+INSERT INTO sru.meta_contact ( author, organization ) VALUES ( ?, ? )
 SQL
-    $sth->execute($author, $organisation);
-    $contact_id = $dbh->last_insert_id(undf, 'sru', 'products', undef);
+    $sth->execute($author, $organization);
+    $contact_id = $dbh->last_insert_id(undef, 'sru', 'meta_contact', undef);
     if (! defined $contact_id) {
         $logger->error("cannot determine contact id from database\n");
     }
+    $sth->finish;
     return $contact_id;
 }
 
