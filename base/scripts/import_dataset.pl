@@ -805,7 +805,7 @@ SQL
     my $contact_id;
     while (my $row = $sth_search->fetchrow_arrayref) {
         $contact_id = $row->[0]; # max one row, schema enforces uniqueness
-        $logger->debug("found contact_id for $author, $organization: $contact_id\n");
+        $logger->debug("found contact_id for $author, $organization: $contact_id\n") if $logger->is_debug();
     }
     return $contact_id if defined $contact_id;
 
