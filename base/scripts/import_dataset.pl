@@ -800,8 +800,8 @@ SELECT id_contact
  WHERE $authorSQL
    AND $orgSQL 
 SQL
-    $sth_search->execute(defined $author ? $author : (),
-                         defined $organization ? $organization : ());
+    $sth_search->execute(defined $author ? uc($author) : (),
+                         defined $organization ? uc($organization) : ());
     my $contact_id;
     while (my $row = $sth_search->fetchrow_arrayref) {
         $contact_id = $row->[0]; # max one row, schema enforces uniqueness
