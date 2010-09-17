@@ -33,8 +33,10 @@ use strict;
 use warnings;
 use Data::Dumper;
 use mmTtime;
-use Metamod::Config;
+use Metamod::Config qw(:init_logger);
 use Log::Log4perl;
+
+my $logger = Log::Log4perl->get_logger('metamod.upload.Uploadutils');
 
 our $VERSION = 0.1;
 
@@ -107,11 +109,12 @@ sub notify_web_system {
 #
 #  Get file sizees for each uploaded file:
 #
-   if ($progress_report == 1) {
-      print "notify_web_system: $code,$dataset_name\n";
-      print "                   $path_to_errors_html\n";
-      print "                   Uploaded basenames:\n";
-      print Dumper(\@uploaded_basenames);
+   if ($logger->is_debug) {
+      my $msg = "notify_web_system: $code,$dataset_name\t";
+      $msg .= "$path_to_errors_html\t";
+      $msg .= "Uploaded basenames:\t";
+      $msg .= join "\t", split ("\n", Dumper(\@uploaded_basenames));
+      $logger->debug($msg ."\n");
    }
    my %file_sizes = ();
    my $i1 = 0;
@@ -193,16 +196,18 @@ sub notify_web_system {
 #     previously did not have any <file> element) to the userfile of
 #     the dataset owner:
 #
-      if ($progress_report == 1) {
-         print "                   Uploaded files:\n";
-         print Dumper($ref_uploaded_files);
-         print "                   found_basenames:\n";
-         print Dumper(\@found_basenames);
+      if ($logger->is_debug) {
+         my $msg = "Uploaded files:\t";
+         $msg .= join "\t", split("\n", Dumper($ref_uploaded_files));
+         $msg .= " found_basenames:\t";
+         $msg .= join "\t", split ("\n", Dumper(\@found_basenames));
+         $logger->debug($msg . "\n");
       }
       my @rest_basenames = &subtract(\@uploaded_basenames,\@found_basenames);
-      if ($progress_report == 1) {
-         print "                   rest_basenames:\n";
-         print Dumper(\@rest_basenames);
+      if ($logger->is_debug) {
+         my  $msg = "rest_basenames:\t";
+         $msg .= join "\t", split("\n", Dumper(\@rest_basenames));
+         $logger->debug($msg . "\n");
       }
       if (scalar @rest_basenames > 0) {
 #   
@@ -241,9 +246,7 @@ sub notify_web_system {
          print USERFILE $new_file_content;
          close (USERFILE);
       }
-      if ($progress_report == 1) {
-         print "-notify_web_system\n";
-      }
+      $logger->debug("-notify_web_system\n");
    } else {
       &syserror("SYS","dataset_not_owned_by_any_user", "", "notify_web_system", "");
    }
@@ -540,39 +543,36 @@ sub current_time {
 #---------------------------------------------------------------------------------
 # $errmsg = (NORMAL TERMINATION | error-message)
 #
-{
-    my $logger = Log::Log4perl->get_logger('metamod.upload.Uploadutils');
-    sub syserror {
-        my ($type,$errmsg,$uploadname,$where,$what) = @_;
-        my (undef, undef, $baseupldname) = File::Spec->splitpath($uploadname);
+sub syserror {
+    my ($type,$errmsg,$uploadname,$where,$what) = @_;
+    my (undef, undef, $baseupldname) = File::Spec->splitpath($uploadname);
 
-        if ($type eq "SYS" || $type eq "SYSUSER") {
-            (my $msg = $errmsg) =~ s/\n/ | /g; 
-            my $errMsg = "$type IN: $where: $msg; ";
-            $errMsg .= "Uploaded file: $uploadname; " if $uploadname;
-            if ($what) {
-                ($msg = $what) =~ s/\n/ | /g;
-                $errMsg .= "Error: $msg; ";
-            }
-            if ($shell_command_error) {
-                ($msg = $shell_command_error) =~ s/\n/ | /g;
-                $errMsg .= "Stderr: $msg; ";
-            }
-            if ($errmsg eq 'NORMAL TERMINATION') {
+    if ($type eq "SYS" || $type eq "SYSUSER") {
+        (my $msg = $errmsg) =~ s/\n/ | /g; 
+        my $errMsg = "$type IN: $where: $msg; ";
+        $errMsg .= "Uploaded file: $uploadname; " if $uploadname;
+        if ($what) {
+            ($msg = $what) =~ s/\n/ | /g;
+            $errMsg .= "Error: $msg; ";
+        }
+        if ($shell_command_error) {
+            ($msg = $shell_command_error) =~ s/\n/ | /g;
+            $errMsg .= "Stderr: $msg; ";
+        }
+        if ($errmsg eq 'NORMAL TERMINATION') {
+            $logger->info($errMsg."\n");
+        } else {
+            if ($type eq "SYSUSER") {
                 $logger->info($errMsg."\n");
             } else {
-                if ($type eq "SYSUSER") {
-                    $logger->info($errMsg."\n");
-                } else {
-                    $logger->error($errMsg."\n");
-                }
+                $logger->error($errMsg."\n");
             }
         }
-        if ($type eq "USER" || $type eq "SYSUSER") {
-            # warnings about the uploaded data
-            push(@user_errors, "$errmsg\nUploadfile: $baseupldname\n$what\n\n");
-        }
-        $shell_command_error = "";
     }
+    if ($type eq "USER" || $type eq "SYSUSER") {
+        # warnings about the uploaded data
+        push(@user_errors, "$errmsg\nUploadfile: $baseupldname\n$what\n\n");
+    }
+    $shell_command_error = "";
 }
 1;
