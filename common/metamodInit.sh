@@ -59,7 +59,7 @@ start() {
          rm -rf $work_flat
          rm -f $path_to_shell_error
          # actually start the daemon
-         start_daemon -n 10 -p $upload_monitor_pid $target_directory/scripts/upload_monitor.pl $webrun_directory/upload_monitor.out $upload_monitor_pid
+         start_daemon -n 10 -p $upload_monitor_pid $target_directory/scripts/upload_monitor.pl $system_log $upload_monitor_pid
          if [ $? -ne 0 ]; then
             echo "upload_monitor failed: $?"
             return $?;
