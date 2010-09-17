@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 
 # Basing lib on $FindBin::Bin works since this script is never copied to target
-use lib "$FindBin::Bin/..lib";
+use lib "$FindBin::Bin/../lib";
 
 use Data::Dumper;
 use FindBin;
