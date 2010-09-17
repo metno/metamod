@@ -547,17 +547,24 @@ sub current_time {
         my (undef, undef, $baseupldname) = File::Spec->splitpath($uploadname);
 
         if ($type eq "SYS" || $type eq "SYSUSER") {
-            my $errMsg = "$type IN: $where: $errmsg; ";
+            (my $msg = $errmsg) =~ s/\n/ | /g; 
+            my $errMsg = "$type IN: $where: $msg; ";
             $errMsg .= "Uploaded file: $uploadname; " if $uploadname;
-            $errMsg .= "Error: $what; " if $what;
-            $errMsg .= "Stderr: $shell_command_error; ";
+            if ($what) {
+                ($msg = $what) =~ s/\n/ | /g;
+                $errMsg .= "Error: $msg; ";
+            }
+            if ($shell_command_error) {
+                ($msg = $shell_command_error) =~ s/\n/ | /g;
+                $errMsg .= "Stderr: $msg; ";
+            }
             if ($errmsg eq 'NORMAL TERMINATION') {
                 $logger->info($errMsg."\n");
             } else {
-                if ($type eq "SYS") {
-                    $logger->error($errMsg."\n");
+                if ($type eq "SYSUSER") {
+                    $logger->info($errMsg."\n");
                 } else {
-                    $logger->warn($errMsg."\n");
+                    $logger->error($errMsg."\n");
                 }
             }
         }
