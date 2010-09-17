@@ -65,7 +65,6 @@ use Uploadutils qw(notify_web_system
                    string_found_in_file
                    syserror
                    $config
-                   $progress_report
                    $webrun_directory
                    $work_directory
                    $uerr_directory
@@ -79,7 +78,8 @@ use Uploadutils qw(notify_web_system
                    $local_url
                    $shell_command_error
                    @user_errors);
-$| = 1;
+use Log::Log4perl;
+my $logger = Log::Log4perl->get_logger('metamod.upload.upload_monitor');
 #
 #  upload_monitor.pl
 #  -----------------
@@ -301,9 +301,8 @@ sub main_loop {
 #
    my %ftp_events = ();
    &read_ftp_events(\%ftp_events);
-   if ($progress_report == 1) {
-      print "Dump av hash ftp_events:\n";
-      print Dumper(\%ftp_events);
+   if ($logger->is_debug()) {
+      $logger->debug("Dump av hash ftp_events:" . join ("\t", split "\n", Dumper(\%ftp_events))); 
    }
 
 #
@@ -395,9 +394,7 @@ sub ftp_process_hour {
 #  the files in that dataset.
 #   
    my ($eventsref,$current_hour) = @_;
-   if ($progress_report == 1) {
-      print "-------- ftp_process_hour: Entered at current_hour: $current_hour\n";
-   }
+   $logger->debug("ftp_process_hour: Entered at current_hour: $current_hour\n");
    my $rex = " 0*$current_hour" . '$';
    my @matches = grep(/$rex/,keys %$eventsref);
    foreach my $eventkey (@matches) {
@@ -430,9 +427,7 @@ sub ftp_process_hour {
       }
       my $filecount = scalar (keys %files_to_process);
       if ($filecount > 0) {
-         if ($progress_report == 1) {
-            print "-------- ftp_process_hour: $filecount files from $dataset_name with age $age_seconds\n";
-         }
+         $logger->debug("ftp_process_hour: $filecount files from $dataset_name with age $age_seconds\n");
       }
       if ($filecount > 0 && $age_seconds > 60 * $wait_minutes) {
          my $datestring = &get_date_and_time_string($current_epoch_time - $age_seconds);
@@ -605,10 +600,11 @@ sub process_files {
    my %orignames = (); # Connects the names of the expanded files to the full path of the 
                        # original names of the uploaded files.
    my $errors = 0;
-   if ($progress_report == 1) {
-      print "-------- Files to process for dataset $dataset_name at $datestring\n";
+   if ($logger->is_debug) {
+      my $msg = "Files to process for dataset $dataset_name at $datestring: ";
       my @files_arr = keys %files_to_process;
-      print Dumper(\@files_arr);
+      $msg .= join "\t", split("\n", Dumper(\@files_arr));
+      $logger->debug($msg. "\n");
    }
    my @originally_uploaded = keys %files_to_process;
    if ($ftp_or_web ne 'TAF' && ! exists($dataset_institution{$dataset_name})) {
@@ -649,9 +645,7 @@ sub process_files {
 #     Get type of file and act accordingly:
 #      
       my $filetype = getFiletype($newpath);
-      if ($progress_report == 1) {
-         print "     Processing $newpath Filtype: $filetype\n";
-      }
+      $logger->debug("Processing $newpath Filtype: $filetype\n");
 #
       if ($filetype =~ /^gzip/) { # gzip or gzip-compressed 
 #         
@@ -701,9 +695,10 @@ sub process_files {
             &syserrorm("SYSUSER","unable_to_unpack_tar_archive", $uploadname, "process_files", "");
             next;
          }
-         if ($progress_report == 1) {
-            print "-------- Components of the tar file $newpath :\n";
-            print Dumper(\@tarcomponents);
+         if ($logger->is_debug) {
+            my  $msg = "Components of the tar file $newpath : ";
+            $msg .= join "\t", split ("\n", Dumper(\@tarcomponents));
+            $logger->debug($msg . "\n");
          }
          my %basenames = ();
          my $errcondition = "";
@@ -804,9 +799,10 @@ sub process_files {
    }
    &purge_current_directory(\%orignames);
    my @expanded_files = glob("*");
-   if ($progress_report == 1) {
-      print "-------- Unpacked files in the work_flat directory:\n";
-      print Dumper(\@expanded_files);
+   if ($logger->is_debug) {
+      my $msg = "Unpacked files in the work_flat directory: ";
+      $msg .= join "\t", split("\n", Dumper(\@expanded_files));
+      $logger->debug($msg . "\n");
    }
 #         
 #  Convert CDL files to netCDF and then check that all files are netCDF:
@@ -828,9 +824,7 @@ sub process_files {
          $extension = $1; # First matching ()-expression
       }
       my $filetype = getFiletype($expandedfile);
-      if ($progress_report == 1) {
-         print "    ---- Processing $expandedfile: $filetype\n";
-      }
+      $logger->debug("Processing $expandedfile: $filetype\n");
       if ($filetype eq 'ascii') {
          my $errorMsg = remove_cr_from_file($expandedfile);
          if (length($errorMsg) > 0) {
@@ -846,9 +840,7 @@ sub process_files {
          	}
             my $firstline = <FH>;
             close FH;
-            if ($progress_report == 1) {
-               print "         Possible CDL-file. Firstline: $firstline\n";
-            }
+            $logger->debug("Possible CDL-file. Firstline: $firstline\n");
             if ($firstline =~ /^\s*netcdf\s/) {
                my $ncname = substr($expandedfile,0,length($expandedfile) - 3) . 'nc';
                if (scalar grep($_ eq $ncname,@expanded_files) > 0) {
@@ -880,9 +872,7 @@ sub process_files {
                   }
                   $filetype = getFiletype($ncname);
                   $expandedfile = $ncname;
-                  if ($progress_report == 1) {
-                     print "         Ncgen OK.\n";
-                  }
+                  $logger->debug("Ncgen OK.\n");
                }
             } else {
                &syserrorm("SYSUSER","text_file_with_cdl_extension_not_a_cdlfile",
@@ -998,9 +988,7 @@ sub process_files {
 #  Run the digest_nc.pl script:
 #   
    my $command = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlpath";
-   if ($progress_report == 1) {
-      print "RUN:    $command\n";
-   }
+   $logger->debug("RUN:    $command\n");
    my $result = &shcommand_scalar($command);
    if (defined($result)) {
       open (DIGOUTPUT,">digest_out");
@@ -1045,7 +1033,7 @@ sub process_files {
             }
             my $xmlFilePath = File::Spec->catfile($xmlFileDir, $pureFile . '.xml');
             my $digestCommand = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlFilePath isChild";
-            print "RUN:    $digestCommand\n" if $progress_report == 1;
+            $logger->debug("RUN:    $digestCommand\n");
             shcommand_scalar($digestCommand);
             if (length($shell_command_error) > 0) {
             	syserrorm("SYS", "digest_nc_file_fails", $filepath, "process_files", "");
@@ -1288,9 +1276,7 @@ sub revert_XML_history {
 #        All files for this dataset has to be re-processed. Remove XML- and
 #        XML-history files:
 #      
-         if ($progress_report == 1) {
-            print "Dataset $dataset_name : All files for this dataset has to be re-processed\n";
-         }
+         $logger->debug("Dataset $dataset_name : All files for this dataset has to be re-processed\n");
          if (clearXmlFile($path_to_xml_file) == 0) {
             &syserrorm("SYS","clearXmlFile file $path_to_xml_file did not succeed","", "revert_XML_history", "");
          }
@@ -1427,9 +1413,7 @@ sub clean_up_repository {
          my $directory = $opendap_directory . "/" . 
                          $dataset_institution{$dataset}->{'institution'} . "/" . $dataset;
          my @files = glob($directory . "/" . $dataset . "_*");
-         if ($progress_report == 1) {
-            print "\nclean_up_repository directory: $directory\n";
-         }
+         $logger->debug("clean_up_repository directory: $directory\n");
          foreach my $fname (@files) {
             my @file_stat = stat($fname);
             if (scalar @file_stat == 0) {
@@ -1442,9 +1426,7 @@ sub clean_up_repository {
 #            
             my $modification_time = mmTtime::ttime($file_stat[9]);
             if ($current_epoch_time - $modification_time > 60*60*24*$days_to_keep_files) {
-               if ($progress_report == 1) {
-                  print "   $fname\n";
-               }
+               $logger->debug("$fname\n");
                my @cdlcontent = &shcommand_array("ncdump -h $fname");
                if (length($shell_command_error) > 0) {
                   &syserrormm("SYS","Could not ncdump -h $fname", "", "clean_up_repository", "");
@@ -1452,18 +1434,14 @@ sub clean_up_repository {
                }
                my $lnum = 0;
                my $lmax = scalar @cdlcontent;
-               if ($progress_report == 1) {
-                  print "      Line count of CDL file (lmax) = $lmax\n";
-               }
+               $logger->debug("Line count of CDL file (lmax) = $lmax\n");
                while ($lnum < $lmax) {
                   if ($cdlcontent[$lnum] eq 'dimensions:') {
                      last;
                   }
                   $lnum++;
                }
-               if ($progress_report == 1) {
-                  print "      'dimensions:' found at line = $lnum\n";
-               }
+               $logger->debug("'dimensions:' found at line = $lnum\n");
                $lnum++;
                while ($lnum < $lmax) {
                   if ($cdlcontent[$lnum] eq 'variables:') {
@@ -1472,9 +1450,7 @@ sub clean_up_repository {
                   $cdlcontent[$lnum] =~ s/=\s*\d+\s*;$/= 1 ;/;
                   $lnum++;
                }
-               if ($progress_report == 1) {
-                  print "      'variables:' found at line = $lnum\n";
-               }
+               $logger->debug("'variables:' found at line = $lnum\n");
                if ($lnum >= $lmax) {
                   &syserrorm("SYS","Error while changing CDL content from $fname",
                             "", "clean_up_repository", "");
