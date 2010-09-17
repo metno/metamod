@@ -34,6 +34,7 @@ use warnings;
 use Data::Dumper;
 use mmTtime;
 use Metamod::Config;
+use Log::Log4perl;
 
 our $VERSION = 0.1;
 
@@ -537,38 +538,34 @@ sub current_time {
 };
 #
 #---------------------------------------------------------------------------------
+# $errmsg = (NORMAL TERMINATION | error-message)
 #
-sub syserror {
-   my ($type,$errmsg,$uploadname,$where,$what) = @_;
-#
-#  Find current time
-#
-   my $datestring = &current_time();
-#
-   my (undef, undef, $baseupldname) = File::Spec->splitpath($uploadname);
-#
-   if ($type eq "SYS" || $type eq "SYSUSER") {
-#
-#     Write message to error log:
-#
-      open (OUT,">>$path_to_syserrors");
-      flock (OUT, LOCK_EX);
-      print OUT "-------- $type $datestring IN: $where\n" .
-                "         $errmsg\n";
-      if ($uploadname ne "") {
-         print OUT "         Uploaded file: $uploadname\n";
-      }
-      if ($what ne "") {
-         print OUT "         $what\n";
-      }
-      if ($shell_command_error ne "") {
-         print OUT "         Stderr: $shell_command_error\n";
-      }
-      close (OUT);
-   }
-   if ($type eq "USER" || $type eq "SYSUSER") {
-      push(@user_errors, "$errmsg\nUploadfile: $baseupldname\n$what\n\n");
-   }
-   $shell_command_error = "";
-};
+{
+    my $logger = Log::Log4perl->get_logger('metamod.upload.Uploadutils');
+    sub syserror {
+        my ($type,$errmsg,$uploadname,$where,$what) = @_;
+        my (undef, undef, $baseupldname) = File::Spec->splitpath($uploadname);
+
+        if ($type eq "SYS" || $type eq "SYSUSER") {
+            my $errMsg = "$type IN: $where: $errmsg; ";
+            $errMsg .= "Uploaded file: $uploadname; " if $uploadname;
+            $errMsg .= "Error: $what; " if $what;
+            $errMsg .= "Stderr: $shell_command_error; ";
+            if ($errmsg eq 'NORMAL TERMINATION') {
+                $logger->info($errMsg."\n");
+            } else {
+                if ($type eq "SYS") {
+                    $logger->error($errMsg."\n");
+                } else {
+                    $logger->warn($errMsg."\n");
+                }
+            }
+        }
+        if ($type eq "USER" || $type eq "SYSUSER") {
+            # warnings about the uploaded data
+            push(@user_errors, "$errmsg\nUploadfile: $baseupldname\n$what\n\n");
+        }
+        $shell_command_error = "";
+    }
+}
 1;

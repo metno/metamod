@@ -11,6 +11,7 @@ CREATE TABLE sru.meta_contact (
     id_contact      SERIAL,
     organization    TEXT, -- UPPER
     author          TEXT, -- UPPER
+    UNIQUE(author, organization),
     PRIMARY KEY(id_contact)
 );
 GRANT SELECT ON sru.meta_contact TO "[==PG_WEB_USER==]";
