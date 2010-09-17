@@ -138,6 +138,43 @@ class MMWebApp {
         mmLogout();        
     }
     
+    public function createStdHeader( $title ){
+        
+        $localURL = $this->config->getVar('LOCAL_URL');
+        $appHeader = $this->config->getVar('APP_HEADER_HTML');
+        
+        $header = <<<END_HTML
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+   <title>$title</title>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+   <link href="$localURL/style.css" rel="stylesheet" type="text/css" />
+   <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div class="mybody">
+$appHeader
+END_HTML;
+
+        return $header;
+        
+    }
+    
+    public function createStdFooter() {
+        
+        $appFooter = $this->config->getVar('APP_FOOTER_HTML');
+        
+        $footer = <<<END_HTML
+$appFooter
+</div>
+</html>
+END_HTML;
+        
+        return $footer;
+        
+    }
+    
     
 }
 

@@ -288,10 +288,11 @@ END_FORM;
 
     function _html_page( $title, $content, $message = '' ){
     
+        $header = $this->createStdHeader($title);
+        $footer = $this->createStdFooter();
+        
         $html_page = <<<END_HTML
-<html>
-<head>
-<title>$title</title>
+$header
 <style type="text/css">
 body {
     font-family: sans-serif;
@@ -374,6 +375,7 @@ $message
 $content
 </div>
 </div>
+$footer
 END_HTML;
 
         return $html_page;

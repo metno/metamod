@@ -2,6 +2,7 @@
 
 require_once 'Auth.php';
 require_once '../funcs/mmAuth.inc';
+require_once '../funcs/mmConfig.inc';
 require_once '../funcs/mmWebApp.inc';
 
 class LoginPage extends MMWebApp {
@@ -29,14 +30,13 @@ class LoginPage extends MMWebApp {
         $auth->start();
 
         if( $auth->checkAuth() ){    
-            if( isset( $_REQUEST['return'] ) ){
+            if( $_REQUEST['return'] ){
                 
                 $get_string = urldecode( $_REQUEST['params'] );
-                
                 echo header( "Location: http://" . $_REQUEST['return'] . '?' . $get_string );
             } else {
-                //do not have a good place to send the user. Send them to the search page
-                echo header( 'Location: ../sch/' );        
+                //do not have a good place to send the user. Send them to the subscription page
+                echo header( 'Location: ../sch/subscription.php' );        
             }
             
         }              
@@ -148,11 +148,11 @@ END_MSG;
            }
         }
         
+        $header = $this->createStdHeader('Login');
+        $footer = $this->createStdFooter();
         
         $form = <<<END_FORM
-<html>
-<head>
-<title>METAMOD login</title>
+$header
 <style>
 body {
     font-family: sans-serif;
@@ -290,8 +290,7 @@ label {
         </table>
     </form>
 </div>
-</body>
-</html>
+$footer
 END_FORM;
         
         echo $form;
@@ -300,6 +299,7 @@ END_FORM;
   
 }
 
+$mmConfig->initLogger();
 $logger = Logger::getLogger('metamod.base.login');
 $loginPage = new LoginPage($logger);
 echo $loginPage->run();
