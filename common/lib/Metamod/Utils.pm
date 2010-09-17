@@ -122,11 +122,11 @@ sub daemonize {
     # check if writing to pidFile is possible
     my $pidFH;
     if ($pidFile) {
-       open $pidFH, ">$pidFile" or die "Cannot write pidfile $pidFile: $!\n";
+       open $pidFH, ">$pidFile" or die "Cannot write pidfile $pidFile: $!";
     }
     my $logFH;
     if ($logFile) {
-       open $logFH, ">>$logFile" or die "Cannot write logfile $logFile: $!\n";
+       open $logFH, ">>$logFile" or die "Cannot write logfile $logFile: $!";
     }
     my $pid;
     if ($pid = _Fork()) {exit 0;};
