@@ -225,6 +225,12 @@ GRANT ALL ON Sessions TO "[==PG_WEB_USER==]";
 CREATE TABLE Dataset_Location (DS_id INTEGER NOT NULL REFERENCES DataSet ON DELETE CASCADE) WITHOUT OIDS;
 GRANT ALL ON Dataset_Location TO "[==PG_WEB_USER==]";
 
+CREATE TABLE HarvestStatus (
+   HS_application     VARCHAR(99)    NOT NULL,
+   HS_url             VARCHAR(99999) NOT NULL,
+   HS_time            TIMESTAMP      NOT NULL
+);
+
 \q
 EOF
 
