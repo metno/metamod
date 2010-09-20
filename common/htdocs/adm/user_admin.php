@@ -145,6 +145,13 @@ END_FORM;
      * Action for regisering new users.
      */
     public function registerNewUser() {
+
+        $requiredFields = array( 'username', 'password', 'email' );
+        foreach ($requiredFields as $field) {
+            if( trim( $_REQUEST[ $field ] ) == ''){
+                return $this->displayNewUser( '', "You cannot register a user with a blank $field" );
+            }
+        }        
         
         $userbase = new MM_userbase();
        
@@ -200,7 +207,7 @@ END_FORM;
         
         $applicationName = $this->config->getVar('APPLICATION_NAME');
 
-        $emailSubject = 'User registeration for $applicationName complete';
+        $emailSubject = "User registeration for $applicationName complete";
         $emailBody = <<<END_MSG
 Dear $name
 
