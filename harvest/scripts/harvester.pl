@@ -274,7 +274,7 @@ sub getlaststatus {
    my $stm = $dbh->prepare("SELECT HS_time FROM HarvestStatus WHERE HS_application = ? AND HS_url = ?" );
    $stm->execute($app, $source) or die($dbh->errstr);
    my ($lastharvest) = $stm->fetchrow_array;
-   $log->debug("Last update for $app: $source was " . $lastharvest || 'never');
+   $log->debug("Last update for $app: $source was " . ($lastharvest || 'never'));
    return $lastharvest; # is undef if not found
 }
 
