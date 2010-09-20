@@ -317,7 +317,8 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
                } else {
                   $colname = $usemtnames[$i1];
                }
-               $line .= "<th class=\"tdresult\" align=\"center\">" . $colname . $navigate . "</th>";
+               $line .= "<th class=\"tdresult\" class=\"secondlevel\" align=\"center\">"
+                        . $colname . $navigate . "</th>";
                $navigate = "";
             }
          }
@@ -340,7 +341,7 @@ function showlowerlevel($parentds,$startrow,$columns,$sqlpart,$sqlPartParams) {
             $line = "<tr><td>&nbsp;</td>\n";
             for ($i2=0; $i2 <= $lastcolnum;$i2++) {
                if (array_key_exists($i2,$usemtnames)) {
-                  $line .= '<td class="tdresult">' . $mdcontentall[$i2] . "</td>\n";
+                  $line .= '<td class="tdresult" class="secondlevel">' . $mdcontentall[$i2] . "</td>\n";
                   $mdcontentall[$i2] = "";
                }
             }
