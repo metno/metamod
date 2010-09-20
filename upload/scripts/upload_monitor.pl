@@ -1069,14 +1069,15 @@ sub process_files {
 #
 #     No user errors:
 #
+         my @no_error_files = keys %files_to_process; # files not moved to problem_dir
          if ($ftp_or_web ne 'TAF') {
             if ($dont_send_email_to_user) {
-               &notify_web_system('Operator reload ', $dataset_name, \@originally_uploaded,"");
+               &notify_web_system('Operator reload ', $dataset_name, \@no_error_files,"");
             } else {
-               &notify_web_system('File accepted ', $dataset_name, \@originally_uploaded, "");
+               &notify_web_system('File accepted ', $dataset_name, \@no_error_files, "");
             }
          } else {
-            my @bnames = &get_basenames(\@originally_uploaded);
+            my @bnames = &get_basenames(\@no_error_files);
             my $bnames_string = join(", ",@bnames);
             $mailbody = "Dear [OWNER],\n\nNo errors found in file(s) $bnames_string .\n\n";
          }
@@ -1113,11 +1114,12 @@ sub process_files {
             &syserrorm("SYS","print_usererrors_fails", "", "process_files", "");
             return;
          }
+         my @no_error_files = keys %files_to_process; # files not moved to problem_dir
          if ($ftp_or_web ne 'TAF') {
             if ($dont_send_email_to_user) {
-               &notify_web_system('Operator reload ', $dataset_name, \@originally_uploaded,"");
+               &notify_web_system('Operator reload ', $dataset_name, \@no_error_files,"");
             } else {
-               &notify_web_system('Errors found ', $dataset_name, \@originally_uploaded,
+               &notify_web_system('Errors found ', $dataset_name, \@no_error_files,
                             $url_to_errors_html);
             }
          }
