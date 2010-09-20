@@ -326,7 +326,7 @@ if [ -z "`ls compare`" ]; then
    for fil in $logfiles; do
       if [ -r webrun/$fil ]; then
          # remove line-number and time/date
-         perl -pe 's/on\s+line:\s+\d+/_LINENO_/g; s/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2},\d+)?/_TIMESTAMP_/g; s/\d{4}-\d{2}-\d{2}/_DATE_/g' webrun/$fil >compare/$fil
+         perl -pe 's/on\s+line:\s+\d+/_LINENO_/g; s/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2}[,\.]?\d+)?/_TIMESTAMP_/g; s/\d{4}-\d{2}-\d{2}/_DATE_/g' webrun/$fil >compare/$fil
       else
          echo "Missing file: webrun/$fil"
       fi
@@ -340,7 +340,7 @@ elif [ 1 -eq 1 ]; then
    for fil in $logfiles; do
       if [ -r webrun/$fil ]; then
          # remove line-number and time/date
-         perl -pe 's/on\s+line:\s+\d+/_LINENO_/g; s/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2},\d+)?/_TIMESTAMP_/g; s/\d{4}-\d{2}-\d{2}/_DATE_/g' webrun/$fil | sort | uniq >t_log2 
+         perl -pe 's/on\s+line:\s+\d+/_LINENO_/g; s/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2}[,\.]?\d+)?/_TIMESTAMP_/g; s/\d{4}-\d{2}-\d{2}/_DATE_/g' webrun/$fil | sort | uniq >t_log2 
          echo "========== diff for $fil (new vs. old):" >>t_result
          sort compare/$fil | uniq >t_log3
          diff t_log2 t_log3 >>t_result
