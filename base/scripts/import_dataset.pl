@@ -792,6 +792,7 @@ sub _get_contact_id {
     $logger->debug("found contact-(author,organization)=($author,$organization) in sru/iso19115\n") if $logger->is_debug();
     
     # search for existing author/organization
+    ($author, $organization) =  map {defined $_ ? uc($_) : undef} ($author, $organization);
     my $authorSQL = defined $author ? "author = ?" : "author IS NULL";
     my $orgSQL = defined $organization ? "organization = ?" : "organization IS NULL";
     my $sth_search = $dbh->prepare_cached(<<"SQL");
@@ -800,7 +801,7 @@ SELECT id_contact
  WHERE $authorSQL
    AND $orgSQL 
 SQL
-    my @authorOrganization = map {defined $_ ? uc($_) : ()} ($author, $organization);
+    my @authorOrganization = map {defined $_ ? $_ : ()} ($author, $organization);
     $sth_search->execute(@authorOrganization);
     my $contact_id;
     while (my $row = $sth_search->fetchrow_arrayref) {
@@ -814,7 +815,7 @@ SQL
     my $sth = $dbh->prepare_cached(<<"SQL");
 INSERT INTO sru.meta_contact ( author, organization ) VALUES ( ?, ? )
 SQL
-    $sth->execute(uc($author), uc($organization));
+    $sth->execute($author, $organization);
     $contact_id = $dbh->last_insert_id(undef, 'sru', 'meta_contact', undef);
     if (! defined $contact_id) {
         $logger->error("cannot determine contact id from database\n");
