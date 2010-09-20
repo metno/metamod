@@ -107,9 +107,9 @@ sub _send_email {
     my $mailer = Mail::Mailer->new( $mail_type );
     $mailer->open( $email_header );
     print $mailer $email_body;
-    my $error = $mailer->close();
+    my $success = $mailer->close();
     
-    if( $error ){
+    if( !$success ){
         $self->{ _logger }->error("Failed to send email: $!");
         return;
     } 
