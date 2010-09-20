@@ -800,8 +800,8 @@ SELECT id_contact
  WHERE $authorSQL
    AND $orgSQL 
 SQL
-    $sth_search->execute(defined $author ? uc($author) : (),
-                         defined $organization ? uc($organization) : ());
+    my @authorOrganization = map {defined $_ ? uc($_) : ()} ($author, $organization);
+    $sth_search->execute(@authorOrganization);
     my $contact_id;
     while (my $row = $sth_search->fetchrow_arrayref) {
         $contact_id = $row->[0]; # max one row, schema enforces uniqueness
@@ -814,7 +814,7 @@ SQL
     my $sth = $dbh->prepare_cached(<<"SQL");
 INSERT INTO sru.meta_contact ( author, organization ) VALUES ( ?, ? )
 SQL
-    $sth->execute($author, $organization);
+    $sth->execute(uc($author), uc($organization));
     $contact_id = $dbh->last_insert_id(undef, 'sru', 'meta_contact', undef);
     if (! defined $contact_id) {
         $logger->error("cannot determine contact id from database\n");
