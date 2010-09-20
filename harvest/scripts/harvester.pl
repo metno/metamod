@@ -274,14 +274,14 @@ sub getlaststatus {
    my $stm = $dbh->prepare("SELECT HS_time FROM HarvestStatus WHERE HS_application = ? AND HS_url = ?" );
    $stm->execute($app, $source) or die($dbh->errstr);
    my ($lastharvest) = $stm->fetchrow_array;
-   $log->debug("Last update for $app: $source was $lastharvest");
+   $log->debug("Last update for $app: $source was " . $lastharvest || 'never');
    return $lastharvest; # is undef if not found
 }
 
 sub updatestatus {
    my ($dbh, $app, $source, $lasttime) = @_;
 
-   $log->debug("Logging status for $app: $source to database [$lasttime]");
+   $log->debug("Logging status for $app: $source to database");
    my $stm = $dbh->prepare(
       $lasttime
       ? "UPDATE HarvestStatus SET HS_time = now() WHERE HS_application = ? AND HS_url = ?"
@@ -301,9 +301,9 @@ sub process_DIF_records {
     my $oaiDoc;
     eval {
         $oaiDoc = $parser->parse_string($content_from_get);
-        $log->info("successfully parsed content\n");
+        $log->debug("successfully parsed content\n");
         if ($harvest_schema) {
-            $log->debug("validating ...");
+            # $log->debug("validating ...");
             $harvest_schema->validate($oaiDoc);
             $log->debug("successfully validated content");
         }
