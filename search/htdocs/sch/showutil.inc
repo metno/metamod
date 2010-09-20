@@ -32,6 +32,7 @@
 include_once 'gautil.inc';
 require_once("../funcs/mmFimex.inc");
 require_once("../funcs/mmWMS2.inc");
+require_once("../funcs/mmUserbase.inc");
 
 function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = false, $level1 = false ) {
 	global $mmConfig;
@@ -54,7 +55,14 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = f
       $s1 .= "<div class=\"btns\">";
       
       if( $level1 && $mmConfig->getVar('SUBSCRIPTION_ENABLED') == 'ENABLED' ){
-          $s1 .= "<a class=\"btn\" href=\"subscription.php?action=display_email_form&dataset_name=$nameshown\"><span>Subscribe</span></a><br/>";          
+          
+          # the subscription button should only be shown for datasets that are in the user base.
+          $applicId = $mmConfig->getVar('APPLICATION_ID');
+          $userbase = new MM_Userbase();
+          if( $userbase->dset_find( $applicId, $nameshown ) ){          
+            $s1 .= "<a class=\"btn\" href=\"subscription.php?action=display_email_form&dataset_name=$nameshown\"><span>Subscribe</span></a><br/>";
+          }
+          $userbase->close();          
       }
       
       if ($wmsSetup) {
