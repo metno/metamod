@@ -87,9 +87,9 @@ sub activate_subscription_handlers {
             next;
         }
 
-        my $error = $handler->push_to_subscribers( $ds, $subs );
-        if ($error) {
-            $self->{_logger}->error("Failed to push to subscribers for type '$type': $error");
+        my $success = $handler->push_to_subscribers( $ds, $subs );
+        if (!$success) {
+            $self->{_logger}->error("Failed to push to subscribers for type '$type'.");
         } else {
             $num_subscriptions += scalar @$subs;
         }
