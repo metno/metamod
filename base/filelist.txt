@@ -7,6 +7,7 @@ init/update_to_Fulltext.sh
 init/sruSchema.sql
 userinit/createuserdb.sh
 userinit/run_createuserdb.sh
+=userinit/load_userbase.pl
 =scripts/import_dataset.pl
 =htdocs/adm/highlight.html
 =htdocs/adm/highlight.php

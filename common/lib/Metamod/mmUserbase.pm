@@ -1055,7 +1055,7 @@ the owner of the new dataset.
 
 IN: Dataset name, dataset key.
 
-Return value: TRUE on success, FALSE on error.
+Return value: TRUE on success, FALSE on error / dataset already exists.
 
 =cut
 
@@ -1094,7 +1094,7 @@ Return value: TRUE on success, FALSE on error.
         $current_ds_id{$ident}   = $href->{"ds_id"};
         $current_ds_name{$ident} = $dataset_name;
         $current_ds_uid{$ident}  = $user_array->{"u_id"};
-        if ( !$self->info_put( "DSKEY", $dataset_key ) ) {
+        if ( !$self->dset_put( "DSKEY", $dataset_key ) ) {
             return FALSE();
         }
         return TRUE();
@@ -1756,7 +1756,7 @@ Return value: TRUE on success, FALSE on error.
             my $sql3 =
                   "UPDATE File\n"
                 . "   SET ("
-                . $user_ordinary_fields
+                . $file_ordinary_fields
                 . ") = \n"
                 . "       ("
                 . $valuelist . ")\n"

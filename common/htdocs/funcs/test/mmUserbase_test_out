@@ -76,6 +76,24 @@ $userbase->infoUDS_new("<XML>with an embedded apostrophe: '</XML>")
    OK   Result: 1
 $userbase->infoUDS_new("<subs>Another XML</subs>")
    OK   Result: 1
+$userbase->infoUDS_set("SUBSCRIPTION_XML","USER_AND_DATASET")
+   OK   Result: 2
+$userbase->infoUDS_delete()
+   OK   Result: 1
+$userbase->infoUDS_get()
+   ERROR:   No infoUDS record defined
+$userbase->infoUDS_next()
+   OK   Result: 1
+$userbase->infoUDS_get()
+   OK   Result: <subs>Another XML</subs>
+$userbase->infoUDS_set("SUBSCRIPTION_XML","USER_AND_DATASET")
+   OK   Result: 1
+$userbase->infoUDS_get()
+   OK   Result: <subs>Another XML</subs>
+$userbase->infoUDS_next()
+   INFO:    No more rows in the set of infoUDS rows
+$userbase->infoUDS_get()
+   OK   Result: <subs>Another XML</subs>
 $userbase->user_find('bingo@barcelona.com','SPONG')
    OK   Result: 1
 $userbase->infoUDS_set("SUBSCRIPTION_XML","USER")
