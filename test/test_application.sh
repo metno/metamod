@@ -321,7 +321,7 @@ grep '\[INFO\]' webrun/metamod.log > webrun/metamod.log_info
 grep -v '\[INFO\]' webrun/metamod.log | grep -v '\[DEBUG\]' > webrun/metamod.log_warnerror
 # 
 # compare info logs
-logfiles='syserrors metamod.log_info'
+logfiles='metamod.log_info'
 if [ -z "`ls compare`" ]; then
    for fil in $logfiles; do
       if [ -r webrun/$fil ]; then
@@ -331,12 +331,11 @@ if [ -z "`ls compare`" ]; then
          echo "Missing file: webrun/$fil"
       fi
    done
-elif [ 1 -eq 1 ]; then
+else
    echo "`whoami`@`uname -n`:`pwd`" >t_result
-   count=1
    echo "========== metamod.log warnings:" >>t_result
+   count=2
    cat webrun/metamod.log_warnerror >> t_result
-   count=`expr $count + 1`
    for fil in $logfiles; do
       if [ -r webrun/$fil ]; then
          # remove line-number and time/date
@@ -353,15 +352,6 @@ elif [ 1 -eq 1 ]; then
    if [ $lines -ne $count ]; then
       mail -s "METAMOD2 $idstring test gives unexpected output" $developeremail <t_result
    fi
-else
-   echo "`whoami`@`uname -n`:`pwd`" >t_result
-   echo "======= syserrors:" >>t_result
-   cat webrun/syserrors >>t_result
-   echo "======= databaselog:" >>t_result
-   cat webrun/databaselog >>t_result
-   echo "======= upload_monitor.out:" >>t_result
-   cat webrun/upload_monitor.out >>t_result
-   mail -s "METAMOD2 output from $idstring test" $developeremail <t_result
 fi
 
 # keep it running after testing
