@@ -58,13 +58,13 @@ GRANT ALL PRIVILEGES ON InfoUDS TO "[==PG_WEB_USER==]";
 GRANT ALL PRIVILEGES ON InfoUDS_i_id_seq TO "[==PG_WEB_USER==]";
 
 CREATE TABLE File (
-   ds_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
+   u_id               INTEGER       NOT NULL REFERENCES UserTable ON DELETE CASCADE,
    f_name             VARCHAR(9999) NOT NULL,
    f_timestamp        VARCHAR(9999),
    f_size             INTEGER,
    f_status           VARCHAR(9999),
    f_errurl           VARCHAR(9999),
-   PRIMARY KEY (ds_id, f_name)
+   PRIMARY KEY (u_id, f_name)
 );
 GRANT ALL PRIVILEGES ON File TO "[==PG_WEB_USER==]";
 
