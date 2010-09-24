@@ -47,6 +47,9 @@ use constant MM2 => <<'EOT';
    xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
 </MM2>
 EOT
+
+my $logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
+
 sub new {
     my ($class, %options) = @_;
     my $sDate = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime(mmTtime::ttime()));
@@ -153,9 +156,24 @@ sub removeMetadataName {
     return @oldValues;
 }
 
-sub getMM2_XML {
+sub getDatasetRegion {
     my ($self) = @_;
-    return $self->getMETA_XML;
+    my $region = $self->SUPER::getDatasetRegion;
+    my %bb = $region->getBoundingBox;
+    if (scalar keys %bb == 0) {
+        $logger->debug("no bounding-box found, try extraction from metadata");
+        # extract bb from metadata
+        my %metadata = $self->getMetadata;
+        if (exists $metadata{bounding_box}) {
+            foreach my $bbText (@{ $metadata{bounding_box} }) {
+                my %bb;
+                $logger->debug("extending bounding-box from metadata to ($bbText)");
+                @bb{qw(east south west north)} = split ',', $bbText;
+                $region->extendBoundingBox(\%bb);
+            }
+        }
+    }
+    return $region;
 }
 
 
@@ -226,42 +244,6 @@ can be read.
 
 Return: $dataset object
 
-
-=item writeToFile($basename)
-
-see L<Metamod::ForeignDataset>
-
-=item getXMD_XML
-
-see L<Metamod::ForeignDataset>
-
-=item getMM2_XML
-
-see L<Metamod::ForeignDataset::getMETA_XML>
-Return: xml-string of MM2
-
-=item getInfo()
-
-see L<Metamod::ForeignDataset>
-
-=item setInfo(\%info)
-
-see L<Metamod::ForeignDataset>
-
-=item originalFormat()
-
-see L<Metamod::ForeignDataset>
-
-=item getQuadtree()
-
-see L<Metamod::ForeignDataset>
-
-=item setQuadtree(\@quadtree_nodes)
-
-see L<Metamod::ForeignDataset>
-
-Return: @oldQuadtree_nodes
-
 =item getMetadata()
 
 read the Metadata
@@ -285,6 +267,12 @@ Return: undef
 remove all metadata with $name
 
 Return: @values list of $name
+
+=item getDatasetRegion
+
+overwritten function from L<Metamod::ForeignDataset>. When ForeignDataset's region
+returns a invalid region (do polygon) without bounding-box, this function will
+try to extract the bounding-box from the metadata, i.e. bounding_box.  
 
 =back
 
