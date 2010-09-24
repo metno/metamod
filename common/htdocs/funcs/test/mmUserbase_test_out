@@ -40,14 +40,14 @@ $userbase->file_find('myfile')
    INFO:    No such file
 $userbase->file_create('myfile')
    OK   Result: 1
-$userbase->file_put('f_timestamp','2011-01-01')
+$userbase->file_put('f_size','999')
    OK   Result: 1
 $userbase->file_first()
    OK   Result: 1
 $userbase->file_get('f_timestamp')
-   OK   Result: 2011-01-01
+   OK   Result: __TIMESTAMP__
 $userbase->file_next()
-   INFO:    No more files for the current dataset
+   INFO:    No more files for the current user
 $userbase->file_find('myfile')
    OK   Result: 1
 $userbase->dset_create('DS-NEW','KEY')

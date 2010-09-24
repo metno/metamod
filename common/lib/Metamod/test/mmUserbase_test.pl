@@ -30,6 +30,9 @@ foreach my $cmd (@test_commands) {
          print '   INFO:    ' . $userbase->get_exception() . "\n";
       }
    } else {
+      if ($result =~ /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ$/) {
+         $result = '__TIMESTAMP__';
+      }
       print "   OK   Result: ".$result."\n";
    }
 }

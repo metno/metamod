@@ -80,6 +80,7 @@ to look at the status of recently uploaded files.
 use Scalar::Util;
 BEGIN { *ident = \&Scalar::Util::refaddr; }
 use DBI;
+use POSIX qw();
 use Metamod::Config;
 use constant TRUE => 1;
 use constant FALSE => 0;
@@ -101,13 +102,13 @@ use constant FALSE => 0;
     my %current_user_ix;            # Index in the allusers array containing the u_id of current user
     my %user_ordinary_fields
         ;    # Commaseparated list of fields in the User database table (except u_id, a_id and u_email).
-    my %file_ordinary_fields;    # Commaseparated list of fields in the File database table (except ds_id and f_name).
+    my %file_ordinary_fields;    # Commaseparated list of fields in the File database table (except u_id and f_name).
     my %integer_fields;          # Array of field names of integer type (all tables)
     my %users_datasets
         ;              # Array with ds_id's for all datasets belonging to the current user. Sorted on increasing ds_id's
-    my %dataset_files; # Array with f_name's for all files belonging to the current dataset.
+    my %users_files; # Array with f_name's for all files belonging to the current user.
     my %current_ds_ix; # Index in the users_datasets array representing the current dataset for the current user
-    my %current_file_ix;      # Index in the dataset_files array representing the current file for the current dataset
+    my %current_file_ix;      # Index in the users_files array representing the current file for the current user
     my %current_ds_id;        # ds_id of the current dataset for the current user
     my %current_ds_name;      # ds_name of the current dataset for the current user
     my %current_ds_uid;       # U_id of user owning the current dataset
@@ -433,7 +434,7 @@ Othervise FALSE.
         delete $file_ordinary_fields{$ident};
         delete $integer_fields{$ident};
         delete $users_datasets{$ident};
-        delete $dataset_files{$ident};
+        delete $users_files{$ident};
         delete $current_ds_ix{$ident};
         delete $current_file_ix{$ident};
         delete $current_ds_id{$ident};
@@ -1714,6 +1715,7 @@ Return value: TRUE on success, FALSE on error.
         my $current_ds_name      = $current_ds_name{$ident};
         my $file_ordinary_fields = $file_ordinary_fields{$ident};
         my $user_ordinary_fields = $user_ordinary_fields{$ident};
+        my $user_array           = $user_array{$ident};
         if ( !defined($file_array) ) {
             $self->_note_exception( 1, "_update_file() found no current file" );
             return FALSE();
@@ -1722,12 +1724,16 @@ Return value: TRUE on success, FALSE on error.
             $self->_note_exception( 1, "_update_file() found no f_name in file_array" );
             return FALSE();
         }
-        if ( !defined($current_ds_id) ) {
-            $self->_note_exception( 1, "_update_file() found no current dataset" );
+        if ( !defined($user_array) ) {
+            $self->_note_exception( 1, "_update_file() No current user" );
             return FALSE();
         }
-        my $sql1 = "SELECT ds_id, f_name FROM File\n"
-            . $self->_get_SQL_WHERE_clause( 'ds_id, f_name', [ $current_ds_id, $file_array->{'f_name'} ] );
+        if ( !defined( $user_array->{"u_id"} ) ) {
+            $self->_note_exception( 1, "_update_file() found no u_id in user_array" );
+            return FALSE();
+        }
+        my $sql1 = "SELECT u_id, f_name FROM File\n"
+            . $self->_get_SQL_WHERE_clause( 'u_id, f_name', [ $user_array->{"u_id"}, $file_array->{'f_name'} ] );
         if ( !$self->_do_query($sql1) ) {
             return FALSE();
         }
@@ -1738,16 +1744,17 @@ Return value: TRUE on success, FALSE on error.
                     . $rowcount
                     . ") with same f_name= "
                     . $file_array->{"f_name"}
-                    . " for dataset "
-                    . $current_ds_name );
+                    . " for user "
+                    . $user_array->{"u_id"} );
             return FALSE();
         }
+        $file_array->{'f_timestamp'} = POSIX::strftime("%Y-%m-%dT%H:%M:%SZ", gmtime());
         my $valuelist;
         if ( $rowcount == 0 ) {
-            $valuelist = $current_ds_id . ", ";
+            $valuelist = $user_array->{"u_id"} . ", ";
             $valuelist .= $self->_get_SQL_value_list( "f_name, " . $file_ordinary_fields, $file_array );
             my $sql2 =
-                "INSERT INTO File (ds_id, f_name, " . $file_ordinary_fields . ")\n" . "   VALUES (" . $valuelist . ")";
+                "INSERT INTO File (u_id, f_name, " . $file_ordinary_fields . ")\n" . "   VALUES (" . $valuelist . ")";
             if ( !$self->_do_query($sql2) ) {
                 return FALSE();
             }
@@ -1760,7 +1767,7 @@ Return value: TRUE on success, FALSE on error.
                 . ") = \n"
                 . "       ("
                 . $valuelist . ")\n"
-                . $self->_get_SQL_WHERE_clause( 'ds_id, f_name', [ $current_ds_id, $file_array->{'f_name'} ] );
+                . $self->_get_SQL_WHERE_clause( 'u_id, f_name', [ $user_array->{"u_id"}, $file_array->{'f_name'} ] );
             if ( !$self->_do_query($sql3) ) {
                 return FALSE();
             }
@@ -1771,7 +1778,7 @@ Return value: TRUE on success, FALSE on error.
 
 =item file_find($file_name)
 
-Search for an existing file (owned by the curent dataset) and make it the current file.
+Search for an existing file (owned by the curent user) and make it the current file.
 
 IN: File name (F_name).
 
@@ -1787,8 +1794,13 @@ Return value: TRUE on success, FALSE on error / no such file.
         my $current_ds_name      = $current_ds_name{$ident};
         my $pending_file_updates = $pending_file_updates{$ident};
         my $file_ordinary_fields = $file_ordinary_fields{$ident};
-        if ( !defined($current_ds_id) ) {
-            $self->_note_exception( 1, "No current dataset" );
+        my $user_array           = $user_array{$ident};
+        if ( !defined($user_array) ) {
+            $self->_note_exception( 1, "No current user" );
+            return FALSE();
+        }
+        if ( !defined( $user_array->{"u_id"} ) ) {
+            $self->_note_exception( 1, "Found no u_id in user_array" );
             return FALSE();
         }
         if ($pending_file_updates) {
@@ -1797,10 +1809,10 @@ Return value: TRUE on success, FALSE on error / no such file.
             }
         }
         my $sql1 =
-              "SELECT "
+              "SELECT u_id, f_name, "
             . $file_ordinary_fields
             . " FROM File "
-            . $self->_get_SQL_WHERE_clause( 'ds_id, f_name', [ $current_ds_id, $file_name ] );
+            . $self->_get_SQL_WHERE_clause( 'u_id, f_name', [ $user_array->{"u_id"}, $file_name ] );
         if ( !$self->_do_query($sql1) ) {
             return FALSE();
         }
@@ -1815,20 +1827,17 @@ Return value: TRUE on success, FALSE on error / no such file.
                     . $rowcount
                     . ") with same f_name= "
                     . $file_name
-                    . " for dataset "
-                    . $current_ds_name );
+                    . " for user with u_id = "
+                    . $user_array->{"u_id"} );
             return FALSE();
         }
-        my $file_array = $self->_fetch_row_as_hashref(0);
-        $file_array->{"ds_id"}  = $current_ds_id;
-        $file_array->{"f_name"} = $file_name;
-        $file_array{$ident}     = $file_array;
+        $file_array{$ident} = $self->_fetch_row_as_hashref(0);
         return TRUE();
     }
 
 =item file_create($file_name)
 
-Create a new file (for the current dataset) and make it the current file.
+Create a new file (for the current user) and make it the current file.
 
 IN: File name (F_name)
 
@@ -1843,12 +1852,17 @@ Return value: TRUE on success, FALSE on error.
         my $current_ds_id        = $current_ds_id{$ident};
         my $current_ds_name      = $current_ds_name{$ident};
         my $pending_file_updates = $pending_file_updates{$ident};
-        if ( !defined($current_ds_id) ) {
-            $self->_note_exception( 1, "No current dataset" );
+        my $user_array           = $user_array{$ident};
+        if ( !defined($user_array) ) {
+            $self->_note_exception( 1, "No current user" );
             return FALSE();
         }
-        my $sql1 = "SELECT ds_id, f_name FROM File "
-            . $self->_get_SQL_WHERE_clause( 'ds_id, f_name', [ $current_ds_id, $file_name ] );
+        if ( !defined( $user_array->{"u_id"} ) ) {
+            $self->_note_exception( 1, "Found no u_id in user_array" );
+            return FALSE();
+        }
+        my $sql1 = "SELECT u_id, f_name FROM File "
+            . $self->_get_SQL_WHERE_clause( 'u_id, f_name', [ $user_array->{"u_id"}, $file_name ] );
         if ( !$self->_do_query($sql1) ) {
             return FALSE();
         }
@@ -1863,7 +1877,7 @@ Return value: TRUE on success, FALSE on error.
             }
         }
         my $file_array = {};
-        $file_array->{"ds_id"}        = $current_ds_id;
+        $file_array->{"u_id"}        = $user_array->{"u_id"};
         $file_array->{"f_name"}       = $file_name;
         $file_array{$ident}           = $file_array;
         $pending_file_updates{$ident} = TRUE();
@@ -1931,79 +1945,67 @@ Return value: Property value or FALSE on error.
 
 =item file_first()
 
-Make the first file (in the current dataset) the current file.
+Make the first file (owned by the current user) the current file.
 
 Return value: TRUE on success, FALSE on error / no files owned by the current dataset.
 
 =cut
 
-    #     This method updates the internal 'dataset_files'
-    #     array that contains the f_name's of all files owned by the current dataset.
+    #     This method updates the internal 'users_files'
+    #     array that contains the f_name's of all files owned by the current user.
     #
     sub file_first {
-
-        # print "FROM file_first: start\n";
         my $self                 = shift;
         my $ident                = ident($self);
         my $pending_file_updates = $pending_file_updates{$ident};
         my $current_ds_id        = $current_ds_id{$ident};
         my $current_ds_name      = $current_ds_name{$ident};
         my $file_ordinary_fields = $file_ordinary_fields{$ident};
+        my $user_array           = $user_array{$ident};
+        if ( !defined($user_array) ) {
+            $self->_note_exception( 1, "No current user" );
+            return FALSE();
+        }
+        if ( !defined( $user_array->{"u_id"} ) ) {
+            $self->_note_exception( 1, "Found no u_id in user_array" );
+            return FALSE();
+        }
         if ($pending_file_updates) {
             if ( !$self->_update_file() ) {
                 return FALSE();
             }
         }
-
-        # print "FROM file_first: initialisation finished\n";
-        if ( !defined($current_ds_id) ) {
-            $self->_note_exception( 1, "No current dataset" );
-            return FALSE();
-        }
-        my $dataset_files = [];
-
-        # print "FROM file_first: local dataset_files arrayref created\n";
-        my $sql1 = "SELECT f_name FROM File WHERE ds_id = " . $current_ds_id;
+        my $users_files = [];
+        my $sql1 = "SELECT f_name FROM File WHERE u_id = " . $user_array->{"u_id"};
         if ( !$self->_do_query($sql1) ) {
             return FALSE();
         }
-
-        # print "FROM file_first: Successfully done: $sql1\n";
         my $rowcount = $self->_pg_num_rows();
         if ( $rowcount == 0 ) {
-            $self->_note_exception( 0, "No files in the database for dataset " . $current_ds_name );
+            $self->_note_exception( 0, "No files in the database for user with u_id = " . $user_array->{"u_id"} );
             return FALSE();
         }
-
-        # print "FROM file_first: rowcount: $rowcount\n";
         my $i1 = 0;
         while ( $i1 < $rowcount ) {
             my $href = $self->_fetch_row_as_hashref($i1);
-            $dataset_files->[$i1] = $href->{"f_name"};
+            $users_files->[$i1] = $href->{"f_name"};
             $i1++;
         }
         my $sql2 =
-              "SELECT f_name, "
+              "SELECT u_id, f_name, "
             . $file_ordinary_fields
             . " FROM File "
-            . $self->_get_SQL_WHERE_clause( 'ds_id, f_name', [ $current_ds_id, $dataset_files->[0] ] );
+            . $self->_get_SQL_WHERE_clause( 'u_id, f_name', [ $user_array->{"u_id"}, $users_files->[0] ] );
         if ( !$self->_do_query($sql2) ) {
             return FALSE();
         }
-
-        # print "FROM file_first: Successfully done: $sql2\n";
         my $file_array = $self->_fetch_row_as_hashref(0);
         if ( !$file_array ) {
             return FALSE();
         }
-
-        # print "FROM file_first: Successfully run: _fetch_row_as_hashref(0)\n";
-        $file_array->{'ds_id'}   = $current_ds_id;
         $current_file_ix{$ident} = 0;
         $file_array{$ident}      = $file_array;
-        $dataset_files{$ident}   = $dataset_files;
-
-        # print "FROM file_first: returning TRUE\n";
+        $users_files{$ident}   = $users_files;
         return TRUE();
     }
 
@@ -2019,35 +2021,40 @@ Return value: TRUE on success, FALSE on error / no more files.
         my $self                 = shift;
         my $ident                = ident($self);
         my $pending_file_updates = $pending_file_updates{$ident};
-        my $dataset_files        = $dataset_files{$ident};
+        my $users_files        = $users_files{$ident};
         my $current_ds_id        = $current_ds_id{$ident};
         my $current_file_ix      = $current_file_ix{$ident};
         my $file_ordinary_fields = $file_ordinary_fields{$ident};
+        my $user_array           = $user_array{$ident};
+        if ( !defined($user_array) ) {
+            $self->_note_exception( 1, "No current user" );
+            return FALSE();
+        }
+        if ( !defined( $user_array->{"u_id"} ) ) {
+            $self->_note_exception( 1, "Found no u_id in user_array" );
+            return FALSE();
+        }
         if ($pending_file_updates) {
 
             if ( !$self->_update_file() ) {
                 return FALSE();
             }
         }
-        if ( !defined($current_ds_id) ) {
-            $self->_note_exception( 1, "No current dataset" );
-            return FALSE();
-        }
-        if ( !defined($dataset_files) ) {
+        if ( !defined($users_files) ) {
             $self->_note_exception( 1, "No current set of files. File_first not called?" );
             return FALSE();
         }
         my $ix = $current_file_ix + 1;
-        if ( $ix >= scalar @{$dataset_files} ) {
-            $self->_note_exception( 0, "No more files for the current dataset" );
+        if ( $ix >= scalar @{$users_files} ) {
+            $self->_note_exception( 0, "No more files for the current user" );
             return FALSE();
         }
-        my $file_name = $dataset_files->[$ix];
+        my $file_name = $users_files->[$ix];
         my $sql1 =
-              "SELECT f_name, "
+              "SELECT u_id, f_name, "
             . $file_ordinary_fields
             . " FROM File "
-            . $self->_get_SQL_WHERE_clause( 'ds_id, f_name', [ $current_ds_id, $file_name ] );
+            . $self->_get_SQL_WHERE_clause( 'u_id, f_name', [ $user_array->{"u_id"}, $file_name ] );
         if ( !$self->_do_query($sql1) ) {
             return FALSE();
         }
@@ -2060,7 +2067,6 @@ Return value: TRUE on success, FALSE on error / no more files.
         if ( !$file_array ) {
             return FALSE();
         }
-        $file_array->{'ds_id'}   = $current_ds_id;
         $current_file_ix{$ident} = $ix;
         $file_array{$ident}      = $file_array;
         return TRUE();

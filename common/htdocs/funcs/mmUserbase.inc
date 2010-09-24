@@ -52,16 +52,16 @@ class MM_Userbase {
    protected $user_ordinary_fields;   # Commaseparated list of fields in the UserTable
                                       # database table (except u_id, a_id and u_email).
    protected $file_ordinary_fields;   # Commaseparated list of fields in the File
-                                      # database table (except ds_id and f_name).
+                                      # database table (except u_id, ds_id and f_name).
    protected $integer_fields;   # Array of field names of integer type (all tables)
    protected $users_datasets;   # Array with ds_id's for all datasets belonging to the current
                               # user. Sorted on increasing ds_id's
-   protected $dataset_files;   # Array with f_name's for all files belonging to the current
-                              # dataset.
+   protected $users_files;   # Array with f_name's for all files belonging to the current
+                              # user.
    protected $current_ds_ix;   # Index in the users_datasets array representing the current
                                # dataset for the current user
-   protected $current_file_ix;   # Index in the dataset_files array representing the current
-                               # file for the current dataset
+   protected $current_file_ix;   # Index in the users_files array representing the current
+                               # file for the current user.
    protected $current_ds_id;   # ds_id of the current dataset
    protected $current_ds_name;   # ds_name of the current dataset
    protected $current_ds_uid;   # U_id of user owning the current dataset
@@ -1095,12 +1095,16 @@ class MM_Userbase {
          $this->note_exception(1,"update_file() found no f_name in file_array");
          return FALSE;
       }
-      if (!isset($this->current_ds_id)) {
-         $this->note_exception(1,"update_file() found no current dataset");
+      if (!isset($this->user_array)) {
+         $this->note_exception(1,"No current user");
          return FALSE;
       }
-      $sql1 = "SELECT ds_id, f_name FROM File\n" .
-         $this->get_SQL_WHERE_clause('ds_id, f_name',array($this->current_ds_id,$this->file_array['f_name']));
+      if (!isset($this->user_array['u_id'])) {
+         $this->note_exception(1,"update_file() no u_id in user_array");
+         return FALSE;
+      }
+      $sql1 = "SELECT u_id, f_name FROM File\n" .
+         $this->get_SQL_WHERE_clause('u_id, f_name',array($this->user_array['u_id'],$this->file_array['f_name']));
       $qhandle = $this->do_query($sql1);
       if ($qhandle === FALSE) {
          return FALSE;
@@ -1108,14 +1112,16 @@ class MM_Userbase {
       $rowcount = pg_num_rows($qhandle);
       if ($rowcount > 1) {
          $this->note_exception(1,"update_file() found multiple files (".$rowcount.") with same f_name= ".
-                               $this->file_array['f_name']." for dataset ".$this->current_ds_name);
+                               $this->file_array['f_name']." for user ".$this->user_array['u_id']);
          return FALSE;
       }
+      date_default_timezone_set('UTC');
+      $this->file_array['f_timestamp'] = date('Y-m-d\Th:i:s\Z');
       if ($rowcount == 0) {
-         $valuelist = $this->current_ds_id . ", ";
+         $valuelist = $this->user_array['u_id'] . ", ";
          $valuelist .= $this->get_SQL_value_list("f_name, " . $this->file_ordinary_fields,
                                                  $this->file_array);
-         $sql1 = "INSERT INTO File (ds_id, f_name, " . $this->file_ordinary_fields . ")\n" .
+         $sql1 = "INSERT INTO File (u_id, f_name, " . $this->file_ordinary_fields . ")\n" .
             "   VALUES (" . $valuelist . ")";
          $qhandle = $this->do_query($sql1);
          if ($qhandle === FALSE) {
@@ -1126,7 +1132,7 @@ class MM_Userbase {
          $sql1 = "UPDATE File\n" .
             "   SET (" . $this->user_ordinary_fields . ") = \n" .
             "       (" . $valuelist . ")\n" .
-            $this->get_SQL_WHERE_clause('ds_id, f_name',array($this->current_ds_id,$this->file_array['f_name']));
+            $this->get_SQL_WHERE_clause('u_id, f_name',array($this->user_array['u_id'],$this->file_array['f_name']));
          $qhandle = $this->do_query($sql1);
          if ($qhandle === FALSE) {
             return FALSE;
@@ -1136,11 +1142,15 @@ class MM_Userbase {
       return TRUE;
    }
 #   
-#      Find file within current dataset
+#      Find file owned by current user
 #   
    public function file_find($file_name) {
-      if (!isset($this->current_ds_id)) {
-         $this->note_exception(1,"No current dataset");
+      if (!isset($this->user_array)) {
+         $this->note_exception(1,"No current user");
+         return FALSE;
+      }
+      if (!isset($this->user_array['u_id'])) {
+         $this->note_exception(1,"u_id not found in user_array");
          return FALSE;
       }
       if ($this->pending_file_updates) {
@@ -1148,8 +1158,8 @@ class MM_Userbase {
             return FALSE;
          }
       }
-      $sql1 = "SELECT " . $this->file_ordinary_fields . " FROM File ".
-          $this->get_SQL_WHERE_clause('ds_id, f_name',array($this->current_ds_id,$file_name));
+      $sql1 = "SELECT u_id, f_name, " . $this->file_ordinary_fields . " FROM File ".
+          $this->get_SQL_WHERE_clause('u_id, f_name',array($this->user_array['u_id'],$file_name));
       $qhandle = $this->do_query($sql1);
       if ($qhandle === FALSE) {
          return FALSE;
@@ -1161,7 +1171,7 @@ class MM_Userbase {
       }
       if ($rowcount != 1) {
         $this->note_exception(1,"Multiple files (".$rowcount.") with same f_name= ".$file_name.
-                            " for dataset ".$this->current_ds_name);
+                            " for user with u_id = ".$this->user_array['u_id']);
         return FALSE;
       }
       $this->file_array = pg_fetch_assoc($qhandle,0);
@@ -1169,23 +1179,25 @@ class MM_Userbase {
          $this->note_exception(1,"pg_fetch_assoc returns FALSE");
          return FALSE;
       }
-      $this->file_array["ds_id"] = $this->current_ds_id;
-      $this->file_array["f_name"] = $file_name;
       return TRUE;
    }
 #   
 #      Create new entry in the File table:
 #   
    public function file_create($file_name) {
-      if (!isset($this->current_ds_id)) {
-         $this->note_exception(1,"No current dataset");
+      if (!isset($this->user_array)) {
+         $this->note_exception(1,"No current user");
+         return FALSE;
+      }
+      if (!isset($this->user_array['u_id'])) {
+         $this->note_exception(1,"u_id not found in user_array");
          return FALSE;
       }
 #      
 #       Check if the file entry already exists:
 #      
-      $sql1 = "SELECT ds_id, f_name FROM File\n" .
-          $this->get_SQL_WHERE_clause('ds_id, f_name',array($this->current_ds_id,$file_name));
+      $sql1 = "SELECT u_id, f_name FROM File\n" .
+          $this->get_SQL_WHERE_clause('u_id, f_name',array($this->user_array['u_id'],$file_name));
       $qhandle = $this->do_query($sql1);
       if ($qhandle === FALSE) {
          return FALSE;
@@ -1204,7 +1216,7 @@ class MM_Userbase {
 #        Initialize the new file array:
 #      
       $this->file_array = array();
-      $this->file_array['ds_id'] = $this->current_ds_id;
+      $this->file_array['u_id'] = $this->user_array['u_id'];
       $this->file_array['f_name'] = $file_name;
       $this->pending_file_updates = TRUE;
       return TRUE;
@@ -1245,38 +1257,42 @@ class MM_Userbase {
       return $this->file_array[$property];
    }
 #
-#      Get first file for the current daaset. This method updates the internal 'dataset_files'
-#      array that contains the f_name's of all files owned by the current dataset.
+#      Get first file for the current user. This method updates the internal 'users_files'
+#      array that contains the f_name's of all files owned by the current user.
 #
    public function file_first() {
+      if (!isset($this->user_array)) {
+         $this->note_exception(1,"No current user");
+         return FALSE;
+      }
+      if (!isset($this->user_array['u_id'])) {
+         $this->note_exception(1,"u_id not found in user_array");
+         return FALSE;
+      }
       if ($this->pending_file_updates) {
          if ($this->update_file() === FALSE) {
             return FALSE;
          }
       }
-      if (!isset($this->current_ds_id)) {
-         $this->note_exception(1,"No current dataset");
-         return FALSE;
-      }
-      $this->dataset_files = array();
-      $sql1 = "SELECT f_name FROM File WHERE ds_id = ".$this->current_ds_id;
+      $this->users_files = array();
+      $sql1 = "SELECT f_name FROM File WHERE u_id = ".$this->user_array['u_id'] . " ORDER BY f_timestamp";
       $qhandle = $this->do_query($sql1);
       if ($qhandle === FALSE) {
          return FALSE;
       }
       $rowcount = pg_num_rows($qhandle);
       if ($rowcount == 0) {
-         $this->note_exception(0,"No files in the database for dataset ".$this->current_ds_name);
+         $this->note_exception(0,"No files in the database for user with u_id = ".$this->user_array['u_id']);
          return FALSE;
       }
       $i1 = 0;
       while ($i1 < $rowcount) {
          $rowarr = pg_fetch_row($qhandle,$i1);
-         $this->dataset_files[$i1] = $rowarr[0];
+         $this->users_files[$i1] = $rowarr[0];
          $i1++;
       }
-      $sql1 = "SELECT f_name, " . $this->file_ordinary_fields . " FROM File ".
-          $this->get_SQL_WHERE_clause('ds_id, f_name',array($this->current_ds_id,$this->dataset_files[0]));
+      $sql1 = "SELECT u_id, f_name, " . $this->file_ordinary_fields . " FROM File ".
+          $this->get_SQL_WHERE_clause('u_id, f_name',array($this->user_array['u_id'],$this->users_files[0]));
       $qhandle = $this->do_query($sql1);
       if ($qhandle === FALSE) {
          return FALSE;
@@ -1286,7 +1302,6 @@ class MM_Userbase {
          $this->note_exception(1,"pg_fetch_assoc returns FALSE");
          return FALSE;
       }
-      $this->file_array['ds_id'] = $this->current_ds_id;
       $this->current_file_ix = 0;
       return TRUE;
    }
@@ -1294,23 +1309,27 @@ class MM_Userbase {
 #      Get next file. 
 #   
    public function file_next() {
+      if (!isset($this->user_array)) {
+         $this->note_exception(1,"No current user");
+         return FALSE;
+      }
+      if (!isset($this->user_array['u_id'])) {
+         $this->note_exception(1,"u_id not found in user_array");
+         return FALSE;
+      }
       if ($this->pending_file_updates) {
          if ($this->update_file() === FALSE) {
             return FALSE;
          }
       }
-      if (!isset($this->current_ds_id)) {
-         $this->note_exception(1,"No current dataset");
-         return FALSE;
-      }
       $ix = $this->current_file_ix + 1;
-      if (!array_key_exists($ix, $this->dataset_files)) {
-         $this->note_exception(0,"No more files for the current dataset");
+      if (!array_key_exists($ix, $this->users_files)) {
+         $this->note_exception(0,"No more files for the current user");
          return FALSE;
       }
-      $file_name = $this->dataset_files[$ix];
-      $sql1 = "SELECT f_name, " . $this->file_ordinary_fields . " FROM File ".
-          $this->get_SQL_WHERE_clause('ds_id, f_name',array($this->current_ds_id,$file_name));
+      $file_name = $this->users_files[$ix];
+      $sql1 = "SELECT u_id, f_name, " . $this->file_ordinary_fields . " FROM File ".
+          $this->get_SQL_WHERE_clause('u_id, f_name',array($this->user_array['u_id'],$file_name));
       $qhandle = $this->do_query($sql1);
       if ($qhandle === FALSE) {
          return FALSE;
@@ -1321,11 +1340,10 @@ class MM_Userbase {
          return FALSE;
       }
       $this->file_array = pg_fetch_assoc($qhandle,0);
-      if ($this->user_array === FALSE) {
+      if ($this->file_array === FALSE) {
          $this->note_exception(1,"pg_fetch_assoc returns FALSE");
          return FALSE;
       }
-      $this->file_array['ds_id'] = $this->current_ds_id;
       $this->current_file_ix = $ix;
       return TRUE;
    }

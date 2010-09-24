@@ -29,6 +29,9 @@
             echo '   INFO:    ' . $userbase->get_exception() . "\n";
          }
       } else {
+         if (preg_match ('/^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ$/',$result)) {
+            $result = '__TIMESTAMP__';
+         }
          echo "   OK   Result: ".$result."\n";
       }
 #      echo "   STATUS: ".$userbase->debug_status()."\n";
