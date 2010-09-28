@@ -1976,7 +1976,8 @@ Return value: TRUE on success, FALSE on error / no files owned by the current da
             }
         }
         my $users_files = [];
-        my $sql1 = "SELECT f_name FROM File WHERE u_id = " . $user_array->{"u_id"};
+        my $sql1 = "SELECT f_name FROM File WHERE u_id = " . $user_array->{"u_id"} .
+                   " ORDER BY f_timestamp, f_name";
         if ( !$self->_do_query($sql1) ) {
             return FALSE();
         }
@@ -2069,6 +2070,47 @@ Return value: TRUE on success, FALSE on error / no more files.
         }
         $current_file_ix{$ident} = $ix;
         $file_array{$ident}      = $file_array;
+        return TRUE();
+    }
+
+=item file_delete()
+
+Delete the current file in the database.
+
+Return value: TRUE on success, FALSE on error.
+
+=cut
+
+    sub file_delete {
+        my $self                 = shift;
+        my $ident                = ident($self);
+        my $file_array           = $file_array{$ident};
+        my $users_files          = $users_files{$ident};
+        my $current_file_ix      = $current_file_ix{$ident};
+        my $user_array           = $user_array{$ident};
+        if ( !defined($user_array) ) {
+            $self->_note_exception( 1, "No current user" );
+            return FALSE();
+        }
+        if ( !defined( $user_array->{"u_id"} ) ) {
+            $self->_note_exception( 1, "Found no u_id in user_array" );
+            return FALSE();
+        }
+        if ( !defined($file_array) ) {
+            $self->_note_exception( 1, "No current file" );
+            return FALSE();
+        }
+        my $file_name = $file_array->{'f_name'};
+        my $sql1 = "DELETE FROM File "
+            . $self->_get_SQL_WHERE_clause( 'u_id, f_name', [ $user_array->{"u_id"}, $file_name ] );
+        if ( !$self->_do_query($sql1) ) {
+            return FALSE();
+        }
+        if (defined($users_files) and  $file_name eq $users_files->[$current_file_ix]) {
+           $users_files->[$current_file_ix] = undef;
+        }
+        $file_array{$ident}      = undef;
+        $pending_file_updates{$ident} = FALSE();
         return TRUE();
     }
 }

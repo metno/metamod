@@ -48,8 +48,26 @@ $userbase->file_get('f_timestamp')
    OK   Result: __TIMESTAMP__
 $userbase->file_next()
    INFO:    No more files for the current user
+$userbase->file_create('newfile')
+   OK   Result: 1
 $userbase->file_find('myfile')
    OK   Result: 1
+$userbase->file_delete()
+   OK   Result: 1
+$userbase->file_create('another_file')
+   OK   Result: 1
+$userbase->file_create('newest')
+   OK   Result: 1
+$userbase->file_first()
+   OK   Result: 1
+$userbase->file_delete()
+   OK   Result: 1
+$userbase->file_get('f_timestamp')
+   ERROR:   No current file
+$userbase->file_next()
+   OK   Result: 1
+$userbase->file_get('f_name')
+   OK   Result: newest
 $userbase->dset_create('DS-NEW','KEY')
    OK   Result: 1
 $userbase->dset_put('LOCATION','/my/somewhere')

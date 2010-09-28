@@ -1275,7 +1275,8 @@ class MM_Userbase {
          }
       }
       $this->users_files = array();
-      $sql1 = "SELECT f_name FROM File WHERE u_id = ".$this->user_array['u_id'] . " ORDER BY f_timestamp";
+      $sql1 = "SELECT f_name FROM File WHERE u_id = ".$this->user_array['u_id'] . 
+              " ORDER BY f_timestamp, f_name";
       $qhandle = $this->do_query($sql1);
       if ($qhandle === FALSE) {
          return FALSE;
@@ -1345,6 +1346,39 @@ class MM_Userbase {
          return FALSE;
       }
       $this->current_file_ix = $ix;
+      return TRUE;
+   }
+#   
+#      Delete current file from the File table:
+#   
+   public function file_delete() {
+      if (!isset($this->user_array)) {
+         $this->note_exception(1,"No current user");
+         return FALSE;
+      }
+      if (!isset($this->user_array['u_id'])) {
+         $this->note_exception(1,"u_id not found in user_array");
+         return FALSE;
+      }
+      if (!isset($this->file_array)) {
+         $this->note_exception(1,"No current file");
+         return FALSE;
+      }
+      $file_name = $this->file_array['f_name'];
+      $sql1 = "DELETE FROM File " .
+          $this->get_SQL_WHERE_clause('u_id, f_name',array($this->user_array['u_id'],$file_name));
+      $qhandle = $this->do_query($sql1);
+      if ($qhandle === FALSE) {
+         return FALSE;
+      }
+      unset($this->file_array);
+      if (isset($this->users_files)) {
+         $ix = $this->current_file_ix;
+         if ($this->users_files[$ix] == $file_name) {
+            unset($this->users_files[$ix]);
+         }
+      }
+      $this->pending_file_updates = FALSE;
       return TRUE;
    }
 #
