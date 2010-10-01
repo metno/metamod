@@ -268,8 +268,8 @@ for dir in `cat $basedir/source/test/directories`; do
    mkdir -p $dir
 done
 #
-# F. The database is initialized and filled with static data.
-# ===========================================================
+# F. The databases (metadatabase and user database) is initialized and filled with static data.
+# =============================================================================================
 #
 # disable tomcat (SRU2jdbc) connection to database
 # this is a hack, TODO: make configurable
@@ -280,8 +280,8 @@ find $basedir/webrun/XML/$idstring -name '*.xmd' | xargs perl -pi -e "s/name=\"D
 cd $basedir/target/init
 ./create_and_load_all.sh
 cd $basedir/target/userinit
-../run_createuserdb.sh
-../load_userbase.pl
+./run_createuserdb.sh
+./load_userbase.pl
 #
 # G. The services defined for the application is started.
 # =======================================================
