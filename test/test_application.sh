@@ -279,6 +279,9 @@ cp -r $basedir/source/test/xmlinput/* $basedir/webrun/XML/$idstring/
 find $basedir/webrun/XML/$idstring -name '*.xmd' | xargs perl -pi -e "s/name=\"DAMOC/name=\"$idstring/g; s/ownertag=\"DAM/ownertag=\"$idstring/"
 cd $basedir/target/init
 ./create_and_load_all.sh
+cd $basedir/target/userinit
+../run_createuserdb.sh
+../load_userbase.pl
 #
 # G. The services defined for the application is started.
 # =======================================================
