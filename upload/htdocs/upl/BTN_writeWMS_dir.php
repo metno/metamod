@@ -46,7 +46,7 @@ if ($error == 0) {
 	$dirkey = conditional_decode($_REQUEST["dirkey"]);   
 	$directory = conditional_decode($_REQUEST["dirname"]);
 	$wmsInput = trim(stripslashes(conditional_decode($_REQUEST["wmsInfo"])));
-	if (checkDirectoryPermission($directory, $dirkey, &$errmsg)) {
+	if (checkDirectoryPermission($directory, $dirkey, &$errmsg) !== FALSE) {
 		$wmsDatasetFile = mmGetRunPath() . "/XML/" . $mmConfig->getVar("APPLICATION_ID") . '/' . $directory . '.xmd';
 		if (is_writable($wmsDatasetFile)) {
 			try {

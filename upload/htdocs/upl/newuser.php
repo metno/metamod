@@ -38,7 +38,12 @@
 #  automatically sent to the user by E-mail.
 #
    include_once("../funcs/mmConfig.inc");
+   include_once("../funcs/mmUserbase.inc");
    include "funcs.inc";
+   $debug = $mmConfig->getVar('DEBUG');
+   if ($debug == 1) {
+      print_r($_POST);
+   }
    $paw = mkpasswd(); // Create new password
    $name = conditional_decode($_POST["name"]);
    $email = conditional_decode($_POST["email"]);
@@ -75,16 +80,31 @@
                   $heading = '<heading';
                   $notification = "New user details:\n";
                   $items = array("name","email","institution","telephone");
+                  $userinfo = array();
                   foreach ($items as $item) {
                      $heading .= ' ' . $item . '="' . normstring(conditional_decode($_POST[$item])) . '"';
                      $notification .= '   ' . $item . ': ' . conditional_decode($_POST[$item]) . "\n";
+                     $userinfo['u_' . $item] = conditional_decode($_POST[$item]);
                   }
                   $heading .= " />\n";
                   fwrite($fileid,$heading);
                   fclose($fileid);
-                  include "./newuserok.php";
-                  $notification .= "\n\n" . $approvelink;
-                  mail($mmConfig->getVar('OPERATOR_EMAIL'), "New ".$mmConfig->getVar('APPLICATION_NAME')." user",$notification, "From: ".$mmConfig->getVar('FROM_ADDRESS'));
+                  $userinfo['u_password'] = $paw;
+                  if ($debug == 1) {
+                     print_r($userinfo);
+                  }
+                  if (put_userinfo($userinfo) === FALSE) {
+                     mmPutLog("Error while adding user info to the User database");
+                     $errmsg = 'Sorry, internal error while processing your request';
+                     include "login.php";
+                  } else {
+                     include "./newuserok.php";
+                     $notification .= "\n\n" . $approvelink;
+                     mail($mmConfig->getVar('OPERATOR_EMAIL'),
+                          "New ".$mmConfig->getVar('APPLICATION_NAME')." user",
+                          $notification,
+                          "From: ".$mmConfig->getVar('FROM_ADDRESS'));
+                  }
                } else {
                   mmPutLog("Error while opening file: $u0path/$filename");
                   $errmsg = 'Sorry, your request were not received. Internal error';

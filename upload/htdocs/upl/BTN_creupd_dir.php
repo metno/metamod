@@ -36,7 +36,7 @@
  //            External. The user provides THREDDS location and catalog information.
  //                      No creation of the directory in the repository or in the
  //                      upload area. Used if the configuration variable
- //                      EXTERNAL_REPOSIRORY is set to true.
+ //                      EXTERNAL_REPOSITORY is set to true.
  //
  if ($debug) {
     mmPutTest("--------- User pushed Create/Update");
@@ -44,16 +44,17 @@
  check_credentials(); // Sets $error, $errmsg, $nextpage, $normemail, $sessioncode,
                       // $runpath, $filepath, $filecontent and $dirinfo (globals).
  $external_repository = (strtolower($mmConfig->getVar('EXTERNAL_REPOSITORY')) == "true");
+ mmPutTest("BTN_creupd_dir.php: starting, external_repository = $external_repository");
  if ($error == 0) { // Check that institution exists and set $institution var.
     $nextpage = 3;
     $userinfo = get_userinfo($filepath);
-    if (!array_key_exists("institution",$userinfo)) {
+    if (!array_key_exists("u_institution",$userinfo)) {
        $error = 2;
        $nextpage = 1;
-       mmPutLog('No institution in userinfo');
+       mmPutLog('No u_institution in userinfo');
        $errmsg = "Sorry. Internal error";
     } else {
-       $institution = $userinfo["institution"];
+       $institution = $userinfo["u_institution"];
     }
  }
  if ($error == 0) {
@@ -82,8 +83,9 @@
                             // set to an empty string if no more actions on the directory
                             // seem to be neccessary.
  }
+ mmPutTest("BTN_creupd_dir.php: directory name = $dirname");
  if ($error == 0) {
- // If directory information exists in the user file in webrun/u1, fetch it and
+ // If directory/dataset information exists in the user database, fetch it and
  // eventually populate variables $odirkey, $olocation and $othreddscatalog:
 
     $odirkey = "";
@@ -92,20 +94,21 @@
     $owmsurl = "";
     if (array_key_exists($dirname,$dirinfo)) {
        $dirattributes = $dirinfo[$dirname];
-       foreach (array('key','location','catalog','wmsurl') as $k1) {
+       foreach (array('DSKEY','LOCATION','CATALOG','WMS_URL') as $k1) {
           if (array_key_exists($k1, $dirattributes)) {
              $val = decodenorm($dirattributes[$k1]);
-             if ($k1 == 'key') {
+             if ($k1 == 'DSKEY') {
                 $odirkey = $val;
-             } else if ($k1 == 'location') {
+             } else if ($k1 == 'LOCATION') {
                 $olocation = $val;
-             } else if ($k1 == 'catalog') {
+             } else if ($k1 == 'CATALOG') {
                 $othreddscatalog = $val;
-             } else if ($k1 == 'wmsurl') {
+             } else if ($k1 == 'WMS_URL') {
                 $owmsurl = $val;
              }
           }
        }
+       mmPutTest("BTN_creupd_dir.php: old directory attributes found");
     }
  }
  $update_dirinfo_needed = FALSE;
@@ -116,12 +119,13 @@
     $location = get_postvar("location");
     $threddscatalog = get_postvar("threddscatalog");
     $wmsurl = get_postvar("wmsurl");
+    mmPutTest("BTN_creupd_dir.php: new directory attributes taken from POST");
  }
  if ($error == 0) {
  // Get a new value for the directory key if provided by the user. Check it
  // and make a normalized string out of it ($ndirkey):
 
-    if ($external_repository && strlen($dirkey) == 0) {
+    if (strlen($dirkey) == 0) {
        $error = 1;
        $nextpage = 3;
        mmPutLog('Create/Update: User provided empty directory key');
@@ -133,10 +137,11 @@
        $errmsg = "[Create/Update] failed. Directory access key too long." .
                  " Max ".$mmConfig->getVar('MAXLENGTH_DIRKEY')." characters allowed";
     }
-    if ($dirkey != $odirkey || $dirkey == "") {
+    if ($dirkey != $odirkey) {
        $update_dirinfo_needed = TRUE;
     }
     $ndirkey = normstring($dirkey);
+    mmPutTest("BTN_creupd_dir.php: directory key checked");
  }
  if ($error == 0 && $external_repository) {
  // If the user has provided a location string (absolute directory path) and
@@ -177,6 +182,7 @@
        }
     }
     $nthreddscatalog = normstring($threddscatalog);
+    mmPutTest("BTN_creupd_dir.php: THREDDS catalog checked");
  }
  $repositorypath = get_repository_path();
  if ($error == 0 && strlen($mmConfig->getVar("WMS_XML"))) {
@@ -197,6 +203,7 @@
        $update_dirinfo_needed = TRUE;
     }
     $nwmsurl = normstring($wmsurl);
+    mmPutTest("BTN_creupd_dir.php: URL to WMS checked");
  }
  if ($error == 0 && ! $external_repository) {
  // Normal case. No THREDDS location and catalog information entered.
@@ -234,6 +241,7 @@
           $nextpage = 1;
        }
     }
+    mmPutTest("BTN_creupd_dir.php: Check on opendappath = $opendappath finished. Errmsg: $errmsg");
  }
  $uploadpath = get_upload_path();
  if ($error == 0 && strlen($uploadpath) > 0 && ! $external_repository) {
@@ -275,6 +283,7 @@
        $update_dirinfo_needed = TRUE;
        $nextpage = 3;
     }
+    mmPutTest("BTN_creupd_dir.php: Check on uploadpath = $dirpath finished. Errmsg: $errmsg");
 }
  if ($error == 0) {
  // If new directory, or any directory information has changed, update the user file in
@@ -285,18 +294,17 @@
           $dirinfo[$dirname] = array();
        }
        if (isset($ndirkey)) {
-          $dirinfo[$dirname]['key'] = $ndirkey;
+          $dirinfo[$dirname]['DSKEY'] = $ndirkey;
        }
        if (isset($nlocation) && isset($nthreddscatalog)) {
-          $dirinfo[$dirname]['location'] = $nlocation;
-          $dirinfo[$dirname]['catalog'] = $nthreddscatalog;
+          $dirinfo[$dirname]['LOCATION'] = $nlocation;
+          $dirinfo[$dirname]['CATALOG'] = $nthreddscatalog;
        }
        if (isset($nwmsurl)) {
-          $dirinfo[$dirname]['wmsurl'] = $nwmsurl;
+          $dirinfo[$dirname]['WMS_URL'] = $nwmsurl;
        }
-       $bytecount = put_dirinfo($filepath,$dirinfo);
-       if ($bytecount == 0) {
-          mmPutLog('Could not update the user file with dir info. 0 bytes written');
+       if (! update_dirinfo(decodenorm($normemail),$dirname,$dirinfo[$dirname]) ) {
+          mmPutLog('Could not update the user database with dir info.');
           $errmsg = 'Sorry. Internal error';
           $error = 2;
           $nextpage = 1;
@@ -307,6 +315,7 @@
              $nextpage = 3;
           }
        }
+       mmPutTest("BTN_creupd_dir.php: update dirinfo finished. Errmsg: $errmsg");
     }
  }
  $dirname = $newdirname;

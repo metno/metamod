@@ -9,6 +9,8 @@
 =htdocs/upl/BTN_upl.php
 =htdocs/upl/BTN_writeproj_dir.php
 =htdocs/upl/BTN_writeWMS_dir.php
+=htdocs/upl/BTN_tfile.php
+=htdocs/upl/BTN_dotest.php
 =htdocs/upl/funcs.inc
 =htdocs/upl/index.php
 =htdocs/upl/login.php

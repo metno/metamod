@@ -140,22 +140,13 @@
  }
  if ($error == 0) { // Check that institution exists and set $institution var.
     $userinfo = get_userinfo($filepath);
-    if (!array_key_exists("institution",$userinfo)) {
+    if (!array_key_exists("u_institution",$userinfo)) {
        $error = 2;
        $nextpage = 1;
        mmPutLog('No institution in userinfo');
        $errmsg = "Sorry. Internal error";
     } else {
-       $institution = $userinfo["institution"];
-    }
- }
- if ($error == 0) { // Write a new version of the user file to disk:
-    $bytecount = put_fileinfo($filepath,$filecontent);
-    if ($bytecount == 0) {
-       mmPutLog('Could not update the user file. 0 bytes written');
-       $errmsg = 'Sorry. Internal error';
-       $error = 2;
-       $nextpage = 1;
+       $institution = $userinfo["u_institution"];
     }
  }
  if ($error == 0) { // Get directory info from the user file:

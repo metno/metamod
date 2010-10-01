@@ -244,32 +244,113 @@ function get_userinfo($filepath)
    // as keys, and the corresponding attribute values as values.
    // The first heading (and supposedly only) tag in the file will be used.
    global $debug;
+   global $mmConfig;
+   $error = 0;
    if ($debug) {
       mmPutTest("get_userinfo:");
    }
    $userinfo = array();
-   if (preg_match('/\.([^\.]+)$/',$filepath,$matches) == 1) {
-      $userinfo["paw"] = decodenorm($matches[1]);
+   $parts = explode(".",basename($filepath));
+   $email_address =  utf8_encode(decodenorm($parts[0]));
+   $application_id = $mmConfig->getVar('APPLICATION_ID');
+   $userbase = new MM_Userbase();
+   $user_properties = array('u_name', 'u_password', 'u_loginname', 'u_institution', 'u_telephone', 'u_session');
+   if ($userbase->user_find($email_address, $application_id) === FALSE) {
+      if ($userbase->exception_is_error()) {
+         mmPutLog($userbase->get_exception());
+      } else {
+         mmPutLog("ERROR: User $email_address not found in User database");
+      }
+      $error = 1;
    }
-   $content = file_get_contents($filepath);
-   if (preg_match('/<heading[^>]*>/',$content,$matches) == 1) {
-      if (preg_match_all('/\w+="\w*"/',$matches[0],$matches1) >= 1) {
-         foreach ($matches1[0] as $match) {
-            if (preg_match('/(\w+)="(\w*)"/',$match,$matches2) == 1) {
-               $userinfo[$matches2[1]] = decodenorm($matches2[2]);
-	       if ($debug) {
-	          mmPutTest($matches2[1] . "=" . $userinfo[$matches2[1]]);
-	       }
+   if ($error == 0) {
+      reset($user_properties);
+      foreach ($user_properties as $property) {
+         $value = $userbase->user_get($property);
+         if ($value === FALSE) {
+            if ($userbase->exception_is_error()) {
+               mmPutLog($userbase->get_exception());
+               $error = 1;
+            }
+         } else {
+            $userinfo[$property] = $value;
+         }
+      }
+      $userinfo['u_email'] = $email_address;
+   }
+   if ($userbase->close() === FALSE) {;
+      mmPutLog($userbase->get_exception());
+      $error = 1;
+   }
+   if ($error == 1) {
+      return FALSE;
+   } else {
+      return $userinfo;
+   }
+}
+
+function put_userinfo($userinfo)
+{
+   // Adds a new entry into the UserTable database table in the User database.
+   // IN: An array $userinfo that has the column names in the UserTable table
+   // as keys, and the corresponding column values as values.
+   global $debug;
+   global $mmConfig;
+   $error = 0;
+   if ($debug) {
+      mmPutTest("put_userinfo:");
+   }
+   $email_address = $userinfo["u_email"];
+   $application_id = $mmConfig->getVar('APPLICATION_ID');
+   $userbase = new MM_Userbase();
+   if ($userbase->user_find($email_address, $application_id) === FALSE) {
+      if ($userbase->exception_is_error()) {
+         mmPutLog($userbase->get_exception());
+         $error = 1;
+      } else {
+         if ($userbase->user_create($email_address, $application_id) === FALSE) {
+            mmPutLog($userbase->get_exception());
+            $error = 1;
+         }
+      }
+   }
+   if ($error == 0) {
+      reset($userinfo);
+      foreach ($userinfo as $property => $value) {
+         if ($property != 'u_email') {
+            mmPutTest("put_userinfo: About to user_put( $property , $value )");
+            if ($userbase->user_put($property,$value) === FALSE) {
+               if ($userbase->exception_is_error()) {
+                  mmPutLog($userbase->get_exception());
+                  $error = 1;
+               }
             }
          }
       }
    }
-   return $userinfo;
+   if ($userbase->close() === FALSE) {;
+      mmPutLog($userbase->get_exception());
+      $error = 1;
+   }
+   if ($error == 1) {
+      return FALSE;
+   } else {
+      return TRUE;
+   }
 }
 
 function get_fileinfo($filepath)
 {
+#
+#   Returns an array, $fileinfo, containing info about each file uploaded by the user
+#   whose E-mail address is encoded in $filepath. Each element in this array is another
+#   array with keys equal to field names in the File table in the User database, and values
+#   equal to the cooresponding values found in a row in the database. The rows in $fileinfo
+#   is sorted in descending order of the f_timestamp field. 
+#
    global $debug;
+   global $mmConfig;
+   $error = 0;
 #   if ($debug) {
 #      mmPutTest("get_fileinfo:");
 #   }
@@ -277,27 +358,144 @@ function get_fileinfo($filepath)
    if (!file_exists($filepath)) {
       return FALSE;
    }
-   $lines = file($filepath);
-   if ($lines == FALSE) {
+   echo "filepath=" . $filepath . "\n";
+   $parts = explode(".",basename($filepath));
+   $email_address =  utf8_encode(decodenorm($parts[0]));
+   echo "email_address=" . $email_address . "\n";
+   $application_id = $mmConfig->getVar('APPLICATION_ID');
+   $userbase = new MM_Userbase();
+   $file_properties = array('f_name', 'f_timestamp', 'f_size', 'f_status', 'f_errurl');
+   mmPutTest("get_fileinfo:: About to user_find( $email_address, $application_id ):");
+   if ($userbase->user_find($email_address, $application_id) === FALSE) {
+      if ($userbase->exception_is_error()) {
+         mmPutLog($userbase->get_exception());
+      } else {
+         mmPutLog("ERROR: User $email_address not found in User database");
+      }
+      $error = 1;
+   }
+   if ($error == 0) {
+       mmPutTest("get_fileinfo:: About to file_first():");
+       if ($userbase->file_first() === FALSE) { # No files or error
+          if ($userbase->exception_is_error()) {
+             mmPutLog($userbase->get_exception());
+             $error = 1;
+          }
+       } else {
+          mmPutTest("get_fileinfo:: About to loop over all files");
+          do {
+             $onefile = array();
+             reset($file_properties);
+             foreach ($file_properties as $property) {
+                $value = $userbase->file_get($property);
+                if ($value === FALSE) {
+                   mmPutLog($userbase->get_exception());
+                } else if ($value != "") {
+                   $onefile[$property] = $value;
+                }
+             }
+             array_unshift($fileinfo,$onefile);
+          } while ($userbase->file_next() === TRUE);
+          if ($userbase->exception_is_error()) {
+             mmPutLog($userbase->get_exception());
+             $error = 1;
+          }
+       }
+   }
+   if ($userbase->close() === FALSE) {;
+      mmPutLog($userbase->get_exception());
+      $error = 1;
+   }
+   if ($error == 1) {
+      mmPutTest("get_fileinfo:: About to return FALSE");
+      return FALSE;
+   } else {
+      mmPutTest("get_fileinfo:: About to return fileinfo");
+      return $fileinfo;
+   }
+}
+
+function update_fileinfo($filepath,$existingname,$origname,$size)
+{
+   # Update info about the uploaded file in the User database. If $existingname != "", the
+   # file has been uploaded before, and the file name may have changed. If $existingname is
+   # empty, a new file has been uploaded, and a new file entry must be created in the User
+   # database.
+   #
+   global $mmConfig;
+   if (!file_exists($filepath)) {
       return FALSE;
    }
-   $filerecords = preg_grep(':<file\b[^>]+/>:',$lines);
-   $ix = 0;
-   foreach ($filerecords as $filerec) {
-      $onefile = array();
-      if (preg_match_all('/\w+="[^"]*"/',$filerec,$matches) >= 1) {
-         foreach ($matches[0] as $match) {
-            if (preg_match('/(\w+)="([^"]*)"/',$match,$matches2) == 1) {
-               $onefile[$matches2[1]] = $matches2[2];
-#	       if ($debug) {
-#	          mmPutTest($matches2[1] . '=' . $onefile[$matches2[1]]);
-#	       }
-            }
+   $error = 0;
+   $parts = explode(".",basename($filepath));
+   $email_address =  utf8_encode(decodenorm($parts[0]));
+   $application_id = $mmConfig->getVar('APPLICATION_ID');
+   $userbase = new MM_Userbase();
+   mmPutTest("update_fileinfo: About to user_find $email_address, $application_id");
+   if ($userbase->user_find($email_address, $application_id) === FALSE) {
+      if ($userbase->exception_is_error()) {
+         mmPutLog($userbase->get_exception());
+      } else {
+         mmPutLog("ERROR: User $email_address not found in User database");
+      }
+      $error = 1;
+   }
+   if ($error == 0 and $existingname != "" and $existingname != $origname) {
+      mmPutTest("update_fileinfo: About to file_find existingname: $existingname");
+      if ($userbase->file_find($existingname) === FALSE) {
+         if ($userbase->exception_is_error()) {
+            mmPutLog($userbase->get_exception());
+            $error = 1;
+         }
+      } else {
+         mmPutTest("update_fileinfo: About to file_delete()");
+         if ($userbase->file_delete() === FALSE) {
+             mmPutLog($userbase->get_exception());
+             $error = 1;
          }
       }
-      $fileinfo[$ix++] = $onefile;
    }
-   return $fileinfo;
+   if ($error == 0 and $existingname == $origname) {
+      mmPutTest("update_fileinfo: About to file_find origname: $origname");
+      if ($userbase->file_find($origname) === FALSE) {
+         mmPutLog($userbase->get_exception());
+         $error = 1;
+      }
+   } else if ($error == 0) {
+      mmPutTest("update_fileinfo: About to file_create origname: $origname");
+      if ($userbase->file_create($origname) === FALSE) {
+         mmPutLog($userbase->get_exception());
+         $error = 1;
+      }
+      $status = "Initial upload " . gmdate('Y-m-d H:i') . ' UTC';
+   }
+   if ($existingname != "") {
+      $status = "Repeated upload " . gmdate('Y-m-d H:i') . ' UTC';
+   }
+   if ($error == 0) {
+      mmPutTest("update_fileinfo: About to file_put f_size $size");
+      if ($userbase->file_put('f_size',$size) === FALSE) {
+         mmPutLog($userbase->get_exception());
+         $error = 1;
+      }
+      mmPutTest("update_fileinfo: About to file_put f_status $status");
+      if ($userbase->file_put('f_status',$status) === FALSE) {
+         mmPutLog($userbase->get_exception());
+         $error = 1;
+      }
+   }
+   mmPutTest("update_fileinfo: About to close()");
+   if ($userbase->close() === FALSE) {;
+      mmPutLog($userbase->get_exception());
+      $error = 1;
+   }
+   if ($error == 1) {
+      mmPutTest("update_fileinfo: About to return FALSE");
+      return FALSE;
+   } else {
+      mmPutTest("update_fileinfo: About to return TRUE");
+      return TRUE;
+   }
 }
 
 function put_fileinfo($filepath,$fileinfo)
@@ -337,76 +535,105 @@ function put_fileinfo($filepath,$fileinfo)
    return $result;
 }
 
-function put_dirinfo($filepath,$dirinfo)
+function update_dirinfo($email,$dirname,$info)
 {
-   // Substitutes all lines containing <dir> tags in the XML file
-   // given by $filepath with <dir> tag lines constructed from the
-   // $dirinfo array. All other lines in the XML file are left unchanged.
-   $dirrecords = array();
-   $lines = file($filepath);
-   array_push($lines,"DUMMY\n");
-   $newcontent = '';
-   $found_heading = FALSE;
-   foreach ($lines as $line) {
-      if (preg_match (':<dir\b[^>]+/>:',$line)) {
-         // Do nothing
-      } else if (preg_match (':<heading\b[^>]+/>:',$line)) {
-         $found_heading = TRUE;
-         $newcontent .= $line;
+   global $mmConfig;
+   $ok_to_now = TRUE;
+   $application_id = $mmConfig->getVar('APPLICATION_ID');
+   $userbase = new MM_Userbase();
+   if ($userbase->dset_find($application_id, $dirname) === FALSE) {
+      if ($userbase->exception_is_error()) {
+         mmPutLog($userbase->get_exception());
+         $ok_to_now = FALSE;
       } else {
-         if ($found_heading) {
-            foreach ($dirinfo as $dirname => $dirattributes) {
-               $fline = '<dir dirname="' . $dirname . '" ';
-               foreach (array('key','location','catalog','wmsurl') as $k1) {
-                  if (array_key_exists($k1, $dirattributes)) {
-                     $fline .= $k1 . '="' . $dirattributes[$k1] . '" ';
-                  }
-               }
-               $fline .= '/>';
-               $newcontent .= $fline . "\n";
-            }
-            $found_heading = FALSE;
-         } 
-         if ($line != "DUMMY\n") {
-            $newcontent .= $line;
+         if ($userbase->user_find($email,$application_id) === FALSE) {
+             mmPutLog($userbase->get_exception());
+             $ok_to_now = FALSE;
+         } else if ($userbase->dset_create($dirname, $info["DSKEY"]) === FALSE) {
+             mmPutLog($userbase->get_exception());
+             $ok_to_now = FALSE;
          }
       }
    }
-   $result = file_put_contents1($filepath,$newcontent);
-   return $result;
+   reset($info);
+   foreach ($info as $key => $value) {
+       if ($ok_to_now) {
+           if ($userbase->dset_put($key,$value) === FALSE and $userbase->exception_is_error()) {
+              mmPutLog($userbase->get_exception());
+              $ok_to_now = FALSE;
+           }
+       }
+   }
+   if ($userbase->close() === FALSE) {;
+      mmPutLog($userbase->get_exception());
+      $ok_to_now = FALSE;
+   }
+   return $ok_to_now;
 }
 
 function get_dirinfo($filepath)
 {
-   global $debug;
+   global $debug, $mmConfig;
+   $error = 0;
 #   if ($debug) {
 #      mmPutTest("get_dirinfo:");
 #   }
    $dirinfo = array();
-   if (!file_exists($filepath)) {
-      mmPutTest("get_dirinfo returns FALSE");
-      return FALSE;
-   }
-   $lines = file($filepath);
-   if ($lines == FALSE) {
-      mmPutTest("get_dirinfo returns FALSE");
-      return FALSE;
-   }
-   $dirrecords = preg_grep(':<dir\b[^>]+/>:',$lines);
-   foreach ($dirrecords as $dirrec){
-      if (preg_match('/dirname="([^"]+)"/',$dirrec,$match) == 1) {
-         $dirname = $match[1];
-         $dirinfo[$dirname] = array();
+   $parts = explode(".",basename($filepath));
+   $email_address =  utf8_encode(decodenorm($parts[0]));
+   $application_id = $mmConfig->getVar('APPLICATION_ID');
+   $userbase = new MM_Userbase();
+   $dset_properties = array('DSKEY','LOCATION','CATALOG','WMS_URL','WMS_XML');
+   if ($userbase->user_find($email_address, $application_id) === FALSE) {
+      if ($userbase->exception_is_error()) {
+         mmPutLog($userbase->get_exception());
       } else {
-         return FALSE;
+         mmPutLog("ERROR: User $email_address not found in User database");
       }
-      foreach (array('key','location','catalog','wmsurl') as $k1) {
-         if (preg_match('/' . $k1 . '="([^"]*)"/',$dirrec,$match) == 1) {
-            $dirinfo[$dirname][$k1] = $match[1];
+      $error = 1;
+   }
+   if ($error == 0) {
+      if ($userbase->dset_first() === FALSE) { # No datasets or error
+         if ($userbase->exception_is_error()) {
+            mmPutLog($userbase->get_exception());
+            $error = 1;
+         }
+      } else {
+         do {
+            $dsname = $userbase->dset_get('ds_name');
+            $dirinfo[$dsname] = array();
+            if ($dsname === FALSE) {
+               mmPutLog($userbase->get_exception());
+               $error = 1;
+            }
+            reset($dset_properties);
+            foreach ($dset_properties as $property) {
+               $value = $userbase->dset_get($property);
+               if ($value === FALSE) {
+                  if ($userbase->exception_is_error()) {
+                     mmPutLog($userbase->get_exception());
+                     $error = 1;
+                  }
+               } else if ($value != "") {
+                  $dirinfo[$dsname][$property] = $value;
+               }
+            }
+         } while ($userbase->dset_next() === TRUE);
+         if ($userbase->exception_is_error()) {
+            mmPutLog($userbase->get_exception());
+            $error = 1;
          }
       }
    }
-   return $dirinfo;
+   if ($userbase->close() === FALSE) {;
+      mmPutLog($userbase->get_exception());
+      $error = 1;
+   }
+   if ($error == 1) {
+      return FALSE;
+   } else {
+      return $dirinfo;
+   }
 }
 
 function get_unique_filename ($namefile)
@@ -458,7 +685,7 @@ function create_user_session($filename)
    // only have one session active at any time.
    $u1path = mmGetRunPath() . '/u1';
    $u2path = mmGetRunPath() . '/u2';
-   $parts = explode('.',$filename);
+   $parts = explode(".",$filename);
    $normemail = $parts[0];
    $matching = glob($u2path . '/' . $normemail . '.*'); // An array of all matching links
                                                         // in the u2 directory, each of which
@@ -482,6 +709,9 @@ function create_user_session($filename)
    if (!link($u1path . '/' . $filename,
              $u2path . '/' . $normemail . '.' . $sessioncode)) {
       echo 'Could not link: ' . $u2path . '/' . $normemail . '.' . $sessioncode . "<br>\n";
+      echo 'u1path = ' . $u1path . "\n";
+      echo 'u2path = ' . $u2path . "\n";
+      echo 'filename = ' . $filename . "\n";
       return FALSE;
    }
    return $sessioncode;
@@ -526,7 +756,7 @@ function get_postvar($varname)
  * @param $directory name of the directory
  * @param $key optional directory key
  * @param $errMsg optional string which will be filled with return message
- * @return true for success, false for access-failure
+ * @return institution name if directory belongs to another user, and dataset key is OK. Othervise true for success, false for access-failure
  */
 function checkDirectoryPermission($directory, $key = "", &$errMsg = "") {
 	global $filepath;
@@ -539,32 +769,61 @@ function checkDirectoryPermission($directory, $key = "", &$errMsg = "") {
       // $directory belongs to current user
       return true; 
    }
-   if (strlen($key) > 0) {
-   	// check all other directories
-   	$userInfoDir = mmGetRunPath() . "/u1";
-		if ($dh = opendir($userInfoDir)) {
-   		while (($file = readdir($dh)) !== false) {
-				if (is_file($file) && is_readable($file)) {
-			   	$file_dirinfo = get_dirinfo($file);
-			   	if (array_key_exists($directory, $file_dirinfo)) {
-                    $info_fields = $file_dirinfo[$directory];
-			      	if (array_key_exists('key',$info_fields) && $key == $info_fields['key']) {
-			      		// $key matches $directory
-			      		return true;
-				      } else {
-				      	$errMsg .= "key does not match";
-				         return false;
-				      }
-			   	}
-				}
-   	   }
-      	closedir($dh);
-		} else {
-   		$errMsg .= "internal error: problems reading directory $userInfoDir";
-			return false;
-   	}
+   if (strlen($key) == 0) {
+       $errMsg .= "dataset $directory not found";
+       return false;
    }
-	$errMsg .= "directory $directory not found";
-	return false;
+   	// check all other directories
+    $userbase = new MM_Userbase();
+    $ok_to_now = true;
+    if ($userbase->dset_find($application_id,$directory) === FALSE) {
+       if ($userbase->exception_is_error()) {
+          mmPutLog($userbase->get_exception());
+       }
+       $errMsg .= "dataset $directory not found";
+       $ok_to_now = false;
+    }
+    if ($ok_to_now) {
+       $dskey = $userbase->dset_get("DSKEY");
+       if ($dskey === FALSE) {
+          if ($userbase->exception_is_error()) {
+             mmPutLog($userbase->get_exception());
+          }
+          $errMsg .= "key does not match";
+          $ok_to_now = false;
+       }
+       if ($dskey != $key) {
+          $errMsg .= "key does not match";
+          $ok_to_now = false;
+       }
+    }
+    if ($ok_to_now) {
+        if ($userbase->user_dsync() === FALSE) {
+            if ($userbase->exception_is_error()) {
+                mmPutLog($userbase->get_exception());
+            }
+            $errMsg .= "internal error";
+            $ok_to_now = false;
+        }
+    }
+    if ($ok_to_now) {
+        $institution = $userbase->user_get("u_institution");
+        if ($institution === FALSE) {
+            if ($userbase->exception_is_error()) {
+                mmPutLog($userbase->get_exception());
+            }
+            $errMsg .= "internal error";
+            $ok_to_now = false;
+        }
+    }
+    if ($userbase->close() === FALSE) {;
+       mmPutLog($userbase->get_exception());
+       $ok_to_now = FALSE;
+    }
+    if ($ok_to_now) {
+       return $institution;
+    } else {
+       return false;
+    }
 }
 ?>

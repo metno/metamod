@@ -39,13 +39,13 @@
                       // $runpath, $filepath and $filecontent (globals).
  if ($error == 0) { // Check that institution exists and set $institution var.
     $userinfo = get_userinfo($filepath);
-    if (!array_key_exists("institution",$userinfo)) {
+    if (!array_key_exists("u_institution",$userinfo)) {
        $error = 2;
        $nextpage = 1;
-       mmPutLog('No institution in userinfo');
+       mmPutLog('No u_institution in userinfo');
        $errmsg = "Sorry. Internal error";
     } else {
-       $institution = $userinfo["institution"];
+       $institution = $userinfo["u_institution"];
     }
  }
 ?>

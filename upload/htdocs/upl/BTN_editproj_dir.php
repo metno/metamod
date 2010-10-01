@@ -47,7 +47,7 @@ if ($error == 0) {
    	// directory name can be in input or select box
       $directory = conditional_decode($_POST["knownDirname"]);
    }
-	if (checkDirectoryPermission($directory, $dirkey, &$errmsg)) {
+	if (checkDirectoryPermission($directory, $dirkey, &$errmsg) !== FALSE) {
 		$projDatasetFile = mmGetRunPath() . "/XML/" . $mmConfig->getVar("APPLICATION_ID") . '/' . $directory . '.xmd';
 		if (is_readable($projDatasetFile)) {
 			list($xmdContent, $xmlContent) = mmGetDatasetFileContent($projDatasetFile);

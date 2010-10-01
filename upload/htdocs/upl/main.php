@@ -30,6 +30,7 @@
 ?>
 <?php
 include_once("../funcs/mmConfig.inc");
+include_once("../funcs/mmUserbase.inc");
 #
 #  Main page for users which are logged into the upload service.
 #

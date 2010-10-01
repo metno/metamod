@@ -46,7 +46,7 @@ if ($error == 0) {
 	$dirkey = conditional_decode($_REQUEST["dirkey"]);   
 	$directory = conditional_decode($_REQUEST["dirname"]);
 	$projectionInput = trim(stripslashes(conditional_decode($_REQUEST["projectionInfo"])));
-	if (checkDirectoryPermission($directory, $dirkey, &$errmsg)) {
+	if (checkDirectoryPermission($directory, $dirkey, &$errmsg) !== FALSE) {
 		$projDatasetFile = mmGetRunPath() . "/XML/" . $mmConfig->getVar("APPLICATION_ID") . '/' . $directory . '.xmd';
 		if (is_writable($projDatasetFile)) {
 			try {

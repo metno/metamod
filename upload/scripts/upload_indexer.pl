@@ -250,23 +250,23 @@ sub process_files {
       print OUT "-------- Command invocation:\n";
       print OUT $0 . " " . join(" ",@ARGV) . "\n";
    }
-   if (! exists($dataset_institution{$dataset_name})) {
+   if (! defined($dataset_institution{$dataset_name})) {
       &syserror("SYS","dataset_not_initialized", "", "process_files", "Dataset: $dataset_name");
       @files_arr = ();
       die "Dataset $dataset_name not found!";
    }
    my $ref_datasetinfo = $dataset_institution{$dataset_name};
-   if (exists($ref_datasetinfo->{'key'}) && $ref_datasetinfo->{'key'} ne $dirkey) {
+   if (defined($ref_datasetinfo->{'key'}) && $ref_datasetinfo->{'key'} ne $dirkey) {
       &syserror("SYSUSER","wrong_directory_key", "", "process_files", "Dataset: $dataset_name");
       @files_arr = ();
       die "Wrong directory key (dirkey)!";
    }
-   if (! exists($ref_datasetinfo->{'location'})) {
+   if (! defined($ref_datasetinfo->{'location'})) {
       &syserror("SYSUSER","dataset_no_access_information", "", "process_files", "Dataset: $dataset_name");
       @files_arr = ();
       die "No access information found for dataset $dataset_name!";
    }
-   if ($config->get('WMS_XML') ne "" && ! exists($ref_datasetinfo->{'wmsurl'})) {
+   if ($config->get('WMS_XML') ne "" && ! defined($ref_datasetinfo->{'wmsurl'})) {
       &syserror("SYSUSER","dataset_no_wmsurl", "", "process_files", "Dataset: $dataset_name");
       @files_arr = ();
       die "No URL to WMS found for dataset $dataset_name!";
@@ -459,7 +459,7 @@ sub unlink_temporary_files {
 }
 
 sub user_report {
-   if (! exists($dataset_institution{$dataset_name})) {
+   if (! defined($dataset_institution{$dataset_name})) {
       return 1;
    }
    my @old_files_arr = @files_arr;

@@ -607,7 +607,7 @@ sub process_files {
       $logger->debug($msg. "\n");
    }
    my @originally_uploaded = keys %files_to_process;
-   if ($ftp_or_web ne 'TAF' && ! exists($dataset_institution{$dataset_name})) {
+   if ($ftp_or_web ne 'TAF' && ! defined($dataset_institution{$dataset_name})) {
       foreach my $uploadname (keys %files_to_process) {
          &move_to_problemdir($uploadname);
       }
@@ -1408,7 +1408,7 @@ sub clean_up_repository {
    foreach my $dataset (keys %all_ftp_datasets) {
       my $days_to_keep_files = $all_ftp_datasets{$dataset};
       if ($days_to_keep_files > 0) {
-         if (!exists($dataset_institution{$dataset})) {
+         if (!defined($dataset_institution{$dataset})) {
             &syserrorm("SYS","$dataset not in any userfiler", "", "clean_up_repository", "");
             next;
          }

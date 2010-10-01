@@ -40,13 +40,13 @@
                // $runpath, $filepath, $dirinfo and $filecontent (globals).
  if ($error == 0) { // Check that institution exists and set $institution var.
     $userinfo = get_userinfo($filepath);
-    if (!array_key_exists("institution",$userinfo)) {
+    if (!array_key_exists("u_institution",$userinfo)) {
        $error = 2;
        $nextpage = 1;
-       mmPutLog('No institution in userinfo');
+       mmPutLog('No u_institution in userinfo');
        $errmsg = "Sorry. Internal error";
     } else {
-       $institution = $userinfo["institution"];
+       $institution = $userinfo["u_institution"];
     }
  }
  if ($error == 0) {
@@ -67,16 +67,16 @@
        $nextpage = 3;
     } else {
        $dirattributes = $dirinfo[$dirname];
-       foreach (array('key','location','catalog','wmsurl') as $k1) {
+       foreach (array('DSKEY','LOCATION','CATALOG','WMS_URL','WMS_XML') as $k1) {
           if (array_key_exists($k1, $dirattributes)) {
              $val = decodenorm($dirattributes[$k1]);
-             if ($k1 == 'key') {
+             if ($k1 == 'DSKEY') {
                 $dirkey = $val;
-             } else if ($k1 == 'location') {
+             } else if ($k1 == 'LOCATION') {
                 $location = $val;
-             } else if ($k1 == 'catalog') {
+             } else if ($k1 == 'CATALOG') {
                 $threddscatalog = $val;
-             } else if ($k1 == 'wmsurl') {
+             } else if ($k1 == 'WMS_URL') {
                 $wmsurl = $val;
              }
           }

@@ -116,13 +116,13 @@ EOF;
       }
          $metadataQuest = $mmConfig->getVar('QUEST_METADATA_UPLOAD_FORM');
          $userinfo = get_userinfo($filepath);
-    	 if (!array_key_exists("institution",$userinfo)) {
+    	 if (!array_key_exists("u_institution",$userinfo)) {
        		$error = 2;
        		$nextpage = 1;
-       		mmPutLog('No institution in userinfo');
+       		mmPutLog('No u_institution in userinfo');
        		$errmsg = "Sorry. Internal error";
     	 } else {
-       		$institution = $userinfo["institution"];
+       		$institution = $userinfo["u_institution"];
     	 }
          
          echo '<h3>Datasets owned by you</h3>' . "\n";
@@ -256,11 +256,11 @@ EOF;
             if (! $external_repository) {
                echo '<td><input type="radio" name="selrec" value="' . $recnum++ . '" />' . "\n";
             }
-            echo '<td>' . $filerec["name"] . '</td>' . "\n";
-            echo '<td>' . $filerec["size"] . '</td>' . "\n";
-            echo '<td>' . $filerec["status"] . '</td>' . "\n";
+            echo '<td>' . $filerec["f_name"] . '</td>' . "\n";
+            echo '<td>' . $filerec["f_size"] . '</td>' . "\n";
+            echo '<td>' . $filerec["f_status"] . '</td>' . "\n";
             if ($filerec["errurl"] != "") {
-               echo '<td><a href="' . $filerec["errurl"] . '" target="_blank">Show</a></td>' . "\n";
+               echo '<td><a href="' . $filerec["f_errurl"] . '" target="_blank">Show</a></td>' . "\n";
             } else {
                echo '<td>&nbsp;</td>' . "\n";
             }

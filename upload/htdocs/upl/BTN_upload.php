@@ -36,13 +36,13 @@
                       // $runpath, $filepath and $filecontent (globals).
  if ($error == 0) { // Check that institution exists and set $institution var.
     $userinfo = get_userinfo($filepath);
-    if (!array_key_exists("institution",$userinfo)) {
+    if (!array_key_exists("u_institution",$userinfo)) {
        $error = 2;
        $nextpage = 1;
-       mmPutLog('No institution in userinfo');
+       mmPutLog('No u_institution in userinfo');
        $errmsg = "Sorry. Internal error";
     } else {
-       $institution = $userinfo["institution"];
+       $institution = $userinfo["u_institution"];
        mmPutTest("BTN_upload.php: OK get_userinfo");
     }
  }
@@ -131,58 +131,18 @@
  // directory key
  //
  if ($error == 0) {
-    $cmd = "cd " . mmGetRunPath() . "/u1 && grep -H '<dir dirname=\"" . $dirname . "\"' *";
-#    mmPutTest($cmd);
-    $s_dirs = shell_exec($cmd);
-    $matching_dirs = array_values(preg_grep('/dir dirname=/',explode("\n",$s_dirs)));
-#    foreach ($matching_dirs as $d1) {
-#       mmPutTest('matching: ' . $d1);
-#    }
-#    mmPutTest('Count, matching_dirs: ' . count($matching_dirs));
-    if (count($matching_dirs) > 1) {
-       mmPutLog('User directory not unique across all institution directories');
-       $errmsg = 'Sorry. Internal error';
-       $error = 2;
-       $nextpage = 1;
-    }
- }
- if ($error == 0 && count($matching_dirs) == 1) {
-    mmPutTest("BTN_upload.php: OK destination directory found and is unique");
-    if (preg_match ('/^([^.]+)\.([^:]+):<dir dirname="([^"]*)" key="([^"]*)"/',$matching_dirs[0],$r1)) {
-       $s_email = $r1[1];
-       $s_pw = $r1[2];
-       $s_dirname = $r1[3];
-       $s_key = $r1[4];
-       if ($s_email != $normemail && strlen($s_key) > 0 && $s_key != $directory_key) {
-          mmPutLog('Attemted upload to foreign directory using wrong directory key');
-          $errmsg = 'Wrong directory key';
-          $error = 1;
-          $nextpage = 2;
-       } else if ($s_email != $normemail && strlen($s_key) > 0) {
-          $cmd = 'cd ' . mmGetRunPath() . '/u1 && grep \'^<heading name="\' ' . $s_email . '.' . $s_pw;
-          $heading_line = shell_exec($cmd);
-          if (preg_match ('/institution="([^"]+)"/',$heading_line,$r1)) {
-             $institution = decodenorm($r1[1]); // NB: Institution changed
-          } else {
-             mmPutLog('Institution="" not part of heading in u1 file');
-             $errmsg = 'Sorry. Internal error';
-             $error = 2;
-             $nextpage = 1;
-          }
-       } else if ($s_email != $normemail) {
-          mmPutLog('Attemted upload to foreign directory using no directory key');
-          $errmsg = 'Directory key is mandatory when uploading to a foreign directory';
-          $error = 1;
-          $nextpage = 2;
-       }
-    } else {
-       mmPutLog('Not able to extract info from grep -H \'<dir dirname="...\' output from u1 file');
-       $errmsg = 'Sorry. Internal error';
-       $error = 2;
-       $nextpage = 1;
+    $errmsg = "";
+    $new_institution = checkDirectoryPermission($dirname, $directory_key, $errmsg);
+    if ($new_institution === FALSE) {
+       mmPutLog("checkDirectoryPermission returns FALSE: $errmsg");
+       $error = 1;
+       $nextpage = 2;
+    } else if ($new_institution !== TRUE) {
+       $institution = $new_institution;
     }
  }
  if ($error == 0) {
+    mmPutTest("BTN_upload.php: OK destination directory found");
     $dirpath = get_upload_path() . "/" . $institution . "/" . $dirname;
     if (!file_exists($dirpath)) {
        $error = 1;
@@ -197,7 +157,7 @@
              // a replace radio button
     reset($filecontent);
     foreach ($filecontent as $filearr) {
-       if ($filearr["name"] == $origname) {
+       if ($filearr["f_name"] == $origname) {
           mmPutLog('User attemped to upload an existing file without resubmit');
           $errmsg = 'To upload an already uploaded file,' .
                     'you must check the "Replace" radio button to the left of the file entry.';
@@ -218,10 +178,11 @@
        break;
     }
  }
+ $existingname = "";
  if ($error == 0 && $selrec >= 0) { // File to be uploaded have been uploaded before.
                                     // Extract user directory name for the existing
                                     // file
-    $existingname = $filecontent[$selrec]["name"];
+    $existingname = $filecontent[$selrec]["f_name"];
     if (!preg_match ('/^([^_]+)_/',$existingname,$matches)) {
        mmPutLog('Upload: User directory not part of existing file name');
        $errmsg = 'Could not upload. Internal error';
@@ -244,23 +205,6 @@
        }
     }
  }
- if ($error == 0) {
-    if ($selrec >= 0) { // File to be uploaded have been uploaded before.
-
-       // Adjust info about the file to be uploaded in the user file:
-       $filecontent[$selrec]["name"] = $origname;
-       $filecontent[$selrec]["size"] = $size;
-       $filecontent[$selrec]["status"] = "Repeated upload " . gmdate('Y-m-d H:i') . ' UTC';
-       $filecontent[$selrec]["errurl"] = "";
-    } else {
-       $selrec = count($filecontent); // Next available index in the $filecontent
-                                      // array.
-       $filecontent[$selrec]["name"] = $origname;
-       $filecontent[$selrec]["size"] = $size;
-       $filecontent[$selrec]["status"] = "Initial upload " . gmdate('Y-m-d H:i') . ' UTC';
-       $filecontent[$selrec]["errurl"] = "";
-    }
- }
  if ($error == 0) { // Move the uploaded file to the permanent upload directory:
 
     mmPutTest("BTN_upload.php: About to move uploaded file to: " . $dirpath);
@@ -271,14 +215,19 @@
        $nextpage = 1;
     }
  }
- if ($error == 0) { // Write a new version of the user file to disk:
-    mmPutTest("BTN_upload.php: About to update the user file");
-    $bytecount = put_fileinfo($filepath,$filecontent);
-    if ($bytecount == 0) {
-       mmPutLog('Could not update the user file. 0 bytes written');
-       $errmsg = 'Sorry. Internal error';
-       $error = 2;
-       $nextpage = 1;
+ if ($error == 0 and update_fileinfo($filepath,$existingname,$origname,$size) === FALSE) {
+    mmPutLog('Upload: Could not update file info in the User database');
+    $errmsg = 'Could not upload. Internal error';
+    $error = 2;
+    $nextpage = 1;
+ }
+ if ($error == 0) { // Update the $filecontent array
+    $filecontent = get_fileinfo($filepath);
+    if (is_bool($filecontent) && $filecontent == FALSE) {
+        mmPutLog("On updating the filecontent array, function get_fileinfo returned FALSE");
+        $errmsg = 'Sorry. Internal error';
+        $error = 2;
+        $nextpage = 1;
     }
  }
 ?>
