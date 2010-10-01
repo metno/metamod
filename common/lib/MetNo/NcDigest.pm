@@ -1741,7 +1741,7 @@ sub parse_file {
       if (exists($RH_variabletypes{$varname})) {
          $vartype = $RH_variabletypes{$varname};
       } else {
-         foreach my $rex (grep {m!^/.*/$!} keys %RH_variabletypes) {
+         foreach my $rex (grep {m:^/.*/$:} keys %RH_variabletypes) {
             my $j1 = length($rex) - 2;
             my $rex1 = substr($rex,1,$j1);
             if ($varname =~ /$rex1/) {

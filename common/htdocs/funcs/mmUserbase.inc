@@ -460,7 +460,7 @@ class MM_Userbase {
          return FALSE;
       }
       if (!isset($this->user_array[$property])) {
-         $this->note_exception(1,"Property '".$property."' not set");
+         $this->note_exception(0,"Property '".$property."' not set");
          return FALSE;
       }
       return $this->user_array[$property];
@@ -1130,7 +1130,7 @@ class MM_Userbase {
       } else { #   ($rowcount == 1)
          $valuelist = $this->get_SQL_value_list($this->file_ordinary_fields, $this->file_array);
          $sql1 = "UPDATE File\n" .
-            "   SET (" . $this->user_ordinary_fields . ") = \n" .
+            "   SET (" . $this->file_ordinary_fields . ") = \n" .
             "       (" . $valuelist . ")\n" .
             $this->get_SQL_WHERE_clause('u_id, f_name',array($this->user_array['u_id'],$this->file_array['f_name']));
          $qhandle = $this->do_query($sql1);

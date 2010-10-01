@@ -299,48 +299,19 @@ sub add_new_dataset {
 
 sub add_new_file {
     my ( $file_name, $ref_to_values ) = @_;
-    my $current_dset = $userbase->dset_get('ds_name');
-    if ( ( !$current_dset ) and $userbase->exception_is_error() ) {
-        $logger->error( $userbase->get_exception() );
-        return 0;
-    }
-    my $file_dset;
-    if ( $file_name =~ /^([A-Za-z0-9.-]+)_/ ) {
-        $file_dset = $1;    # First matching ()-expression
-    } else {
-        $logger->warn("Filename $file_name contain no dataset name \n");
-        return 0;
-    }
-    if ( $file_dset ne $current_dset ) {
-        my $result = $userbase->dset_find( $application_id, $file_dset );
-        if ( ( !$result ) and $userbase->exception_is_error() ) {
-            $logger->error( $userbase->get_exception() );
-            return 0;
-        } elsif ( !$result ) {    # No such dataset
-            $logger->warn(
-                "Dataset $file_dset (with name taken from file name $file_name) not found in User database\n");
-            return 0;
-        }
-    }
 
-    #
     #     Create a new file
-    #     (for the current dataset) and make it the current file
-    #
+    #     (for the current user) and make it the current file
     if ( ( !$userbase->file_create($file_name) ) and $userbase->exception_is_error() ) {
         $logger->error( $userbase->get_exception() );
         return 0;
     }
 
     #
-    #    foreach key,value pair in a hash
-    #
     while ( my ( $hkey, $hvalue ) = each(%$ref_to_values) ) {
         if ( defined($hvalue) ) {
 
-            #
             #         Set file property for the current file
-            #
             if ( ( !$userbase->file_put( $hkey, $hvalue ) ) and $userbase->exception_is_error() ) {
                 $logger->error( $userbase->get_exception() );
             }
