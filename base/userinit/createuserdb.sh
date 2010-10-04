@@ -70,5 +70,3 @@ GRANT ALL PRIVILEGES ON File TO "[==PG_WEB_USER==]";
 
 \q
 EOF
-
-date +'%Y-%m-%d %H:%M Userbase re-initialized, dynamic tables created' >>[==USERBASELOG==]
