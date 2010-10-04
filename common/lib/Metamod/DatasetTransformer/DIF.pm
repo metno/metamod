@@ -39,6 +39,7 @@ use quadtreeuse;
 use mmTtime;
 use Metamod::Config;
 use Log::Log4perl;
+use POSIX qw();
 #use Dataset; # required later, so we don't have circular 'use'
 
 use 5.6.0;

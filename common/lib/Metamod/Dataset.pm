@@ -37,6 +37,7 @@ use encoding 'utf-8';
 use Carp qw();
 use Metamod::DatasetTransformer;
 use Metamod::DatasetTransformer::MM2;
+use POSIX qw();
 
 use constant NAMESPACE_MM2 => 'http://www.met.no/schema/metamod/MM2';
 use constant MM2 => <<'EOT';
