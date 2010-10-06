@@ -172,7 +172,7 @@ sub notify_web_system {
                         $logger->error( $userbase->get_exception() . "\n" );
                     }
                 } else {
-                    for ( my $i1 = 0 ; $i1 < 4 ; $i1++ ) {
+                    for ( my $i1 = 1 ; $i1 < 4 ; $i1++ ) {
 
                         #
                         #                   Set file property for the current file

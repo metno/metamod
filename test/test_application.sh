@@ -75,7 +75,9 @@
 #    A corresponding directory structure is created for the webupload
 #    and data directories.
 #
-# F. The database is initialized and filled with static data.
+# F. The databases (metadatabase and user database) is initialized and
+#    filled with static data. The user database is loaded with user info
+#    from the webrun/u1 files.
 # 
 # G. The services defined for the application is started.
 #
