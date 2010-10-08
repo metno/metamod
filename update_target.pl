@@ -96,7 +96,9 @@ my $majorVersion;
         die "could not read version from VERSION file\n";
     }
 }
-print "\nConfiguring application '$appName' with Metamod $majorVersion ($version)\n\n";
+if ($optcount == 0) { # Supress this message if only "copy with substitution" is done
+   print "\nConfiguring application '$appName' with Metamod $majorVersion ($version)\n\n";
+}
 
 
 my %conf;
@@ -204,7 +206,7 @@ if (-r $sourcedir . '/common/filelist.txt') {
    push (@flistpathes,$sourcedir . '/common/filelist.txt');
 }
 foreach my $module qw(METAMODBASE METAMODSEARCH METAMODUPLOAD METAMODQUEST METAMODPMH METAMODHARVEST METAMODTHREDDS) {
-   if (exists($conf{$module . '_DIRECTORY'})) {
+   if (exists($conf{$module . '_DIRECTORY'}) and $conf{$module . '_DIRECTORY'} ne "") {
       my $moduledir = $conf{$module . '_DIRECTORY'};
       $moduledir = &substituteval($moduledir);
       push (@flistpathes,$moduledir . '/filelist.txt');
