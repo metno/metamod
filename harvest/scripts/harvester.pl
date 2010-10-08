@@ -71,18 +71,6 @@ my $log = get_logger('metamod.harvester');
 my $xmldirectory = $config->get('WEBRUN_DIRECTORY').'/XML/'.$config->get('APPLICATION_ID').'/';
 my $applicationid = $config->get('APPLICATION_ID');
 my $status_file = $config->get('WEBRUN_DIRECTORY').'/oai_harvest_status';
-#my $path_to_syserrors = $config->get('WEBRUN_DIRECTORY').'/syserrors';
-#my $progress_report = $config->get('TEST_IMPORT_PROGRESS_REPORT');
-## If == 1, prints what's going on via Log4perl [obsolete - configure via Log4perl instead]
-
-#if ($progress_report == 1) {
-#
-#  # Make sure test output is flushed:
-#
-#   my $old_fh = select(STDOUT);
-#   $| = 1;
-#   select($old_fh);
-#}
 
 #
 #  Set up the source URLs from which harvesting should be done, and also
@@ -120,6 +108,7 @@ if ($pid) {
         };
         if ($@) {
             $log->error($@);
+            printf STDERR $@;
             exit(1);
         }
         if ($token) {
@@ -181,83 +170,43 @@ sub do_harvest {
 
             # Open file for reading (with shared lock)
             $log->debug("harvesting $ownertag $url");
-            
+
             my $date_last_upd = getlaststatus($dbh, $applicationid, $url);
-            
-            # # checking for status file and slurping it
-            # my $status_content = "";
-            # if (-r $status_file) {
-            #     open(STATUS,"$status_file") or die "cannot read $status_file: $!\n";
-            #     flock(STATUS, LOCK_SH);
-            #     local $/ = undef;
-            #     $status_content = <STATUS>;
-            #     close (STATUS); # Also unlocks
-            # }
-            # 
-            # $log->debug( "Status content:\n" . substr($status_content, 0, 256) );
-            # 
-            # #find first occurence of datasource in status file (not what we want - should get the last)
-            # my $j1 = index($status_content,$url);
-            # if ($j1 >= 0) {
-            #     $j1 += length($url) + 1;
-            #     $date_last_upd = substr($status_content,$j1,10);
-            # }
+
             my $urlsent = $url . '?verb=ListRecords&metadataPrefix=dif';
             if (defined($date_last_upd)) {
-                $urlsent .= '&from=' . $date_last_upd;
+                $urlsent .= '&from=' . substr( $date_last_upd, 0, 10 ); # use only date from timestamp
             }
             if (exists($hash_set_specifications{$ownertag}) &&
                  defined($hash_set_specifications{$ownertag})) {
                 $urlsent .= '&set=' . $hash_set_specifications{$ownertag};
             }
-            my $content_from_get = getContentFromUrl($urlsent);
-            next unless $content_from_get;
-
-            # Process DIF records:
-            my $resumptionToken = process_DIF_records($ownertag, $content_from_get);
-            while ($resumptionToken) {
-                # continue reading records
-                my $resumptionUrl = $url . '?verb=ListRecord&resumptionToken='. uri_escape($resumptionToken);
-                my $content_from_get = getContentFromUrl($resumptionUrl);
-                last unless $content_from_get;
-                $resumptionToken = process_DIF_records($ownertag, $content_from_get);
+            my $content_from_get = eval { getContentFromUrl($urlsent); };
+            #next unless $content_from_get;
+            if ($@) {
+                $log->error("GET error: $@ for GET $urlsent");
+                next; # probably network or server error, let's wait and see
             }
 
-            # # Update the status file:
-            # open(STATUS,"+>>$status_file") or die "cannot create/append to $status_file: $!\n";
-            # flock(STATUS, LOCK_EX);
-            # my $lastPos = tell(STATUS);
-            # seek(STATUS, 0, SEEK_SET);
-            # read(STATUS, $status_content, $lastPos);
-            # if ($lastPos > 0) {
-            #      $status_content .= "\n";
-            # } else {
-            #      $status_content = "";
-            # }
-            # 
-            # my $j2 = index($status_content,$url);
-            # $log->debug("j2 = $j2\n" . "length of url = " . length($url) );
-            # my $new_status_content;
-            # if ($j2 >= 0) {
-            #     $new_status_content = substr($status_content,0,$j2);
-            #     $new_status_content .= substr($status_content,$j2+length($url)+12);
-            # } else {
-            #     $new_status_content = $status_content;
-            # }
-            # {
-            #     my @utctime = gmtime(mmTtime::ttime());
-            #     my $year = 1900 + $utctime[5];
-            #     my $mon = $utctime[4]; # 0-11
-            #     my $mday = $utctime[3]; # 1-31
-            #     my $updated = sprintf('%04d-%02d-%02d',$year,$mon+1,$mday);
-            #     $new_status_content .= $url . ' ' . $updated . "\n";
-            # }
-            # seek(STATUS,0,SEEK_SET);
-            # print STATUS $new_status_content;
-            # close (STATUS);
-            
-            eval { updatestatus($dbh, $applicationid, $url, $date_last_upd); };
-            $log->error($@) if ($@);
+            # Process DIF records:
+            eval {
+                my $resumptionToken = process_DIF_records($ownertag, $content_from_get);
+                while ($resumptionToken) {
+                    # continue reading records
+                    my $resumptionUrl = $url . '?verb=ListRecord&resumptionToken='. uri_escape($resumptionToken);
+                    my $content_from_get = getContentFromUrl($resumptionUrl);
+                    last unless $content_from_get;
+                    $resumptionToken = process_DIF_records($ownertag, $content_from_get);
+                }
+            };
+
+            if ($@) { # OAI-PMH reports an error
+                $log->error("DIF processing error: $@");
+            } else { # all ok, update status in db to current timestamp
+                eval { updatestatus($dbh, $applicationid, $url, $date_last_upd); };
+                $log->error("Could not update status in DB: $@") if ($@);
+            }
+
         }
         $dbh->disconnect;
         sleep(10);
@@ -269,21 +218,22 @@ sub do_harvest {
 # read/update status timestamps in db
 
 sub getlaststatus {
-   my ($dbh, $app, $source) = @_;
+    # return timestamp of last update or undef if not found
+    my ($dbh, $app, $source) = @_;
 
-   my $stm = $dbh->prepare("SELECT HS_time FROM HarvestStatus WHERE HS_application = ? AND HS_url = ?" );
-   $stm->execute($app, $source) or die($dbh->errstr);
-   my ($lastharvest) = $stm->fetchrow_array;
-   $log->debug("Last update for $app: $source was " . ($lastharvest || 'never'));
-   return $lastharvest; # is undef if not found
+    my $stm = $dbh->prepare("SELECT HS_time FROM HarvestStatus WHERE HS_application = ? AND HS_url = ?" );
+    $stm->execute($app, $source) or die($dbh->errstr);
+    my ($lastharvest) = $stm->fetchrow_array;
+    $log->debug("Last update for $app: $source was " . ($lastharvest || 'never'));
+    return $lastharvest;
 }
 
 sub updatestatus {
-   my ($dbh, $app, $source, $lasttime) = @_;
+   my ($dbh, $app, $source, $exists) = @_;
 
    $log->debug("Logging status for $app: $source to database");
    my $stm = $dbh->prepare(
-      $lasttime
+      $exists
       ? "UPDATE HarvestStatus SET HS_time = now() WHERE HS_application = ? AND HS_url = ?"
       : "INSERT INTO HarvestStatus (HS_application, HS_url, HS_time) VALUES ( ?, ?, now() )"
    );
@@ -295,30 +245,44 @@ sub updatestatus {
 #-----------------------------------------------------------------------
 #
 sub process_DIF_records {
+    # parse DIF XML and extract records
+    # returns a string if ResumptionToken, undef if none, dies on error
     my ($ownertag, $content_from_get) = @_;
     $log->debug("--- Process DIF records:");
     my $parser = new XML::LibXML();
     my $oaiDoc;
     eval {
         $oaiDoc = $parser->parse_string($content_from_get);
-        $log->debug("successfully parsed content\n");
+        $log->debug("Successfully parsed XML\n");
         if ($harvest_schema) {
             # $log->debug("validating ...");
             $harvest_schema->validate($oaiDoc);
-            $log->debug("successfully validated content");
+            $log->debug("Successfully validated XML");
         }
-    }; if ($@) {
-        $log->error("error in parsing: $@\n");
-        #$log->debug( "Error with content: $@" . substr($content_from_get, 0, 250) );
-        return;
-    }
+    };
+
+    die "XML parser error: $@" if $@;
+
+    #if ($@) {
+    #    $log->error("XML parser error: $@\n");
+    #    #$log->debug( "Error with content: $@" . substr($content_from_get, 0, 250) );
+    #    return;
+    #}
+
     my $xpath = XML::LibXML::XPathContext->new();
     $xpath->registerNs('oai', 'http://www.openarchives.org/OAI/2.0/');
-    #
-    # TODO: check for one of the oai error-codes before parsing the records
-    #
+
+    if ( my ($error) = $xpath->findnodes("/*/oai:error", $oaiDoc) ) {
+        my $code = $error->getAttribute('code');
+        if ($code eq 'noRecordsMatch') { # no new records, which is normal
+            $log->debug($error->textContent);
+            return;
+        }
+        die "Harvest source error: " . $error->textContent;
+    }
+
     my @records = $xpath->findnodes("/oai:OAI-PMH/oai:ListRecords/oai:record", $oaiDoc);
-    $log->debug("found ", scalar @records, " records\n");
+    $log->debug("Found ", scalar @records, " DIF records\n");
     my $i;
     foreach my $record (@records) {
         $i++;
@@ -429,10 +393,11 @@ sub getContentFromUrl {
     my $getrequest = $useragent->get($urlsent);
     my $content_from_get;
     if ($getrequest->is_success) {
-        $content_from_get = $getrequest->decoded_content;
+        $content_from_get = $getrequest->decoded_content || '';
     } else {
-        $log->error("GET did not succeed: " . $getrequest->status_line . $content_from_get);
-        return;
+        my $stat = $getrequest->status_line || '';
+        $log->error("GET did not succeed: " . $stat . $content_from_get);
+        die $stat;
     }
     $log->debug("GET request returned " . length($content_from_get) . " bytes");
     return $content_from_get;
@@ -475,27 +440,8 @@ sub makesane {
     }
     return $newstring;
 }
-#
-#-----------------------------------------------------------------------
-#
-# sub my_time {
-#   my $realtime;
-#   if (scalar @_ == 0) {
-#      $realtime = time;
-#   } else {
-#      $realtime = $_[0];
-#   }
-#   my $scaling = $config->get('TEST_IMPORT_SPEEDUP');
-#   if ($scaling <= 1) {
-#      return $realtime;
-#   } else {
-#      my $basistime = $config->get('TEST_IMPORT_BASETIME');
-#      return $basistime + ($realtime - $basistime)*$scaling;
-#   }
-# };
-#
-#-----------------------------------------------------------------------
-#
+
+
 sub trim {
     my ($string) = @_;
     $string =~ s/^\s*//m;
@@ -512,32 +458,6 @@ EOT
 }
 
 
-#
-#---------------------------------------------------------------------------------
-#
-#sub syserror {
-#    my ($type,$errmsg, $content_from_get) = @_;
-#
-#    #  Find current time
-#    my @ta = localtime();
-#    my $year = 1900 + $ta[5];
-#    my $mon = $ta[4] + 1; # 1-12
-#    my $mday = $ta[3]; # 1-31
-#    my $hour = $ta[2]; # 0-23
-#    my $min = $ta[1]; # 0-59
-#    my $datestring = sprintf ('%04d-%02d-%02d %02d:%02d',$year,$mon,$mday,$hour,$min);
-#
-#    #     Write message to error log:
-#    open (OUT,">>$path_to_syserrors");
-#    flock (OUT, LOCK_EX);
-#    print OUT "-------- HARVESTER $datestring:\n" .
-#                 "         $errmsg\n";
-#    if ($type eq "CONTENT" && defined $content_from_get) {
-#        print OUT "         The first 200 characters of \$content_from_get:\n";
-#        print OUT substr($content_from_get,0,200);
-#        print OUT "\n";
-#    }
-#};
 
 =head1 NAME
 
