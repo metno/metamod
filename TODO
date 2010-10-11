@@ -1,17 +1,6 @@
-Quest in upload/admin
-===================== 
-* password for quest, or generally better session handling (PHP build in sessions?)
-* automatically filling data from directory contents
-
 General tasks for Metamod2
 ==========================
-* central security handling
-* unified session handling
-* splitting config: installation config, runtime config, app runtime config
-   reading runtime config on the fly,
-   reducing number of [==VAR==] in scripts to close to 0
-* using single metadata-configuration for quest and upload
-  * using another config (but connected) for digest_nc.pl to extract metadata
-    from nc-files
-* concentrate on one scripting language, avoid the other
-* use centralised logging, i.e. log4php or simply mmLogging.php
+
+* deletion of datasets by user
+* better metadata conversion
+* concentrate on one scripting language (perl), avoid the other

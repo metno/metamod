@@ -63,14 +63,15 @@ of the METAMOD 2.x distribution:
 
 - NetCDF software 3.x (x >= 5): libnetcdf, ncdump and ncgen (METAMODUPLOAD)
 
-- PHP 5.x with libxml, libxslt and libpsql installed
+- PHP 5.x with libxml, libxslt, libgd and libpsql installed and the PEAR-modules:
+  Auth, DB, Log
 
 - Perl v5.8 with the following Perl modules:
   XML::Simple, XML::LibXML, XML::LibXSLT, DBI, DBD::Pg
   Geo::Proj4, Mail::Mailer, PDL, PDL::Char, PDL::NetCDF,
-  LWP* (libwww-perl), URI::Escape
-
-METAMOD 2.x has been developed and tested using Fedora and Debian Linux, but
+  LWP* (libwww-perl), URI::Escape, XML-RSS-LibXML
+  
+METAMOD 2.x has been developed and tested using Ubuntu Linux 8.04, but
 should work on most operating systems supporting the mentioned libraries.
 
 
