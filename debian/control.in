@@ -10,7 +10,7 @@ Section: web
 Priority: optional
 Architecture: all
 Essential: no
-Depends: libapache2-mod-php5, php5-pgsql, php5-gd, php5-xsl, libdbd-pg-perl, libxml-simple-perl, libxml-libxslt-perl, libmailtools-perl, libwww-perl, pdl, proj, liburi-perl, libpdl-netcdf-perl, libgeo-proj4-perl, php-auth, php-db, php-log
+Depends: libapache2-mod-php5, php5-pgsql, php5-gd, php5-xsl, libdbd-pg-perl, libxml-simple-perl, libxml-libxslt-perl, libmailtools-perl, libwww-perl, pdl, proj, liburi-perl, libpdl-netcdf-perl, libgeo-proj4-perl, php-auth, php-db, php-log, libxml-rss-libxml-perl
 Pre-Depends: perl 
 Recommends: exim4 | postfix | sendmail, libxml2-utils, mailx, subversion, libdatetime-perl
 Suggests: metamod2-database
