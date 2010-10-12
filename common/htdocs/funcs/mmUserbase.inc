@@ -90,6 +90,7 @@ class MM_Userbase {
       global $mmConfig;
       $this->dbh = @pg_Connect ("dbname=".$mmConfig->getVar('USERBASE_NAME').
                    " user=".$mmConfig->getVar('PG_WEB_USER')." ".$mmConfig->getVar('PG_CONNECTSTRING_PHP'));
+      pg_set_client_encoding($this->dbh, 'LATIN1');
       $this->pending_user_updates = FALSE;
       $this->pending_dataset_updates = FALSE;
       $this->pending_file_updates = FALSE;
