@@ -468,7 +468,6 @@ Return value: TRUE on success, FALSE on error.
         my $ident                = ident($self);
         my $pending_file_updates = $pending_file_updates{$ident};
         my $pending_user_updates = $pending_user_updates{$ident};
-        my $in_transaction       = $in_transaction{$ident};
         my $dbh                  = $dbh{$ident};
         if ($pending_file_updates) {
             if ( !( $self->_update_file() ) ) {
@@ -484,7 +483,7 @@ Return value: TRUE on success, FALSE on error.
         }
 
         # print "FROM close: passed pending_user_updates\n";
-        if ($in_transaction) {
+        if ($in_transaction{$ident}) {
 
             # print "FROM close: ready to run COMMIT\n";
             if ( !$dbh->commit ) {
@@ -513,9 +512,8 @@ Return value: TRUE on success, FALSE on error.
     sub revert {
         my $self           = shift;
         my $ident          = ident($self);
-        my $in_transaction = $in_transaction{$ident};
         my $dbh            = $dbh{$ident};
-        if ($in_transaction) {
+        if ($in_transaction{$ident}) {
             if ( !$dbh->rollback ) {
                 my $pg_error = $dbh->errstr;
                 $self->_note_exception( 1, "Failed to rollback transaction. " . $pg_error );

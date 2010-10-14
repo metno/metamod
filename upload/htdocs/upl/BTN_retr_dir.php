@@ -69,7 +69,7 @@
        $dirattributes = $dirinfo[$dirname];
        foreach (array('DSKEY','LOCATION','CATALOG','WMS_URL','WMS_XML') as $k1) {
           if (array_key_exists($k1, $dirattributes)) {
-             $val = decodenorm($dirattributes[$k1]);
+             $val = $dirattributes[$k1];
              if ($k1 == 'DSKEY') {
                 $dirkey = $val;
              } else if ($k1 == 'LOCATION') {

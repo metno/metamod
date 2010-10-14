@@ -85,18 +85,13 @@
     }
     if (strlen($pawnew1) > 0 && strlen($pawnew2) > 0) {
        if ($changepaw && $pawnew1 == $pawnew2) { // Change password to user-supplied password
-          $newfilename = $normemail . '.' . normstring($pawnew1); // User filename
-          $newfilepath = $u1path . '/' . $newfilename;
-          if (!rename($filepath,$newfilepath)) {
-             mmPutLog("Function rename returnef FALSE.");
-             mmPutLog("   - from: $filepath");
-             mmPutLog("   - to:   $newfilepath");
+          if (!changePassword($filepath,$pawnew1)) {
              $errmsg = 'Sorry. Could not change your password. Internal error';
              $error = 2;
              $nextpage = 1;
           } else {
-             $filename = $newfilename;
-             $filepath = $newfilepath;
+             $filename = $normemail . '.' . normstring($pawnew1);
+             $filepath = $u1path . '/' . $filename;
              $paw = $pawnew1;
              $errextra = 'Your password were changed, BUT: ';
           }

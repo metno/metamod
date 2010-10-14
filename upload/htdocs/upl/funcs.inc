@@ -826,4 +826,33 @@ function checkDirectoryPermission($directory, $key = "", &$errMsg = "") {
        return false;
     }
 }
+function changePassword($filepath,$newpassword) {
+    global $mmConfig;
+    $normpasswd = normstring($newpassword);
+    $parts = explode(".",basename($filepath));
+    $normemail = $parts[0];
+    $newfilepath = dirname($filepath) . '/' . $normemail . '.' . $normpasswd;
+    if (!rename($filepath,$newfilepath)) {
+       mmPutLog("Function rename returned FALSE. $filepath -> $newfilepath");
+       return FALSE;
+    }
+    $email_address =  decodenorm($normemail);
+    $application_id = $mmConfig->getVar('APPLICATION_ID');
+    $userbase = new MM_Userbase();
+    if ($userbase->user_find($email_address, $application_id) === FALSE) {
+       if ($userbase->exception_is_error()) {
+          mmPutLog($userbase->get_exception());
+       } else {
+          mmPutLog("ERROR: User $email_address not found in User database");
+       }
+    } else {
+        if ($userbase->user_put('u_password',$newpassword) === FALSE) {
+           mmPutLog($userbase->get_exception());
+        }
+    }
+    if ($userbase->close() === FALSE) {;
+       mmPutLog($userbase->get_exception());
+    }
+    return TRUE;
+}
 ?>

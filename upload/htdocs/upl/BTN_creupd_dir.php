@@ -96,7 +96,7 @@
        $dirattributes = $dirinfo[$dirname];
        foreach (array('DSKEY','LOCATION','CATALOG','WMS_URL') as $k1) {
           if (array_key_exists($k1, $dirattributes)) {
-             $val = decodenorm($dirattributes[$k1]);
+             $val = $dirattributes[$k1];
              if ($k1 == 'DSKEY') {
                 $odirkey = $val;
              } else if ($k1 == 'LOCATION') {
@@ -140,7 +140,7 @@
     if ($dirkey != $odirkey) {
        $update_dirinfo_needed = TRUE;
     }
-    $ndirkey = normstring($dirkey);
+    $ndirkey = $dirkey;
     mmPutTest("BTN_creupd_dir.php: directory key checked");
  }
  if ($error == 0 && $external_repository) {
@@ -163,7 +163,7 @@
     if ($location != $olocation) {
        $update_dirinfo_needed = TRUE;
     }
-    $nlocation = normstring($location);
+    $nlocation = $location;
     if ($error == 0) {
        if (strlen($threddscatalog) == 0) {
           $error = 1;
@@ -181,7 +181,7 @@
           $update_dirinfo_needed = TRUE;
        }
     }
-    $nthreddscatalog = normstring($threddscatalog);
+    $nthreddscatalog = $threddscatalog;
     mmPutTest("BTN_creupd_dir.php: THREDDS catalog checked");
  }
  $repositorypath = get_repository_path();
@@ -202,7 +202,7 @@
     if ($wmsurl != $owmsurl) {
        $update_dirinfo_needed = TRUE;
     }
-    $nwmsurl = normstring($wmsurl);
+    $nwmsurl = $wmsurl;
     mmPutTest("BTN_creupd_dir.php: URL to WMS checked");
  }
  if ($error == 0 && ! $external_repository) {
