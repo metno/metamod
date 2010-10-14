@@ -42,7 +42,7 @@ use FindBin qw($Bin);
 use lib "$Bin/common/lib";
 use Metamod::Config;
 
-my $appdir = shift @ARGV or die "Usage: $0 application_directory";
+my $appdir = shift @ARGV or usage();
 
 my $mm_config = Metamod::Config->new("$appdir/master_config.txt");
 my $conf_file = $mm_config->get('APACHE_SITE_CONFIG');
@@ -73,7 +73,17 @@ Alias $local	$target/htdocs
 
 EOT
 
-print $conf_text;
+if ($conf_file) {
+    open FH, ">$conf_file" or die "Cannot open $conf_file for writing";
+    print FH $conf_text;
+} else {
+    print $conf_text;
+}
+
+sub usage {
+    print STDERR "Usage: $0 application_directory\n";
+    exit (1);
+}
 
 =head1 NAME
 
