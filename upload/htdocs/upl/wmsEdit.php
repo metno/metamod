@@ -2,34 +2,34 @@
 /*
  * Created on Jul 20, 2009
  *
- *---------------------------------------------------------------------------- 
- * METAMOD - Web portal for metadata search and upload 
+ *----------------------------------------------------------------------------
+ * METAMOD - Web portal for metadata search and upload
  *
- * Copyright (C) 2009 met.no 
+ * Copyright (C) 2009 met.no
  *
- * Contact information: 
- * Norwegian Meteorological Institute 
- * Box 43 Blindern 
- * 0313 OSLO 
- * NORWAY 
- * email: heiko.klein@met.no 
- *  
- * This file is part of METAMOD 
+ * Contact information:
+ * Norwegian Meteorological Institute
+ * Box 43 Blindern
+ * 0313 OSLO
+ * NORWAY
+ * email: heiko.klein@met.no
  *
- * METAMOD is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 2 of the License, or 
- * (at your option) any later version. 
+ * This file is part of METAMOD
  *
- * METAMOD is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
- * GNU General Public License for more details. 
- *  
- * You should have received a copy of the GNU General Public License 
- * along with METAMOD; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
- *--------------------------------------------------------------------------- 
+ * METAMOD is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * METAMOD is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with METAMOD; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *---------------------------------------------------------------------------
  */
 require_once("../funcs/mmConfig.inc");
 // must be called from main.php and via BTN_editwms_dir, to set variables $wmsDataset and $wmsDatasetFile
@@ -108,12 +108,12 @@ require_once("../funcs/mmConfig.inc");
             </p>
             <p>
             <b>You will need to have made a working DIANA setup on the
-            diana-WMS server</b>.  
+            diana-WMS server</b>.
             </p>
             <p>The setup will be uploaded within the next 10 minutes. <b>Please test your setup!</b></p>
-            <p>Simply edit/add a setup according the example below. The most important parameters are the url in the begining 
+            <p>Simply edit/add a setup according the example below. The most important parameters are the url in the begining
             (using the DATASET_PARENT and DATASET), and the displayArea (EPSG:32661 (northpole), EPSG:32761 (southpole) and EPSG:4326 (lat/lon))
-				The layer/palette setup is optional.
+				The layer/palette setup is optional. To connect to the thredds datasets with ncWMS, use url="%THREDDS_DATAREF%".
             <pre>
 <?php $input = <<<EOT
 <?xml version="1.0" encoding="UTF-8"?>

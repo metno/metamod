@@ -45,6 +45,7 @@ include_once "mmConfig.inc"
  */
 class MM_WMSSetup2 {
    private $wmsTemplate = "";
+   private $dbh;
    const wmsSetupNS = "http://www.met.no/schema/metamod/ncWmsSetup";
 
 	static function getSchema() {
@@ -59,9 +60,10 @@ class MM_WMSSetup2 {
     * @param $validate boolean flag, validate xml-string, default false
     * @throws MM_DatasetException if the string is not parseable
     */
-   function __construct($str, $isParent = true, $validate = false) {
+   function __construct($str, $dbh = false, $isParent = true, $validate = false) {
    	// contains attributes: isParent, isComplex, dom, xpath, rul
    	$this->isParent = $isParent;
+   	$this->dbh = $dbh;
       if (strlen($str)) {
          $this->dom = new DOMDocument();
          if (!$this->dom->loadXML($str)) {
@@ -81,7 +83,8 @@ class MM_WMSSetup2 {
    }
 
    /**
-    * get the real url, (replacing %DATASET_PARENT% and %DATASET% with the $datasetName)
+    * get the real url, (replacing %DATASET_PARENT% and %DATASET% or %THREDDS_WMS_DATAREF%
+    * with the $datasetName)
     * change the url of this if required
     */
    function getUrl($datasetName = '') {
@@ -98,6 +101,16 @@ class MM_WMSSetup2 {
                	}
                	$url = preg_replace('/%DATASET%/', $dataset, $url);
                	$url = preg_replace('/%DATASET_PARENT%/', $parent, $url);
+               	if (preg_match('/%THREDDS_DATAREF%/', $url)) {
+							$threddsDataref = getDataRef($dataset);
+							// translate url like
+							// http://osisaf.met.no/thredds/catalog/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/catalog.html?dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
+							// to
+							// http://osisaf.met.no/thredds/wms/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/05/ice_drift_nh_polstere-625_amsr-aqua_201005291200-201005311200.nc.gz
+               	   //                          dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
+               	   preg_replace(':(.*/thredds/)catalog/.*\?dataset=(.*):', "$1/wms/$2", $threddsDataref);
+               	   $url = preg_replace('/%THREDDS_DATAREF%/', $threddsDataref, $url);
+               	}
                   $att->nodeValue = $url;
                }
 				}
@@ -165,6 +178,32 @@ class MM_WMSSetup2 {
 	 	    $this->getUrl($dataset);
 	 	 }
 	    return $this->dom->saveXML();
+	 }
+
+	 function getDataRef($dataset) {
+	 	if (!$this->dbh) {
+	 	   return "";
+	 	}
+	 	$sql = 'SELECT MD_content FROM DataSet, DS_Has_MD, Metadata'.
+		       ' WHERE DataSet.name = $1 '.
+	     	    '   AND DataSet.DS_id = DS_Has_MD.DS_id' .
+	     	    '   AND Metadata.MD_id = DS_Has_MD.MD_id'.
+	     	    '   AND MT.name = $2';
+	   $result = pg_query_params($this->dbh, $sql, array($dataset, 'dataref'));
+	   if (!$result) {
+	  	   mm_log(MM_ERROR, "Could not execute $sql", __FILE__, __LINE__);
+     	   die("Internal Error");
+	   }
+	   $threddsUrl = "";
+	   if (pg_num_rows($result) >= 1) {
+	   	if ($row = pg_fetch_row($result)) {
+	   		$threddsUrl = $row[0];
+	   	}
+	   } else {
+	      mm_log(MM_ERROR, "No dataref for $dataset", __FILE__, __LINE__);
+     	   die("Internal Error");
+	   }
+	   return $threddsUrl;
 	 }
 }
 
@@ -240,7 +279,7 @@ function getWMSSetup2FromDbById($pgDB, $datasetId) {
 		}
 	}
 	if ($row = pg_fetch_row($result)) {
-		return new MM_WMSSetup2($row[0], $isParent);
+		return new MM_WMSSetup2($row[0], $pgDB, $isParent);
 	}
 	return false;
 }
@@ -279,7 +318,7 @@ function getGeneralWMSSetupFromDbById($pgDB, $datasetId) {
 	}
 	if ($row = pg_fetch_row($result)) {
 		if (preg_match('!ncWmsSetup!', $row[0])) {
-			return new MM_WMSSetup2($row[0], $isParent);
+			return new MM_WMSSetup2($row[0], $pgDB, $isParent);
 		} elseif (preg_match('!wmcSetup!', $row[0])){
 		   return new MM_WMSSetup($row[0]);
 		}

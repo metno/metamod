@@ -7,6 +7,7 @@ search/ /usr/share/metamod-2.x/search/
 thredds/ /usr/share/metamod-2.x/thredds/
 upload/ /usr/share/metamod-2.x/upload/
 update_target.pl /usr/share/metamod-2.x/
+gen_httpd_conf.pl /usr/share/metamod-2.x/
 LICENCE /usr/share/metamod-2.x/
 README /usr/share/metamod-2.x/
 VERSION /usr/share/metamod-2.x/
