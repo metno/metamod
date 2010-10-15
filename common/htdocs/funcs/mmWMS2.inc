@@ -102,7 +102,7 @@ class MM_WMSSetup2 {
                	$url = preg_replace('/%DATASET%/', $dataset, $url);
                	$url = preg_replace('/%DATASET_PARENT%/', $parent, $url);
                	if (preg_match('/%THREDDS_DATAREF%/', $url)) {
-							$threddsDataref = getDataRef($dataset);
+							$threddsDataref = $this->getDataRef($dataset);
 							// translate url like
 							// http://osisaf.met.no/thredds/catalog/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/catalog.html?dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
 							// to
