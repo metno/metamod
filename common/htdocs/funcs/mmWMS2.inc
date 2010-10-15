@@ -102,13 +102,13 @@ class MM_WMSSetup2 {
                	$url = preg_replace('/%DATASET%/', $dataset, $url);
                	$url = preg_replace('/%DATASET_PARENT%/', $parent, $url);
                	if (preg_match('/%THREDDS_DATAREF%/', $url)) {
-							$threddsDataref = $this->getDataRef($dataset);
+							$threddsDataref = $this->getDataRef($datasetName);
 							// translate url like
 							// http://osisaf.met.no/thredds/catalog/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/catalog.html?dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
 							// to
 							// http://osisaf.met.no/thredds/wms/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/05/ice_drift_nh_polstere-625_amsr-aqua_201005291200-201005311200.nc.gz
                	   //                          dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
-               	   preg_replace(':(.*/thredds/)catalog/.*\?dataset=(.*):', "$1/wms/$2", $threddsDataref);
+               	   $threddsDataref = preg_replace(':(.*/thredds)/catalog/.*\?dataset=(.*):', "$1/wms/$2", $threddsDataref);
                	   $url = preg_replace('/%THREDDS_DATAREF%/', $threddsDataref, $url);
                	}
                   $att->nodeValue = $url;
@@ -180,16 +180,16 @@ class MM_WMSSetup2 {
 	    return $this->dom->saveXML();
 	 }
 
-	 function getDataRef($dataset) {
+	 function getDataRef($datasetName) {
 	 	if (!$this->dbh) {
 	 	   return "";
 	 	}
 	 	$sql = 'SELECT MD_content FROM DataSet, DS_Has_MD, Metadata'.
-		       ' WHERE DataSet.name = $1 '.
+		       ' WHERE DataSet.DS_name = $1 '.
 	     	    '   AND DataSet.DS_id = DS_Has_MD.DS_id' .
 	     	    '   AND Metadata.MD_id = DS_Has_MD.MD_id'.
-	     	    '   AND MT.name = $2';
-	   $result = pg_query_params($this->dbh, $sql, array($dataset, 'dataref'));
+	     	    '   AND Metadata.MT_name = $2';
+	   $result = pg_query_params($this->dbh, $sql, array($datasetName, 'dataref'));
 	   if (!$result) {
 	  	   mm_log(MM_ERROR, "Could not execute $sql", __FILE__, __LINE__);
      	   die("Internal Error");
@@ -241,7 +241,7 @@ function getWMSSetup2FromDb($pgDB, $datasetName) {
 		}
 	}
 	if ($row = pg_fetch_row($result)) {
-		return new MM_WMSSetup2($row[0], $isParent);
+		return new MM_WMSSetup2($row[0], $pgDB, $isParent);
 	}
 	return false;
 }
