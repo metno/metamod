@@ -11,9 +11,7 @@ This module comprise two main systems:
 
      Three scripts are involved in this system:
 
-     upload_monitor.pl    This script runs continously as long as the file
-                          upl/CONTINUE_UPLOAD_MONITOR (in the webrun directory)
-                          exists. It sleeps most of the time, but wakes up to
+     upload_monitor.pl    It sleeps most of the time, but wakes up to
                           see if any new files are uploaded, either through
                           the web application, or directly (by ftp or another
                           program). It investigates the file type of the
