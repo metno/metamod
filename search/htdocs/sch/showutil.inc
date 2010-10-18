@@ -51,26 +51,26 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = f
          $s1 .= ' <a href="feed/' . $nameshown . '">';
          $s1 .= '<img style="border: 0px;" src="../img/feed.png" alt="RSS feed" /></a>';
       }
-      
+
       $s1 .= "<div class=\"btns\">";
-      
+
       if( $level1 && $mmConfig->getVar('SUBSCRIPTION_ENABLED') == 'ENABLED' ){
-          
+
           # the subscription button should only be shown for datasets that are in the user base.
           $applicId = $mmConfig->getVar('APPLICATION_ID');
           $userbase = new MM_Userbase();
-          if( $userbase->dset_find( $applicId, $nameshown ) ){          
+          if( $userbase->dset_find( $applicId, $nameshown ) ){
             $s1 .= "<a class=\"btn\" href=\"subscription.php?action=display_email_form&dataset_name=$nameshown\"><span>Subscribe</span></a><br/>";
           }
-          $userbase->close();          
+          $userbase->close();
       }
-      
+
       if ($wmsSetup) {
 	$wmsQuery = $wmsSetup->getClientQuery($dsName);
 	 if (preg_match('/wmssetup/', $wmsQuery)) {
 	    $s1 .= "<iframe class=\"thumbmap\" src=\"wmsthmb?$wmsQuery&size=64\"></iframe>";
 	 }
-	 $s1 .= "<a class=\"visual\" href=\"wms.php?$wmsQuery\" ><span>Visualize</span></a><br/>";
+	 $s1 .= "<a class=\"visual\" href=\"wms.php?$wmsQuery\" ><span>Visualize</span></a><br /><br />";
       }
       $s1 .= " <a class=\"btn\" href=\"xmlShow.php?dsName=$dsName\" target=\"_new\"><span>Show xml</span></a> ";
       $s1 .= "</div>";
