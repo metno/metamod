@@ -108,6 +108,16 @@
    margin: 1px;
    border: 1px solid black;
 }
+.explusminus {
+   background:none repeat scroll 0 0 #ECFBFB;
+   border:1px solid #A0EEFA;
+   color:#000099;
+   font-size:90%;
+   height:18px;
+   margin:1px;
+   padding:1px;
+   width:18px;
+}
 .selectbutton {
    display: block;
    text-decoration: none;
