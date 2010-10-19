@@ -32,7 +32,7 @@
 //
 //
 
-// please change to the according metadata prefix you use 
+// please change to the according metadata prefix you use
 // $prefix = 'oai_dc';
 
 // you do need to change anything in the namespace and schema stuff
@@ -40,9 +40,9 @@
 
 $prefix = $metadataPrefix;
 if ($metadataPrefix == 'iso19115') {
-   $prefix = 'dif'; # iso19115 read as dif and converted afterwards 
+   $prefix = 'dif'; # iso19115 read as dif and converted afterwards
 }
-$output .= 
+$output .=
 '   <metadata>'."\n";
 
 $gotFile = 0;
@@ -56,7 +56,7 @@ if ((($metadataPrefix == 'dif') && ($record[$SQL['metadataFormat']] == 'DIF')) |
 		try {
 			$ds = new MM_ForeignDataset($xmdContent, $xmlContent, 1);
 			$xml =  $ds->getOther_XML();
-			$xml = substr($xml, strpos($xml, "\n")); # remove first line, <?xml 
+			$xml = substr($xml, strpos($xml, "\n")); # remove first line, <?xml
 			$output .= $xml;
 			$gotFile = 1;
 		} catch (MM_DatasetException $mde) {
@@ -75,7 +75,7 @@ if (!$gotFile) {
     $last_mainelement = ""; # This variable is used to remember the first element in $xmlpath.
                             # If the new $xmlpath has the same first element, and both $xmlpath
                             # (old and new) have an initial '*', this initial '*' is removed
-                            # from the new $xmlpath. This is done to allow optional items 
+                            # from the new $xmlpath. This is done to allow optional items
                             # to trig the production of a complex XML element. The first item
                             # encountered will trig this production (by keeping the '*'), while
                             # subsequent items will be included in the complex XML element
@@ -206,14 +206,14 @@ if (!$gotFile) {
 	$outRecord .= $b1->get();
 
 	// Here, no changes need to be done
-	$outRecord .=           
+	$outRecord .=
 	'     </'.$METADATAFORMATS[$prefix]['metadataPrefix'];
 	if (isset($METADATAFORMATS[$prefix]['record_prefix'])) {
 		$outRecord .= ':'.$METADATAFORMATS[$prefix]['record_prefix'];
 	}
 	$outRecord .= ">\n";
 	#$outRecord contains now the document
-	
+
 	if ($metadataPrefix == 'iso19115') {
       # translate from dif to iso19115
 	   # convert dif record to DOM
@@ -225,7 +225,7 @@ if (!$gotFile) {
       $xslDoc->load($METADATAFORMATS[$metadataPrefix]['dif2isoXslt']);
       $xslt = new XSLTProcessor();
       $xslt->importStylesheet( $xslDoc );
-      
+      $xslt->setParameter('', 'REPOSITORY_IDENTIFIER', $repositoryIdentifier);
       # return to string
       $xml = $xslt->transformToXML( $xmlDoc );
       # remove xml declaration and return to outRecord

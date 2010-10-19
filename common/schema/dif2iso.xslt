@@ -7,6 +7,7 @@
                 xmlns:gmd="http://www.isotc211.org/2005/gmd">
 
   <xsl:output method="xml" indent="yes"/>
+  <xsl:param name="REPOSITORY_IDENTIFIER"/>
 
   <xsl:variable name="uc" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
   <xsl:variable name="lc" select="'abcdefghijklmnopqrstuvwxyz'"/>
@@ -19,7 +20,7 @@
       <!-- fileIdentifier ? -->
       <gmd:fileIdentifier>
         <gco:CharacterString>
-          <xsl:copy-of select="dif:Entry_ID/child::node()"/>
+          <xsl:if test="$REPOSITORY_IDENTIFIER">urn:<xsl:value-of select="$REPOSITORY_IDENTIFIER"/>:</xsl:if><xsl:copy-of select="dif:Entry_ID/child::node()"/>
         </gco:CharacterString>
       </gmd:fileIdentifier>
 
@@ -165,10 +166,10 @@
         <gco:CharacterString>2003</gco:CharacterString>
       </gmd:metadataStandardVersion>
 
-      <xsl:if test="/dif:DIF/dif:Online_Resource">
+      <xsl:if test="/dif:DIF/dif:Data_Set_Citation/dif:Online_Resource">
         <gmd:dataSetURI>
           <gco:CharacterString>
-            <xsl:copy-of select="/dif:DIF/dif:Online_Resource"/>
+            <xsl:copy-of select="/dif:DIF/dif:Data_Set_Citation/dif:Online_Resource/child::text()"/>
           </gco:CharacterString>
         </gmd:dataSetURI>
       </xsl:if>
@@ -471,7 +472,7 @@
           </xsl:for-each>
         </gmd:MD_DataIdentification>
       </gmd:identificationInfo>
-      <xsl:if test="/dif:DIF/dif:Online_Resource">
+      <xsl:if test="/dif:DIF/dif:Data_Set_Citation/dif:Online_Resource">
         <gmd:distributionInfo>
           <gmd:MD_Distribution>
             <gmd:transferOptions>
@@ -480,7 +481,7 @@
                   <gmd:CI_OnlineResource>
                     <gmd:linkage>
                       <gmd:URL>
-                        <xsl:copy-of select="/dif:DIF/dif:Online_Resource"/>
+                        <xsl:copy-of select="/dif:DIF/dif:Data_Set_Citation/dif:Online_Resource/child::text()"/>
                       </gmd:URL>
                     </gmd:linkage>
                   </gmd:CI_OnlineResource>
