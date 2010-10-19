@@ -24,14 +24,14 @@
         <xsl:copy-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString/child::text()"/>
       </Entry_Title>
       <Data_Set_Citation>
-        <xsl:if test="/gmd:MD_Metadata/gmd:dataSetURI/gco:CharacterString">
+        <xsl:if test="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='principalInvestigator']/gmd:individualName">
           <Dataset_Creator>
-            <xsl:if test="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='principalInvestigator']/gmd:individualName">
-              <xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='principalInvestigator']/gmd:individualName/gco:CharacterString/child::text()"/>
-            </xsl:if>
+             <xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='principalInvestigator']/gmd:individualName/gco:CharacterString/child::text()"/>
           </Dataset_Creator>
+        </xsl:if>  
+        <xsl:if test="/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL">
           <Online_Resource>
-            <xsl:copy-of select="/gmd:MD_Metadata/gmd:dataSetURI/gco:CharacterString/child::text()"/>
+            <xsl:copy-of select="/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/child::text()"/>
           </Online_Resource>
         </xsl:if>
       </Data_Set_Citation>

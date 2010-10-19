@@ -165,10 +165,10 @@
         <gco:CharacterString>2003</gco:CharacterString>
       </gmd:metadataStandardVersion>
 
-      <xsl:if test="/dif:DIF/dif:Data_Center/dif:Data_Center_URL">
+      <xsl:if test="/dif:DIF/dif:Online_Resource">
         <gmd:dataSetURI>
           <gco:CharacterString>
-            <xsl:copy-of select="/dif:DIF/dif:Data_Center/dif:Data_Center_URL/child::text()"/>
+            <xsl:copy-of select="/dif:DIF/dif:Online_Resource"/>
           </gco:CharacterString>
         </gmd:dataSetURI>
       </xsl:if>
@@ -471,7 +471,7 @@
           </xsl:for-each>
         </gmd:MD_DataIdentification>
       </gmd:identificationInfo>
-      <xsl:if test="/dif:DIF/dif:Data_Center/dif:Data_Center_URL">
+      <xsl:if test="/dif:DIF/dif:Online_Resource">
         <gmd:distributionInfo>
           <gmd:MD_Distribution>
             <gmd:transferOptions>
@@ -480,7 +480,7 @@
                   <gmd:CI_OnlineResource>
                     <gmd:linkage>
                       <gmd:URL>
-                        <xsl:copy-of select="/dif:DIF/dif:Data_Center/dif:Data_Center_URL/child::text()"/>
+                        <xsl:copy-of select="/dif:DIF/dif:Online_Resource"/>
                       </gmd:URL>
                     </gmd:linkage>
                   </gmd:CI_OnlineResource>
