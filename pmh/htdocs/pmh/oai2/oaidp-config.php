@@ -1,4 +1,4 @@
-<?    
+<?
 /*
 * +----------------------------------------------------------------------+
 * | PHP Version 4                                                        |
@@ -33,9 +33,9 @@
 // $Id: oaidp-config.php,v 1.07 2004/07/01 16:59:57 stamer Exp $
 //
 
-/* 
+/*
  * This is the configuration file for the PHP OAI Data-Provider.
- * Please read through the WHOLE file, there are several things, that 
+ * Please read through the WHOLE file, there are several things, that
  * need to be adjusted:
 
  - where to find the PEAR classes (look for PEAR SETUP)
@@ -44,14 +44,14 @@
  - the encoding your data is stored (all below DATABASE SETUP)
 */
 
-// To install, test and debug use this	
+// To install, test and debug use this
 // If set to TRUE, will die and display query and database error message
 // as soon as there is a problem. Do not set this to TRUE on a production site,
 // since it will show error messages to everybody.
 // If set FALSE, will create XML-output, no matter what happens.
 $SHOW_QUERY_ERROR = FALSE;
 
-// The content-type the WWW-server delivers back. For debug-puposes, "text/plain" 
+// The content-type the WWW-server delivers back. For debug-puposes, "text/plain"
 // is easier to view. On a production site you should use "text/xml".
 $CONTENT_TYPE = 'Content-Type: '.$mmConfig->getVar('PMH_CONTENT_TYPE');
 
@@ -68,7 +68,7 @@ $CONTENT_TYPE = 'Content-Type: '.$mmConfig->getVar('PMH_CONTENT_TYPE');
 // ini_set('include_path', '.;c:\php\pear');
 
 // if there are problems with unknown 'numrows', then make sure
-// to upgrade to a decent PEAR version. 
+// to upgrade to a decent PEAR version.
 // require_once('DB.php');
 
 error_reporting(E_ALL & ~E_NOTICE);
@@ -89,23 +89,23 @@ $protocolVersion      = '2.0';
 // How your repository handles deletions
 // no: 			The repository does not maintain status about deletions.
 //				It MUST NOT reveal a deleted status.
-// persistent:	The repository persistently keeps track about deletions 
+// persistent:	The repository persistently keeps track about deletions
 //				with no time limit. It MUST consistently reveal the status
 //				of a deleted record over time.
-// transient:   The repository does not guarantee that a list of deletions is 
+// transient:   The repository does not guarantee that a list of deletions is
 //				maintained. It MAY reveal a deleted status for records.
-// 
+//
 // If your database keeps track of deleted records change accordingly.
 // Currently if $record['deleted'] is set to 'true', $status_deleted is set.
-// Some lines in listidentifiers.php, listrecords.php, getrecords.php  
+// Some lines in listidentifiers.php, listrecords.php, getrecords.php
 // must be changed to fit the condition for your database.
-$deletedRecord        = 'transient'; 
+$deletedRecord        = 'transient';
 
 // MAY (only one)
 //granularity is days
-$granularity          = 'YYYY-MM-DD';
+//$granularity          = 'YYYY-MM-DD';
 // granularity is seconds
-// $granularity          = 'YYYY-MM-DDThh:mm:ssZ';
+$granularity          = 'YYYY-MM-DDThh:mm:ssZ';
 
 // MUST (only one)
 // the earliest datestamp in your repository,
@@ -120,13 +120,13 @@ if ($granularity == 'YYYY-MM-DDThh:mm:ss:Z') {
 
 // MUST (multiple)
 // please adjust
-$adminEmail			= array('mailto:'.$mmConfig->getVar('OPERATOR_EMAIL')); 
+$adminEmail			= array('mailto:'.$mmConfig->getVar('OPERATOR_EMAIL'));
 
-// MAY (multiple) 
+// MAY (multiple)
 // Comment out, if you do not want to use it.
-// Currently only gzip is supported (you need output buffering turned on, 
-// and php compiled with libgz). 
-// The client MUST send "Accept-Encoding: gzip" to actually receive 
+// Currently only gzip is supported (you need output buffering turned on,
+// and php compiled with libgz).
+// The client MUST send "Accept-Encoding: gzip" to actually receive
 // compressed output.
 //$compression		= array('gzip');
 $compression		= '';
@@ -136,20 +136,20 @@ $compression		= '';
 $delimiter			= ':';
 
 // MUST (only one)
-// You may choose any name, but for repositories to comply with the oai 
-// format for unique identifiers for items records. 
+// You may choose any name, but for repositories to comply with the oai
+// format for unique identifiers for items records.
 // see: http://www.openarchives.org/OAI/2.0/guidelines-oai-identifier.htm
 // Basically use domainname-word.domainname
 // please adjust
-$repositoryIdentifier = $mmConfig->getVar('PMH_REPOSITORY_IDENTIFIER'); 
+$repositoryIdentifier = $mmConfig->getVar('PMH_REPOSITORY_IDENTIFIER');
 
 
-// description is defined in identify.php 
+// description is defined in identify.php
 $show_identifier = false;
 
 // You may include details about your community and friends (other
 // data-providers).
-// Please check identify.php for other possible containers 
+// Please check identify.php for other possible containers
 // in the Identify response
 
 // maximum mumber of the records to deliver
@@ -166,28 +166,46 @@ $MAXIDS = $mmConfig->getVar('PMH_MAXRECORDS');
 
 // After 24 hours resumptionTokens become invalid.
 $tokenValid = 24*3600;
-$expirationdatetime = gmstrftime('%Y-%m-%dT%TZ', time()+$tokenValid); 
+$expirationdatetime = gmstrftime('%Y-%m-%dT%TZ', time()+$tokenValid);
 
 // define all supported sets in your repository
-//$SETS = 	array (); 
-$SETS = 	''; 
+function parse_PMH_set_config($config = "") {
+   if (strlen($config) == 0) {
+      return "";
+   }
+   // several rows of
+   // setSpec|setName|setDescription
+	$retVals = array();
+	$row = "";
+	foreach ( explode("\n", $config) as $row ) {
+		list($spec, $name, $description) = explode("|", $row);
+		if (strlen($spec) && strlen($name)) {
+			// description is optional
+		   $retVals[$spec] = array('setSpec' => $spec,
+		                           'setName' => $name,
+		                           'setDescription' => $description);
+		}
+	}
+   return $retVals;
+}
+$SETS = 	parse_PMH_set_config($mmConfig->getVar('PMH_SETCONFIG'));
 // define all supported metadata formats
 
 //
-// myhandler is the name of the file that handles the request for the 
+// myhandler is the name of the file that handles the request for the
 // specific metadata format.
 // [record_prefix] describes an optional prefix for the metadata
 // [record_namespace] describe the namespace for this prefix
 
 $METADATAFORMATS = 	array (
-				'oai_dc' => array('metadataPrefix'=>'oai_dc', 
+				'oai_dc' => array('metadataPrefix'=>'oai_dc',
 					'schema'=>'http://www.openarchives.org/OAI/2.0/oai_dc.xsd',
 					'metadataNamespace'=>'http://www.openarchives.org/OAI/2.0/oai_dc/',
 					'myhandler'=>'record_gen.php',
 					'record_prefix'=>'dc',
 					'record_namespace' => 'http://purl.org/dc/elements/1.1/'
 			                ),
-				'dif' => array('metadataPrefix'=>'DIF', 
+				'dif' => array('metadataPrefix'=>'DIF',
 					'schema'=>'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif_v9.7.1.xsd',
 					'metadataNamespace'=>'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/',
 					'myhandler'=>'record_gen.php',
@@ -200,10 +218,20 @@ $METADATAFORMATS = 	array (
                'myhandler' => 'record_gen.php',
                'record_namespace' => '',
                'dif2isoXslt' => $mmConfig->getVar('TARGET_DIRECTORY') .'/schema/dif2iso.xslt'
+			                ),
+			   // same as iso19115, but WIS prefers to call it 19139
+			   'iso19139' => array(
+               'metadataPrefix' => 'gmd',
+               'schema' => 'http://www.isotc211.org/2005/gmd/gmd.xsd',
+               'metadataNamespace' => 'http://www.isotc211.org/2005/gmd',
+               'myhandler' => 'record_gen.php',
+               'record_namespace' => '',
+               'dif2isoXslt' => $mmConfig->getVar('TARGET_DIRECTORY') .'/schema/dif2iso.xslt'
 			                )
+
 			);
 
-// 
+//
 // DATABASE SETUP
 //
 
@@ -211,7 +239,7 @@ $METADATAFORMATS = 	array (
 $DB_HOST   = 'localhost';
 $DB_USER   = $mmConfig->getVar('PG_ADMIN_USER');
 $DB_PASSWD = '';
-$DB_NAME   = 'oaipmh';												           
+$DB_NAME   = 'oaipmh';
 
 // Data Source Name: This is the universal connection string
 // if you use something other than mysql edit accordingly.
@@ -226,11 +254,11 @@ $DB_NAME   = 'oaipmh';
 // currently only utf-8 and iso8859-1 are supported
 $metadataCharset = "utf-8";
 
-// if entities such as < > ' " in your metadata has already been escaped 
+// if entities such as < > ' " in your metadata has already been escaped
 // then set this to true (e.g. you store < as &lt; in your DB)
 $xmlescaped = false;
 
-// We store multiple entries for one element in a single row 
+// We store multiple entries for one element in a single row
 // in the database. SQL['split'] ist the delimiter for these entries.
 // If you do not do this, do not define $SQL['split']
 // $SQL['split'] = ';';
@@ -238,7 +266,7 @@ $xmlescaped = false;
 // the name of the table where your store your metadata
 $SQL['table'] = 'DataSet';
 
-// the name of the column where you store your sequence 
+// the name of the column where you store your sequence
 // (or autoincrement values).
 $SQL['id_column'] = 'DS_id';
 
@@ -255,7 +283,7 @@ $idPrefix = 'metamod/';
 // this will be expanded to
 // oai:$repositoryIdentifier:$idPrefix$SQL['identifier']
 // should not be changed
-$oaiprefix = "oai".$delimiter.$repositoryIdentifier.$delimiter.$idPrefix; 
+$oaiprefix = "oai".$delimiter.$repositoryIdentifier.$delimiter.$idPrefix;
 
 // adjust anIdentifier with sample contents an identifier
 $sampleIdentifier     = $oaiprefix.'anIdentifier';
@@ -276,14 +304,18 @@ $SQL['metadataFormat'] = 'DS_metadataFormat';
 // the name of the column where you store sets
 // NOTE: This implementation does not support sets. The DS_set element
 // is set to an empty string for all records.
-$SQL['set'] = '';
+if (! is_array($SETS) ) {
+	$SQL['set'] = '';
+} else {
+   $SQL['set'] = 'DS_ownertag';
+}
 
 // Including arrays that define a mapping between CF standard_names and
 // GCMD keywords:
 
 include 'var_topic.php';
 
-// Here are a couple of queries which might need to be adjusted to 
+// Here are a couple of queries which might need to be adjusted to
 // your needs. Normally, if you have correctly named the columns above,
 // this does not need to be done.
 
@@ -313,7 +345,7 @@ function selectallQuery ($id = '')
 	}
 	return $query;
 }
-function getRecords ($id = '', $from = '', $until = '') {
+function getRecords ($id = '', $from = '', $until = '', $set = '') {
    global $mmDbConnection, $mmConfig;
    global $metadataPrefix;
    global $key_conversion;
@@ -412,6 +444,9 @@ function getRecords ($id = '', $from = '', $until = '') {
    if ($until != '') {
       $query .= "AND DS_datestamp <= '$until' ";
    }
+   if ($set != '') {
+      $query .= "AND DS_ownertag = '$set' ";
+   }
    $result1 = pg_query ($mmDbConnection, $query);
    $dsids = array();
    $allresults = array();
@@ -495,7 +530,7 @@ function idQuery ($id = '')
                          $SQL['deleted'].' FROM '.$SQL['table'];
 	}
         $query .= " WHERE DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN (".$mmConfig->getVar('PMH_EXPORT_TAGS').")";
-	
+
 	if ($id != '') {
 		$query .= ' AND '.$SQL['identifier']." = '$id'";
 	}
@@ -504,7 +539,7 @@ function idQuery ($id = '')
 }
 
 // filter for until
-function untilQuery($until) 
+function untilQuery($until)
 {
 	global $SQL;
 
@@ -534,19 +569,18 @@ $datetime = gmstrftime('%Y-%m-%dT%T');
 $responseDate = $datetime.'Z';
 
 // do not change
-$XMLHEADER = 
+$XMLHEADER =
 '<?xml version="1.0" encoding="UTF-8"?>
 <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
          http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">'."\n";
 
-$xmlheader = $XMLHEADER . 
+$xmlheader = $XMLHEADER .
 			  ' <responseDate>'.$responseDate."</responseDate>\n";
 
 // the xml schema namespace, do not change this
 $XMLSCHEMA = 'http://www.w3.org/2001/XMLSchema-instance';
-
 
 
 

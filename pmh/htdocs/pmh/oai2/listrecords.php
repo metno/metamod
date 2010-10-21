@@ -36,7 +36,7 @@
 // parse and check arguments
 foreach($args as $key => $val) {
 
-	switch ($key) { 
+	switch ($key) {
 		case 'from':
 			// prevent multiple from
 			if (!isset($from)) {
@@ -49,7 +49,7 @@ foreach($args as $key => $val) {
 		case 'until':
 			// prevent multiple until
 			if (!isset($until)) {
-				$until = $val; 
+				$until = $val;
 			} else {
 				$errors .= oai_error('badArgument', $key, $val);
 			}
@@ -71,7 +71,7 @@ foreach($args as $key => $val) {
 			} else {
 				$errors .= oai_error('badArgument', $key, $val);
 			}
-			break;      
+			break;
 
 		case 'resumptionToken':
 			if (!isset($resumptionToken)) {
@@ -91,10 +91,13 @@ if (!isset($from)) {
 if (!isset($until)) {
    $until = '';
 }
+if (!isset($set)) {
+   $set = '';
+}
 
 
 // Resume previous session?
-if (isset($args['resumptionToken'])) { 		
+if (isset($args['resumptionToken'])) {
 	if (count($args) > 1) {
 		// overwrite all other errors
 		$errors = oai_error('exclusiveArgument');
@@ -102,8 +105,8 @@ if (isset($args['resumptionToken'])) {
 		if (is_file("tokens/re-$resumptionToken")) {
 			$fp = fopen("tokens/re-$resumptionToken", 'r');
 			$filetext = fgets($fp, 255);
-			$textparts = explode('#', $filetext); 
-			$deliveredrecords = (int)$textparts[0]; 
+			$textparts = explode('#', $filetext);
+			$deliveredrecords = (int)$textparts[0];
 			$extquery = $textparts[1];
 			$metadataPrefix = $textparts[2];
 			if (is_array($METADATAFORMATS[$metadataPrefix])
@@ -112,23 +115,23 @@ if (isset($args['resumptionToken'])) {
 			} else {
 				$errors .= oai_error('cannotDisseminateFormat', $key, $val);
 			}
-			fclose($fp); 
+			fclose($fp);
 			//unlink ("tokens/re-$resumptionToken");
-		} else { 
-			$errors .= oai_error('badResumptionToken', '', $resumptionToken); 
+		} else {
+			$errors .= oai_error('badResumptionToken', '', $resumptionToken);
 		}
 	}
 }
 // no, we start a new session
 else {
-	$deliveredrecords = 0; 
+	$deliveredrecords = 0;
 	if (!$args['metadataPrefix']) {
 		$errors .= oai_error('missingArgument', 'metadataPrefix');
 	}
 
 	if (isset($args['from'])) {
 		if (!checkDateFormat($from)) {
-			$errors .= oai_error('badGranularity', 'from', $from); 
+			$errors .= oai_error('badGranularity', 'from', $from);
 		}
 	}
 
@@ -138,22 +141,27 @@ else {
 		}
 	}
 
-        if (isset($args['from']) && isset($args['until'])) {
-            if (!checkDateRange($from,$until)) {
-		    $errors .= oai_error('badArgument','',"$from > $until"); 
-            }
-        }
+   if (isset($args['from']) && isset($args['until'])) {
+      if (!checkDateRange($from,$until)) {
+		   $errors .= oai_error('badArgument','',"$from > $until");
+      }
+   }
 
-        if (isset($args['set'])) {
-		$errors .= oai_error('noSetHierarchy'); 
-		oai_exit();
+	if (isset($args['set'])) {
+		if (!is_array($SETS)) {
+		   $errors .= oai_error('noSetHierarchy');
+		   oai_exit();
+		} else if (! array_key_exists($args['set'], $SETS)) {
+		   $errors .= oai_error('noRecordsMatch');
+		   $set = 'not_in_database';
+		}
 	}
 }
 
 if (empty($errors)) {
-        $allrecords = getRecords('',$from,$until);
+        $allrecords = getRecords('',$from,$until,$set);
         if ($allrecords === FALSE) {
-	   $errors .= oai_error('internalDatabaseError'); 
+	   $errors .= oai_error('internalDatabaseError');
         } else {
            $num_rows = count($allrecords);
            if (!$num_rows) {
@@ -171,17 +179,17 @@ $output .= " <ListRecords>\n";
 
 // Will we need a ResumptionToken?
 if ($num_rows - $deliveredrecords > $MAXRECORDS) {
-	$token = get_token(); 
-	$fp = fopen ("tokens/re-$token", 'w'); 
-	$thendeliveredrecords = (int)$deliveredrecords + $MAXRECORDS;  
-	fputs($fp, "$thendeliveredrecords#"); 
-	fputs($fp, "$extquery#"); 
-	fputs($fp, "$metadataPrefix#"); 
-	fclose($fp); 
-	$restoken = 
+	$token = get_token();
+	$fp = fopen ("tokens/re-$token", 'w');
+	$thendeliveredrecords = (int)$deliveredrecords + $MAXRECORDS;
+	fputs($fp, "$thendeliveredrecords#");
+	fputs($fp, "$extquery#");
+	fputs($fp, "$metadataPrefix#");
+	fclose($fp);
+	$restoken =
 '  <resumptionToken expirationDate="'.$expirationdatetime.'"
      completeListSize="'.$num_rows.'"
-     cursor="'.$deliveredrecords.'">'.$token."</resumptionToken>\n"; 
+     cursor="'.$deliveredrecords.'">'.$token."</resumptionToken>\n";
 }
 // Last delivery, return empty ResumptionToken
 elseif (isset($args['resumptionToken'])) {
@@ -201,7 +209,7 @@ while ($countrec++ < $maxrec) {
 
 	$identifier = $oaiprefix.$record[$SQL['identifier']];
 	$datestamp = formatDatestamp($record[$SQL['datestamp']]);
-	 
+
 	if (isset($record[$SQL['deleted']]) && ($record[$SQL['deleted']] == 'true') &&
 		($deletedRecord == 'transient' || $deletedRecord == 'persistent')) {
 		$status_deleted = TRUE;
@@ -217,17 +225,17 @@ while ($countrec++ < $maxrec) {
         }
 	$output .= xmlformat($identifier, 'identifier', '', 4);
 	$output .= xmlformat($datestamp, 'datestamp', '', 4);
-	if (!$status_deleted and $SQL['set'] != '') 
+	if (!$status_deleted and $SQL['set'] != '')
 		// use xmlrecord since we use stuff from database
 		$output .= xmlrecord($record[$SQL['set']], 'setSpec', '', 4);
 
-	$output .= '   </header>'."\n"; 
+	$output .= '   </header>'."\n";
 
 // return the metadata record itself
 	if (!$status_deleted)
 		include('oai2/'.$inc_record);
 
-	$output .= '  </record>'."\n";   
+	$output .= '  </record>'."\n";
 }
 
 // ResumptionToken
@@ -236,7 +244,7 @@ if (isset($restoken)) {
 }
 
 // end ListRecords
-$output .= 
+$output .=
 ' </ListRecords>'."\n";
-  
+
 ?>

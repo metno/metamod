@@ -39,7 +39,8 @@
 // the correct headers should be created automatically
 
 $prefix = $metadataPrefix;
-if ($metadataPrefix == 'iso19115') {
+if (($metadataPrefix == 'iso19115') ||
+    ($metadataPrefix == 'iso19139')) {
    $prefix = 'dif'; # iso19115 read as dif and converted afterwards
 }
 $output .=
@@ -47,7 +48,8 @@ $output .=
 
 $gotFile = 0;
 if ((($metadataPrefix == 'dif') && ($record[$SQL['metadataFormat']] == 'DIF')) ||
-    (($metadataPrefix == 'iso19115') && ($record[$SQL['metdataFormat']]) == 'ISO19115')) {
+    (($metadataPrefix == 'iso19115') && ($record[$SQL['metdataFormat']]) == 'ISO19115') ||
+    (($metadataPrefix == 'iso19139') && ($record[$SQL['metdataFormat']]) == 'ISO19115')) {
 	# read original record from file, don't create from database
 	# $output .= $mmConfig->getVar("WEBRUN_DIRECTORY").'/XML/'.mmDatasetName2FileName($record[$SQL['identifier']]);
 	$filename = $mmConfig->getVar("WEBRUN_DIRECTORY").'/XML/'.mmDatasetName2FileName($record[$SQL['identifier']]);
@@ -214,7 +216,8 @@ if (!$gotFile) {
 	$outRecord .= ">\n";
 	#$outRecord contains now the document
 
-	if ($metadataPrefix == 'iso19115') {
+	if (($metadataPrefix == 'iso19115') ||
+	    ($metadataPrefix == 'iso19139')) {
       # translate from dif to iso19115
 	   # convert dif record to DOM
       $xmlDoc = new DOMDocument();

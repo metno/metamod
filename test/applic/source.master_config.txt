@@ -446,6 +446,10 @@ PMH_EXPORT_TAGS = Substituted by test_application.sh
 # deliver a ResumptionToken will be generated.
 PMH_MAXRECORDS = 1000
 
+# optional set configuration, one set per row spec|name|description
+PMH_SETCONFIG = 
+
+
 # ============ METAMODHARVEST configuration ==============
 #
 # The hour on each day that OAI harvesting takes place:

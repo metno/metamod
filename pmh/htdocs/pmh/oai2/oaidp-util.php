@@ -1,4 +1,4 @@
-<?    
+<?
 /*
 * +----------------------------------------------------------------------+
 * | PHP Version 4                                                        |
@@ -200,11 +200,11 @@ function xmlformat($record, $element, $attr = '', $indent = 0)
 {
 	global $charset;
 	global $xmlescaped;
-		
+
 	if ($attr != '') {
 		$attr = ' '.$attr;
 	}
-	
+
 	$str = '';
 	if (is_array($record)) {
 		foreach  ($record as $val) {
@@ -223,11 +223,11 @@ function date2UTCdatestamp($date)
 	global $granularity;
 
 	if ($date == '') return '';
-	
+
 	switch ($granularity) {
 
 		case 'YYYY-MM-DDThh:mm:ssZ':
-			// we assume common date ("YYYY-MM-DD") 
+			// we assume common date ("YYYY-MM-DD")
 			// or datetime format ("YYYY-MM-DD hh:mm:ss")
 			// or datetime format with timezone YYYY-MM-DD hh:mm:ss+02
 			// or datetime format with GMT timezone YYYY-MM-DD hh:mm:ssZ
@@ -236,7 +236,7 @@ function date2UTCdatestamp($date)
 			//             with timezone YYYY-MM-DD hh:mm:ss.xxx+02
 			// with all variations as above
 			// in the database
-			// 
+			//
 			if (strstr($date, ' ') || strstr($date, 'T')) {
 				$checkstr = '/([0-9]{4})(-)([0-9]{1,2})(-)([0-9]{1,2})([T ])([0-9]{2})(:)([0-9]{2})(:)([0-9]{2})(\.?)(\d*)([Z+-]{0,1})([0-9]{0,2})$/';
 				$val = preg_match($checkstr, $date, $matches);
@@ -276,16 +276,16 @@ function date2UTCdatestamp($date)
 						// 3600 sec = 1 h
 						if ($matches[14] == '-') {
 							// we are before GMT, thus we need to add
-							$timestamp += (int) $tz * 3600; 
+							$timestamp += (int) $tz * 3600;
 						} else {
 							// we are after GMT, thus we need to subtract
-							$timestamp -= (int) $tz * 3600; 
-						}							
+							$timestamp -= (int) $tz * 3600;
+						}
 						return strftime("%Y-%m-%dT%H:%M:%SZ", $timestamp);
 					}
 				} elseif ($matches[14] == 'Z') {
 					return str_replace(' ', 'T', $date);
-				}				
+				}
 				return str_replace(' ', 'T', $date).'Z';
 			} else {
 				// date is date format
@@ -314,12 +314,12 @@ function checkDateFormat($date) {
 	global $message;
 
     if ($granularity == 'YYYY-MM-DDThh:mm:ssZ') {
-		$checkstr = '([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})T([0-9]{2}):([0-9]{2}):([0-9]{2})Z$';
+		$checkstr = '([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})(T([0-9]{2}):([0-9]{2}):([0-9]{2})Z)?$';
 	} else {
 		$checkstr = '([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}$)';
 	}
 	if (ereg($checkstr, $date, $regs)) {
-		if (checkdate($regs[2], $regs[3], $regs[1])) {	
+		if (checkdate($regs[2], $regs[3], $regs[1])) {
 			return 1;
 		}
 		else {
@@ -339,7 +339,7 @@ function checkDateRange($from,$until) {
     global $message;
 
     if ($granularity == 'YYYY-MM-DDThh:mm:ssZ') {
-	$checkstr = '([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})T([0-9]{2}):([0-9]{2}):([0-9]{2})Z$';
+	$checkstr = '([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})(T([0-9]{2}):([0-9]{2}):([0-9]{2})Z)?$';
     } else {
 	$checkstr = '([0-9]{4})-([0-9]{1,2})-([0-9]{1,2}$)';
     }
@@ -357,9 +357,9 @@ function checkDateRange($from,$until) {
 	    $message = "From parameter ($from) is after until parameter ($until).";
 	    return 0;
     }
-    if ($dateuntil == $datefrom && $granularity == 'YYYY-MM-DDThh:mm:ssZ') {
-       $timefrom = 100*$regsfrom[4] + $regsfrom[5];
-       $timeuntil = 100*$regsuntil[4] + $regsuntil[5];
+    if ($dateuntil == $datefrom && $granularity == 'YYYY-MM-DDThh:mm:ssZ' && strlen($regsfrom[4])) {
+       $timefrom = 100*$regsfrom[5] + $regsfrom[6];
+       $timeuntil = 100*$regsuntil[5] + $regsuntil[6];
        if ($timeuntil < $timefrom) {
 	    $message = "From parameter ($from) is after until parameter ($until).";
 	    return 0;
@@ -372,7 +372,7 @@ function formatDatestamp($datestamp)
 {
 	global $granularity;
 
-	$datestamp = date2UTCdatestamp($datestamp); 
+	$datestamp = date2UTCdatestamp($datestamp);
 	if (!checkDateFormat($datestamp)) {
 		if ($granularity == 'YYYY-MM-DD') {
 			return '2002-01-01';
@@ -434,7 +434,7 @@ function metadataHeader($prefix)
 	$myformat = $METADATAFORMATS[$prefix];
         $metadataprefix = $myformat['metadataPrefix'];
 
-	$str = 
+	$str =
 	'     <'.$metadataprefix;
 	if ($myformat['record_prefix']) {
 		$str .= ':'.$myformat['record_prefix'];
@@ -447,10 +447,10 @@ function metadataHeader($prefix)
 	   '       xmlns:'.$prefix.'="'.$myformat['metadataNamespace'].'"'."\n";
         }
 	if ($myformat['record_prefix'] && $myformat['record_namespace']) {
-		$str .= 
+		$str .=
 		'       xmlns:'.$myformat['record_prefix'].'="'.$myformat['record_namespace'].'"'."\n";
 	}
-	$str .= 
+	$str .=
 	'       xmlns:xsi="'.$XMLSCHEMA.'"'."\n".
 	'       xsi:schemaLocation="'.$myformat['metadataNamespace']."\n".
 	'       '.$myformat['schema'].'">'."\n";
