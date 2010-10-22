@@ -363,7 +363,7 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
          'area', 'dc:coverage','','',
          'distribution_statement', 'dc:rights','',''
          );
-   } else if ($metadataPrefix == 'dif' || $metadataPrefix == 'iso19115') {
+   } else if ($metadataPrefix == 'dif' || $metadataPrefix == 'iso19115' || $metadataPrefix = 'iso19139') {
    	# iso19115 will use 'dif' conversion and then convert to iso19115 using xslt
       $key_conversion = array(
          '!DS_name 1', 'Entry_ID', '','',

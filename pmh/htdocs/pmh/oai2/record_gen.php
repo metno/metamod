@@ -214,8 +214,6 @@ if (!$gotFile) {
 		$outRecord .= ':'.$METADATAFORMATS[$prefix]['record_prefix'];
 	}
 	$outRecord .= ">\n";
-	#$outRecord contains now the document
-
 	if (($metadataPrefix == 'iso19115') ||
 	    ($metadataPrefix == 'iso19139')) {
       # translate from dif to iso19115
