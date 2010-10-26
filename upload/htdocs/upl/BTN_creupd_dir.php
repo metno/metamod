@@ -38,6 +38,7 @@
  //                      upload area. Used if the configuration variable
  //                      EXTERNAL_REPOSITORY is set to true.
  //
+ require_once("../funcs/mmDataset.inc");
  if ($debug) {
     mmPutTest("--------- User pushed Create/Update");
  }
@@ -313,6 +314,111 @@
              $errmsg = "Registration of directory $dirname accepted";
              $newdirname = "";
              $nextpage = 3;
+          }
+       }
+       if ($error == 0 && $external_repository && $threddscatalog != $othreddscatalog) {
+       // The user has changed the THREDDS catalog URL. This change must be propagated to the
+       // XML metadata files for the directory and file level datasets:
+          $application_id = $mmConfig->getVar("APPLICATION_ID");
+          $datasetpath = "$runpath/XML/$application_id/$dirname";
+          $file_found_and_dataset_ok = FALSE;
+          if (file_exists($datasetpath . ".xmd")) {
+             try {
+                $dataset = new MM_Dataset($datasetpath . ".xmd");
+                $file_found_and_dataset_ok = TRUE;
+             } catch (MM_DatasetException $mde) {
+                $errmsg .= "Sorry, internal error";
+                $nextpage = 1;
+                $error = 2;
+                mmPutLog("BTN_creupd_dir.php: Error on reading dataset $datasetpath: ". $mde->getMessage());
+                $file_found_and_dataset_ok = FALSE;
+             }
+          }
+          if ($file_found_and_dataset_ok) {
+             $newmetadata = array();
+             //
+             // This complex string manipulation is documented by using example strings with
+             // assumed values:
+             // Assume: $threddscatalog == 'http://thredds/catalog/catalog.html?dataset=dir'
+             // Assume: $othreddscatalog == 'http://thredds/aaa/catalog.html?dataset=ooo'
+             mmPutTest("BTN_creupd_dir.php: threddscatalog: $threddscatalog");
+             mmPutTest("BTN_creupd_dir.php: othreddscatalog: $othreddscatalog");
+             $j1 = strpos($threddscatalog,'?');
+             $directory_dataref = substr($threddscatalog,0,$j1);
+             // $directory_dataref == 'http://thredds/catalog/catalog.html'
+             mmPutTest("BTN_creupd_dir.php: directory_dataref: $directory_dataref");
+             $j1 = strpos($othreddscatalog,'?');
+             $old_directory_dataref = substr($othreddscatalog,0,$j1);
+             // $old_directory_dataref == 'http://thredds/aaa/catalog.html'
+             mmPutTest("BTN_creupd_dir.php: old_directory_dataref: $old_directory_dataref");
+             $j1 = strpos($othreddscatalog,'=');
+             $initial_path_after_equal = substr($othreddscatalog,$j1+1) . '/';
+             // $initial_path_after_equal == 'ooo/'
+             mmPutTest("BTN_creupd_dir.php: initial_path_after_equal: $initial_path_after_equal");
+             $newmetadata['dataref'] = array($directory_dataref);
+             try {
+                $dataset->removeMetadata(array_keys($newmetadata));
+                $dataset->addMetadata($newmetadata);
+                $dataset->write($datasetpath);
+             } catch (MM_DatasetException $mde) {
+                $errmsg .= "Sorry, internal error";
+                $nextpage = 1;
+                $error = 2;
+                mmPutLog("BTN_creupd_dir.php: Error on writing dataset $datasetpath: ". $mde->getMessage());
+             }
+          }
+          if ( $error == 0 && $file_found_and_dataset_ok) {
+             $file_level_datasets = scandir($datasetpath);
+             foreach ($file_level_datasets as $file) {
+                if (preg_match ('/^(.*)\.xmd$/',$file,$matches)) {
+                   $filedatasetpath = $datasetpath . "/" . $matches[1];
+                   try {
+                      $dataset = new MM_Dataset($filedatasetpath . ".xmd");
+                      $metadata = $dataset->getMetadata();
+                   } catch (MM_DatasetException $mde) {
+                      $errmsg .= "Sorry, internal error";
+                      $nextpage = 1;
+                      $error = 2;
+                      mmPutLog("BTN_creupd_dir.php: Error on reading dataset $filedatasetpath: ". $mde->getMessage());
+                      break;
+                   }
+                   $old_file_dataref = $metadata['dataref'][0];
+                   // Assume: $old_file_dataref == 'http://thredds/aaa/b/c/catalog.html?dataset=ooo/b/c/file.nc'
+                   mmPutTest("BTN_creupd_dir.php: old_file_dataref: $old_file_dataref");
+                   $j1 = strpos($old_file_dataref,'=');
+                   $whole_path_after_equal = substr($old_file_dataref,$j1+1);
+                   // $whole_path_after_equal == 'ooo/b/c/file.nc'
+                   mmPutTest("BTN_creupd_dir.php: whole_path_after_equal: $whole_path_after_equal");
+                   $old_filename = str_replace($initial_path_after_equal,"",$whole_path_after_equal);
+                   // $old_filename == 'b/c/file.nc'
+                   mmPutTest("BTN_creupd_dir.php: old_filename: $old_filename");
+                   $j1 = strrpos($old_filename,'/');
+                   if ($j1 !== false) {
+                      $extra_dirpath = substr($old_filename,0,$j1+1);
+                   } else {
+                      $extra_dirpath = "";
+                   }
+                   // $extra_dirpath == 'b/c/'
+                   mmPutTest("BTN_creupd_dir.php: extra_dirpath: $extra_dirpath");
+                   $new_file_dataref = str_replace('catalog.html?',$extra_dirpath . 'catalog.html?',$threddscatalog);
+                   // $new_file_dataref == 'http://thredds/catalog/b/c/catalog.html?dataset=dir'
+                   $new_file_dataref .= '/' . $old_filename;
+                   // $new_file_dataref == 'http://thredds/catalog/b/c/catalog.html?dataset=dir/b/c/file.nc'
+                   mmPutTest("BTN_creupd_dir.php: new_file_dataref: $new_file_dataref");
+                   $newmetadata['dataref'] = array($new_file_dataref);
+                   try {
+                      $dataset->removeMetadata(array_keys($newmetadata));
+                      $dataset->addMetadata($newmetadata);
+                      $dataset->write($filedatasetpath);
+                   } catch (MM_DatasetException $mde) {
+                       $errmsg .= "Sorry, internal error";
+                       $nextpage = 1;
+                       $error = 2;
+                       mmPutLog("BTN_creupd_dir.php: Error on writing dataset $filedatasetpath: ". $mde->getMessage());
+                       break;
+                   }
+                }
+             }
           }
        }
        mmPutTest("BTN_creupd_dir.php: update dirinfo finished. Errmsg: $errmsg");
