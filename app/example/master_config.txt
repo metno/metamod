@@ -490,6 +490,7 @@ TEST_EMAIL_RECIPIENT =
 # The directory where SMS will look for new transfers to perform.
 SUBSCRIPTION_SMS_DIRECTORY = some dir
 
+SUBSCRIPTION_ENABLED = ENABLED
 
 # ============ Authentication configuration ============
 #
