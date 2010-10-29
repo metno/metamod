@@ -3,6 +3,7 @@ base/* /usr/share/metamod-2.x/base/
 common/* /usr/share/metamod-2.x/common/
 harvest/* /usr/share/metamod-2.x/harvest/
 pmh/* /usr/share/metamod-2.x/pmh/
+quest/* /usr/share/metamod-2.x/quest/
 search/* /usr/share/metamod-2.x/search/
 thredds/* /usr/share/metamod-2.x/thredds/
 upload/* /usr/share/metamod-2.x/upload/
