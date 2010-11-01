@@ -453,7 +453,7 @@ PMH_SETCONFIG =
 # ============ METAMODHARVEST configuration ==============
 #
 # The hour on each day that OAI harvesting takes place:
-HARVEST_HOUR = 16
+HARVEST_HOUR = 1
 
 # The sources that are harvested. Each line comprise two entities separated
 # by space: Ownertag and Base URL. The ownertag should be a short text string
