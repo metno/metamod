@@ -156,14 +156,14 @@
         </gco:Date>
       </gmd:dateStamp>
 
-      <!-- metadataStandardname ? -->
+      <!-- metadataStandardname -->
       <gmd:metadataStandardName>
-        <gco:CharacterString>ISO 19115</gco:CharacterString>
+        <gco:CharacterString xmlns:srv="http://www.isotc211.org/2005/srv">ISO 19115:2003/19139</gco:CharacterString>
       </gmd:metadataStandardName>
 
-      <!-- metadataStandardVersion ? -->
+      <!-- metadataStandardVersion -->
       <gmd:metadataStandardVersion>
-        <gco:CharacterString>2003</gco:CharacterString>
+        <gco:CharacterString xmlns:srv="http://www.isotc211.org/2005/srv">ISO 19115:2003/19139</gco:CharacterString>
       </gmd:metadataStandardVersion>
 
       <xsl:if test="/dif:DIF/dif:Data_Set_Citation/dif:Online_Resource">
