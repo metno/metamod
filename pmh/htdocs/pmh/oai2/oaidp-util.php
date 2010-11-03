@@ -422,7 +422,9 @@ function php_is_at_least($version) {
 
 function is_valid_uri($url)
 {
-	return((bool)preg_match("'^[^:]+:(?://)?(?:[a-z_0-9-]+[\.]{1})*(?:[a-z_0-9-]+\.)[a-z]{2,3}.*$'i", $url));
+	//return((bool)preg_match("'^[^:]+:(?://)?(?:[a-z_0-9-]+[\.]{1})*(?:[a-z_0-9-]+\.)[a-z]{2,3}.*$'i", $url));
+	//allowing uri word after oai: no longer requiring a domain-name with two dots; required by x-wmo
+	  return((bool)preg_match("'^[^:]+:(?://)?(?:[a-z_0-9-]+)*(?:[a-z_0-9-]+)[a-z]{2,3}.*$'i", $url));
 }
 
 function metadataHeader($prefix)

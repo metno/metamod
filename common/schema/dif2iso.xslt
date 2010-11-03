@@ -163,7 +163,7 @@
 
       <!-- metadataStandardVersion -->
       <gmd:metadataStandardVersion>
-        <gco:CharacterString xmlns:srv="http://www.isotc211.org/2005/srv">ISO 19115:2003/19139</gco:CharacterString>
+        <gco:CharacterString>1.0</gco:CharacterString>
       </gmd:metadataStandardVersion>
 
       <xsl:if test="/dif:DIF/dif:Data_Set_Citation/dif:Online_Resource">
@@ -198,6 +198,18 @@
                   </gmd:dateType>
                 </gmd:CI_Date>
               </gmd:date>
+              <xsl:if test="/dif:DIF/dif:Related_URL/dif:URL_Content_Type/dif:Type = 'GTSInstancePattern'">
+              <gmd:identifier>
+                <gmd:RS_Identifier id="InstancePattern">
+                  <gmd:code>
+                    <gco:CharacterString><xsl:copy-of select="/dif:DIF/dif:Related_URL/dif:URL/child::text()"/></gco:CharacterString>
+                  </gmd:code>
+                  <gmd:codeSpace>
+                    <gco:CharacterString>Instance Pattern of WIS GISC Cache</gco:CharacterString>
+                  </gmd:codeSpace>
+                </gmd:RS_Identifier>
+              </gmd:identifier>
+              </xsl:if>
             </gmd:CI_Citation>
           </gmd:citation>
           <gmd:abstract>

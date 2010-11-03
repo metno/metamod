@@ -42,7 +42,7 @@ function get_exception($mtname, $exception, $value) {
 #           Try to avoid "Hysrosphere" which is deprecated.
 #
             $parts = explode(" > ",$topics[$value][1]);
-         }   
+         }
          if ($exception < 0) {
       	    return $detail;
          } elseif ($exception == 4) {
@@ -64,7 +64,7 @@ function get_exception($mtname, $exception, $value) {
            } elseif ($exception == 4) {
               return $value; # Hack. See above
            } elseif ($exception <= count($parts)) {
-      	      $val = $parts[$exception - 1]; 
+      	      $val = $parts[$exception - 1];
       	      if ($val == "Spectral Engineering") {
       	         $val = "Spectral/Engineering"; # fix bug in Metamod-data
       	      }
@@ -138,6 +138,14 @@ function get_exception($mtname, $exception, $value) {
    	  } else {
    		 return $value;
    	  }
+   }
+   elseif ($mtname == "gtsInstancePattern") {
+   	  return
+            "<URL_Content_Type>\n".
+   	      "  <Type>GTSInstancePattern</Type>\n".
+            "</URL_Content_Type>\n".
+				"<URL>$value</URL>\n".
+            "<Description>Instance pattern connecting to Global Telecommunication System (GTS)</Description>\n";
    }
    return FALSE;
 }

@@ -388,7 +388,7 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
          '', 'Personnel Contact_Address City', 'Oslo','',
          '', 'Personnel Contact_Address Postal_Code', 'N-0313','',
          '', 'Personnel Contact_Address Country', 'Norway','',
-
+         'gtsInstancePattern 1', '*Related_URL', '', '',
          'variable 4', '*Parameters Category', 'EARTH SCIENCE','Not Available',
          'variable 1', 'Parameters Topic', '','Not Available',
          'variable 2', 'Parameters Term', '','Not Available',
