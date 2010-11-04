@@ -4008,4 +4008,5 @@
 <mt name="format_description" share="FALSE" def="Free text descripion of data format" />
 <mt name="dataref" share="FALSE" def="URL reference to data, or short name" />
 <mt name="gtsInstancePattern" share="FALSE" def="Pattern to locate data in GTS" />
+<mt name="gtsFileIdentifier" share="FALSE" def="Identifier for data in GTS" />
 </searchdata>

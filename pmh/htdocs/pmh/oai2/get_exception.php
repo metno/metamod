@@ -147,6 +147,14 @@ function get_exception($mtname, $exception, $value) {
 				"<URL>$value</URL>\n".
             "<Description>Instance pattern connecting to Global Telecommunication System (GTS)</Description>\n";
    }
+   elseif ($mtname == "gtsFileIdentifier") {
+   	  return
+            "<URL_Content_Type>\n".
+   	      "  <Type>GTSFileIdentifier</Type>\n".
+            "</URL_Content_Type>\n".
+				"<URL>$value</URL>\n".
+            "<Description>File-Identifier connecting to Global Telecommunication System (GTS)</Description>\n";
+   }
    return FALSE;
 }
 ?>

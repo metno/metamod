@@ -33,6 +33,7 @@
         <Online_Resource><xsl:value-of select="key('mm2', 'dataref')"/></Online_Resource>
       </Data_Set_Citation>
       
+      <xsl:apply-templates select="key('mm2', 'gtsFileIdentifier')"/>
       <xsl:apply-templates select="key('mm2', 'gtsInstancePattern')"/>
       <xsl:call-template name="personell"/>
       <xsl:apply-templates select="key('mm2', 'variable')"/>
@@ -104,6 +105,15 @@
         </URL_Content_Type>
         <URL><xsl:value-of select="current()"/></URL>
         <Description>Instance pattern connecting to Global Telecommunication System (GTS)</Description>
+      </Related_URL>
+  </xsl:template>
+  <xsl:template match="*[@name='gtsFileIdentifier']" xmlns="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/">
+      <Related_URL>
+        <URL_Content_Type>
+          <Type>GTSFileIdentifier</Type>
+        </URL_Content_Type>
+        <URL><xsl:value-of select="current()"/></URL>
+        <Description>File-Identifier connecting to Global Telecommunication System (GTS)</Description>
       </Related_URL>
   </xsl:template>
   

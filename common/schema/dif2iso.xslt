@@ -17,12 +17,21 @@
                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                      xmlns:gmd="http://www.isotc211.org/2005/gmd">
 
-      <!-- fileIdentifier ? -->
+      <!-- fileIdentifier -->
+      <!-- Hack: WMO requires special identifier for data available in GTS -->
       <gmd:fileIdentifier>
         <gco:CharacterString>
-          <xsl:if test="$REPOSITORY_IDENTIFIER">urn:<xsl:value-of select="$REPOSITORY_IDENTIFIER"/>:</xsl:if><xsl:copy-of select="dif:Entry_ID/child::node()"/>
+          <xsl:choose>
+            <xsl:when test="/dif:DIF/dif:Related_URL[normalize-space(dif:URL_Content_Type/dif:Type) = 'GTSFileIdentifier']">
+            <xsl:copy-of select="/dif:DIF/dif:Related_URL[normalize-space(dif:URL_Content_Type/dif:Type) = 'GTSFileIdentifier']/dif:URL/child::text()"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:if test="$REPOSITORY_IDENTIFIER">urn:<xsl:value-of select="$REPOSITORY_IDENTIFIER"/>:</xsl:if><xsl:copy-of select="dif:Entry_ID/child::node()"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </gco:CharacterString>
       </gmd:fileIdentifier>
+      
 
       <!-- language ? -->
       <gmd:language>
@@ -198,11 +207,11 @@
                   </gmd:dateType>
                 </gmd:CI_Date>
               </gmd:date>
-              <xsl:if test="/dif:DIF/dif:Related_URL/dif:URL_Content_Type/dif:Type = 'GTSInstancePattern'">
+              <xsl:if test="/dif:DIF/dif:Related_URL[normalize-space(dif:URL_Content_Type/dif:Type) = 'GTSInstancePattern']">
               <gmd:identifier>
                 <gmd:RS_Identifier id="InstancePattern">
                   <gmd:code>
-                    <gco:CharacterString><xsl:copy-of select="/dif:DIF/dif:Related_URL/dif:URL/child::text()"/></gco:CharacterString>
+                    <gco:CharacterString><xsl:copy-of select="/dif:DIF/dif:Related_URL[normalize-space(dif:URL_Content_Type/dif:Type) = 'GTSInstancePattern']/dif:URL/child::text()"/></gco:CharacterString>
                   </gmd:code>
                   <gmd:codeSpace>
                     <gco:CharacterString>Instance Pattern of WIS GISC Cache</gco:CharacterString>
@@ -357,6 +366,9 @@
                   </gco:CharacterString>
                 </gmd:keyword>
               </xsl:for-each>
+              <gmd:type>
+                <gmd:MD_KeywordTypeCode codeList="http://wis.wmo.int/2008/catalogues/draft_version_1-1/WMO_Codelists_ver1_1.xml#MD_KeywordTypeCode" codeListValue="theme"/>
+              </gmd:type>
             </gmd:MD_Keywords>
           </gmd:descriptiveKeywords>
 
