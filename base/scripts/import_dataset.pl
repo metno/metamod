@@ -256,10 +256,13 @@ sub update_database {
     #  Create the datestamp for the current date:
     #
     my @timearr   = localtime( mmTtime::ttime() );
-    my $datestamp = sprintf( '%04d-%02d-%02d',
+    my $datestamp = sprintf( '%04d-%02d-%02dT%02d:%02d:%02dZ',
         1900 + $timearr[5],
         1 + $timearr[4],
-        $timearr[3] );
+        $timearr[3],
+        $timearr[2],
+        $timearr[1],
+        $timearr[0] );
 
     #
     #  Create hash with all existing basic keys in the database.
