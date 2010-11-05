@@ -96,7 +96,14 @@ if ( scalar @ARGV > 2 ) {
 }
 my $inputfile;
 my $inputDir;
-if ( @ARGV == 1 ) {
+
+# should subscription be activated or not. We do not want to activate subscriptions
+# when the metabase is re-indexed i.e. the script is running in batch mode.
+my $activateSubscriptions = 0;
+
+if( @ARGV == 0 ){
+    $activateSubscriptions = 1;
+} elsif ( @ARGV == 1 ) {
     if ( -f $ARGV[0] ) {
         $inputfile = $ARGV[0];
     }
@@ -107,6 +114,7 @@ if ( @ARGV == 1 ) {
         die "Unknown inputfile or inputdir: $ARGV[0]\n";
     }
 } elsif ( @ARGV == 2 ) {
+    $activateSubscriptions = 1;
     Metamod::Utils::daemonize($ARGV[0], $ARGV[1]);
 }
 our $SIG_TERM = 0;
@@ -626,7 +634,7 @@ sub update_database {
         updateSru2Jdbc($dbh, $ds, $dsid, $inputBaseFile);
     }
 
-    if($ds->getParentName()){
+    if($ds->getParentName() && $activateSubscriptions ){
         my $subscription = Metamod::Subscription->new();
         my $num_subscribers = $subscription->activate_subscription_handlers($ds);
     }    
