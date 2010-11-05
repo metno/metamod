@@ -253,18 +253,6 @@ sub update_database {
     );
 
     #
-    #  Create the datestamp for the current date:
-    #
-    my @timearr   = localtime( mmTtime::ttime() );
-    my $datestamp = sprintf( '%04d-%02d-%02dT%02d:%02d:%02dZ',
-        1900 + $timearr[5],
-        1 + $timearr[4],
-        $timearr[3],
-        $timearr[2],
-        $timearr[1],
-        $timearr[0] );
-
-    #
     #  Create hash with all existing basic keys in the database.
     #  The keys in this hash have the form: 'SC_id:BK_name' and
     #  the values are the corresponding 'BK_id's.
@@ -418,6 +406,19 @@ sub update_database {
         my $sql_insert_DS =  $dbh->prepare_cached(
             "INSERT INTO DataSet (DS_id, DS_name, DS_parent, DS_status, DS_datestamp, DS_ownertag, DS_creationDate, DS_metadataFormat, DS_filePath)"
           . " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)" );
+        
+        my $datestamp = $info{datestamp};
+        if ( $config->get('TEST_IMPORT_SPEEDUP') > 1 ) {
+            # testing, use artificial time
+            my @timearr   = localtime( mmTtime::ttime() );
+            $datestamp = sprintf( '%04d-%02d-%02dT%02d:%02d:%02dZ',
+                                 1900 + $timearr[5],
+                                 1 + $timearr[4],
+                                 $timearr[3],
+                                 $timearr[2],
+                                 $timearr[1],
+                                 $timearr[0] );
+        }
         $sql_insert_DS->execute(
             $dsid,               $info{name},
             $parentId,           $dsStatus,

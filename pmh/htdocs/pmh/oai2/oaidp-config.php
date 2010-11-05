@@ -467,8 +467,8 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
             } else {
                $allresults[$dsid]['DS_status'] = 'true';
             }
-            $allresults[$dsid]['DS_datestamp'] = substr($rowarr[3], 0, 10);
-            $allresults[$dsid]['DS_creationDate'] = substr($rowarr[4], 0, 10);
+            $allresults[$dsid]['DS_datestamp'] = $rowarr[3];
+            $allresults[$dsid]['DS_creationDate'] = $rowarr[4];
             $allresults[$dsid]['DS_ownertag'] = $rowarr[5];
 				$allresults[$dsid]['DS_metadataFormat'] = $rowarr[6];
             $allresults[$dsid]['DS_set'] = '';
