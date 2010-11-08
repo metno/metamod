@@ -34,7 +34,7 @@ require_once("../funcs/mmFimex.inc");
 require_once("../funcs/mmWMS2.inc");
 require_once("../funcs/mmUserbase.inc");
 
-function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = false, $level1 = false ) {
+function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = false, $level1 = false, $hasChildren = false ) {
 	global $mmConfig;
    $s1 = $value;
    $jpos = strpos($s1,' > HIDDEN');
@@ -46,8 +46,8 @@ function displayval($mtname, $value, $dsName, $fimexSetup = false, $wmsSetup = f
       $nameshown = preg_replace(':[^/]*/:','', $dsName);
       $s1 = '<a href="' . $dataUrl . '"><b>' . $nameshown . '</b></a>';
 
-      # feeds should only be shown for level 1 datasets
-      if( $level1 ){
+      # feeds should only be shown for level 1 datasets that have at least one child
+      if( $level1 && $hasChildren ){
          $s1 .= ' <a href="feed/' . $nameshown . '">';
          $s1 .= '<img style="border: 0px;" src="../img/feed.png" alt="RSS feed" /></a>';
       }
