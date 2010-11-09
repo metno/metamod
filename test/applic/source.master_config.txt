@@ -178,6 +178,10 @@ DROPDB = dropdb
 # List of import directories:
 IMPORTDIRS = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
 
+# Seconds to wait between different dataset-import tasks
+IMPORT_DATASET_WAIT_SECONDS = 600
+
+
 # ============ METAMODSEARCH configuration ==============
 # Name of web-based search application as seen by users:
 SEARCH_APP_NAME = METAMOD search

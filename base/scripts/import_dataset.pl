@@ -75,9 +75,13 @@ my $logger = Log::Log4perl->get_logger('metamod.base.import_dataset');
 #  given by this argument.
 #
 
-my $sleeping_seconds = 600; # check every 10 minutes for new files
+# wait-time between re-checking files
+my $sleeping_seconds = $config->get('IMPORT_DATASET_WAIT_SECONDS');
 if ( $config->get('TEST_IMPORT_SPEEDUP') > 1 ) {
-    $sleeping_seconds = 1; # don't wait in test-case
+    $sleeping_seconds = 0; # don't wait in test-case
+}
+if (!defined $sleeping_seconds or $sleeping_seconds <= 0) {
+    $sleeping_seconds = 600; # default 10minutes
 }
 my $importdirs_string          = $config->get("IMPORTDIRS");
 my @importdirs                 = split( /\n/, $importdirs_string );
