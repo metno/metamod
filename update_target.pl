@@ -180,6 +180,7 @@ $targetdir = &substituteval($targetdir);
 #
 if (! -f "$targetdir/$configMaster" or ($config_modified > (stat _)[9])) {
    print "Copy to $targetdir/$configMaster\n";
+   mkpath($targetdir);
    copy($configfile, "$targetdir/$configMaster") or
       die "Could not copy $configfile to $targetdir: $!";
 }
