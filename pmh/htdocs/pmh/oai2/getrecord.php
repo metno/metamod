@@ -93,7 +93,7 @@ foreach ($res as $record) { // Note: Only one record in $res
         $output .= "  <GetRecord>\n";
 	$identifier = $oaiprefix.$record[$SQL['identifier']];
 
-	$datestamp = formatDatestamp($record[$SQL['datestamp']]); 
+	$datestamp = formatDatestamp($record['OAI_datestamp']); 
 
 	if (isset($record[$SQL['deleted']]) && ($record[$SQL['deleted']] == 'true') && 
 		($deletedRecord == 'transient' || $deletedRecord == 'persistent')) {

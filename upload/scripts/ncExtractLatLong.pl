@@ -12,9 +12,8 @@ ncExtractLatLong - extract lat/long information from datasets
 
 This script will read all xml/xmd-files in a directory
 For each dataset beloning to the xml/xmd data, it will read the
-latitute/longitude information and put them to a xmlbb file 
-(the xmll data should be in a later stage be added to the xmd data
-instead of the quadtree_nodes)
+latitute/longitude information and 
+add the dataset-region to the xmd data
 
 =head1 AUTHOR
 

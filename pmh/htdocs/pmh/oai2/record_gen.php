@@ -227,6 +227,10 @@ if (!$gotFile) {
       $xslt = new XSLTProcessor();
       $xslt->importStylesheet( $xslDoc );
       $xslt->setParameter('', 'REPOSITORY_IDENTIFIER', $repositoryIdentifier);
+      $oldGranularity = $granularity;
+      $granularity = 'YYYY-MM-DDThh:mm:ssZ'; #global $granularity needed by formatDatestamp
+      $xslt->setParameter('', 'DATASET_TIMESTAMP', formatDatestamp($record['OAI_datestamp']));
+      $granularity = $oldGranularity;
       # return to string
       $xml = $xslt->transformToXML( $xmlDoc );
       # remove xml declaration and return to outRecord

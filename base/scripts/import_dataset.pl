@@ -675,7 +675,11 @@ sub updateSru2Jdbc {
             # convert to ISO19115 by reading original format from disk
             my $fds = Metamod::ForeignDataset->newFromFileAutocomplete($inputBaseFile);
             eval {
-                $fds = foreignDataset2iso19115($fds);
+                my %options;
+                if ($config->get('PMH_REPOSITORY_IDENTIFIER')) {
+                    $options{REPOSITORY_IDENTIFIER} = $config->get('PMH_REPOSITORY_IDENTIFIER');
+                }
+                $fds = foreignDataset2iso19115($fds, \%options);
                 isoDoc2SruDb($dbh, $fds, $dsid);
             }; if ($@) {
                 $logger->warn("problems converting to iso19115 and adding to sru-db: $@\n");

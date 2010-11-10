@@ -56,7 +56,8 @@ sub _init {
 }
 
 sub foreignDataset2iso19115 {
-    my ($foreignDataset) = @_;
+    my ($foreignDataset, $options) = @_;
+    $options = {} unless defined $options;
     _init();
     if (!UNIVERSAL::isa($foreignDataset, 'Metamod::ForeignDataset')) {
         $_logger->error_log("foreignDataset2iso19115 requires Metamod::ForeignDataset, got: " . ref($foreignDataset));
@@ -80,7 +81,11 @@ sub foreignDataset2iso19115 {
         my %info = $foreignDataset->getInfo();
         $_logger->error_die('cannot translate dataset '.$info{name}.' to internal format');
     }
-    my $isoDoc = $difToIsoStyle->transform($difFds->getMETA_DOC());
+    my %info = $foreignDataset->getInfo();
+    my %params = ('DATASET_TIMESTAMP' => $info{datestamp}); # required
+    $params{REPOSITORY_IDENTIFIER} = $options->{REPOSITORY_IDENTIFIER}
+        if exists $options->{REPOSITORY_IDENTIFIER};
+    my $isoDoc = $difToIsoStyle->transform($difFds->getMETA_DOC(), XML::LibXSLT::xpath_to_string(%params));
     return Metamod::ForeignDataset->newFromDoc($isoDoc, $difFds->getXMD_DOC());
     
 }
@@ -111,9 +116,11 @@ internal format.
 
 =head2 FUNCTIONS
 
-=head3 foreignDataset2iso19115($foreignDataset)
+=head3 foreignDataset2iso19115($foreignDataset, [{options}])
 
 Parameter: $foreignDataset Metamod::ForeignDataset of base-filename.
+           $options: currently supported: {REPOSITORY_IDENTIFIER => '...'}, text-string of the
+           repository-name, i.e. $config->getVar('PMH_REPOSITORY_IDENTIFIER')
 
 Return: object
 Exceptions: on file-system related problems

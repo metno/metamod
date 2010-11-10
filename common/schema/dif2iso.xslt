@@ -8,6 +8,7 @@
 
   <xsl:output method="xml" indent="yes"/>
   <xsl:param name="REPOSITORY_IDENTIFIER"/>
+  <xsl:param name="DATASET_TIMESTAMP" />
 
   <xsl:variable name="uc" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
   <xsl:variable name="lc" select="'abcdefghijklmnopqrstuvwxyz'"/>
@@ -160,9 +161,12 @@
 
       <!-- dateStamp 1 -->
       <gmd:dateStamp>
-        <gco:Date>
-          <xsl:copy-of select="dif:DIF_Creation_Date/child::text()"/>
-        </gco:Date>
+        <gco:DateTime>
+          <!-- DIF Last revision date is of date resolution, we require second resolution
+            <xsl:copy-of select="dif:DIF_Last_Revision_Date/child::text()"/>
+          -->
+          <xsl:value-of select="$DATASET_TIMESTAMP" />
+        </gco:DateTime>
       </gmd:dateStamp>
 
       <!-- metadataStandardname -->
