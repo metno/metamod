@@ -41,7 +41,10 @@ use warnings;
 use FindBin qw($Bin);
 use lib "$Bin/common/lib";
 use Metamod::Config;
+use Getopt::Std;
 
+our $opt_p; # print to stderr
+getopts('p');
 my $appdir = shift @ARGV or usage();
 
 my $mm_config = Metamod::Config->new("$appdir/master_config.txt");
@@ -66,14 +69,15 @@ Alias $local	$target/htdocs
 
 <Directory $target/htdocs>
     Options Indexes FollowSymLinks MultiViews
-    AllowOverride None
+    AddDefaultCharset UTF-8
+    #AllowOverride None
     Order allow,deny
     allow from all
 </Directory>
 
 EOT
 
-if ($conf_file) {
+if ($conf_file && !$opt_p) {
     open FH, ">$conf_file" or die "Cannot open $conf_file for writing";
     print FH $conf_text;
 } else {
@@ -81,7 +85,7 @@ if ($conf_file) {
 }
 
 sub usage {
-    print STDERR "Usage: $0 application_directory\n";
+    print STDERR "Usage: [-p] $0 application_directory\n";
     exit (1);
 }
 
@@ -103,6 +107,12 @@ or conf.d.
 =head2 Parameters
 
 =over 4
+
+=item -p
+
+Prints output to stdout regardless of setting in master_config.
+
+=back
 
 =item application_directory
 
