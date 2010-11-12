@@ -33,8 +33,8 @@
 # ==========================
 #
 # This script wakes up periodically to update the THREDDS
-# catalog that makes the data repository available to users through the 
-# THREDDS Data Server (TDS) installation. 
+# catalog that makes the data repository available to users through the
+# THREDDS Data Server (TDS) installation.
 #
 # If this script introduces any changes in the catalog, the script will NOT
 # restart the TDS. The TDS is assumed to restart at fixed periods.
@@ -47,7 +47,7 @@ sub getTargetDir {
     my ($finalDir) = @_;
     my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
     $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
-    $dir = File::Spec->catdir($dir, $finalDir); 
+    $dir = File::Spec->catdir($dir, $finalDir);
     return File::Spec->catpath($vol, $dir, "");
 }
 
@@ -55,14 +55,16 @@ use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
 
 use Metamod::Dataset;
 use Metamod::Utils qw(findFiles);
-use Metamod::Config;
+use Metamod::Config qw(:init_logger);
 use Data::Dumper;
+use Log::Log4perl;
 use DBI;
 use File::Spec qw();
 use File::Copy;
 use Fcntl ':flock';
 use mmTtime;
 
+my $logger = Log::Log4perl->get_logger('metamod.thredds.create_thredds_catalogs');
 my $config = new Metamod::Config();
 my $dbname = $config->get("DATABASE_NAME");
 my $user   = $config->get("PG_ADMIN_USER");
@@ -89,9 +91,9 @@ eval {
    }
 };
 if ($@) {
-   &syserror("ABORTED: " . $@,"");
+   $logger->error("ABORTED: " . $@);
 } else {
-   &syserror("NORMAL TERMINATION","");
+   $logger->info("NORMAL TERMINATION");
 }
 
 sub sigterm {
@@ -116,16 +118,16 @@ sub main_body {
    open (THREDDSCONFIG,$thredds_config_path);
    undef $/;
    my $thredds_config = <THREDDSCONFIG>;
-   $/ = "\n"; 
+   $/ = "\n";
    close (THREDDSCONFIG);
 #
 #  Parse the config file:
 #
    my @configlines = split(/\n/m,$thredds_config);
    foreach my $line (@configlines) {
-#   
+#
 #     Ignore comments:
-#   
+#
 #      print "    $line\n";
       if ($line =~ /^\s*#/) {
          next;
@@ -133,9 +135,9 @@ sub main_body {
       if ($line =~ /([^#]*[^#\\])#/) {
          $line = $1;
       }
-#   
+#
 #     Split line in 'keyword obj rest' (only rest may contain whitespace):
-#   
+#
       if ($line =~ /^\s*([^ \t]+)\s+([^ \t]+)\s+(.+)\b\s*$/) {
          my $keyword = $1; # First matching ()-expression
          my $obj = $2;
@@ -149,9 +151,8 @@ sub main_body {
             $minutes_between_runs =~ s/[^0-9].*$//;
             if (length($minutes_between_runs) == 0) {
                $minutes_between_runs = 10;
-               syserror("Improper minutes value: $rest. Using default" .
-                        " $minutes_between_runs minutes between runs",
-                        "main_body");
+               $logger->warn("Improper minutes value: $rest. Using default" .
+                        " $minutes_between_runs minutes between runs");
             }
          } else {
             die("Syntax error in thredds_config, line: $line");
@@ -204,7 +205,7 @@ sub inner_loop {
       my $distribution_stm;
 #
 #     Datasets with no distribution_statement in the metadata are given
-#     a default distribution statment = "forbidden". This is accosiated 
+#     a default distribution statment = "forbidden". This is accosiated
 #     with the rolename "FORBIDDEN" which is assumed not to exist in the
 #     in the Tomcat configuration (tomcat-users.xml).
 #
@@ -217,7 +218,7 @@ sub inner_loop {
       } else {
          $distribution_stm = "forbidden";
       }
-      if (index($dref,$opendap_url) == 0) { 
+      if (index($dref,$opendap_url) == 0) {
 #
 #        String $dref starts with the string $opendap_url.
 #        Datasets with other content in $dref (dataref field) are ignored
@@ -232,9 +233,9 @@ sub inner_loop {
    }
 #
 #  The string $catalog_signature will contain a newline-separated list of
-#  "institution/dataset rolename". It is used as a basis for creating the 
+#  "institution/dataset rolename". It is used as a basis for creating the
 #  THREDDS catalog, and also as a condenced version ("signature") of the
-#  catalog. As a signature, it is used to trace changes in the would-be 
+#  catalog. As a signature, it is used to trace changes in the would-be
 #  catalog (the previous signature is stored in the $old_catalog_signature
 #  variable). If changes occur, the catalog is written to disk, and the
 #  THREDDS Data Server is restarted.
@@ -244,21 +245,21 @@ sub inner_loop {
 #  Loop through all dataset directories within the top
 #  OPeNDAP/THREDDS directory:
 #
-   print "    traverse subdirectories of the top OPENDAP directory: $opendap_directory\n";
-   opendir(OPENDAPDIR,$opendap_directory) || 
+#   print "    traverse subdirectories of the top OPENDAP directory: $opendap_directory\n";
+   opendir(OPENDAPDIR,$opendap_directory) ||
          die "Could not open directory $opendap_directory: $!\n";
    foreach my $institution_dir (sort readdir(OPENDAPDIR)) {
       my $inst_dir = "$opendap_directory/$institution_dir";
       if (-d $inst_dir and substr($institution_dir,0,1) ne '.') {
-         print "   found institution directory: $inst_dir\n";
-         opendir(INSTITUTIONDIR,$inst_dir) || 
+#         print "   found institution directory: $inst_dir\n";
+         opendir(INSTITUTIONDIR,$inst_dir) ||
                die "Could not open directory $inst_dir: $!\n";
          my $institution = $inst_dir;
          $institution =~ s|^.*/||mg;
          foreach my $dataset_dir (sort readdir(INSTITUTIONDIR)) {
             my $dset_dir = "$inst_dir/$dataset_dir";
             if (-d $dset_dir and substr($dataset_dir,0,1) ne '.') {
-               print "   found dataset directory: $dset_dir\n";
+#               print "   found dataset directory: $dset_dir\n";
                my $dataset = $dset_dir;
                $dataset =~ s|^.*/||mg;
                if (exists($dist_statements{$dataset})) {
@@ -267,10 +268,10 @@ sub inner_loop {
                      my $rolename = $rolenames_from_config->{$distribution_statement};
                      $catalog_signature .= "$institution/$dataset $rolename\n";
                   } else {
-                     print "   - No rolename\n";
+                     $logger->warn("$dset_dir  - No rolename");
                   }
                } else {
-                  print "   - No distribution statement\n";
+                  $logger->warn("$dset_dir - No distribution statement");
                }
             }
          }
@@ -280,12 +281,13 @@ sub inner_loop {
    closedir(OPENDAPDIR);
 #
    if ($catalog_signature ne $old_catalog_signature) {
-      print "-- " . &datestring() . ": Writing new catalog.xml:\n";
       if (-e $thredds_catalog_path) {
          if (move($thredds_catalog_path,$thredds_catalog_path . "_bcup") == 0) {
             die "Moving $thredds_catalog_path to backup file did not succeed. Error code: $!\n";
          }
       }
+      my $new_entry_count = 0;
+      my $removed_entry_count = 0;
       open (THREDDSCAT,">$thredds_catalog_path");
       flock (THREDDSCAT, LOCK_EX);
       $old_catalog_signature = $catalog_signature;
@@ -315,7 +317,8 @@ EOF
                   if (exists($old_catalog_hash{$line})) {
                      delete($old_catalog_hash{$line});
                   } else {
-                     print "    New catalog entry: $line\n";
+#                     print "    New catalog entry: $line\n";
+                     $new_entry_count++;
                   }
                }
                if ($institution ne $prev_institution and $prev_institution ne "") {
@@ -371,8 +374,11 @@ EOF
 #     the THREDDS catalog:
 #
       foreach my $line (keys %old_catalog_hash) {
-          print "    Removed catalog entry: $line\n";
+#          print "    Removed catalog entry: $line\n";
+         $removed_entry_count++;
       }
+      $logger->info("Writing new THREDDS catalog file: $thredds_catalog_path " .
+                    "- adding $new_entry_count removing $removed_entry_count entries");
       %old_catalog_hash = ();
       foreach my $line (@scatalog) {
           if ($line ne "dummy/dummy dummy") {
