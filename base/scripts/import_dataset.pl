@@ -41,7 +41,7 @@ sub getTargetDir {
     my ($finalDir) = @_;
     my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
     $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
-    $dir = File::Spec->catdir($dir, $finalDir); 
+    $dir = File::Spec->catdir($dir, $finalDir);
     return File::Spec->catpath($vol, $dir, "");
 }
 
@@ -80,7 +80,7 @@ my $sleeping_seconds = $config->get('IMPORT_DATASET_WAIT_SECONDS');
 if ( $config->get('TEST_IMPORT_SPEEDUP') > 1 ) {
     $sleeping_seconds = 0; # don't wait in test-case
 }
-if (!defined $sleeping_seconds or $sleeping_seconds <= 0) {
+if (!defined $sleeping_seconds or $sleeping_seconds < 0) {
     $sleeping_seconds = 600; # default 10minutes
 }
 my $importdirs_string          = $config->get("IMPORTDIRS");
@@ -193,7 +193,7 @@ sub processFoundFile {
         $logger->info("$file -accepted\n");
         my $basename = substr $file, 0, length($file)-4; # remove .xm[ld]
         if ($file eq "$basename.xml" and -f "$basename.xmd" and (stat(_))[9] >= $last_updated) {
-            # ignore .xml file, will be processed together with .xmd file            
+            # ignore .xml file, will be processed together with .xmd file
         } else {
             # import to database
             eval { &update_database( $file, $dbh ); };
@@ -207,7 +207,7 @@ sub processFoundFile {
                 $logger->info("$basename successfully imported\n");
             }
         }
-    } 
+    }
 }
 
 sub process_directories {
@@ -272,7 +272,7 @@ sub update_database {
 
 #
 #  Create hash with existing metadata in the database that may be shared between
-#  datasets. The keys in this hash have the form: 'MT_name:MD_content' with 
+#  datasets. The keys in this hash have the form: 'MT_name:MD_content' with
 #  MD_content in lower-case and the values are the corresponding 'MD_id's.
 #
     my %dbMetadata = ();
@@ -353,7 +353,7 @@ sub update_database {
                     # Remove upper components of hierarchical name originating from
                     # questionnaire data.
                     $area =~ s/^.*>\s*//;
-                    
+
                     my $mref = [ 'area', $area ];
                     push( @metaarray, $mref );
                 }
@@ -369,7 +369,7 @@ sub update_database {
             my $mref = [ 'datacollection_period', $period ];
             push( @metaarray, $mref );
         }
-        
+
         my $sql_getIDByName_DS = $dbh->prepare_cached("SELECT DS_id FROM Dataset WHERE DS_name = ?");
         $sql_getIDByName_DS->execute( $info{name} );
         my $dsid;
@@ -387,7 +387,7 @@ sub update_database {
             my $sql_delete_DS = $dbh->prepare_cached("DELETE FROM DataSet WHERE DS_id = ?");
             $sql_delete_DS->execute( $dsid );
         } else {
-            my $sql_getkey_DS = $dbh->prepare_cached("SELECT nextval('DataSet_DS_id_seq')");            
+            my $sql_getkey_DS = $dbh->prepare_cached("SELECT nextval('DataSet_DS_id_seq')");
             $sql_getkey_DS->execute();
             my @result = $sql_getkey_DS->fetchrow_array;
             $dsid = $result[0];
@@ -410,7 +410,7 @@ sub update_database {
         my $sql_insert_DS =  $dbh->prepare_cached(
             "INSERT INTO DataSet (DS_id, DS_name, DS_parent, DS_status, DS_datestamp, DS_ownertag, DS_creationDate, DS_metadataFormat, DS_filePath)"
           . " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)" );
-        
+
         my $datestamp = $info{datestamp};
         if ( $config->get('TEST_IMPORT_SPEEDUP') > 1 ) {
             # testing, use artificial time
@@ -517,7 +517,7 @@ sub update_database {
                 my $sql_getkey_GA = $dbh->prepare_cached("SELECT nextval('GeographicalArea_GA_id_seq')");
                 my $sql_insert_GA = $dbh->prepare_cached("INSERT INTO GeographicalArea (GA_id) VALUES (?)");
                 my $sql_insert_GAGD = $dbh->prepare_cached("INSERT INTO GA_Contains_GD (GA_id, GD_id) VALUES (?, ?)");
-                
+
                 $sql_getkey_GA->execute();
                 my @result = $sql_getkey_GA->fetchrow_array;
                 my $gaid   = $result[0];
@@ -556,7 +556,7 @@ sub update_database {
                 my $regionColumns = join ',', map {"geom_$_"} @regions;
                 my $regionValues = join ',', map {'ST_TRANSFORM(ST_GeomFromText(?,'.$config->get('LONLAT_SRID')."), $_)"} @regions;
                 my $sql_insert_Location = $dbh->prepare_cached("INSERT INTO Dataset_Location (DS_id, $regionColumns) VALUES (?, $regionValues)");
-            
+
                 my $regionAdded = 0;
                 foreach my $p ($region->getPolygons) {
                     my $pString = $p->toProjectablePolygon->toWKT;
@@ -564,7 +564,7 @@ sub update_database {
                         my $parCound = 0;
                         $sql_insert_Location->bind_param(++$parCound, $dsid);
                         foreach my $srid (@regions) {
-                            $sql_insert_Location->bind_param(++$parCound, $pString);                        
+                            $sql_insert_Location->bind_param(++$parCound, $pString);
                         }
                         $sql_insert_Location->execute();
                         $regionAdded++;
@@ -577,10 +577,10 @@ sub update_database {
                         my $parCound = 0;
                         $sql_insert_Location->bind_param(++$parCound, $dsid);
                         foreach my $srid (@regions) {
-                            $sql_insert_Location->bind_param(++$parCound, $pString);                        
+                            $sql_insert_Location->bind_param(++$parCound, $pString);
                         }
                         $sql_insert_Location->execute();
-                        $regionAdded++;                    
+                        $regionAdded++;
                     }
                     $regionAdded++;
                 }
@@ -600,22 +600,22 @@ sub update_database {
                             my $parCound = 0;
                             $sql_insert_Location->bind_param(++$parCound, $dsid);
                             foreach my $srid (@regions) {
-                                $sql_insert_Location->bind_param(++$parCound, $pString);                        
+                                $sql_insert_Location->bind_param(++$parCound, $pString);
                             }
                             $sql_insert_Location->execute();
                             $regionAdded++;
-                        }                                        
-                    }                
+                        }
+                    }
                 }
             }
         }
-        
+
         #
         #   Insert new projectionInformation
         #
-        
+
         my $sql_delete_ProjectionInfo = $dbh->prepare_cached("DELETE FROM ProjectionInfo WHERE DS_id = ?");
-        
+
         $sql_delete_ProjectionInfo->execute($dsid);
         my $projectionInfo = $ds->getProjectionInfo;
         if ($projectionInfo) {
@@ -645,7 +645,7 @@ sub update_database {
     if($ds->getParentName() && $activateSubscriptions ){
         my $subscription = Metamod::Subscription->new();
         my $num_subscribers = $subscription->activate_subscription_handlers($ds);
-    }    
+    }
 }
 
 
@@ -691,39 +691,39 @@ sub updateSru2Jdbc {
 }
 
 # read a parsed iso19115 libxml document
-# and put it into the sru database 
+# and put it into the sru database
 sub isoDoc2SruDb {
     my ($dbh, $isods, $dsid) = @_;
     my %info = $isods->getInfo;
     return unless $info{status} eq 'active';
-        
+
     # find elements
     my $xpc = XML::LibXML::XPathContext->new();
     $xpc->registerNs('gmd', 'http://www.isotc211.org/2005/gmd');
     $xpc->registerNs('d', 'http://www.met.no/schema/metamod/dataset');
-        
+
     my (@params, @values);
-    
+
     push @params, "id_product";
     push @values, $dsid;
-    
+
     push @params, "dataset_name";
     push @values, $info{name};
 
     push @params, "ownertag";
     push @values, uc($info{ownertag});
-    
+
     push @params, "created";
     push @values, $info{creationDate};
-    
+
     push @params, "updated";
     push @values, $info{datestamp};
-    
+
     my $xml = $isods->getMETA_XML();
     $xml =~ s/<\?xml[^>]*>//g; # remove xml-processing strings
     push @params, "metaxml";
     push @values, $xml;
-    
+
     push @params, "metatext";
     push @values, $isods->getMETA_DOC()->textContent();
 
@@ -735,14 +735,14 @@ sub isoDoc2SruDb {
 
     push @params, "subject";
     push @values, uc(scalar _get_text_from_doc($isods->getMETA_DOC(), '//gmd:subject', $xpc)); # TODO: does this exist?
-    
+
     push @params, "search_strings";
     push @values, uc(scalar _get_text_from_doc($isods->getMETA_DOC(), '//gmd:keyword', $xpc)); # TODO: word separator?
-    
+
     # TODO, not in document yet ???
     #push @params, "begin_date";
     #push @values, uc(scalar _get_text_from_doc($isods->getMETA_DOC(), '//gmd:XXXX', $xpc));
-    
+
     # TODO, not in document yet ???
     #push @params, "end_date";
     #push @values, uc(scalar _get_text_from_doc($isods->getMETA_DOC(), '//gmd:XXXX', $xpc));
@@ -778,7 +778,7 @@ sub min {
     foreach my $vn (@_) {
         if ($val > $vn) {
             $val = $vn;
-        } 
+        }
     }
     return $val;
 }
@@ -789,7 +789,7 @@ sub max {
     foreach my $vn (@_) {
         if ($val < $vn) {
             $val = $vn;
-        } 
+        }
     }
     return $val;
 }
@@ -801,16 +801,16 @@ sub max {
 #
 sub _get_contact_id {
     my ($dbh, $doc, $xpc) = @_;
-    # fetch author and org from document, publisher or principalInvestigator 
+    # fetch author and org from document, publisher or principalInvestigator
     my $authorXP = '//gmd:pointOfContact/gmd:CI_ResponsibleParty[ gmd:role/gmd:CI_RoleCode[ @codeListValue="publisher" or @codeListValue="principalInvestigator" ] ]/gmd:individualName';
     my $author = _get_text_from_doc($doc, $authorXP, $xpc);
     my $orgXP = '//gmd:pointOfContact/gmd:CI_ResponsibleParty[ gmd:role/gmd:CI_RoleCode[ @codeListValue="publisher" or @codeListValue="principalInvestigator" ] ]/gmd:organisationName';
     my $organization = _get_text_from_doc($doc, $orgXP, $xpc);
-    
+
     # TODO: get author from other places if other code-list is used
-    
+
     $logger->debug("found contact-(author,organization)=($author,$organization) in sru/iso19115\n") if $logger->is_debug();
-    
+
     # search for existing author/organization
     ($author, $organization) =  map {defined $_ ? uc($_) : undef} ($author, $organization);
     my $authorSQL = defined $author ? "author = ?" : "author IS NULL";
@@ -819,7 +819,7 @@ sub _get_contact_id {
 SELECT id_contact
   FROM sru.meta_contact
  WHERE $authorSQL
-   AND $orgSQL 
+   AND $orgSQL
 SQL
     my @authorOrganization = map {defined $_ ? $_ : ()} ($author, $organization);
     $sth_search->execute(@authorOrganization);
@@ -844,7 +844,7 @@ SQL
     return $contact_id;
 }
 
-# 
+#
 # get all text-contents from a LibXML document
 # paramas:
 #    doc: xml document
@@ -852,7 +852,7 @@ SQL
 #    xpc: xpath context
 # return:
 #   list-context: list of text-contents
-#   scalar: white-space joined context, or undef 
+#   scalar: white-space joined context, or undef
 sub _get_text_from_doc {
     my ($doc, $xpath, $xpc) = @_;
     my @nodes = $xpc->findnodes($xpath, $doc);
@@ -860,7 +860,7 @@ sub _get_text_from_doc {
     foreach my $node (@nodes) {
         push @results, $node->textContent;
     }
-    
+
     if (wantarray) {
         return @results;
     } else {
@@ -878,5 +878,5 @@ sub cleanContent {
     $content =~ s/(^\s+|\s+$)//go;
     # convert several spaces to one space
     $content =~ s/\s+/ /go;
-    return lc($content); 
+    return lc($content);
 }
