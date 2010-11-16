@@ -302,6 +302,7 @@ sub inner_loop {
 <service name="allServices" base="" serviceType="compound">
    <service name="thisDODS" serviceType="OpenDAP" base="/thredds/dodsC/" />
    <service name="httpService" serviceType="HTTPServer" base="/thredds/fileServer/" />
+   <service name="wms" serviceType="WMS" base="/thredds/wms/" />
 </service>
 
 <dataset name="$thredds_top_dataset_name" ID="$thredds_top_dataset_name">
