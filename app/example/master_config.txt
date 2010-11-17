@@ -14,6 +14,10 @@ METAMODQUEST_DIRECTORY = [==SOURCE_DIRECTORY==]/quest
 # full URL:
 BASE_PART_OF_EXTERNAL_URL = http://[==SERVER==]:8080
 
+# Set this directive to enable Apache virtualhosts
+#VIRTUAL_HOST = [==SERVER==]
+VIRTUAL_HOST =
+
 # Initial part of local URLs:
 LOCAL_URL = /example/htdocs
 
@@ -91,8 +95,11 @@ PG_TSEARCH2_SCRIPT = /usr/share/postgresql/8.3/contrib/tsearch2.sql
 
 # the location of the initialization sql-script for postGIS
 PG_POSTGIS_SCRIPT = /usr/share/postgresql-8.3-postgis/lwpostgis.sql
+# in Lucid/PG 8.4 this has been renamed to /usr/share/postgresql/8.4/contrib/postgis-1.5/postgis.sql
+
 # the Coordinate System References
 PG_POSTGIS_SYSREF_SCRIPT = /usr/share/postgresql-8.3-postgis/spatial_ref_sys.sql
+
 # additional coordinate systems, retrieve from e.g. : http://spatialreference.org
 PG_POSTGIS_ADDITIONAL_SYSREF =
   INSERT into spatial_ref_sys (srid, auth_name, auth_srid, proj4text, srtext) values ( 93995, 'epsg', 3995, '+proj=stere +lat_0=90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs ', 'PROJCS["WGS 84 / Arctic Polar Stereographic",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],UNIT["metre",1,AUTHORITY["EPSG","9001"]],PROJECTION["Polar_Stereographic"],PARAMETER["latitude_of_origin",-71],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],AUTHORITY["EPSG","3995"],AXIS["Easting",UNKNOWN],AXIS["Northing",UNKNOWN]]');
