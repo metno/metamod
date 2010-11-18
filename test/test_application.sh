@@ -283,6 +283,7 @@ cd $basedir/target/init
 ./create_and_load_all.sh
 cd $basedir/target/userinit
 ./run_createuserdb.sh
+cd $basedir/target/scripts
 ./load_userbase.pl
 #
 # G. The services defined for the application is started.
