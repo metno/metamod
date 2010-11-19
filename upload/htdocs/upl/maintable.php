@@ -259,7 +259,7 @@ EOF;
             echo '<td>' . $filerec["f_name"] . '</td>' . "\n";
             echo '<td>' . $filerec["f_size"] . '</td>' . "\n";
             echo '<td>' . $filerec["f_status"] . '</td>' . "\n";
-            if ($filerec["errurl"] != "") {
+            if ($filerec["f_errurl"] != "") {
                echo '<td><a href="' . $filerec["f_errurl"] . '" target="_blank">Show</a></td>' . "\n";
             } else {
                echo '<td>&nbsp;</td>' . "\n";
