@@ -45,11 +45,11 @@ my $wmsparams = "SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&FORMAT=image%2Fpng"
     . "&EXCEPTIONS=application%2Fvnd.ogc.se_inimage";
 
 # these map url's should really be configured somewhere else
-my $coast_url = "http://wms.met.no/maps/world.map?";
+my $coast_url = "http://wms.met.no/maps/world.map";
 if ($area{crs} eq "EPSG:32661") {
-    $coast_url = "http://wms.met.no/maps/northpole.map?";
+    $coast_url = "http://wms.met.no/maps/northpole.map";
 } elsif ($area{crs} eq "EPSG:32761") {
-    $coast_url = "http://wms.met.no/maps/southpole.map?";
+    $coast_url = "http://wms.met.no/maps/southpole.map";
 }
 
 #print STDERR Dumper($wms_url, \%area, \%layer);
