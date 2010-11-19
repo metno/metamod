@@ -96,7 +96,7 @@ EOT
 #
 sub getXML {
     my $url = shift or die "Missing URL";
-    $logger->info('GET ' . $url);
+    $logger->debug('GET ' . $url);
     my $ua = LWP::UserAgent->new;
     $ua->timeout(100);
     #$ua->env_proxy;
