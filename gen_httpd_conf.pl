@@ -43,7 +43,7 @@ use lib "$Bin/common/lib";
 use Metamod::Config;
 use Getopt::Std;
 
-our $opt_p; # print to stderr
+our $opt_p; # print to stdout
 getopts('p');
 my $appdir = shift @ARGV or usage();
 
@@ -69,6 +69,10 @@ ScriptAlias     $local/sch/gc2wmc   $target/cgi-bin/gc2wmc.pl
 # note slash after "feed"
 ScriptAlias     $local/sch/feed/    $target/cgi-bin/feed.pl/
 RedirectMatch   $local/sch/feed\$   $base$target/sch/feed/
+
+# The remaining lines are used when installing to a clean Apache
+# DO NOT USE if you've already configured your server manually
+# (including using symlinks to specify htdocs dir)!
 
 Alias $local	$target/htdocs
 
@@ -105,7 +109,7 @@ B<gen_httpd_conf.pl> - Apache config generator for Metamod
 =head1 DESCRIPTION
 
 This utility generates a stub Apache config to be placed somewhere in sites-available
-or conf.d.
+(if using VirtualHosts) or conf.d (if using path to specify different sites).
 
 =head1 USAGE
 
@@ -127,7 +131,6 @@ Prints output to stdout regardless of setting in master_config.
 
 'application_directory' is the name of a directory containing the application
 specific files. Inside this directory, there must be a master_config.txt file.
-
 
 =back
 
