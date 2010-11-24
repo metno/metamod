@@ -478,11 +478,9 @@ and upload the two files test1_arctic20.200611.cdl and test1_synop_99710.cdl
 found in the testdata directory.
 
 12. After a few minutes, check that metadata from the files have been 
-loaded into the database. This can be done by looking at the databaselog
-(path defined by the LOGFILE variable in master_config.txt), and by
+loaded into the database. This can be done by looking at the system log
+(path defined by the LOG4ALL_SYSTEM_LOG variable in master_config.txt), and by
 entering the METAMODSEARCH web page and search for the data.
-You may also consult the output files from the two perl scripts started
-by 'metamodInit.sh start': upload_monitor.out and import_dataset.out.
 
 13. Do a similar exercise with the files test2_arctic20.200611.cdl and
 test2_synop_99710.cdl. A new directory/dataset has to be created for these

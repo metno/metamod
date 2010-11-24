@@ -1,37 +1,58 @@
-This module comprise two main systems:
+The METAMOD2 Upload module
+==========================
 
-   - A web application for users to upload files to the METAMOD2 data repository.
-     This application is found in the htdocs/upl directory and is documented in
-     the htdocs/upl/README file.
+The Upload module is a framework for creating new datasets and extracting metadata for the
+datasets from netCDF files provided by users. The netCDF files will reside in a data
+repository accesible within the file system on the server where METAMOD2 is running.
 
-   - Pearl scripts for monitoring uploaded files and extracting metadata from
-     these files. Currently, metadata can only be extracted from netCDF files.
-     The scripts produce XML files ready to be imported to the METAMOD2 database
-     by the METAMODBASE module.
+The module operates in two different modes depending on the value of the configuration
+variable "EXTERNAL_REPOSITORY":
 
-     Three scripts are involved in this system:
+EXTERNAL_REPOSITORY = false  METAMOD is the owner of the data repository. It will monitor
+ (or any value except true)  directories where data providers can upload netCDF files, and
+                             move the files from there into the data repository. While doing
+                             this, METAMOD will extract metadata for the XML Metadata
+                             repository, and check the files and eventually report to the
+                             user any errors or missing metadata encountered. This is the
+                             normal mode.
 
-     upload_monitor.pl    It sleeps most of the time, but wakes up to
-                          see if any new files are uploaded, either through
-                          the web application, or directly (by ftp or another
-                          program). It investigates the file type of the
-                          uploaded files, and performs preparatory operations
-                          on them as needed:
+EXTERNAL_REPOSITORY = true   In this case, METAMOD has no responsibilty for moving netCDF
+                             files into their final destination (i.e. the data repository).
+                             Files are already in the repository when METAMOD recieves them.
+                             The responsibility for METAMOD is only to extract metadata, 
+                             check the files and eventually report any irregularities back
+                             to the data provider.
 
-                          * Files compressed with gzip are uncompressed.
-                          * Tar files are expanded.
-                          * Cdl files are converted to netCDF.
+This module comprise the following main systems:
 
-                          Then files are sent to the digest_nc.pl script
-                          which extracts the metadata from the files and
-                          creates/updates the XML files with metadata.
+   - A web application for data providers to create and manage datasets, and to upload files
+     to the internal data repository. This application is found in the htdocs/upl directory
+     and is documented in the htdocs/upl/README file.
 
-     digest_nc.pl         This script is documented in the
-                          scripts/README_digest_nc file.
+   - A pearl script, upload_monitor.pl, for monitoring uploaded files and extracting
+     metadata from these files. Currently, metadata can only be extracted from netCDF files.
+     The scripts produce XML files ready to be imported to the METAMOD2 database by the
+     METAMODBASE module. The script sleeps most of the time, but wakes up to see if any new
+     files are uploaded, either through the web application, or directly (by ftp or another
+     program). It investigates the file type of the uploaded files, and performs preparatory
+     operations on them as needed:
 
-     print_usererrors.pl  Both the upload_monitor.pl and the digest_nc.pl
-                          script may find errors with the files that are
-                          the responsibility of the data provider. This
-                          script creates a summary of the errors found, in the
-                          form of an HTML file which is intended for the user.
+        * Files compressed with gzip are uncompressed.
+        * Tar files are expanded.
+        * Cdl files are converted to netCDF.
+
+     Then files are sent to the digest_nc.pl script which extracts the metadata from the
+     files and creates/updates the XML files with metadata.
+
+   - A web service used for registering netCDF files already in the data repository. This
+     service is intended for systems with an external data repository. The service is
+     implemented by newfiles.php and the perl script upload_indexer.pl. 
+
+   - A perl script, digest_nc.pl, for extracting metadata from netCDF files. This script
+     is documented in the scripts/README_digest_nc file.
+
+   - A perl script, print_usererrors.pl, for generating error reports (as html files) for
+     the data provider. The scripts responsible for controlling netCDF files 
+     (upload_monitor.pl, upload_indexer.pl and digest_nc.pl) may find errors with the files
+     that should be corrected by the data provider.
 

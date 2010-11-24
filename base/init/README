@@ -73,3 +73,12 @@ Sessions                - Table holding information on user sessions in the
                           field. A timestamp field, set to the last time when the
                           session was active, is used to invalidate a session when
                           a timeout limit has been exceeded.
+
+ProjectionInfo
+
+WMSInfo
+
+Dataset_Location
+
+HarvestStatus
+

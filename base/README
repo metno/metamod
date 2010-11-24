@@ -1,15 +1,22 @@
 This is the top directory of the METAMODBASE module. It is part of the
 METAMOD2 software (see ../README).
 
-The METAMODBASE module has the responsibility of managing the METAMOD2 database,
-that can be shared between several METAMOD2 applications. Only one of these
-applications will be using the METAMODBASE module (possibly together with other
-METAMOD2 modules).
+The METAMODBASE module is responsible for managing two METAMOD2 databases,
+the Metadata database and the User database.
 
-An overview of the database tables is found in init/README. The ultimate 
-documentation of these tables are found in the init/createdb.sh script.
+These databases can be shared between several METAMOD2 applications, but only one
+of these applications will be using the METAMODBASE module (possibly together with
+other METAMOD2 modules). The METAMODBASE module includes scripts for initializing
+the databases, and for loading data into the Metadata database. The User database
+can be updated also from other METAMOD2 modules.
 
-The tasks performed by the METAMODBASE module are:
+An overview of the Metadata database tables is found in init/README. The ultimate 
+documentation of these tables are found in the init/createdb.sh script. A similar
+initalization script for the User database is userinit/createuserdb.sh. The User
+database and an API for reading/writing to the database is found in the wiki page
+https://wiki.met.no/metamod/user_database_revised.
+
+For the Metadata database, the tasks performed by the METAMODBASE module are:
 
 - Initialising the database. This is done by the init/create_and_load_all.sh
   script which sets up the database tables and load static data into some of the 
@@ -40,7 +47,3 @@ The tasks performed by the METAMODBASE module are:
   scripts) as a daemon or cronjob.
 
   The XML formats used for dataset import is documented in README_XML.
-
-When METAMOD is updated from version 2.2 to 2.3, an existing database has to be 
-prepared for fulltext search. How to do this is described in UPDATE_FROM_2.2 in
-the top METAMOD directory.

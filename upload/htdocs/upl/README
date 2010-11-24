@@ -1,12 +1,12 @@
-METAMOD2 upload service
-=======================
+METAMOD2 service pages for data providers
+=========================================
 
 INTRODUCTION
 ------------
 
-This web application makes it possible for METAMOD2 data providers to upload data files
-(netCDF files) to the central METAMOD2 data repository. In order to do so, the data provider
-must be a registered user of this upload service.
+This web application makes it possible for METAMOD2 data providers to create new datasets,
+and upload data files (netCDF files) to the central data repository. In order to do so,
+the data provider must be a registered user of this service.
 
 The index.html file contains two forms, one for registered users and one for new users.
 User E-mail addresses are used as basic user identification.
@@ -26,11 +26,10 @@ telling the user that the application for a new user account has been approved. 
 will also provide the user with the initial password.
 
 Users must belong to one of the institutions that are found in the INSTITUTION_LIST
-varible in the master_config.txt file.
-The new user select which institution she/he belongs to while filling in the form.
-Each institution is given an acronym. These acronyms are, among other things, used as
-directory names at the topmost level for the directory hierarchy containing the files
-uploaded to the system.
+value in the master_config.txt file. The new user selects which institution she/he belongs
+to while filling in the form. Each institution is given an acronym. These acronyms are, among
+other things, used as directory names at the topmost level for the directory hierarchy
+containing the files uploaded to the system.
 
 REGISTERED USERS
 
@@ -40,42 +39,59 @@ original application form for new users. In addition, the user may change the pa
 checking a check box in the form, and filling in twice the new password.
 
 When the form for registered users is correctly submitted, the user enters a web application
-for directory administration and file uploads.
+for directory administration and file uploads/registrations.
 
 
 WEB APPLICATION
 ---------------
 
-Apart from the log in page, the web application has two main windows, available as two menu
-items on the left web page column: "Administration" and "File upload".
+The web application operates in two different modes (normal and external) depending on the
+value of the configuration variable EXTERNAL_REPOSITORY (see the upload/README file).
 
-The administration window allows creation of new directories where uploaded data files
-will be stored on the server. A new directory is created under the main directory for
-the institution that the user belongs to (identified by the institution acronym).
+Apart from the log in page, the web application has two or three main windows, available as 
+menu items on the left web page column: "Administration", "Upload files" (or just "Files") and
+(for normal mode) "Test a file".
 
-The directory name should be short (max ten characters allowed), and must be unique across
-all institution directories.
+The administration window allows registration of new datasets. In normal mode, a directory with
+the same name as the dataset will be created in the data repository. This directory will be
+created as a subdirectory of the institution directory (identified by the institution acronym).
+Uploaded data files will be copied to this directory after metadata extraction. For external
+repositories, the user has to enter the absolute directory path where all data files belonging
+to the dataset can be found. The data files resides in this directory on any subdirectory
+level.
 
-Within each directory, only files with names complying to a (directory specific) naming scheme
-are allowed. The user who creates a directory is responsible for setting up a suitable
-naming scheme for it. This is done as part of the directory creation dialogue.
+The dataset name should be short (a configurable max length apply), and must be unique across
+all datasets created for the institution.
 
-The user who creates a directory will be the owner of that directory, and will have the right to
-upload files to that directory. Other users may also ulpoad files to that directory, but only
-with permission from the directory owner. The directory owner may set up a directory key 
-(a character string) for the directory. This key will act as a password which other users must
-provide while uploading files to the directory. The owner may disclose the key to any other
-user, or publish it to all users. This disclosure of the key must be done by E-mail or by
-other means; it is not a service provided by the METAMOD2 system. If the owner wants to
-withdraw such upload rights, it is allways possible to change the directory key.
+In normal mode, a special naming scheme for data files is applied. Within each dataset directory,
+file names must correspond to the following template: DATASETNAME_REST. DATASETNAME is the
+name of the dataset (which may not include any underscores '_'). REST may be any string from the
+alphabet [A-Za-z_.-].
+
+The data provider who creates a dataset will be the owner of that dataset, and will have the
+right to upload/register files to that dataset. Other users may also ulpoad/register files to
+that dataset, but only with permission from the dataset owner. The dataset owner may set up a
+dataset key (a character string) for the dataset. This key will act as a password which other
+data providers must provide while uploading/registering files to the dataset. The owner may
+disclose the key to any other data provider, or publish it to all providers. This disclosure of
+the key must be done by E-mail or by other means; it is not a service provided by the METAMOD2
+system. If the owner wants to withdraw such rights, it is allways possible to change the dataset
+key. For external repositories, the dataset key is mandatory.
 
 
 INTERNAL REPRESENTATION OF USER ACCOUNTS
 ----------------------------------------
 
-A user account is represented by a file residing in subdirectory u1 of the the METAMOD2
-webrun directory (given by the value of WEBRUN_DIRECTORY in master_config.txt). The filename
-is composed as follows:
+A user account is represented by an entry in the UserTable table in the User database. 
+A detailed description of the User database can be found on the web page:
+https://wiki.met.no/metamod/user_database_revised.
+
+Prior to the 2.6 release of METAMOD, user accounts were represented by files residing in
+subdirectory u1 of the the METAMOD2 webrun directory (given by the value of WEBRUN_DIRECTORY
+in master_config.txt). For existing METAMOD2 installations that are to be upgraded to 2.6, the
+perl script load_userbase.pl can be used to convert these files to the User database.
+
+These files have names composed as follows:
 
    <normalised E-mail address>.<normalised password>
 
@@ -86,17 +102,17 @@ this is done.
 The content of these files is "allmost" XML. What is missing is a start tag and corresponding
 end tag. Three different tags are used:
 
-<heading name="" email="" institution="" telephone="" />
-<dir dirname="" key="" />
-<file name="" size="" status="" errurl="" />
+   <heading name="" email="" institution="" telephone="" />
+   <dir dirname="" key="" />
+   <file name="" size="" status="" errurl="" />
 
-The heading tag occure once at the beginning of a user file.
+The "heading" tag occure once at the beginning of a file.
 
-Each dir tag contains the name of a directory created by the user, together with the
-directory key (which may have empty content).
+Each "dir" tag contains the name of a dataset directory created by the user, together with the
+dataset key (which may have empty content).
 
-Each file tag contains the name, size and status of an uploaded file. In addition, an errurl
+Each "file" tag contains the name, size and status of an uploaded file. In addition, an errurl
 attribute may be found that points to an html file with a summary of errors found while 
 "parsing" the uploaded file (see the ../../scripts/upload_monitor.pl script).
 
-As the parsing of a user file is somewhat primitive, each tag must comprise only one line.
+As the parsing of these files are somewhat primitive, each tag must comprise only one line.
