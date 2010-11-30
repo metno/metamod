@@ -1,13 +1,24 @@
 #!/bin/sh
-DBNAME=[==USERBASE_NAME==]
-PSQL=[==PSQL==]
-CREATEDB=[==CREATEDB==]
-DROPDB=[==DROPDB==]
-$DROPDB -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] $DBNAME
-$CREATEDB -E UTF-8 -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] $DBNAME
-echo "----------------- Database $DBNAME created ------------------"
 
-$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<'EOF'
+COMMON="[==TARGET_DIRECTORY==]/init/common.sh"
+
+if [ -e  $COMMON ]
+then
+    echo $COMMON found!
+    . "$COMMON"
+else
+        echo "Library $COMMON not found."
+        exit 1
+fi
+
+USERBASE_NAME=[==USERBASE_NAME==]
+check "USERBASE_NAME"
+
+$DROPDB -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] $USERBASE_NAME
+$CREATEDB -E UTF-8 -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] $USERBASE_NAME
+echo "----------------- Database $USERBASE_NAME created ------------------"
+
+$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $USERBASE_NAME <<'EOF'
 
 CREATE TABLE UserTable (
    u_id               SERIAL,
