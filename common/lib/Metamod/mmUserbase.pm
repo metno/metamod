@@ -1,31 +1,37 @@
-#----------------------------------------------------------------------------
-#  METAMOD - Web portal for metadata search and upload
-#
-#  Copyright (C) 2010 met.no
-#
-#  Contact information:
-#  Norwegian Meteorological Institute
-#  Box 43 Blindern
-#  0313 OSLO
-#  NORWAY
-#  email: Egil.Storen@met.no
-#
-#  This file is part of METAMOD
-#
-#  METAMOD is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  METAMOD is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with METAMOD; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-#----------------------------------------------------------------------------
+
+=begin LICENSE
+
+METAMOD - Web portal for metadata search and upload
+
+Copyright (C) 2010 met.no
+
+Contact information:
+Norwegian Meteorological Institute
+Box 43 Blindern
+0313 OSLO
+NORWAY
+email: Egil.Storen@met.no
+
+This file is part of METAMOD
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+METAMOD is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with METAMOD; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=end LICENCE
+
+=cut
+
 use strict;
 package Metamod::mmUserbase;
 
@@ -64,7 +70,7 @@ Metamod::mmUserbase - Perl API against the METAMOD User Database
 API for accessing and updating the METAMOD User database. The database contains information
 about users, datasets and files. A user owns one or more dataset, and a dataset owns one or
 more file. The database also contain information that are connected to both dataset
-and user, but not neccessarily the user that owns the dataset (the infoUDS table). 
+and user, but not neccessarily the user that owns the dataset (the infoUDS table).
 
 The database will contain a complete inventory of the datasets that are also found in
 the Metadata database (and the XML files that are sources for the Metadata database).
@@ -149,8 +155,8 @@ use constant FALSE => 0;
         #        Set attribute values
         #
         my $config = new Metamod::Config();
-        my $dbname = $config->get("USERBASE_NAME");
-        my $user   = $config->get("PG_ADMIN_USER");
+        my $dbname = $config->get("USERBASE_NAME") or die "Missing USERBASE_NAME in master_config";
+        my $user   = $config->get("PG_ADMIN_USER") or die "Missing PG_ADMIN_USER in master_config";
         $dbh{$ident} =
             DBI->connect( "dbi:Pg:dbname=" . $dbname . " " . $config->get("PG_CONNECTSTRING_PERL"), $user, "" ) or die $DBI::errstr;
         $pending_user_updates{$ident}    = FALSE();
@@ -715,7 +721,7 @@ Return value: TRUE on success, FALSE on error.
 
 IN: User E-mail address, application id (a_id).
 
-Create a new user and make it the current user. Initially, the value of the mandatory 
+Create a new user and make it the current user. Initially, the value of the mandatory
 U_loginname field will be set to the E-mail address, but this can be changed using the
 user_put method.
 
