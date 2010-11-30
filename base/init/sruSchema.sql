@@ -2,7 +2,7 @@
 
 -- main schema
 
-DROP SCHEMA sru CASCADE;
+DROP SCHEMA IF EXISTS sru CASCADE;
 CREATE SCHEMA sru;
 GRANT USAGE ON SCHEMA sru TO "[==PG_WEB_USER==]";
 
@@ -63,4 +63,3 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER update_metatext_fulltext BEFORE INSERT OR UPDATE ON sru.products
     FOR EACH ROW EXECUTE PROCEDURE sru.update_metatext_fulltext();
-

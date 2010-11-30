@@ -1,4 +1,5 @@
 #!/bin/sh
+
 IMP=import
 if [ $# -eq 1 ]; then
    IMP=$1
@@ -6,6 +7,7 @@ fi
 PSQL=psql
 CREATEDB=createdb
 DROPDB=dropdb
+
 #
 # Re-initialize the data base, and load all static search data and datasets
 #
