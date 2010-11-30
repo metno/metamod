@@ -1,6 +1,7 @@
 init/create_and_load_all.sh
 init/createdb.sh
 init/createusers.sh
+init/common.sh
 =init/import_searchdata.pl
 init/update2.2To2.3.sql
 init/update_to_Fulltext.sh
