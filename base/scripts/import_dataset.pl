@@ -554,7 +554,8 @@ sub update_database {
             }
             if (@regions) {
                 my $regionColumns = join ',', map {"geom_$_"} @regions;
-                my $regionValues = join ',', map {'ST_TRANSFORM(ST_GeomFromText(?,'.$config->get('LONLAT_SRID')."), $_)"} @regions;
+                my $lonlat = $config->get('LONLAT_SRID') or die "Missing config directive LONLAT_SRID";
+                my $regionValues = join ',', map {"ST_TRANSFORM(ST_GeomFromText(?,$lonlat), $_)"} @regions;
                 my $sql_insert_Location = $dbh->prepare_cached("INSERT INTO Dataset_Location (DS_id, $regionColumns) VALUES (?, $regionValues)");
 
                 my $regionAdded = 0;
@@ -642,7 +643,7 @@ sub update_database {
         updateSru2Jdbc($dbh, $ds, $dsid, $inputBaseFile);
     }
 
-    if($ds->getParentName() && $activateSubscriptions ){
+    if( $config->get("USERBASE_NAME") && $ds->getParentName() && $activateSubscriptions ){
         my $subscription = Metamod::Subscription->new();
         my $num_subscribers = $subscription->activate_subscription_handlers($ds);
     }
@@ -653,7 +654,7 @@ sub update_database {
     my $ownertags;
     sub _get_sru_ownertags {
         unless ($ownertags) {
-            my $sru2jdbc_tags = $config->get('SRU2JDBC_TAGS');
+            my $sru2jdbc_tags = $config->get('SRU2JDBC_TAGS') or die "Missing config param SRU2JDBC_TAGS";
             %{ $ownertags } = map {cleanContent($_) => 1} map {s/'//g; $_} split (',', $sru2jdbc_tags);
         }
         return $ownertags;
