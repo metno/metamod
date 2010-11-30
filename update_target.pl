@@ -100,30 +100,31 @@ if ($optcount == 0) { # Supress this message if only "copy with substitution" is
    print "\nConfiguring application '$appName' with Metamod $majorVersion ($version)\n\n";
 }
 
-
+#######################
+#
+# Process master_config
+#
 my %conf;
 my $missing_variables = 0;
-#
-#  Open file for reading
-#
+
+#  Open config file for reading
 my $config_modified = (stat($configfile))[9];
 unless (-r $configfile) {die "Can not read from file: $configfile\n";}
 open (CONFIG,$configfile);
-#
-#  Loop through all lines read from a file:
-#
+
 my %newfilenames = ();
 my $value = "";
 my $varname = "";
 my $origname = "";
 my $newname = "";
 my $line = "";
+
+#  Loop through all lines in config file:
 while (<CONFIG>) {
    chomp($_);
    $line = $_;
-#
-#     Check if expression matches RE:
-#
+
+   # check for something (looks like we're closing a multi-line assignment?)
    if ($line =~ /^[A-Z0-9_#!]/ && $varname ne "") {
       if (length($origname) > 0) {
          $conf{$varname . ':' . $origname . ':' . $newname} = $value;
@@ -133,7 +134,8 @@ while (<CONFIG>) {
       }
       $varname = "";
    }
-   if ($line =~ /^([A-Z0-9_]+)\s*=(.*)$/) {
+
+   if ($line =~ /^([A-Z0-9_]+)\s*=(.*)$/) {  # this looks like a single-line assignment
       $varname = $1; # First matching ()-expression
       $value = $2; # Second matching ()-expression
       $value =~ s/^\s*//;
@@ -144,29 +146,36 @@ while (<CONFIG>) {
    } elsif ($line =~ /^!end_substitute_to_file_with_new_name\s*$/) {
       $origname = "";
       $newname = "";
-   } elsif ($line !~ /^#/ && $line !~ /^\s*$/) {
+   } elsif ($line !~ /^#/ && $line !~ /^\s*$/) {  # append value in multi-line assignment
       $value .= "\n" . $line;
    }
 }
-if ($varname ne "") {
+
+if ($varname ne "") {  # fall-off multi-line assignment (end of file)
    $conf{$varname} = $value;
 }
+
 close (CONFIG);
+# finished processing config
+
 #
+# Start processing output files
+#
+
 if ($optcount > 0) {
-#
-#   Only copy (with substitutions) one file to a targetfile. Then exit:
-#
+   # Only copy (with substitutions) one file to a targetfile. Then exit:
    my $sourcefile = $commandline_options{'--from'};
    my $targetfile = $commandline_options{'--to'};
    print "Copy and substitute from $sourcefile to $targetfile\n";
    &substcopy($sourcefile,$targetfile);
    exit;
 }
-#
+
+# now we need to copy a bunch of files into target dir
 if (!exists($conf{'TARGET_DIRECTORY'})) {
    die "TARGET_DIRECTORY is not defined in $configfile";
 }
+
 #
 #  Create an array of pathes (@flistpathes). Each element in this array
 #  is the name of a file containing a list of source files to be
@@ -175,21 +184,23 @@ if (!exists($conf{'TARGET_DIRECTORY'})) {
 my @flistpathes = ();
 my $targetdir = $conf{'TARGET_DIRECTORY'};
 $targetdir = &substituteval($targetdir);
+
 #
 # Install the config-file
 #
 if (! -f "$targetdir/$configMaster" or ($config_modified > (stat _)[9])) {
    print "Copy to $targetdir/$configMaster\n";
-   mkpath($targetdir);
    copy($configfile, "$targetdir/$configMaster") or
       die "Could not copy $configfile to $targetdir: $!";
 }
+
 # install link from /etc/metamod-$majorVersoin/$appName.cfg to $targetdir/$configMaster
+# NOTE: this only works when running as root, and should not be run on development servers
 {
     my $etcDir = "/etc/metamod-$majorVersion";
     if (-d $etcDir) {
         my $etcConfig = "$etcDir/$appName.cfg";
-        unlink $etcConfig;
+        unlink $etcConfig; # need root for this
         symlink("$targetdir/$configMaster", $etcConfig)
             or print STDERR "unable to create symlink from $etcConfig -> $targetdir/$configMaster\n";
     } else {
@@ -197,7 +208,9 @@ if (! -f "$targetdir/$configMaster" or ($config_modified > (stat _)[9])) {
     }
 }
 
-
+#
+# get list over files to process
+#
 if (!exists($conf{'SOURCE_DIRECTORY'})) {
    die "SOURCE_DIRECTORY is not defined in $configfile";
 }
@@ -214,6 +227,10 @@ foreach my $module qw(METAMODBASE METAMODSEARCH METAMODUPLOAD METAMODQUEST METAM
    }
 }
 push (@flistpathes, $appdir . '/filelist.txt');
+
+
+#
+# start processing source files
 #
 my %copied_targetnames = ();
 foreach my $filelistpath (@flistpathes) {
@@ -227,15 +244,12 @@ foreach my $filelistpath (@flistpathes) {
    my $topdir = $filelistpath;
    $topdir =~ s:/[^/]*$::; # $topdir is the directory containing the
                            # current filelist.txt file
-#
-#  Open file for reading
-#
+   # Open source file for reading
    unless (-r $filelistpath) {die "Can not read from file: $filelistpath\n";}
    open (FILES,$filelistpath);
    print "--- Processing $filelistpath:\n";
-#
-#  Loop through all lines read from a file:
-#
+
+   # Loop through all lines in source file:
    while (<FILES>) {
       chomp($_);
       my $filename = $_;
@@ -245,7 +259,7 @@ foreach my $filelistpath (@flistpathes) {
       }
       my $srcfilepath = $topdir . '/' . $filename;
       if (!( -e $srcfilepath)) {
-         print 'Unknown file in ' . $filelistpath . ': ' . $filename . "\n";
+         print "Unknown file in $filelistpath: $filename [$srcfilepath]\n";
       } else {
          my @targetfilenames = ();
          my $rex = '^' . $filename . ':';
@@ -258,23 +272,24 @@ foreach my $filelistpath (@flistpathes) {
          }
          foreach my $targetname (@targetfilenames) {
             my $targetfile = $targetdir . '/' . $targetname;
-            if (exists($copied_targetnames{$targetname}) || !( -e $targetfile) ||
-                 (stat($srcfilepath))[9] > (stat($targetfile))[9] ||
-                 ($ch1 ne '=' and $config_modified > (stat($targetfile))[9]) ) {
-#
-#        File $filename or the config file is modified later than $targetfile:
-#        (or the file has already been copied from another filelist - this
-#        ensures that files from the lattermost part of the sequence of filelists
-#        are chosen).
-#
+            if ( exists($copied_targetnames{$targetname})
+                 || !( -e $targetfile)
+                 || (stat($srcfilepath))[9] > (stat($targetfile))[9]
+                 || ($ch1 ne '=' and $config_modified > (stat($targetfile))[9])
+               ) {
+               # File $filename or the config file is modified later than $targetfile:
+               # (or the file has already been copied from another filelist - this
+               # ensures that files from the lattermost part of the sequence of filelists
+               # are chosen).
                my $dirpath = $targetdir . '/' . $targetname;
                $dirpath =~ s/\/[^\/]*$//;
                mkpath($dirpath);
-               if ($ch1 eq '=') {
+               #my $current_count = $missing_variables;
+               if ($ch1 eq '=') { # copy contents verbatim
                   print "Copy to $targetdir/$targetname\n";
                   copy($srcfilepath, $targetdir . '/' . $targetname) or
                            die "Could not copy $srcfilepath to $targetdir: $!";
-               } else {
+               } else { # process contents before copying
                   print "Copy and substitute to $targetdir/$targetname\n";
                   &substcopy($topdir, $filename, $targetdir, $targetname);
                }
@@ -282,6 +297,9 @@ foreach my $filelistpath (@flistpathes) {
                   if ($1 eq "pl" || $1 eq "sh") {
                      chmod 0755, $targetfile;
                   }
+                  #if ($1 eq "sh" and $current_count < $missing_variables) {
+                  #   die "Fatal error: Missing config definitions for shell script $filename";
+                  #} # not really a good idea since you get errors for scripts you never will run (e.g. harvester and thredds)
                }
                $copied_targetnames{$targetname} = 1;
             }
@@ -297,6 +315,20 @@ my $lcp = Metamod::LoggerConfigParser->new( { verbose => 1 } );
 $lcp->create_and_write_configs($configfile,$logger_config);
 
 
+# install the catalyst application
+my $catalyst_dir = "$sourcedir/catalyst";
+my $catalyst_install_dir = "$targetdir";
+my $catalyst_lib_dir = "$catalyst_install_dir/lib";
+chdir $catalyst_dir or die "Could not chdir to $catalyst_dir: $!";
+
+# If local::lib has been installed on the machine then PERL_MM_OPT will be set with INSTALL_BASE
+# which conflicts with PREFIX. We want to use PREFIX since it allows us to set LIB as well.
+$ENV{PERL_MM_OPT} = '' if exists $ENV{PERL_MM_OPT};
+
+system 'perl', 'Makefile.PL', "PREFIX=$catalyst_install_dir", "LIB=$catalyst_lib_dir";
+system 'make';
+system 'make install';
+
 if ($missing_variables > 0) {
    print "NOTE: All [==...==] constructs found that were not defined in the configuration file\n" .
                 "      were substituted with empty values\n";
@@ -304,15 +336,15 @@ if ($missing_variables > 0) {
 #
 #----------------------------------------------------------------------
 sub substcopy {
+   # copies a file with inline processing
    my $inputdir;
    my $inputfile = "";
    my $inputpath;
    my $outputdir;
    my $outputfile = "";
    my $outputpath;
-#
-#  Check number of arguments
-#
+
+   # Check number of arguments
    if (scalar @_ == 4) {
       $inputdir = $_[0];
       $inputfile = $_[1];
@@ -326,13 +358,11 @@ sub substcopy {
    } else {
       die "\nsubstcopy:     Wrong number of arguments\n\n";
    }
-#
-#  Open file for writing
-#
+
+   # Open target file for writing
    open (OUT,">$outputpath");
-#
-#  Open file for reading
-#
+
+   # Open source file for reading
    unless (-r "$inputpath")
           {die "Can not read from file: $inputpath\n";}
    open (IN,"$inputpath");
@@ -347,6 +377,7 @@ sub substcopy {
 }
 
 sub substituteval {
+   # process subtitution, either on string or source file
    my $textline;
    my $ifil = "";
    my $ofil = "";
@@ -364,9 +395,8 @@ sub substituteval {
       if ($textline =~ /\[==([A-Z0-9_]+)==\]/) {
          $vname = $1; # First matching ()-expression
          my $value = "";
-#
-#        Check if key exists in hash
-#
+
+         #  Check if substitution key exists in config hash
          if (length($ifil) > 0 &&
                   exists($conf{$vname . ':' . $ifil . ':' . $ofil})) {
             $value = $conf{$vname . ':' . $ifil . ':' . $ofil};
@@ -383,9 +413,9 @@ sub substituteval {
             $textline =~ s/$reg/$value/mg;
          } else {
             if (length($ifil) > 0) {
-               print "WARNING: [==" . $vname . "==] in $ifil not found\n";
+               print "WARNING: [==" . $vname . "==] in $ifil not configured\n";
             } else {
-               print "WARNING: [==" . $vname . "==] not found:\n";
+               print "WARNING: [==" . $vname . "==] not configured:\n";
                print "         $textline\n";
             }
             $textline =~ s/$reg//mg;
@@ -412,7 +442,10 @@ B<update_target.pl> - Metamod installer/tester
 
 =head1 DESCRIPTION
 
-Longer description of what facilities the software offers.
+This script copies the files listed in the various filelist.txt manifests into the
+corresponding dirs in the target.
+Also performs macro expansion of several shell scripts and other files, substituting
+variables from master_config.txt.
 
 =head1 USAGE
 
