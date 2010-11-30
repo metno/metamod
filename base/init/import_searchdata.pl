@@ -1,34 +1,39 @@
 #!/usr/bin/perl -w
-# 
-#---------------------------------------------------------------------------- 
-#  METAMOD - Web portal for metadata search and upload 
-# 
-#  Copyright (C) 2008 met.no 
-# 
-#  Contact information: 
-#  Norwegian Meteorological Institute 
-#  Box 43 Blindern 
-#  0313 OSLO 
-#  NORWAY 
-#  email: egil.storen@met.no 
-#   
-#  This file is part of METAMOD 
-# 
-#  METAMOD is free software; you can redistribute it and/or modify 
-#  it under the terms of the GNU General Public License as published by 
-#  the Free Software Foundation; either version 2 of the License, or 
-#  (at your option) any later version. 
-# 
-#  METAMOD is distributed in the hope that it will be useful, 
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-#  GNU General Public License for more details. 
-#   
-#  You should have received a copy of the GNU General Public License 
-#  along with METAMOD; if not, write to the Free Software 
-#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
-#---------------------------------------------------------------------------- 
-#
+
+
+=begin LICENSE
+
+METAMOD - Web portal for metadata search and upload
+
+Copyright (C) 2008 met.no
+
+Contact information:
+Norwegian Meteorological Institute
+Box 43 Blindern
+0313 OSLO
+NORWAY
+email: egil.storen@met.no
+
+This file is part of METAMOD
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+METAMOD is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with METAMOD; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=end LICENSE
+
+=cut
+
 #
 #  Update static search data in the database from an XML file.
 #
@@ -40,7 +45,7 @@ sub getTargetDir {
     my ($finalDir) = @_;
     my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
     $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
-    $dir = File::Spec->catdir($dir, $finalDir); 
+    $dir = File::Spec->catdir($dir, $finalDir);
     return File::Spec->catpath($vol, $dir, "");
 }
 
@@ -53,8 +58,8 @@ use Metamod::Config;
 
 # global variables
 use vars qw($dbh @logarr %searchdata @ancestors
-            $sql_insert_SC $sql_getkey_BK $sql_insert_BK $sql_insert_MT 
-            $sql_getkey_HK $sql_insert_HK $sql_insert_HKBK 
+            $sql_insert_SC $sql_getkey_BK $sql_insert_BK $sql_insert_MT
+            $sql_getkey_HK $sql_insert_HK $sql_insert_HKBK
             );
 
 
@@ -68,6 +73,7 @@ my $searchdataxml = $ARGV[0];
 #
 my $dbname = $config->get("DATABASE_NAME");
 my $user = $config->get("PG_ADMIN_USER");
+
 $dbh = DBI->connect("dbi:Pg:dbname=" . $dbname . " ".$config->get("PG_CONNECTSTRING_PERL"), $user, "");
 #
 #  Use full transaction mode. The changes has to be committed or rolled back:
@@ -127,7 +133,7 @@ sub update_database {
 #   open (XMLINPUT,$searchdataxml);
 #   undef $/;
 #   my $xmlcontent = <XMLINPUT>;
-#   $/ = "\n"; 
+#   $/ = "\n";
 #   close (XMLINPUT);
 #   $xmlcontent =~ s/&/&amp;/mg;
    my $xmlref = XMLin($searchdataxml,
@@ -189,7 +195,7 @@ sub update_database {
 #  Use "?" as placeholders in the SQL statements:
 #
    $sql_insert_SC = $dbh->prepare(
-      "INSERT INTO SearchCategory (SC_id, SC_type, SC_fnc) VALUES (?, ?, ?)");
+      "INSERT INTO SearchCategory (SC_id, SC_idname, SC_type, SC_fnc) VALUES (?, ?, ?, ?)");
    $sql_getkey_BK = $dbh->prepare("SELECT nextval('BasicKey_BK_id_seq')");
    $sql_insert_BK = $dbh->prepare(
       "INSERT INTO BasicKey (BK_id, SC_id, BK_name) VALUES (?, ?, ?)");
@@ -202,54 +208,55 @@ sub update_database {
    $sql_insert_HKBK = $dbh->prepare(
       "INSERT INTO HK_Represents_BK (HK_id, BK_id) VALUES (?, ?)");
 #
-# Loop through a given level of tags 
+# Loop through a given level of tags
 # rooted in a hash reference $xmlref.
 # Each $ref1 is a new reference to HASH, ARRAY or SCALAR
 #
    foreach my $key1 (keys %$xmlref) {
       my $ref1 = $xmlref->{$key1};
       if ($key1 eq "sc") {
-#      
+#
 #        Check if reference is a HASH
-#      
+#
          if (ref($ref1) ne "HASH") {
             die "$0: XML hash: Top level value (key 'sc') is not a hash reference\n";
          }
-#         
+#
 #       Loop through all SearchCategories in the XML file:
-#       
+#
          foreach my $key2 (keys %$ref1) {
             my $ref2 = $ref1->{$key2};
-#            
+#
 #           Execute prepared SQL statement
 #           Each argument below replaces a "?" placeholder in the $sqlstatement:
-#            
+#
             if (ref($ref2) ne "HASH") {
                die "$0: XML hash: sc element is not a hash reference\n";
             }
             if (! exists($searchdata{"SC:" . $key2})) {
+               my $idname = $ref2->{"idname"};
                my $type = $ref2->{"type"};
                my $fnc = $ref2->{"fnc"};
-               $sql_insert_SC->execute($key2,$type,$fnc);
+               $sql_insert_SC->execute($key2,$idname,$type,$fnc);
                $searchdata{"SC:" . $key2} = 1;
 #               push (@logarr,"Added to SC: $key2,$type,$fnc");
             }
          }
       } elsif ($key1 eq "hkhead") {
-#      
+#
 #        Check if reference is a HASH
-#      
+#
          if (ref($ref1) ne "HASH") {
             die "$0: XML hash: Top level value (key 'hkhead') is not a hash reference\n";
          }
-#      
+#
 #       Loop through a given level of tags
-#      
+#
          foreach my $scid (keys %$ref1) {
             my $ref2 = $ref1->{$scid};
-#         
+#
 #           Check if reference is a HASH
-#         
+#
             if (ref($ref2) ne "HASH") {
                die "$0: XML hash: 'hkhead' element is not a hash reference\n";
             }
@@ -258,18 +265,18 @@ sub update_database {
             }
             my $ref3 = $ref2->{'hk'};
             my $level = 1;
-#         
+#
 #           Subroutine call: hkloop
-#         
+#
             &hkloop($level,$ref3,$scid,0);
          }
       } elsif ($key1 eq "bk") {
          if (ref($ref1) ne "ARRAY") {
             die "$0: XML hash: Top level value (key 'bk') is not an array reference\n";
          }
-#      
+#
 #       Loop through all 'bk' elements at the top XML level
-#      
+#
          foreach my $ref2 (@$ref1) {
             if (ref($ref2) ne "HASH") {
                die "$0: XML hash: Error in 'bk' element at the top XML level\n";
@@ -277,9 +284,9 @@ sub update_database {
             my $name = $ref2->{'content'};
             my $scid = $ref2->{'sc'};
             if (! exists($searchdata{"BK:" . $scid . ":" . $name})) {
-#         
+#
 #           Get new primary key ($bkid) and insert into the BasicKey table:
-#         
+#
                $sql_getkey_BK->execute();
                my @result = $sql_getkey_BK->fetchrow_array;
                my $bkid = $result[0];
@@ -293,17 +300,17 @@ sub update_database {
          if (ref($ref1) ne "HASH") {
             die "$0: XML hash: Top level value (key 'mt') is not a hash reference\n";
          }
-#      
+#
 #       Loop through all 'mt' elements at the top XML level
-#      
+#
          foreach my $name (keys %$ref1) {
             my $ref2 = $ref1->{$name};
             if (ref($ref2) ne "HASH" || !exists($ref2->{'def'})) {
                die "$0: XML hash: Error in 'mt' element\n";
             }
-#         
+#
 #           Execute prepared SQL statement
-#         
+#
             my $def = $ref2->{'def'};
             my $share = $ref2->{'share'};
             if (! exists($searchdata{"MT:" . $name})) {
@@ -321,14 +328,14 @@ sub update_database {
 #  -----------------------------------------------------------------------
 #
 sub hkloop {
-#   
+#
 #     Split argument array into variables
-#   
+#
    my ($level,$ref1,$scid,$hkparent) = @_;
    $ancestors[$level] = $hkparent;
-#   
+#
 #    Loop through all 'hk' tags at the current level
-#   
+#
    foreach my $name (keys %$ref1) {
       my $ref2 = $ref1->{$name};
 #
@@ -347,29 +354,29 @@ sub hkloop {
       } else {
          $hkid = $searchdata{$hashkey};
       }
-#      
+#
 #       The next level in the XML hash is either a reference to a set
 #       of 'hk' nodes (one level below current node), a reference to a
 #       set of 'bk' nodes or both:
-#      
+#
       foreach my $key1 (keys %$ref2) {
          my $ref3 = $ref2->{$key1};
          if ($key1 eq "hk") {
-#            
+#
 #              Recursive call to hkloop:
-#            
+#
             &hkloop($level+1,$ref3,$scid,$hkid);
          } elsif ($key1 eq "bk") {
-#            
+#
 #             Loop through all 'bk' elements within a 'hk' element:
-#            
+#
             foreach my $ref4 (@$ref3) {
                if (ref($ref4) ne "HASH") {
                   die "$0: XML hash: Error in 'bk' element within a 'hk' element\n";
                }
-#               
+#
 #                 Get primary key for BasicKey ($bkid):
-#               
+#
                my $bkid;
                my $name = $ref4->{'content'};
                my $scid = $ref4->{'sc'};
@@ -410,4 +417,3 @@ sub hkloop {
       }
    }
 }
-
