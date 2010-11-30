@@ -1,32 +1,54 @@
 #!/bin/sh
-DBNAME=[==DATABASE_NAME==]
-PSQL=[==PSQL==]
-CREATEDB=[==CREATEDB==]
-DROPDB=[==DROPDB==]
-$DROPDB -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] $DBNAME
-$CREATEDB -E UTF-8 -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] $DBNAME
+
+COMMON="[==TARGET_DIRECTORY==]/init/common.sh"
+
+if [ -e  $COMMON ]
+then
+    echo $COMMON found!
+    . "$COMMON"
+else
+        echo "Library $COMMON not found."
+        exit 1
+fi
+
+PG_TSEARCH2_SCRIPT=[==PG_TSEARCH2_SCRIPT==]
+PG_POSTGIS_SCRIPT=[==PG_POSTGIS_SCRIPT==]
+PG_POSTGIS_SYSREF_SCRIPT=[==PG_POSTGIS_SYSREF_SCRIPT==]
+SRUSCHEMA=[==TARGET_DIRECTORY==]/init/sruSchema.sql
+
+check "PG_TSEARCH2_SCRIPT" 1
+check "PG_POSTGIS_SCRIPT" 1
+check "PG_POSTGIS_SYSREF_SCRIPT" 1
+check "SRUSCHEMA" 1
+
+# create DB
+$DROPDB -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $DBNAME
+$CREATEDB -E UTF-8 -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $DBNAME
 echo "----------------- Database $DBNAME created ------------------"
 
 echo "----------------- Allow PLSQL ------------------"
-$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<'EOF'
+$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<'EOF'
 -- allow plpgsql
 CREATE TRUSTED LANGUAGE plpgsql;
 EOF
 
+# install additional features
 echo "----------- Trying to install Fulltext-search: tsearch2.sql --"
-$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME < [==PG_TSEARCH2_SCRIPT==]
+$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $PG_TSEARCH2_SCRIPT
 echo "----------------- Database Fulltext-search prepared ---------"
 echo "----------- Trying to install PostGIS ---------------------"
-$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME < [==PG_POSTGIS_SCRIPT==]
+$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $PG_POSTGIS_SCRIPT
 echo "----------- Trying to install PostGIS Coordinate systems ---------------------"
-$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME < [==PG_POSTGIS_SYSREF_SCRIPT==]
+$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $PG_POSTGIS_SYSREF_SCRIPT
 echo "----------- Trying to install PostGIS Additional Coordinate systems ---------------------"
-$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<'EOT'
+# this may be blank
+$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<'EOT'
 [==PG_POSTGIS_ADDITIONAL_SYSREF==]
 EOT
 
-
-$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<'EOF'
+# start creating tables and functions
+#
+$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<'EOF'
 
 -- drop eventuelly existing stuff
 DROP TRIGGER IF EXISTS update_MD_content_fulltext ON Metadata;
@@ -37,10 +59,10 @@ DROP LANGUAGE IF EXISTS plpgsql;
 
 -- allow full-text search
 -- pg < 8.2
-GRANT SELECT ON pg_ts_cfg TO "[==PG_WEB_USER==]"; 
+GRANT SELECT ON pg_ts_cfg TO "[==PG_WEB_USER==]";
 GRANT SELECT ON pg_ts_cfgmap TO "[==PG_WEB_USER==]";
 -- pg >= 8.3
-GRANT SELECT ON pg_ts_config TO "[==PG_WEB_USER==]"; 
+GRANT SELECT ON pg_ts_config TO "[==PG_WEB_USER==]";
 GRANT SELECT ON pg_ts_config_map TO "[==PG_WEB_USER==]";
 -- all pg
 GRANT SELECT ON pg_ts_parser TO "[==PG_WEB_USER==]";
@@ -83,7 +105,8 @@ GRANT SELECT ON WMSInfo TO "[==PG_WEB_USER==]";
 
 CREATE TABLE SearchCategory (
    SC_id              INTEGER       NOT NULL,
-   SC_type            INTEGER       NOT NULL,
+   SC_idname          VARCHAR(32)   UNIQUE NOT NULL,
+   SC_type            VARCHAR(32)   NOT NULL,
    SC_fnc             VARCHAR(9999) NOT NULL,
    PRIMARY KEY (SC_id)
 );
@@ -171,8 +194,8 @@ CREATE TABLE Metadata (
 GRANT SELECT ON Metadata TO "[==PG_WEB_USER==]";
 
 -- create the full text index
-CREATE INDEX MD_content_vector_idx 
-ON Metadata 
+CREATE INDEX MD_content_vector_idx
+ON Metadata
 USING gist(MD_content_vector);
 
 CREATE FUNCTION to_mmDefault_tsvector(IN text) RETURNS tsvector AS $$
@@ -235,15 +258,15 @@ CREATE TABLE HarvestStatus (
 EOF
 
 echo "----------------- ADD GEOMETRY COLUMNS FOR EACH COORD-SYSTEM -----------"
-for i in [==SRID_ID_COLUMNS==]; do
-$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME <<EOF
+for i in $SRID_ID_COLUMNS; do
+$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<EOF
 SELECT AddGeometryColumn('public', 'dataset_location', 'geom_$i', $i, 'GEOMETRY', 2);
 CREATE INDEX Idx_Dataset_Location_geom_$i ON Dataset_Location USING GIST (geom_$i);
 EOF
 done
 
 echo "----------------- ADDING SRU2JDBC SUPPORT -----------"
-$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $DBNAME < sruSchema.sql
+$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $SRUSCHEMA
 
 
-date +'%Y-%m-%d %H:%M Database re-initialized, dynamic tables created' 
+date +'%Y-%m-%d %H:%M Database re-initialized, dynamic tables created'
