@@ -69,7 +69,7 @@
 443323
 443331
 443332
-443333</quadtree_nodes><info name="H2x/ice" status="active" creationDate="2010-03-29T03:10:00Z" datestamp="2010-03-29T03:10:00Z" ownertag="H2x" metadataFormat="MM2"/>
+443333</quadtree_nodes><info name="DAMOC/ice" status="active" creationDate="2010-03-29T03:10:00Z" datestamp="2010-03-29T03:10:00Z" ownertag="DAM" metadataFormat="MM2"/>
 <wmsInfo xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup"><w:ncWmsSetup xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" url="http://dev-vm188/thredds/wms/osisaf/met.no/%DATASET_PARENT%/%DATASET%.nc" xsi:schemaLocation="http://www.met.no/schema/metamod/ncWmsSetup ncWmsSetup.xsd ">
           <w:displayArea crs="EPSG:32661" left="-3000000" right="7000000" bottom="-3000000" top="7000000"/>
           <w:layer name="ice_conc" style="BOXFILL/greyscale"/>
