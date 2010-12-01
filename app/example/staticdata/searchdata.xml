@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <searchdata>
-<sc id="1" type="1" fnc="name: Activity types" />
+<sc id="1" idname="activity_types" type="basickey" fnc="name: Activity types" />
 <bk sc="1">Cruise</bk>
 <bk sc="1">Moored instrument</bk>
 <bk sc="1">Float</bk>
@@ -10,7 +10,7 @@
 <bk sc="1">field_experiment</bk>
 <bk sc="1">ice_station</bk>
 <bk sc="1">Land station</bk>
-<sc id="2" type="1" fnc="name: Areas" />
+<sc id="2" idname="areas" type="basickey" fnc="name: Areas" />
 <bk sc="2">Greenland Sea</bk>
 <bk sc="2">Iceland Sea</bk>
 <bk sc="2">Norwegian Sea</bk>
@@ -26,13 +26,13 @@
 <bk sc="2">White Sea</bk>
 <bk sc="2">Nordic Seas</bk>
 <bk sc="2">Northern Hemisphere</bk>
-<sc id="10" type="1" fnc="name: Operational status" />
+<sc id="10" idname="operational_status" type="basickey" fnc="name: Operational status" />
 <bk sc="10">Operational</bk>
 <bk sc="10">Pre operational</bk>
 <bk sc="10">Experimental</bk>
 <bk sc="10">Scientific</bk>
-<sc id="3" type="1" fnc="name: variables; status: hidden" />
-<sc id="4" type="2" fnc="name: Topics and variables" />
+<sc id="3" idname="variables" type="basickey" fnc="name: variables; status: hidden" />
+<sc id="4" idname="topics_and_variables" type="tree" fnc="name: Topics and variables" />
 <hkhead sc="4">
    <hk name="Agriculture">
       <bk sc="3">Agriculture > HIDDEN</bk>
@@ -3954,11 +3954,12 @@
       </hk>
    </hk>
 </hkhead>
-<sc id="7" type="1" fnc="name: Institutions" />
+<sc id="7" idname="institutions" type="basickey" fnc="name: Institutions" />
 <bk sc="7">IXI International Example Institute</bk>
 <bk sc="7">ASI Another Similar Institute</bk>
-<sc id="8" type="3" fnc="name: Datacollection period; cyclic: no; numtype: date; lower: FROM; upper: TO" />
-<sc id="9" type="4" fnc="name: Map search" />
+<sc id="8" idname="datacollection_period" type="date_interval" fnc="name: Datacollection period; cyclic: no; numtype: date; lower: FROM; upper: TO" />
+<sc id="9" idname="map_search" type="map_search" fnc="name: Map search" />
+<sc id="11" idname="fulltext" type="fulltext" fnc="name: Text" />
 <mt name="title" share="FALSE" def="A descriptive title for the dataset" />
 <mt name="abstract" share="FALSE" def="Brief narrative summary for the dataset" />
 <mt name="topiccategory" share="TRUE" def="Blank-separated list of topic words describing the topics covered by this dataset, according to a standard code list" />
