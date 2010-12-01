@@ -50,25 +50,25 @@ our %_config; #_config{file} => $config
 our $_logger_initialised;
 
 sub new {
-	my ($class, $file) = @_;
+    my ($class, $file) = @_;
     my $fileFlag = "";
-	unless ($file) {
-		$file = _getDefaultConfigFile();
-		$fileFlag = "default";
-	}
-	if ((! -f $file) and (! -r _)) {
+    unless ($file) {
+        $file = _getDefaultConfigFile();
+        $fileFlag = "default";
+    }
+    if ((! -f $file) and (! -r _)) {
         die "Cannot read $fileFlag config-file: $file";
-	}
+    }
     $file = _normalizeFile($file);
-	unless (exists $_config{$file}) {
-		my $config = {
-			mtime => '0',
-			filename => $file,
-			vars => {}, # lazy loading on first get
-		};
-		$_config{$file} = bless $config, $class;
-	}
-	return $_config{$file};
+    unless (exists $_config{$file}) {
+        my $config = {
+            mtime => '0',
+            filename => $file,
+            vars => {}, # lazy loading on first get
+        };
+        $_config{$file} = bless $config, $class;
+    }
+    return $_config{$file};
 }
 
 # get the file from METAMOD_MASTER_CONFIG or in ../../master_config.txt
@@ -92,33 +92,33 @@ sub _getDefaultConfigFile {
 
 # normalize the filename
 sub _normalizeFile {
-	my ($file) = @_;
-	return Cwd::abs_path($file);
+    my ($file) = @_;
+    return Cwd::abs_path($file);
 }
 
 sub get {
-	my ($self, $var) = @_;
-	return undef unless $var;
+    my ($self, $var) = @_;
+    return undef unless $var;
 
-	$self->_checkFile();
-	return $self->_substituteVariable($var);
+    $self->_checkFile();
+    return $self->_substituteVariable($var);
 }
 
 # check for updates of config and reread
 sub _checkFile {
-	my ($self) = @_;
-	my @stat = stat $self->{filename};
-	die "stat on ". $self->{filename}. " failed" unless @stat;
+    my ($self) = @_;
+    my @stat = stat $self->{filename};
+    die "stat on ". $self->{filename}. " failed" unless @stat;
     my $mtime = $stat[9];
     if ($self->{mtime} < $mtime) {
-    	$self->{mtime} = $mtime;
-    	$self->_readConfig;
+        $self->{mtime} = $mtime;
+        $self->_readConfig;
     }
 }
 
 sub _readConfig {
-	my ($self) = @_;
-	open my $fh, $self->{filename} or die "Cannot read file".$self->{filename}.": $!\n";
+    my ($self) = @_;
+    open my $fh, $self->{filename} or die "Cannot read file".$self->{filename}.": $!\n";
     my %conf;
     #
     #  Loop through all lines read from a file:
@@ -162,14 +162,14 @@ sub _readConfig {
     }
 
 
-	$self->{vars} = \%conf;
-	close $fh;
+    $self->{vars} = \%conf;
+    close $fh;
 }
 
 # get a variable from env or the internal hash, without substitution
 sub _getVar {
     my ($self, $var) = @_;
-    
+
     if (exists $ENV{"METAMOD_".$var}) {
         return $ENV{"METAMOD_".$var};
     }
@@ -185,9 +185,9 @@ sub _getVar {
 
 # substitute intrinsic values from config
 sub _substituteVariable {
-	my ($self, $var) = @_;
+    my ($self, $var) = @_;
 
-	return $self->_getVar($var) unless $self->_getVar($var); # return undef/empty
+    return $self->_getVar($var) unless $self->_getVar($var); # return undef/empty
 
     my $textline = $self->_getVar($var);
 
@@ -330,7 +330,7 @@ will be used.
 
 =item getDBH()
 
-Return a cached/pooled DBI-handler to the default database of metamod. The handler is in 
+Return a cached/pooled DBI-handler to the default database of metamod. The handler is in
 AutoCommit = 0 and RaiseError = 1, FetchHash mode. This function will die on error. (DBI-connect error)
 
 disconnect will free the database. Be careful when using getDBH and transactions.
