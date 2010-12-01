@@ -1,0 +1,12 @@
+td.dataset_view {
+	font-size: 1.0em;
+    border: 1px solid silver;
+    padding: 3px 5px 3px 5px;
+}
+
+td.dataset_header {
+    font-size: 1.3em;
+    font-weight: bolder;
+    padding: 10px 5px 3px 5px;
+    text-align: center;
+}

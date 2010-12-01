@@ -1,0 +1,132 @@
+/* Stylesheet for the search part of METAMOD. This includes the search criteria
+page and the search results page.
+ */
+div.search-criteria {
+	display: none;
+}
+
+div.wmsthumb {
+	border: solid 1px grey;
+}
+
+div.dataset_actions {
+    padding-left: 10px;
+}
+
+table.sub_result {
+    margin: 2px 0px 10px 20px;
+}
+
+th.result, th.sub_result, td.two_way_vertical_key, td.option_label {
+    font-weight: bolder;
+}
+
+th.result, td.two_way_vertical_key {
+    background-color: #f6f6f6;
+}
+
+td.two_way_vertical_key {
+    font-size: 1.0em;
+}
+
+td.two_way_result {
+    text-align: center;
+    vertical-align: top;
+}
+
+th.invisible {
+    border: 0px;
+}
+
+td.sub_result_pager {
+    padding-left: 20px;
+    padding-top: 10px;
+}
+
+td.sub_result {
+    font-size: 1.0em;
+    vertical-align: top;
+}
+
+td.cross_column {
+    text-align: center;
+}
+
+td.result, th.result, td.sub_result, th.sub_result {
+    border: 1px solid silver;
+    padding: 3px;
+    vertical-align: top;
+}
+
+td.options_heading {
+    font-size: 1.1em;
+    font-weight: bolder;
+}
+
+li.topics_tree {
+    margin-left: 15px;
+}
+
+ul.topics_tree {
+    list-style-type: none;
+}
+
+ul.topics_tree_level2, ul.topics_tree_level3, ul.topics_tree_level4 {
+    display: none;
+}
+
+div.help_content {
+    float: right;
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #027abb;
+}
+
+p.help {
+   font-size: 1.0em;
+   margin-bottom: 6px;
+   padding-left: 6px;
+   width: 95%;
+}
+
+.emph {
+   color: #103099;
+   font-weight: bold;
+}
+h1.help {
+   color: #027abb;
+   font-size: 1.5em;
+   margin-bottom: 0.5em;
+}
+
+h2.help {
+   color: #027abb;
+   font-size: 1.3em;
+   margin-bottom: 0.3em;
+}
+.hhd1c {
+   color: #027abb;
+   font-size: 1.2em;
+}
+.hhd1c a:visited {
+   text-decoration: none;
+   color: #027abb;
+}
+.hhd1c a:link {
+   text-decoration: none;
+   color: #027abb;
+}
+.hhd2c {
+   color: #027abb;
+   font-size: 1.0em;
+   padding-left: 10px;
+   text-decoration: none;
+}
+.hhd2c a:visited {
+   text-decoration: none;
+   color: #027abb;
+}
+.hhd2c a:link {
+   text-decoration: none;
+   color: #027abb;
+}

@@ -1,0 +1,38 @@
+[% SET map_srid = search_ui_utils.selected_map() %]
+[% SET x1_id = search_ui_utils.html_id_for_map('x1') %]
+[% SET x2_id = search_ui_utils.html_id_for_map('x2') %]
+[% SET y1_id = search_ui_utils.html_id_for_map('y1') %]
+[% SET y2_id = search_ui_utils.html_id_for_map('y2') %]
+
+<p class="help">
+Select a rectangular search area in the map below. Click once to place the first corner of rectangle, then after the
+page reloads click again to place the second corner of the rectangle. The two selected points are used as opposite
+corners of the rectangle.
+</p>
+
+<p class="help">
+The search result will contain any datasets that partially covered by the selected area.
+</p>
+
+<p class="help">
+To clear you current selection press "Clear map". If more than one map is available you can select it from the
+dropdown list.
+</p>
+
+<label for="selected_map">Select map</label>
+<select name="selected_map" id="selected_map" onchange="jQuery('#search_form').attr( 'action', '[% c.uri_for('/search') %]');jQuery('#search_form').submit()">
+[% FOREACH map IN search_ui_utils.available_maps %]
+    <option value="[% map.srid %]" [% map.selected ? 'selected="selected"' : ''%]>[% map.name %]</option>
+[% END %]
+
+</select>
+
+<button>Clear map</button>
+
+<br />
+
+<input type="hidden" name="[% x1_id %]" id="[% x1_id %]" value="[% c.req().param( x1_id ) %]" />
+<input type="hidden" name="[% x2_id %]" id="[% x2_id %]" value="[% c.req().param( x2_id ) %]" />
+<input type="hidden" name="[% y1_id %]" id="[% y1_id %]" value="[% c.req().param( y1_id ) %]" />
+<input type="hidden" name="[% y2_id %]" id="[% y2_id %]" value="[% c.req().param( y2_id ) %]" />
+<input type="image" name="map_coord" alt="Map search" src="[% c.uri_for( '/map/' _ map_srid, search_ui_utils.map_coordinates() ) %]" onclick="jQuery( '#search_form' ).attr( 'action', '[% c.uri_for( '/search' ) %]' ); jQuery('#active_criteria').val('[% criteria_index %]'); jQuery( '#search_form' ).submit()" />

@@ -1,0 +1,52 @@
+<div style="width: 100%; text-align: center">
+
+    [% IF pager.first_page() != pager.last_page() %]
+
+        [% SET link_url = search_ui_utils.navigation_url( url_template, pager.first_page() )%]
+        <a href="[% c.uri_for( link_url, c.req.params ) %]">
+            <img src="[% c.uri_for('/static/images/resultset_first.png') %]" alt="First page" />
+        </a>
+
+        [% IF 1 != pager.current_page() %]
+            [% SET link_url = search_ui_utils.navigation_url( url_template, pager.previous_page() )%]
+            <a href="[% c.uri_for( link_url, c.req.params ) %]">
+                <img src="[% c.uri_for('/static/images/resultset_previous.png') %]" alt="Previous page" />
+            </a>
+        [% ELSE %]
+            <img src="[% c.uri_for('/static/images/resultset_previous.png') %]" alt="Previous page" />
+        [% END %]
+
+        [% SET pages_to_show = search_ui_utils.pages_to_show( pager ) %]
+
+        [% IF pages_to_show.first != 1 %]
+        ...
+        [% END %]
+
+        [% FOREACH page IN search_ui_utils.pages_to_show( pager ) %]
+            [% IF page == pager.current_page() %]
+                [% page %]
+            [% ELSE %]
+                [% SET link_url = search_ui_utils.navigation_url( url_template, page )%]
+                <a href="[% c.uri_for( link_url, c.req.parameters ) %]">[% page %]</a>
+            [% END %]
+        [% END %]
+
+        [% IF pages_to_show.last != pager.last_page() %]
+        ...
+        [% END %]
+
+        [% IF pager.last_page() != pager.current_page() %]
+            [% SET link_url = search_ui_utils.navigation_url( url_template, pager.next_page() )%]
+            <a href="[% c.uri_for( link_url, c.req.params ) %]">
+                <img src="[% c.uri_for('/static/images/resultset_next.png') %]" alt="Next page"/>
+            </a>
+        [% ELSE %]
+            <img src="[% c.uri_for('/static/images/resultset_next.png') %]" alt="Next page" />
+        [% END %]
+
+        [% SET link_url = search_ui_utils.navigation_url( url_template, pager.last_page() )%]
+        <a href="[% c.uri_for( link_url, c.req.params ) %]">
+            <img src="[% c.uri_for('/static/images/resultset_last.png') %]" alt="Last page" />
+        </a>
+    [% END %]
+</div>

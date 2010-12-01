@@ -1,0 +1,27 @@
+/*
+ Stylesheet for the administration interface.
+ This accounts for file upload, login, subscriptions, user administration and dataset administration
+*/
+
+td.subscription, th.subscription, td.list_table {
+    border: 1px solid silver;
+    padding: 3px;
+}
+
+th.list_table {
+    font-weight: bolder;
+}
+
+td.list_table, th.list_table {
+    border: 1px solid silver;
+    padding: 3px;
+}
+
+div#loginform, div#registerform {
+    float: left;
+    width: 680px;
+    background-color: #D2F2F4;
+    border: 1px solid #0E8AEF;
+    margin: 5px 5px 5px 5px;
+    padding: 5px 5px 5px 5px;
+}

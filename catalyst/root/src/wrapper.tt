@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>[% title %]</title>
+<link rel="stylesheet" href="[% c.uri_for('/static/css/reset.css') %]" />
+<link rel="stylesheet" href="[% c.uri_for('/static/css/golden.css') %]" />
+<link rel="stylesheet" href="[% c.uri_for('/static/css/metamod_theme/jquery-ui.css') %]" />
+<link rel="stylesheet" href="[% c.uri_for('/static/css/main.css') %]" />
+<link rel="stylesheet" href="[% c.uri_for('/static/css/button.css') %]" />
+
+<!-- include any extra style sheets -->
+[% FOREACH file IN css_files %]
+    <link rel="stylesheet" href="[% file %]" />
+[% END %]
+
+<!-- Load the custom style sheet last, so that it can override any style -->
+<link rel="stylesheet" href="[% c.uri_for('/static/css/custom.css') %]" />
+
+<script type="text/javascript" src="[% c.uri_for('/static/js/jquery.min.js') %]"></script>
+<script type="text/javascript" src="[% c.uri_for('/static/js/jquery-ui.min.js') %]"></script>
+<script type="text/javascript" src="[% c.uri_for('/static/js/metamod.js') %]"></script>
+
+<!-- below is needed for fancybox  -->
+<!--<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.min.js"></script>-->
+<script type="text/javascript" src="[% c.uri_for('/static/js/fancybox/jquery.mousewheel-3.0.2.pack.js') %]"></script>
+<script type="text/javascript" src="[% c.uri_for('/static/js/fancybox/jquery.fancybox-1.3.1.js') %]"></script>
+<link rel="stylesheet" type="text/css" href="[% c.uri_for('/static/js/fancybox/jquery.fancybox-1.3.1.css') %]" media="screen" />
+
+
+<!-- Include any extra specific javascript files -->
+[% FOREACH file IN javascript_files %]
+    <script type="text/javascript" src="[% file %]"></script>
+[% END %]
+
+</head>
+<body>
+<div id="page" class="main">
+
+<div id="page-header" class="g960">
+[% INCLUDE 'header.tt' %]
+</div>
+
+<div id="menu" class="g240">
+[% INCLUDE 'menu.tt' %]
+</div>
+
+<div id="content" class="g720">
+[% content %]
+</div>
+
+<div id="footer" class="g960">
+[% INCLUDE 'footer.tt' %]
+</div>
+
+</div>
+</body>
+</html>

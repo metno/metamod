@@ -1,0 +1,82 @@
+<script>
+function toggleTree( hkId ){
+
+    jQuery( '#topics_tree_' + hkId ).toggle();
+    jQuery( '#toggle_tree_' + hkId + ' > .toggle_indicator' ).toggle();
+
+}
+
+</script>
+
+<p class="help">
+
+Mark one or more [% category.name %] in the tree structure below by checking checkboxes in the
+the tree. To view lower levels in the tree click a <span class="toggle_indicator">+</span> button.
+Expanded sub-trees can be collapsed by clicking the corresponding <span class="toggle_indicator">-</span> button.
+
+</p>
+
+<p class="help">
+
+The selected [% category.name %] will restrict the search result to only those datasets that match at least one
+the selected criteria.
+
+</p>
+
+<p class="help">
+
+Selecting a higher level criteria implies that all lower level criteria are also selected.
+
+</p>
+
+<ul class="topics_tree topics_tree_level1">
+[% FOREACH root IN search_ui_utils.topics_tree() %]
+    <li class="topics_tree">
+    <span class="clickable" id="toggle_tree_[% root.hk_id %]" onclick="toggleTree( '[% root.hk_id %]' )">
+        <span class="toggle_indicator" style="font-family: monospace;">+</span>
+        <span class="toggle_indicator" style="font-family: monospace; display: none">-</span>
+    </span>
+    <input type="checkbox" name="[% search_ui_utils.html_id_for_hk_topic( root.hk_id ) %]" id="[% search_ui_utils.html_id_for_hk_topic( root.hk_id ) %]" [% root.selected ? 'checked="checked"' : '' %] />
+    <label>[% root.name %]</label>
+    <ul class="topics_tree topics_tree_level2" id="topics_tree_[% root.hk_id %]" >
+    [% FOREACH level2_tree IN root.subtrees %]
+        <li class="topics_tree">
+        <span class="clickable" id="toggle_tree_[% level2_tree.hk_id %]" onclick="toggleTree( '[% level2_tree.hk_id %]' )">
+            <span class="toggle_indicator" style="font-family: monospace;">+</span>
+            <span class="toggle_indicator" style="font-family: monospace; display: none">-</span>
+        </span>
+        <input type="checkbox" name="[% search_ui_utils.html_id_for_hk_topic( level2_tree.hk_id ) %]" id="[% search_ui_utils.html_id_for_hk_topic( level2_tree.hk_id ) %]" [% level2_tree.selected ? 'checked="checked"' : '' %] />
+        <label>[% level2_tree.name %]</label>
+        <ul class="topics_tree topics_tree_level3" id="topics_tree_[% level2_tree.hk_id %]">
+        [% FOREACH level3_tree IN level2_tree.subtrees %]
+            <li class="topics_tree">
+            [% IF level3_tree.subtrees.size() != 0 %]
+                <span class="clickable" id="toggle_tree_[% level3_tree.hk_id %]" onclick="toggleTree( '[% level3_tree.hk_id %]' )">
+                    <span class="toggle_indicator" style="font-family: monospace;">+</span>
+                    <span class="toggle_indicator" style="font-family: monospace; display: none">-</span>
+                </span>
+            [% ELSE %]
+                <span style="font-family: monospace;">&nbsp;</span>
+            [% END %]
+            <input type="checkbox" name="[% search_ui_utils.html_id_for_hk_topic( level3_tree.hk_id ) %]" id="[% search_ui_utils.html_id_for_hk_topic( level3_tree.hk_id ) %]" [% level3_tree.selected ? 'checked="checked"' : '' %] />
+            <label>[% level3_tree.name %]</label>
+            <ul class="topics_tree topics_tree_level4" id="topics_tree_[% level3_tree.hk_id %]">
+            [% IF level3_subtree.subtrees.size() != 0 %]
+                [% FOREACH level4_tree IN level3_tree.subtrees %]
+                    <li class="topics_tree">
+                    <span style="font-family: monospace;">&nbsp;</span>
+                    <input type="checkbox" name="[% search_ui_utils.html_id_for_bk_topic( level4_tree.bk_id ) %]" id="[% search_ui_utils.html_id_for_bk_topic( level4_tree.bk_id ) %]" [% level4_tree.selected ? 'checked="checked"' : '' %]>
+                    <label>[% level4_tree.name %]</label>
+                    </li>
+                [% END %]
+            [% END %]
+            </ul>
+            </li>
+        [% END %]
+        </ul>
+        </li>
+    [% END %]
+    </ul>
+    </li>
+[% END %]
+</ul>

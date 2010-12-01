@@ -1,0 +1,50 @@
+<h1>Information about dataset</h1>
+<table>
+
+<tr>
+    <td class="dataset_view"><label>Unqualified dataset name</label></td>
+    <td class="dataset_view">[% ds.unqualified_ds_name() %]</td>
+</tr>
+
+<tr>
+    <td class="dataset_view"><label>Full dataset name</label></td>
+    <td class="dataset_view">[% ds.ds_name() %]</td>
+</tr>
+
+[% IF ds.is_level2_dataset %]
+    <tr>
+        <td class="dataset_view"><label>Parent dataset</label></td>
+        <td class="dataset_view"><a href="[% c.uri_for( '/dataset/' _ ds.ds_parent() _ '/view' ) %]">Parent</a></td>
+    </tr>
+[% END %]
+
+<tr>
+<td class="dataset_header" colspan="2">Metadata</td>
+</tr>
+
+[% SET metadata = ds.metadata() %]
+[% FOREACH mt_name IN metadata.keys().sort() %]
+
+    <tr>
+        <td class="dataset_view"><label>[% mt_name %]</label></td>
+        <td class="dataset_view">[% metadata.$mt_name.join('<br />') %]</td>
+    </tr>
+[% END %]
+
+[% IF ds.is_level1_dataset() %]
+
+    <tr>
+    <td class="dataset_header" colspan="2">Child datasets</td>
+    </tr>
+
+    <tr>
+    <td class="dataset_view" colspan="2">
+    [% SET child_datasets = ds.child_datasets %]
+    [% FOREACH child IN child_datasets %]
+        <a href="[% c.uri_for( '/dataset/' _ child.ds_id _ '/view' ) %]">[% child.unqualified_ds_name() %]</a><br />
+    [% END %]
+    </td>
+    </tr>
+[% END %]
+
+</table>

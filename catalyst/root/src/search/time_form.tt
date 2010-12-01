@@ -1,0 +1,27 @@
+[% SET from_id = search_ui_utils.html_id_for_date( category.sc_id, 'from' ) %]
+[% SET to_id = search_ui_utils.html_id_for_date( category.sc_id, 'to' ) %]
+
+<p class="help">
+Enter the [% category.name %] to search for by filling in the [% category.lower %] and [% category.upper %]
+fields below.
+</p>
+
+[% IF category.numtype == 'date' %]
+    <p class="help">
+    In each field, use the date format "YYYY-MM-DD". Just "YYYY" or "YYYY-MM"
+    will also be understood.
+    </p>
+[% END %]
+
+<p class="help">
+Only datasets having a [% category.name %] overlapping the interval thus defined, will be selected.
+</p>
+
+
+<label for="[% from_id %]">[% category.lower %]</label>
+<script>$(function() { $( "#[% from_id %]" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
+<input type="text" size="12" name="[% from_id %]" id="[% from_id %]" value="[% c.req().param( from_id ) %]" />
+
+<label for="[% to_id %]">[% category.upper %]</label>
+<script>$(function() { $( "#[% to_id %]" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
+<input type="text" size="12" name="[% to_id %]" id="[% to_id %]" value="[% c.req().param( to_id ) %]" />

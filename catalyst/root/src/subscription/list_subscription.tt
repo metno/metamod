@@ -1,0 +1,29 @@
+<h2>My subscriptions</h2>
+<table>
+<tr>
+<th class="subscription">Dataset name</th>
+<th class="subscription">Subscription type</th>
+<th class="subscription">Subscription parameters</th>
+<th class="subscription">&nbsp</th>
+</tr>
+
+[% FOREACH subscription IN subscriptions %]
+<tr>
+<td class="subscription">[% subscription.ds_name %]</td>
+<td class="subscription">[% subscription.type %]</td>
+
+<td class="subscription">
+    [% FOREACH param IN subscription %]
+        [% IF param.key != 'type' && param.key != 'ds_name' %]
+            <strong>[% param.key %]:</strong> [% param.value %]<br />
+        [% END %]
+    [% END %]
+</td>
+<td class="subscription">
+<span class="clickable" onclick="removeSubscriptionDialog()">Remove</span>
+</td>
+</tr>
+[% END %]
+</table>
+
+<div id="remove-subscription-dialog" style="display: none">Really remove subscription</div>

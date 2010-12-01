@@ -1,0 +1,9 @@
+[% SET html_id = search_ui_utils.html_id_for_freetext( category.sc_id ) %]
+
+<p class="help">
+Enter a list of search words separated by spaces. If more than one search word is used it will only match datasets
+that match all words.
+</p>
+
+<label for="[% html_id %]">Matching text</label>
+<input type="text" size="50" id="[% html_id %]" name="[% html_id %]" value="[% c.req().param( html_id ) %]" />

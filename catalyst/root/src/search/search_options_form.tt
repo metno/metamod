@@ -1,0 +1,56 @@
+[% SET num_search_cols = search_ui_utils.num_search_cols() %]
+<table>
+    <tr>
+        <td>&nbsp;</td>
+        <td class="options_heading" style="padding-left: 10px; padding-right: 10px;" colspan="[% num_search_cols %]">Column number</td>
+        <td class="options_heading" style="padding-left: 10px; padding-right: 10px;" colspan="3">Crosstable columns</td>
+    </tr>
+    <tr>
+        <td class="options_heading">Column names</td>
+
+        [% FOREACH col_num IN [ 1 .. num_search_cols ] %]
+            <td class="option_label" style="text-align: center">[% col_num %]</td>
+        [% END %]
+
+        <td class="option_label" style="text-align: center">Vertical</td>
+        <td class="option_label" style="text-align: center">Horisontal</td>
+    </tr>
+
+    [% FOREACH search_option IN search_ui_utils.search_options() %]
+        <tr>
+        <td class="option_label">[% search_option.shown_name %]</td>
+        [% FOREACH col_num IN [ 1 .. num_search_cols ] %]
+            <td><input type="radio" name="shown_mt_name_[% col_num %]" value="[% search_option.mt_name %]" [% search_option.col == col_num ? 'checked="checked""' : '' %] /></td>
+        [% END %]
+
+        [% UNLESS search_option.cross == 'no' %]
+            <td class="cross_column"><input type="radio" name="vertical_mt_name" value="[% search_option.mt_name %]" [% search_option.cross == 'v' ? 'checked="checked""' : '' %] /></td>
+            <td class="cross_column"><input type="radio" name="horisontal_mt_name" value="[% search_option.mt_name %]" [% search_option.cross == 'h' ? 'checked="checked""' : '' %] /></td>
+        [% END %]
+        </tr>
+    [% END %]
+
+    <tr>
+        <td class="option_label">Results per page (datasets)</td>
+        <td colspan="4">
+            <select name="datasets_per_page" id="datasets_per_page">
+                <option value="10" [% c.req.params.datasets_per_page == 10 ? 'selected="selected"' : '' %]>10</option>
+                <option value="25" [% c.req.params.datasets_per_page == 25 ? 'selected="selected"' : '' %]>25</option>
+                <option value="50" [% c.req.params.datasets_per_page == 50 ? 'selected="selected"' : '' %]>50</option>
+            </select>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="option_label">Results per page (file)</td>
+        <td colspan="4">
+            <select name="files_per_page" id="files_per_page">
+                <option value="10" [% c.req.params.files_per_page == 10 ? 'selected="selected"' : '' %]>10</option>
+                <option value="25" [% c.req.params.files_per_page == 10 ? 'selected="selected"' : '' %]>25</option>
+                <option value="50" [% c.req.params.files_per_page == 10 ? 'selected="selected"' : '' %]>50</option>
+            </select>
+        </td>
+    </tr>
+
+
+</table>

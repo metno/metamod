@@ -1,0 +1,156 @@
+<script type="text/javascript">
+jQuery(document).ready( function () {
+    jQuery('#search-tabs').tabs();
+
+    // doesn't work either...
+    jQuery("a.visual").fancybox({
+        'width'           : '90%',
+        'height'          : '90%',
+        'autoScale'       : false,
+        'transitionIn'    : 'none',
+        'transitionOut'   : 'none',
+        'type'            : 'iframe'
+    });
+} );
+</script>
+
+<form name="search" id="search_form" method="GET" action="[% c.uri_for( '/search/result' ) %]">
+
+<span class="clickable" onclick="jQuery('#search_form').attr('action', '[% c.uri_for( '/search' ) %]' ); jQuery('#search_form').submit()">Back to search</span>
+<div style="display: none">
+[% INCLUDE 'search/keep_search_params.tt' %]
+</div>
+
+<div id="search-tabs">
+    <ul>
+        <li><a href="#search-result">Result</a></li>
+        <li><a href="#two-way-tables">Two-way tables</a></li>
+    </ul>
+
+    <div id="search-result">
+
+    [% IF !dataset_count %]
+
+        No datasets that match your search criteria where found.
+
+    [%ELSE %]
+
+        [% INCLUDE 'search/pager_navigation.tt' pager = datasets_pager, url_template = '/search/page/%s/result' %]
+
+        <table>
+        <tr>
+        <th class="result" style="width: 90px;">Dataset name</th>
+        [% FOREACH metadata_name IN metadata_columns %]
+            [% IF metadata_name != 'dataref' %]
+                <th class="result">[% search_ui_utils.mt_name_to_display_name(metadata_name) %]</th>
+            [% END %]
+        [%END %]
+        </tr>
+
+        [% FOREACH dataset IN datasets %]
+
+            [% SET metadata = dataset.metadata( metadata_columns ) %]
+            <tr>
+            <td class="result">
+                <div class="btns">
+                    [% IF dataset.child_datasets() %]
+                        [% SET expand_param = 'show_level2_' _ dataset.ds_id %]
+                        [% IF c.req.params.$expand_param %]
+                            <a class="btn2" href="[% c.uri_for( '/search/page/' _ datasets_pager.current_page() _ '/deflate/' _ dataset.ds_id, c.req.parameters ) _ '#ds' _ dataset.ds_id %]" title="Hide the datafiles for this dataset" />
+                            <span>&#8211;</span>
+                            </a>
+                        [% ELSE %]
+                            <a class="btn2" href="[% c.uri_for( '/search/page/' _ datasets_pager.current_page() _ '/expand/' _ dataset.ds_id, c.req.parameters ) _ '#ds' _ dataset.ds_id %]" title="Show the datafiles for this dataset" />
+                            <span>+</span>
+                            </a>
+                        [% END %]
+                    [% ELSE %]
+                        <!-- We must reset the variable as TT does not have scoping -->
+                        [% SET expand_param = '' %]
+                    [% END %]
+                </div>
+
+                <strong class="dataset_name">
+                [% IF search_ui_utils.looks_like_url( metadata.dataref.0 ) %]
+                    <a name="ds[% dataset.ds_id %]" href="[% metadata.dataref.0 %]">
+                    [% dataset.unqualified_ds_name %]</a>
+                [% ELSE %]
+                    [% dataset.unqualified_ds_name %]
+                [% END %]
+                </strong>
+
+                <br/>
+
+                <div class="btns" _class="dataset_actions">
+                    <a class="btn" href="[% c.uri_for( '/dataset', dataset.ds_id, 'xml' ) %]" target="_blank" title="Show the raw XML metadata for this file in a separate windows"><span>Show xml</span></a><br />
+                    [% IF dataset.child_datasets() %]
+                        <a class="btn" href="[% c.uri_for( '/dataset', dataset.ds_id, 'rss' ) %]" target="_blank" title="The RSS feed for this dataset. The RSS feed will notify you about any new datafiles associated with this dataset"><span>RSS Feed</span></a><br />
+
+                        [% IF mm_config.get('SUBSCRIPTION_ENABLED') == 'ENABLED' and search_ui_utils.dataset_in_userbase(dataset) %]
+                            <a class="btn" href="[% mm_config.get('BASE_PART_OF_EXTERNAL_URL') _ mm_config.get('LOCAL_URL') _ '/sch/subscription.php?action=display_email_form&dataset_name=' _ dataset.unqualified_ds_name() %]" title="Setup a subscription to get notified about new datafiles (requires login)"><span>Subscribe</span></a><br />
+                        [% END %]
+                    [% END %]
+                </div>
+            </td>
+
+            [% FOREACH metadata_name IN metadata_columns %]
+                [% SET md_content = metadata.$metadata_name %]
+
+                [% IF metadata_name == 'variable' %]
+                    [% SET md_content = search_ui_utils.remove_hidden_flag( md_content )%]
+                [% END %]
+                [% IF metadata_name != 'dataref' %]
+                    <td class="result">[% md_content.join('<br />') %]</td>
+                [% END %]
+            [%END %]
+            </tr>
+
+            [% IF c.req.params.$expand_param %]
+                [% INCLUDE 'search/search_result_level2.tt' datasets_pager = datasets_pager %]
+            [% END %]
+
+
+        [% END %]
+        </table>
+    [% END %]
+    </div>
+
+    <div id="two-way-tables">
+
+
+        [% IF !dataset_count %]
+
+            No datasets that match your search criteria where found.
+
+        [%ELSE %]
+            <table>
+            <tr>
+            [% SET horisontal_keys = search_ui_utils.two_way_table_h_keys( two_way_table ) %]
+            <th class="invisible">&nbsp</th>
+            [% FOREACH h_key IN horisontal_keys %]
+                <th class="result">[% h_key %]</th>
+            [%END %]
+            </tr>
+
+            [% FOREACH vertical_key IN two_way_table %]
+
+                <tr>
+                <td class="result two_way_vertical_key">
+                    [% vertical_key.key %]
+                </td>
+                [% FOREACH h_key IN horisontal_keys %]
+                    <td class="result two_way_result">
+                    <!-- Need to use item() functions since . notation does not work -->
+                    [% vertical_key.value.exists( h_key ) ? vertical_key.value.item( h_key ) : 0 %]
+                    </td>
+                [%END %]
+                </tr>
+
+            [% END %]
+            </table>
+        [% END %]
+    </div>
+
+</div>
+
+</form>

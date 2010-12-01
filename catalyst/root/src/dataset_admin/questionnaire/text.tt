@@ -1,0 +1,18 @@
+<tr>
+    <td class="quest_label">
+        <label for="metadata_[% element.name %]">[% element.label | html %]</label>
+    </td>
+</tr>
+
+<tr>
+    <td class="quest_field">
+        <input
+            type="text"
+            name="metadata_[% element.name %]"
+            id="metadata_[% element.name %]"
+            value="[% metadata.item( element.name ).0 | html %]"
+            size="[% element.length %]"
+            maxlength="[% element.size %]"
+            />
+    </td>
+</tr>

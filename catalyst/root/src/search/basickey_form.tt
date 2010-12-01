@@ -1,0 +1,25 @@
+<p class="help">
+Mark one or more [% category.name %] from the list below by checking the corresponding checkboxes.
+Then, click the "Search" button above.
+</p>
+
+<p class="help">
+The selected [% category.name %] will restrict the search result to only those datasets that match
+at least one of the selected [% category.name %]. If no [% category.name %] are selected, no restrictions
+regarding [% category.name %] are used.
+</p>
+
+[% FOREACH basickey IN search_ui_utils.basickeys( category.sc_id ) %]
+
+	[% SET html_id = search_ui_utils.html_id_for_bk( category.sc_id, basickey.bk_id ) %]
+
+	[% IF c.req().param( html_id ) == 'on' %]
+	    [% SET checked = 'checked="checked"' %]
+	[% ELSE %]
+	    [% SET checked = '' %]
+	[% END %]
+
+	<input type="checkbox" name="[% html_id %]" id="[% html_id %]" type="checkbox" [% checked %]/>
+	<label for="[% html_id %]">[% basickey.bk_name %]</label><br />
+
+[% END %]

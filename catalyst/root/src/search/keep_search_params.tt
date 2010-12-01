@@ -1,0 +1,7 @@
+<!-- generate input elements for keeping search parameters between requests -->
+
+[% FOREACH param IN c.req.parameters %]
+
+    <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
+
+[% END %]

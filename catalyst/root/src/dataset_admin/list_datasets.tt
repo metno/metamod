@@ -1,0 +1,21 @@
+<h1 class="std">Dataset directories you own</h1>
+
+
+<a href="[% c.uri_for('/dataset_admin/create') %]">Create new</a>
+
+<table class="list_table">
+<thead>
+<tr class="list_table">
+<th class="list_table">Dataset name</th>
+<th class="list_table">&nbsp;</th>
+<th class="list_table">&nbsp;</th>
+</tr>
+</thead>
+[% FOREACH ds IN da_ui_utils.user_datasets() %]
+    <tr class="list_table">
+    <td class="list_table">[% ds.ds_name %]</td>
+    <td class="list_table"><a href="[% c.uri_for( '/dataset_admin/' _ ds.ds_id _ '/edit' ) %]">Edit</a></td>
+    <td class="list_table"><a href="[% c.uri_for( '/dataset_admin/' _ ds.ds_id _ '/questionnaire' ) %]">Edit metadata</a></td>
+    </tr>
+[% END %]
+</table>

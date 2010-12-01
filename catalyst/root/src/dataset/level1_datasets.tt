@@ -1,0 +1,16 @@
+<h1 class="info">Available level 1 datasets</h1>
+
+<p>
+This page is primarily intended for search engines as it links to all available level 1
+datasets and then further to all level 2 datasets. Human users are recommended to use the search
+interface found <a href="[% c.uri_for('/search') %]">here.</a>
+</p>
+
+
+<ul>
+[% FOREACH dataset IN datasets %]
+    <li>
+        <a href="[% c.uri_for( '/dataset/' _ dataset.ds_id _ '/view' ) %]">[% dataset.ds_name %]</a>
+    </li>
+[% END %]
+</ul>

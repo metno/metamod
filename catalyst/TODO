@@ -1,0 +1,76 @@
+
+Things to do in Catalyst version of Metamod
+-------------------------------------------
+
+
+* move openlayers and get rid of local symlinks [GA]
+    ~/projects/metamod28/src/catalyst$ ls -l `find . -type l`
+    ./master_config_dev.txt -> /home/user/projects/metamod28/catnip/master_config.txt
+
+* check that wmsinfo data gets imported from test xmlfiles [GA]
+
+* Implement support for reprojections (Lat/long and Stereo). This can be implemented as a port of the current PHP code.
+  At a later time this should be supported using some type of WPS service, but not for this version. [HK]
+
+* Fix result tables that overflow the current layout. This might require a complete re-thinking of the visual design.
+
+* Setup nighly integration (test_application) and test machines.
+
+* change subscription feature to link to existing php pages [ØT]
+
+* Add option for removing columns from the result page. See current implementation.
+
+* Fix redirect when logging out after adding subscription. Should probably be done after deployment specifics are
+  finished.
+
+* Move this branch to trunk
+  * Move this page afterwards to ../TODO-2.7, so we have TODO and TODO-2.7
+    side by side
+
+* Fix licenses
+
+    DONE
+------------------------------------------
+
+* Setup and test Apache front-end proxy configuration to FastCGI Catalyst process. [GA]
+
+* Add input validation to Data collection period dates.
+  * Added calendar widget instead [GA]
+  * waiting for spec for other formats
+
+* move openlayers and get rid of local symlinks
+    ./root/static/img -> ../../../search/htdocs/img/
+    ./root/static/lib -> ../../../search/htdocs/lib
+    ./root/xsl/gc2wmc.xsl -> ../../../search/cgi-bin/gc2wmc.xsl
+    ./root/static/css/openlayers_theme -> ../../../../search/htdocs/theme
+
+* Generate Catalyst configuration based on master_config.txt. The generation should be usable standalone (during)
+  development and be included in the update_target.pl script.
+
+* fix fancybox conflict with jquery in search
+
+* Remove RSS feed link from level 1 datasets that do not have any level 2 datasets.
+
+* fix buttons in result list
+
+* fix search for datacollection period (get 'invalid input syntax for integer: "2008-07-15" ')
+
+* reduce number of links in paging
+
+* fix log4perl initialization
+    currently seems random if done in metamod-init or catalyst
+
+* When clicking on the map for selection map search region the map shall be displayed again instead of Topics and
+  Variables.
+
+* Add a system for adding help messages to the various parts of the search interface. The help messages should be
+  configurable by an implementor. (solution was simplified as help messages are not configurable be implementor)
+
+* Add support for setting the HTML header and footer. See header.tt and footer.tt:
+  needs to integrate with existing php-based system (solution: header and footer now fetched from master_config.txt)
+
+* Add a page that contains a link to all available RSS feeds. This page should not be easily accessible to a human user
+  but instead accessible to search engines for indexing. Solution: The link is now not to RSS feeds as those are not
+  indexed by Google, but instead to plain HTML pages.
+
+* Test integration with part of the application that will still be in PHP. Solution: Subscription link is now tested.

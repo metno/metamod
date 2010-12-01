@@ -1,0 +1,6 @@
+<fieldset class="questionnaire">
+[% IF element.value %]
+    <legend>[% element.value %]</legend>
+[% END %]
+
+<table>

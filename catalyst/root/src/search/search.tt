@@ -1,0 +1,78 @@
+<script type="text/javascript">
+
+[% IF c.req.params.active_criteria %]
+    var activeCriteria = [% c.req.params.active_criteria %];
+[% ELSE %]
+    var activeCriteria = 0;
+[% END %]
+
+[% IF c.req.params.active_tab %]
+var activeTab = [% c.req.params.active_tab %];
+[% ELSE %]
+var activeTab = 0;
+[% END %]
+
+
+jQuery(document).ready( function () {
+    jQuery('#criteria-tabs').tabs( { collapsible: true, selected : activeTab } );
+    jQuery('#search-criteria-accordion').accordion( { autoHeight: false, collapsible: true, active: activeCriteria });
+
+} );
+</script>
+
+<form name="search" method="GET" action="[% c.uri_for( '/search/page/1/result' ) %]" id="search_form">
+
+<!-- this is needed for map search that need to set the active_criteria in an input field. This is because
+     map search is a image that acts as a submit button. We are required to use this to get the clicked coordinates.
+ -->
+<input type="hidden" name="active_criteria" id="active_criteria" />
+
+<h1 class="std">Metadata search</h1>
+
+<div id="criteria-tabs">
+    <ul>
+        <li><a href="#search-criteria">Search criteria</a></li>
+        <li><a href="#search-options">Options</a></li>
+        <li><a href="#search-help">Help</a></li>
+    </ul>
+
+    <div id="search-criteria">
+        <button type="submit">Search</button>
+        <div id="search-criteria-accordion">
+        [% FOREACH category IN search_ui_utils.search_categories() %]
+
+	        <h3><a href="#">[% category.name %]</a></h3>
+	        <div id="search-criteria-[% category.sc_id %]" class="search-criteria">
+
+	        [% IF category.sc_type == 'basickey' %]
+	            [% INCLUDE 'search/basickey_form.tt' category = category %]
+	        [% ELSIF category.sc_type == 'date_interval' %]
+	            [% INCLUDE 'search/time_form.tt' category = category %]
+            [% ELSIF category.sc_type == 'fulltext' %]
+                [% INCLUDE 'search/text_form.tt' category = category %]
+	        [% ELSIF category.sc_type == 'map_search' %]
+                [% INCLUDE 'search/map_search_form.tt' criteria_index = loop.index() %]
+            [% ELSIF category.sc_type == 'tree' %]
+                [% INCLUDE 'search/tree_form.tt'  %]
+	        [% END %]
+
+	        </div>
+
+        [% END %]
+        </div>
+        <button type="submit">Search</button>
+    </div>
+
+    <div id="search-options">
+        <button type="submit">Search</button>
+        [% INCLUDE 'search/search_options_form.tt' %]
+        <button type="submit">Search</button>
+    </div>
+
+    <div id="search-help">
+        [% INCLUDE 'search/help.tt' %]
+    </div>
+
+</div>
+
+</form>

@@ -1,0 +1,24 @@
+<tr>
+    <td class="quest_label">
+        <label for="metadata_[% element.name %]">[% element.label | html %]</label>
+    </td>
+</tr>
+
+<tr>
+    <td class="quest_field">
+        <select
+            name="metadata_[% element.name %]"
+            id="metadata_[% element.name %]"
+            multiple="multiple"
+            size="[% element.height %]">
+
+            [% FOREACH option IN da_ui_utils.gcmdlist( element ) %]
+                <option
+                    [% metadata.item( element.name ).grep( '^' _ option _ '$' ).size() > 0 ? 'selected="selected"' : '' %]
+                    value="[% option | html %]">[% option | html %]</option>
+            [% END %]
+
+        </select>
+    </td>
+</tr>
+

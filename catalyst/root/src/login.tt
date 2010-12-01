@@ -1,0 +1,93 @@
+[% META title = 'Login' %]
+
+<div id="info">
+    <p class="info">
+    Log in to METAMOD to get access to more functions. When logged in you can do the following:
+    </p>
+    <ul>
+    <li>Setup automatic subscriptions to get notified about new data files.</li>
+    <li>Upload new datafiles and add meta data</li>
+    <li>Administrate your own account.</li>
+    </ul>
+</div>
+
+<div id="loginform">
+
+    <h2>Login</h2>
+    <p class="form">
+    For already registered users.
+    </p>
+    <form name="login" method="POST" action="[% c.uri_for('/login/authenticate') %]">
+        <input type="hidden" name="return" value="[% return %]" />
+        <input type="hidden" name="return_params" value="[% return_params %]" />
+        <table>
+            <tr>
+            <td class="error" colspan="2">[% error_msg %]</td>
+            </tr>
+
+            <tr>
+            <td><label for="username">Username<label></td>
+            <td><input type="text" name="username" id="username" value="[% username %]" /></td>
+            </tr>
+
+            <tr>
+            <td><label for="password">Password</label></td>
+            <td><input type="password" id="password" name="password" /></td>
+            </tr>
+
+            <tr>
+            <td colspan="2"><input type="submit" value="Login" /></td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<div id="registerform">
+
+    <h2>Request new user</h2>
+
+    <span style="font-weight: bolder">$this->registrationSuccess</span>
+
+    <p class="form">
+    If you do not already have a username and password you can send a request for one. Be aware that it can take
+    some time to process your request as it has to be manually approved.
+    </p>
+
+    <form name="register" method="POST" action="">
+    <input type="hidden" name="return" value="$return" />
+    <input type="hidden" name="params" value="$params" />
+        <table>
+            <tr>
+            <td class="error" colspan="2">$this->registrationFailure</td>
+            </tr>
+
+
+            <tr>
+            <td><label for="name">Name</label></td>
+            <td><input type="text" id="name" name="name" value="$name" /></td>
+            </tr>
+
+            <tr>
+            <td><label for="email">Email address</label></td>
+            <td><input type="text" id="email" name="email" value="$email" /></td>
+            </tr>
+
+            <tr>
+            <td><label for="institution_name">Name of institution</label></td>
+            <td>
+                <select id="institution_name" name="institution_name">
+                $institutionOptions;
+                </select>
+            </tr>
+
+            <tr>
+            <td><label for="telephone_number">Telephone number</label></td>
+            <td><input type="text" id="telephone_number" name="telephone_number" value="$telephoneNumber" /></td>
+            </tr>
+
+            <tr>
+            <td colspan="2"><input type="submit" value="Request access" /></td>
+            </tr>
+        </table>
+    </form>
+</div>

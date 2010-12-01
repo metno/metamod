@@ -1,0 +1,5 @@
+[% IF in_search_app %]
+    [% mm_config.get('SEARCH_APP_HEADER_HTML') %]
+[% ELSE %]
+    [% mm_config.get('APP_HEADER_HTML') %]
+[% END %]
