@@ -14,16 +14,20 @@
 
 . /lib/lsb/init-functions
 
-APPNAME=MyApp
-APPDIR=/home/user/MyApp
+APPNAME=MetamodWeb
+APPDIR=/home/user/projects/metamod28/src/catalyst
 PORT=3000
+MYAPP_ENGINE=HTTP::Prefork
+
+# Set this if you have more than one instance of the app and you don't want
+# them to step on each other's pidfile.
+PIDSUFFIX=catnip
+
 UNIXNAME=$(echo $APPNAME | perl -pe 's/::/_/;$_=lc')
 # Leave these unset and we won't try to setuid/setgid.
 USER=user
 GROUP=user
-# Set this if you have more than one instance of the app and you don't want
-# them to step on each other's pidfile.
-PIDSUFFIX=
+
 
 if [ -f "/etc/default/"$UNIXNAME ]; then
 . "/etc/default/"$UNIXNAME
