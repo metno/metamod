@@ -1,3 +1,4 @@
+etc/init.d/metamod-catalyst
 init/create_and_load_all.sh
 init/createdb.sh
 init/createusers.sh
