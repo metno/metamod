@@ -59,11 +59,15 @@ if ($cust) {
     while (<CUST>) {
         if ( /^([A-Z_]+) =/ ) {
             if ($vars{$1}) {
-                printf "+%s\n", $1 if $opt_v;
+                $vars{$1}++;
+                printf " %s\n", $1 if $opt_v;
             } else {
-                printf "-%s\n", $1;
+                printf "+%s\n", $1;
             }
         }
+    }
+    foreach (sort keys %vars) {
+        print "-$_\n" if $vars{$_} == 1;
     }
 
 } else {
@@ -81,7 +85,7 @@ if ($cust) {
 # END ####################################
 
 sub usage {
-    print STDERR "Usage: $0 [-v] auth_master_config [my_master_config]\n";
+    print STDERR "Usage: $0 [-v] [-c] auth_master_config [my_master_config]\n";
     exit (1);
 }
 
@@ -94,11 +98,13 @@ B<chk_conf.pl> - check METAMOD master_config
 Given one parameter, it lists all the configuration directives in the file.
 
 Given two parameters, it checks that all the directives in the former file
-(normally B<app/example/master_config.txt>)  is present in the latter.
+(normally B<app/example/master_config.txt>) is present in the latter. Missing
+directives are prefixed with '-', while directives not in the authorative file
+is prefixed with '+'.
 
 =head1 USAGE
 
- chk_conf.pl [-v] file1 [file2]
+ chk_conf.pl [-v] [-c] file1 [file2]
 
 =head1 OPTIONS
 
