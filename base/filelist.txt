@@ -10,6 +10,7 @@ init/sruSchema.sql
 userinit/createuserdb.sh
 userinit/run_createuserdb.sh
 =scripts/import_dataset.pl
+=scripts/chk_conf.pl
 =htdocs/adm/highlight.html
 =htdocs/adm/highlight.php
 =htdocs/adm/gettables.php
