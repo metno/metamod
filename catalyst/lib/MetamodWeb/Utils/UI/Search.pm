@@ -116,7 +116,7 @@ sub basickeys {
 
     my $category = $self->meta_db->resultset('Searchcategory')->find($category_id);
 
-    my $basickeys = $category->basickeys();
+    my $basickeys = $category->basickeys( undef, { order_by => 'bk_name' } );
     my @basickeys = ();
     while ( my $basickey = $basickeys->next() ) {
 
@@ -345,7 +345,7 @@ sub topics_tree {
     my $hk_rs = $self->meta_db->resultset('Hierarchicalkey');
 
 
-    my $hierarchical_keys = $hk_rs->search( { 'me.sc_id' => 4 }, { select => [ 'hk_id', 'hk_parent', 'hk_name' ] } );
+    my $hierarchical_keys = $hk_rs->search( { 'me.sc_id' => 4 }, { select => [ 'hk_id', 'hk_parent', 'hk_name' ], order_by => 'hk_name' } );
 
 
     # build a list of children for each node in the tree and get roots
