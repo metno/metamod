@@ -34,6 +34,7 @@
 =end LICENCE
 
 =cut
+
 use strict;
 use warnings;
 
@@ -177,13 +178,10 @@ or conf.d.
 
 Prints output to stdout regardless of setting in master_config.
 
-=back
-
 =item application_directory
 
 'application_directory' is the name of a directory containing the application
 specific files. Inside this directory, there must be a master_config.txt file.
-
 
 =back
 

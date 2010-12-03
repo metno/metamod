@@ -138,7 +138,7 @@ if ($conf_file && !$opt_p) {
 }
 
 sub usage {
-    print STDERR "Usage: [-p] $0 application_directory\n";
+    print STDERR "Usage: $0 [-p] application_directory\n";
     exit (1);
 }
 
@@ -164,8 +164,6 @@ This utility generates a stub Apache config to be placed somewhere in sites-avai
 =item -p
 
 Prints output to stdout regardless of setting in master_config.
-
-=back
 
 =item application_directory
 
