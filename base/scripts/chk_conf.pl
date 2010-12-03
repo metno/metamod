@@ -40,7 +40,8 @@ use warnings;
 use Getopt::Std;
 
 our $opt_v; # verbose
-getopts('v');
+our $opt_c; # count
+getopts('cv');
 
 my $orig = shift @ARGV or usage();
 my $cust = shift @ARGV;
@@ -67,8 +68,12 @@ if ($cust) {
 
 } else {
 
-    for (sort keys %vars) {
-        print "$_\n";
+    if ($opt_c) {
+        printf "%d directives in %s\n", scalar keys %vars, $orig;
+    } else {
+        for (sort keys %vars) {
+            print "$_\n";
+        }
     }
 
 }
