@@ -121,7 +121,7 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
     my $horisontal_mt_name = $c->req->param('horisontal_mt_name');
     my $two_way_table = $dataset->two_way_table($search_criteria, $owner_tags, $vertical_mt_name, $horisontal_mt_name );
 
-    my $num_search_cols = $c->stash->{ search_ui_utils }->num_search_cols();
+    my $num_search_cols = $c->req->param('num_mt_columns') || $c->stash->{ search_ui_utils }->num_search_cols();
     my @md_cols = ();
     foreach my $col_num ( 1 .. $num_search_cols ){
         my $mt_name = $c->req->param( 'shown_mt_name_' . $col_num );

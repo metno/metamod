@@ -16,10 +16,21 @@
         <td class="option_label" style="text-align: center">Horisontal</td>
     </tr>
 
+    <!-- The name column should always be displayed as the first column. We include is an option
+        so that is apparant to the user and so that we don't need special code for the special case. -->
+    <tr>
+        <td class="option_label">Name</td>
+        <td><input type="radio" name="shown_mt_name_1" id="shown_mt_name_1" value="dataref" checked="checked" /></td>
+        [% FOREACH col_num IN [ 2 .. num_search_cols ] %]
+            <td>&nbsp;</td>
+        [% END %]
+    </tr>
+
     [% FOREACH search_option IN search_ui_utils.search_options() %]
         <tr>
         <td class="option_label">[% search_option.shown_name %]</td>
-        [% FOREACH col_num IN [ 1 .. num_search_cols ] %]
+        <td>&nbsp;</td>
+        [% FOREACH col_num IN [ 2 .. num_search_cols ] %]
             <td><input type="radio" name="shown_mt_name_[% col_num %]" value="[% search_option.mt_name %]" [% search_option.col == col_num ? 'checked="checked""' : '' %] /></td>
         [% END %]
 
@@ -29,6 +40,22 @@
         [% END %]
         </tr>
     [% END %]
+
+    <tr>
+        <td class="option_label" title="Used to set the number for metadata columns to show on the search result page.">
+            Number of metadata columns
+        </td>
+        <td colspan="4">
+            <select name="num_mt_columns" id="num_mt_columns">
+                [% SET selected_num_columns = ( c.req.params.num_mt_columns ? c.req.params.num_mt_columns : search_ui_utils.num_search_cols )%]
+                [% FOREACH num IN [ 1 .. num_search_cols ] %]
+                    <option value="[% num %]" [% selected_num_columns == num ? 'selected="selected"' : '' %]>
+                        [% num %]
+                    </option>
+                [% END %]
+            </select>
+        </td>
+    </tr>
 
     <tr>
         <td class="option_label">Results per page (datasets)</td>
