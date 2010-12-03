@@ -25,6 +25,7 @@ jQuery(document).ready( function () {
     <ul>
         <li><a href="#search-result">Result</a></li>
         <li><a href="#two-way-tables">Two-way tables</a></li>
+        <li><a href="#search-help">Help</a></li>
     </ul>
 
     <div id="search-result">
@@ -149,6 +150,10 @@ jQuery(document).ready( function () {
             [% END %]
             </table>
         [% END %]
+    </div>
+
+    <div id="search-help">
+        [% INCLUDE 'search/help.tt' %]
     </div>
 
 </div>
