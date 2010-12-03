@@ -16,18 +16,12 @@ Things to do in Catalyst version of Metamod
 
 * Setup nighly integration (test_application) and test machines.
 
-* change subscription feature to link to existing php pages [ØT]
-
-* Add option for removing columns from the result page. See current implementation.
-
 * Fix redirect when logging out after adding subscription. Should probably be done after deployment specifics are
   finished.
 
 * Move this branch to trunk
   * Move this page afterwards to ../TODO-2.7, so we have TODO and TODO-2.7
     side by side
-
-* Fix licenses
 
     DONE
 ------------------------------------------
@@ -74,3 +68,9 @@ Things to do in Catalyst version of Metamod
   indexed by Google, but instead to plain HTML pages.
 
 * Test integration with part of the application that will still be in PHP. Solution: Subscription link is now tested.
+
+* change subscription feature to link to existing php pages [ØT]
+
+* Add option for removing columns from the result page. See current implementation.
+
+* Fix licenses
