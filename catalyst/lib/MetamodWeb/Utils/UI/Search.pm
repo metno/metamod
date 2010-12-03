@@ -144,7 +144,9 @@ sub two_way_table_h_keys {
         }
     }
 
-    my @horisontal_keys = sort keys %horisontal_keys;
+    # We do a locale insensivtive sort so we need to compare the lower case of the keys to ensure that
+    # upper and lower case letters are treated the same
+    my @horisontal_keys = sort { lc($a) cmp lc($b) } keys %horisontal_keys;
     return \@horisontal_keys;
 }
 
