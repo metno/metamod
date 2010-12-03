@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <searchdata>
-<sc id="1" type="1" fnc="name: Activity types" />
+<sc id="1" idname="activity_types" type="basickey" fnc="name: Activity types" />
 <bk sc="1">Cruise</bk>
 <bk sc="1">Moored instrument</bk>
 <bk sc="1">Float</bk>
@@ -10,7 +10,7 @@
 <bk sc="1">field_experiment</bk>
 <bk sc="1">ice_station</bk>
 <bk sc="1">Land station</bk>
-<sc id="2" type="1" fnc="name: Areas" />
+<sc id="2" idname="areas" type="basickey" fnc="name: Areas" />
 <bk sc="2">Greenland Sea</bk>
 <bk sc="2">Iceland Sea</bk>
 <bk sc="2">Norwegian Sea</bk>
@@ -26,13 +26,13 @@
 <bk sc="2">White Sea</bk>
 <bk sc="2">Nordic Seas</bk>
 <bk sc="2">Northern Hemisphere</bk>
-<sc id="10" type="1" fnc="name: Operational status" />
+<sc id="10" idname="operational_status" type="basickey" fnc="name: Operational status" />
 <bk sc="10">Operational</bk>
 <bk sc="10">Pre operational</bk>
 <bk sc="10">Experimental</bk>
 <bk sc="10">Scientific</bk>
-<sc id="3" type="1" fnc="name: variables; status: hidden" />
-<sc id="4" type="2" fnc="name: Topics and variables" />
+<sc id="3" idname="variables" type="basickey" fnc="name: variables; status: hidden" />
+<sc id="4" idname="topics_and_variables" type="tree" fnc="name: Topics and variables" />
 <hkhead sc="4">
    <hk name="Agriculture">
       <bk sc="3">Agriculture > HIDDEN</bk>
@@ -3954,13 +3954,12 @@
       </hk>
    </hk>
 </hkhead>
-<sc id="7" type="1" fnc="name: Institutions" />
-<bk sc="7">PPAS Point Pollution AS</bk>
-<bk sc="7">WINT Winter Institute</bk>
-<bk sc="7">SVE Snow V. East</bk>
-<bk sc="7">TUN Tunnel Enterprises</bk>
-<sc id="8" type="3" fnc="name: Datacollection period; cyclic: no; numtype: date; lower: FROM; upper: TO" />
-<sc id="9" type="4" fnc="name: Map search" />
+<sc id="7" idname="institutions" type="basickey" fnc="name: Institutions" />
+<bk sc="7">IXI International Example Institute</bk>
+<bk sc="7">ASI Another Similar Institute</bk>
+<sc id="8" idname="datacollection_period" type="date_interval" fnc="name: Datacollection period; cyclic: no; numtype: date; lower: FROM; upper: TO" />
+<sc id="9" idname="map_search" type="map_search" fnc="name: Map search" />
+<sc id="11" idname="fulltext" type="fulltext" fnc="name: Text" />
 <mt name="title" share="FALSE" def="A descriptive title for the dataset" />
 <mt name="abstract" share="FALSE" def="Brief narrative summary for the dataset" />
 <mt name="topiccategory" share="TRUE" def="Blank-separated list of topic words describing the topics covered by this dataset, according to a standard code list" />
@@ -3974,6 +3973,13 @@
 <mt name="history" share="FALSE" def="Provides an audit trail for modifications to the original data" />
 <mt name="area" share="TRUE" def="Geographical coverage. Comma-separated list of names taken from a list of predefined values" />
 <mt name="grid_projection" share="TRUE" def="Description of geographical projection used to store the data. Either 'lat-lon' or a grid_mapping_name (CF convention appendix F)" />
+<!-- disabling *_latitude *_longitude in favor of bounding_box -->
+<!--
+<mt name="southernmost_latitude" share="TRUE" def="Value between -90 and 90 degrees" />
+<mt name="northernmost_latitude" share="TRUE" def="Value between -90 and 90 degrees" />
+<mt name="westernmost_longitude" share="TRUE" def="Value between -180 and 180 degrees" />
+<mt name="easternmost_longitude" share="TRUE" def="Value between -180 and 180 degrees" />
+-->
 <mt name="bounding_box" share="FALSE" def="geographical bounding_box given as comma-separated string with 'east, south, west, north' with east, west between -180 and 180 and south, north between -90 and 90  (degrees)" />
 <mt name="latitude_resolution" share="TRUE" def="distance between gridlines in latitude direction (degrees)" />
 <mt name="longitude_resolution" share="TRUE" def="distance between gridlines in longitude direction (degrees)" />
@@ -4002,4 +4008,6 @@
 <mt name="file_format" share="TRUE" def="File format. One of: GRIB|BUFR|netCDF|netCDF/CF|HDF|HDF-EOS|HDF5|Excel|CSV|ASCII|Other" />
 <mt name="format_description" share="FALSE" def="Free text descripion of data format" />
 <mt name="dataref" share="FALSE" def="URL reference to data, or short name" />
+<mt name="gtsInstancePattern" share="FALSE" def="Pattern to locate data in GTS" />
+<mt name="gtsFileIdentifier" share="FALSE" def="Identifier for data in GTS" />
 </searchdata>
