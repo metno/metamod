@@ -4,8 +4,14 @@
     </div>
 [% END %]
 
-[% IF c.req.path().match('search/page')  %]
-    [% INCLUDE 'search/search_menu.tt' %]
+[% IF in_search_app %]
+
+    <!-- We don't want multiple places to edit the criteria so for the criteria page we disable all links -->
+    [% IF c.req.path().match('search/page')  %]
+        [% INCLUDE 'search/search_menu.tt' allow_changes=1 %]
+    [% ELSE %]
+        [% INCLUDE 'search/search_menu.tt' allow_changes=0 %]
+    [% END %]
 [% END %]
 
 [% IF my_metamod_menu %]
