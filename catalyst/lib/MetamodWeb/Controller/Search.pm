@@ -86,6 +86,17 @@ sub index : Path("/search") {
         $y2 = $y_coord;
         $c->req->params->{ $ui_utils->html_id_for_map( 'x2' ) } = $x2;
         $c->req->params->{ $ui_utils->html_id_for_map( 'y2' ) } = $y2;
+    } elsif( $x_coord && $y_coord && $x1 && $y2 && $x2 && $y2 ){
+        $x1 = $x_coord;
+        $y1 = $y_coord;
+
+        # overwrite the old coordinates
+        $c->req->params->{ $ui_utils->html_id_for_map( 'x1' ) } = $x1;
+        $c->req->params->{ $ui_utils->html_id_for_map( 'y1' ) } = $y1;
+
+        #clear the second set of parameters
+        $c->req->params->{ $ui_utils->html_id_for_map( 'x2' ) } = '';
+        $c->req->params->{ $ui_utils->html_id_for_map( 'y2' ) } = '';
     }
 
     $c->stash( template => 'search/search.tt' );
