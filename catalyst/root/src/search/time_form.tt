@@ -25,3 +25,6 @@ Only datasets having a [% category.name %] overlapping the interval thus defined
 <label for="[% to_id %]">[% category.upper %]</label>
 <script>$(function() { $( "#[% to_id %]" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
 <input type="text" size="12" name="[% to_id %]" id="[% to_id %]" value="[% c.req().param( to_id ) %]" />
+
+<br />
+<button type="button" onclick="jQuery('#[% from_id %]').val(''); jQuery('#[% to_id %]').val('')">Clear dates</button>

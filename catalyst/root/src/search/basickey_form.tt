@@ -9,6 +9,10 @@ at least one of the selected [% category.name %]. If no [% category.name %] are 
 regarding [% category.name %] are used.
 </p>
 
+<button type="button" onclick="jQuery( 'input.basickey_[% category.sc_id %]' ).attr('checked', 'checked')">Select All</button>
+<button type="button" onclick="jQuery( 'input.basickey_[% category.sc_id %]' ).attr('checked', '')">Clear All</button>
+<br />
+
 [% FOREACH basickey IN search_ui_utils.basickeys( category.sc_id ) %]
 
 	[% SET html_id = search_ui_utils.html_id_for_bk( category.sc_id, basickey.bk_id ) %]
@@ -19,7 +23,7 @@ regarding [% category.name %] are used.
 	    [% SET checked = '' %]
 	[% END %]
 
-	<input type="checkbox" name="[% html_id %]" id="[% html_id %]" type="checkbox" [% checked %]/>
+	<input type="checkbox" class="basickey_[% category.sc_id %]" name="[% html_id %]" id="[% html_id %]" type="checkbox" [% checked %]/>
 	<label for="[% html_id %]">[% basickey.bk_name %]</label><br />
 
 [% END %]
