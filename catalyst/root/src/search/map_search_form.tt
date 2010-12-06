@@ -31,7 +31,9 @@ dropdown list.
 
 </select>
 
-<button>Clear map</button>
+<button type="button" onclick="jQuery('#[% x1_id %], #[% x2_id %], #[% y1_id %], #[% y2_id %]' ).val(''); jQuery('#search_form').attr( 'action', '[% c.uri_for('/search') %]#map_search'); jQuery('#active_criteria').val('[% criteria_index %]'); jQuery('#search_form').submit()">
+    Clear map
+</button>
 
 <br />
 
