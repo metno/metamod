@@ -22,7 +22,7 @@
 #                                 'svn checkout <URL to SVN source>'.
 #                                 This must be done outside this script,
 #                                 Before the script is run the first time.
-#                               
+#
 #                        source/test/applic
 #                               - The local files for the application,
 #                                 including the master_config.txt file.
@@ -62,7 +62,7 @@
 #
 # A. The source directory is updated. (svn update).
 #
-# B. The master_config.txt file in the app directory is 'doctored' 
+# B. The master_config.txt file in the app directory is 'doctored'
 #    by changing the value of some important variables.
 #
 # C. Purging of the directory structure: All content in the following
@@ -78,7 +78,7 @@
 # F. The databases (metadatabase and user database) is initialized and
 #    filled with static data. The user database is loaded with user info
 #    from the webrun/u1 files.
-# 
+#
 # G. The services defined for the application is started.
 #
 # H. Uploads to the system is simulated by copying files to the ftp- and
@@ -198,7 +198,7 @@ svn update
 #
 cd $basedir/source/test/applic
 importbasetime=\
-`perl -e 'use DateTime; my $dt=DateTime->now; $dt->set(hour => 0, minute => 0, second => 0); print $dt->epoch;'` 
+`perl -e 'use DateTime; my $dt=DateTime->now; $dt->set(hour => 0, minute => 0, second => 0); print $dt->epoch;'`
 servername=`uname -n`
 if [ $apacheport -ne 80 ]; then
    appendport=':'$apacheport
@@ -254,6 +254,7 @@ mkdir -p webupload/TUN/ice
 # =======================================================
 #
 cd $basedir/source
+export PERL5LIB=/opt/metno-catalyst-dependencies-ver1/lib/perl5/
 ./update_target.pl test/applic
 cd $basedir/target
 ./prepare_runtime_env.sh
@@ -325,7 +326,7 @@ cd $basedir
 # split INFO and WARN/ERROR log
 grep '\[INFO\]' webrun/metamod.log > webrun/metamod.log_info
 grep -v '\[INFO\]' webrun/metamod.log | grep -v '\[DEBUG\]' > webrun/metamod.log_warnerror
-# 
+#
 # compare info logs
 logfiles='metamod.log_info'
 if [ -z "`ls compare`" ]; then
@@ -345,7 +346,7 @@ else
    for fil in $logfiles; do
       if [ -r webrun/$fil ]; then
          # remove line-number and time/date
-         perl -pe 's/on\s+line:\s+\d+/_LINENO_/g; s/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2}[,\.]?\d+)?/_TIMESTAMP_/g; s/\d{4}-\d{2}-\d{2}/_DATE_/g' webrun/$fil | sort | uniq >t_log2 
+         perl -pe 's/on\s+line:\s+\d+/_LINENO_/g; s/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2}[,\.]?\d+)?/_TIMESTAMP_/g; s/\d{4}-\d{2}-\d{2}/_DATE_/g' webrun/$fil | sort | uniq >t_log2
          echo "========== diff for $fil (new vs. old):" >>t_result
          sort compare/$fil | uniq >t_log3
          diff t_log2 t_log3 >>t_result
