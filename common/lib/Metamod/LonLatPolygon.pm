@@ -44,17 +44,23 @@ sub new {
     my ($class, @points) = @_;
     @points = map {UNIVERSAL::isa($_, 'Metamod::LonLatPoint') ? $_ : Metamod::LonLatPoint->new(@$_)} @points;
     return unless @points;
-    unless ($points[0] == $points[-1]) {
-        push @points, $points[0];
-    }
-    # clean polygon for double occurance of same point
+
+    # clean polygon for double occurance of (logically) same point
     my @cleanPoints = (shift @points);
     foreach my $p (@points) {
         if ($p != $cleanPoints[-1]) {
             push @cleanPoints, $p;
         }
     }
-    
+
+    # make sure the polygons start and end-point are
+    # exactly the same, even outside LonLatPoints accuracy
+    # required to really have a closed ring
+    unless ("$cleanPoints[0]" eq "$cleanPoints[-1]") {
+        push @cleanPoints, $cleanPoints[0];
+    }
+
+
     return bless \@cleanPoints, $class;
 }
 
@@ -83,7 +89,7 @@ sub toProjectablePolygon {
     if (@points < 20) {
         # insert 3 extra point between each to point-pair
         # to avoid singularities during reprojection
-        my $lastPoint = shift @points; 
+        my $lastPoint = shift @points;
         @outPoints = ($lastPoint);
         while (my $point = shift @points) {
             my ($lastLon, $lastLat) = $lastPoint->getLonLat;
@@ -135,17 +141,17 @@ Metamod::LonLatPolygon - container for polygons
   my @points = $polygon->getPoints;
   print $polygon; # overloaded, see toString
   print $polygon->toString;
-  
+
   my $otherPolygon = new Metamod::LonLatPolygon([0,0],[0,1],[1,1],[1,0],[0,0]);
   if ($polygon == $otherPolygon) { #overloaded, $polygon->equals($otherPolygon)
       # do it
   }
- 
+
   my @uniqPolys = Metamod::LonLatPolygon::unique($polygon, $otherPolygon);
- 
+
   # create a new polygon, save to project (avoid some singularities)
   my $newPoly = $polygon->toProjectablePolygon;
- 
+
 =head1 DESCRIPTION
 
 This is a class for convenient storage of polygons. It stores internally all

@@ -5,7 +5,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../";
 
-use Test::More tests => 11;
+use Test::More tests => 13;
 use Data::Dumper;
 
 BEGIN {use_ok('Metamod::LonLatPolygon')};
@@ -25,7 +25,11 @@ is($obj->toString, $str, "toString");
 is("$obj", $str, "toString, overloaded");
 
 my @points = $obj->getPoints;
-isa_ok($points[0], 'Metamod::LonLatPoint'); 
+isa_ok($points[0], 'Metamod::LonLatPoint');
 
 my $projPol = $obj->toProjectablePolygon;
 ok (scalar($projPol->getPoints) > scalar(@points), "toProjectablePolygon");
+
+my $obj3 = new Metamod::LonLatPolygon([0,0],[0,1],[1,1],[1,0],[0.01,0.0]);
+is($obj3->[0][0], $obj3->[-1][0], "first and last point are equal in first coordinate");
+is($obj3->[0][1], $obj3->[-1][1], "first and last point are equal in second coordinate");
