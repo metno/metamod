@@ -1,3 +1,5 @@
+SERVER = dev-vm140
+
 SOURCE_DIRECTORY = Substituted by test_application.sh
 TARGET_DIRECTORY = Substituted by test_application.sh
 METAMODBASE_DIRECTORY = [==SOURCE_DIRECTORY==]/base
@@ -31,6 +33,10 @@ AUTH_USERFILE =
 # Application name:
 APPLICATION_NAME = Test Application
 
+# posix user for web stuff (in 2.7, only used for catalyst)
+#APPLICATION_USER = www-data
+APPLICATION_USER = user
+
 # Application id (has to be short and unique among applications using the same
 # database)::
 APPLICATION_ID = Substituted by test_application.sh
@@ -44,13 +50,19 @@ LOG4PERL_WATCH_TIME = 30
 LOG4PHP_CONFIG = [==TARGET_DIRECTORY==]/log4php_config.ini
 LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
 
-# PG_ADMIN_USER is the PostgreSQL user who may freely create, modify and 
-# delete the metadata database. 
-PG_ADMIN_USER = admin 
+# Port for running local catalyst server
+CATALYST_PORT = 3000
 
-# PG_WEB_USER is a PostgreSQL user who may read/write data in the metadata 
-# database. 
-PG_WEB_USER = webuser 
+# lib for Catalyst etc
+CATALYST_LIB = /opt/metno-catalyst-dependencies-ver1
+
+# PG_ADMIN_USER is the PostgreSQL user who may freely create, modify and
+# delete the metadata database.
+PG_ADMIN_USER = admin
+
+# PG_WEB_USER is a PostgreSQL user who may read/write data in the metadata
+# database.
+PG_WEB_USER = webuser
 
 # the location of the initialization sql-script for the full-text facilities
 PG_TSEARCH2_SCRIPT = /usr/share/postgresql/8.3/contrib/tsearch2.sql
@@ -66,7 +78,7 @@ PG_POSTGIS_ADDITIONAL_SYSREF =
 
 # the language to use for the data for full-text indexing, pre-installed are 'default' and 'simple' (pg <= 8.2); 'english' and 'simple' (pg >= 8.3)
 # see 'select * from pg_ts_config;'
-PG_TSEARCH_LANGUAGE = english 
+PG_TSEARCH_LANGUAGE = english
 
 # PG_CONNECTSTRING_* are strings used to indicate hostname and port for
 # connecting to the PostgreSQL database. They are found in various
@@ -90,6 +102,10 @@ DATABASE_NAME = Substituted by test_application.sh
 
 # Name of the PostgreSQL user database:
 USERBASE_NAME = Substituted by test_application.sh
+
+# LDAP server used for authentication + base DN
+LDAP_SERVER = ldaps://ldap-dev.met.no
+LDAP_BASE_DN = ou=user,ou=internal,dc=met,dc=no
 
 # URL of OPeNDAP server:
 OPENDAP_URL = Substituted by test_application.sh
@@ -150,7 +166,7 @@ SRID_MAP_OFFSET_Y_93995 = 240
 # scalefactor is derived from the map, y=477 := lat=-70 := ry=-2194494.25
 # scale = 2194494.25/(477-280) +- 1 pixel
 SRID_MAP_SCALE_FACTOR_X_93031 = 11120
-SRID_MAP_OFFSET_X_93031 = 280 
+SRID_MAP_OFFSET_X_93031 = 280
 SRID_MAP_SCALE_FACTOR_Y_93031 = -11120
 SRID_MAP_OFFSET_Y_93031 = 280
 
@@ -247,7 +263,7 @@ SEARCH_APP_SHOW_COLUMNS =
 # The sequence by which the search categories are visible in the search
 # application. The numbers are keys in the SearchCategory database table.
 # In addition to the numbers, the keyword FullText may be used.
-SEARCH_CATEGORY_SEQUENCE = 4,1,7,2,9,8,FullText
+SEARCH_CATEGORY_SEQUENCE = topics_and_variables,activity_types,institutions,areas,map_search,datacollection_period,fulltext
 
 # Set default fontsize for the results and the two-way tables (percent):
 DEFAULT_FONTSIZE = 80
@@ -300,7 +316,7 @@ UPLOAD_FTP_DIRECTORY = Substituted by test_application.sh
 # all files in a batch.
 UPLOAD_AGE_THRESHOLD = 20
 
-# Directory path for the top data repository directory. This will 
+# Directory path for the top data repository directory. This will
 # be a directory accessible through some OPeNDAP server (like THREDDS).
 # If no OPeNDAP server is installed, links in the web interface pointing to
 # data files may be faulty. This dependence on OPeNDAP will be corrected in
@@ -332,11 +348,11 @@ MAX_UPLOAD_SIZE_BYTES = 100000000
 # name, and [URL] is replaced by an url to the html-file describing the errors:
 EMAIL_BODY_WHEN_UPLOAD_ERROR =
  Dear [OWNER],
-   
+
  The METAMOD system that automatically check files uploaded to the data
  repository, have found errors in files recently uploaded to the [DATASET]
  dataset. Please find the details on the URL below:
-     
+
  [URL].
 
 # Subject field in E-mails sent to a dataset owner when errors are found
@@ -399,7 +415,7 @@ QUEST_OUTPUT_DIRECTORY = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
 
 # use this form for editing UPLOAD metadata by QUEST
 # make sure the output directory of the form
-# is set to one of the IMPORTDIRS 
+# is set to one of the IMPORTDIRS
 QUEST_METADATA_UPLOAD_FORM = [==LOCAL_URL==]/qst/fmmeta.php
 
 # Ownertag used to tag all dataset entries sent to the database:
@@ -413,7 +429,7 @@ QUEST_SENDER_ADDRESS = [==OPERATOR_EMAIL==]
 QUEST_RECIPIENTS = [==OPERATOR_EMAIL==]
 
 # Message shown to the user (as a web page) when the form has been submitted:
-QUEST_OKMESSAGE = Thanks for submitting information! 
+QUEST_OKMESSAGE = Thanks for submitting information!
  <a href="[==METADATA_SEARCH_URL==]">Return to the main page</a>.
 
 # Background image for file administration page
@@ -451,7 +467,7 @@ PMH_EXPORT_TAGS = Substituted by test_application.sh
 PMH_MAXRECORDS = 1000
 
 # optional set configuration, one set per row spec|name|description
-PMH_SETCONFIG = 
+PMH_SETCONFIG =
 
 
 # ============ METAMODHARVEST configuration ==============
@@ -464,7 +480,7 @@ HARVEST_HOUR = 1
 # (without embedded spaces) which will serve as a short identification for
 # the source. Each source (given by the base URL) must have its own ownertag,
 OAI_HARVEST_SOURCES = Substituted by test_application.sh
-# Strict validation of schema. Leave empty to switch off. 
+# Strict validation of schema. Leave empty to switch off.
 OAI_HARVEST_VALIDATION_SCHEMA = [==TARGET_DIRECTORY==]/schema/OAI-PMH.xsd
 
 # ============ METAMODTHREDDS configuration ==============
@@ -483,7 +499,7 @@ CATALINA_HOME =
 #
 # TEST_IMPORT_* are used to set up a test environment for automatic importing
 # of datasets into the database and data repository. This involves both the
-# METAMODUPLOAD and the METAMODBASE modules. 
+# METAMODUPLOAD and the METAMODBASE modules.
 #
 # When testing, a virtual time is used which goes faster than ordinary time.
 # The following speedup factor is the number of virtual seconds per real
@@ -511,11 +527,11 @@ TEST_EMAIL_RECIPIENT = 0
 # Configuration of METAMOD configuration
 
 # The type of authentication to perform. The types DB and LDAP are supported
-AUTH_TYPE = DB 
+AUTH_TYPE = DB
 
 # The URL used to connect to the LDAP server. Only used when AUTH_TYPE is LDAP.
 # Examples: ldaps://ldap-dev.met.no and ldaps://ldap-dev.met.no
-#AUTH_LDAP_URL = 
+#AUTH_LDAP_URL =
 
 # The LDAP DN where you should start search for the user. Example: dc=met,dc=no
 #AUTH_LDAP_BASE_DN=
