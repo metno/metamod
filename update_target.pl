@@ -314,7 +314,6 @@ my $logger_config = File::Spec->catfile( $targetdir, 'logger_config.ini' );
 my $lcp = Metamod::LoggerConfigParser->new( { verbose => 1 } );
 $lcp->create_and_write_configs($configfile,$logger_config);
 
-
 # install the catalyst application
 my $catalyst_dir = "$sourcedir/catalyst";
 my $catalyst_install_dir = "$targetdir";
@@ -333,8 +332,19 @@ if ($missing_variables > 0) {
    print "NOTE: All [==...==] constructs found that were not defined in the configuration file\n" .
                 "      were substituted with empty values\n";
 }
-#
+
+my $appuser = $conf{'APPLICATION_USER'};
+my $webrun = $conf{'WEBRUN_DIRECTORY'};
+if ($appuser) {
+   my $owner = getpwuid( (stat($webrun))[4] );
+   print STDERR "webrun dir '$webrun' is owned by user '$owner'\n";
+   warn "Webrun directory ($webrun) should be owned by user $appuser (not $owner)" unless $owner eq $appuser;
+}
+
 #----------------------------------------------------------------------
+# END
+#----------------------------------------------------------------------
+
 sub substcopy {
    # copies a file with inline processing
    my $inputdir;
@@ -374,6 +384,8 @@ sub substcopy {
    }
    close (IN);
    close (OUT);
+   # copy executable flag from source (svn)
+   chmod(0755, $outputpath) if -x $inputpath;
 }
 
 sub substituteval {
