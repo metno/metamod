@@ -2,47 +2,47 @@
 # Start a Catalyst app under Engine::HTTP(::Prefork)
 
 ### BEGIN INIT INFO
-# Provides: myapp
+# Provides: MetamodWeb
 # Required-Start: $local_fs $network $named
 # Required-Stop: $local_fs $network $named
 # Should-Start: apache2
 # Should-Stop: apache2
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
-# Short-Description: MyApp
+# Short-Description: MetamodWeb
 ### END INIT INFO
 
 . /lib/lsb/init-functions
 
-APPNAME=[==APPLICATION_NAME==]
-APPDIR=[==TARGET_DIRECTORY==]/catalyst
+APPNAME=MetamodWeb
+#APPDIR=[==TARGET_DIRECTORY==]/catalyst
+#COMMON_LIB=[==TARGET_DIRECTORY==]/lib
+APPDIR=[==SOURCE_DIRECTORY==]/catalyst
+COMMON_LIB=[==SOURCE_DIRECTORY==]/common/lib
 PORT=[==CATALYST_PORT==]
+LOCAL_LIB=[==CATALYST_LIB==]
 
 # Set this if you have more than one instance of the app and you don't want
 # them to step on each other's pidfile.
-PIDSUFFIX=[==APPLICATION_NAME==]
+PIDSUFFIX=[==APPLICATION_ID==]
 
 MYAPP_ENGINE=HTTP::Prefork
 
 UNIXNAME=$(echo $APPNAME | perl -pe 's/::/_/;$_=lc')
 # Leave these unset and we won't try to setuid/setgid.
-USER=user
-GROUP=user
+USER=[==APPLICATION_USER==]
+GROUP=
 
+#if [ $(id -u) -eq 0 ] ; then
+#  PIDDIR=/var/run/$UNIXNAME
+#  mkdir $PIDDIR >/dev/null 2>&1
+#  chown $USER:$GROUP $PIDDIR
+#  chmod 775 $PIDDIR
+#else
+#  PIDDIR=/tmp
+#fi
 
-if [ -f "/etc/default/"$UNIXNAME ]; then
-. "/etc/default/"$UNIXNAME
-fi
-
-if [ $(id -u) -eq 0 ] ; then
-  PIDDIR=/var/run/$UNIXNAME
-  mkdir $PIDDIR >/dev/null 2>&1
-  chown $USER:$GROUP $PIDDIR
-  chmod 775 $PIDDIR
-else
-  PIDDIR=/tmp
-fi
-
+PIDDIR=[==WEBRUN_DIRECTORY==]
 PIDFILE=$PIDDIR/$UNIXNAME${PIDSUFFIX:+"-$PIDSUFFIX"}.pid
 
 check_running() {
@@ -50,32 +50,32 @@ check_running() {
 }
 
 check_compile() {
-  if [ -n "$USER" ] ; then
-    if su $USER -c "cd $APPDIR ; perl -Ilib -M$APPNAME -ce1 2> /dev/null" ; then
-        return 1
+    if [ -n "$USER" ] ; then
+        if su $USER -c "cd $APPDIR ; perl -I$APPDIR/lib -ICOMMON_LIB -I$LOCAL_LIB -I$LOCAL_LIB -M$APPNAME -ce1 2> /dev/null" ; then
+            return 1
+        fi
+        return 0
+    else
+        if ( cd $APPDIR ; perl -I$APPDIR/lib -ICOMMON_LIB -I$LOCAL_LIB -M$APPNAME -ce1 2> /dev/null ) ; then
+            return 1
+        fi
+        return 0
     fi
-    return 0
-  else
-    if ( cd $APPDIR ; perl -Ilib -M$APPNAME -ce1 2> /dev/null ) ; then
-      return 1
-    fi
-    return 0
-  fi
 }
 
 _start() {
-  start-stop-daemon --start --quiet --pidfile $PIDFILE -m --chdir $APPDIR \
-    ${USER:+"--chuid"} $USER ${GROUP:+"--group"} $GROUP --background \
-    --startas $APPDIR/script/${UNIXNAME}_server.pl -- -p $PORT
+    start-stop-daemon --start --quiet --pidfile $PIDFILE -m --chdir $APPDIR \
+        ${USER:+"--chuid"} $USER ${GROUP:+"--group"} $GROUP --background \
+        --startas $APPDIR/script/${UNIXNAME}_server.pl -- -p $PORT
 
 
-  for i in 1 2 3 4 5 ; do
-    sleep 1
-    if check_running ; then
-      return 0
-    fi
-  done
-  return 1
+    for i in 1 2 3 4 5 ; do
+        sleep 1
+        if check_running ; then
+            return 0
+        fi
+    done
+    return 1
 }
 
 start() {
