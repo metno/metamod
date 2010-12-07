@@ -1,8 +1,8 @@
 ### edit & copy this file to /etc/default/catalyst-[==APPLICATION_ID==]
 
-export METAMOD_MASTER_CONFIG=/path/to/master_config.txt
+export METAMOD_MASTER_CONFIG=[==TARGET_DIRECTORY==]/master_config.txt
+export PORT=[==CATALYST_PORT==]
 export MYAPP_ENGINE=HTTP::Prefork
-export PORT=3000
 
 # export MYAPP_DEBUG=1
 # export DBIC_TRACE=1
