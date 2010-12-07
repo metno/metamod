@@ -27,6 +27,9 @@ use namespace::autoclean;
 after 'execute' => sub {
     my ( $self, $controller, $c, $test ) = @_;
 
+    # tracing is not enabled, so nothing to do
+    return unless exists $ENV{METAMOD_DBIC_TRACE} && $ENV{METAMOD_DBIC_TRACE} == 1;
+
     my $beautifier;
     try {
         require SQL::Beautify;
