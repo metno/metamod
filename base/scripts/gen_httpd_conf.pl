@@ -48,9 +48,9 @@ getopts('p');
 my $appdir = shift @ARGV or usage();
 
 my $mm_config = Metamod::Config->new("$appdir/master_config.txt");
-my $conf_file = $mm_config->get('APACHE_SITE_CONFIG');
-my $virtualhost = $mm_config->get('VIRTUAL_HOST');
 my $target = $mm_config->get('TARGET_DIRECTORY');
+my $conf_file = "$target/etc/httpd";
+my $virtualhost = $mm_config->get('VIRTUAL_HOST');
 my $local = $mm_config->get('LOCAL_URL');
 my $base = $mm_config->get('BASE_PART_OF_EXTERNAL_URL');
 my $port = $mm_config->get('CATALYST_PORT');
@@ -67,6 +67,20 @@ my $conf_text = <<EOT;
 
 # (none yet since all handled by catalyst)
 
+# --------------
+# Catalyst proxy settings
+
+<Proxy *>
+    Order deny,allow
+    Allow from all
+</Proxy>
+
+ProxyPass           $local/search http://127.0.0.1:$port/search
+ProxyPassReverse    $local/search http://127.0.0.1:$port/search
+
+# static files should be served directly from Apache
+Alias $local/static $target/lib/MetamodWeb/root/static/
+
 # -----------
 # The remaining lines are used when installing to a clean Apache
 # DO NOT USE if you've already configured your server manually
@@ -82,16 +96,6 @@ Alias $local	$target/htdocs
     Order allow,deny
     allow from all
 </Directory>
-
-<Proxy *>
-    Order deny,allow
-    Allow from all
-</Proxy>
-
-# assuming catalyst runs locally on port $port, e.g. with
-# $ CATALYST_ENGINE='HTTP::Prefork' script/metamod_server.pl -p $port
-ProxyPass           $local http://127.0.0.1:$port/
-ProxyPassReverse    $local http://127.0.0.1:$port/
 
 EOT
 
