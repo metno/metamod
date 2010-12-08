@@ -54,7 +54,7 @@ LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
 CATALYST_PORT = 3000
 
 # lib for Catalyst etc
-CATALYST_LIB = /opt/metno-catalyst-dependencies-ver1
+CATALYST_LIB = /opt/metno-catalyst-dependencies-ver1/lib/perl5
 
 # PG_ADMIN_USER is the PostgreSQL user who may freely create, modify and
 # delete the metadata database.
