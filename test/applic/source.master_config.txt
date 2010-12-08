@@ -34,8 +34,8 @@ AUTH_USERFILE =
 APPLICATION_NAME = Test Application
 
 # posix user for web stuff (in 2.7, only used for catalyst)
-#APPLICATION_USER = www-data
-APPLICATION_USER = user
+APPLICATION_USER = www-data
+#APPLICATION_USER = user
 
 # Application id (has to be short and unique among applications using the same
 # database)::
