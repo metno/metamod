@@ -22,10 +22,16 @@
 APPNAME=MetamodWeb
 UNIXNAME=$(echo $APPNAME | perl -pe 's/::/_/;$_=lc')
 
-#APPDIR=[==TARGET_DIRECTORY==]/catalyst
-#COMMON_LIB=[==TARGET_DIRECTORY==]/lib
-APPDIR=[==SOURCE_DIRECTORY==]/catalyst
-COMMON_LIB=[==SOURCE_DIRECTORY==]/common/lib
+# settings for running from target
+APPDIR=[==TARGET_DIRECTORY==]
+COMMON_LIB=[==TARGET_DIRECTORY==]/lib
+BINDIR=[==TARGET_DIRECTORY==]/bin
+
+# settings from running from source
+#APPDIR=[==SOURCE_DIRECTORY==]/catalyst
+#COMMON_LIB=[==SOURCE_DIRECTORY==]/common/lib
+#BINDIR=[==TARGET_DIRECTORY==]/script
+
 LOCAL_LIB=[==CATALYST_LIB==]
 export PERL5LIB=$APPDIR/lib:$COMMON_LIB:$LOCAL_LIB
 
@@ -65,7 +71,6 @@ check_running() {
 
 check_compile() {
     if [ -n "$USER" ] ; then
-        #if su $USER -c "cd $APPDIR ; perl -I$APPDIR/lib -I$COMMON_LIB -I$LOCAL_LIB -M$APPNAME -ce1 2> /dev/null" ; then
         if su $USER -c "cd $APPDIR ; perl -M$APPNAME -ce1 3> /dev/null" ; then
             return 1
         fi
@@ -81,7 +86,7 @@ check_compile() {
 _start() {
     start-stop-daemon --start --verbose --pidfile $PIDFILE -m --chdir $APPDIR \
         ${USER:+"--chuid"} $USER ${GROUP:+"--group"} $GROUP --background \
-        --startas $APPDIR/script/${UNIXNAME}_server.pl -- -p $PORT
+        --startas $BINDIR/${UNIXNAME}_server.pl -- -p $PORT
 
     for i in 1 2 3 4 5 ; do
         sleep 1
