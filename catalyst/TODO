@@ -2,19 +2,17 @@
 Things to do in Catalyst version of Metamod
 -------------------------------------------
 
-
 * move openlayers and get rid of local symlinks [GA]
-    ~/projects/metamod28/src/catalyst$ ls -l `find . -type l`
     ./master_config_dev.txt -> /home/user/projects/metamod28/catnip/master_config.txt
+    (must think a little more about how to find this...)
 
 * check that wmsinfo data gets imported from test xmlfiles [GA]
+  * not really a catalyst issue
 
 * Implement support for reprojections (Lat/long and Stereo). This can be implemented as a port of the current PHP code.
   At a later time this should be supported using some type of WPS service, but not for this version. [HK]
 
-* Fix result tables that overflow the current layout. This might require a complete re-thinking of the visual design.
-
-* Setup nighly integration (test_application) and test machines.
+* Setup nighly integration (test_application) and test machines. [ØT]
 
 * Fix redirect when logging out after adding subscription. Should probably be done after deployment specifics are
   finished.
@@ -22,9 +20,23 @@ Things to do in Catalyst version of Metamod
 * Move this branch to trunk
   * Move this page afterwards to ../TODO-2.7, so we have TODO and TODO-2.7
     side by side
+    * why? the idea is that this list should be empty before we release version 2.7 [GA]
+
+* investigate tests for DBIx::Class::ResultSet::RecursiveUpdate (fails if sqlite installed)
+
+* move WMS coastlines urls in thumbs + wms.tt to master_config [GA]
 
     DONE
 ------------------------------------------
+
+* init.d-script for starting/stopping catalyst [GA]
+
+* autogenerate JSON catalyst config when starting catalyst server [GA]
+
+* update_target must check that webrun is owned by APPLICATION_USER [GA]
+
+* Fix result tables that overflow the current layout. This might require a complete re-thinking of the visual design.
+  * Not important according to Heiko
 
 * Setup and test Apache front-end proxy configuration to FastCGI Catalyst process. [GA]
 
