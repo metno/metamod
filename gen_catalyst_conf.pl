@@ -40,7 +40,9 @@ use warnings;
 
 use FindBin qw($Bin);
 use lib "$Bin/common/lib";
+use lib "$Bin/catalyst/lib";
 use Metamod::Config;
+use MetamodWeb::Utils::GenCatalystConf;
 use Getopt::Std;
 use JSON;
 
@@ -48,106 +50,20 @@ our $opt_p; # print to stdout
 getopts('p');
 my $appdir = shift @ARGV or usage();
 
-my $mm_config = Metamod::Config->new("$appdir/master_config.txt");
+my $gen_conf = MetamodWeb::Utils::GenCatalystConf->new( master_config_dir => $appdir );
+my $mm_config = $gen_conf->mm_config();
 
-my $json = JSON->new->allow_nonref;
-
-my $config = {
-    "name" => 'MetamodWeb',
-    "Model::Metabase" => {
-        "connect_info" => {
-            "dsn" => "dbi:Pg:dbname=" . rget('DATABASE_NAME'),
-            "user" => rget('PG_ADMIN_USER'),
-            #"password" => "admin"
-        }
-    },
-    "Model::Userbase" => {
-        "connect_info" => {
-            "dsn" => "dbi:Pg:dbname=" . rget('USERBASE_NAME'),
-            "user" => rget('PG_ADMIN_USER'),
-            #"password" => "admin"
-        }
-    },
-    'Plugin::SmartURI' => {
-        'disposition' => 'relative', # application-wide
-        'uri_class' => 'URI::SmartURI' # by default
-    }
-
-
-};
-
-
-if ( my $ldap = oget('LDAP_SERVER') ) {
-
-    $$config{"authentication"} = {
-        "default_realm" => "dbix",
-        "realms" => {
-            "ldap" => {
-                "credential" => {
-                    "class" => "Password",
-                    "password_field" => "password",
-                    "password_type" => "self_check"
-                },
-                "store" => {
-                    "class" => "LDAP",
-                    "ldap_server" => $ldap,
-                    "ldap_server_options" => {
-                        "timeout" => 30
-                    },
-                    "start_tsl" => 0,
-                    "user_basedn" => rget('LDAP_BASE_DN'),
-                    "user_filter" => "(uid=%s)",
-                    "user_field" => "uid",
-                    "user_search_options" => {
-                        "deref" =>  "always"
-                    },
-                    "use_roles" => 0
-                },
-                "dbix" => {
-                    "credential" => {
-                        "class" => "Password",
-                        "password_field" => "u_password",
-                        "password_type" => "clear"
-                    },
-                    "store" => {
-                        "class" => "DBIx::Class",
-                        "user_model" => "Userbase::Usertable",
-                        "id_field" => "u_loginname"
-                    }
-                }
-            }
-        }
-    },
-};
+my $catalyst_conf = $gen_conf->catalyst_conf();
 
 # don't check for output file if printing to stderr (to avoid warning)
 my $conf_file = $opt_p ? undef : $mm_config->get('CATALYST_SITE_CONFIG');
 
 if ($conf_file) {
     print STDERR "Writing Catalyst config to $conf_file...\n";
-    open FH, ">$conf_file" or die "Cannot open $conf_file for writing";
-    print FH $json->pretty->encode( $config );
+    open my $FH, ">$conf_file" or die "Cannot open $conf_file for writing";
+    print $FH $catalyst_conf;
 } else {
-    print $json->pretty->encode( $config );
-}
-
-# end
-
-sub rget { # required get
-    my $key = shift or die "Missing config key param";
-    my $val = eval {
-        $mm_config->get($key);
-    };
-    die "Missing config $key in master_config" unless $val;
-    return $val;
-}
-
-sub oget { # optional get
-    my $key = shift or die "Missing config key param";
-    my $val = eval {
-        $mm_config->get($key);
-    };
-    return $val;
+    print $catalyst_conf;
 }
 
 sub usage {
