@@ -48,6 +48,7 @@ getopts('p');
 my $appdir = shift @ARGV or usage();
 
 my $mm_config = Metamod::Config->new("$appdir/master_config.txt");
+my $source = $mm_config->get('SOURCE_DIRECTORY');
 my $target = $mm_config->get('TARGET_DIRECTORY');
 my $conf_file = "$target/etc/httpd";
 my $virtualhost = $mm_config->get('VIRTUAL_HOST');
@@ -79,7 +80,9 @@ ProxyPass           $local/search http://127.0.0.1:$port/search
 ProxyPassReverse    $local/search http://127.0.0.1:$port/search
 
 # static files should be served directly from Apache
-Alias $local/static $target/lib/MetamodWeb/root/static/
+Alias               $local/static   $target/lib/MetamodWeb/root/static
+# or if running from source (during devel)
+#Alias              $local/static   $source/catalyst/root/static
 
 # -----------
 # The remaining lines are used when installing to a clean Apache
