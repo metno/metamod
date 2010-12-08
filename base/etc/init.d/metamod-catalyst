@@ -20,16 +20,16 @@
 . /lib/lsb/init-functions
 
 APPNAME=MetamodWeb
+UNIXNAME=$(echo $APPNAME | perl -pe 's/::/_/;$_=lc')
+
 #APPDIR=[==TARGET_DIRECTORY==]/catalyst
 #COMMON_LIB=[==TARGET_DIRECTORY==]/lib
 APPDIR=[==SOURCE_DIRECTORY==]/catalyst
 COMMON_LIB=[==SOURCE_DIRECTORY==]/common/lib
 LOCAL_LIB=[==CATALYST_LIB==]
+export PERL5LIB=$APPDIR/lib:$COMMON_LIB:$LOCAL_LIB
 
-# Set this if you have more than one instance of the app and you don't want
-# them to step on each other's pidfile.
-
-UNIXNAME=$(echo $APPNAME | perl -pe 's/::/_/;$_=lc')
+# -------------
 
 # Leave these unset and we won't try to setuid/setgid.
 USER=[==APPLICATION_USER==]
@@ -40,6 +40,8 @@ if [ -f "/etc/default/catalyst-[==APPLICATION_ID==]" ]; then
     . "/etc/default/catalyst-[==APPLICATION_ID==]"
 fi
 
+# -------------
+
 #if [ $(id -u) -eq 0 ] ; then
 #  PIDDIR=/var/run/$UNIXNAME
 #  mkdir $PIDDIR >/dev/null 2>&1
@@ -49,9 +51,13 @@ fi
 #  PIDDIR=/tmp
 #fi
 
-PIDDIR=[==WEBRUN_DIRECTORY==]
+# Set this if you have more than one instance of the app and you don't want
+# them to step on each other's pidfile.
 PIDSUFFIX=[==APPLICATION_ID==]
+PIDDIR=[==WEBRUN_DIRECTORY==]
 PIDFILE=$PIDDIR/$UNIXNAME${PIDSUFFIX:+"-$PIDSUFFIX"}.pid
+
+# -------------
 
 check_running() {
     [ -s $PIDFILE ] && kill -0 $(cat $PIDFILE) 2> /dev/null
@@ -59,12 +65,13 @@ check_running() {
 
 check_compile() {
     if [ -n "$USER" ] ; then
-        if su $USER -c "cd $APPDIR ; perl -I$APPDIR/lib -I$COMMON_LIB -I$LOCAL_LIB -I$LOCAL_LIB -M$APPNAME -ce1 2> /dev/null" ; then
+        #if su $USER -c "cd $APPDIR ; perl -I$APPDIR/lib -I$COMMON_LIB -I$LOCAL_LIB -M$APPNAME -ce1 2> /dev/null" ; then
+        if su $USER -c "cd $APPDIR ; perl -M$APPNAME -ce1 3> /dev/null" ; then
             return 1
         fi
         return 0
     else
-        if ( cd $APPDIR ; perl -I$APPDIR/lib -I$COMMON_LIB -I$LOCAL_LIB -M$APPNAME -ce1 2> /dev/null ) ; then
+        if ( cd $APPDIR ; perl -M$APPNAME -ce1 3> /dev/null ) ; then
             return 1
         fi
         return 0
@@ -72,7 +79,7 @@ check_compile() {
 }
 
 _start() {
-    start-stop-daemon --start --quiet --pidfile $PIDFILE -m --chdir $APPDIR \
+    start-stop-daemon --start --verbose --pidfile $PIDFILE -m --chdir $APPDIR \
         ${USER:+"--chuid"} $USER ${GROUP:+"--group"} $GROUP --background \
         --startas $APPDIR/script/${UNIXNAME}_server.pl -- -p $PORT
 
@@ -109,7 +116,7 @@ start() {
 stop() {
     log_daemon_msg "Stopping $APPNAME" $UNIXNAME
 
-    start-stop-daemon --stop --retry 1 --user $USER --quiet --pidfile $PIDFILE
+    start-stop-daemon --stop --retry 1 --quiet --pidfile $PIDFILE ${USER:+"--user"} $USER
     log_end_msg $?
     return $?
 }
