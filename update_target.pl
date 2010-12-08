@@ -370,7 +370,7 @@ sub substcopy {
    }
 
    # Open target file for writing
-   open (OUT,">$outputpath");
+   open (OUT,">$outputpath") or die "Couldn't open $outputpath for writing";
 
    # Open source file for reading
    unless (-r "$inputpath")
