@@ -5,12 +5,18 @@ use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin/../../common/lib";
 use lib "$FindBin::Bin/../../lib";
 
+use MetamodWeb::Utils::GenCatalystConf;
+
 BEGIN {
     $ENV{CATALYST_SCRIPT_GEN} = 40;
 
     if( !exists $ENV{METAMOD_MASTER_CONFIG } ){
-        $ENV{METAMOD_MASTER_CONFIG} = "$FindBin::Bin/../master_config_dev.txt";
+        $ENV{METAMOD_MASTER_CONFIG} = "$FindBin::Bin/../master_config.txt";
     }
+    my $conffile = "$FindBin::Bin/../metamodweb.json";
+    open CF, ">$conffile" or die "Can't open $conffile for output";
+    print CF MetamodWeb::Utils::GenCatalystConf::catalyst_conf;
+    close CF;
 }
 
 use Catalyst::ScriptRunner;
@@ -66,4 +72,3 @@ This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-

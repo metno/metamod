@@ -20,13 +20,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
-use Moose;
+use strict;
 use warnings;
 
 use File::Spec;
 use JSON;
 
 use Metamod::Config;
+my $conf = Metamod::Config->new();
 
 =head1 NAME
 
@@ -39,34 +40,11 @@ information found in a master config file. It is the intention that the
 generated Catalyst configuration should be used with out any manually editing
 afterwards.
 
-=head1 FUNCTIONS/METHODS
+=head1 FUNCTIONS
 
 =cut
 
-#
-# The file name of the master config file.
-#
-has 'master_config_file' => ( is => 'ro', default => 'master_config.txt' );
-
-#
-# The directory where the master config file is located.
-#
-has 'master_config_dir' => ( is => 'ro', required => 1 );
-
-#
-# The Metamod::Config object for the specified master config
-#
-has 'mm_config' => ( is => 'ro', lazy => 1, builder => '_build_mm_config' );
-
-sub _build_mm_config {
-    my $self = shift;
-
-    my $path = File::Spec->catfile( $self->master_config_dir, $self->master_config_file );
-    return Metamod::Config->new($path);
-
-}
-
-=head2 $self->catalyst_config()
+=head2 catalyst_config()
 
 Generate a Catalyst configuration in JSON format from the information found in
 the master config file.
@@ -80,6 +58,7 @@ Returns the Catalyst configuration as a JSON string.
 =back
 
 =cut
+
 sub catalyst_conf {
     my $self = shift;
 
@@ -87,16 +66,16 @@ sub catalyst_conf {
         "name"            => 'MetamodWeb',
         "Model::Metabase" => {
             "connect_info" => {
-                "dsn"  => "dbi:Pg:dbname=" . $self->rget('DATABASE_NAME'),
-                "user" => $self->rget('PG_ADMIN_USER'),
+                "dsn"  => "dbi:Pg:dbname=" . _rget('DATABASE_NAME'),
+                "user" => _rget('PG_ADMIN_USER'),
 
                 #"password" => "admin"
             }
         },
         "Model::Userbase" => {
             "connect_info" => {
-                "dsn"  => "dbi:Pg:dbname=" . $self->rget('USERBASE_NAME'),
-                "user" => $self->rget('PG_ADMIN_USER'),
+                "dsn"  => "dbi:Pg:dbname=" . _rget('USERBASE_NAME'),
+                "user" => _rget('PG_ADMIN_USER'),
 
                 #"password" => "admin"
             }
@@ -108,7 +87,7 @@ sub catalyst_conf {
 
     };
 
-    if ( my $ldap = $self->oget('LDAP_SERVER') ) {
+    if ( my $ldap = _oget('LDAP_SERVER') ) {
 
         $$config{"authentication"} = {
             "default_realm" => "dbix",
@@ -124,7 +103,7 @@ sub catalyst_conf {
                         "ldap_server"         => $ldap,
                         "ldap_server_options" => { "timeout" => 30 },
                         "start_tsl"           => 0,
-                        "user_basedn"         => $self->rget('LDAP_BASE_DN'),
+                        "user_basedn"         => _rget('LDAP_BASE_DN'),
                         "user_filter"         => "(uid=%s)",
                         "user_field"          => "uid",
                         "user_search_options" => { "deref" => "always" },
@@ -148,59 +127,22 @@ sub catalyst_conf {
     }
 
     my $json = JSON->new->allow_nonref;
-    return $json->pretty->encode( $config )
+    return $json->pretty->encode( $config );
 }
 
-=head2 $self->rget($key)
+# private helper functions - not for export
 
-Get a requird parameter from the master config.
-
-This function will die if the key is not found in the master config.
-
-=over
-
-=item $key
-
-The name of the key in the master config.
-
-=item return
-
-Returns the value of the key if exists. Dies on failure.
-
-=back
-
-=cut
-sub rget {    # required get
-    my $self = shift;
-
+sub _rget {    # required get
     my $key = shift or die "Missing config key param";
-    my $val = eval { $self->mm_config->get($key); };
+    my $val = eval { $conf->get($key); };
     die "Missing config $key in master_config" unless $val;
     return $val;
 }
 
-=head2 $self->oget($key)
 
-Get optional parameter from master_config.
-
-=over
-
-=item $key
-
-The name of the key in master config.
-
-=item return
-
-The value of the config variable if it exists. Returns an empty string otherwise.
-
-=back
-
-=cut
-sub oget {
-    my $self = shift;
-
+sub _oget {     # optional get
     my $key = shift or die "Missing config key param";
-    my $val = eval { $self->mm_config->get($key); };
+    my $val = eval { $conf->get($key); };
     return $val;
 }
 
