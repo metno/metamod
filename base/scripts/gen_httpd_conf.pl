@@ -39,7 +39,7 @@ use strict;
 use warnings;
 
 use FindBin qw($Bin);
-use lib "$Bin/common/lib";
+use lib "$Bin/../../common/lib";
 use Metamod::Config;
 use Getopt::Std;
 
