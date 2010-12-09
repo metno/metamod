@@ -6,6 +6,7 @@ use warnings;
 use base 'DBIx::Class';
 use XML::LibXML;
 use Data::Dumper;
+use Metamod::Config;
 
 __PACKAGE__->load_components("InflateColumn::DateTime", "Core");
 __PACKAGE__->table("dataset");
@@ -258,6 +259,8 @@ sub wmsthumb {
     my $self = shift;
     my ($size) = @_;
 
+    my $config = Metamod::Config->new();
+
     my $setup = $self->wmsinfo;
     if (!$setup) {
         printf STDERR "Error: Missing wmsSetup for dataset %s\n", $self->ds_name;
@@ -286,16 +289,20 @@ sub wmsthumb {
         . "&EXCEPTIONS=application%2Fvnd.ogc.se_inimage";
 
     # these map url's should really be configured somewhere else
-    my %maps = ("EPSG:32661" => "http://wms.met.no/maps/northpole.map",
-                "EPSG:32761" => "http://wms.met.no/maps/southpole.map");
-    my $coast_url = $maps{ $area{crs} } || "http://wms.met.no/maps/world.map";
+    my $mapserver = $config->get('WMS_BACKGROUND_MAPSERVER');
+    my $map = $config->get('WMS_WORLD_MAP');
+    if ($area{crs} eq "EPSG:32661") {
+        $map = $config->get('WMS_NORTHPOLE_MAP');
+    } elsif ($area{crs} eq "EPSG:32761") {
+        $map = $config->get('WMS_SOUTHPOLE_MAP');
+    }
 
     #print STDERR Dumper($wms_url, \%area, \%layer ); #$metadata
 
     my $out = {
         xysize  => $size,
         datamap => "$wms_url?$wmsparams&LAYERS=$layer{name}&STYLES=$layer{style}",
-        outline => "$coast_url?$wmsparams&TRANSPARENT=true&LAYERS=borders&STYLES=",
+        outline => "$mapserver$map?$wmsparams&TRANSPARENT=true&LAYERS=borders&STYLES=",
     };
 
     #print STDERR Dumper($out);
