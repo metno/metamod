@@ -162,7 +162,9 @@ status() {
          retval=4
       fi
    fi  
-   return $retval;
+   if [ $retval -ne 0 ]; then
+      exit 3;
+   fi
 }
 
 case "$1" in
