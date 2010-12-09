@@ -7,14 +7,13 @@ use lib "$FindBin::Bin/../../lib";
 
 use MetamodWeb::Utils::GenCatalystConf;
 
-BEGIN {
-    $ENV{CATALYST_SCRIPT_GEN} = 40;
-
-}
+$ENV{CATALYST_SCRIPT_GEN} = 40;
 
 if( !exists $ENV{METAMOD_MASTER_CONFIG } ){
-    $ENV{METAMOD_MASTER_CONFIG} = "$FindBin::Bin/../master_config.txt";
+    $FindBin::Bin =~ qw!(.+)/(catalyst/script|bin)$! or die "This script doesn't recognize its surroundings";
+    $ENV{METAMOD_MASTER_CONFIG} = "$1/master_config.txt";
 }
+die "Cannot open master config $ENV{METAMOD_MASTER_CONFIG}" unless -r $ENV{METAMOD_MASTER_CONFIG};
 
 use Catalyst::ScriptRunner;
 Catalyst::ScriptRunner->run('MetamodWeb', 'Server');
