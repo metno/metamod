@@ -64,6 +64,10 @@ PG_ADMIN_USER = admin
 # database.
 PG_WEB_USER = webuser
 
+# The password for the PG_WEB_USER. Can be blank if connecting to PostgreSQL over socket
+# I.e. PostgreSQL server running on same machine as web server.
+PG_WEB_USER_PASSWORD =
+
 # the location of the initialization sql-script for the full-text facilities
 PG_TSEARCH2_SCRIPT = /usr/share/postgresql/8.3/contrib/tsearch2.sql
 
