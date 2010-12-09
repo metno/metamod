@@ -65,14 +65,14 @@ sub catalyst_conf {
             "connect_info" => {
                 "dsn"  => "dbi:Pg:dbname=" . _rget($conf,'DATABASE_NAME'),
                 "user" => _rget($conf,'PG_WEB_USER'),
-                "password" => _rget($conf,'PG_WEB_USER_PASSWORD'),
+                "password" => _oget($conf,'PG_WEB_USER_PASSWORD'),
             }
         },
         "Model::Userbase" => {
             "connect_info" => {
                 "dsn"  => "dbi:Pg:dbname=" . _rget($conf,'USERBASE_NAME'),
                 "user" => _rget($conf,'PG_WEB_USER'),
-                "password" => _rget($conf,'PG_WEB_USER_PASSWORD'),
+                "password" => _oget($conf,'PG_WEB_USER_PASSWORD'),
             }
         },
         'Plugin::SmartURI' => {
