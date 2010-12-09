@@ -23,10 +23,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use strict;
 use warnings;
 
-use FindBin;
-use File::Spec;
-use JSON;
-
 use Metamod::Config;
 
 =head1 NAME
@@ -63,22 +59,20 @@ sub catalyst_conf {
 
     my $conf = Metamod::Config->new();
 
-    my $config = {
+    my %config = (
         "name"            => 'MetamodWeb',
         "Model::Metabase" => {
             "connect_info" => {
                 "dsn"  => "dbi:Pg:dbname=" . _rget($conf,'DATABASE_NAME'),
-                "user" => _rget($conf,'PG_ADMIN_USER'),
-
-                #"password" => "admin"
+                "user" => _rget($conf,'PG_WEB_USER'),
+                "password" => _rget($conf,'PG_WEB_USER_PASSWORD'),
             }
         },
         "Model::Userbase" => {
             "connect_info" => {
                 "dsn"  => "dbi:Pg:dbname=" . _rget($conf,'USERBASE_NAME'),
-                "user" => _rget($conf,'PG_ADMIN_USER'),
-
-                #"password" => "admin"
+                "user" => _rget($conf,'PG_WEB_USER'),
+                "password" => _rget($conf,'PG_WEB_USER_PASSWORD'),
             }
         },
         'Plugin::SmartURI' => {
@@ -86,11 +80,11 @@ sub catalyst_conf {
             'uri_class'   => 'URI::SmartURI'    # by default
             }
 
-    };
+    );
 
     if ( my $ldap = _oget($conf,'LDAP_SERVER') ) {
 
-        $$config{"authentication"} = {
+        $config{"authentication"} = {
             "default_realm" => "dbix",
             "realms"        => {
                 "ldap" => {
@@ -127,36 +121,7 @@ sub catalyst_conf {
         };
     }
 
-    my $json = JSON->new->allow_nonref;
-    return $json->pretty->encode( $config );
-}
-
-=head2 config_path()
-
-=over
-
-=item return
-
-Returns the path where the configuration file should be stored depending if we
-are in development or in production. Dies if it cannot determine the correct
-path.
-
-=back
-
-=cut
-sub config_path {
-
-    my @dirs = File::Spec->splitdir($FindBin::Bin);
-
-    my $last_dir = pop @dirs;
-    if( $last_dir eq 'bin' ){
-        # we are in a production environment
-        return File::Spec->catfile( $FindBin::Bin, '..', 'lib', 'MetamodWeb', 'metamodweb.json' );
-    } elsif( $last_dir eq 'script' ) {
-        return File::Spec->catfile( $FindBin::Bin, '..', 'metamodweb.json' );
-    } else {
-        die "Cannot determine config path when not running script from bin/ or script/ dir"
-    }
+    return %config;
 
 }
 

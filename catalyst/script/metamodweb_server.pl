@@ -16,11 +16,6 @@ if( !exists $ENV{METAMOD_MASTER_CONFIG } ){
     $ENV{METAMOD_MASTER_CONFIG} = "$FindBin::Bin/../master_config.txt";
 }
 
-my $conffile = MetamodWeb::Utils::GenCatalystConf::config_path();
-open CF, ">$conffile" or die "Can't open $conffile for output";
-print CF MetamodWeb::Utils::GenCatalystConf::catalyst_conf;
-close CF;
-
 use Catalyst::ScriptRunner;
 Catalyst::ScriptRunner->run('MetamodWeb', 'Server');
 

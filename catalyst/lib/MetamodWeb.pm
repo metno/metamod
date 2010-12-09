@@ -28,6 +28,7 @@ use Catalyst::Runtime 5.80;
 use Catalyst::Log::Log4perl;
 
 use Metamod::Config;
+use MetamodWeb::Utils::GenCatalystConf;
 
 # Set flags and add plugins for the application
 #
@@ -62,8 +63,7 @@ $VERSION = eval $VERSION;
 # with an external configuration file acting as an override for
 # local deployment.
 
-__PACKAGE__->config(
-    # Disable deprecated behavior needed by old applications
+my %default_config = (
     disable_component_resolution_regex_fallback => 1,
 
     'View::TT' => {
@@ -83,7 +83,17 @@ __PACKAGE__->config(
     },
 
     'default_view' => 'TT'
+);
 
+# we generate a Catalyst configuration hash at runtime from the master config file.
+# This removes the need for an extra configuration file at the cost of the possibility of
+# manually overwriting the generated configuration. If you need to manually override the configuration
+# use a metamodweb_local.json file
+my %master_catalyst_config = MetamodWeb::Utils::GenCatalystConf::catalyst_conf();
+
+__PACKAGE__->config(
+    %default_config,
+    %master_catalyst_config
 );
 
 my $mm_config = Metamod::Config->new();
