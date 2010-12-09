@@ -23,11 +23,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use strict;
 use warnings;
 
+use FindBin;
 use File::Spec;
 use JSON;
 
 use Metamod::Config;
-my $conf = Metamod::Config->new();
 
 =head1 NAME
 
@@ -60,22 +60,23 @@ Returns the Catalyst configuration as a JSON string.
 =cut
 
 sub catalyst_conf {
-    my $self = shift;
+
+    my $conf = Metamod::Config->new();
 
     my $config = {
         "name"            => 'MetamodWeb',
         "Model::Metabase" => {
             "connect_info" => {
-                "dsn"  => "dbi:Pg:dbname=" . _rget('DATABASE_NAME'),
-                "user" => _rget('PG_ADMIN_USER'),
+                "dsn"  => "dbi:Pg:dbname=" . _rget($conf,'DATABASE_NAME'),
+                "user" => _rget($conf,'PG_ADMIN_USER'),
 
                 #"password" => "admin"
             }
         },
         "Model::Userbase" => {
             "connect_info" => {
-                "dsn"  => "dbi:Pg:dbname=" . _rget('USERBASE_NAME'),
-                "user" => _rget('PG_ADMIN_USER'),
+                "dsn"  => "dbi:Pg:dbname=" . _rget($conf,'USERBASE_NAME'),
+                "user" => _rget($conf,'PG_ADMIN_USER'),
 
                 #"password" => "admin"
             }
@@ -87,7 +88,7 @@ sub catalyst_conf {
 
     };
 
-    if ( my $ldap = _oget('LDAP_SERVER') ) {
+    if ( my $ldap = _oget($conf,'LDAP_SERVER') ) {
 
         $$config{"authentication"} = {
             "default_realm" => "dbix",
@@ -103,7 +104,7 @@ sub catalyst_conf {
                         "ldap_server"         => $ldap,
                         "ldap_server_options" => { "timeout" => 30 },
                         "start_tsl"           => 0,
-                        "user_basedn"         => _rget('LDAP_BASE_DN'),
+                        "user_basedn"         => _rget($conf,'LDAP_BASE_DN'),
                         "user_filter"         => "(uid=%s)",
                         "user_field"          => "uid",
                         "user_search_options" => { "deref" => "always" },
@@ -130,9 +131,39 @@ sub catalyst_conf {
     return $json->pretty->encode( $config );
 }
 
+=head2 config_path()
+
+=over
+
+=item return
+
+Returns the path where the configuration file should be stored depending if we
+are in development or in production. Dies if it cannot determine the correct
+path.
+
+=back
+
+=cut
+sub config_path {
+
+    my @dirs = File::Spec->splitdir($FindBin::Bin);
+
+    my $last_dir = pop @dirs;
+    if( $last_dir eq 'bin' ){
+        # we are in a production environment
+        return File::Spec->catfile( $FindBin::Bin, '..', 'lib', 'MetamodWeb', 'metamodweb.json' );
+    } elsif( $last_dir eq 'script' ) {
+        return File::Spec->catfile( $FindBin::Bin, '..', 'metamodweb.json' );
+    } else {
+        die "Cannot determine config path when not running script from bin/ or script/ dir"
+    }
+
+}
+
 # private helper functions - not for export
 
 sub _rget {    # required get
+    my $conf = shift;
     my $key = shift or die "Missing config key param";
     my $val = eval { $conf->get($key); };
     die "Missing config $key in master_config" unless $val;
@@ -141,6 +172,7 @@ sub _rget {    # required get
 
 
 sub _oget {     # optional get
+    my $conf = shift;
     my $key = shift or die "Missing config key param";
     my $val = eval { $conf->get($key); };
     return $val;
