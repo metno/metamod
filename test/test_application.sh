@@ -235,6 +235,8 @@ sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 # C. Purging of the directory structure:
 # ======================================
 #
+/etc/init.d/catalyst-$idstring stop
+
 cd $basedir
 # stop metamod if it is still running
 target/metamodInit.sh stop
@@ -367,3 +369,6 @@ su $WEBUSER -c "$basedir/target/metamodInit.sh start"
 # enable tomcat (SRU2jdbc) connection to database
 # this is a hack, TODO: make configurable
 /root/apache-tomcat-6.0.16/bin/catalina.sh start
+
+# start the catalyst servers
+/etc/init.d/catalyst-$idstring stop
