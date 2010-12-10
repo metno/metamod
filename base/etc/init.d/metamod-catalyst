@@ -21,13 +21,14 @@
 
 APPNAME=MetamodWeb
 UNIXNAME=$(echo $APPNAME | perl -pe 's/::/_/;$_=lc')
+APPID=[==APPLICATION_ID==]
 
 # settings for running from target
 APPDIR=[==TARGET_DIRECTORY==]
 COMMON_LIB=[==TARGET_DIRECTORY==]/lib
 BINDIR=[==TARGET_DIRECTORY==]/bin
 
-# settings from running from source
+# settings for running from source
 #APPDIR=[==SOURCE_DIRECTORY==]/catalyst
 #COMMON_LIB=[==SOURCE_DIRECTORY==]/common/lib
 #BINDIR=[==TARGET_DIRECTORY==]/script
@@ -41,9 +42,9 @@ export PERL5LIB=$APPDIR/lib:$COMMON_LIB:$LOCAL_LIB
 USER=[==APPLICATION_USER==]
 GROUP=
 
-if [ -f "/etc/default/catalyst-[==APPLICATION_ID==]" ]; then
+if [ -f "/etc/default/catalyst-$APPID" ]; then
     # use this file to set prefork engine + master_config path
-    . "/etc/default/catalyst-[==APPLICATION_ID==]"
+    . "/etc/default/catalyst-$APPID"
 fi
 
 # -------------
@@ -83,6 +84,14 @@ check_compile() {
     fi
 }
 
+status() {
+    if check_running ; then
+        return 0
+    else
+        return 3
+    fi
+}
+
 _start() {
     start-stop-daemon --start --verbose --pidfile $PIDFILE -m --chdir $APPDIR \
         ${USER:+"--chuid"} $USER ${GROUP:+"--group"} $GROUP --background \
@@ -98,7 +107,7 @@ _start() {
 }
 
 start() {
-    log_daemon_msg "Starting $APPNAME" $UNIXNAME
+    log_daemon_msg "Starting $APPNAME Catalyst for $APPID" $UNIXNAME
     if check_running; then
         log_failure_msg "already running"
         log_end_msg 1
@@ -119,11 +128,15 @@ start() {
 }
 
 stop() {
-    log_daemon_msg "Stopping $APPNAME" $UNIXNAME
-
-    start-stop-daemon --stop --retry 1 --quiet --pidfile $PIDFILE ${USER:+"--user"} $USER
-    log_end_msg $?
-    return $?
+    log_daemon_msg "Stopping $APPNAME Catalyst for $APPID" $UNIXNAME
+    if check_running; then
+        start-stop-daemon --stop --retry 1 --quiet --pidfile $PIDFILE ${USER:+"--user"} $USER
+        log_end_msg $?
+        return $?
+    else
+        log_daemon_msg "Catalyst $APPID not running" $UNIXNAME
+        return 0
+    fi
 }
 
 restart() {
@@ -139,6 +152,9 @@ case "$1" in
     ;;
     stop)
         stop
+    ;;
+    status)
+        status
     ;;
     restart|force-reload)
         restart
