@@ -45,7 +45,8 @@ sub getTargetDir {
     return File::Spec->catpath($vol, $dir, "");
 }
 
-use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
+use FindBin;
+use lib ("$FindBin::Bin/../../common/lib", getTargetDir('lib'), getTargetDir('scripts'), '.');
 
 use Metamod::Dataset;
 use Metamod::DatasetTransformer::ToISO19115 qw(foreignDataset2iso19115);
