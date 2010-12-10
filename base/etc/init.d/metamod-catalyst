@@ -72,7 +72,7 @@ check_running() {
 
 check_compile() {
     if [ -n "$USER" ] ; then
-        if su $USER -c "cd $APPDIR ; perl -M$APPNAME -ce1 3> /dev/null" ; then
+        if su -s /bin/sh $USER -c "cd $APPDIR ; perl -M$APPNAME -ce1 3> /dev/null" ; then
             return 1
         fi
         return 0
