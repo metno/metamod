@@ -297,7 +297,7 @@ SEARCH_APP_SORT_COLUMN = datacollection_period
 # The sequence by which the search categories are visible in the search
 # application. The numbers are keys in the SearchCategory database table.
 # In addition to the numbers, the keyword FullText may be used.
-SEARCH_CATEGORY_SEQUENCE = 4,1,7,2,9,8,FullText
+SEARCH_CATEGORY_SEQUENCE = topics_and_variables,activity_types,institutions,areas,map_search,datacollection_period,fulltext
 
 # Set default fontsize for the results and the two-way tables (percent):
 DEFAULT_FONTSIZE = 80
