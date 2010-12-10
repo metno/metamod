@@ -29,7 +29,7 @@ requires 'DBIx::Class::QueryLog' => '1.3.0';
 requires 'Data::Page' => '2.00';
 requires 'namespace::autoclean';
 requires 'JSON' => '2.00';
-requires 'Template::Toolkit' => '2.22';
+requires 'Template' => '2.22';
 requires 'HTML::FormHandler' => '0.32005';
 requires 'Data::FormValidator' => '4.66';
 
@@ -39,8 +39,8 @@ requires 'Data::FormValidator' => '4.66';
 requires 'Imager'; # If installing from CPAN you need libpng-dev (Ubuntu)
 requires 'XML::LibXML';
 requires 'XML::LibXSLT';
-requires 'XML::RSS::LibXML';                 
-                 
+requires 'XML::RSS::LibXML';
+
 test_requires 'Test::More' => '0.88';
 
 catalyst;
@@ -54,5 +54,3 @@ if( !( grep { /--skipdeps|--defaultdeps|--testonly|--checkdeps/ } @ARGV ) ){
 auto_install;
 
 WriteAll;
-
-
