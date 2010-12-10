@@ -252,6 +252,7 @@ foreach my $filelistpath (@flistpathes) {
    # Loop through all lines in source file:
    while (<FILES>) {
       chomp($_);
+      next unless /\w+/;
       my $filename = $_;
       my $ch1 = substr($filename,0,1);
       if ($ch1 eq '=') { # File will be copied unmodified
