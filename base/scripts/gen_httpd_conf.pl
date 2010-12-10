@@ -60,6 +60,8 @@ my $site = $local;
 $site .= " on $virtualhost" if $virtualhost;
 my $config_dir = $virtualhost ? "/etc/apache/sites-available" : "/etc/apache2/conf.d";
 
+my $proxies = proxy('search') . proxy('dataset');
+
 my $conf_text = <<EOT;
 
 #
@@ -78,8 +80,7 @@ my $conf_text = <<EOT;
     Allow from all
 </Proxy>
 
-ProxyPass           $local/search http://127.0.0.1:$port/search
-ProxyPassReverse    $local/search http://127.0.0.1:$port/search
+$proxies
 
 # -----------
 # Plain Apache settings
@@ -152,6 +153,15 @@ if ($conf_file && !$opt_p) {
     print FH $conf_text;
 } else {
     print $conf_text;
+}
+
+sub proxy {
+    my $path = shift or die "Missing argument to proxy";
+    return <<EOT;
+ProxyPass           $local/$path http://127.0.0.1:$port/$path
+ProxyPassReverse    $local/$path http://127.0.0.1:$port/$path
+
+EOT
 }
 
 sub usage {
