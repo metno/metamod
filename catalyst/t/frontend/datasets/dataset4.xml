@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="area">Central Arctic</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="contact">ipycoord@met.no</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="topiccategory">climatologyMeteorologyAtmosphere</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="topiccategory">oceans</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="PI_name">IPYCOORD Team</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="keywords">Model Forecast Temperature Wind Humidity Clouds</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="keywords">unknown</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="datacollection_period_from">2008-06-02</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="activity_type">Model run</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="project_name">Dataset4</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="Conventions">CF-1.0</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="history">2010-01-01 Dummy</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="distribution_statement">Restricted to IPY</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="datacollection_period_to">2009-07-22</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="abstract">Dummy abstract</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="title">Dataset4</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="bounding_box">180,60,-180,90</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="product_name">Dataset4</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="dataref">http://example.com/thredds//</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="institution">met.no Norwegian Meteorological Institute</metadata>
+</MM2>

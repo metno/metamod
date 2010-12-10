@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+	<info name="TEST/dataset2" status="active" creationDate="2009-03-23T23:02:07Z"
+		datestamp="2009-03-23T23:02:07Z" ownertag="TEST" metadataFormat="MM2" />
+	<datasetRegion xmlns="http://www.met.no/schema/metamod/datasetRegion"
+		xsi:schemaLocation="http://www.met.no/schema/metamod/datasetRegion https://wiki.met.no/_media/metamod/datasetRegion.xsd">
+		<boundingBox north="90.00" south="60.00" east="180.00"
+			west="-180.00" />
+		<lonLatPoints />
+	</datasetRegion>
+</dataset>
