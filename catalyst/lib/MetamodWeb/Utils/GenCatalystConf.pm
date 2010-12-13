@@ -63,14 +63,14 @@ sub catalyst_conf {
         "name"            => 'MetamodWeb',
         "Model::Metabase" => {
             "connect_info" => {
-                "dsn"  => "dbi:Pg:dbname=" . _rget($conf,'DATABASE_NAME'),
+                "dsn"  => $conf->getDSN(),
                 "user" => _rget($conf,'PG_WEB_USER'),
                 "password" => _oget($conf,'PG_WEB_USER_PASSWORD'),
             }
         },
         "Model::Userbase" => {
             "connect_info" => {
-                "dsn"  => "dbi:Pg:dbname=" . _rget($conf,'USERBASE_NAME'),
+                "dsn"  => $conf->getDSN_Userbase(),
                 "user" => _rget($conf,'PG_WEB_USER'),
                 "password" => _oget($conf,'PG_WEB_USER_PASSWORD'),
             }

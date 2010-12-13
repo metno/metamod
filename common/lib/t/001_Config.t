@@ -36,7 +36,7 @@ use FindBin;
 use lib "$FindBin::Bin/../";
 
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 
 BEGIN {use_ok('Metamod::Config');}
 
@@ -48,6 +48,8 @@ ok($config->get('TARGET_DIRECTORY'), 'get TARGET_DIRECTORY');
 #print STDERR Dumper($config->{vars});
 ok(!$config->get('NOT_THERE'), 'getting false value on NOT_THERE');
 ok(index($config->get("SOURCE_DIRECTORY"), $config->get("BASE_DIRECTORY")) == 0, "get sustitutes variables");
+
+is($config->getDSN(), "dbi:Pg:dbname=damocles;host=localhost;port=15432;", "getDSN");
 
 my $config2 = new Metamod::Config($FindBin::Bin.'/../t/master_config.txt');
 is($config, $config2, "config-singleton on same file");
@@ -65,7 +67,7 @@ my $cwd = Cwd::getcwd();
 chdir "/tmp";
 my $config3;
 eval {
-    $config3 = new Metamod::Config();    
+    $config3 = new Metamod::Config();
 };
 isa_ok($config3, 'Metamod::Config');
 chdir $cwd;

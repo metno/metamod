@@ -203,16 +203,35 @@ sub _substituteVariable {
     return $textline;
 }
 
-sub getDBH() {
+sub getDSN {
+    my ($self) = @_;
+    my $dbname = $self->get("DATABASE_NAME");
+    my $pgConnectString =  $self->get("PG_CONNECTSTRING_PERL");
+    my $dsn = "dbi:Pg:dbname=" . $dbname;
+    if ($pgConnectString) {
+        $dsn .= ";$pgConnectString"
+    }
+    return $dsn;
+}
+
+sub getDSN_Userbase {
+    my ($self) = @_;
+    my $dbname = $self->get("USERBASE_NAME");
+    my $pgConnectString =  $self->get("PG_CONNECTSTRING_PERL");
+    my $dsn = "dbi:Pg:dbname=" . $dbname;
+    if ($pgConnectString) {
+        $dsn .= ";$pgConnectString"
+    }
+    return $dsn;
+}
+
+
+sub getDBH {
     my ($self) = @_;
     require DBI;
-    my $dbname = $self->get("DATABASE_NAME");
     my $user   = $self->get("PG_ADMIN_USER");
-    my $connect = "dbi:Pg:dbname=" .
-                  $dbname .
-                  " ".
-                  $self->get("PG_CONNECTSTRING_PERL");
-    my $dbh =  DBI->connect_cached($connect,
+    my $dsn = $self->getDSN();
+    my $dbh =  DBI->connect_cached($dsn,
                                    $user, "",
                                    {AutoCommit => 0,
                                     RaiseError => 1,
@@ -326,7 +345,17 @@ and then initialise the logger with C<initLogger()>.
 The $path_to_master_config parameter is optional and if not supplied the default master config
 will be used.
 
-=back
+=item getDSN()
+
+Return the database source name of the metadata database,
+i.e. "dbi:Pg:dbname=damocles;host=localhost;port=5432"
+
+=item getDSN_Userbase
+
+Return the database source name of the user-database,
+i.e. "dbi:Pg:dbname=userbase;host=localhost;port=5432"
+
+
 
 =item getDBH()
 
@@ -336,6 +365,9 @@ AutoCommit = 0 and RaiseError = 1, FetchHash mode. This function will die on err
 disconnect will free the database. Be careful when using getDBH and transactions.
 A call to getDBH will commit a transaction, and cached connections might be used
 several places.
+
+
+=back
 
 =head1 AUTHOR
 
