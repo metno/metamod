@@ -165,7 +165,7 @@ sub two_way_table {
 
     my ( $search_criteria, $ownertags, $vertical_col, $horisontal_col ) = @_;
 
-    my $matching_datasets = $self->metadata_search( { search_criteria => $search_criteria, ownertags => $ownertags, all_levels => 1 } );
+    my $matching_datasets = $self->metadata_search( { search_criteria => $search_criteria, ownertags => $ownertags, all_levels => 0 } );
 
     # we could probably do this by chaining the queries or by using a subquery,
     # but for easier debugging with fetch the ids first and then create the two
