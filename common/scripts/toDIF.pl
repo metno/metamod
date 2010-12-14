@@ -38,12 +38,31 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 use strict;
 use warnings;
+use FindBin qw($Bin);
 
-use lib ('../lib');
-use Metamod::DatasetTransformer::ToDIF;
+use XML::LibXML;
+use XML::LibXSLT;
 
-my $data = do { local $/; <> };
+my $parser = XML::LibXML->new();
+my $xslt = XML::LibXSLT->new();
 
-print foreignDataset2Dif($data);
+my $mm2Doc = shift or die "Missing input file name parameter";
+my $source = $parser->parse_file($mm2Doc);
+
+my $style_doc = $parser->parse_file("$Bin/../schema/mm2dif.xsl");
+my $stylesheet = $xslt->parse_stylesheet($style_doc) or die "Cannot find mm2dif.xsl";
+my $results = $stylesheet->transform($source);
+
+# post-transform processing
+my $xc = XML::LibXML::XPathContext->new( $results->documentElement() );
+$xc->registerNs('topic', "foo");
+
+foreach ($xc->findnodes('//*[@topic:default]')) {
+    $_->appendTextNode( $_->getAttribute('topic:default') ) unless $_->textContent;
+    $_->removeAttribute('topic:default');
+}
+
+print $results->toString(1);
+  
 
 
