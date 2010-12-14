@@ -121,7 +121,7 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
     my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $c, config => $c->stash->{ mm_config } } );
     my $search_criteria = $search_utils->selected_criteria( $c->req->params() );
     my $owner_tags = $search_utils->get_ownertags();
-    my $datasets = $dataset->metadata_search_with_children( {
+    my $datasets = $dataset->metadata_search( {
         curr_page => $curr_page,
         ownertags => $owner_tags,
         rows_per_page => $datasets_per_page,
