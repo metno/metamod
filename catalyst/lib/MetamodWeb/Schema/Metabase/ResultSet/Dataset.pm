@@ -110,24 +110,47 @@ sub metadata_search {
 
     }
 
+#    if( exists $search_criteria->{ topics } ){
+#
+#        my $hk_ids = $search_criteria->{ topics }->{ hk_ids };
+#        my $bk_ids = $search_criteria->{ topics }->{ bk_ids };
+#
+#        # To simplify the search query a little we fetch the related bk_ids as a separate
+#        # query. If this proves inefficient attempt another way.
+#        if( @$hk_ids ){
+#            get_logger()->debug( dump $hk_ids );
+#            my $hrb_rs = $self->result_source()->schema()->resultset('HkRepresentsBk');
+#            my @related_bkids = $hrb_rs->search( { hk_id => { IN => $hk_ids } }, { distinct => 1 } )->get_column('bk_id')->all();
+#            push @$bk_ids, @related_bkids;
+#        }
+#
+#        my $bk_describes_ds_rs = $self->result_source->schema->resultset('BkDescribesDs');
+#        my $basickey_search = $bk_describes_ds_rs->search( { bk_id => { IN => $bk_ids } } );
+#        my %cond = ( IN => $basickey_search->get_column('ds_id')->as_query() );
+#
+#        push @ds_ids_conds, \%cond;
+#    }
     if( exists $search_criteria->{ topics } ){
 
         my $hk_ids = $search_criteria->{ topics }->{ hk_ids };
         my $bk_ids = $search_criteria->{ topics }->{ bk_ids };
 
-        # To simplify the search query a little we fetch the related bk_ids as a separate
-        # query. If this proves inefficient attempt another way.
+
+        my @bk_conds = ();
         if( @$hk_ids ){
-            get_logger()->debug( dump $hk_ids );
             my $hrb_rs = $self->result_source()->schema()->resultset('HkRepresentsBk');
-            my @related_bkids = $hrb_rs->search( { hk_id => { IN => $hk_ids } }, { distinct => 1 } )->get_column('bk_id')->all();
-            push @$bk_ids, @related_bkids;
+            my $bk_search = $hrb_rs->search( { hk_id => { IN => $hk_ids } }, { distinct => 1 } );
+            push @bk_conds, { IN => $bk_search->get_column('bk_id')->as_query() }
+        }
+
+        if( @$bk_ids ){
+            push @bk_conds, { IN => $bk_ids };
         }
 
         my $bk_describes_ds_rs = $self->result_source->schema->resultset('BkDescribesDs');
-        my $basickey_search = $bk_describes_ds_rs->search( { bk_id => { IN => $bk_ids } } );
-        my %cond = ( IN => $basickey_search->get_column('ds_id')->as_query() );
+        my $basickey_search = $bk_describes_ds_rs->search( { bk_id => [ @bk_conds ] } );
 
+        my %cond = ( IN => $basickey_search->get_column('ds_id')->as_query() );
         push @ds_ids_conds, \%cond;
     }
 
@@ -165,15 +188,12 @@ sub two_way_table {
 
     my ( $search_criteria, $ownertags, $vertical_col, $horisontal_col ) = @_;
 
-    my $matching_datasets = $self->metadata_search( { search_criteria => $search_criteria, ownertags => $ownertags, all_levels => 0 } );
-
-    # we could probably do this by chaining the queries or by using a subquery,
-    # but for easier debugging with fetch the ids first and then create the two
-    # way table.
-    my @ds_ids = $matching_datasets->get_column('ds_id')->all();
+    my $matching_datasets = $self->metadata_search( { search_criteria => $search_criteria,
+                                                      ownertags => $ownertags,
+                                                      all_levels => 0 } );
 
     my $h_search = $self->search(
-        { 'md_id.mt_name' => $horisontal_col, 'me.ds_id' => { IN => \@ds_ids } },
+        { 'md_id.mt_name' => $horisontal_col, 'me.ds_id' => { IN => $matching_datasets->get_column('ds_id')->as_query() } },
         {
             join      => { 'ds_has_mds' => 'md_id' },
             columns   => [qw( me.ds_id )],
@@ -183,7 +203,7 @@ sub two_way_table {
         },
     );
     my $v_search = $self->search(
-        { 'md_id.mt_name' => $vertical_col, 'me.ds_id' => { IN => \@ds_ids } },
+        { 'md_id.mt_name' => $vertical_col, 'me.ds_id' => { IN => $matching_datasets->get_column('ds_id')->as_query() } },
         {
             join      => { 'ds_has_mds' => 'md_id' },
             columns   => [qw( me.ds_id )],
