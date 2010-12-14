@@ -551,7 +551,9 @@ sub level2_result {
 	my $current_page = $self->c->req->params->{ 'level2_page_' . $dataset->ds_id() } || 1;
 
     my $files_per_page = $self->c->req->params->{ files_per_page } || 10;
-	my $level2_datasets = $dataset->child_datasets()->search( {}, { rows => $files_per_page, page => $current_page } );
+
+    # We cache the row objects so that we can fetch the associated metadata only once
+	my $level2_datasets = $dataset->child_datasets()->search( {}, { rows => $files_per_page, page => $current_page, cache => 1, } );
 
 	return $level2_datasets;
 
@@ -582,9 +584,9 @@ A reference to a list of metadata column names.
 sub level2_metadata_columns {
     my $self = shift;
 
-    my ( $dataset ) = @_;
+    my ( $dataset, $level2_datasets ) = @_;
 
-    my $level2_datasets = $dataset->child_datasets();
+    #my $level2_datasets = $dataset->child_datasets();
     my $metadata_rs = $self->meta_db->resultset('Metadata');
     my $mt_names = $metadata_rs->available_metadata();
     my $level1_md = $dataset->metadata();
@@ -615,6 +617,7 @@ sub level2_metadata_columns {
             }
         }
     }
+    $level2_datasets->reset();
 
     my @md_columns = keys %non_equal_metadata;
 

@@ -1,10 +1,11 @@
 <!-- template for displaying level2 datasets in the search result -->
 
 [% SET first_child = dataset.child_datasets().first() %]
-[% SET diff_names = search_ui_utils.level2_metadata_columns( dataset ) %]
 
 [% SET level2_result = search_ui_utils.level2_result( dataset ) %]
 [% SET level2_pager = level2_result.pager() %]
+
+[% SET diff_names = search_ui_utils.level2_metadata_columns( dataset, level2_result ) %]
 
 <tr>
 
@@ -36,7 +37,8 @@
 </tr>
 </thead>
 
-[% FOREACH child IN level2_result.all() %]
+[%# FOREACH child IN level2_result.all() %]
+[% WHILE (child = level2_result.next()) %]
     <tr>
     [% SET child_metadata = child.metadata( diff_names ) %]
     <td class="sub_result">

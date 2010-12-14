@@ -187,13 +187,17 @@ sub metadata {
 
     my ( $metadata_names ) = @_;
 
+    if( exists $self->{ _metadata_cache } ){
+        return $self->{ _metadata_cache };
+    }
+
     my $search_conds = {};
     if( defined $metadata_names && 0 != @$metadata_names ){
         $search_conds->{ 'md_id.mt_name' } = { IN => $metadata_names };
     }
 
     my $metadata = $self->ds_has_mds()->search( $search_conds, { select => [ qw( md_id.md_content md_id.mt_name ) ],
-                                                                 prefetch => 'md_id',
+                                                                 join => 'md_id',
                                                                  order_by => 'md_id.md_content'} );
     my %metadata = ();
     foreach my $md_name ( @$metadata_names ){
@@ -206,6 +210,7 @@ sub metadata {
         push @{ $metadata{ $mt_name } }, $md_content;
     }
 
+    $self->{ _metadata_cache } = \%metadata;
     return \%metadata;
 }
 
