@@ -41,4 +41,4 @@ dropdown list.
 <input type="hidden" name="[% x2_id %]" id="[% x2_id %]" value="[% c.req().param( x2_id ) %]" />
 <input type="hidden" name="[% y1_id %]" id="[% y1_id %]" value="[% c.req().param( y1_id ) %]" />
 <input type="hidden" name="[% y2_id %]" id="[% y2_id %]" value="[% c.req().param( y2_id ) %]" />
-<input type="image" name="map_coord" alt="Map search" src="[% c.uri_for( '/map/' _ map_srid, search_ui_utils.map_coordinates() ) %]" onclick="jQuery( '#search_form' ).attr( 'action', '[% c.uri_for( '/search' ) %]#map_search' ); jQuery('#active_criteria').val('[% criteria_index %]'); jQuery( '#search_form' ).submit()" />
+<input type="image" name="map_coord" alt="Map search" src="[% c.uri_for( '/search/map/' _ map_srid, search_ui_utils.map_coordinates() ) %]" onclick="jQuery( '#search_form' ).attr( 'action', '[% c.uri_for( '/search' ) %]#map_search' ); jQuery('#active_criteria').val('[% criteria_index %]'); jQuery( '#search_form' ).submit()" />

@@ -42,7 +42,7 @@ Catalyst Controller.
 =cut
 
 
-sub map :Path :Args(1) {
+sub map :Path('/search/map') :Args(1) {
     my ( $self, $c ) = @_;
 
     my $filetype = 'png';

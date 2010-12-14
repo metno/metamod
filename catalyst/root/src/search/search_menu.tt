@@ -98,7 +98,7 @@
                    [% IF allow_changes %]
                        [% INCLUDE 'search/remove_criteria.tt' html_ids = form_ids %]
                    [% END %]
-                   <img src="[% c.uri_for( '/map/' _ srid, map_coords ) %]" alt="Map search" height="150" width="150" />
+                   <img src="[% c.uri_for( '/search/map/' _ srid, map_coords ) %]" alt="Map search" height="150" width="150" />
                </div>
             [% END %]
         </div>
