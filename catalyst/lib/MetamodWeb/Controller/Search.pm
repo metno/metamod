@@ -128,10 +128,6 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
         search_criteria => $search_criteria,
     } );
 
-    my $vertical_mt_name = $c->req->param('vertical_mt_name');
-    my $horisontal_mt_name = $c->req->param('horisontal_mt_name');
-    my $two_way_table = $dataset->two_way_table($search_criteria, $owner_tags, $vertical_mt_name, $horisontal_mt_name );
-
     my $num_search_cols = $c->req->param('num_mt_columns') || $c->stash->{ search_ui_utils }->num_search_cols();
     my @md_cols = ();
     foreach my $col_num ( 1 .. $num_search_cols ){
@@ -147,8 +143,24 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
     $c->stash( metadata_columns => \@md_cols );
     $c->stash( datasets => [ $datasets->all() ] );
     $c->stash( datasets_pager => $datasets->pager() );
-    $c->stash( two_way_table => $two_way_table );
     $c->stash( dataset_count => $datasets->count() );
+
+}
+
+sub two_way_table : Path( "/search/two_way_table" ) : Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $dataset = $c->model('Metabase::Dataset');
+
+    my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $c, config => $c->stash->{ mm_config } } );
+    my $search_criteria = $search_utils->selected_criteria( $c->req->params() );
+    my $owner_tags = $search_utils->get_ownertags();
+    my $vertical_mt_name = $c->req->param('vertical_mt_name');
+    my $horisontal_mt_name = $c->req->param('horisontal_mt_name');
+    my $two_way_table = $dataset->two_way_table($search_criteria, $owner_tags, $vertical_mt_name, $horisontal_mt_name );
+
+    $c->stash( two_way_table => $two_way_table );
+    $c->stash( template => 'search/two_way_table.tt', current_view => 'Raw' );
 
 }
 

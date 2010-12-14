@@ -1,0 +1,30 @@
+[% IF two_way_table.size() == 0 %]
+
+    No datasets that match your search criteria where found.
+
+[%ELSE %]
+    <table>
+    <tr>
+    [% SET horisontal_keys = search_ui_utils.two_way_table_h_keys( two_way_table ) %]
+    <th class="invisible">&nbsp</th>
+    [% FOREACH h_key IN horisontal_keys %]
+        <th class="result">[% h_key %]</th>
+    [%END %]
+    </tr>
+
+    [% FOREACH vertical_key IN two_way_table.keys.sort() %]
+
+        <tr>
+        <td class="result two_way_vertical_key">
+            [% vertical_key %]
+        </td>
+        [% FOREACH h_key IN horisontal_keys %]
+            <td class="result two_way_result">
+            <!-- Need to use item() functions since . notation does not work -->
+            [% two_way_table.$vertical_key.exists( h_key ) ? two_way_table.$vertical_key.item( h_key ) : 0 %]
+            </td>
+        [%END %]
+        </tr>
+    [% END %]
+    </table>
+[% END %]
