@@ -192,13 +192,18 @@ sub metadata {
         $search_conds->{ 'md_id.mt_name' } = { IN => $metadata_names };
     }
 
-    my $metadata = $self->ds_has_mds()->search( $search_conds, { prefetch => 'md_id', order_by => 'md_id.md_content'} );
+    my $metadata = $self->ds_has_mds()->search( $search_conds, { select => [ qw( md_id.md_content md_id.mt_name ) ],
+                                                                 prefetch => 'md_id',
+                                                                 order_by => 'md_id.md_content'} );
     my %metadata = ();
     foreach my $md_name ( @$metadata_names ){
         $metadata{ $md_name } = [];
     }
-    while( my $row = $metadata->next() ){
-        push @{ $metadata{ $row->md_id->mt_name } }, $row->md_id->md_content;
+
+    my $metadata_cursor = $metadata->cursor();
+    while ( my ($md_content, $mt_name ) = $metadata_cursor->next() ) {
+
+        push @{ $metadata{ $mt_name } }, $md_content;
     }
 
     return \%metadata;
@@ -344,6 +349,24 @@ sub is_level2_dataset {
     my $self = shift;
 
     return $self->ds_parent() != 0 ? 1 : 0;
+
+}
+
+=head2 $self->num_children()
+
+=over
+
+=item return
+
+Get the number of children for a level 1 dataset. For a level 2 dataset it will always return 0.
+
+=back
+
+=cut
+sub num_children {
+    my $self = shift;
+
+    return $self->child_datasets()->count();
 
 }
 
