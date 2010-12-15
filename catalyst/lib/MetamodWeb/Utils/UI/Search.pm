@@ -344,43 +344,51 @@ sub map_coordinates {
 sub topics_tree {
     my $self = shift;
 
-    my $hk_rs = $self->meta_db->resultset('Hierarchicalkey');
-
-
-    my $hierarchical_keys = $hk_rs->search( { 'me.sc_id' => 4 }, { select => [ 'hk_id', 'hk_parent', 'hk_name' ], order_by => 'hk_name' } );
-
-
-    # build a list of children for each node in the tree and get roots
-    my %children_for = ();
-    my @roots        = ();
-    my $hk_cursor = $hierarchical_keys->cursor();
-    while ( my ($hk_id, $hk_parent, $hk_name) = $hk_cursor->next() ) {
-
-        my $hk = {};
-        $hk->{hk_id} = $hk_id;
-        $hk->{hk_parent} = $hk_parent;
-        $hk->{hk_name} = $hk_name;
-
-        $children_for{$hk_id} = [] if !exists $children_for{$hk_id};
-
-        # add the child to the parents list of children
-        if ( $hk_parent != 0 ) {
-            push @{ $children_for{$hk_parent} }, $hk;
-        } else {
-            push @roots, $hk;
-        }
-    }
+    my ($roots, $children_for) = $self->_hierarchy();
 
     my $bks_for_hk = $self->_related_basickeys();
 
     my @topics_tree = ();
-    foreach my $root (@roots) {
-        my $subtree = $self->_gen_topics_tree( $root, \%children_for, $bks_for_hk );
+    foreach my $root (@$roots) {
+        my $subtree = $self->_gen_topics_tree( $root, $children_for, $bks_for_hk );
         push @topics_tree, $subtree;
     }
 
     return \@topics_tree;
 
+}
+
+sub _hierarchy {
+    my $self = shift;
+
+    my $hk_rs = $self->meta_db->resultset('Hierarchicalkey');
+
+    my $hierarchical_keys = $hk_rs->search( { 'me.sc_id' => 4 },
+                                            { select   => [ 'hk_id', 'hk_parent', 'hk_name' ],
+                                              order_by => 'hk_name' } );
+
+    # build a list of children for each node in the tree and get roots
+    my %children_for = ();
+    my @roots        = ();
+    my @hk_rows = $hierarchical_keys->cursor()->all();
+
+    foreach my $row (@hk_rows){
+        my $hk = {};
+        $hk->{hk_id} = $row->[0];
+        $hk->{hk_parent} = $row->[1];
+        $hk->{hk_name} = $row->[2];
+
+        $children_for{$hk->{hk_id}} = [] if !exists $children_for{$hk->{hk_id}};
+
+        # add the child to the parents list of children
+        if ( $hk->{hk_parent} != 0 ) {
+            push @{ $children_for{$hk->{hk_parent}} }, $hk;
+        } else {
+            push @roots, $hk;
+        }
+    }
+
+    return (\@roots, \%children_for);
 }
 
 sub _related_basickeys {
@@ -403,20 +411,20 @@ sub _related_basickeys {
     # basic keys. Instead we get the raw data from the DBI cursor and do some
     # extra processing our selves.
     my %bks_for_hk = ();
-    my $cursor     = $related_bks->cursor();
-    while ( my @row = $cursor->next() ) {
-
+    my @rows = $related_bks->cursor()->all();
+    foreach my $row (@rows){
         my $bk = {};
-        $bk->{bk_id}   = $row[0];
-        $bk->{bk_name} = $row[1];
-        $bk->{sc_id}   = $row[2];
-        $bk->{hk_id}   = $row[3];
+        $bk->{bk_id}   = $row->[0];
+        $bk->{bk_name} = $row->[1];
+        $bk->{sc_id}   = $row->[2];
+        $bk->{hk_id}   = $row->[3];
 
         push @{ $bks_for_hk{ $bk->{hk_id} } }, $bk;
 
     }
 
     return \%bks_for_hk;
+
 }
 
 sub _gen_topics_tree {
