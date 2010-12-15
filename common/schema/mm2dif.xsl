@@ -36,7 +36,9 @@
 
       <xsl:apply-templates select="key('mm2', 'gtsFileIdentifier')"/>
       <xsl:apply-templates select="key('mm2', 'gtsInstancePattern')"/>
-      <xsl:call-template name="personell"/>
+      <xsl:call-template name="personell">
+        <xsl:with-param name="role" select="'Technical Contact'"/>
+      </xsl:call-template>
       <xsl:apply-templates select="key('mm2', 'variable')"/>
 
       <xsl:variable name="topiccategory" select="key('mm2', 'topiccategory')"/>
@@ -90,12 +92,14 @@
       <Data_Set_Language>Not Available</Data_Set_Language>
 
       <Data_Center>
-         <Data_Center_Name>
-           <Short_Name>NO/MET</Short_Name>
-           <Long_Name>Norwegian Meteorological Institute, Norway</Long_Name>
-         </Data_Center_Name>
-         <Data_Center_URL>http://met.no/</Data_Center_URL>
-         <xsl:call-template name="personell"/>
+        <Data_Center_Name>
+          <Short_Name>NO/MET</Short_Name>
+          <Long_Name>Norwegian Meteorological Institute, Norway</Long_Name>
+        </Data_Center_Name>
+        <Data_Center_URL>http://met.no/</Data_Center_URL>
+        <xsl:call-template name="personell">
+          <xsl:with-param name="role" select="'Data Center Contact'"/>
+        </xsl:call-template>
        </Data_Center>
 
       <Reference><xsl:value-of select="key('mm2', 'references')"/></Reference>
@@ -228,11 +232,12 @@
   </xsl:template>
   
   <xsl:template name="personell" xmlns="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/">
+    <xsl:param name="role"/>
     <Personnel>
-      <Role>Data Center Contact</Role>
+      <Role><xsl:value-of select="$role"/></Role>
       <First_Name>Egil</First_Name>
       <Last_Name>Støren</Last_Name>
-      <!--<Email>Not Available</Email>-->
+      <Email>Not Available</Email>
       <Phone>+4722963000</Phone>
       <Contact_Address>
         <Address>Norwegian Meteorological Institute
