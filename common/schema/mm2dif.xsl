@@ -9,7 +9,9 @@
   <xsl:param name="DS_datestamp"/>
 
   <xsl:output encoding="UTF-8" indent="yes"/>
-
+  <xsl:variable name="lc" select="'abcdefghijklmnopqrstuvwxyz'"/>
+  <xsl:variable name="uc" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
+ 
   <xsl:key name="mm2" match="/*/mm:metadata" use="@name"/>
 
   <xsl:template match="/">
@@ -97,7 +99,7 @@
        </Data_Center>
 
       <Reference><xsl:value-of select="key('mm2', 'references')"/></Reference>
-      <Summary><Abstract><xsl:value-of select="key('mm2', 'abstract')"/></Abstract></Summary>
+      <Summary><Abstract topic:default="Not Available"><xsl:value-of select="key('mm2', 'abstract')"/></Abstract></Summary>
       <Related_URL>
         <URL_Content_Type>
           <Type>VIEW RELATED INFORMATION</Type>
@@ -154,9 +156,9 @@
     <Parameters>
       <Category>EARTH SCIENCE</Category>
       <xsl:variable name="topicvar" select="document('')/*/topic:var[@name = current()]"/>
-      <Topic topic:default="Not Available"><xsl:value-of select="$topicvar/topic:param[1]/@topic"/></Topic>
-      <Term topic:default="Not Available"><xsl:value-of select="$topicvar/topic:param[1]/@term"/></Term>
-      <Variable_Level_1><xsl:value-of select="$topicvar/topic:param[1]/@VL1"/></Variable_Level_1>
+      <Topic topic:default="Not Available"><xsl:value-of select="translate($topicvar/topic:param[1]/@topic, $lc, $uc)"/></Topic>
+      <Term topic:default="Not Available"><xsl:value-of select="translate($topicvar/topic:param[1]/@term, $lc, $uc)"/></Term>
+      <Variable_Level_1 topic:default="Not Available"><xsl:value-of select="translate($topicvar/topic:param[1]/@VL1, $lc, $uc)"/></Variable_Level_1>
       <Detailed_Variable><xsl:value-of select="."/></Detailed_Variable>
     </Parameters>
   </xsl:template>
@@ -227,10 +229,10 @@
   
   <xsl:template name="personell" xmlns="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/">
     <Personnel>
-      <Role>Technical Contact</Role>
+      <Role>Data Center Contact</Role>
       <First_Name>Egil</First_Name>
       <Last_Name>Støren</Last_Name>
-      <Email>Not Available</Email>
+      <!--<Email>Not Available</Email>-->
       <Phone>+4722963000</Phone>
       <Contact_Address>
         <Address>Norwegian Meteorological Institute
