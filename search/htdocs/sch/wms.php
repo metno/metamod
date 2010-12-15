@@ -41,6 +41,7 @@
                 } else {
                     alert("Missing wmssetup or wmsurl parameter!");
                 }
+
             }
 
             function buildStyleSelector(styles, layername) {
@@ -135,11 +136,18 @@
                 }
 
                 map.addControl(layersw);
-                map.addControl( new OpenLayers.Control.MousePosition() );
+                //map.addControl( new OpenLayers.Control.MousePosition() );
                 map.addControl( new OpenLayers.Control.PanZoomBar() );
                 map.addControl( new OpenLayers.Control.Navigation() );
                 map.addControl( new OpenLayers.Control.ScaleLine() );
-                map.addControl( new OpenLayers.Control.Permalink('permalink') );
+                //map.addControl( new OpenLayers.Control.Permalink('permalink') );
+                //map.addControl( new OpenLayers.Control.Graticule({
+                //    numPoints: 2,
+                //    //targetSize: 200,
+                //    labelled: true,
+                //    displayInLayerSwitcher: true,
+                //    autoActivate: true
+                //}) );
                 //map.addControl( new OpenLayers.Control.OverviewMap( {layers: [coastlines]} ) );
 
                 document.getElementById('map').style.height = map.getSize().h - 60;
