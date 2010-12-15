@@ -42,6 +42,9 @@ use FindBin qw($Bin);
 
 use XML::LibXML;
 use XML::LibXSLT;
+use DateTime;
+
+my $now = DateTime->today->mdy;
 
 my $parser = XML::LibXML->new();
 my $xslt = XML::LibXSLT->new();
@@ -51,12 +54,33 @@ my $source = $parser->parse_file($mm2Doc);
 
 my $style_doc = $parser->parse_file("$Bin/../schema/mm2dif.xsl");
 my $stylesheet = $xslt->parse_stylesheet($style_doc) or die "Cannot find mm2dif.xsl";
-my $results = $stylesheet->transform($source);
+my $results = $stylesheet->transform($source, XML::LibXSLT::xpath_to_string(
+    DS_name => $mm2Doc, # faking it for now
+    DS_creationdate => $now,
+    DS_datestamp => $now
+));
 
 # post-transform processing
 my $xc = XML::LibXML::XPathContext->new( $results->documentElement() );
-$xc->registerNs('topic', "foo");
+$xc->registerNs('dif', "http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/");
+$xc->registerNs('topic', "mailto:geira\@met.no?Subject=WTF");
 
+# split GCWF strings into topics, terms &c
+foreach ($xc->findnodes('/*/dif:Parameters/dif:Detailed_Variable')) {
+    my $dvar = $_->textContent;
+    next unless $dvar =~ /^(.+) > HIDDEN$/;
+    $_->removeChildNodes();
+    $_->appendText($1);
+    my @gcwf = split(' > ', $dvar);
+    #printf STDERR "%s - %s\n", ref $_, join('|', @gcwf);
+    foreach my $node (qw(Topic Term Variable_Level_1)) {
+        foreach ($_->parentNode->getChildrenByTagName("$node")) {
+            $_->appendText(uc shift @gcwf);
+        }
+    }
+}
+
+# look for empty elements with default values
 foreach ($xc->findnodes('//*[@topic:default]')) {
     $_->appendTextNode( $_->getAttribute('topic:default') ) unless $_->textContent;
     $_->removeAttribute('topic:default');
@@ -64,5 +88,3 @@ foreach ($xc->findnodes('//*[@topic:default]')) {
 
 print $results->toString(1);
   
-
-

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
                 xmlns:mm="http://www.met.no/schema/metamod/MM2"
-                xmlns:topic="foo"
+                xmlns:topic="mailto:geira@met.no?Subject=WTF"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
   <xsl:param name="DS_name"/>
   <xsl:param name="DS_creationdate"/>
   <xsl:param name="DS_datestamp"/>
 
-  <xsl:output indent="yes"/>
+  <xsl:output encoding="UTF-8" indent="yes"/>
 
   <xsl:key name="mm2" match="/*/mm:metadata" use="@name"/>
 
@@ -30,9 +30,8 @@
         <Dataset_Release_Place>Not Available</Dataset_Release_Place>
         <Dataset_Publisher><xsl:value-of select="key('mm2', 'institution')"/></Dataset_Publisher>
         <Version>Not Available</Version>
-        <Online_Resource><xsl:value-of select="key('mm2', 'dataref')"/></Online_Resource>
       </Data_Set_Citation>
-      
+
       <xsl:apply-templates select="key('mm2', 'gtsFileIdentifier')"/>
       <xsl:apply-templates select="key('mm2', 'gtsInstancePattern')"/>
       <xsl:call-template name="personell"/>
@@ -52,17 +51,37 @@
       <Data_Set_Progress>In Work</Data_Set_Progress>
       <xsl:apply-templates select="key('mm2', 'area')"/>
 
-      <Project>
-        <xsl:variable name="project" select="key('mm2', 'project_name')"/>
-        <xsl:choose>
-          <xsl:when test="$project">
-            <Short_Name topic:default="{$project}"><xsl:value-of select="document('')/*/topic:project[@name = $project]"/></Short_Name>
-          </xsl:when>
-          <xsl:otherwise>
-            <Short_Name>Not Available</Short_Name>
-          </xsl:otherwise>
-        </xsl:choose>
-      </Project>
+      <!-- Project -->
+      <xsl:variable name="project" select="key('mm2', 'project_name')"/>
+      <xsl:variable name="projs" select="document('')/*/topic:project[@shortname != 'IPY']/topic:project[@name = $project]"/>
+
+      <xsl:choose>
+
+        <xsl:when test="$projs">
+          <xsl:for-each select="$projs">
+            <Project>
+              <Short_Name><xsl:value-of select="../@shortname"/></Short_Name>
+              <Long_Name><xsl:value-of select="../@longname"/></Long_Name>
+            </Project>
+          </xsl:for-each>
+        </xsl:when>
+
+        <xsl:otherwise>
+          <Project>
+            <Short_Name topic:default="Not Available"><xsl:value-of select="$project"/></Short_Name>
+            <Long_Name topic:default="Not Available"><xsl:value-of select="$project"/></Long_Name>
+          </Project>
+        </xsl:otherwise>
+
+      </xsl:choose>
+
+      <!-- also add IPY if required -->
+      <xsl:for-each select="document('')/*/topic:project[@shortname = 'IPY']/topic:project[@name = $project]">
+        <Project>
+          <Short_Name><xsl:value-of select="../@shortname"/></Short_Name>
+          <Long_Name><xsl:value-of select="../@longname"/></Long_Name>
+        </Project>
+      </xsl:for-each>
 
       <Access_Constraints topic:default="Not Available"><xsl:value-of select="key('mm2', 'distribution_statement')"/></Access_Constraints>
       <Use_Constraints>Not Available</Use_Constraints>
@@ -77,10 +96,22 @@
          <xsl:call-template name="personell"/>
        </Data_Center>
 
-      <Summary><xsl:value-of select="key('mm2', 'abstract')"/></Summary>
+      <Reference><xsl:value-of select="key('mm2', 'references')"/></Reference>
+      <Summary><Abstract><xsl:value-of select="key('mm2', 'abstract')"/></Abstract></Summary>
+      <Related_URL>
+        <URL_Content_Type>
+          <Type>VIEW RELATED INFORMATION</Type>
+        </URL_Content_Type>
+        <URL><xsl:value-of select="key('mm2', 'dataref')"/></URL>
+      </Related_URL>
+      <xsl:apply-templates select="key('mm2', 'gtsFileIdentifier')"/>
+      <xsl:apply-templates select="key('mm2', 'gtsInstancePattern')"/>
 
       <IDN_Node>
         <Short_Name>ARCTIC/NO</Short_Name>
+      </IDN_Node>
+      <IDN_Node>
+        <Short_Name>ARCTIC</Short_Name>
       </IDN_Node>
       <IDN_Node>
         <Short_Name>IPY</Short_Name>
@@ -117,7 +148,6 @@
         <Description>File-Identifier connecting to Global Telecommunication System (GTS)</Description>
       </Related_URL>
   </xsl:template>
-  
 
   <!-- variables -->
   <xsl:template match="*[@name='variable']" xmlns="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/">
@@ -133,8 +163,10 @@
 
   <!-- areas -->
   <xsl:template match="*[@name='area']" xmlns="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/">
+
+    <xsl:variable name="topicarea" select="document('')/*/topic:area[@name = current()]"/>
+
     <Location>
-      <xsl:variable name="topicarea" select="document('')/*/topic:area[@name = current()]"/>
       <Location_Category><xsl:value-of select="$topicarea/@category"/></Location_Category>
       <Location_Type><xsl:value-of select="$topicarea/@type"/></Location_Type>
       <xsl:if test="$topicarea/@subregion1">
@@ -142,6 +174,18 @@
       </xsl:if>
       <Detailed_Location><xsl:value-of select="."/></Detailed_Location>
     </Location>
+
+    <xsl:if test="$topicarea/@type = 'NORTHERN HEMISPHERE' or $topicarea/@type = 'ARCTIC OCEAN'">
+      <Location>
+         <Location_Category>GEOGRAPHIC REGION</Location_Category>
+         <Location_Type>POLAR</Location_Type>
+       </Location>
+       <Location>
+         <Location_Category>GEOGRAPHIC REGION</Location_Category>
+         <Location_Type>ARCTIC</Location_Type>
+       </Location>
+    </xsl:if>
+
   </xsl:template>
 
   <!-- keywords -->
@@ -169,18 +213,18 @@
 
   <!-- bounding_box -->
   <xsl:template match="*[@name='bounding_box']" xmlns="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/">
-    <Spatial_Coverage>
-      <xsl:variable name="ESWN" select="."/>
-      <Easternmost_Longitude><xsl:value-of select="substring-before($ESWN, ',')"/></Easternmost_Longitude>
-      <xsl:variable name="SWN" select="substring-after($ESWN, ',')"/>
-      <Southernmost_Latitude><xsl:value-of select="substring-before($SWN, ',')"/></Southernmost_Latitude>
-      <xsl:variable name="WN" select="substring-after($SWN, ',')"/>
-      <Westernmost_Longitude><xsl:value-of select="substring-before($WN, ',')"/></Westernmost_Longitude>
-      <xsl:variable name="N" select="substring-after($WN, ',')"/>
-      <Northernmost_Latitude><xsl:value-of select="$N"/></Northernmost_Latitude>
+    <Spatial_Coverage> <!-- order must be SNWE -->
+      <xsl:variable name="SNWE" select="."/>
+      <Southernmost_Latitude><xsl:value-of select="substring-before($SNWE, ',')"/></Southernmost_Latitude>
+      <xsl:variable name="NWE" select="substring-after($SNWE, ',')"/>
+      <Northernmost_Latitude><xsl:value-of select="substring-before($NWE, ',')"/></Northernmost_Latitude>
+      <xsl:variable name="WE" select="substring-after($NWE, ',')"/>
+      <Westernmost_Longitude><xsl:value-of select="substring-before($WE, ',')"/></Westernmost_Longitude>
+      <xsl:variable name="E" select="substring-after($WE, ',')"/>
+      <Easternmost_Longitude><xsl:value-of select="$E"/></Easternmost_Longitude>
     </Spatial_Coverage>
   </xsl:template>
-
+  
   <xsl:template name="personell" xmlns="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/">
     <Personnel>
       <Role>Technical Contact</Role>
@@ -201,6 +245,7 @@ Blindern</Address>
 
   <!-- end of transformation, rest is lookup tables -->
 
+  <!-- translation from CF to GCMD terms -->
   <topic:var name="aerosol_angstrom_exponent">
     <topic:param topic="Atmosphere" term="Aerosols" VL1="Aerosol Particle Properties"/>
   </topic:var>
@@ -2569,32 +2614,76 @@ Blindern</Address>
   <topic:category name="transportation">Transportation</topic:category>
   <topic:category name="utilitiesCommunications">Utilities/Communications</topic:category>
 
-  <topic:area name="Arctic Ocean" category="Ocean" type="Arctic Ocean"/>
-  <topic:area name="Northern Hemisphere" category="Geographic Region" type="Northern Hemisphere"/>
-  <topic:area name="Norwegian Sea" category="Ocean" type="Atlantic Ocean" subregion1="North Atlantic Ocean"/>
-  <topic:area name="Nordic Seas" category="Ocean" type="Atlantic Ocean" subregion1="North Atlantic Ocean"/>
-  <topic:area name="North Atlantic Ocean" category="Ocean" type="Atlantic Ocean" subregion1="North Atlantic Ocean"/>
-  <topic:area name="Greenland Sea" category="Ocean" type="Arctic Ocean"/>
-  <topic:area name="Barents Sea" category="Ocean" type="Arctic Ocean" subregion1="Barents Sea"/>
-  <topic:area name="Fram Strait" category="Ocean" type="Arctic Ocean"/>
-  <topic:area name="Central Arctic" category="Ocean" type="Arctic Ocean"/>
-  <topic:area name="Iceland Sea" category="Ocean" type="Atlantic Ocean" subregion1="North Atlantic Ocean"/>
-  <topic:area name="Denmark Strait" category="Ocean" type="Arctic Ocean"/>
-  <topic:area name="Laptev Sea" category="Ocean" type="Arctic Ocean"/>
-  <topic:area name="Kara Sea" category="Ocean" type="Arctic Ocean"/>
-  <topic:area name="Beufort Sea" category="Ocean" type="Arctic Ocean"/>
-  <topic:area name="Chukchi Sea" category="Ocean" type="Arctic Ocean"/>
-  <topic:area name="East Siberian Sea" category="Ocean" type="Arctic Ocean"/>
-  <topic:area name="White Sea" category="Ocean" type="Arctic Ocean"/>
-  <topic:area name="Southern Hemipshere" category="Geographic Region" type="Southern Hemipshere"/>
-  <topic:area name="Denmark Strait Sea" category="Ocean" type="Arctic Ocean"/>
+  <topic:area name="Northern Hemisphere"  category="GEOGRAPHIC REGION" type="NORTHERN HEMISPHERE"/>
+  <topic:area name="Southern Hemipshere"  category="GEOGRAPHIC REGION" type="SOUTHERN HEMIPSHERE"/>
+  <topic:area name="Arctic Ocean"         category="OCEAN" type="ARCTIC OCEAN"/>
+  <topic:area name="Greenland Sea"        category="OCEAN" type="ARCTIC OCEAN"/>
+  <topic:area name="Fram Strait"          category="OCEAN" type="ARCTIC OCEAN"/>
+  <topic:area name="Central Arctic"       category="OCEAN" type="ARCTIC OCEAN"/>
+  <topic:area name="Denmark Strait"       category="OCEAN" type="ARCTIC OCEAN"/>
+  <topic:area name="Laptev Sea"           category="OCEAN" type="ARCTIC OCEAN"/>
+  <topic:area name="Kara Sea"             category="OCEAN" type="ARCTIC OCEAN"/>
+  <topic:area name="Beufort Sea"          category="OCEAN" type="ARCTIC OCEAN"/>
+  <topic:area name="Chukchi Sea"          category="OCEAN" type="ARCTIC OCEAN"/>
+  <topic:area name="East Siberian Sea"    category="OCEAN" type="ARCTIC OCEAN"/>
+  <topic:area name="White Sea"            category="OCEAN" type="ARCTIC OCEAN"/>
+  <topic:area name="Denmark Strait Sea"   category="OCEAN" type="ARCTIC OCEAN"/>
+  <topic:area name="Barents Sea"          category="OCEAN" type="ARCTIC OCEAN" subregion1="BARENTS SEA"/>
+  <topic:area name="Norwegian Sea"        category="OCEAN" type="ATLANTIC OCEAN" subregion1="NORTH ATLANTIC OCEAN"/>
+  <topic:area name="Nordic Seas"          category="OCEAN" type="ATLANTIC OCEAN" subregion1="NORTH ATLANTIC OCEAN"/>
+  <topic:area name="North Atlantic Ocean" category="OCEAN" type="ATLANTIC OCEAN" subregion1="NORTH ATLANTIC OCEAN"/>
+  <topic:area name="Iceland Sea"          category="OCEAN" type="ATLANTIC OCEAN" subregion1="NORTH ATLANTIC OCEAN"/>
 
-	<topic:project name="Damocles,TotalPoleAirship">DAMOCLES</topic:project>
-	<topic:project name="Damocles, AREX 2007">DAMOCLES</topic:project>
-	<topic:project name="DAMOCLES IP">DAMOCLES</topic:project>
-	<topic:project name="IPY/Damocles/iAOOS">DAMOCLES</topic:project>
-	<topic:project name="Hamburg Arctic Ocean Buoy Drift Experiment DAMOCLES 2008-2009">DAMOCLES</topic:project>
-	<topic:project name="Hamburg Arctic Ocean Buoy Drift Experiment DAMOCLES 2007-2008">DAMOCLES</topic:project>
-	<topic:project name="IPY/iAOOS/Damocles">DAMOCLES</topic:project>
+  <topic:project shortname="DAMOCLES" longname="Developing Arctic Modelling &amp; Observing Capabilities for Long-term Env. Studies">
+    <topic:project name="Damocles,TotalPoleAirship"/>
+    <topic:project name="Damocles, AREX 2007"/>
+    <topic:project name="DAMOCLES IP"/>
+    <topic:project name="DAMOCLES"/> <!-- this is needed to insert longname -->
+    <topic:project name="IPY/Damocles/iAOOS"/>
+    <topic:project name="Hamburg Arctic Ocean Buoy Drift Experiment DAMOCLES 2008-2009"/>
+    <topic:project name="Hamburg Arctic Ocean Buoy Drift Experiment DAMOCLES 2007-2008"/>
+    <topic:project name="IPY/iAOOS/Damocles"/>
+  </topic:project>
+
+  <topic:project shortname="IPY" longname="INTERNATIONAL POLAR YEAR">
+    <topic:project name="AOE-2001"/>
+    <topic:project name="Arctic Summer Cloud Ocean Study"/>
+    <topic:project name="Arctic Summer Cloud Ocean Study (ASCOS)"/>
+    <topic:project name="Arctic Summer Cloud-Ocean Study (ASCOS)"/>
+    <topic:project name="Arctic Summer Cloud Ocean Study (ASCOS) 2008"/>
+    <topic:project name="AREX 2008"/>
+    <topic:project name="ARIST"/>
+    <topic:project name="ASCOS"/>
+    <topic:project name="AtmoTroll"/>
+    <topic:project name="Beaufort Gyre Observing System (BGOS)"/>
+    <topic:project name="DAMOCLES"/>
+    <topic:project name="Damocles, AREX 2007"/>
+    <topic:project name="DAMOCLES IP"/>
+    <topic:project name="Damocles,TotalPoleAirship"/>
+    <topic:project name="ECMWF"/>
+    <topic:project name="EUMETSAT OSI SAF"/>
+    <topic:project name="Hamburg Arctic Ocean Buoy Drift Experiment DAMOCLES 2007-2008"/>
+    <topic:project name="Hamburg Arctic Ocean Buoy Drift Experiment DAMOCLES 2008-2009"/>
+    <topic:project name="HIRLAM"/>
+    <topic:project name="IAOOS"/>
+    <topic:project name="iAOOS-Norway"/>
+    <topic:project name="iAOOS-Norway/IPY-THORPEX"/>
+    <topic:project name="IPY/Damocles/iAOOS"/>
+    <topic:project name="IPY/iAOOS/Damocles"/>
+    <topic:project name="IPY Operational Data Coordination"/>
+    <topic:project name="IPY-THORPEX"/>
+    <topic:project name="ISSS08"/>
+    <topic:project name="ISSS-08"/>
+    <topic:project name="LOMROG"/>
+    <topic:project name="LOMROG 2007"/>
+    <topic:project name="Nansen and Amundsen Basins Observational System (NABOS)"/>
+    <topic:project name="North Pole Environmental Observatory (NPEO)"/>
+    <topic:project name="POLARCAT"/>
+    <topic:project name="POLEWARD"/>
+    <topic:project name="REFLEX-2"/>
+    <topic:project name="SUMO on Spitsbergen 2008"/>
+    <topic:project name="SUMO on Spitsbergen 2009"/>
+    <topic:project name="WARPS"/>
+  </topic:project>
 
 </xsl:stylesheet>
