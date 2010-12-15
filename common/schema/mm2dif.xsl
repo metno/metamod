@@ -123,8 +123,8 @@
       <Metadata_Name>CEOS IDN DIF</Metadata_Name>
       <Metadata_Version>9.7</Metadata_Version>
       <!-- dif does not handle second resolution -->
-      <DIF_Creation_Date><xsl:value-of select="substring($DS_creationdate,0,10)"/></DIF_Creation_Date>
-      <Last_DIF_Revision_Date><xsl:value-of select="substring($DS_datestamp,0,10)"/></Last_DIF_Revision_Date>
+      <DIF_Creation_Date><xsl:value-of select="substring($DS_creationdate,1,10)"/></DIF_Creation_Date>
+      <Last_DIF_Revision_Date><xsl:value-of select="substring($DS_datestamp,1,10)"/></Last_DIF_Revision_Date>
       <Private>False</Private>
     </DIF>
   </xsl:template>
