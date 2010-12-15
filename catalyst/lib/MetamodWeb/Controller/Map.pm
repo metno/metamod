@@ -56,6 +56,19 @@ sub map :Path('/search/map') :Args(1) {
     $c->log->debug("Coordinates: ($x1,$y1) ($x2,$y2)");
 
     my $image_srid = $c->req->args->[0];
+
+    # The user has not set any points so there is no reason to get the additional overhead
+    # of using Imager. Read the image bytes and serve them.
+    if( !$x1 && !$y1 ){
+
+        open my $IMAGE, '<', $c->path_to("/root/static/images/map_$image_srid.png") or die $!;
+        my $image_bytes = do { local $/; <$IMAGE> };
+
+        $c->response->content_type('image/png');
+        $c->response->body($image_bytes);
+        return;
+    }
+
     my $image = Imager->new();
     $image->read( file => $c->path_to("/root/static/images/map_$image_srid.png") ) or die $image->errstr();
 
