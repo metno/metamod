@@ -44,10 +44,13 @@ use XML::LibXML;
 use XML::LibXSLT;
 use DateTime;
 
-my $now = DateTime->today->mdy;
+my $now = DateTime->today->ymd;
 
 my $parser = XML::LibXML->new();
 my $xslt = XML::LibXSLT->new();
+
+my $gcmdterms = "$Bin/../../quest/htdocs/qst/config/gcmd-science-keywords.txt";
+die "Cannot find gcmd-science-keywords.txt" unless -r $gcmdterms;
 
 my $mm2Doc = shift or die "Missing input file name parameter";
 my $source = $parser->parse_file($mm2Doc);
@@ -69,8 +72,12 @@ $xc->registerNs('topic', "mailto:geira\@met.no?Subject=WTF");
 foreach ($xc->findnodes('/*/dif:Parameters/dif:Detailed_Variable')) {
     my $dvar = $_->textContent;
     next unless $dvar =~ /^(.+) > HIDDEN$/;
+    my $cfstring = $1;
+    system('grep', '-xq', $cfstring, $gcmdterms) >= 0 or die "grep failed: $?";
+    #printf STDERR " %s - $cfstring\n", $?;
+    next unless $? == 0; # file contains CF string
     $_->removeChildNodes();
-    $_->appendText($1);
+    $_->appendText($cfstring);
     my @gcwf = split(' > ', $dvar);
     #printf STDERR "%s - %s\n", ref $_, join('|', @gcwf);
     foreach my $node (qw(Topic Term Variable_Level_1)) {
