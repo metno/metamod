@@ -25,6 +25,16 @@ use Moose;
 use namespace::autoclean;
 use Data::Dumper;
 
+use Memoize;
+
+# We cache some functions that just return data from the database. The data in the database is
+# static so this should not cause problems. Keep in mind that the memoized functions cannot use any input that
+# is context/object specific. Then can just read data from the database since we memoize once not once for each object.
+# The NORMALIZER parameter is required to disregard the $self parameter when checking if the parameters are the same
+memoize('_related_basickeys', NORMALIZER => sub { return '_related_basickeys_cache' } );
+memoize('_hierarchy', NORMALIZER => sub { return '_hierarchy_cache' } );
+memoize('_basickey_rows', NORMALIZER => sub { my ($self, $category_id ) = @_; return '_basickey_rows_cache_' . $category_id } );
+
 use warnings;
 
 extends 'MetamodWeb::Utils::UI::Base';
@@ -94,11 +104,9 @@ sub selected_bks {
 
     my ($category_id) = @_;
 
-    my $category = $self->meta_db->resultset('Searchcategory')->find($category_id);
-
-    my $basickeys    = $category->basickeys();
+    my $basickey_rows    = $self->_basickey_rows($category_id);
     my %selected_bks = ();
-    while ( my $basickey = $basickeys->next() ) {
+    foreach my $basickey (@$basickey_rows){
 
         my $html_id = 'bk_id_' . $category_id . '_' . $basickey->bk_id();
         if ( $self->c->req->param($html_id) ) {
@@ -109,25 +117,29 @@ sub selected_bks {
     return \%selected_bks;
 }
 
-sub basickeys {
+sub _basickey_rows {
     my $self = shift;
 
     my ($category_id) = @_;
 
     my $category = $self->meta_db->resultset('Searchcategory')->find($category_id);
+    my @basickey_rows    = $category->basickeys( undef, { order_by => 'bk_name ' } )->all();
+    return \@basickey_rows;
 
-    my $basickeys = $category->basickeys( undef, { order_by => 'bk_name' } );
+}
+
+sub basickeys {
+    my $self = shift;
+
+    my ($category_id) = @_;
+
+    my $basickey_rows = $self->_basickey_rows($category_id);
     my @basickeys = ();
-    while ( my $basickey = $basickeys->next() ) {
+    foreach my $basickey (@$basickey_rows){
 
         my %columns = $basickey->get_columns();
-        my $html_id = $self->html_id_for_bk( $category_id, $basickey->bk_id() );
-        if ( $self->c->req->param($html_id) ) {
-            $columns{selected} = 1;
-        }
         push @basickeys, \%columns;
     }
-
     return \@basickeys;
 
 }
@@ -348,9 +360,10 @@ sub topics_tree {
 
     my $bks_for_hk = $self->_related_basickeys();
 
+    my $params = $self->c->req->params();
     my @topics_tree = ();
     foreach my $root (@$roots) {
-        my $subtree = $self->_gen_topics_tree( $root, $children_for, $bks_for_hk );
+        my $subtree = $self->_gen_topics_tree( $root, $children_for, $bks_for_hk, $params );
         push @topics_tree, $subtree;
     }
 
@@ -430,7 +443,7 @@ sub _related_basickeys {
 sub _gen_topics_tree {
     my $self = shift;
 
-    my ( $root, $children_for, $bks_for_hk ) = @_;
+    my ( $root, $children_for, $bks_for_hk, $params ) = @_;
 
     my %tree = ();
 
@@ -447,7 +460,7 @@ sub _gen_topics_tree {
     $tree{type}     = 'hk';
 
     # if the topic has been selected
-    if ( $self->c->req->params->{ $self->html_id_for_hk_topic( $tree{hk_id} ) } ) {
+    if ( $params->{ $self->html_id_for_hk_topic( $tree{hk_id} ) } ) {
         $tree{selected} = 1;
     }
 
@@ -455,7 +468,7 @@ sub _gen_topics_tree {
     if (@children) {
         my @subtrees = ();
         foreach my $child (@children) {
-            my $subtree = $self->_gen_topics_tree( $child, $children_for, $bks_for_hk );
+            my $subtree = $self->_gen_topics_tree( $child, $children_for, $bks_for_hk, $params );
             push @subtrees, $subtree;
         }
         $tree{subtrees} = \@subtrees;
@@ -478,7 +491,7 @@ sub _gen_topics_tree {
             $subtree{bk_id} = $hk_represents_bk->{bk_id};
 
             # if the basickey has already been selected
-            if ( $self->c->req->params->{ $self->html_id_for_bk_topic( $subtree{bk_id} ) } ) {
+            if ( $params->{ $self->html_id_for_bk_topic( $subtree{bk_id} ) } ) {
                 $subtree{selected} = 1;
             }
 
