@@ -7,6 +7,10 @@ use base 'DBIx::Class';
 use XML::LibXML;
 use Data::Dumper;
 use Metamod::Config;
+use Log::Log4perl qw();
+use Metamod::FimexProjections;
+
+my $logger = Log::Log4perl::get_logger(__PACKAGE__);
 
 __PACKAGE__->load_components("InflateColumn::DateTime", "Core");
 __PACKAGE__->table("dataset");
@@ -97,7 +101,7 @@ __PACKAGE__->has_many(
 __PACKAGE__->has_many(
   "projectioninfos",
   "MetamodWeb::Schema::Metabase::Result::Projectioninfo",
-  { "foreign.ds_id" => "self.ds_id" },
+  { "foreign.ds_id" => "self.ds_parent" },
 );
 __PACKAGE__->has_many(
   "wmsinfos",
@@ -105,8 +109,6 @@ __PACKAGE__->has_many(
   { "foreign.ds_id" => "self.ds_parent" },
 );
 
-# Created by DBIx::Class::Schema::Metabase::Loader v0.04006 @ 2010-09-15 13:43:08
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:PAO1qInqGnYQeU9XRvGxaw
 __PACKAGE__->has_many(
   "child_datasets",
   "MetamodWeb::Schema::Metabase::Result::Dataset",
@@ -212,6 +214,37 @@ sub metadata {
 
     $self->{ _metadata_cache } = \%metadata;
     return \%metadata;
+}
+
+=head2 $self->fimex_projections()
+
+=over
+
+=item return
+
+Returns a Metamod::FimexProjections object (never null)
+
+=back
+
+=cut
+sub fimex_projections {
+    my ($self) = @_;
+    my $config = Metamod::Config->new();
+    return new Metamod::FimexProjections() unless $config->get('FIMEX_PROGRAM');
+
+    my $projinfo_row = $self->projectioninfos()->first();
+    my $dsName = $self->ds_name;
+    my $projinfo;
+    if ( defined $projinfo_row ) {
+        my $projinfo_str = $projinfo_row->pi_content() || "";
+        eval { $projinfo = new Metamod::FimexProjections($projinfo_str, 1); };
+        if ($@) {
+            $logger->error("xml-error while reading projectionInfo for dataset $dsName: $@");
+        }
+    } else {
+        $projinfo = new Metamod::FimexProjections();
+    }
+    return $projinfo;
 }
 
 =head2 $self->wmsinfo()

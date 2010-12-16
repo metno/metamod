@@ -53,6 +53,10 @@
         <div class="btns" _class="dataset_actions">
             <a class="btn" href="[% c.uri_for( '/dataset', child.ds_id, 'xml' ) %]" target="_blank"
                title="Show the raw XML metadata for this file in a separate windows"><span>Show xml</span></a><br/><br/>
+            [% FOREACH projection IN child.fimex_projections.listProjections() %]
+                <a class="btn" href="TODO" target="_blank"
+                    title="Download file in [% projection %]"><span>[% projection %] Downl.</span></a><br/><br/>
+            [% END %]
             [% IF child.wmsinfo != '' %]
                 [% SET thumbsize = 64 %]
                 [% SET wmsthumb = child.wmsthumb(thumbsize, child_metadata) %]
