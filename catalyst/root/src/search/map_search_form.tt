@@ -24,7 +24,7 @@ dropdown list.
 </p>
 
 <label for="selected_map">Select map</label>
-<select name="selected_map" id="selected_map" onchange="jQuery('#search_form').attr( 'action', '[% c.uri_for('/search') %]');jQuery('#search_form').submit()">
+<select name="selected_map" id="selected_map" onchange="jQuery('#[% x1_id %], #[% x2_id %], #[% y1_id %], #[% y2_id %]' ).val(''); jQuery('#search_form').attr( 'action', '[% c.uri_for('/search') %]#map_search'); jQuery('#active_criteria').val('[% criteria_index %]'); jQuery('#search_form').attr( 'action', '[% c.uri_for('/search') %]');jQuery('#search_form').submit()">
 [% FOREACH map IN search_ui_utils.available_maps %]
     <option value="[% map.srid %]" [% map.selected ? 'selected="selected"' : ''%]>[% map.name %]</option>
 [% END %]
