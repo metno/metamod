@@ -1,6 +1,4 @@
 [% mm_config.get('APP_FOOTER_HTML') %]
 
-<a href="http://wiki.met.no/metamod/start">METAMOD</a> version 2.7. METAMOD is developed by <a href="http://met.no">met.no</a>
-
 
 
