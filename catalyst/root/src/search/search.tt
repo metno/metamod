@@ -29,14 +29,14 @@ jQuery(document).ready( function () {
 
 <h1 class="std">Metadata search</h1>
 
-<div id="criteria-tabs">
-    <ul>
-        <li><a href="#search-criteria">Search criteria</a></li>
-        <li><a href="#search-options">Options</a></li>
-        <li><a href="#search-help">Help</a></li>
+<div id="criteria-tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all ui-tabs-collapsible">
+    <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+        <li class="ui-state-default ui-corner-top"><a href="#search-criteria">Search criteria</a></li>
+        <li class="ui-state-default ui-corner-top"><a href="#search-options">Options</a></li>
+        <li class="ui-state-default ui-corner-top"><a href="#search-help">Help</a></li>
     </ul>
 
-    <div id="search-criteria">
+    <div id="search-criteria" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
         <button type="submit">Search</button>
         <div id="search-criteria-accordion">
         [% FOREACH category IN search_ui_utils.search_categories() %]
@@ -63,13 +63,13 @@ jQuery(document).ready( function () {
         <button type="submit">Search</button>
     </div>
 
-    <div id="search-options">
+    <div id="search-options" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
         <button type="submit">Search</button>
         [% INCLUDE 'search/search_options_form.tt' %]
         <button type="submit">Search</button>
     </div>
 
-    <div id="search-help">
+    <div id="search-help" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
         [% INCLUDE 'search/help.tt' %]
     </div>
 
