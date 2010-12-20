@@ -108,7 +108,7 @@ logger_config.ini
 =lib/Metamod/LonLatPolygon.pm
 =lib/Metamod/Utils.pm
 =lib/Metamod/Config.pm
-=lib/Metamod/FimexProjection.pm
+=lib/Metamod/FimexProjections.pm
 =lib/Metamod/LoggerConfigParser.pm
 =lib/Metamod/Search/Feed.pm
 =lib/Metamod/Subscription.pm
