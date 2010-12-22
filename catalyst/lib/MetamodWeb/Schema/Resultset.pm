@@ -89,23 +89,6 @@ sub dataset_location_search {
     };
     return $search_cond;
 
-#
-#        $scaleFactorX = $mmConfig->getVar("SRID_MAP_SCALE_FACTOR_X_$srid");
-#         $scaleFactorY = $mmConfig->getVar("SRID_MAP_SCALE_FACTOR_Y_$srid");
-#         $offsetX = $mmConfig->getVar("SRID_MAP_OFFSET_X_$srid");
-#         $offsetY = $mmConfig->getVar("SRID_MAP_OFFSET_Y_$srid");
-#         $x1m = ($x1 - $offsetX)*$scaleFactorX;
-#         $x2m = ($x2 - $offsetX)*$scaleFactorX;
-#         $y1m = ($y1 - $offsetY)*$scaleFactorY;
-#         $y2m = ($y2 - $offsetY)*$scaleFactorY;
-#         $polygon = "ST_MakeBox2D(ST_Point($x1m, $y1m),ST_Point($x2m,$y2m))";
-#         $sql_gapart .= '    DS_id IN (' .
-#                        '       SELECT DISTINCT Dataset_Location.DS_id FROM Dataset_Location '.
-#                        "         WHERE ST_DWITHIN(ST_SetSRID($polygon,$srid), geom_$srid, 0.1)".
-#                        "    )\n";
-
-
-
 }
 
 sub quote_sql_value {
