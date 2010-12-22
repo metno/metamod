@@ -9,6 +9,7 @@ use Log::Log4perl qw(get_logger);
 use Moose;
 use Try::Tiny;
 
+use MetamodWeb::Schema::Metabase;
 use MetamodWeb::Utils::GenCatalystConf;
 
 has 'master_config_file' => ( is => 'ro', default => 'master_config_test.txt' );
@@ -72,6 +73,17 @@ sub run_import_dataset {
     print $output;
 }
 
+sub connect_to_metabase {
+    my $self = shift;
+
+    my $mm_config = $self->mm_config();
+
+    my $metabase = MetamodWeb::Schema::Metabase->connect( $mm_config->getDSN(), $mm_config->get('PG_WEB_USER'), $mm_config->get('PG_WEB_USER_PASSWORD' ) );
+
+    return $metabase;
+
+}
+
 sub DEMOLISH {
     my $self = shift;
 
@@ -84,9 +96,7 @@ sub DEMOLISH {
         ga_describes_ds
         geographicalarea
         geometry_columns
-        hk_represents_bk
         metadata
-        metadatatype
         numberitem
         projectioninfo
         sessions
@@ -119,7 +129,7 @@ sub DEMOLISH {
         };
     }
 
-    unlink $self->catalyst_conf_file();
+    unlink $self->catalyst_conf_file() or warn $!;
 
 }
 
