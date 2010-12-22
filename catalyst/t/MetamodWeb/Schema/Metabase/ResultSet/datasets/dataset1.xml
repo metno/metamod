@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="variable">lwe_thickness_of_surface_snow_amount</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="variable">relative_humidity</metadata>
+    <metadata xmlns="http://www.met.no/schema/metamod/MM2" name="variable">Oceans &gt; Sea Ice &gt; Sea Ice Concentration &gt; HIDDEN</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="area">Barents Sea</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="keywords">Test Test2 Test3</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="datacollection_period_from">2010-01-01</metadata>
+    <metadata xmlns="http://www.met.no/schema/metamod/MM2" name="datacollection_period_to">2010-12-31</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="activity_type">Model run</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="bounding_box">180,60,-180,90</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="dataref">http://example.com/thredds//</metadata>
+</MM2>
