@@ -26,6 +26,47 @@ use Data::Dump qw( dump );
 use Log::Log4perl qw( get_logger );
 use Params::Validate qw( :all );
 
+=head2 $self->metadata_search(%PARAMS)
+
+Search for dataset by looking at the associated metadata for the datasets.
+
+=over
+
+=item curr_page (optional, default = 1)
+
+The current page to view in the paged search result.
+
+=item ownertags
+
+An array ref of owner tags to search for.
+
+=item rows_per_page (optional, default = 10)
+
+The number of rows to fetch.
+
+=item search_criteria
+
+The search criteria a hash reference. The hash reference is best explained with an example as each type of meta data
+requires a slightly different structure.
+
+  $search_criteria = {
+      basickey => [
+        [ 1000, 1001, 1002 ], # basic keys for one search category
+        [ 2000, 2001, ], # basic keys for another search category.
+      ],
+      dates => { 8 => { from => '20100205', to => '20100801', } },
+      freetext => [ 'Some text' ],
+      coords => { srid => 93995, x1 => 1, x2 => 10, y1 => 1, y2 => 10 },
+      topics => { bk_ids => [ 1, 2, 3 ], hk_ids => [ 10, 20, 30 ] },
+  }
+
+=item return
+
+Returns a C<DBIx::Class> result sets for the search.
+
+=back
+
+=cut
 sub metadata_search {
     my $self = shift;
 
@@ -34,7 +75,7 @@ sub metadata_search {
         {
             curr_page       => { type => SCALAR, optional => 1 },
             ownertags       => { type => ARRAYREF },
-            rows_per_page   => { type => SCALAR, optional => 1 },
+            rows_per_page   => { type => SCALAR, optional => 10 },
             search_criteria => { type => HASHREF },
             all_levels      => { type => SCALAR, default => 0 },
         }
@@ -110,26 +151,6 @@ sub metadata_search {
 
     }
 
-#    if( exists $search_criteria->{ topics } ){
-#
-#        my $hk_ids = $search_criteria->{ topics }->{ hk_ids };
-#        my $bk_ids = $search_criteria->{ topics }->{ bk_ids };
-#
-#        # To simplify the search query a little we fetch the related bk_ids as a separate
-#        # query. If this proves inefficient attempt another way.
-#        if( @$hk_ids ){
-#            get_logger()->debug( dump $hk_ids );
-#            my $hrb_rs = $self->result_source()->schema()->resultset('HkRepresentsBk');
-#            my @related_bkids = $hrb_rs->search( { hk_id => { IN => $hk_ids } }, { distinct => 1 } )->get_column('bk_id')->all();
-#            push @$bk_ids, @related_bkids;
-#        }
-#
-#        my $bk_describes_ds_rs = $self->result_source->schema->resultset('BkDescribesDs');
-#        my $basickey_search = $bk_describes_ds_rs->search( { bk_id => { IN => $bk_ids } } );
-#        my %cond = ( IN => $basickey_search->get_column('ds_id')->as_query() );
-#
-#        push @ds_ids_conds, \%cond;
-#    }
     if( exists $search_criteria->{ topics } ){
 
         my $hk_ids = $search_criteria->{ topics }->{ hk_ids };
