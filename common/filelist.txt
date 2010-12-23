@@ -121,6 +121,7 @@ logger_config.ini
 =lib/Metamod/mmUserbase.pm
 =lib/Metamod/test/mmUserbase_test.pl
 =lib/Metamod/test/mmUserbase_test.sh
+=lib/MetNo/Fimex.pm
 =lib/MetNo/NcFind.pm
 =lib/MetNo/NcDigest.pm
 =lib/quadtreeuse.pm
