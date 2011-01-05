@@ -162,20 +162,30 @@
 
   <!-- variables -->
   <xsl:template match="*[@name='variable']">
+    <xsl:variable name="value">  <!-- strip away HIDDEN suffix -->
+      <xsl:choose>
+        <xsl:when test="contains(., 'HIDDEN')">
+          <xsl:value-of select="substring-before(., ' &gt; HIDDEN')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="."/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="keywords" select="document('gcmd/keywords.xml')/*/gcmd:variable"/>
     <xsl:choose>
       <xsl:when test="contains(., ' &gt; ')"> <!-- lookup GCMD variable -->
         <xsl:call-template name="Parameters">
-          <xsl:with-param name="topicvar" select="$keywords[starts-with(current(), @label)]"/> <!-- ignore HIDDEN suffix -->
-          <xsl:with-param name="origin" select="."/>
+          <xsl:with-param name="topicvar" select="$keywords[@label = $value]"/>
+          <xsl:with-param name="origin" select="$value"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise> <!-- CF standard name (may be obsoleted) -->
-        <xsl:variable name="standard_name" select="$keywords[nc:standard_name|nco:obsolete_standard_name = current()]"/>
+        <xsl:variable name="standard_name" select="$keywords[nc:standard_name|nco:obsolete_standard_name = $value]"/>
         <xsl:if test="count($standard_name)"> <!-- ignore MM2 variables not listed in keywords.xml -->
           <xsl:call-template name="Parameters">
             <xsl:with-param name="topicvar" select="$standard_name"/>
-            <xsl:with-param name="origin" select="."/>
+            <xsl:with-param name="origin" select="$value"/>
           </xsl:call-template>
         </xsl:if>
       </xsl:otherwise>
