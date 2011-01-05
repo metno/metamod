@@ -38,54 +38,31 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 use strict;
 use warnings;
-use FindBin qw($Bin);
-
 use XML::LibXML;
 use XML::LibXSLT;
 use DateTime;
 
-my $now = DateTime->today->ymd;
+use FindBin qw($Bin);
+use lib "$FindBin::Bin/../lib";
 
 my $parser = XML::LibXML->new();
 my $xslt = XML::LibXSLT->new();
 
-my $gcmdterms = "$Bin/../../quest/htdocs/qst/config/gcmd-science-keywords.txt";
-die "Cannot find gcmd-science-keywords.txt" unless -r $gcmdterms;
-
-my $mm2Doc = shift or die "Missing input file name parameter";
-my $source = $parser->parse_file($mm2Doc);
+my $mm2file = shift or die "Missing input file name parameter";
+my $source = $parser->parse_file($mm2file);
+my $name = getname($mm2file) || $mm2file;
 
 my $style_doc = $parser->parse_file("$Bin/../schema/mm2dif.xsl");
 my $stylesheet = $xslt->parse_stylesheet($style_doc) or die "Cannot find mm2dif.xsl";
+my $now = DateTime->today->ymd;
 my $results = $stylesheet->transform($source, XML::LibXSLT::xpath_to_string(
-    DS_name => $mm2Doc, # faking it for now
+    DS_name => $name,
     DS_creationdate => $now,
     DS_datestamp => $now
 ));
 
-# post-transform processing
 my $xc = XML::LibXML::XPathContext->new( $results->documentElement() );
-$xc->registerNs('dif', "http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/");
 $xc->registerNs('topic', "mailto:geira\@met.no?Subject=WTF");
-
-# split GCWF strings into topics, terms &c
-foreach ($xc->findnodes('/*/dif:Parameters/dif:Detailed_Variable')) {
-    my $dvar = $_->textContent;
-    next unless $dvar =~ /^(.+) > HIDDEN$/;
-    my $cfstring = $1;
-    system('grep', '-xq', $cfstring, $gcmdterms) >= 0 or die "grep failed: $?";
-    #printf STDERR " %s - $cfstring\n", $?;
-    next unless $? == 0; # file contains CF string
-    $_->removeChildNodes();
-    $_->appendText($cfstring);
-    my @gcwf = split(' > ', $dvar);
-    #printf STDERR "%s - %s\n", ref $_, join('|', @gcwf);
-    foreach my $node (qw(Topic Term Variable_Level_1)) {
-        foreach ($_->parentNode->getChildrenByTagName("$node")) {
-            $_->appendText(uc shift @gcwf);
-        }
-    }
-}
 
 # look for empty elements with default values
 foreach ($xc->findnodes('//*[@topic:default]')) {
@@ -94,4 +71,17 @@ foreach ($xc->findnodes('//*[@topic:default]')) {
 }
 
 print $results->toString(1);
-  
+
+
+# END
+#####
+
+sub getname {
+    # lookup dataset name from xmd file (if exists)
+    my $mm2file = shift or die;
+    my ($xmdfile) = "$1.xms" if $mm2file =~ /(.+)\.(\w+)$/;
+    return unless -r $xmdfile;
+    my $xmd = $parser->parse_file($xmdfile);
+    return $xmd->findvalue('/*/*[local-name() = "info"]/@name');
+}
+
