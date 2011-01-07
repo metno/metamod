@@ -1,0 +1,26 @@
+
+Pod::Simple::Wiki::Dokuwiki
+===========================
+
+A Dokuwiki filter for use with pod2wiki
+
+
+USAGE
+=====
+
+Make sure Pod::Simple::Wiki is installed (e.g. via libpod-simple-wiki-perl in Debian).
+
+To convert POD documentation to Dokuwiki format, use the supplied pod2wiki tool:
+
+  $ PERL5LIB=common/lib pod2wiki -s dokuwiki update_target.pl
+
+(Setting PERL5LIB is necessary unless you manually install the library to @INC.)
+
+
+COPYRIGHT
+=========
+
+(c) MMIII-MMVII, John McNamara.
+
+All Rights Reserved. This module is free software. It may be used, redistributed
+and/or modified under the same terms as Perl itself.
