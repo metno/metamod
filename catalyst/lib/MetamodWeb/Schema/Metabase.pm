@@ -3,15 +3,9 @@ package MetamodWeb::Schema::Metabase;
 use strict;
 use warnings;
 
-our $VERSION = 2.008002;
-
 use base 'DBIx::Class::Schema';
 
 __PACKAGE__->load_namespaces;
-
-
-# Created by DBIx::Class::Schema::Loader v0.04006 @ 2010-09-15 13:43:08
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:v91XlgWvJ9s0VRG/pV8bYA
 
 =begin LICENSE
 
@@ -39,5 +33,4 @@ GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
 
 =cut
 
-# You can replace this text with custom content, and it will be preserved on regeneration
 1;

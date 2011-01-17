@@ -7,10 +7,6 @@ use base 'DBIx::Class::Schema';
 
 __PACKAGE__->load_namespaces;
 
-
-# Created by DBIx::Class::Schema::Loader v0.04006 @ 2010-09-15 14:15:48
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:GDTtzOxG9yIwhIuWOL50Fg
-
 =begin LICENSE
 
 METAMOD is free software; you can redistribute it and/or modify
@@ -37,5 +33,4 @@ GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
 
 =cut
 
-# You can replace this text with custom content, and it will be preserved on regeneration
 1;
