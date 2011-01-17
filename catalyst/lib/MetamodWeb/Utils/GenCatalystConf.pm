@@ -63,16 +63,16 @@ sub catalyst_conf {
         "name"            => 'MetamodWeb',
         "Model::Metabase" => {
             "connect_info" => {
-                "dsn"  => $conf->getDSN(),
-                "user" => _rget($conf,'PG_WEB_USER'),
-                "password" => _oget($conf,'PG_WEB_USER_PASSWORD'),
+                "dsn"      => $conf->getDSN(),
+                "user"     => _rget( $conf, 'PG_WEB_USER' ),
+                "password" => _oget( $conf, 'PG_WEB_USER_PASSWORD' ),
             }
         },
         "Model::Userbase" => {
             "connect_info" => {
-                "dsn"  => $conf->getDSN_Userbase(),
-                "user" => _rget($conf,'PG_WEB_USER'),
-                "password" => _oget($conf,'PG_WEB_USER_PASSWORD'),
+                "dsn"      => $conf->getDSN_Userbase(),
+                "user"     => _rget( $conf, 'PG_WEB_USER' ),
+                "password" => _oget( $conf, 'PG_WEB_USER_PASSWORD' ),
             }
         },
         'Plugin::SmartURI' => {
@@ -82,10 +82,10 @@ sub catalyst_conf {
 
     );
 
-    if ( my $ldap = _oget($conf,'LDAP_SERVER') ) {
+    if ( my $ldap = _oget( $conf, 'LDAP_SERVER' ) ) {
 
         $config{"authentication"} = {
-            "default_realm" => "dbix",
+            "default_realm" => "ldap",
             "realms"        => {
                 "ldap" => {
                     "credential" => {
@@ -98,27 +98,37 @@ sub catalyst_conf {
                         "ldap_server"         => $ldap,
                         "ldap_server_options" => { "timeout" => 30 },
                         "start_tsl"           => 0,
-                        "user_basedn"         => _rget($conf,'LDAP_BASE_DN'),
+                        "user_basedn"         => _rget( $conf, 'LDAP_BASE_DN' ),
                         "user_filter"         => "(uid=%s)",
                         "user_field"          => "uid",
                         "user_search_options" => { "deref" => "always" },
                         "use_roles"           => 0
                     },
-                    "dbix" => {
-                        "credential" => {
-                            "class"          => "Password",
-                            "password_field" => "u_password",
-                            "password_type"  => "clear"
-                        },
-                        "store" => {
-                            "class"      => "DBIx::Class",
-                            "user_model" => "Userbase::Usertable",
-                            "id_field"   => "u_loginname"
-                        }
+                }
+            }
+        };
+    } else {
+
+        # we do not have LDAP authentication we assume database authentication instead
+
+        $config{"authentication"} = {
+            "default_realm" => "dbix",
+            "realms"        => {
+                "dbix" => {
+                    "credential" => {
+                        "class"          => "Password",
+                        "password_field" => "u_password",
+                        "password_type"  => "clear"
+                    },
+                    "store" => {
+                        "class"      => "DBIx::Class",
+                        "user_model" => "Userbase::Usertable",
+                        "id_field"   => "u_loginname"
                     }
                 }
             }
         };
+
     }
 
     return %config;
@@ -129,17 +139,16 @@ sub catalyst_conf {
 
 sub _rget {    # required get
     my $conf = shift;
-    my $key = shift or die "Missing config key param";
-    my $val = eval { $conf->get($key); };
+    my $key  = shift or die "Missing config key param";
+    my $val  = eval { $conf->get($key); };
     die "Missing config $key in master_config" unless $val;
     return $val;
 }
 
-
-sub _oget {     # optional get
+sub _oget {    # optional get
     my $conf = shift;
-    my $key = shift or die "Missing config key param";
-    my $val = eval { $conf->get($key); };
+    my $key  = shift or die "Missing config key param";
+    my $val  = eval { $conf->get($key); };
     return $val;
 }
 
