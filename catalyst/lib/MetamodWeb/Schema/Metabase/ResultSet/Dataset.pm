@@ -196,14 +196,43 @@ sub metadata_search {
 
 }
 
-sub metadata_search_with_children {
-    my $self = shift;
+=head2 $self->two_way_table($search_criteria, $ownertags, $vertical_col, $horisontal_col)
 
-    my $matching_datasets = $self->metadata_search( @_ );
-    my $matching_with_children = $matching_datasets->search( {}, { prefetch => 'child_datasets' } );
-    return $matching_with_children;
-}
+Search the database for matching datasets and create a two way table for the result.
 
+=over
+
+=item $search_criteria
+
+The search criteria used for selecting datasets. See C<metadata_search()> for more details.
+
+=item $ownertags
+
+The owner tags that the datasets should match.
+
+=item $vertical_col
+
+The C<mt_name> for the vertical column.
+
+=item $horisontal_col
+
+The C<mt_name> for the horisontal column.
+
+=item return
+
+Returns a hash reference where the values for the vertical column is used as
+the keys and the values are hash references where the values for the horisontal
+column is used as key and the value is the number of datasets that match the
+value of the horisontal and vertical key. This is simpler to understand with an
+example.
+
+  { model_run => { 'Baltic Sea' => 4, 'Barents Sea' => 0, 'Artic Ocean' => 3 },
+    observation => { 'Baltic Sea' => 1, 'Barents Sea' => 32, 'Artic Ocean' => 5 },
+  }
+
+=back
+
+=cut
 sub two_way_table {
     my $self = shift;
 
@@ -244,45 +273,41 @@ sub two_way_table {
     my %two_way_table = ();
     while ( my $v_row = $v_search->next() ) {
 
-        my $ds_id = $v_row->ds_id();
-        my $v_key = $v_row->get_column('md_content');
+        my $ds_id = $v_row->ds_id(); my $v_key =
+        $v_row->get_column('md_content');
 
         $two_way_table{$v_key} = {} if !exists $two_way_table{$v_key};
 
-        my $h_keys = $h_keys_for{$ds_id};
-        foreach my $h_key ( keys %$h_keys ) {
-            $two_way_table{$v_key}->{$h_key}++;
-        }
-    }
+        my $h_keys = $h_keys_for{$ds_id};         foreach my $h_key ( keys
+%$h_keys ) {             $two_way_table{$v_key}->{$h_key}++;         }     }
 
     return \%two_way_table;
 
 }
 
-sub active_by_name {
-    my $self = shift;
+=head2 $self->level1_datasets($ownertags)
 
-    my ($ds_name) = @_;
+=over
 
-    my @ownertags = $self->_get_ownertags;
+=item $ownertags
 
-    return $self->search(
-        {
-            ds_ownertag => { IN => [@ownertags] },
-            ds_status   => 1,
-        }
-    )->find( { ds_name => $ds_name } );
+A list of owner tags that the datasets should match.
 
-}
+=item return
 
+Return a C<DBIx::Class> resultset for all active level 1 datasets that match the current owner tags.
+
+=back
+
+=cut
 sub level1_datasets {
     my $self = shift;
 
-    my @ownertags = $self->_get_ownertags;
+    my ($ownertags) = @_;
 
     return $self->search(
         {
-            ds_ownertag => { IN => [@ownertags] },
+            ds_ownertag => { IN => $ownertags },
             ds_status   => 1,
             ds_parent   => 0,
         }
@@ -290,16 +315,43 @@ sub level1_datasets {
 
 }
 
+=head2 $self->level2_datasets(%PARAMS)
+
+Fetch level 2 datasets for a specific level 1 dataset.
+
+=over
+
+=item $ds_id
+
+The C<ds_id> of the level 1 datasets to fetch level 2 datasets for.
+
+=item max_files (optional, default = 100)
+
+The maximum number of level 2 datasets to return.
+
+=item max_age (optional, default = 90)
+
+The maximum age of the level 2 datasets to return if more C<max_files> are
+found in the catalogue. If the C<max_files> limit is not reached, older
+datasets can be returned.
+
+=item return
+
+The datasets are returned as a list of C<DBIx::Class> row objects.
+
+=back
+
+=cut
 sub level2_datasets {
     my $self = shift @_;
 
-    my %parameters =
-        Params::Validate::validate( @_,
-        { ds_id => 1, max_files => { default => 100, }, max_age => { default => 90 } } );
+    my %parameters = Params::Validate::validate( @_, { ds_id => 1,
+                                                       max_files => { default => 100, },
+                                                       max_age => { default => 90 } } );
 
     my $config         = Metamod::Config->new();
     my $dbh            = $config->getDBH();
-    my $days           = $parameters{max_age} + 0;                                       # get into numeric presentation
+    my $days           = $parameters{max_age} + 0; # get into numeric presentation
     my ($cut_off_date) = $dbh->selectrow_array("SELECT now() - interval '$days days'");
 
     my @datasets = $self->search(
@@ -329,21 +381,75 @@ sub level2_datasets {
     return @datasets;
 }
 
-sub _get_ownertags {
+=head2 $self->dataset_location_search($srid, $x1, $y1, $x2, $y2)
+
+Create a condition that can be used for searching dataset locations.
+
+=over
+
+=item $srid
+
+The SRID for the map that is used as the basis for the search.
+
+=item $x1
+
+The first x coordinate for the search.
+
+=item $y1
+
+The first y coordinate for the search.
+
+=item $x2
+
+The second x coordinate for the search.
+
+=item $y2
+
+The second y coordinate for the search.
+
+=item return
+
+A C<DBIx::Class> search condition that can be used for doing a dataset location search.
+
+=back
+
+=cut
+sub dataset_location_search {
     my $self = shift;
 
-    my @ownertags;
-    my $config    = Metamod::Config->new();
-    my $ownertags = $config->get('DATASET_TAGS');
-    if ( defined $ownertags ) {
+    my ( $srid, $x1, $y1, $x2, $y2 ) = @_;
 
-        # comma-separated string
-        @ownertags = split /\s*,\s*/, $ownertags;
+    my $config = Metamod::Config->new();
 
-        # remove '' around tags
-        @ownertags = map { s/^'//; s/'$//; $_ } @ownertags;
+    my $scale_factor_x = $config->get("SRID_MAP_SCALE_FACTOR_X_$srid");
+    my $scale_factor_y = $config->get("SRID_MAP_SCALE_FACTOR_Y_$srid");
+    my $offset_x = $config->get("SRID_MAP_OFFSET_X_$srid");
+    my $offset_y = $config->get("SRID_MAP_OFFSET_Y_$srid");
+
+    if( !$scale_factor_x || !$scale_factor_y || !$offset_x || !$offset_y ){
+        die "Need all SRID map params in config for '$srid'. Got ($scale_factor_x,$scale_factor_y,$offset_x,$offset_y)";
     }
-    return @ownertags;
+
+
+    my $x1m = ($x1 - $offset_x)*$scale_factor_x;
+    my $x2m = ($x2 - $offset_x)*$scale_factor_x;
+    my $y1m = ($y1 - $offset_y)*$scale_factor_y;
+    my $y2m = ($y2 - $offset_y)*$scale_factor_y;
+
+    $x1m = $self->quote_sql_value( $x1m );
+    $x2m = $self->quote_sql_value( $x2m );
+    $y1m = $self->quote_sql_value( $y1m );
+    $y2m = $self->quote_sql_value( $y2m );
+
+    my $selected_box = "ST_MakeBox2D(ST_Point($x1m, $y1m),ST_Point($x2m,$y2m))";
+    my $bounding_box = "ST_SetSRID($selected_box,$srid)";
+    my $geom_column  = "geom_$srid";
+
+    my $search_cond = {
+        IN => \"( SELECT DISTINCT ds_id FROM dataset_location WHERE ST_DWITHIN( $bounding_box, $geom_column, 0.1))",
+    };
+    return $search_cond;
+
 }
 
 =head1 LICENSE
