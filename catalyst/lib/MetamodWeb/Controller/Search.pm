@@ -32,35 +32,39 @@ BEGIN {extends 'Catalyst::Controller'; }
 
 =head1 NAME
 
-MetamodWeb::Controller::Search - Catalyst Controller
+MetamodWeb::Controller::Search - Catalyst controller for the search interface.
 
 =head1 DESCRIPTION
 
-Catalyst Controller.
+Catalyst controller for the search interface.
 
 =head1 METHODS
 
 =cut
 
+=head2 auto
 
-=head2 index
+Controller specific initisialisation for each request.
 
 =cut
-
 sub auto :Private {
     my ( $self, $c ) = @_;
 
     my $mm_config = $c->stash->{ mm_config };
     my $ui_utils = MetamodWeb::Utils::UI::Search->new( { config => $mm_config, c => $c } );
     $c->stash( search_ui_utils => $ui_utils,
-               in_search_app => 1, #used to control header to show
+               in_search_app => 1, #used to control which header to show
      );
 
     push @{ $c->stash->{ css_files } }, $c->uri_for( '/static/css/search.css' );
 
 }
 
+=head2 index
 
+Action for displaying the search form.
+
+=cut
 sub index : Path("/search") {
     my ( $self, $c ) = @_;
 
@@ -103,6 +107,11 @@ sub index : Path("/search") {
 
 }
 
+=head2
+
+Chained action for displaying the search result.
+
+=cut
 sub display_result : Chained("perform_search") : PathPart('result') : Args(0) {
     my ( $self, $c ) = @_;
 
@@ -110,6 +119,11 @@ sub display_result : Chained("perform_search") : PathPart('result') : Args(0) {
 
 }
 
+=head2
+
+The root of the chained actions performing searches. This action will perform the actual search.
+
+=cut
 sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
     my ( $self, $c ) = @_;
 
@@ -120,10 +134,10 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
 
     my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $c, config => $c->stash->{ mm_config } } );
     my $search_criteria = $search_utils->selected_criteria( $c->req->params() );
-    my $owner_tags = $search_utils->get_ownertags();
+    my $ownertags = $search_utils->get_ownertags();
     my $datasets = $dataset->metadata_search( {
         curr_page => $curr_page,
-        ownertags => $owner_tags,
+        ownertags => $ownertags,
         rows_per_page => $datasets_per_page,
         search_criteria => $search_criteria,
     } );
@@ -147,6 +161,11 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
 
 }
 
+=head2
+
+Action for displaying a two way table of the search result.
+
+=cut
 sub two_way_table : Path( "/search/two_way_table" ) : Args(0) {
     my ( $self, $c ) = @_;
 
@@ -164,6 +183,19 @@ sub two_way_table : Path( "/search/two_way_table" ) : Args(0) {
 
 }
 
+=head2
+
+Action for expanding the view a level 1 dataset so that level 2 datasets are
+also displayed.
+
+B<IMPLEMENATION REMARK:> It can be discussed if this should be a controller
+action or we should just manipulate the CGI parameters in the template.
+Manipulating the CGI parameters gives one less place to worry about the name of
+the CGI parameter, but gives some ugly TT code. For that reason we have kept it
+here.
+
+
+=cut
 sub expand_level2 : Chained('perform_search') : PathPart('expand') :Args(1) {
     my ($self, $c, $dataset_id ) = @_;
 
@@ -172,6 +204,18 @@ sub expand_level2 : Chained('perform_search') : PathPart('expand') :Args(1) {
     $c->stash( template => 'search/search_result.tt' );
 }
 
+=head2
+
+Action for hiding the view of level 2 datasets for specific level 1 dataset.
+
+B<IMPLEMENATION REMARK:> It can be discussed if this should be a controller
+action or we should just manipulate the CGI parameters in the template.
+Manipulating the CGI parameters gives one less place to worry about the name of
+the CGI parameter, but gives some ugly TT code. For that reason we have kept it
+here.
+
+
+=cut
 sub deflate_level2 : Chained('perform_search') : PathPart('deflate') :Args(1) {
     my ($self, $c, $dataset_id ) = @_;
 
@@ -181,6 +225,18 @@ sub deflate_level2 : Chained('perform_search') : PathPart('deflate') :Args(1) {
 
 }
 
+=head2
+
+Action for changing the display page of level 2 datasets displayed under a
+specific level 1 dataset.
+
+B<IMPLEMENATION REMARK:> It can be discussed if this should be a controller
+action or we should just manipulate the CGI parameters in the template.
+Manipulating the CGI parameters gives one less place to worry about the name of
+the CGI parameter, but gives some ugly TT code. For that reason we have kept it
+here.
+
+=cut
 sub set_level2_page : Chained('perform_search') : PathPart('level2page') :Args(2) {
     my ($self, $c, $dataset_id, $page_num ) = @_;
 
@@ -198,12 +254,12 @@ sub wms :Path('/search/wms') :Args {
 
 }
 
-sub wmsThumb :Path('/search/wmsthumb') :Args {
-    my ($self, $c) = @_;
-
-    $c->stash( template => 'search/wmsthumb.tt', 'current_view' => 'Raw' );
-
-}
+#sub wmsThumb :Path('/search/wmsthumb') :Args {
+#    my ($self, $c) = @_;
+#
+#    $c->stash( template => 'search/wmsthumb.tt', 'current_view' => 'Raw' );
+#
+#}
 
 __PACKAGE__->meta->make_immutable;
 
