@@ -27,20 +27,15 @@ BEGIN {extends 'Catalyst::Controller'; }
 
 =head1 NAME
 
-MetamodWeb::Controller::Logout - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
+MetamodWeb::Controller::Logout - Catalyst Controller for logging out a user.
 
 =head1 METHODS
 
 =cut
 
-
 =head2 index
 
-Logout logic
+Clear the user state and send the user to the start page.
 
 =cut
 
