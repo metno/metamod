@@ -10,8 +10,8 @@
                 xmlns:topic="mailto:geira@met.no?Subject=WTF"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xmlns="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/"
-                xsi:schemaLocation="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/ http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif_v9.7.1.xsd"
-                exclude-result-prefixes="mm gcmd nc nco">
+                xsi:schemaLocation="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/ http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif_v9.8.2.xsd"
+                exclude-result-prefixes="mm gcmd nc nco rdf skos dc xsi">
 
   <xsl:param name="DS_name"/>
   <xsl:param name="DS_creationdate"/>
