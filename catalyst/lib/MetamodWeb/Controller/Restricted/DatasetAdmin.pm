@@ -59,8 +59,6 @@ sub auto : Private {
     my $da_ui_utils = MetamodWeb::Utils::UI::DatasetAdmin->new( c => $c, config => $c->stash->{mm_config} );
     $c->stash( da_ui_utils => $da_ui_utils );
 
-    return $self->SUPER::auto($c);
-
 }
 
 sub list : Path('/dataset_admin') : Args(0) {

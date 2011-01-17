@@ -48,8 +48,6 @@ sub auto : Private {
 
     $c->stash( my_metamod_menu => 1 );
 
-    return $self->SUPER::auto($c);
-
 }
 
 sub index : Path : Args(0) {
