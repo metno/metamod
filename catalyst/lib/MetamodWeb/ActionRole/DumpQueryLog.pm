@@ -20,9 +20,26 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
+use DBIx::Class::QueryLog::Analyzer;
 use Moose::Role;
 use Try::Tiny;
 use namespace::autoclean;
+
+=head1 NAME
+
+MetamodWeb::ActionRole::DumpQueryLog - Moose/Catalyst action role for dumping a DBIx::Class query log.
+
+=head1 DESCRIPTION
+
+This module implements a Moose/Catalyst action role that when applied to an
+action with C<:Does('DumpQueryLog')> will dump a C<DBIx::Class> query log with C<$c->log->debug()>
+
+For the dumping to work you must first initialise the C<DBIx::Class> query log
+with C<MetamodWeb::ActionRole::InitQueryLog> action role.
+
+=head1 METHODS
+
+=cut
 
 after 'execute' => sub {
     my ( $self, $controller, $c, $test ) = @_;
@@ -30,6 +47,8 @@ after 'execute' => sub {
     # tracing is not enabled, so nothing to do
     return unless exists $ENV{METAMOD_DBIC_TRACE} && $ENV{METAMOD_DBIC_TRACE} == 1;
 
+    # We use SQL::Beautify to get more readable SQL if it is available, but we
+    # do not want to have SQL::Beautify as a requirement for MetamodWeb
     my $beautifier;
     try {
         require SQL::Beautify;

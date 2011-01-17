@@ -25,11 +25,10 @@ use Metamod::Config;
 use namespace::autoclean;
 
 use Data::Dump qw( dump );
-use DBIx::Class::QueryLog;
-use DBIx::Class::QueryLog::Analyzer;
 
 use MetamodWeb::Utils::UI::Common;
 
+# By extending from ActionRole we can apply action roles to actions.
 BEGIN { extends 'Catalyst::Controller::ActionRole' }
 
 #
@@ -40,17 +39,19 @@ __PACKAGE__->config(namespace => '' );
 
 =head1 NAME
 
-Metamod::Controller::Root - Root Controller for Metamod
+MetamodWeb::Controller::Root - Root Controller for MetamodWeb
 
 =head1 DESCRIPTION
 
-[enter your description here]
+This is the root controller for the MetamodWeb Catalyst application. The root controller is special in that its
+auto(), begin() and end() actions are relevant for all other controllers. The auto() action in this controller will be
+called for all Controllers for instance.
 
 =head1 METHODS
 
 =head2 index
 
-The root page (/)
+The root page (/) for the Catalyst site. We configure it to send the user directly to the search page.
 
 =cut
 
@@ -74,11 +75,24 @@ sub default :Path {
     $c->response->status(404);
 }
 
+=head2 begin()
+
+Default begin action.
+
+=cut
 sub begin :Does('InitQueryLog'){
     my ( $self, $c ) = @_;
 
 }
 
+=head2 auto()
+
+Default auto action. This function is responsible for all application specific
+setup that is required for all request.
+
+For instance creating objects that are relevant for all requests.
+
+=cut
 sub auto :Private {
     my ( $self, $c ) = @_;
 
@@ -95,7 +109,9 @@ sub auto :Private {
 
 =head2 end
 
-Attempt to render a view, if needed.
+Default end action. Attempt to render a view, if needed.
+
+It is seldom necessary to override the end() action in a sub controller.
 
 =cut
 

@@ -31,20 +31,17 @@ BEGIN {extends 'Catalyst::Controller'; }
 
 =head1 NAME
 
-MetamodWeb::Controller::Dataset - Catalyst Controller
+MetamodWeb::Controller::Dataset - Controller for viewing information about a single dataset.
 
 =head1 DESCRIPTION
 
-Catalyst Controller.
+This controller implements action for retrieving information about a single dataset.
 
 =head1 METHODS
 
 =cut
 
 
-=head2 index
-
-=cut
 
 sub auto :Private {
     my ( $self, $c ) = @_;
@@ -53,6 +50,12 @@ sub auto :Private {
 
 }
 
+=head2 index
+
+Action for viewing all datasets that are available in the catalog. This page is
+primarily intended for search engines.
+
+=cut
 sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
 
@@ -60,6 +63,15 @@ sub index :Path :Args(0) {
     $c->stash( template => 'dataset/level1_datasets.tt', datasets => \@level1_datasets );
 }
 
+=head2 ds_id
+
+Root for chained actions. Used to get the ds_id from the URL and check that it
+actually matches a dataset in the catalog.
+
+If the dataset cannot be found the request is detached to the 'default' action
+in the Root controller.
+
+=cut
 sub ds_id :Chained("") :PathPart("dataset") :CaptureArgs(1) {
     my ( $self, $c ) = @_;
 
@@ -75,6 +87,11 @@ sub ds_id :Chained("") :PathPart("dataset") :CaptureArgs(1) {
 
 }
 
+=head2 xml
+
+A chained action for displaying the metadata XML for a dataset.
+
+=cut
 sub xml :Chained("ds_id") :PathPart("xml") :Args(0) {
     my ( $self, $c ) = @_;
 
@@ -96,6 +113,11 @@ sub xml :Chained("ds_id") :PathPart("xml") :Args(0) {
 
 }
 
+=head2 view
+
+A chained action for viewing the metadata for a dataset in HTML.
+
+=cut
 sub view :Chained("ds_id") :PathPart("view") :Args(0) {
     my ($self, $c) = @_;
 
@@ -103,6 +125,12 @@ sub view :Chained("ds_id") :PathPart("view") :Args(0) {
 
 }
 
+=head2 wmssetup
+
+A chained action for getting the WMS setup info for a dataset. The WMS setup
+info is returned as a XML document.
+
+=cut
 sub wmssetup :Chained("ds_id") :PathPart("wmssetup") :Args(0) {
     my ( $self, $c ) = @_;
 
@@ -122,6 +150,12 @@ sub wmssetup :Chained("ds_id") :PathPart("wmssetup") :Args(0) {
     }
 
 }
+
+=head2 rss
+
+A chained action for generating a RSS feed for a level 1 dataset.
+
+=cut
 sub rss :Chained("ds_id") :PathPart("rss") : Args(0) {
     my ( $self, $c ) = @_;
 
