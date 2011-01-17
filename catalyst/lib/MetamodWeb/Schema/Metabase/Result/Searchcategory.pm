@@ -71,7 +71,17 @@ GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
 
 =cut
 
-# You can replace this text with custom content, and it will be preserved on regeneration
+=head2 $self->sc_fnc_parsed()
+
+=over
+
+=item return
+
+The contents of the C<sc_fnc> is parsed returned as a hash reference.
+
+=back
+
+=cut
 sub sc_fnc_parsed {
     my $self = shift;
 
