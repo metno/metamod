@@ -59,7 +59,9 @@ primarily intended for search engines.
 sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
 
-    my @level1_datasets = $c->model('Metabase::Dataset')->level1_datasets()->all();
+    my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $c, config => $c->stash->{ mm_config } } );
+    my $ownertags = $search_utils->get_ownertags();
+    my @level1_datasets = $c->model('Metabase::Dataset')->level1_datasets( $ownertags )->all();
     $c->stash( template => 'dataset/level1_datasets.tt', datasets => \@level1_datasets );
 }
 
