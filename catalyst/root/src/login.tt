@@ -18,8 +18,8 @@
     For already registered users.
     </p>
     <form name="login" method="POST" action="[% c.uri_for('/login/authenticate') %]">
-        <input type="hidden" name="return" value="[% return %]" />
-        <input type="hidden" name="return_params" value="[% return_params %]" />
+        <input type="hidden" name="return_path" value="[% c.req.params.return_path %]" />
+        <input type="hidden" name="return_params" value="[% c.req.param.return_params %]" />
         <table>
             <tr>
             <td class="error" colspan="2">[% error_msg %]</td>
@@ -27,7 +27,7 @@
 
             <tr>
             <td><label for="username">Username<label></td>
-            <td><input type="text" name="username" id="username" value="[% username %]" /></td>
+            <td><input type="text" name="username" id="username" value="[% c.req.params.username %]" /></td>
             </tr>
 
             <tr>
@@ -46,43 +46,53 @@
 
     <h2>Request new user</h2>
 
-    <span style="font-weight: bolder">$this->registrationSuccess</span>
+    <span style="font-weight: bolder">[% register_info_msg %]</span>
 
     <p class="form">
     If you do not already have a username and password you can send a request for one. Be aware that it can take
     some time to process your request as it has to be manually approved.
     </p>
 
-    <form name="register" method="POST" action="">
+    <form name="register" method="POST" action="/login/register">
     <input type="hidden" name="return" value="$return" />
     <input type="hidden" name="params" value="$params" />
         <table>
             <tr>
-            <td class="error" colspan="2">$this->registrationFailure</td>
+            <td class="error" colspan="2">[% register_error_msg %]</td>
             </tr>
 
 
             <tr>
             <td><label for="name">Name</label></td>
-            <td><input type="text" id="name" name="name" value="$name" /></td>
+            <td><input type="text" id="name" name="name" value="[% c.req.params.name %]" /></td>
             </tr>
 
             <tr>
             <td><label for="email">Email address</label></td>
-            <td><input type="text" id="email" name="email" value="$email" /></td>
+            <td><input type="text" id="email" name="email" value="[% c.req.params.email %]" /></td>
             </tr>
 
             <tr>
             <td><label for="institution_name">Name of institution</label></td>
             <td>
                 <select id="institution_name" name="institution_name">
-                $institutionOptions;
+                    [% SET institutions = login_ui_utils.user_institutions() %]
+                    [% FOREACH institution IN institutions %]
+                        [% IF c.req.params.institution_name == institution.key %]
+                            [% SET institution_selected = 'selected="selected"' %]
+                        [% END %]
+                        <option [% institution_selected %] value="[% institution.key %]">[% institution.value %]</option>
+
+                        [%# Template toolkit lacks lexical scoping so need to reset the variable here. %]
+                        [% SET institution_selected = '' %]
+
+                    [% END %]
                 </select>
             </tr>
 
             <tr>
             <td><label for="telephone_number">Telephone number</label></td>
-            <td><input type="text" id="telephone_number" name="telephone_number" value="$telephoneNumber" /></td>
+            <td><input type="text" id="telephone_number" name="telephone_number" value="[% c.req.params.telephone_number %]" /></td>
             </tr>
 
             <tr>

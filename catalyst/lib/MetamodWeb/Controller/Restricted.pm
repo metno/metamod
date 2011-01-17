@@ -63,7 +63,7 @@ sub auto :Private {
         }
 
         # Redirect the user to the login page
-        $c->response->redirect($c->uri_for('/login', { return => $wanted_path, return_params => $wanted_string } ) );
+        $c->response->redirect($c->uri_for('/login', { return_path => $wanted_path, return_params => $wanted_string } ) );
 
         # Return 0 to cancel 'post-auto' processing and prevent use of application
         return 0;

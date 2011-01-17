@@ -23,11 +23,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use Moose;
 use namespace::autoclean;
 
+use MetamodWeb::Utils::UI::Login;
+
 BEGIN {extends 'Catalyst::Controller'; }
 
 =head1 NAME
 
-MetamodWeb::Controller::Login - Catalyst Controller
+MetamodWeb::Controller::Login - Controller for handling user login.
 
 =head1 DESCRIPTION
 
@@ -38,24 +40,37 @@ Catalyst Controller.
 =cut
 
 
+sub auto :Private {
+    my ( $self, $c ) = @_;
+
+    my $mm_config = $c->stash->{ mm_config }; my $ui_utils =
+    MetamodWeb::Utils::UI::Login->new( { config => $mm_config, c => $c } );
+    $c->stash( login_ui_utils => $ui_utils, );
+
+}
+
 =head2 index
+
+Action for display the login form.
 
 =cut
 
 sub index :Path :Args(0) {
     my ($self, $c) = @_;
 
-    # Get the username and password from form
-    my $username = $c->request->params->{username};
-    my $password = $c->request->params->{password};
-
-    $c->stash( username => $username,
-               'return' => $c->request->param('return'),
-               return_params => $c->request->param('return_params'),
-               template => 'login.tt' );
+    $c->stash( template => 'login.tt' );
 
 }
 
+=head2 authenticate
+
+Attempt to authenticate the user. If the authentication fails,
+send the user back to the login page with a message. Otherwise
+send the user to the page where they wanted to go in the
+first place or to main page if they where not redirected to the
+login page.
+
+=cut
 sub authenticate :Path('authenticate') :Args(0) {
     my ( $self, $c ) = @_;
 
@@ -68,22 +83,36 @@ sub authenticate :Path('authenticate') :Args(0) {
         # Attempt to log the user in
         if ($c->authenticate({ u_loginname => $username,
                                u_password => $password  } )) {
-            # If successful, then let them use the application
-            my $return = $c->request->param( 'return' ) || '/';
-            $c->log->debug( "Return:" . $return );
+
+            # If the user was redirected from a different page, e.g. subscription/,
+            # then we want to send them back to where they wanted in the first place.
+            # For that we use the CGI param 'return_path' if set.
+            my $return_path = $c->request->param( 'return_path' ) || '/';
+            $c->log->debug( "Return:" . $return_path );
             my $return_params = $c->request->param('return_params');
 
-            $c->response->redirect($c->uri_for($return) . "?$return_params" );
+            $c->response->redirect($c->uri_for($return_path) . "?$return_params" );
             return;
         } else {
-            # Set an error message
             $c->stash(error_msg => "Invalid username or password.");
         }
     } else {
-        # Set an error message
         $c->stash(error_msg => "Empty username or password.");
     }
 
+    $c->forward('index');
+
+}
+
+=head2 register
+
+Action for registering a new user in the system.
+
+=cut
+sub register : Path('register') :Args(0) {
+    my ($self, $c) = @_;
+
+    # not yet implemented to just send back to login
     $c->forward('index');
 
 }
