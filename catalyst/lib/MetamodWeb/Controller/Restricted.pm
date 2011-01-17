@@ -1,4 +1,4 @@
-package MetamodWeb::BaseController::Restricted;
+package MetamodWeb::Controller::Restricted;
 
 =begin LICENSE
 
@@ -31,9 +31,10 @@ MetamodWeb::Controller::Restricted - Catalyst Controller used to create restrict
 
 =head1 DESCRIPTION
 
-This Catalyst controll is used to add a login requirement to pages in an easy
-way. All pages that have a path like /restricted/<path> will require the user
-to authenticate themselves.
+This Catalyst controller is used to add login requirements to controllers. All
+controllers that are put in the MetamodWeb::Restricted::<module name> namespace
+will automatically have a login requirement that will be verified by this
+module's C<auto> method.
 
 =head1 METHODS
 
@@ -41,13 +42,13 @@ to authenticate themselves.
 
 =head2 auto
 
-Check if there is a user and, if not, forward to login page
+Check if we have a user object, i.e. that the user is logged in. If the user is
+not logged in we forward the user to the login page.
 
 =cut
 
 sub auto :Private {
     my ($self, $c) = @_;
-
 
     if (!$c->user_exists) {
 
