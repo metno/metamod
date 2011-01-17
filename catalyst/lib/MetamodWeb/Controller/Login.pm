@@ -33,13 +33,17 @@ MetamodWeb::Controller::Login - Controller for handling user login.
 
 =head1 DESCRIPTION
 
-Catalyst Controller.
+Controller for handling user login and registration.
 
 =head1 METHODS
 
 =cut
 
+=head2 auto
 
+Controller specific initialisation.
+
+=cut
 sub auto :Private {
     my ( $self, $c ) = @_;
 
