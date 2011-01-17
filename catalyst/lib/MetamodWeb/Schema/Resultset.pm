@@ -31,14 +31,43 @@ use Metamod::Config;
 
 MetamodWeb::Schema::Resultset - Base class for results sets.
 
-=head1 SYNOPSIS
-
 =head1 DESCRIPTION
+
+This module extends the standard C<DBIx::Class::ResultSet> with some additional
+methods that can be used for all result sets in MetamodWeb.
 
 =head1 FUNCTIONS/METHODS
 
 =cut
 
+=head2 $self->fulltext_search($search_text)
+
+Create a PostgreSQL fulltext search expression that can be used as part of a
+DBIx::Class search conditon.
+
+For instance
+
+  my $search_text = 'dummy'
+  my $dataset_rs = $model->resultset('Dataset');
+  my $result_rs = $dataset_rs->search( fulltext_column_name => $dataset_rs->fulltext_search($search_text));
+
+=over
+
+=item $search_text
+
+The search text that will be used for searching. The text will be split on
+spaces and then search expression that is created will AND them together in
+PostgreSQL syntax. For instance if searching for "hirlam ice" we get the search
+text "hirlam & ice" sent to PostgreSQL.
+
+=item return
+
+Returns the correct PostgreSQL syntax as a reference to a scalar. A reference
+to a scalar is so that C<DBIx::Class> interprets it as a raw SQL.
+
+=back
+
+=cut
 sub fulltext_search {
     my $self = shift;
 
@@ -53,44 +82,26 @@ sub fulltext_search {
 
 }
 
-sub dataset_location_search {
-    my $self = shift;
 
-    my ( $srid, $x1, $y1, $x2, $y2 ) = @_;
+=head2 $self->quote_sql_value($value)
 
-    my $config = Metamod::Config->new();
+Quote a concrete value correctly. This function is used when you cannot use
+normal SQL binding since the query has to contain raw SQL. For instance when
+generating PostgreSQL specific SQL.
 
-    my $scale_factor_x = $config->get("SRID_MAP_SCALE_FACTOR_X_$srid");
-    my $scale_factor_y = $config->get("SRID_MAP_SCALE_FACTOR_Y_$srid");
-    my $offset_x = $config->get("SRID_MAP_OFFSET_X_$srid");
-    my $offset_y = $config->get("SRID_MAP_OFFSET_Y_$srid");
+=over
 
-    if( !$scale_factor_x || !$scale_factor_y || !$offset_x || !$offset_y ){
-        die "Need all SRID map params in config for '$srid'. Got ($scale_factor_x,$scale_factor_y,$offset_x,$offset_y)";
-    }
+=item $value
 
+The value to quote.
 
-    my $x1m = ($x1 - $offset_x)*$scale_factor_x;
-    my $x2m = ($x2 - $offset_x)*$scale_factor_x;
-    my $y1m = ($y1 - $offset_y)*$scale_factor_y;
-    my $y2m = ($y2 - $offset_y)*$scale_factor_y;
+=item return
 
-    $x1m = $self->quote_sql_value( $x1m );
-    $x2m = $self->quote_sql_value( $x2m );
-    $y1m = $self->quote_sql_value( $y1m );
-    $y2m = $self->quote_sql_value( $y2m );
+The value which has now been quoted.
 
-    my $selected_box = "ST_MakeBox2D(ST_Point($x1m, $y1m),ST_Point($x2m,$y2m))";
-    my $bounding_box = "ST_SetSRID($selected_box,$srid)";
-    my $geom_column  = "geom_$srid";
+=back
 
-    my $search_cond = {
-        IN => \"( SELECT DISTINCT ds_id FROM dataset_location WHERE ST_DWITHIN( $bounding_box, $geom_column, 0.1))",
-    };
-    return $search_cond;
-
-}
-
+=cut
 sub quote_sql_value {
     my $self = shift;
 
