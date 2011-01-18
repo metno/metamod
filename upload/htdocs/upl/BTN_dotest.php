@@ -110,7 +110,7 @@
 
     $emailfile = $mmConfig->getVar('WEBRUN_DIRECTORY').'/upl/etaf/' . $origname;
     $EMAILFILE = fopen($emailfile,'w');
-    fwrite($EMAILFILE,decodenorm($normemail) . " " . $userinfo["name"] . "\n");
+    fwrite($EMAILFILE,decodenorm($normemail) . " " . $userinfo["u_name"] . "\n");
     fclose($EMAILFILE);
     $dirpath = $mmConfig->getVar('WEBRUN_DIRECTORY').'/upl/ftaf';
     mmPutTest("BTN_dotest.php: About to move uploaded file to: " . $dirpath);
