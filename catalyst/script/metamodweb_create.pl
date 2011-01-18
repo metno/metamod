@@ -10,11 +10,11 @@ Catalyst::ScriptRunner->run('MetamodWeb', 'Create');
 
 =head1 NAME
 
-metamod_create.pl - Create a new Catalyst Component
+metamodweb_create.pl - Create a new Catalyst Component
 
 =head1 SYNOPSIS
 
-metamod_create.pl [options] model|view|controller name [helper] [options]
+metamodweb_create.pl [options] model|view|controller name [helper] [options]
 
  Options:
    --force        don't create a .new file where a file to be created exists
@@ -22,13 +22,13 @@ metamod_create.pl [options] model|view|controller name [helper] [options]
    --help         display this help and exits
 
  Examples:
-   metamod_create.pl controller My::Controller
-   metamod_create.pl -mechanize controller My::Controller
-   metamod_create.pl view My::View
-   metamod_create.pl view MyView TT
-   metamod_create.pl view TT TT
-   metamod_create.pl model My::Model
-   metamod_create.pl model SomeDB DBIC::Schema MyApp::Schema create=dynamic\
+   metamodweb_create.pl controller My::Controller
+   metamodweb_create.pl -mechanize controller My::Controller
+   metamodweb_create.pl view My::View
+   metamodweb_create.pl view MyView TT
+   metamodweb_create.pl view TT TT
+   metamodweb_create.pl model My::Model
+   metamodweb_create.pl model SomeDB DBIC::Schema MyApp::Schema create=dynamic\
    dbi:SQLite:/tmp/my.db
    metamod_create.pl model AnotherDB DBIC::Schema MyApp::Schema create=static\
    dbi:Pg:dbname=foo root 4321

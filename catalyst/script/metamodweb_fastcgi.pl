@@ -7,11 +7,11 @@ Catalyst::ScriptRunner->run('MetamodWeb', 'FastCGI');
 
 =head1 NAME
 
-metamod_fastcgi.pl - Catalyst FastCGI
+metamodweb_fastcgi.pl - Catalyst FastCGI
 
 =head1 SYNOPSIS
 
-metamod_fastcgi.pl [options]
+metamodweb_fastcgi.pl [options]
 
  Options:
    -? -help      display this help and exits

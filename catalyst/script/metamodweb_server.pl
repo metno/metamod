@@ -22,11 +22,11 @@ Catalyst::ScriptRunner->run('MetamodWeb', 'Server');
 
 =head1 NAME
 
-metamod_server.pl - Catalyst Test Server
+metamodweb_server.pl - Catalyst Test Server
 
 =head1 SYNOPSIS
 
-metamod_server.pl [options]
+metamodweb_server.pl [options]
 
    -d --debug           force debug mode
    -f --fork            handle each request in a new process

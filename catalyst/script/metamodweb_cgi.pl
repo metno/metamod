@@ -7,7 +7,7 @@ Catalyst::ScriptRunner->run('MetamodWeb', 'CGI');
 
 =head1 NAME
 
-metamod_cgi.pl - Catalyst CGI
+metamodweb_cgi.pl - Catalyst CGI
 
 =head1 SYNOPSIS
 

@@ -7,11 +7,11 @@ Catalyst::ScriptRunner->run('MetamodWeb', 'Test');
 
 =head1 NAME
 
-metamod_test.pl - Catalyst Test
+metamodweb_test.pl - Catalyst Test
 
 =head1 SYNOPSIS
 
-metamod_test.pl [options] uri
+metamodweb_test.pl [options] uri
 
  Options:
    --help    display this help and exits
