@@ -51,7 +51,7 @@ function get_exception($mtname, $exception, $value) {
             return htmlspecialchars($value); # Hack. Return some non-false value. The actual value to be used is a constant
                            # not accessible from this function. Egils
          } elseif ($exception <= count($parts)) {
-            return htmlspecialchars($parts[$exception - 1]);
+            return htmlspecialchars(strtoupper($parts[$exception - 1]));
          }
       } else { // gcmd-string keywords, splitted by >, appended '> HIDDEN' at the end
       	$parts = preg_split('/\s*>\s*/', $value, -1, PREG_SPLIT_NO_EMPTY);
