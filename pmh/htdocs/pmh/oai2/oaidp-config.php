@@ -437,7 +437,7 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
          '', '*IDN_Node Short_Name', 'IPY', '',
          '', '*IDN_Node Short_Name', 'DOKIPY', '',
          '', 'Metadata_Name', 'CEOS IDN DIF','',
-         '', 'Metadata_Version', '9.7','',
+         '', 'Metadata_Version', '9.8.2','',
          '!DS_creationDate', 'DIF_Creation_Date', '','',
          '!DS_datestamp', 'Last_DIF_Revision_Date', '','',
          '', 'Private', 'False','',
