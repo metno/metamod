@@ -428,7 +428,8 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
          '', 'Data_Center Personnel Contact_Address Country', 'Norway','',
          'references', 'Reference', '','',
          'abstract', 'Summary Abstract', '','Not Available',
-         'dataref 1', '*Related_URL URL', '','', # URLs should appear here according to GCMD
+         'dataref 99', '*Related_URL URL_Content_Type Type', 'VIEW RELATED INFORMATION','', # URLs should appear here according to GCMD
+         'dataref 1', 'Related_URL URL', '','', # URLs should appear here according to GCMD
          'gtsFileIdentifier 1', '*Related_URL', '', '',
          'gtsInstancePattern 1', '*Related_URL', '', '',
          '', '*IDN_Node Short_Name', 'ARCTIC/NO', '',
