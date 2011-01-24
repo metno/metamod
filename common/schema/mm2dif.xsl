@@ -7,7 +7,8 @@
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
                 xmlns:nc="http://vocab.ndg.nerc.ac.uk/list/P071/current"
                 xmlns:nco="http://vocab.ndg.nerc.ac.uk/list/P072/current"
-                xmlns:topic="mailto:geira@met.no?Subject=WTF"
+                xmlns:jif="http://www.met.no/schema/metamod/jif"
+                xmlns:topic="http://www.met.no/schema/metamod/mm2dif"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xmlns="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/"
                 xsi:schemaLocation="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/ http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif_v9.8.2.xsd"
@@ -27,11 +28,11 @@
     <DIF>
 
       <Entry_ID><xsl:value-of select="$DS_name"/></Entry_ID>
-      <Entry_Title topic:default="Not Available"><xsl:value-of select="key('mm2', 'title')"/></Entry_Title>
+      <Entry_Title jif:default="Not Available"><xsl:value-of select="key('mm2', 'title')"/></Entry_Title>
 
       <Data_Set_Citation>
-        <Dataset_Creator topic:default="Not Available"><xsl:value-of select="key('mm2', 'PI_name')"/></Dataset_Creator>
-        <Dataset_Title topic:default="Not Available"><xsl:value-of select="key('mm2', 'title')"/></Dataset_Title>
+        <Dataset_Creator jif:default="Not Available"><xsl:value-of select="key('mm2', 'PI_name')"/></Dataset_Creator>
+        <Dataset_Title jif:default="Not Available"><xsl:value-of select="key('mm2', 'title')"/></Dataset_Title>
         <Dataset_Release_Date>Not Available</Dataset_Release_Date>
         <Dataset_Release_Place>Not Available</Dataset_Release_Place>
         <Dataset_Publisher><xsl:value-of select="key('mm2', 'institution')"/></Dataset_Publisher>
@@ -43,7 +44,10 @@
       <xsl:call-template name="personell">
         <xsl:with-param name="role" select="'Technical Contact'"/>
       </xsl:call-template>
+      
+      <xsl:comment>start of variables</xsl:comment>
       <xsl:apply-templates select="key('mm2', 'variable')"/>
+      <xsl:comment>end of variables</xsl:comment>
 
       <xsl:variable name="topiccategory" select="key('mm2', 'topiccategory')"/>
       <ISO_Topic_Category><xsl:value-of select="document('')/*/topic:category[@name = $topiccategory]"/></ISO_Topic_Category>
@@ -55,8 +59,8 @@
         <Stop_Date><xsl:value-of select="key('mm2', 'datacollection_period_to')"/></Stop_Date>
       </Temporal_Coverage>
 
-      <xsl:apply-templates select="key('mm2', 'bounding_box')"/>
       <Data_Set_Progress>In Work</Data_Set_Progress>
+      <xsl:apply-templates select="key('mm2', 'bounding_box')"/>
       <xsl:apply-templates select="key('mm2', 'area')"/>
 
       <!-- Project -->
@@ -76,8 +80,8 @@
 
         <xsl:otherwise>
           <Project>
-            <Short_Name topic:default="Not Available"><xsl:value-of select="$project"/></Short_Name>
-            <Long_Name topic:default="Not Available"><xsl:value-of select="$project"/></Long_Name>
+            <Short_Name jif:default="Not Available"><xsl:value-of select="$project"/></Short_Name>
+            <Long_Name jif:default="Not Available"><xsl:value-of select="$project"/></Long_Name>
           </Project>
         </xsl:otherwise>
 
@@ -91,7 +95,7 @@
         </Project>
       </xsl:for-each>
 
-      <Access_Constraints topic:default="Not Available"><xsl:value-of select="key('mm2', 'distribution_statement')"/></Access_Constraints>
+      <Access_Constraints jif:default="Not Available"><xsl:value-of select="key('mm2', 'distribution_statement')"/></Access_Constraints>
       <Use_Constraints>Not Available</Use_Constraints>
       <Data_Set_Language>Not Available</Data_Set_Language>
 
@@ -107,7 +111,7 @@
        </Data_Center>
 
       <Reference><xsl:value-of select="key('mm2', 'references')"/></Reference>
-      <Summary><Abstract topic:default="Not Available"><xsl:value-of select="key('mm2', 'abstract')"/></Abstract></Summary>
+      <Summary><Abstract jif:default="Not Available"><xsl:value-of select="key('mm2', 'abstract')"/></Abstract></Summary>
       <Related_URL>
         <URL_Content_Type>
           <Type>VIEW RELATED INFORMATION</Type>
@@ -196,10 +200,10 @@
     <xsl:param name="topicvar"/>
     <xsl:param name="origin"/>
     <Parameters>
-      <Category         topic:default="EARTH SCIENCE"><xsl:value-of select="$topicvar/gcmd:category"/></Category>
-      <Topic            topic:default="Not Available"><xsl:value-of select="$topicvar/gcmd:topic"/></Topic>
-      <Term             topic:default="Not Available"><xsl:value-of select="$topicvar/gcmd:term"/></Term>
-      <Variable_Level_1 topic:default="Not Available"><xsl:value-of select="$topicvar/gcmd:VL1"/></Variable_Level_1>
+      <Category         jif:default="EARTH SCIENCE"><xsl:value-of select="$topicvar/gcmd:category"/></Category>
+      <Topic            jif:default="Not Available"><xsl:value-of select="$topicvar/gcmd:topic"/></Topic>
+      <Term             jif:default="Not Available"><xsl:value-of select="$topicvar/gcmd:term"/></Term>
+      <Variable_Level_1 jif:default="Not Available"><xsl:value-of select="$topicvar/gcmd:VL1"/></Variable_Level_1>
       <Detailed_Variable><xsl:value-of select="$origin"/></Detailed_Variable>
     </Parameters>
   </xsl:template>

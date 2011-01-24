@@ -48,9 +48,11 @@ our $_logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
 
 my $mm2ToDifXslt = $Metamod::DatasetTransformer::XSLT_DIR . 'mm2dif.xsl';
 my $isoToDifXslt = $Metamod::DatasetTransformer::XSLT_DIR . 'iso2dif.xslt';
+my $jifXslt = $Metamod::DatasetTransformer::XSLT_DIR . 'jif.xsl';
 
 my $mm2ToDifStyle;
 my $isoToDifStyle;
+my $jifStyle;
 my $_init = 0;
 sub _init {
     return if $_init++;
@@ -64,6 +66,11 @@ sub _init {
     $isoToDifStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet($styleDoc);
     if (!$isoToDifStyle) {
         $_logger->logcroak("cannot parse stylesheet $isoToDifXslt");   
+    }
+    $styleDoc = Metamod::DatasetTransformer->XMLParser->parse_file($jifXslt);
+    $jifStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet($styleDoc);
+    if (!$jifStyle) {
+        $_logger->logcroak("cannot parse stylesheet $jifXslt");   
     }
 }
 
@@ -101,19 +108,13 @@ sub foreignDataset2Dif {
             DS_datestamp => $info{datestamp},
         );
         my $mm2Doc = $foreignDataset->getMETA_DOC();
-        my $difDoc = $mm2ToDifStyle->transform(
+        my $_difDoc = $mm2ToDifStyle->transform(
             $mm2Doc,
             XML::LibXSLT::xpath_to_string(%params) # always double quote strings for XSLT
         );
         # post-transform processing
+        my $difDoc = $jifStyle->transform($_difDoc);
 
-        my $xc = XML::LibXML::XPathContext->new( $difDoc->documentElement() );
-        $xc->registerNs('topic', "mailto:geira\@met.no?Subject=WTF");
-        
-        foreach ($xc->findnodes('//*[@topic:default]')) {
-            $_->appendTextNode( $_->getAttribute('topic:default') ) unless $_->textContent;
-            $_->removeAttribute('topic:default');
-        }
         return Metamod::ForeignDataset->newFromDoc($difDoc, $foreignDataset->getXMD_DOC());
     }
     
