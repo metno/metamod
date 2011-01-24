@@ -60,7 +60,7 @@ sub setup2wmc {
     my $xslt = XML::LibXSLT->new();
     my $wmcns = "http://www.opengis.net/context";
     my $getcap = $wmsurl || $setup->documentElement->getAttribute('url') or die("Missing setup or WMS url");
-    printf STDERR "XML: %s\n", $getcap;
+    #printf STDERR "XML: %s\n", $getcap;
     $getcap .= '?service=WMS&version=1.3.0&request=GetCapabilities';
     my $stylesheet = $xslt->parse_stylesheet_file($xslfile);
     my $results = eval { $stylesheet->transform( getXML($getcap), XML::LibXSLT::xpath_to_string(%bbox) ); };
