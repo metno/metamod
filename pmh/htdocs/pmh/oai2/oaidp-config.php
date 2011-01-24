@@ -206,7 +206,7 @@ $METADATAFORMATS = 	array (
 					'record_namespace' => 'http://purl.org/dc/elements/1.1/'
 			                ),
 				'dif' => array('metadataPrefix'=>'DIF',
-					'schema'=>'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif_v9.7.1.xsd',
+					'schema'=>'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif.xsd',
 					'metadataNamespace'=>'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/',
 					'myhandler'=>'record_gen.php',
 					'record_namespace' => ''
@@ -378,7 +378,6 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
    		'', 'Data_Set_Citation Dataset_Release_Place', 'Not Available', '',
          'institution', 'Data_Set_Citation Dataset_Publisher', '','',
          '', 'Data_Set_Citation Version', 'Not Available', '',
-         'dataref', 'Data_Set_Citation Online_Resource', '','',
          '', '*Personnel Role', 'Technical Contact', '',
          '', 'Personnel First_Name', 'Egil', '',
          '', 'Personnel Last_Name', 'Støren', '',
@@ -388,9 +387,7 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
          '', 'Personnel Contact_Address City', 'Oslo','',
          '', 'Personnel Contact_Address Postal_Code', 'N-0313','',
          '', 'Personnel Contact_Address Country', 'Norway','',
-         'gtsFileIdentifier 1', '*Related_URL', '', '',
-         'gtsInstancePattern 1', '*Related_URL', '', '',
-         'variable 4', '*Parameters Category', 'EARTH SCIENCE','Not Available',
+         'variable 99', '*Parameters Category', 'EARTH SCIENCE','Not Available',
          'variable 1', 'Parameters Topic', '','Not Available',
          'variable 2', 'Parameters Term', '','Not Available',
          'variable 3', 'Parameters Variable_Level_1', '','',
@@ -405,9 +402,16 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
          'area 2', 'Location Location_Type', '','',
          'area 3', 'Location Location_Subregion1', '','',
          'area -1', 'Location Detailed_Location', '','',
+         'area 10', '*Location Location_Category', '','', # required by GCMD
+         'area 11', 'Location Location_Type', '','', # required by GCMD
+         'area 12', '*Location Location_Category', '','', # required by GCMD
+         'area 13', 'Location Location_Type', '','', # required by GCMD
          'latitude_resolution 1', 'Data_Resolution Latitude_Resolution', '','',
          'longitude_resolution 1', 'Data_Resolution Longitude_Resolution', '','',
-         'project_name 1', 'Project Short_Name', '', 'Not Available',
+         'project_name 3', '*Project Short_Name', '', 'Not Available', # required by GCMD (IPY projects)
+         'project_name 4', 'Project Long_Name', '', '', # required by GCMD (IPY projects)
+         'project_name 1', '*Project Short_Name', '', '',
+         'project_name 2', 'Project Long_Name', '', '',
          'distribution_statement', 'Access_Constraints', '','Not Available',
          '', 'Use_Constraints', 'Not Available', '',
          '', 'Data_Set_Language', 'Not Available', '',
@@ -423,8 +427,12 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
          '', 'Data_Center Personnel Contact_Address Postal_Code', 'N-0313','',
          '', 'Data_Center Personnel Contact_Address Country', 'Norway','',
          'references', 'Reference', '','',
-         'abstract', 'Summary', '','Not Available',
+         'abstract', 'Summary Abstract', '','Not Available',
+         'dataref 1', '*Related_URL URL', '','', # URLs should appear here according to GCMD
+         'gtsFileIdentifier 1', '*Related_URL', '', '',
+         'gtsInstancePattern 1', '*Related_URL', '', '',
          '', '*IDN_Node Short_Name', 'ARCTIC/NO', '',
+         '', '*IDN_Node Short_Name', 'ARCTIC', '',
          '', '*IDN_Node Short_Name', 'IPY', '',
          '', '*IDN_Node Short_Name', 'DOKIPY', '',
          '', 'Metadata_Name', 'CEOS IDN DIF','',

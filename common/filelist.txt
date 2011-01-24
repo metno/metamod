@@ -86,6 +86,7 @@ logger_config.ini
 =schema/iso2dif.xslt
 =schema/dif2iso.xslt
 =schema/dif_v9.7.1.xsd
+=schema/dif_v9.8.xsd
 =schema/OAI-PMH.xsd
 =schema/oai_dc.xsd
 =schema/simpledc20021212.xsd

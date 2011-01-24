@@ -33,6 +33,8 @@ function get_exception($mtname, $exception, $value) {
    global $areas;
    global $topicCategories;
    global $projectNames;
+   global $projectLongNames;
+   global $ipyProjects;
    if ($mtname == 'variable') {
    	  $detail = $value;
       if (array_key_exists($value, $topics)) {
@@ -44,12 +46,12 @@ function get_exception($mtname, $exception, $value) {
             $parts = explode(" > ",$topics[$value][1]);
          }
          if ($exception < 0) {
-      	    return $detail;
-         } elseif ($exception == 4) {
-            return $value; # Hack. Return some non-false value. The actual value to be used is a constant
+      	    return htmlspecialchars($detail);
+         } elseif ($exception == 99) {
+            return htmlspecialchars($value); # Hack. Return some non-false value. The actual value to be used is a constant
                            # not accessible from this function. Egils
          } elseif ($exception <= count($parts)) {
-            return $parts[$exception - 1];
+            return htmlspecialchars($parts[$exception - 1]);
          }
       } else { // gcmd-string keywords, splitted by >, appended '> HIDDEN' at the end
       	$parts = preg_split('/\s*>\s*/', $value, -1, PREG_SPLIT_NO_EMPTY);
@@ -61,14 +63,14 @@ function get_exception($mtname, $exception, $value) {
         if (array_key_exists($detail, $inverse_topics)) {
            if ($exception < 0) {
       	      return FALSE; # detail not required if full gcmd-keywords
-           } elseif ($exception == 4) {
-              return $value; # Hack. See above
+           } elseif ($exception == 99) {
+              return htmlspecialchars($value); # Hack. See above
            } elseif ($exception <= count($parts)) {
       	      $val = $parts[$exception - 1];
       	      if ($val == "Spectral Engineering") {
       	         $val = "Spectral/Engineering"; # fix bug in Metamod-data
       	      }
-              return $val;
+              return htmlspecialchars(strtoupper($val));
            }
         }
       }
@@ -76,10 +78,15 @@ function get_exception($mtname, $exception, $value) {
    elseif ($mtname == "datacollection_period") {
       $parts = explode(" to ",$value);
       if (count($parts) >= $exception) {
-         return $parts[$exception - 1];
+         return htmlspecialchars($parts[$exception - 1]);
       }
    }
    elseif ($mtname == "area") {
+      if (array_key_exists($value, $areas)) {
+         $gcmd_area = $areas[$value];
+      } else {
+         $gcmd_area = $value;
+      }
    	  $detail = $value;
       if (array_key_exists($value, $areas)) {
          $parts = explode(" > ",$areas[$value]);
@@ -95,9 +102,41 @@ function get_exception($mtname, $exception, $value) {
 		 }
       }
       if ($exception < 0) {
-      	  return $detail;
+      	  return htmlspecialchars($detail);
       } elseif ($exception <= count($parts)) {
-          return $parts[$exception - 1];
+          return htmlspecialchars($parts[$exception - 1]);
+      }
+      if ($exception >= 10) {
+         $polar = FALSE;
+         if (preg_match ('/ARCTIC/',$gcmd_area) || preg_match ('/NORTHERN HEMISPHERE/',$gcmd_area)) {
+            $arctic = "ARCTIC";
+            $polar = "POLAR";
+         } else {
+            $arctic = FALSE;
+         }
+         if (preg_match ('/SOUTHERN HEMISPHERE/',$gcmd_area)) {
+            $polar = "POLAR";
+         }
+         if ($exception == 10) {
+            if ($polar !== FALSE) {
+               return "GEOGRAPHIC REGION";
+            } else {
+               return FALSE;
+            }
+         }
+         if ($exception == 11) {
+            return $polar;
+         }
+         if ($exception == 12) {
+            if ($arctic !== FALSE) {
+               return "GEOGRAPHIC REGION";
+            } else {
+               return FALSE;
+            }
+         }
+         if ($exception == 13) {
+            return $arctic;
+         }
       }
    }
    elseif ($mtname == "bounding_box") {
@@ -110,7 +149,7 @@ function get_exception($mtname, $exception, $value) {
    }
    elseif ($mtname == "latitude_resolution" || $mtname == "longitude_resolution") {
       if ($exception == 1) {
-         return "$value degrees";
+         return htmlspecialchars($value) . " degrees";
       }
    }
    elseif ($mtname == "DS_ownertag") {
@@ -122,22 +161,50 @@ function get_exception($mtname, $exception, $value) {
    }
    elseif ($mtname == "DS_name") {
       if ($exception == 1) {
-         return str_replace('/','_',$value);
+         return htmlspecialchars(str_replace('/','_',$value));
       }
    }
    elseif ($mtname == "topiccategory") {
    	  if (array_key_exists($value, $topicCategories)) {
-   		 return $topicCategories[$value];
+   		 return htmlspecialchars($topicCategories[$value]);
    	  } else {
-   		 return $value;
+   		 return htmlspecialchars($value);
    	  }
    }
    elseif ($mtname == "project_name") {
    	  if (array_key_exists($value, $projectNames)) {
-   		 return $projectNames[$value];
+   	     $shortname = $projectNames[$value];
    	  } else {
-   		 return $value;
+   	     $shortname = $value;
    	  }
+      if ($exception == 1) {
+         return htmlspecialchars($shortname);
+      } else if ($exception == 2) {
+         if (array_key_exists($shortname, $projectLongNames)) {
+            return htmlspecialchars($projectLongNames[$shortname]);
+         } else {
+            return FALSE;
+         }
+      } else if ($exception == 3) {
+         if (array_key_exists($value, $ipyProjects)) {
+            return "IPY";
+         } else {
+            return FALSE;
+         }
+      } else if ($exception == 4) {
+         if (array_key_exists($value, $ipyProjects)) {
+            return "INTERNATIONAL POLAR YEAR";
+         } else {
+            return FALSE;
+         }
+   	  }
+   }
+   elseif ($mtname == "dataref") {
+      if (preg_match ('!^https?://!',$value)) {
+         return htmlspecialchars($value);
+      } else {
+         return FALSE;
+      }
    }
    elseif ($mtname == "gtsInstancePattern") {
    	  return

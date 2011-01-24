@@ -134,7 +134,7 @@ if (!$gotFile) {
             	    } else if ($excpt != 0) {
                	        $val = get_exception($prev_mtname,$excpt,$value);
 	                    if ($val !== FALSE) {
-                            if ($excpt == 4) {
+                            if ($excpt == 99) {
                                 $outlist[] = array($path,htmlspecialchars($const));
                                 $count_of_defaultvalues++;
                             } else {

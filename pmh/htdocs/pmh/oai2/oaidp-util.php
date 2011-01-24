@@ -132,7 +132,7 @@ function oai_error($code, $argument = '', $value = '')
 	return $error;
 }
 
-function xmlstr($string, $charset = 'iso8859-1', $xmlescaped = 'false')
+function xmlstr($string, $charset = 'iso8859-1', $xmlescaped = true)
 {
 	$xmlstr = stripslashes(trim($string));
 	// just remove invalid characters

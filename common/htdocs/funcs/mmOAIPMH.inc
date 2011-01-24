@@ -67,7 +67,7 @@ class MM_OaiPmh {
 	static function getKnownRecordSchemas() {
 	   global $mmConfig;
 	   return array(
-			"http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/" => $mmConfig->getVar("TARGET_DIRECTORY") . "/schema/dif_v9.7.1.xsd",
+			"http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/" => $mmConfig->getVar("TARGET_DIRECTORY") . "/schema/dif_v9.8.xsd",
 	   	"http://purl.org/dc/elements/1.1/" => $mmConfig->getVar("TARGET_DIRECTORY") . "/schema/simpledc20021212.xsd",
 	   	"http://www.openarchives.org/OAI/2.0/oai_dc/" => $mmConfig->getVar("TARGET_DIRECTORY") . "/schema/oai_dc.xsd"
 	   );

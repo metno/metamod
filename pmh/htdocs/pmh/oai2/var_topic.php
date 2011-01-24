@@ -4,6 +4,8 @@ global $inverse_topics;
 global $areas;
 global $topicCategories;
 global $projectNames;
+global $projectLongNames;
+global $ipyProjects;
 $topics = array("aerosol_angstrom_exponent" => array("Atmosphere > Aerosols > Aerosol Particle Properties")
    ,"air_potential_temperature" => array("Atmosphere > Atmospheric Temperature > Potential Temperature")
    ,"air_pressure" => array("Atmosphere > Atmospheric Pressure > Atmospheric Pressure Measurements")
@@ -663,25 +665,25 @@ foreach ($topics as $var => $gcmdarr) {
       }
    }
 }
-$areas = array("Arctic Ocean" => "Ocean > Arctic Ocean",
-   "Northern Hemisphere" => "Geographic Region > Northern Hemisphere",
-   "Norwegian Sea" => "Ocean > Atlantic Ocean > North Atlantic Ocean",
-   "Nordic Seas" => "Ocean > Atlantic Ocean > North Atlantic Ocean",
-   "North Atlantic Ocean" => "Ocean > Atlantic Ocean > North Atlantic Ocean",
-   "Greenland Sea" => "Ocean > Arctic Ocean",
-   "Barents Sea" => "Ocean > Arctic Ocean > Barents Sea",
-   "Fram Strait" => "Ocean > Arctic Ocean",
-   "Central Arctic" => "Ocean > Arctic Ocean",
-   "Iceland Sea" => "Ocean > Atlantic Ocean > North Atlantic Ocean",
-   "Denmark Strait" => "Ocean > Arctic Ocean",
-   "Laptev Sea" => "Ocean > Arctic Ocean",
-   "Kara Sea" => "Ocean > Arctic Ocean",
-   "Beufort Sea" => "Ocean > Arctic Ocean",
-   "Chukchi Sea" => "Ocean > Arctic Ocean",
-   "East Siberian Sea" => "Ocean > Arctic Ocean",
-   "White Sea" => "Ocean > Arctic Ocean",
-   "Southern Hemipshere" => "Geographic Region > Southern Hemipshere",
-   "Denmark Strait Sea" => "Ocean > Arctic Ocean"
+$areas = array("Arctic Ocean" => "OCEAN > ARCTIC OCEAN",
+   "Northern Hemisphere" => "GEOGRAPHIC REGION > NORTHERN HEMISPHERE",
+   "Norwegian Sea" => "OCEAN > ATLANTIC OCEAN > NORTH ATLANTIC OCEAN",
+   "Nordic Seas" => "OCEAN > ATLANTIC OCEAN > NORTH ATLANTIC OCEAN",
+   "North Atlantic Ocean" => "OCEAN > ATLANTIC OCEAN > NORTH ATLANTIC OCEAN",
+   "Greenland Sea" => "OCEAN > ARCTIC OCEAN",
+   "Barents Sea" => "OCEAN > ARCTIC OCEAN > BARENTS SEA",
+   "Fram Strait" => "OCEAN > ARCTIC OCEAN",
+   "Central Arctic" => "OCEAN > ARCTIC OCEAN",
+   "Iceland Sea" => "OCEAN > ATLANTIC OCEAN > NORTH ATLANTIC OCEAN",
+   "Denmark Strait" => "OCEAN > ARCTIC OCEAN",
+   "Laptev Sea" => "OCEAN > ARCTIC OCEAN",
+   "Kara Sea" => "OCEAN > ARCTIC OCEAN",
+   "Beufort Sea" => "OCEAN > ARCTIC OCEAN",
+   "Chukchi Sea" => "OCEAN > ARCTIC OCEAN",
+   "East Siberian Sea" => "OCEAN > ARCTIC OCEAN",
+   "White Sea" => "OCEAN > ARCTIC OCEAN",
+   "Southern Hemipshere" => "GEOGRAPHIC REGION > SOUTHERN HEMISPHERE",
+   "Denmark Strait Sea" => "OCEAN > ARCTIC OCEAN"
 );
 
 $topicCategories = array(
@@ -715,5 +717,50 @@ $projectNames = array(
    "Hamburg Arctic Ocean Buoy Drift Experiment DAMOCLES 2008-2009" => "DAMOCLES",
    "Hamburg Arctic Ocean Buoy Drift Experiment DAMOCLES 2007-2008" => "DAMOCLES",
    "IPY/iAOOS/Damocles" => "DAMOCLES"
+);
+
+$projectLongNames = array(
+   "DAMOCLES" => "Developing Arctic Modelling & Observing Capabilities for Long-term Env. Studies"
+);
+
+$ipyProjects = array(
+   "AOE-2001" => 1,
+   "Arctic Summer Cloud Ocean Study" => 1,
+   "Arctic Summer Cloud Ocean Study (ASCOS)" => 1,
+   "Arctic Summer Cloud-Ocean Study (ASCOS)" => 1,
+   "Arctic Summer Cloud Ocean Study (ASCOS) 2008" => 1,
+   "AREX 2008" => 1,
+   "ARIST" => 1,
+   "ASCOS" => 1,
+   "AtmoTroll" => 1,
+   "Beaufort Gyre Observing System (BGOS)" => 1,
+   "DAMOCLES" => 1,
+   "Damocles, AREX 2007" => 1,
+   "DAMOCLES IP" => 1,
+   "Damocles,TotalPoleAirship" => 1,
+   "ECMWF" => 1,
+   "EUMETSAT OSI SAF" => 1,
+   "Hamburg Arctic Ocean Buoy Drift Experiment DAMOCLES 2007-2008" => 1,
+   "Hamburg Arctic Ocean Buoy Drift Experiment DAMOCLES 2008-2009" => 1,
+   "HIRLAM" => 1,
+   "IAOOS" => 1,
+   "iAOOS-Norway" => 1,
+   "iAOOS-Norway/IPY-THORPEX" => 1,
+   "IPY/Damocles/iAOOS" => 1,
+   "IPY/iAOOS/Damocles" => 1,
+   "IPY Operational Data Coordination" => 1,
+   "IPY-THORPEX" => 1,
+   "ISSS08" => 1,
+   "ISSS-08" => 1,
+   "LOMROG" => 1,
+   "LOMROG 2007" => 1,
+   "Nansen and Amundsen Basins Observational System (NABOS)" => 1,
+   "North Pole Environmental Observatory (NPEO)" => 1,
+   "POLARCAT" => 1,
+   "POLEWARD" => 1,
+   "REFLEX-2" => 1,
+   "SUMO on Spitsbergen 2008" => 1,
+   "SUMO on Spitsbergen 2009" => 1,
+   "WARPS" => 1
 );
 ?>
