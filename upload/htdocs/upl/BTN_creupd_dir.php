@@ -126,7 +126,7 @@
  // Get a new value for the directory key if provided by the user. Check it
  // and make a normalized string out of it ($ndirkey):
 
-    if (strlen($dirkey) == 0) {
+    if (strlen($dirkey) == 0 && $external_repository) {
        $error = 1;
        $nextpage = 3;
        mmPutLog('Create/Update: User provided empty directory key');
@@ -257,7 +257,11 @@
     if (file_exists($dirpath)) {
        if (array_key_exists($dirname,$dirinfo)) {
           if ($dirkey == $odirkey) {
+             if ($dirkey == "") {
+                $errmsg = "Directory $dirname already exists";
+             } else {
              $errmsg = "Directory $dirname already exists with the directory key you asked for";
+             }
           } else {
              $errmsg = "Directory key for directory $dirname updated";
              $update_dirinfo_needed = TRUE;
