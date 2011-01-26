@@ -257,21 +257,22 @@ if ( $mmDbConnection ) {
          } else {
             $rowarr[$dsstatusix] = "deleted";
          }
+         $basename = mmGetBasename($rowarr[$dsfilepathix]);
          if ($checked == " checked" && array_key_exists("mdel",$_POST)) {
             list($xmd, $xml) = mmGetDatasetFileContent($rowarr[$dsfilepathix]);
             $newxmd = str_replace('status="active"','status="deleted"',$xmd);
-            mmWriteDataset($rowarr[$dsfilepathix], $newxmd, $xml);
+            mmWriteDataset($basename, $newxmd, $xml);
          }
          if ($checked == " checked" && array_key_exists("activate",$_POST)) {
             list($xmd, $xml) = mmGetDatasetFileContent($rowarr[$dsfilepathix]);
             $newxmd = str_replace('status="deleted"','status="active"',$xmd);
-            mmWriteDataset($rowarr[$dsfilepathix], $newxmd, $xml);
+            mmWriteDataset($basename, $newxmd, $xml);
          }
          if ($checked == " checked" && array_key_exists("owner",$_POST)) {
             list($xmd, $xml) = mmGetDatasetFileContent($rowarr[$dsfilepathix]);
             $oldtag = $rowarr[$dsotagix];
             $newxmd = str_replace('ownertag="'.$oldtag.'"','ownertag="'.$newtag.'"',$xmd);
-            mmWriteDataset($rowarr[$dsfilepathix], $newxmd, $xml);
+            mmWriteDataset($basename, $newxmd, $xml);
          }
          if ($show) {
 	        echo "<td>" . implode("</td><td>",$rowarr) . "</td>\n";
