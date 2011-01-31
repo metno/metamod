@@ -408,6 +408,43 @@ sub num_children {
 
 }
 
+=head2 file_location()
+
+Calculate the file location where the dataset is located if possible.
+
+=over
+
+=item return
+
+Returns an URL where the file can be downloaded if possible. Returns C<undef>
+if the file location cannot be calculated.
+
+=back
+
+=cut
+sub file_location {
+    my $self = shift;
+
+    my $metadata = $self->metadata( ['dataref'] );
+
+    my $config = Metamod::Config->new();
+    my $opendap_basedir = $config->get('OPENDAP_BASEDIR') || '';
+    my $thredds_dataset_prefix = $config->get('THREDDS_DATASET_PREFIX') || '';
+
+    my $server_location = "http://thredds.met.no/thredds/fileServer/$opendap_basedir/";
+
+    my $dataref = $metadata->{dataref}->[0];
+    my $filename;
+    if ( $dataref =~ /.*dataset=$thredds_dataset_prefix(.*)&?/ ) {
+        $filename = $1
+    } else {
+        return
+    }
+
+    return "$server_location$filename";
+
+}
+
 =head1 LICENSE
 
 GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
