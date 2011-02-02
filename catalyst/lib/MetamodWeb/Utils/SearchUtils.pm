@@ -26,7 +26,7 @@ use namespace::autoclean;
 use warnings;
 
 #
-# A Metamo::Config object containing the configuration for the application
+# A Metamod::Config object containing the configuration for the application
 #
 has 'config' => ( is => 'ro', isa => 'Metamod::Config', required => 1 );
 
@@ -38,7 +38,7 @@ has 'c' => (
     required => 1,
     handles  => {
         meta_db => [ model => 'Metabase' ],
-        user_db => [ model => 'Usebase' ],
+        user_db => [ model => 'Userbase' ],
     }
 );
 
