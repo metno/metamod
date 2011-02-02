@@ -18,6 +18,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =end LICENSE
 
+=head1 NAME
+
+MetamodWeb::Controller::Wms - Catalyst controller for WMS functions
+
+=head1 DESCRIPTION
+
+This is the backend for making the WMS client (OpenLayers) work with METAMOD.
+Main function is to supply a proxy to bypass JavaScript security restrictions
+in reading WMS GetCapabilities from an external server (THREDDS). Secondly it
+translates the GetCapabilities document along with METAMOD metadata into
+WMC (Web Map Context) format.
+
 =cut
 
 use Moose;
@@ -31,17 +43,6 @@ use Metamod::WMS;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-=head1 NAME
-
-MetamodWeb::Controller::Wms - Catalyst Controller
-
-=head1 DESCRIPTION
-
-Catalyst Controller.
-
-=head1 METHODS
-
-=cut
 
 sub auto :Private {
     my ( $self, $c ) = @_;
@@ -49,7 +50,25 @@ sub auto :Private {
     $c->stash( wmc => MetamodWeb::Utils::XML::WMC->new( { c => $c } ));
 }
 
+=head1 METHODS
+
 =head2 gc2wmc
+
+This returns a WMC document describing layers and dimensions for the WMS client.
+Parameters are one of the following:
+
+=head3 ds_id
+
+Numerical id of the dataset to be projected. This is only applicable to datasets
+having a wmsinfo setup in the datbase.
+
+=head3 wmssetup
+
+URL to wmsinfo setup document. Currently deprecated.
+
+=head3 getcap
+
+URL to GetCapabilites document on WMS server (w/o query string).
 
 =cut
 
@@ -103,6 +122,13 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
 
 }
 
+=head2 qtips
+
+Helper feature which reads query string and outputs arguments as XML.
+Used only for debugging.
+
+=cut
+
 sub qtips :Path("/qtips") :Args(0) {
     my ( $self, $c ) = @_;
 
@@ -144,4 +170,4 @@ GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
 
 =cut
 
-1;
+__PACKAGE__->meta->make_immutable;
