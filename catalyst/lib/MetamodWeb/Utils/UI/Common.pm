@@ -56,7 +56,7 @@ sub app_menu {
                 # external link, copy verbatim
                 $items{$label} = $link;
             }
-            printf STDERR "%s %s\n", $label, $link;
+            #printf STDERR "%s %s\n", $label, $link;
         }
     }
     return \%items;

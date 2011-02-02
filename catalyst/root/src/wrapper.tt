@@ -48,6 +48,7 @@
 
 <div id="content" class="g720">
 [% INCLUDE "${section}/header.tt" %]
+<hr/>
 [% content %]
 </div>
 

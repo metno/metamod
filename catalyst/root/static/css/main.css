@@ -92,6 +92,13 @@ h1.std {
     padding: 7px 5px 7px 5px;
 }
 
+h2.std {
+    font-size: 1.0em;
+    font-weight: bolder;
+    padding: 5px 0px 5px 0px;
+}
+
+
 li {
     margin-left: 15px;
 }

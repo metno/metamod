@@ -80,6 +80,7 @@ sub default :Path {
 Default begin action.
 
 =cut
+
 sub begin :Does('InitQueryLog'){
     my ( $self, $c ) = @_;
 
@@ -93,6 +94,7 @@ setup that is required for all request.
 For instance creating objects that are relevant for all requests.
 
 =cut
+
 sub auto :Private {
     my ( $self, $c ) = @_;
 
@@ -102,7 +104,7 @@ sub auto :Private {
 
     my $ui_utils = MetamodWeb::Utils::UI::Common->new( { config => $mm_config, c => $c } );
     $c->stash( ui_utils => $ui_utils,
-               title => $mm_config->get('SEARCH_APP_TITLE'),
+               title => $mm_config->get('SEARCH_APP_TITLE'), # FIXME: only true for search, not upload etc
                css_files => [] );
 
 }

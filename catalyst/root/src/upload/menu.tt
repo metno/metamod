@@ -8,4 +8,8 @@
     <a href="[% c.uri_for('/upload/test') %]">Test a file</a>
 </div>
 
+<div class="menu-item">
+    <a href="[% c.uri_for('/logout') %]">Logout</a>
+</div>
+
 </div>

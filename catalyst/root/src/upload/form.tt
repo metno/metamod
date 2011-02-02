@@ -1,4 +1,4 @@
-<h2">Upload file</h2>
+<h2 class="std">Upload file</h2>
 
 <p>Use the "Browse..." button below to enter the name of a file on your local file system
 that you want to upload to the Catalyst testbed data repository.</p>
@@ -15,16 +15,20 @@ Only alphanumeric characters, underscore (_), period (.) and hyphens (-)
 are allowed in file names. <b>The initial part of a file name must be the name of a
 user directory followed by an underscore (_)</b>.</p>
 
-<form enctype="multipart/form-data" action="[% c.uri_for('/upload') %]" method="post">
-
 
 <p>You may upload files to directories not owned by you (even directories owned by another
 institution). In that case you must obtain the directory key from the owner of the
 directory, and fill it into the entry field below. Otherwise, you should leave the directory
-key field empty.<br /><br />
+key field empty.</p>
+
+<form enctype="multipart/form-data" action="[% c.uri_for('/upload') %]" method="post">
+
 Directory key: <input name="dirkey" value="" size="10" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
 File name: <input name="data" type="file" />
+
 <input class="selectbutton1" type="submit" name="BTN_upload" value="Upload" />
-</p>
+
+</form>
 
 
