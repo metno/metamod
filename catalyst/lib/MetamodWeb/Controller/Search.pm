@@ -54,8 +54,8 @@ sub auto :Private {
     my $ui_utils = MetamodWeb::Utils::UI::Search->new( { config => $mm_config, c => $c } );
     $c->stash( search_ui_utils => $ui_utils,
                in_search_app => 1, #used to control which header to show
-     );
-
+               section => 'search',
+    );
     push @{ $c->stash->{ css_files } }, $c->uri_for( '/static/css/search.css' );
 
 }

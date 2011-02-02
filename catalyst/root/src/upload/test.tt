@@ -1,0 +1,5 @@
+<h3 class="std">Test upload</h3>
+
+<p>File = [% data %]</p>
+
+<p><a href="/logout">Logout</a></p>

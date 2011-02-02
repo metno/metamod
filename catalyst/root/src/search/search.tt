@@ -27,8 +27,6 @@ jQuery(document).ready( function () {
  -->
 <input type="hidden" name="active_criteria" id="active_criteria" />
 
-<h1 class="std">Metadata search</h1>
-
 <div id="criteria-tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all ui-tabs-collapsible">
     <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
         <li class="ui-state-default ui-corner-top"><a href="#search-criteria">Search criteria</a></li>

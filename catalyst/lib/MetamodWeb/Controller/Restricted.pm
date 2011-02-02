@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 use Moose;
 use namespace::autoclean;
+use URI::Escape;
 
 BEGIN {extends 'Catalyst::Controller'; }
 
@@ -59,11 +60,15 @@ sub auto :Private {
         my $wanted_params = $c->request->params();
         my $wanted_string = '';
         while( my ( $key, $value ) = each %$wanted_params ){
-            $wanted_string = "&$key=$value";
+            $wanted_string .= "$key=" . uri_escape($value) . "&";
         }
+        chop $wanted_string;
+        printf STDERR " Wanted: %s\n", $wanted_string;
 
         # Redirect the user to the login page
-        $c->response->redirect($c->uri_for('/login', { return_path => $wanted_path, return_params => $wanted_string } ) );
+        my $url = $c->uri_for('/login', { return_path => $wanted_path, return_params => $wanted_string } );
+        print STDERR "* url = $url\n";
+        $c->response->redirect($url);
 
         # Return 0 to cancel 'post-auto' processing and prevent use of application
         return 0;

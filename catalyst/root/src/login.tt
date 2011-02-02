@@ -19,7 +19,7 @@
     </p>
     <form name="login" method="POST" action="[% c.uri_for('/login/authenticate') %]">
         <input type="hidden" name="return_path" value="[% c.req.params.return_path %]" />
-        <input type="hidden" name="return_params" value="[% c.req.param.return_params %]" />
+        <input type="hidden" name="return_params" value="[% c.req.params.return_params %]" />
         <table>
             <tr>
             <td class="error" colspan="2">[% error_msg %]</td>

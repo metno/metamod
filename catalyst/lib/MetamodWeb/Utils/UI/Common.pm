@@ -47,8 +47,16 @@ sub app_menu {
     # mapping between name to show and the link url
     my %items = ();
     foreach my $item (@items) {
-        if ( $item =~ /^\s*([^\s]+)\s(.*)$/i ) {
-            $items{$2} = $1;
+        if ( $item =~ /^\s*([^\s]+)\s+(.*)$/ ) {
+            my ($link, $label, $appid) = ( $1, $2, $self->config->get('LOCAL_URL') );
+            if ($link =~ /^$appid(.+)$/) {
+                # web link, presumably Catalyst
+                $items{$label} = $self->c->uri_for($1); # makes link work both in Catalyst and Apache
+            } else {
+                # external link, copy verbatim
+                $items{$label} = $link;
+            }
+            printf STDERR "%s %s\n", $label, $link;
         }
     }
     return \%items;
