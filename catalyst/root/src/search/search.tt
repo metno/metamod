@@ -1,76 +1,53 @@
-<script type="text/javascript">
-
-[% IF c.req.params.active_criteria %]
-    var activeCriteria = [% c.req.params.active_criteria %];
-[% ELSE %]
-    var activeCriteria = 0;
-[% END %]
-
-[% IF c.req.params.active_tab %]
-var activeTab = [% c.req.params.active_tab %];
-[% ELSE %]
-var activeTab = 0;
-[% END %]
-
-
-jQuery(document).ready( function () {
-    jQuery('#criteria-tabs').tabs( { collapsible: true, selected : activeTab } );
-    jQuery('#search-criteria-accordion').accordion( { autoHeight: false, collapsible: true, active: activeCriteria });
-
-} );
-</script>
-
 <form name="search" method="GET" action="[% c.uri_for( '/search/page/1/result' ) %]" id="search_form">
 
-<!-- this is needed for map search that need to set the active_criteria in an input field. This is because
-     map search is a image that acts as a submit button. We are required to use this to get the clicked coordinates.
- -->
+<!-- This input element is used to change between the criteria -->
 <input type="hidden" name="active_criteria" id="active_criteria" />
 
-<div id="criteria-tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all ui-tabs-collapsible">
-    <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
-        <li class="ui-state-default ui-corner-top"><a href="#search-criteria">Search criteria</a></li>
-        <li class="ui-state-default ui-corner-top"><a href="#search-options">Options</a></li>
-        <li class="ui-state-default ui-corner-top"><a href="#search-help">Help</a></li>
-    </ul>
+[% IF active_criteria %]
 
-    <div id="search-criteria" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
-        <button type="submit">Search</button>
-        <div id="search-criteria-accordion">
-        [% FOREACH category IN search_ui_utils.search_categories() %]
+    <div id="search_criteria" class="inside level2-active-area">
+    [% FOREACH category IN search_ui_utils.search_categories() %]
 
-	        <h3><a href="#">[% category.name %]</a></h3>
-	        <div id="search-criteria-[% category.sc_id %]" class="search-criteria">
+        [% NEXT IF category.sc_idname != active_criteria %]
 
-	        [% IF category.sc_type == 'basickey' %]
-	            [% INCLUDE 'search/basickey_form.tt' category = category %]
-	        [% ELSIF category.sc_type == 'date_interval' %]
-	            [% INCLUDE 'search/time_form.tt' category = category %]
-            [% ELSIF category.sc_type == 'fulltext' %]
-                [% INCLUDE 'search/text_form.tt' category = category %]
-	        [% ELSIF category.sc_type == 'map_search' %]
-                [% INCLUDE 'search/map_search_form.tt' criteria_index = loop.index() %]
-            [% ELSIF category.sc_type == 'tree' %]
-                [% INCLUDE 'search/tree_form.tt'  %]
-	        [% END %]
+       <h2 class="std">[% category.name %]</h2>
 
-	        </div>
-
+        [% IF category.sc_type == 'basickey' %]
+            [% INCLUDE 'search/basickey_form.tt' category = category %]
+        [% ELSIF category.sc_type == 'date_interval' %]
+            [% INCLUDE 'search/time_form.tt' category = category %]
+        [% ELSIF category.sc_type == 'fulltext' %]
+            [% INCLUDE 'search/text_form.tt' category = category %]
+        [% ELSIF category.sc_type == 'map_search' %]
+            [% INCLUDE 'search/map_search_form.tt' criteria_index = loop.index() %]
+        [% ELSIF category.sc_type == 'tree' %]
+            [% INCLUDE 'search/tree_form.tt'  %]
         [% END %]
-        </div>
-        <button type="submit">Search</button>
+
+        [% INCLUDE search/keep_search_params.tt category_type = category.sc_type category_id = category.sc_id %]
+    [% END %]
+    <button type="submit">Search</button>
     </div>
+[% ELSE %]
 
-    <div id="search-options" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
-        <button type="submit">Search</button>
-        [% INCLUDE 'search/search_options_form.tt' %]
-        <button type="submit">Search</button>
+<p>
+Search the DAMOCLES Metadata Catalogue. Use the links on the left hand side to
+access pages for setting search conditions. Then use the menu below to view
+results. Initially, only directory level datasets are shown. For each directory
+level dataset containing files on a second level, there is a small [+] button
+that may be used to show metadata about the files.
+</p>
+
+<p>
+The catalogue contains information about datasets as well as references to
+actual data which are available through a THREDDS Data Server. Always remember
+to cite data providers when using data. It is good practise to contact the PI
+listed for each dataset prior to using it.
+</p>
+
+[% END %]
+
+    <div style="display: none">
+        [% INCLUDE search/search_options_form.tt %]
     </div>
-
-    <div id="search-help" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
-        [% INCLUDE 'search/help.tt' %]
-    </div>
-
-</div>
-
 </form>

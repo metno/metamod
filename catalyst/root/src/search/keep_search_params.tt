@@ -1,7 +1,38 @@
-<!-- generate input elements for keeping search parameters between requests -->
+[%#
+
+    Template for keeping parameters between requests. We use this instead of
+    actually generating the forms again as that can take too much time.
+
+    INPUT
+
+    category_id
+
+        The sc_id of the current category. Used to prevent input names to be
+        used twice.
+
+    category_type
+
+        The sc_type of the current category. Used to prevent input names to be
+        used twice when they are already in the form
+
+%]
 
 [% FOREACH param IN c.req.parameters %]
 
-    <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
+    [% IF param.key.search('hk_id_') && category_type != 'tree' %]
+        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
+    [% ELSIF (matches = param.key.match('bk_id_(\d+)')) %]
+        [% IF matches.0 != category_id %]
+            <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
+        [% END %]
+    [% ELSIF param.key.search('date_from_') && category_type != 'date_interval' %]
+        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
+    [% ELSIF param.key.search('date_to_') && category_type != 'date_interval' %]
+        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
+    [% ELSIF param.key.search('freetext_') && category_type != 'fulltext' %]
+        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
+    [% ELSIF param.key.search('map_coord_') && category_type != 'map_search' %]
+        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
+    [% END %]
 
 [% END %]

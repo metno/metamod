@@ -1,8 +1,11 @@
-<!--
-    Template for adding a link to remove specific search criteria. The
-    search critia are removed by deleting them from the CGI parameters and then
+[%#
+
+    Template for adding a link to remove specific search criteria. The search
+    critia are removed by deleting them from the query parameters and then
     linking to the page without the search criteria.
- -->
+
+%]
+
 [% SET cgi_values = [] %]
 
 [% FOREACH html_id IN html_ids %]
@@ -14,7 +17,7 @@
     [% c.req.params.delete(html_id) %]
 [% END %]
 
-<a href="[% c.uri_for( '/search/page/1/result' , c.req.params ) %]" title="Remove criteria">
+<a href="[% c.uri_for( '/' _ c.req.path() , c.req.params ) %]" title="Remove criteria">
    <img class="clickable" src="[% c.uri_for( '/static/images/cancel.png') %]" alt="Remove" />
 </a>
 

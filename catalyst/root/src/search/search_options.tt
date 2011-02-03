@@ -1,0 +1,18 @@
+<form name="search" method="GET" action="[% c.uri_for( '/search/page/1/result' ) %]" id="search_form">
+
+<!-- This input element is used to change between the criteria -->
+<input type="hidden" name="active_criteria" id="active_criteria" />
+
+[% INCLUDE search/keep_search_params.tt category_type = 'none' category_id = 'none' %]
+
+<div class="inside level2-active-area">
+
+<h2 class="std">Search options</h2>
+
+[% INCLUDE search/search_options_form.tt %]
+
+<button type="submit">Search</button>
+
+</div>
+
+</form>

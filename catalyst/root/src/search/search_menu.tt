@@ -1,47 +1,84 @@
-<div id="search-criteria-menu">
-<div class="menu-item">Current search criteria
+[% IF c.req.path().match('search/page')  %]
+    [% SET on_result_page = 1 %]
+[% ELSE %]
+    [% SET on_result_page = 0 %]
+[% END %]
 
+<script type="text/javascript">
+
+function changeCriteria(criteriaIndex){
+	var form = jQuery('form#search_form');
+
+	if( 0 == form.size() ){
+		alert("Could not find the form #search_form");
+	}
+
+	var activeCriteria = jQuery('input#active_criteria');
+
+	if( 0 == activeCriteria.size() ) {
+		alert( "Could not find the element input#active_criteria");
+	}
+
+	activeCriteria.val(criteriaIndex);
+	form.attr( 'action', '/search');
+	form.submit();
+
+	return false;
+}
+
+function showSearchOptions(){
+    var form = jQuery('form#search_form');
+
+    if( 0 == form.size() ){
+        alert("Could not find the form #search_form");
+    }
+
+    form.attr( 'action', '/search/options');
+    form.submit();
+
+    return false;
+
+}
+
+</script>
+
+<div class="level2-menu" id="search-criteria-menu">
+<div class="level2-menu-item">Current search criteria
+
+[% SET active_criteria = c.req.params.active_criteria %]
 [% FOREACH category IN search_ui_utils.search_categories() %]
 
-    [% IF category.sc_type == 'basickey' %]
-        [% SET selected_bks = search_ui_utils.selected_bks( category.sc_id ) %]
-        <div class="sub-menu-item">
-            [% SET link_params = c.req.params
-               link_params.active_criteria = loop.index()
-            %]
 
-            [% IF allow_changes %]
-                <a href="[% c.uri_for( '/search', link_params ) %]">[% category.name %]</a>
-            [% ELSE %]
-                [% category.name %]
-            [% END %]
+    [% IF active_criteria == loop.index() %]
+        [% SET item_class = "level2-sub-menu-item level2-sub-menu-item-active" %]
+    [% ELSE %]
+        [% SET item_class = "level2-sub-menu-item" %]
+    [% END %]
 
-            [% FOREACH selected_bk IN selected_bks %]
-               <div class="sub-menu-item">
-                   [% IF allow_changes %]
-                       [% INCLUDE 'search/remove_criteria.tt' html_ids = [ search_ui_utils.html_id_for_bk( category.sc_id, selected_bk.key ) ] %]
-                   [% END %]
-                   [% selected_bk.value %]
-               </div>
-            [% END %]
-        </div>
+    <div class="[% item_class %]">
+        [% SET link_params = c.req.params
+           link_params.active_criteria = loop.index()
+        %]
 
-    [% ELSIF category.sc_type == 'date_interval' %]
+        <a href="[% c.uri_for( '/search', link_params ) %]" onclick="return changeCriteria('[% loop.index() %]')">[% category.name %]</a>
 
-        <div class="sub-menu-item">
-            [% SET link_params = c.req.params
-               link_params.active_criteria = loop.index()
-            %]
 
-            [% IF allow_changes %]
-                <a href="[% c.uri_for( '/search', link_params ) %]">[% category.name %]</a>
-            [% ELSE %]
-                [% category.name %]
-            [% END %]
+        [% IF category.sc_type == 'basickey' %]
+            [% SET selected_bks = search_ui_utils.selected_bks( category.sc_id ) %]
+
+                [% FOREACH selected_bk IN selected_bks %]
+                   <div class="[% item_class %]">
+                       [% IF allow_changes %]
+                           [% INCLUDE 'search/remove_criteria.tt' html_ids = [ search_ui_utils.html_id_for_bk( category.sc_id, selected_bk.key ) ] %]
+                       [% END %]
+                       [% selected_bk.value %]
+                   </div>
+                [% END %]
+        [% ELSIF category.sc_type == 'date_interval' %]
 
             [% IF c.req().param( search_ui_utils.html_id_for_date( category.sc_id, 'from' ) )
                && c.req().param( search_ui_utils.html_id_for_date( category.sc_id, 'to' ) ) %]
-                <div class="sub-menu-item">
+                <div class="[% item_class %]">
                     [% IF allow_changes %]
                         [% INCLUDE 'search/remove_criteria.tt' html_ids = [ search_ui_utils.html_id_for_date( category.sc_id, 'from' ), search_ui_utils.html_id_for_date( category.sc_id, 'to' ) ] %]
                     [% END %]
@@ -50,41 +87,19 @@
                     [% c.req().param( search_ui_utils.html_id_for_date( category.sc_id, 'to' ) ) %]
                 </div>
             [% END %]
-        </div>
 
-    [% ELSIF category.sc_type == 'fulltext' %]
-
-        <div class="sub-menu-item">
-            [% SET link_params = c.req.params
-               link_params.active_criteria = loop.index()
-            %]
-
-            [% IF allow_changes %]
-                <a href="[% c.uri_for( '/search', link_params ) %]">[% category.name %]</a>
-            [% ELSE %]
-                [% category.name %]
-            [% END %]
+        [% ELSIF category.sc_type == 'fulltext' %]
 
             [% IF c.req().param( search_ui_utils.html_id_for_freetext( category.sc_id ) ) %]
-               <div class="sub-menu-item">
+               <div class="[% item_class %]">
                    [% IF allow_changes %]
                        [% INCLUDE 'search/remove_criteria.tt' html_ids = [ search_ui_utils.html_id_for_freetext( category.sc_id ) ] %]
                    [% END %]
                    [% c.req().param( search_ui_utils.html_id_for_freetext( category.sc_id ) ) %]
                </div>
             [% END %]
-        </div>
-    [% ELSIF category.sc_type == 'map_search' %]
-        <div class="sub-menu-item">
-            [% SET link_params = c.req.params
-               link_params.active_criteria = loop.index()
-            %]
 
-            [% IF allow_changes %]
-                <a href="[% c.uri_for( '/search', link_params ) %]">[% category.name %]</a>
-            [% ELSE %]
-                [% category.name %]
-            [% END %]
+        [% ELSIF category.sc_type == 'map_search' %]
 
             [% SET map_coords = search_ui_utils.map_coordinates() %]
             [% SET srid = search_ui_utils.selected_map() %]
@@ -94,31 +109,21 @@
                                     search_ui_utils.html_id_for_map( 'x2' ),
                                     search_ui_utils.html_id_for_map( 'y2' ) ]
                 %]
-               <div class="sub-menu-item">
+               <div class="[% item_class %]">
                    [% IF allow_changes %]
                        [% INCLUDE 'search/remove_criteria.tt' html_ids = form_ids %]
                    [% END %]
                    <img src="[% c.uri_for( '/search/map/' _ srid, map_coords ) %]" alt="Map search" height="150" width="150" />
                </div>
             [% END %]
-        </div>
-    [% ELSIF category.sc_type == 'tree' %]
-        <div class="sub-menu-item">
-            [% SET link_params = c.req.params
-               link_params.active_criteria = loop.index()
-            %]
 
-            [% IF allow_changes %]
-                <a href="[% c.uri_for( '/search', link_params ) %]">[% category.name %]</a>
-            [% ELSE %]
-                [% category.name %]
-            [% END %]
+        [% ELSIF category.sc_type == 'tree' %]
 
             [% SET selected_topics = search_ui_utils.selected_topics() %]
             [% IF selected_topics.size() > 0 %]
 
                 [% FOREACH selected_topic IN selected_topics %]
-                    <div class="sub-menu-item">
+                    <div class="[% item_class %]">
                         [% IF allow_changes %]
                             [% IF selected_topic.type == 'hk' %]
                                 [% INCLUDE 'search/remove_criteria.tt' html_ids = [ search_ui_utils.html_id_for_hk_topic( selected_topic.id ) ] %]
@@ -130,23 +135,21 @@
                     </div>
                 [% END %]
             [% END %]
-        </div>
-     [% END %]
+
+         [% END %]
+    </div>
 [% END %]
 
-    <div class="sub-menu-item">
-    [% SET link_params = c.req.params
-       link_params.active_tab = 1
-    %]
-
-    <!-- A link to the options are not needed on the search criteria page -->
-    [% IF allow_changes %]
-        <a href="[% c.uri_for('/search', link_params) %]">Search options</a>
-    [% END %]
-
-    </div>
-
-
 </div>
+
+[% IF c.req.path().search('search/options') %]
+    [% SET item_class = "level2-menu-item level2-menu-item-active" %]
+[% ELSE %]
+    [% SET item_class = "level2-menu-item" %]
+[% END %]
+<div class="[% item_class %]">
+    <a href="[% c.uri_for('/search/options', link_params) %]" onclick="return showSearchOptions()">Search options</a>
+</div>
+
 
 </div>

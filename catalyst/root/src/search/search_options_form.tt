@@ -1,4 +1,5 @@
 [% SET num_search_cols = search_ui_utils.num_search_cols() %]
+
 <table>
     <tr>
         <td>&nbsp;</td>

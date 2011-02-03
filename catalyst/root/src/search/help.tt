@@ -1,10 +1,17 @@
-<!-- This file can be overwritten during the update_target.pl phase
-     if desired. If you do so please only use pure HTML and not
-     Template::Toolkit directives to prevent any accidental behaviour.
+[%#
 
-     This page will be contained in a div so there is no need to create
-     an extra container div
--->
+This file can be overwritten during the update_target.pl phase if desired. If
+you do so please only use pure HTML and not Template::Toolkit directives to
+prevent any accidental behaviour.
+
+If you overwrite this file you must remember to include the from below.
+
+%]
+
+<div class="inside level2-active-area">
+<form name="search_form" id="search_form" method="GET" action="/search/help">
+[% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
+</form>
 
 <table cellspacing="5" border="0">
     <tr>
@@ -257,3 +264,5 @@
         </td>
     </tr>
 </table>
+
+</div>

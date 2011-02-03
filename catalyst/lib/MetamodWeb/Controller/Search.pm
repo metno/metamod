@@ -62,11 +62,23 @@ sub auto :Private {
 
 =head2 index
 
-Action for displaying the search form.
+Action for displaying the search front page.
 
 =cut
-sub index : Path("/search") {
+sub index : Path("/search") :Args(0) {
     my ( $self, $c ) = @_;
+
+    $c->stash( template => 'search/search.tt');
+
+}
+
+=head2
+
+Action for displaying one of the search criteria forms.
+
+=cut
+sub display_search_criteria : Path('/search') : Args(1) {
+    my ( $self, $c, $active_criteria ) = @_;
 
     # Check for information from the map search
     my $x_coord = $c->req->params->{ 'map_coord.x' };
@@ -103,8 +115,9 @@ sub index : Path("/search") {
         $c->req->params->{ $ui_utils->html_id_for_map( 'y2' ) } = '';
     }
 
-    $c->stash( template => 'search/search.tt' );
-
+    $c->stash( template => 'search/search_criteria.tt',
+               active_criteria => $active_criteria
+    );
 }
 
 =head2
@@ -117,6 +130,17 @@ sub display_result : Chained("perform_search") : PathPart('result') : Args(0) {
 
     $c->stash( template => 'search/search_result.tt' );
 
+}
+
+=head2
+
+Action for displaying the search options form.
+
+=cut
+sub search_options : Path('/search/options') : Args(0) {
+    my ($self, $c) = @_;
+
+    $c->stash( template => 'search/search_options.tt' );
 }
 
 =head2
@@ -251,6 +275,18 @@ sub wms :Path('/search/wms') :Args {
     #print STDERR $c->req->args->[0];
 
     $c->stash( template => 'search/wms.tt', 'current_view' => 'Raw' );
+
+}
+
+=head2
+
+Action for displaying the help message to the user.
+
+=cut
+sub display_help : Path('/search/help') : Args(0) {
+    my ($self, $c) = @_;
+
+    $c->stash( template => 'search/help.tt' );
 
 }
 
