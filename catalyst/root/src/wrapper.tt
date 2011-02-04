@@ -43,11 +43,15 @@
 
 <div id="menu" class="g240">
 [% INCLUDE 'menu.tt' %]
+[% IF section %]
 [% INCLUDE "${section}/menu.tt" %]
+[% END %]
 </div>
 
 <div id="content" class="g720">
+[% IF section %]
 [% INCLUDE "${section}/header.tt" %]
+[% END %]
 <hr/>
 [% content %]
 </div>
