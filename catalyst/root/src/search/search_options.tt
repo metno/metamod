@@ -3,7 +3,7 @@
 <!-- This input element is used to change between the criteria -->
 <input type="hidden" name="active_criteria" id="active_criteria" />
 
-[% INCLUDE search/keep_search_params.tt category_type = 'none' category_id = 'none' %]
+[% INCLUDE search/keep_search_params.tt category_type = 'search_options' category_id = 'none' %]
 
 <div class="inside level2-active-area">
 

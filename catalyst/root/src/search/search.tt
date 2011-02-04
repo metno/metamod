@@ -1,34 +1,6 @@
 <form name="search" method="GET" action="[% c.uri_for( '/search/page/1/result' ) %]" id="search_form">
 
-<!-- This input element is used to change between the criteria -->
-<input type="hidden" name="active_criteria" id="active_criteria" />
-
-[% IF active_criteria %]
-
-    <div id="search_criteria" class="inside level2-active-area">
-    [% FOREACH category IN search_ui_utils.search_categories() %]
-
-        [% NEXT IF category.sc_idname != active_criteria %]
-
-       <h2 class="std">[% category.name %]</h2>
-
-        [% IF category.sc_type == 'basickey' %]
-            [% INCLUDE 'search/basickey_form.tt' category = category %]
-        [% ELSIF category.sc_type == 'date_interval' %]
-            [% INCLUDE 'search/time_form.tt' category = category %]
-        [% ELSIF category.sc_type == 'fulltext' %]
-            [% INCLUDE 'search/text_form.tt' category = category %]
-        [% ELSIF category.sc_type == 'map_search' %]
-            [% INCLUDE 'search/map_search_form.tt' criteria_index = loop.index() %]
-        [% ELSIF category.sc_type == 'tree' %]
-            [% INCLUDE 'search/tree_form.tt'  %]
-        [% END %]
-
-        [% INCLUDE search/keep_search_params.tt category_type = category.sc_type category_id = category.sc_id %]
-    [% END %]
-    <button type="submit">Search</button>
-    </div>
-[% ELSE %]
+[% INCLUDE search/keep_search_params.tt category_type = 'none' category_id = 'none' %]
 
 <p>
 Search the DAMOCLES Metadata Catalogue. Use the links on the left hand side to
@@ -45,9 +17,4 @@ to cite data providers when using data. It is good practise to contact the PI
 listed for each dataset prior to using it.
 </p>
 
-[% END %]
-
-    <div style="display: none">
-        [% INCLUDE search/search_options_form.tt %]
-    </div>
 </form>

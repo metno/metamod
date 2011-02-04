@@ -1,3 +1,9 @@
+<h2 class="std">Two-way table</h2>
+
+<form name="search_form" id="search_form" method="GET" action="/collectionbasket/remove_selected">
+    [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
+</form>
+
 [% IF two_way_table.size() == 0 %]
 
     No datasets that match your search criteria where found.

@@ -27,8 +27,4 @@
 <button type="submit">Search</button>
 </div>
 
-<div style="display: none">
-    [% INCLUDE search/search_options_form.tt %]
-</div>
-
 </form>

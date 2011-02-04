@@ -233,6 +233,86 @@ sub search_options {
 
 }
 
+=head2 $self->default_mt_name($col_num)
+
+=over
+
+=item $col_num
+
+The column number to get the default mt_name for.
+
+=item return
+
+The mt_name of the default column for the specific C<$col_num>.
+
+=back
+
+=cut
+sub default_mt_name {
+    my $self = shift;
+
+    my ($col_num) = @_;
+
+    my $show_columns = $self->search_app_show_columns();
+    foreach my $column_info (@$show_columns){
+        if( $column_info->{ col } eq $col_num ){
+            return $column_info->{ mt_name };
+        }
+    }
+
+    die "No default mt_name for '$col_num'. Error in config.";
+}
+
+=head2 $self->default_vertical_mt_name()
+
+=over
+
+=item return
+
+The default mt_name for the vertical column in a two way table.
+
+=back
+
+=cut
+sub default_vertical_mt_name {
+    my $self = shift;
+
+    my $show_columns = $self->search_app_show_columns();
+    foreach my $column_info (@$show_columns){
+        if( $column_info->{ cross } eq 'v' ){
+            return $column_info->{ mt_name };
+        }
+    }
+
+    die "No default vertical column. Error in config.";
+
+}
+
+=head2 $self->default_horisontal_mt_name()
+
+=over
+
+=item return
+
+The default mt_name for the horisontal column in a two way table.
+
+=back
+
+=cut
+sub default_horisontal_mt_name {
+    my $self = shift;
+
+    my $show_columns = $self->search_app_show_columns();
+    foreach my $column_info (@$show_columns){
+        if( $column_info->{ cross } eq 'h' ){
+            return $column_info->{ mt_name };
+        }
+    }
+
+    die "No default horisontal column. Error in config.";
+
+}
+
 =head2 $self->search_app_show_columns()
 
 This function parses the C<SEARCH_APP_SHOW_COLMNS> configuration variable from

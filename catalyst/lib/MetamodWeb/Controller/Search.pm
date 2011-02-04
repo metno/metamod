@@ -168,13 +168,13 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
 
     my $num_search_cols = $c->req->param('num_mt_columns') || $c->stash->{ search_ui_utils }->num_search_cols();
     my @md_cols = ();
-    foreach my $col_num ( 1 .. $num_search_cols ){
+    foreach my $col_num ( 2 .. $num_search_cols ){
         my $mt_name = $c->req->param( 'shown_mt_name_' . $col_num );
         if( !$mt_name ){
-            $c->log->debug( "Ups! no mt name set for that column: $col_num" );
-        } else {
-            push @md_cols, $mt_name;
+            $mt_name = $c->stash->{ search_ui_utils }->default_mt_name($col_num);
+            $c->log->debug( "Ups! no mt name set for that column: $col_num, so using default" );
         }
+        push @md_cols, $mt_name;
 
     }
 
@@ -198,12 +198,12 @@ sub two_way_table : Path( "/search/two_way_table" ) : Args(0) {
     my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $c, config => $c->stash->{ mm_config } } );
     my $search_criteria = $search_utils->selected_criteria( $c->req->params() );
     my $owner_tags = $search_utils->get_ownertags();
-    my $vertical_mt_name = $c->req->param('vertical_mt_name');
-    my $horisontal_mt_name = $c->req->param('horisontal_mt_name');
+    my $vertical_mt_name = $c->req->param('vertical_mt_name') || $c->stash->{ search_ui_utils }->default_vertical_mt_name();
+    my $horisontal_mt_name = $c->req->param('horisontal_mt_name') || $c->stash->{ search_ui_utils }->default_horisontal_mt_name();;
     my $two_way_table = $dataset->two_way_table($search_criteria, $owner_tags, $vertical_mt_name, $horisontal_mt_name );
 
     $c->stash( two_way_table => $two_way_table );
-    $c->stash( template => 'search/two_way_table.tt', current_view => 'Raw' );
+    $c->stash( template => 'search/two_way_table.tt' );
 
 }
 
