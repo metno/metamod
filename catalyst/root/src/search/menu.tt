@@ -104,7 +104,7 @@ function submitSearchForm(actionUrl){
 
     <div class="level2-sub-menu-item">
         <button type="button" style="width: 80px" onclick="submitSearchForm('[% c.uri_for( '/search/page/1/result' ) %]')">Search</button>
-        <a href="[% '/' _ c.uri_for( c.req.path ) %]"><button type="button" style="width: 80px">Clear all</button></a>
+        <a href="[% c.uri_for( '/' _ c.req.path ) %]"><button type="button" style="width: 80px">Clear all</button></a>
         <button type="button" style="width: 165px" onclick="submitSearchForm('[% c.uri_for( '/search/two_way_table' ) %]')">Two-way table</button>
 
     </div>
