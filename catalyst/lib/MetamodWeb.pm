@@ -63,6 +63,9 @@ $VERSION = eval $VERSION;
 # with an external configuration file acting as an override for
 # local deployment.
 
+my $mm_config = Metamod::Config->new();
+$mm_config->initLogger();
+
 my %default_config = (
     disable_component_resolution_regex_fallback => 1,
 
@@ -82,7 +85,15 @@ my %default_config = (
         CATALYST_VAR => 'c',
     },
 
-    'default_view' => 'TT'
+    'default_view' => 'TT',
+
+    static => {
+        include_path => [
+            $mm_config->get('WEBRUN_DIRECTORY'),
+            __PACKAGE__->config->{root},
+        ],
+        dirs => [ 'static', 'download' ],
+    }
 );
 
 # we generate a Catalyst configuration hash at runtime from the master config file.
@@ -95,9 +106,6 @@ __PACKAGE__->config(
     %default_config,
     %master_catalyst_config
 );
-
-my $mm_config = Metamod::Config->new();
-$mm_config->initLogger();
 
 if ( my $catconf = $mm_config->get('CATALYST_SITE_CONFIG') ) {
     __PACKAGE__->config( 'Plugin::ConfigLoader' => { file => $catconf } );

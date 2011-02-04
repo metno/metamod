@@ -1,0 +1,68 @@
+[% SET files = collection_basket_ui_utils.files_in_basket() %]
+
+<div class="level2-active-area">
+<h2 class="std">Collection basket</h2>
+
+[% IF info_msgs %]
+    <div class="info_msg">
+        [% FOREACH msg IN info_msgs %]
+            [% msg %] <br />
+        [% END %]
+    </div>
+[% END %]
+
+[% IF error_msgs %]
+    <div class="error_msg">
+        [% FOREACH msg IN error_msgs %]
+            [% msg %] <br />
+        [% END %]
+    </div>
+[% END %]
+
+<form name="search_form" id="search_form" method="GET" action="/collectionbasket/remove_selected">
+    [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
+
+[% IF files.size > 0 %]
+
+    <table>
+
+        <tr>
+            <th>
+                &nbsp;
+            </th>
+            <th>
+                Filename
+            </th>
+        </tr>
+
+
+
+        [% FOREACH file IN files %]
+            <tr>
+                <td>
+                    <input type="checkbox" name="remove_file" value="[% file.ds_id %]" />
+                </td>
+                <td>
+                <a href="[% file.location %]">[% file.name %]</a>
+                </td>
+            </tr>
+        [% END %]
+    </table>
+
+    <input type="submit" name="collection_basket_remove" value="Remove selected" />
+    <a href="[% c.uri_for( '/search/collectionbasket/empty_basket', c.req.params ) %]">Empty basket</a>
+    </form>
+
+    <form name="request_download" action="[% c.uri_for('/collectionbasket/request_download') %]" method="POST" >
+    Email
+    <input type="text" name="email_address" />
+    <input type="submit" value="Request download" />
+    </form>
+
+[% ELSE %]
+    There are no files in the collection basket.
+[% END %]
+
+</form>
+
+</div>
