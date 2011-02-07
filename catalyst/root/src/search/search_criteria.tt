@@ -3,7 +3,7 @@
 <!-- This input element is used to change between the criteria -->
 <input type="hidden" name="active_criteria" id="active_criteria" />
 
-<div id="search_criteria" class="inside level2-active-area">
+<div id="search_criteria" class="inside criteria-active-area">
 [% FOREACH category IN search_ui_utils.search_categories() %]
 
     [% NEXT IF category.sc_idname != active_criteria %]

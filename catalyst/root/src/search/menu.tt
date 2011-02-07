@@ -15,14 +15,36 @@ function submitSearchForm(actionUrl){
 </script>
 
 <div class="level2-menu" id="search-criteria-menu">
-<div class="level2-menu-item">Current search
+
+    [% IF c.req.path().search('search/collectionbasket') %]
+        [% SET item_class = "level2-menu-item level2-menu-item-active" %]
+    [% ELSE %]
+        [% SET item_class = "level2-menu-item" %]
+    [% END %]
+    <div class="[% item_class %]">
+        <a href="[% c.uri_for('/search/collectionbasket', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/collectionbasket' ) %] ')">View Basket</a>
+    </div>
+
+    [% IF c.req.path().search('search/help') %]
+        [% SET item_class = "level2-menu-item level2-menu-item-active" %]
+    [% ELSE %]
+        [% SET item_class = "level2-menu-item" %]
+    [% END %]
+    <div class="[% item_class %]">
+        <a href="[% c.uri_for('/search/help', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/help' ) %] ')">Help</a>
+    </div>
+</div>
+
+<div class="search-criteria-menu">
+
+<span style="font-weight: normal; font-size: 1.1em; font-style:italic">Current search</span> (<a href="[% c.uri_for( '/' _ c.req.path ) %]">Clear all</a>)
 
 [% FOREACH category IN search_ui_utils.search_categories() %]
 
     [% IF active_criteria == category.sc_idname %]
-        [% SET item_class = "level2-sub-menu-item level2-sub-menu-item-active" %]
+        [% SET item_class = "criteria-item criteria-item-active" %]
     [% ELSE %]
-        [% SET item_class = "level2-sub-menu-item" %]
+        [% SET item_class = "criteria-item" %]
     [% END %]
 
     <div class="[% item_class %]">
@@ -102,39 +124,9 @@ function submitSearchForm(actionUrl){
     </div>
 [% END %]
 
-    <div class="level2-sub-menu-item">
-        <button type="button" style="width: 80px" onclick="submitSearchForm('[% c.uri_for( '/search/page/1/result' ) %]')">Search</button>
-        <a href="[% c.uri_for( '/' _ c.req.path ) %]"><button type="button" style="width: 80px">Clear all</button></a>
-        <button type="button" style="width: 165px" onclick="submitSearchForm('[% c.uri_for( '/search/two_way_table' ) %]')">Two-way table</button>
-
+    <div class="criteria-item">
+        <img src="[% c.uri_for( '/static/images/bullet_go.png') %]" alt="Search" />
+        <a href="[% c.uri_for( '/search/page/1/result', c.req.params ) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/page/1/result' ) %]')">Search</a>
     </div>
 </div>
 
-[% IF c.req.path().search('search/options') %]
-    [% SET item_class = "level2-menu-item level2-menu-item-active" %]
-[% ELSE %]
-    [% SET item_class = "level2-menu-item" %]
-[% END %]
-<div class="[% item_class %]">
-    <a href="[% c.uri_for('/search/options', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/options' ) %]')">Search options</a>
-</div>
-
-[% IF c.req.path().search('search/collectionbasket') %]
-    [% SET item_class = "level2-menu-item level2-menu-item-active" %]
-[% ELSE %]
-    [% SET item_class = "level2-menu-item" %]
-[% END %]
-<div class="[% item_class %]">
-    <a href="[% c.uri_for('/search/collectionbasket', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/collectionbasket' ) %] ')">Collection basket</a>
-</div>
-
-[% IF c.req.path().search('search/help') %]
-    [% SET item_class = "level2-menu-item level2-menu-item-active" %]
-[% ELSE %]
-    [% SET item_class = "level2-menu-item" %]
-[% END %]
-<div class="[% item_class %]">
-    <a href="[% c.uri_for('/search/help', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/help' ) %] ')">Help</a>
-</div>
-
-</div>

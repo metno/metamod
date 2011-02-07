@@ -1,15 +1,20 @@
+<div style="width: 100%; text-align: right">
+    <a href="[% c.uri_for('/search/options', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/options' ) %]')">Search options</a>
+    <a href="[% c.uri_for('/search/two_way_table', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/two_way_table' ) %]')">Pivot table</a>
+</div>
+
 <div style="width: 100%; text-align: center">
 
     [% IF pager.first_page() != pager.last_page() %]
 
         [% SET link_url = search_ui_utils.navigation_url( url_template, pager.first_page() )%]
-        <a href="[% c.uri_for( link_url, c.req.params ) %]">
+        <a class="image-link" href="[% c.uri_for( link_url, c.req.params ) %]">
             <img src="[% c.uri_for('/static/images/resultset_first.png') %]" alt="First page" />
         </a>
 
         [% IF 1 != pager.current_page() %]
             [% SET link_url = search_ui_utils.navigation_url( url_template, pager.previous_page() )%]
-            <a href="[% c.uri_for( link_url, c.req.params ) %]">
+            <a class="image-link"  href="[% c.uri_for( link_url, c.req.params ) %]">
                 <img src="[% c.uri_for('/static/images/resultset_previous.png') %]" alt="Previous page" />
             </a>
         [% ELSE %]
@@ -37,7 +42,7 @@
 
         [% IF pager.last_page() != pager.current_page() %]
             [% SET link_url = search_ui_utils.navigation_url( url_template, pager.next_page() )%]
-            <a href="[% c.uri_for( link_url, c.req.params ) %]">
+            <a class="image-link"  href="[% c.uri_for( link_url, c.req.params ) %]">
                 <img src="[% c.uri_for('/static/images/resultset_next.png') %]" alt="Next page"/>
             </a>
         [% ELSE %]
@@ -45,8 +50,9 @@
         [% END %]
 
         [% SET link_url = search_ui_utils.navigation_url( url_template, pager.last_page() )%]
-        <a href="[% c.uri_for( link_url, c.req.params ) %]">
+        <a class="image-link" href="[% c.uri_for( link_url, c.req.params ) %]">
             <img src="[% c.uri_for('/static/images/resultset_last.png') %]" alt="Last page" />
         </a>
     [% END %]
+
 </div>
