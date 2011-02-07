@@ -59,6 +59,11 @@ div.level2-menu-item {
     padding: 3px 0px 3px 12px;
 }
 
+p {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
 a {
     /*text-decoration: none;*/
     color: #0A2C94;
@@ -75,13 +80,28 @@ div#info {
     padding: 5px 5px 5px 5px;
 }
 
-table {
+table.plain {
     border-collapse: collapse;
 }
 
+table.box {
+    border: solid 1px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+table.box td, th {
+    border: solid 1px grey;
+    padding: 2px 2px 2px 2px;
+}
+
+table.box th {
+    background-color: #d1e0e1;
+}
+
 h1.info {
-	font-size: 1.5em;
-	font-weight: bolder;
+    font-size: 1.5em;
+    font-weight: bolder;
     text-align: center;
 }
 

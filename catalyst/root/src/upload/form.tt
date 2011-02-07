@@ -8,12 +8,14 @@ file. Then you upload the archive file</p>
 <p>The following archive formats are accepted:</p>
 
 <div align="center">
-<table class="foo" cellspacing="0" cellpadding="8" border="1">
+<table class="box" cellspacing="0" cellpadding="8" border="1">
 <tr><th>Archive format</th><th>File extension</th></tr>
 <tr><td align="left">Tar</td><td align="left">.tar</td></tr>
 <tr><td align="left">Compressed tar (gzip)</td><td align="left">.tgz or .tar.gz</td></tr>
 </table>
 </div>
+
+<hr/>
 
 <h2 class="std">Upload file</h2>
 
@@ -40,13 +42,18 @@ key field empty.</p>
 
 <form enctype="multipart/form-data" action="[% c.uri_for('/upload') %]" method="post">
 
+<div id="upload-form">
 Directory key: <input name="dirkey" value="" size="10" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 File name: <input name="data" type="file" />
 
 <input class="selectbutton1" type="submit" name="BTN_upload" value="Upload" />
 
-<table border="1" bgcolor="white" cellspacing="0" cellpadding="8" width="100%">
+</div>
+
+<div id="upload-list">
+
+<table class="box" width="100%">
 <!--   <colgroup width="6%" />
    <colgroup width="37%" />
    <colgroup width="10%" />
@@ -76,6 +83,7 @@ File name: <input name="data" type="file" />
     </tr>
 [% END %]
 
+</div>
 
 </table>
 

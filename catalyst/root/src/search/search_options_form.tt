@@ -4,7 +4,7 @@
     <tr>
         <td>&nbsp;</td>
         <td class="options_heading" style="padding-left: 10px; padding-right: 10px;" colspan="[% num_search_cols %]">Column number</td>
-        <td class="options_heading" style="padding-left: 10px; padding-right: 10px;" colspan="3">Crosstable columns</td>
+        <td class="options_heading" style="padding-left: 10px; padding-right: 10px;" colspan="3">Pivot table</td>
     </tr>
     <tr>
         <td class="options_heading">Column names</td>
@@ -13,7 +13,7 @@
             <td class="option_label" style="text-align: center">[% col_num %]</td>
         [% END %]
 
-        <td class="option_label" style="text-align: center">Vertical</td>
+        <td class="option_label" style="text-align: center">Vertical&nbsp;</td>
         <td class="option_label" style="text-align: center">Horisontal</td>
     </tr>
 
