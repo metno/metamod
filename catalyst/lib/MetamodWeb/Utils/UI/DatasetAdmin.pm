@@ -49,6 +49,7 @@ A reference to a list of DBIx::Class rows objects for the datasets that the user
 =back
 
 =cut
+
 sub user_datasets {
     my $self = shift;
 
@@ -56,6 +57,30 @@ sub user_datasets {
     my @datasets = $self->user_db->resultset('Dataset')->search( { u_id => $user_id } )->all();
 
     return \@datasets;
+
+}
+
+=head2 $self->user_files()
+
+Get the list of files uploaded by the currently logged in user.
+
+=over
+
+=item return
+
+A reference to a list of DBIx::Class rows objects for the files that the user has uploaded.
+
+=back
+
+=cut
+
+sub user_files {
+    my $self = shift;
+
+    my $user_id = $self->c->user()->u_id();
+    my @files = $self->user_db->resultset('File')->search( { u_id => $user_id } )->all();
+
+    return \@files;
 
 }
 
@@ -78,6 +103,7 @@ Returns the configuration as reference to list of hash references.
 =back
 
 =cut
+
 sub quest_config {
     my $self = shift;
 

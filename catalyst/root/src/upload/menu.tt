@@ -1,15 +1,11 @@
-<div id="my-metamod-menu">
+<div class="level2-menu" id="upload-menu">
 
-<div class="menu-item">
+<div class="level2-menu-item">
     <a href="[% c.uri_for('/upload') %]">Upload files</a>
 </div>
 
-<div class="menu-item">
+<div class="level2-menu-item">
     <a href="[% c.uri_for('/upload/test') %]">Test a file</a>
-</div>
-
-<div class="menu-item">
-    <a href="[% c.uri_for('/logout') %]">Logout</a>
 </div>
 
 </div>

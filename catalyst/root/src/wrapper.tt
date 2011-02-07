@@ -56,9 +56,11 @@
 
 <div id="menu" class="g240">
 [% INCLUDE 'menu.tt' %]
-[% IF section %]
-[% INCLUDE "${section}/menu.tt" %]
+
+[% IF section == 'search' %]
+[% INCLUDE "${section}/current_search_box.tt" %]
 [% END %]
+
 </div>
 
 <div id="content" class="g720">

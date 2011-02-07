@@ -50,7 +50,7 @@ sub app_menu {
         if ( $item =~ /^\s*([^\s]+)\s+(.*)$/ ) {
             my ($link, $label, $appid) = ( $1, $2, $self->config->get('LOCAL_URL') );
             if ($link =~ /^$appid(.+)$/) {
-                # web link, presumably Catalyst
+                # web link, presumably Catalyst [TO BE REMOVED]
                 $items{$label} = $self->c->uri_for($1); # makes link work both in Catalyst and Apache
             } else {
                 # external link, copy verbatim

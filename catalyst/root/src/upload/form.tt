@@ -1,3 +1,20 @@
+<h2 class="std">File format</h2>
+
+<p>Normally, a file to be uploaded should be a netCDF file (with a ".nc" file extention),
+or the equivalent CDL variant (".cdl" extention).
+However, if you have a large number of small files, you may pack the files into an archive
+file. Then you upload the archive file</p>
+
+<p>The following archive formats are accepted:</p>
+
+<div align="center">
+<table class="foo" cellspacing="0" cellpadding="8" border="1">
+<tr><th>Archive format</th><th>File extension</th></tr>
+<tr><td align="left">Tar</td><td align="left">.tar</td></tr>
+<tr><td align="left">Compressed tar (gzip)</td><td align="left">.tgz or .tar.gz</td></tr>
+</table>
+</div>
+
 <h2 class="std">Upload file</h2>
 
 <p>Use the "Browse..." button below to enter the name of a file on your local file system
@@ -29,6 +46,43 @@ File name: <input name="data" type="file" />
 
 <input class="selectbutton1" type="submit" name="BTN_upload" value="Upload" />
 
+<table border="1" bgcolor="white" cellspacing="0" cellpadding="8" width="100%">
+<!--   <colgroup width="6%" />
+   <colgroup width="37%" />
+   <colgroup width="10%" />
+   <colgroup width="37%" />
+   <colgroup width="10%" />
+-->   <tr>
+      <th>Replace</th>
+      <th>File name</th>
+      <th>Size</th>
+      <th>Time</th>
+      <th>Status</th>
+      <th>Show errors</th>
+   </tr>
+
+[% FOREACH fi IN da_ui_utils.user_files() %]
+    <tr class="list_table">
+    <td class="list_table"><input type="radio" name="selrec"/></td>
+    <td class="list_table">[% fi.f_name %]</td>
+    <td class="list_table">[% fi.f_size %]</td>
+    <td class="list_table">[% fi.f_timestamp %]</td>
+    <td class="list_table">[% fi.f_status %]</td>
+    <td class="list_table">
+        [% IF fi.f_errurl %]
+            <a href="[% c.uri_for( fi.f_errurl ) %]">Error</a>
+        [% END %]
+    </td>
+    </tr>
+[% END %]
+
+
+</table>
+
 </form>
 
+[% IF data %]
 
+<p style="color: red">[% data %]</p>
+
+[% END %]

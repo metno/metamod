@@ -8,7 +8,7 @@ use base 'DBIx::Class';
 __PACKAGE__->load_components("InflateColumn::DateTime", "Core");
 __PACKAGE__->table("file");
 __PACKAGE__->add_columns(
-  "ds_id",
+  "u_id",
   { data_type => "integer", default_value => undef, is_nullable => 0, size => 4 },
   "f_name",
   {
@@ -41,12 +41,12 @@ __PACKAGE__->add_columns(
     size => 9999,
   },
 );
-__PACKAGE__->set_primary_key("ds_id", "f_name");
-__PACKAGE__->add_unique_constraint("file_pkey", ["ds_id", "f_name"]);
+__PACKAGE__->set_primary_key("u_id", "f_name");
+__PACKAGE__->add_unique_constraint("file_pkey", ["u_id", "f_name"]);
 __PACKAGE__->belongs_to(
-  "ds_id",
-  "MetamodWeb::Schema::Userbase::Result::Dataset",
-  { ds_id => "ds_id" },
+  "u_id",
+  "MetamodWeb::Schema::Userbase::Result::Usertable",
+  { u_id => "u_id" },
 );
 
 

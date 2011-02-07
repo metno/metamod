@@ -30,8 +30,9 @@ BEGIN { extends 'Catalyst::Controller' };
 
 sub auto :Private {
     my ( $self, $c ) = @_;
+    my $da_ui_utils = MetamodWeb::Utils::UI::DatasetAdmin->new( c => $c, config => $c->stash->{mm_config} );
+    $c->stash( da_ui_utils => $da_ui_utils );
     $c->stash( section => 'upload' );
-    printf STDERR "*user = %s\n", Dumper($c->user->u_email);
 }
 
 #
@@ -53,19 +54,33 @@ sub upload_GET {
 sub upload_POST  {
     my ( $self, $c ) = @_;
 
+    my $upload_utils = MetamodWeb::Utils::UploadUtils->new( { c => $c, config => $c->stash->{ mm_config } } );
+
     #my $cru = new Catalyst::Request::Upload;
     my $upload = $c->req->upload('data');
-    my $data = $upload->filename . " = " . $upload->size;
+    my $data = $upload->filename . " (" . $upload->size . "B) uploaded. ";
+    my $fn = $upload->filename;
 
-    #my $data = $c->request->query_parameters->{data} || ':-(';
-    printf STDERR "* data = %s\n", $data;
+    if ( my $dataset = $upload_utils->validate_datafile($fn) ) {
 
-my $target = $c->stash->{mm_config}->get('UPLOAD_DIRECTORY');
-    $c->response->redirect('/upload/test');
-    $c->detach();
+        my $institution = $c->user->u_institution;
+        my $updir = $c->stash->{mm_config}->get('UPLOAD_DIRECTORY');
+        my $target = join( '/', $updir, $institution, $dataset, $fn);
+
+        printf STDERR "* file %s\n", $target;
+
+        mkdir "$updir/$institution";
+        mkdir "$updir/$institution/$dataset";
+        $upload->copy_to($target) or die $!;
+
+        #$c->response->redirect('/upload/test');
+        #$c->detach();
+    } else {
+        $data .= "FAILED validation!";
+    }
 
     $c->stash(
-        template => 'upload/test.tt',
+        template => 'upload/form.tt',
         data => $data,
     );
 
@@ -97,12 +112,17 @@ sub test_POST  {
     #my $cru = new Catalyst::Request::Upload;
     if ( my $upload = $c->req->upload('data') ) {
 
-        if ( $upload_utils->validate_datafile($upload->filename) ) {
-            my $target = $c->stash->{mm_config}->get('WEBRUN_DIRECTORY') . "/upl/ftaf";
-            printf STDERR " -> %s\n", $target;
-            $upload->copy_to($target) or die "Can't copy file to $target";
-            $data = sprintf "File %s (%s bytes) uploaded successfully. Test report will be sent on e-mail.",
-                $upload->filename, $upload->size;
+        my $fn = $upload->filename;
+
+        if ( $upload_utils->validate_datafile($fn) ) {
+            # FIXME - move this from controller to uploadutils
+            my $target = $c->stash->{mm_config}->get('WEBRUN_DIRECTORY') . "/upl";
+
+            $upload->copy_to("$target/ftaf/$fn") or die "Can't copy file to \"$target/ftaf/$fn\"";
+            open(my $etaf, '>', "$target/etaf/$fn") or die $!;
+            print $etaf $c->user->u_email . "\n";
+            close $etaf;
+            $data = sprintf "File $fn (%s bytes) uploaded successfully. Test report will be sent on e-mail.", $upload->size;
         } else {
             $data = "File name must start with \"dir_\" where dir is a destination directory (which need not exist)";
         }
