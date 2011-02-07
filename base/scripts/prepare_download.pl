@@ -7,8 +7,11 @@ use strict;
 use warnings;
 use TheSchwartz;
 
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($DEBUG);
+
 use Metamod::Config;
-use Metamod::Worker::PrepareDownload;
+use Metamod::Queue::Worker::PrepareDownload;
 
 if ( 1 != @ARGV ) {
     print "usage: $0 <path to master_config.txt>\n";
@@ -29,5 +32,5 @@ my $queue_worker = TheSchwartz->new(
     ]
 );
 
-$queue_worker->can_do('Metamod::Worker::PrepareDownload');
+$queue_worker->can_do('Metamod::Queue::Worker::PrepareDownload');
 $queue_worker->work();

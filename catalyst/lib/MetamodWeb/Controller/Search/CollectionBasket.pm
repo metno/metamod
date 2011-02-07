@@ -25,6 +25,7 @@ use Moose;
 use TheSchwartz;
 use namespace::autoclean;
 
+use Metamod::Queue;
 use MetamodWeb::Utils::UI::CollectionBasket;
 
 BEGIN { extends 'Catalyst::Controller'; }
@@ -108,29 +109,21 @@ sub request_download : Path('/search/collectionbasket/request_download') {
         push @dataset_locations, $file_location;
     }
 
-    #my $db_path = $c->path_to('jobqueue.db');
-    #my $job_client = TheSchwartz->new( databases => [ { dsn => "dbi:SQLite:dbname=$db_path" } ] );
-
-    my $mm_config  = $c->stash->{mm_config};
-    my $job_client = TheSchwartz->new(
-        databases => [
-            {
-                dsn  => $mm_config->getDSN_Userbase(),
-                user => $mm_config->get('PG_WEB_USER'),
-                pass => $mm_config->get('PG_WEB_USER_PASSWORD')
-            }
-        ]
-    );
-
-    $job_client->insert(
-        'Metamod::Worker::PrepareDownload',
-        {
+    my $queue = Metamod::Queue->new();
+    my $job_parameters = {
             locations => \@dataset_locations,
             email     => $email_address
-        }
-    );
+    };
 
-    $c->stash( info_msg => ['The download is being prepared for you. Please wait for an email'] );
+    my $success = $queue->insert_job( job_type => 'Metamod::Queue::Worker::PrepareDownload',
+                                      job_parameters => $job_parameters );
+
+    if( $success ){
+        $c->stash( info_msgs => ['The download is being prepared for you. Please wait for an email'] );
+    } else {
+        $c->stash( error_msgs => ['An error occured and your download could not be prepared'] );
+    }
+
     $c->detach('view');
 
 }
