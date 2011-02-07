@@ -1,4 +1,11 @@
 
+<!-- custom level 1 menu items -->
+[% FOREACH item IN ui_utils.app_menu() %]
+    <div class="menu-item">
+        <a href="[% item.value %]">[% item.key %]</a>
+    </div>
+[% END %]
+
 <!-- standard level 1 menu items -->
 <div class="menu-item"><a href="[% c.uri_for( '/search' )%]">Metadata search</a></div>
 [% IF section == 'search' %]
@@ -12,12 +19,6 @@
 
 <div class="menu-item"><a href="[% c.uri_for( '/restricted/subscription' )%]">My subscriptions</a></div>
 
-<!-- custom level 1 menu items -->
-[% FOREACH item IN ui_utils.app_menu() %]
-    <div class="menu-item">
-        <a href="[% item.value %]">[% item.key %]</a>
-    </div>
-[% END %]
 
 [% IF c.user_exists %]
 <div class="menu-item"><a href="[% c.uri_for( '/logout' )%]">Logout</a></div>
