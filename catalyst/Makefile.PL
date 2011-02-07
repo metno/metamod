@@ -12,6 +12,7 @@ all_from 'lib/MetamodWeb.pm';
 requires 'Catalyst::Devel' => '1.27';
 requires 'Catalyst::Runtime' => '5.80022';
 requires 'Catalyst::Plugin::Authentication';
+requires 'Catalyst::Action::REST';
 requires 'Catalyst::Authentication::Store::DBIx::Class';
 requires 'Catalyst::Authentication::Store::LDAP';
 requires 'Catalyst::Plugin::Session';
@@ -32,6 +33,7 @@ requires 'JSON' => '2.00';
 requires 'Template' => '2.22';
 requires 'HTML::FormHandler' => '0.32005';
 requires 'Data::FormValidator' => '4.66';
+requires 'TheSchwartz' => 1.10;
 
 # Dependencies that are not handled by the Catalyst .deb package. These should
 # be using the standard Ubuntu repository (or similar on other platforms). If the package
