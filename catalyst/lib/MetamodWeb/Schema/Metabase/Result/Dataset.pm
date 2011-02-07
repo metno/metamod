@@ -189,7 +189,8 @@ sub metadata {
 
     my ( $metadata_names ) = @_;
 
-    if( exists $self->{ _metadata_cache } ){
+    # cache the metadata if not requesting specific metadata names
+    if( exists $self->{ _metadata_cache } && 0 == @$metadata_names ){
         return $self->{ _metadata_cache };
     }
 
@@ -212,7 +213,9 @@ sub metadata {
         push @{ $metadata{ $mt_name } }, $md_content;
     }
 
-    $self->{ _metadata_cache } = \%metadata;
+    if( 0 == @$metadata_names ){
+        $self->{ _metadata_cache } = \%metadata;
+    }
     return \%metadata;
 }
 
