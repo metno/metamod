@@ -1,0 +1,22 @@
+<table border=0 cellpadding=0 cellspacing=0 align="center">
+<tr valign="top">
+<td bgcolor="#f5f5dc">
+<br>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<div style="border: solid thin olive; background: white">
+<center>
+<p><font size="+2">METAMOD2</font></p>
+<p><font size="+2">&nbsp;&nbsp;System Administration&nbsp;&nbsp;</font></p>
+</center>
+</div>
+</td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td bgcolor="#f5f5dc">
+    <a href="/admin/showconfig">View master_config.txt</a><br>
+    <a href="/admin/showlog">View METAMOD log</a><br>
+</td>
+</tr>
+</table>

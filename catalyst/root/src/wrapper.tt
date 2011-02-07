@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+[% IF use_admin_wrapper %]
+<head>
+   <title>METAMOD - Metadata Catalogue - Administration</title>
+   <style>
+     .menu { line-height: 1.3; }
+     .bgblue { background-color: #aaaaff; }
+   </style>
+</head>
+<body bgcolor="#f5f5dc">
+<a href="/admin">Main menu</a>
+<hr />
+[% content %]
+[% ELSE %]
 <head>
 <title>[% title %]</title>
 <link rel="stylesheet" href="[% c.uri_for('/static/css/reset.css') %]" />
@@ -61,5 +74,6 @@
 </div>
 
 </div>
+[% END %]
 </body>
 </html>
