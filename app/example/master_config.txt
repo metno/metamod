@@ -366,7 +366,7 @@ THREDDS_DATASET_PREFIX =
 
 # URL of OPeNDAP server. If no OPeNDAP server is installed, use an URL that
 # gives access to the data repository by HTTP download.
-OPENDAP_URL = http://[==SERVER==]:8081/thredds/catalog/data
+OPENDAP_URL = http://thredds.example.com:8081/thredds/catalog/data
 
 # Ownertag for uploaded datasets:
 UPLOAD_OWNERTAG = MM
