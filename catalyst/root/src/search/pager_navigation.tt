@@ -1,7 +1,30 @@
-<div style="width: 100%; text-align: right">
-    <a href="[% c.uri_for('/search/options', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/options' ) %]')">Search options</a>
-    <a href="[% c.uri_for('/search/two_way_table', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/two_way_table' ) %]')">Pivot table</a>
-</div>
+[%#
+
+Template for generating the page navigation for the search result.
+
+INPUT
+
+    url_template
+
+    A string on the form 'somethinh/%s/something' where %s will be replaced with a page number.
+
+    dataset_pager
+
+    A Data::Page object for the current result set.
+
+    on_level_1
+
+    A flag to indicate if you are on level 1 or not
+
+%]
+
+
+[% IF on_level_1 %]
+    <div style="width: 100%; text-align: right">
+        <a href="[% c.uri_for('/search/options', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/options' ) %]')">Search options</a>
+        <a href="[% c.uri_for('/search/two_way_table', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/two_way_table' ) %]')">Pivot table</a>
+    </div>
+[% END %]
 
 <div style="width: 100%; text-align: center">
 
