@@ -47,6 +47,7 @@ Catalyst controller for the search interface.
 Controller specific initisialisation for each request.
 
 =cut
+
 sub auto :Private {
     my ( $self, $c ) = @_;
 
@@ -65,6 +66,7 @@ sub auto :Private {
 Action for displaying the search front page.
 
 =cut
+
 sub index : Path("/search") :Args(0) {
     my ( $self, $c ) = @_;
 
@@ -72,11 +74,12 @@ sub index : Path("/search") :Args(0) {
 
 }
 
-=head2
+=head2 display_search_criteria
 
 Action for displaying one of the search criteria forms.
 
 =cut
+
 sub display_search_criteria : Path('/search') : Args(1) {
     my ( $self, $c, $active_criteria ) = @_;
 
@@ -120,11 +123,12 @@ sub display_search_criteria : Path('/search') : Args(1) {
     );
 }
 
-=head2
+=head2 display_result
 
 Chained action for displaying the search result.
 
 =cut
+
 sub display_result : Chained("perform_search") : PathPart('result') : Args(0) {
     my ( $self, $c ) = @_;
 
@@ -132,22 +136,24 @@ sub display_result : Chained("perform_search") : PathPart('result') : Args(0) {
 
 }
 
-=head2
+=head2 search_options
 
 Action for displaying the search options form.
 
 =cut
+
 sub search_options : Path('/search/options') : Args(0) {
     my ($self, $c) = @_;
 
     $c->stash( template => 'search/search_options.tt' );
 }
 
-=head2
+=head2 perform_search
 
 The root of the chained actions performing searches. This action will perform the actual search.
 
 =cut
+
 sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
     my ( $self, $c ) = @_;
 
@@ -185,11 +191,12 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
 
 }
 
-=head2
+=head2 two_way_table
 
 Action for displaying a two way table of the search result.
 
 =cut
+
 sub two_way_table : Path( "/search/two_way_table" ) : Args(0) {
     my ( $self, $c ) = @_;
 
@@ -207,7 +214,7 @@ sub two_way_table : Path( "/search/two_way_table" ) : Args(0) {
 
 }
 
-=head2
+=head2 expand_level2
 
 Action for expanding the view a level 1 dataset so that level 2 datasets are
 also displayed.
@@ -220,6 +227,7 @@ here.
 
 
 =cut
+
 sub expand_level2 : Chained('perform_search') : PathPart('expand') :Args(1) {
     my ($self, $c, $dataset_id ) = @_;
 
@@ -228,7 +236,7 @@ sub expand_level2 : Chained('perform_search') : PathPart('expand') :Args(1) {
     $c->stash( template => 'search/search_result.tt' );
 }
 
-=head2
+=head2 deflate_level2
 
 Action for hiding the view of level 2 datasets for specific level 1 dataset.
 
@@ -240,6 +248,7 @@ here.
 
 
 =cut
+
 sub deflate_level2 : Chained('perform_search') : PathPart('deflate') :Args(1) {
     my ($self, $c, $dataset_id ) = @_;
 
@@ -249,7 +258,7 @@ sub deflate_level2 : Chained('perform_search') : PathPart('deflate') :Args(1) {
 
 }
 
-=head2
+=head2 set_level2_page
 
 Action for changing the display page of level 2 datasets displayed under a
 specific level 1 dataset.
@@ -261,6 +270,7 @@ the CGI parameter, but gives some ugly TT code. For that reason we have kept it
 here.
 
 =cut
+
 sub set_level2_page : Chained('perform_search') : PathPart('level2page') :Args(2) {
     my ($self, $c, $dataset_id, $page_num ) = @_;
 
@@ -269,20 +279,25 @@ sub set_level2_page : Chained('perform_search') : PathPart('level2page') :Args(2
     $c->stash( template => 'search/search_result.tt' );
 }
 
+=head2 wms
+
+Action for displaying the WMS map
+
+=cut
+
 sub wms :Path('/search/wms') :Args {
     my ($self, $c) = @_;
-
-    #print STDERR $c->req->args->[0];
 
     $c->stash( template => 'search/wms.tt', 'current_view' => 'Raw' );
 
 }
 
-=head2
+=head2 display_help
 
 Action for displaying the help message to the user.
 
 =cut
+
 sub display_help : Path('/search/help') : Args(0) {
     my ($self, $c) = @_;
 
