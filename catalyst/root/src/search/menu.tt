@@ -7,7 +7,7 @@
         [% SET item_class = "level2-menu-item" %]
     [% END %]
     <div class="[% item_class %]">
-        <a href="[% c.uri_for('/search/collectionbasket', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/collectionbasket' ) %] ')">View Basket</a>
+        <a href="[% c.uri_for('/search/collectionbasket', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/collectionbasket' ) %] ')">View Basket ([% collection_basket.num_files() %])</a>
     </div>
 
     [% IF c.req.path().search('search/help') %]
