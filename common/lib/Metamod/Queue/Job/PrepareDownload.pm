@@ -30,8 +30,10 @@ use File::Temp qw(tempdir);
 use Log::Log4perl qw(get_logger);
 use LWP::Simple;
 use Params::Validate qw(:all);
+use POSIX qw(strftime);
 
 use Metamod::Config;
+use Metamod::Email;
 
 use Moose;
 use namespace::autoclean;
@@ -57,7 +59,6 @@ requirements change.
 =head1 FUNCTIONS/METHODS
 
 =cut
-
 
 =head2 $self->prepare_download($jobid, $locations)
 
@@ -85,10 +86,12 @@ is available via C<error_msg()>;
 =back
 
 =cut
+
 sub prepare_download {
     my $self = shift;
 
-    my ( $jobid, $locations ) = validate_pos( @_, { type => SCALAR }, { type => ARRAYREF } );
+    my ( $jobid, $locations, $email ) =
+        validate_pos( @_, { type => SCALAR }, { type => ARRAYREF }, { type => SCALAR } );
 
     my $logger = get_logger('job');
 
@@ -113,13 +116,39 @@ sub prepare_download {
 
     my $config          = Metamod::Config->new();
     my $download_area   = $config->get('WEBRUN_DIRECTORY') . "/download";
-    my $zip_destination = File::Spec->catfile( $download_area, "${jobid}.zip" );
+
+    my $now = time;
+    my $zip_filename = $email . '_' . $now . '.zip';
+    my $zip_destination = File::Spec->catfile( $download_area, $zip_filename );
+    my $zip_url = $config->get('BASE_PART_OF_EXTERNAL_URL') . $config->get('LOCAL_URL') . 'download/' . $zip_filename;
 
     if ( $zip->writeToFileNamed($zip_destination) != AZ_OK ) {
         $self->error_msg("Failed to write zip file to '$zip_destination'");
-        $logger->error($self->error_msg);
+        $logger->error( $self->error_msg );
         return;
     }
+
+    my $in_one_week = $now + (3600 * 24 * 7);
+    my $datestamp = strftime("%Y-%m-%d %H:%M", localtime($in_one_week));
+
+    my $email_body = <<"END_EMAIL";
+Your basket has now been processed and a zip archive with the requested file
+can now be downloaded.
+
+The zip archive will be available until $datestamp after that point it
+may be deleted and no longer be available.
+
+$zip_url
+END_EMAIL
+
+    Metamod::Email::send_simple_email(
+        {
+            to      => [$email],
+            from    => 'oysteint@met.no',
+            subject => 'Collection basket download ready',
+            body    => $email_body,
+        }
+    );
 
     $logger->debug('Job done');
     return 1;
