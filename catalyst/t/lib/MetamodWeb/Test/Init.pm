@@ -103,30 +103,37 @@ sub DEMOLISH {
         wmsinfo
     );
 
-    my $dbh = $self->mm_config->getDBH();
+    my $dbh;
+    try {
+        $dbh = $self->mm_config->getDBH();
+    } catch {
+        get_logger()->error("Failed to get database handle")
+    };
 
-    foreach my $table (@clean_tables) {
+    if( $dbh ){
+        foreach my $table (@clean_tables) {
 
-        try {
-            $dbh->do( "DELETE FROM $table" );
-            $dbh->commit();
-        } catch {
-            get_logger()->error("Failed to delete table '$table': $_");
-        };
-    }
+            try {
+                $dbh->do( "DELETE FROM $table" );
+                $dbh->commit();
+            } catch {
+                get_logger()->error("Failed to delete table '$table': $_");
+            };
+        }
 
-    my @reset_sequence = qw(
-            dataset_ds_id_seq
-    );
+        my @reset_sequence = qw(
+                dataset_ds_id_seq
+        );
 
-    foreach my $sequence (@reset_sequence) {
+        foreach my $sequence (@reset_sequence) {
 
-        try {
-            $dbh->do( "SELECT setval('$sequence', 1, false)" );
-            $dbh->commit();
-        } catch {
-            get_logger()->error("Failed to reset sequence '$sequence': $_");
-        };
+            try {
+                $dbh->do( "SELECT setval('$sequence', 1, false)" );
+                $dbh->commit();
+            } catch {
+                get_logger()->error("Failed to reset sequence '$sequence': $_");
+            };
+        }
     }
 
     unlink $self->catalyst_conf_file() or warn $!;
