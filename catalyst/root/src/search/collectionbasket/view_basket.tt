@@ -1,7 +1,8 @@
-[% SET files = collection_basket_ui_utils.files_in_basket() %]
+[% SET files = collection_basket.files() %]
 
-<div class="level2-active-area">
-<h2 class="std">Collection basket</h2>
+<h2 class="std">Basket</h2>
+
+<br />
 
 [% IF info_msgs %]
     <div class="info_msg">
@@ -19,19 +20,34 @@
     </div>
 [% END %]
 
-<form name="search_form" id="search_form" method="GET" action="/collectionbasket/remove_selected">
-    [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
-
 [% IF files.size > 0 %]
 
-    <table>
+<form name="request_download" action="[% c.uri_for('/search/collectionbasket/request_download') %]" method="POST" >
+    [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
+    <label for="email_address">Email</label>
+    <input type="text" name="email_address" id="email_address" size="40" value="[% c.req.params.email_address %]" />
+    <input type="submit" value="Request download" />
+</form>
+
+<form name="search_form" id="search_form" method="GET" action="/search/collectionbasket/remove_selected">
+    [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
+
+    <br />
+
+    <table class="plain" style="width: 100%">
 
         <tr>
-            <th>
+            <th class="collection-basket">
                 &nbsp;
             </th>
-            <th>
+            <th class="collection-basket">
                 Filename
+            </th>
+            <th class="collection-basket">
+                File size
+            </th>
+            <th class="collection-basket">
+                Estimated zip'ed file size
             </th>
         </tr>
 
@@ -39,30 +55,41 @@
 
         [% FOREACH file IN files %]
             <tr>
-                <td>
+                <td class="collection-basket">
                     <input type="checkbox" name="remove_file" value="[% file.ds_id %]" />
                 </td>
-                <td>
-                <a href="[% file.location %]">[% file.name %]</a>
+                <td class="collection-basket">
+                    <a href="[% file.data_file_url %]">[% file.name %]</a>
+                </td>
+                <td class="collection-basket" style="text-align: right">
+                    [% collection_basket.human_readable_size( file.data_file_size ) %]
+                </td>
+                <td class="collection-basket" style="text-align: right">
+                    [% collection_basket.human_readable_size( file.data_file_zip_size ) %]
                 </td>
             </tr>
         [% END %]
+        <tr>
+        <td class="collection-basket"></td>
+        <td class="collection-basket">&nbsp;</td>
+        <td class="collection-basket" style="text-align: right;">[% collection_basket.human_readable_size( collection_basket.calculate_size() ) %]</td>
+        <td class="collection-basket" style="text-align: right;">[% collection_basket.human_readable_size( collection_basket.calculate_zip_size() ) %]</td>
+        </tr>
+
     </table>
 
     <input type="submit" name="collection_basket_remove" value="Remove selected" />
-    <a href="[% c.uri_for( '/search/collectionbasket/empty_basket', c.req.params ) %]">Empty basket</a>
+    <a class="button-link" href="[% c.uri_for( '/search/collectionbasket/empty_basket', c.req.params ) %]"><button type="button">Empty basket</a></button>
     </form>
 
-    <form name="request_download" action="[% c.uri_for('/collectionbasket/request_download') %]" method="POST" >
-    Email
-    <input type="text" name="email_address" />
-    <input type="submit" value="Request download" />
-    </form>
 
 [% ELSE %]
-    There are no files in the collection basket.
+
+[%# the form is needed since many the search criteria links are dependant upon it %]
+<form name="search_form" id="search_form" method="GET" action="/search/collectionbasket/remove_selected">
+    [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
+</form>
+    There are no files in the basket.
 [% END %]
 
 </form>
-
-</div>

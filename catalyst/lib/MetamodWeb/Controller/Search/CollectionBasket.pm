@@ -26,7 +26,7 @@ use TheSchwartz;
 use namespace::autoclean;
 
 use Metamod::Queue;
-use MetamodWeb::Utils::UI::CollectionBasket;
+use MetamodWeb::Utils::CollectionBasket;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -49,12 +49,8 @@ Controller specific initisialisation for each request.
 sub auto : Private {
     my ( $self, $c ) = @_;
 
-    my $mm_config = $c->stash->{mm_config};
-
-    my $cb_ui_utils = MetamodWeb::Utils::UI::CollectionBasket->new( { config => $mm_config, c => $c } );
-    $c->stash( collection_basket_ui_utils => $cb_ui_utils, );
-
-    push @{ $c->stash->{css_files} }, $c->uri_for('/static/css/search.css');
+    my $collection_basket = MetamodWeb::Utils::CollectionBasket->new( c => $c );
+    $c->stash( collection_basket => $collection_basket );
 
 }
 
@@ -76,38 +72,15 @@ sub request_download : Path('/search/collectionbasket/request_download') {
         $c->detach('view');
     }
 
-    my $cookie = $c->req->cookies->{metamod_basket};
-    if ( !defined $cookie ) {
+    my $basket = $c->stash->{collection_basket};
+    my $files = $basket->files();
+
+    if ( 0 == @$files ) {
         $c->stash( info_msgs => ['There are no files in the collection basket to download'] );
         $c->detach('view');
     }
 
-    my @dataset_ids = $cookie->value();
-
-    if ( 0 == @dataset_ids ) {
-        $c->stash( info_msgs => ['There are no files in the collection basket to download'] );
-        $c->detach('view');
-    }
-
-    my @dataset_locations = ();
-    foreach my $ds_id (@dataset_ids) {
-
-        my $ds = $c->model('Metabase::Dataset')->find($ds_id);
-
-        if ( !defined $ds ) {
-            $c->log->error('Attempted to download dataset the does not exist');
-            next;
-        }
-
-        my $file_location = $ds->file_location();
-
-        if ( !defined $file_location ) {
-            $c->log->warn("Could not find the file location for '$ds_id'");
-            next;
-        }
-
-        push @dataset_locations, $file_location;
-    }
+    my @dataset_locations = map { $_->{data_file_url} } @$files;
 
     my $queue = Metamod::Queue->new();
     my $job_parameters = {
@@ -137,44 +110,11 @@ Action for adding a dataset to the collection basket.
 sub add_to_basket : Chained("/search/perform_search") : PathPart('add_to_basket') : Args(1) {
     my ( $self, $c, $ds_id ) = @_;
 
-    my $cookie = $c->req->cookies->{metamod_basket};
+    my $basket = $c->stash->{ collection_basket };
+    $basket->add_dataset($ds_id);
+    $basket->update_basket();
 
-    my %ds_ids = ();
-    if ( defined $cookie ) {
-
-        my @ds_ids = $cookie->value();
-
-        # ensure that ds_ids are unique
-        %ds_ids = map { $_ => 1 } @ds_ids;
-    }
-
-    my $dataset = $c->model('Metabase::Dataset')->find($ds_id);
-
-    if ( defined $dataset ) {
-
-        if ( $dataset->is_level1_dataset() ) {
-
-            my @child_ds_ids = $dataset->child_datasets->get_column('ds_id')->all();
-            foreach my $child_ds_id (@child_ds_ids) {
-                $ds_ids{$child_ds_id} = 1;
-            }
-        } else {
-            $ds_ids{$ds_id} = 1;
-        }
-    } else {
-        $c->log->error("Tried to add non-existant dataset to the collection basket: $ds_id");
-    }
-
-    $c->response->cookies->{metamod_basket} = { value => [ keys %ds_ids ] };
-
-    my $mm_config = $c->stash->{mm_config};
-    my $s_ui_utils = MetamodWeb::Utils::UI::Search->new( { config => $mm_config, c => $c } );
-
-    $c->stash(
-        template        => 'search/search_result.tt',
-        search_ui_utils => $s_ui_utils,
-        in_search_app   => 1,
-    );
+    $c->stash( template => 'search/search_result.tt', );
 
 }
 
@@ -200,14 +140,9 @@ Action for completely emptying the collection basket.
 sub empty_basket : Path('/search/collectionbasket/empty_basket') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $cookie = $c->req->cookies->{metamod_basket};
-
-    if ( defined $cookie ) {
-
-        # manipulate the cookie here so that it will be empty when reaching view()
-        $cookie->value( [] );
-        $c->response->cookies->{metamod_basket} = $cookie;
-    }
+    my $basket = $c->stash->{collection_basket};
+    $basket->empty_basket();
+    $basket->update_basket();
 
     $c->stash( info_msgs => ['The collection basket has been emptied'] );
     $c->detach('view');
@@ -224,26 +159,17 @@ sub remove_selected : Path('/search/collectionbasket/remove_selected') : Args(0)
 
     my $dataset_ids = $c->req->params->{'remove_file'} || [];
 
-    if ( 0 != @$dataset_ids ) {
-
-        my $cookie = $c->req->cookies->{metamod_basket};
-        if ( defined $cookie ) {
-
-            my @ds_ids = $cookie->value();
-
-            # ensure that ds_ids are unique
-            my %ds_ids = map { $_ => 1 } @ds_ids;
-
-            foreach my $ds_id (@$dataset_ids) {
-                delete $ds_ids{$ds_id};
-            }
-
-            # manipulate the cookie here so that it will be empty when reaching view()
-            $cookie->value( [ keys %ds_ids ] );
-            $c->response->cookies->{metamod_basket} = $cookie;
-        }
-
+    # dataset_ids can be either an array ref or just a single scalar if just
+    # one is selected for removal. If it is a scalar we convert it to array
+    # here.
+    if( ref( $dataset_ids ) ne 'ARRAY' ){
+        $dataset_ids = [ $dataset_ids ];
     }
+
+    my $basket = $c->stash->{collection_basket};
+    $basket->remove_datasets(@$dataset_ids);
+
+    $basket->update_basket();
 
     $c->forward('view');
 }
