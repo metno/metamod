@@ -29,12 +29,12 @@
 
 package Metamod::Utils;
 use base qw(Exporter);
-use strict; 
+use strict;
 use warnings;
 
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 
-our @EXPORT_OK = qw(findFiles isNetcdf trim getFiletype remove_cr_from_file);
+our @EXPORT_OK = qw(findFiles isNetcdf trim getFiletype remove_cr_from_file human_readable_size);
 
 use File::Find qw();
 use POSIX qw();
@@ -42,7 +42,7 @@ use POSIX qw();
 sub findFiles {
    my ($dir, @funcs) = @_;
    my @files;
-   
+
    File::Find::find(sub {-f && _execFuncs($_, @funcs) && push @files, $File::Find::name;}, $dir);
    return @files;
 }
@@ -82,7 +82,7 @@ sub getFiletype {
                 if (substr($buffer, $offset, length($magic)) eq $magic) {
                     return $type;
                 }
-            }  
+            }
         }
     }
     return "";
@@ -105,7 +105,7 @@ sub remove_cr_from_file {
         my $backupFile = $file . "~";
         rename $file, $backupFile or die "Cannot rename $file $backupFile: $!";
         open my $inFH, "<$backupFile" or die "Cannot read $backupFile: $!";
-        open my $outFH, ">$file" or die "Cannot write $file: $!"; 
+        open my $outFH, ">$file" or die "Cannot write $file: $!";
         while (defined (my $line = <$inFH>)) {
             $line =~ tr/\r//d;
             print $outFH $line;
@@ -142,7 +142,7 @@ sub daemonize {
     if ($logFH) {
         open STDOUT, ">>&", $logFH or die "Can't redirect STDOUT to $logFile: $!";
     } else {
-        open (STDOUT, ">/dev/null"); # instead of closing 
+        open (STDOUT, ">/dev/null"); # instead of closing
     }
     open STDERR, ">>&STDOUT" or die "Can't redirect STDERR: $!";
 }
@@ -165,6 +165,43 @@ sub _Fork {
     }
 }
 
+=head2 human_readable_size($size)
+
+Convert a number of bytes to a more human readable format.
+
+=over
+
+=item $size
+
+The number of bytes in a file or similar
+
+=item return
+
+A text string in a format that is more readable than mere byte size.
+
+=back
+
+=cut
+sub human_readable_size {
+    my ($size) = @_;
+
+    #
+    # The following code is adjusted from Filesys::DiskUsage
+    #
+
+    my $block = 1024;
+    my @args = qw/B Kb Mb Gb Tb/;
+
+    while (@args && $size > $block) {
+      shift @args;
+      $size /= $block;
+    }
+
+    $size = sprintf( "%.2f", $size );
+
+    return "$size $args[0]";
+
+}
 
 1;
 __END__
@@ -176,9 +213,9 @@ Metamod::Utils - utilities for metamod
 =head1 SYNOPSIS
 
   use Metamod::Utils qw(findFiles isNetcdf trim);
-  
+
   daemonize('/var/log/logfile','/var/pid/pidfile');
-  
+
   my @files = findFiles('/tmp');
   my @numberFiles = findFiles('/tmp', sub {$_[0] =~ m/^\d/});
 
@@ -191,10 +228,10 @@ Metamod::Utils - utilities for metamod
   if (isNetcdf("file.nc")) {
          # ... do something with a nc file
   }
-  
+
   my $trimmed = trim("  string  "); # $trimmed = "string"
-  
-  
+
+
 =head1 DESCRIPTION
 
 This modules is a collection of small functions useful when working with Metamod.
@@ -206,7 +243,7 @@ The functions are listed below:
 
 Return all files in the directory. The each callback-function will be called with
 the filename as $_[0] parameter. All callbacks need to return true for the file.
-The callbacks have in addition access to the following variables: $File::Find::name and 
+The callbacks have in addition access to the following variables: $File::Find::name and
 $File::Find::dir. In addition the perl-special _ filehandle is set due to a previously checked -f.
 See stat or -X in L<perlfunc>.
 
