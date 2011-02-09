@@ -14,6 +14,20 @@ body {
     overflow-y: scroll;
 }
 
+div.info_msg {
+    border: 1px solid #0b5a00;
+    padding: 5px 5px 5px 5px;
+    margin: 5px 5px 5px 5px;
+    background-color: #cdfbc7;
+}
+
+div.error_msg {
+	border: 1px solid #ff1212;
+    padding: 5px 5px 5px 5px;
+    margin: 5px 5px 5px 5px;
+	background-color: #ffd7d7;
+}
+
 div#page {
     background-color: white;
 }
@@ -69,8 +83,12 @@ a {
     color: #0A2C94;
 }
 
-a.image-link {
+a.image-link, a.button-link {
     text-decoration: none;
+}
+
+a.button-link {
+    color: black;
 }
 
 div#info {
@@ -135,13 +153,6 @@ h2.std {
     text-align: center;
     padding: 7px 5px 7px 5px;
 }
-
-h2.std {
-    font-size: 1.0em;
-    font-weight: bolder;
-    padding: 5px 0px 5px 0px;
-}
-
 
 li {
     margin-left: 15px;
