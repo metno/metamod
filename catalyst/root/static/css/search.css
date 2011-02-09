@@ -35,11 +35,11 @@ table.sub_result {
     margin: 2px 0px 10px 20px;
 }
 
-th.result, th.sub_result, td.two_way_vertical_key, td.option_label {
+th.result, th.sub_result, td.two_way_vertical_key, td.option_label, th.collection-basket {
     font-weight: bolder;
 }
 
-th.result, td.two_way_vertical_key {
+th.result, td.two_way_vertical_key, th.collection-basket {
     background-color: #f6f6f6;
 }
 
@@ -70,7 +70,7 @@ td.cross_column {
     text-align: center;
 }
 
-td.result, th.result, td.sub_result, th.sub_result {
+td.result, th.result, td.sub_result, th.sub_result, th.collection-basket, td.collection-basket {
     border: 1px solid silver;
     padding: 3px;
     vertical-align: top;
