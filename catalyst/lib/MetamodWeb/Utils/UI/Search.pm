@@ -39,6 +39,51 @@ use warnings;
 
 extends 'MetamodWeb::Utils::UI::Base';
 
+#
+# The search conditions used for the current metadata search
+#
+has 'current_search_conds' => (is => 'rw', isa => 'HashRef', lazy => 1, builder => '_build_current_search_conds' );
+
+#
+# The search attrs used for the current metadata search
+#
+has 'current_search_attrs' => (is => 'rw', isa => 'HashRef', lazy => 1, builder => '_build_current_search_attrs' );
+
+#
+# Initialise the current_search_conds attribute
+#
+sub _build_current_search_conds {
+    my $self = shift;
+
+    my ($conds, $attrs) = $self->_current_search_params();
+    return $conds;
+}
+
+#
+# Initialise the current_search_attrs attribute
+#
+sub _build_current_search_attrs {
+    my $self = shift;
+
+    my ($conds, $attrs) = $self->_current_search_params();
+    return $attrs;
+}
+
+#
+# Helper function for _build_current_search_conds and _build_current_search_attrs
+#
+sub _current_search_params {
+    my $self = shift;
+
+    my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $self->c, config => $self->config } );
+    my $search_criteria = $search_utils->selected_criteria( $self->c->req->params() );
+    my $ownertags = $search_utils->get_ownertags();
+    my $dataset_rs = $self->meta_db->resultset('Dataset');
+    my ($conds, $attrs ) = $dataset_rs->metadata_search_params( { ownertags => $ownertags,
+                                                                  search_criteria => $search_criteria } );
+    return ($conds,$attrs);
+}
+
 =head1 NAME
 
 MetamodWeb::Utils::UI::Search- Utility functions for building the search ui.
@@ -653,10 +698,22 @@ sub level2_result {
 
     my $files_per_page = $self->c->req->params->{ files_per_page } || 10;
 
+    my $conds = $self->current_search_conds();
+    my %attrs = %{ $self->current_search_attrs() };
+    $attrs{ rows } = $files_per_page;
+    $attrs{ page } = $current_page;
+
     # We cache the row objects so that we can fetch the associated metadata only once
-	my $level2_datasets = $dataset->child_datasets()->search( {}, { rows => $files_per_page, page => $current_page, cache => 1, } );
+    $attrs{ cache } = 1;
+
+	my $level2_datasets = $dataset->child_datasets()->search( $conds, \%attrs );
 
 	return $level2_datasets;
+
+}
+
+sub _search_params {
+    my $self = shift;
 
 }
 

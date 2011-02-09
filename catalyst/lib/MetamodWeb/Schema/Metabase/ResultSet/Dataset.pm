@@ -46,19 +46,7 @@ The number of rows to fetch.
 
 =item search_criteria
 
-The search criteria a hash reference. The hash reference is best explained with an example as each type of meta data
-requires a slightly different structure.
-
-  $search_criteria = {
-      basickey => [
-        [ 1000, 1001, 1002 ], # basic keys for one search category
-        [ 2000, 2001, ], # basic keys for another search category.
-      ],
-      dates => { 8 => { from => '20100205', to => '20100801', } },
-      freetext => [ 'Some text' ],
-      coords => { srid => 93995, x1 => 1, x2 => 10, y1 => 1, y2 => 10 },
-      topics => { bk_ids => [ 1, 2, 3 ], hk_ids => [ 10, 20, 30 ] },
-  }
+See the corresponding parameter in C<metadata_search_params>
 
 =item return
 
@@ -80,8 +68,75 @@ sub metadata_search {
             all_levels      => { type => SCALAR, default => 0 },
         }
     );
+
+
     my ( $all_levels, $curr_page, $ownertags, $rows_per_page, $search_criteria ) =
         @params{qw( all_levels curr_page ownertags rows_per_page search_criteria )};
+
+    my ( $search_conds, $search_attrs )  = $self->metadata_search_params( { ownertags => $ownertags,
+                                                                            search_criteria => $search_criteria } );
+
+    $search_conds->{'me.ds_parent'}   = 0 if !$all_levels;
+
+    if( $curr_page && $rows_per_page ) {
+        $search_attrs->{ page } = $curr_page;
+        $search_attrs->{ rows } = $rows_per_page;
+    }
+
+    my $matching_datasets = $self->search( $search_conds, $search_attrs );
+
+    return $matching_datasets;
+
+}
+
+=head2 $self->metadata_search_params(%PARAMS)
+
+Create DBIx::Class compatible search parameters from a set of search critieria.
+
+=over
+
+=item ownertags
+
+An array ref of owner tags to search for.
+
+=item search_criteria
+
+The search criteria a hash reference. The hash reference is best explained with an example as each type of meta data
+requires a slightly different structure.
+
+  $search_criteria = {
+      basickey => [
+        [ 1000, 1001, 1002 ], # basic keys for one search category
+        [ 2000, 2001, ], # basic keys for another search category.
+      ],
+      dates => { 8 => { from => '20100205', to => '20100801', } },
+      freetext => [ 'Some text' ],
+      coords => { srid => 93995, x1 => 1, x2 => 10, y1 => 1, y2 => 10 },
+      topics => { bk_ids => [ 1, 2, 3 ], hk_ids => [ 10, 20, 30 ] },
+  }
+
+
+=item return
+
+Returns a list of two items. The first item is a hash reference with
+C<DBIx::Class> search conditions. The second item contains a C<DBIx::Class>
+compatible search attributes that are  neccessary for the search specified in
+the condtions to work.
+
+=back
+
+=cut
+sub metadata_search_params {
+    my $self = shift;
+
+    my %params = validate(
+        @_,
+        {
+            ownertags       => { type => ARRAYREF },
+            search_criteria => { type => HASHREF },
+        }
+    );
+    my ( $ownertags, $search_criteria ) = @params{qw( ownertags search_criteria )};
 
     my %search_cond  = ();
     my @ds_ids_conds = ();
@@ -175,25 +230,16 @@ sub metadata_search {
         push @ds_ids_conds, \%cond;
     }
 
-    $search_cond{'me.ds_parent'}   = 0 if !$all_levels;
     $search_cond{'me.ds_ownertag'} = { IN => $ownertags };
     $search_cond{'me.ds_id'}    = [ -and => @ds_ids_conds ] if @ds_ids_conds;
 
-    my $search_attrs =         {
+    my %search_attrs = (
             join     => [ { 'ds_has_mds' => 'md_id' } ],
             distinct => 1,
             order_by => 'me.ds_id',
-    };
+    );
 
-    if( $curr_page && $rows_per_page ) {
-        $search_attrs->{ page } = $curr_page;
-        $search_attrs->{ rows } = $rows_per_page;
-    }
-
-    my $matching_datasets = $self->search( \%search_cond, $search_attrs );
-
-    return $matching_datasets;
-
+    return ( \%search_cond, \%search_attrs );
 }
 
 =head2 $self->two_way_table($search_criteria, $ownertags, $vertical_col, $horisontal_col)
