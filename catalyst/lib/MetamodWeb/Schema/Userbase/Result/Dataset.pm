@@ -67,13 +67,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
-=head1 LICENSE
-
-GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
-
-=cut
-
-# You can replace this text with custom content, and it will be preserved on regeneration
 
 =head2 $self->dataset_key($new_key?)
 
@@ -122,6 +115,22 @@ sub dataset_key {
 
         return $new_key;
     }
+}
+
+=head2 $self->validate_dskey($key)
+
+Check if dataset key is valid (always true if no key set).
+
+=cut
+
+sub validate_dskey {
+    my $self = shift;
+    my $key = shift;
+
+    my $dskey = $self->dataset_key();
+    printf STDERR " '%s' = '%s'? %d\n", $key, $dskey, ($key eq $dskey);
+    return 1 unless $dskey; # blank key = access all areas
+    return !$dskey || ($key eq $dskey);
 }
 
 =head2 $self->projection_xml($new_projection?)
@@ -223,3 +232,9 @@ sub _infods_resultset {
 }
 
 1;
+
+=head1 LICENSE
+
+GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
+
+=cut

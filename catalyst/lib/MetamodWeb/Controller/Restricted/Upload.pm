@@ -61,22 +61,27 @@ sub upload_POST  {
     my $data = $upload->filename . " (" . $upload->size . "B) uploaded. ";
     my $fn = $upload->filename;
 
-    if ( my $dataset = $upload_utils->validate_datafile($fn) ) {
-
+    if (! $upload->size) {
+        $data = "ERROR: File size is zero bytes.";
+    } elsif ( !( my $dsname = $upload_utils->validate_datafile($fn) ) ) {
+        $data .= "FAILED validation!";
+    } elsif ( !( my $dataset = $c->model('Userbase::Dataset')->search( { ds_name => $dsname } )->first() ) ) {
+        $data .= "No such dataset '$dsname' registered!";
+    } elsif ( ! $dataset->validate_dskey( $c->req->param('dirkey') ) ) {
+        $data = "Invalid key!";
+    } else {
         my $institution = $c->user->u_institution;
         my $updir = $c->stash->{mm_config}->get('UPLOAD_DIRECTORY');
-        my $target = join( '/', $updir, $institution, $dataset, $fn);
+        my $target = join( '/', $updir, $institution, $dsname, $fn);
 
         printf STDERR "* file %s\n", $target;
 
         mkdir "$updir/$institution";
-        mkdir "$updir/$institution/$dataset";
+        mkdir "$updir/$institution/$dsname";
         $upload->copy_to($target) or die $!;
 
         #$c->response->redirect('/upload/test');
         #$c->detach();
-    } else {
-        $data .= "FAILED validation!";
     }
 
     $c->stash(
@@ -109,22 +114,23 @@ sub test_POST  {
 
     my $upload_utils = MetamodWeb::Utils::UploadUtils->new( { c => $c, config => $c->stash->{ mm_config } } );
 
-    #my $cru = new Catalyst::Request::Upload;
     if ( my $upload = $c->req->upload('data') ) {
 
         my $fn = $upload->filename;
 
-        if ( $upload_utils->validate_datafile($fn) ) {
+        if (! $upload->size) {
+            $data = "ERROR: File size is zero bytes.";
+        } elsif (! $upload_utils->validate_datafile($fn) ) {
+            $data = "File name must start with \"dir_\" where dir is a destination directory (which need not exist)";
+        } else {
             # FIXME - move this from controller to uploadutils
             my $target = $c->stash->{mm_config}->get('WEBRUN_DIRECTORY') . "/upl";
 
-            $upload->copy_to("$target/ftaf/$fn") or die "Can't copy file to \"$target/ftaf/$fn\"";
+            $upload->copy_to("$target/ftaf/$fn") or die $!;
             open(my $etaf, '>', "$target/etaf/$fn") or die $!;
             print $etaf $c->user->u_email . "\n";
             close $etaf;
             $data = sprintf "File $fn (%s bytes) uploaded successfully. Test report will be sent on e-mail.", $upload->size;
-        } else {
-            $data = "File name must start with \"dir_\" where dir is a destination directory (which need not exist)";
         }
     } else {
         $data = "No file uploaded. Try again.";
@@ -134,6 +140,19 @@ sub test_POST  {
         template => 'upload/test.tt',
         data => $data,
     );
+
+}
+
+=head2 index
+
+Action for displaying the search front page.
+
+=cut
+
+sub index : Path("/search") :Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->stash( template => 'search/search.tt');
 
 }
 
