@@ -1,0 +1,7 @@
+[% INCLUDE admin/admin_header.tt %]
+<pre>
+[% FILTER html %]
+[% config_content %]
+[% END %]
+</pre>
+[% INCLUDE admin/admin_footer.tt %]

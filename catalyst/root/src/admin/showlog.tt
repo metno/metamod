@@ -1,0 +1,43 @@
+[% INCLUDE admin/admin_header.tt %]
+<h2>Show METAMOD log:</h2>
+<form action="[% c.uri_for('/admin/showlog') %]" method="get">
+<table border="0" bgcolor="#f5f5dc" width="100%">
+<tr>
+<th align="right">Dates:</th>
+<td>From: <input type="text" name="fromdate" value="[% fromdate %]" />
+   &nbsp;&nbsp;&nbsp;To:<input type="text" name="todate" value="[% todate %]" /></td>
+<td>&nbsp;</td>
+<td><input type="submit" name="getmessages" value="Get messages" /></td>
+<td>&nbsp;</td>
+<td align="right"><input type="submit" name="summarydate" value="Date summary" /></td>
+</tr>
+<tr>
+<th align="right">Category:</th>
+<td><input type="text" name="logger" value="[% logger %]" size="55" /></td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td align="right"><input type="submit" name="summarylogger" value="Category summary" /></td>
+</tr>
+<tr>
+<th align="right">Level:</th>
+<td><input type="text" name="level" value="[% level %]" /></td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td align="right"><input type="submit" name="summarylevel" value="Level summary" /></td>
+</tr>
+</table>
+<p>Show messages on multiple lines with blank lines between messages:
+<input type="checkbox" name="multiline" value="multiline" [% multiline_is_checked %] />
+</p>
+</form>
+<hr />
+<pre>
+[% FILTER html %]
+[% optionstring %]
+
+[% result %]
+[% END %]
+</pre>
+[% INCLUDE admin/admin_footer.tt %]
