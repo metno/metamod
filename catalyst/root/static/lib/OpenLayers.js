@@ -2,11 +2,11 @@
  * license.  See http://svn.openlayers.org/trunk/openlayers/license.txt for the
  * full text of the license. */
 
-/* 
+/*
  * @requires OpenLayers/BaseTypes.js
  * @requires OpenLayers/Lang/en.js
  * @requires OpenLayers/Console.js
- */ 
+ */
 
 (function() {
     /**
@@ -16,19 +16,19 @@
      * case with single file builds.
      */
     var singleFile = (typeof OpenLayers == "object" && OpenLayers.singleFile);
-    
+
     /**
      * Cache for the script location returned from
      * OpenLayers._getScriptLocation
      */
     var scriptLocation;
-    
+
     /**
      * Namespace: OpenLayers
      * The OpenLayers object provides a namespace for all things OpenLayers
      */
     window.OpenLayers = {
-        
+
         /**
          * Property: _scriptName
          * {String} Relative path of this script.
@@ -46,9 +46,9 @@
             if (scriptLocation != undefined) {
                 return scriptLocation;
             }
-            scriptLocation = "";            
+            scriptLocation = "";
             var isOL = new RegExp("(^|(.*?\\/))(" + OpenLayers._scriptName + ")(\\?|$)");
-         
+
             var scripts = document.getElementsByTagName('script');
             for (var i=0, len=scripts.length; i<len; i++) {
                 var src = scripts[i].getAttribute('src');
@@ -66,11 +66,11 @@
     /**
      * OpenLayers.singleFile is a flag indicating this file is being included
      * in a Single File Library build of the OpenLayers Library.
-     * 
+     *
      * When we are *not* part of a SFL build we dynamically include the
      * OpenLayers library code.
-     * 
-     * When we *are* part of a SFL build we do not dynamically include the 
+     *
+     * When we *are* part of a SFL build we do not dynamically include the
      * OpenLayers library code as it will be appended at the end of this file.
       */
     if(!singleFile) {
@@ -186,7 +186,7 @@
             "OpenLayers/Geometry/MultiPoint.js",
             "OpenLayers/Geometry/Curve.js",
             "OpenLayers/Geometry/LineString.js",
-            "OpenLayers/Geometry/LinearRing.js",        
+            "OpenLayers/Geometry/LinearRing.js",
             "OpenLayers/Geometry/Polygon.js",
             "OpenLayers/Geometry/MultiLineString.js",
             "OpenLayers/Geometry/MultiPolygon.js",
@@ -296,28 +296,15 @@
             "OpenLayers/Lang/en.js"
         ); // etc.
 
-        var agent = navigator.userAgent;
-        var docWrite = (agent.match("MSIE") || agent.match("Safari"));
-        if(docWrite) {
-            var allScriptTags = new Array(jsfiles.length);
-        }
-        var host = OpenLayers._getScriptLocation() + "lib/";    
+        // Fix for HTML5 - see http://trac.osgeo.org/openlayers/ticket/2933
+        // use "parser-inserted scripts" for guaranteed execution order
+        // http://hsivonen.iki.fi/script-execution/
+        var allScriptTags = new Array(jsfiles.length);
+        var host = OpenLayers._getScriptLocation() + "lib/";
         for (var i=0, len=jsfiles.length; i<len; i++) {
-            if (docWrite) {
-                allScriptTags[i] = "<script src='" + host + jsfiles[i] +
-                                   "'></script>"; 
-            } else {
-                var s = document.createElement("script");
-                s.src = host + jsfiles[i];
-                var h = document.getElementsByTagName("head").length ? 
-                           document.getElementsByTagName("head")[0] : 
-                           document.body;
-                h.appendChild(s);
-            }
+            allScriptTags[i] = "<script src='" + host + jsfiles[i] + "'></script>";
         }
-        if (docWrite) {
-            document.write(allScriptTags.join(""));
-        }
+        document.write(allScriptTags.join(""));
     }
 })();
 
