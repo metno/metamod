@@ -2,16 +2,27 @@
 Things to do in Catalyst version of Metamod
 -------------------------------------------
 
+* File Upload [GA]
+  * upload_indexer + webservice
+  * dataset admin
+    * wms setup
+
+
 * check that wmsinfo data gets imported from test xmlfiles [GA]
   * not really a catalyst issue
+
+    DONE
+------------------------------------------
+
+* File Upload [GA]
+  * test a file
+  * upload file
+    * check key
 
 * Implement support for reprojections (Lat/long and Stereo). This can be implemented as a port of the current PHP code.
   At a later time this should be supported using some type of WPS service, but not for this version. [HK]
 
 * Add section header + menu in templates [GA]
-
-    DONE
-------------------------------------------
 
 * Setup nighly integration (test_application) and test machines. [ØT]
 
