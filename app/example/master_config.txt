@@ -270,7 +270,6 @@ SEARCH_APP_MAXROWS_SCNDLEV = 50
 # similarly define the vertical axis. X="no" excludes the column to be used in
 # cross tables.
 SEARCH_APP_SHOW_COLUMNS =
- dataref 'Name' col=1 cross=no
  area 'Areas' col=3 cross=v
  institution 'Institutions' col=2
  variable 'Topics and variables'
@@ -306,6 +305,23 @@ DEFAULT_FONTSIZE = 80
 # Upload application: Set this to 1 for debug output to the screen
 # and to the testlog file:
 DEBUG = 0
+
+# METAMOD is the owner of the data repository. It will monitor
+# directories where data providers can upload netCDF files, and
+# move the files from there into the data repository. While doing
+# this, METAMOD will extract metadata for the XML Metadata
+# repository, and check the files and eventually report to the
+# user any errors or missing metadata encountered. This is the
+# normal mode.
+EXTERNAL_REPOSITORY = false
+
+# In this case, METAMOD has no responsibilty for moving netCDF
+# files into their final destination (i.e. the data repository).
+# Files are already in the repository when METAMOD recieves them.
+# The responsibility for METAMOD is only to extract metadata,
+# check the files and eventually report any irregularities back
+# to the data provider.
+#EXTERNAL_REPOSITORY = true
 
 # Title to appear on all web pages in the file upload application:
 UPLOAD_APP_TITLE = Uploads to the Data Repository
