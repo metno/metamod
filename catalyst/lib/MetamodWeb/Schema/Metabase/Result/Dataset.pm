@@ -189,6 +189,8 @@ sub metadata {
 
     my ( $metadata_names ) = @_;
 
+    $metadata_names = [] if !defined $metadata_names;
+
     # cache the metadata if not requesting specific metadata names
     if( exists $self->{ _metadata_cache } && 0 == @$metadata_names ){
         return $self->{ _metadata_cache };
