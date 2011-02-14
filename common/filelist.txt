@@ -111,6 +111,9 @@ logger_config.ini
 =lib/Metamod/Config.pm
 =lib/Metamod/FimexProjections.pm
 =lib/Metamod/LoggerConfigParser.pm
+=lib/Metamod/Queue.pm
+=lib/Metamod/Queue/Job/PrepareDownload.pm
+=lib/Metamod/Queue/Worker/PrepareDownload.pm
 =lib/Metamod/Search/Feed.pm
 =lib/Metamod/Subscription.pm
 =lib/Metamod/SubscriptionHandler.pm
