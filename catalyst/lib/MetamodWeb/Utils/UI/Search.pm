@@ -744,7 +744,6 @@ sub level2_metadata_columns {
 
     my ( $dataset, $level2_datasets ) = @_;
 
-    #my $level2_datasets = $dataset->child_datasets();
     my $metadata_rs = $self->meta_db->resultset('Metadata');
     my $mt_names = $metadata_rs->available_metadata();
     my $level1_md = $dataset->metadata();
@@ -755,11 +754,17 @@ sub level2_metadata_columns {
         $level1_as_string{$mt_name} = join ',', @$md_content;
     }
 
+    my $show_columns = $self->search_app_show_columns();
+    my %columns_to_show = map { $_->{mt_name} => 1 } @$show_columns;
+
     my %non_equal_metadata = ();
     while( my $level2_ds = $level2_datasets->next() ){
 
         my $md = $level2_ds->metadata();
         while( my ($mt_name, $md_content) = each %$md ){
+
+            # the meta data is not part of the columns that is configured to displayed, so just skip.
+            next if !exists $columns_to_show{$mt_name};
 
             # dataref is added in the end anyway as it is always use to link to
             # the resource if present. To simplify things a bit we do not care
