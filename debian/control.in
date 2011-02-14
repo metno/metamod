@@ -10,7 +10,7 @@ Section: web
 Priority: optional
 Architecture: all
 Essential: no
-Depends: libapache2-mod-php5, postgresql-client-common, postgresql-client-8.3, php5-pgsql, php5-gd, php5-xsl, libdbd-pg-perl, libxml-simple-perl, libxml-libxslt-perl, libmailtools-perl, libwww-perl, pdl, proj, liburi-perl, libpdl-netcdf-perl, libgeo-proj4-perl, php-auth, php-db, php-log, libxml-rss-libxml-perl, libconfig-tiny-perl, liblog-log4perl-perl, libparams-validate-perl, libimager-perl, libfile-copy-recursive-perl
+Depends: libapache2-mod-php5, postgresql-client-common, postgresql-client-8.3, php5-pgsql, php5-gd, php5-xsl, libdbd-pg-perl, libxml-simple-perl, libxml-libxslt-perl, libmailtools-perl, libwww-perl, pdl, proj, liburi-perl, libpdl-netcdf-perl, libgeo-proj4-perl, php-auth, php-db, php-log, libxml-rss-libxml-perl, libconfig-tiny-perl, liblog-log4perl-perl, libparams-validate-perl, libimager-perl, libfile-copy-recursive-perl, libpod-simple-wiki-perl
 Pre-Depends: perl
 Recommends: exim4 | postfix | sendmail, libxml2-utils, mailx, subversion, libdatetime-perl
 Suggests: metamod2-database

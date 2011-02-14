@@ -34,6 +34,7 @@ requires 'Template' => '2.22';
 requires 'HTML::FormHandler' => '0.32005';
 requires 'Data::FormValidator' => '4.66';
 requires 'TheSchwartz' => 1.10;
+requires 'POD::Simple::Wiki';
 
 # Dependencies that are not handled by the Catalyst .deb package. These should
 # be using the standard Ubuntu repository (or similar on other platforms). If the package
