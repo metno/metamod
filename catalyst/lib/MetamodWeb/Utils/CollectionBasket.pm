@@ -29,7 +29,7 @@ use warnings;
 
 use Metamod::Config;
 use Metamod::Utils;
-use MetamodWeb::Utils::SearchUtils
+use MetamodWeb::Utils::SearchUtils;
 
 #
 # A Metamod::Config object containing the configuration for the application
