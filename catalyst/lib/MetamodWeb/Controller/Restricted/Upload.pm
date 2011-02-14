@@ -18,6 +18,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =end LICENSE
 
+=head1 NAME
+
+MetamodWeb::Controller::Restricted:Upload - Catalyst Controller for file upload
+
+=head1 DESCRIPTION
+
+blah blah blah
+
+=head1 METHODS
+
+blah blah blah
+
 =cut
 
 use Moose;
@@ -35,9 +47,13 @@ sub auto :Private {
     $c->stash( section => 'upload' );
 }
 
-#
-# upload file
-#
+
+=head2 upload
+
+Action for uploading files
+
+=cut
+
 sub upload : Path('/upload') :ActionClass('REST') : Args(0) {
     my ( $self, $c ) = @_;
 }
@@ -91,9 +107,12 @@ sub upload_POST  {
 
 }
 
-#
-# test file
-#
+=head2 test
+
+Action for testing uploaded files
+
+=cut
+
 sub test : Path('/upload/test') :ActionClass('REST') : Args(0) {
     my ( $self, $c ) = @_;
 }
@@ -143,31 +162,6 @@ sub test_POST  {
 
 }
 
-=head2 index
-
-Action for displaying the search front page.
-
-=cut
-
-sub index : Path("/search") :Args(0) {
-    my ( $self, $c ) = @_;
-
-    $c->stash( template => 'search/search.tt');
-
-}
-
-=head1 NAME
-
-MetamodWeb::Controller::Restricted:Upload - Catalyst Controller for file upload
-
-=head1 DESCRIPTION
-
-blah blah blah
-
-=head1 METHODS
-
-blah blah blah
-
 =head1 LICENSE
 
 GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
@@ -175,4 +169,3 @@ GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
 =cut
 
 __PACKAGE__->meta->make_immutable;
-

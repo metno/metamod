@@ -41,6 +41,7 @@ our $DEBUG = 0;
 use strict;
 use warnings;
 
+use Carp;
 use File::Spec qw();
 use Cwd qw();
 # read ABS_PATH early, in case somebody uses a chdir
@@ -182,9 +183,9 @@ sub _getVar {
     }
     if (!exists $self->{vars}{$var}) {
         if ($_logger_initialised) {
-            Log::Log4perl::get_logger('metamod::common::Metamod::Config')->warn("missing config variable in master_config.txt: $var");
+            Log::Log4perl::get_logger('metamod::common::Metamod::Config')->logcarp("missing config variable in master_config.txt: $var");
         } else {
-            warn("missing config variable in master_config.txt: $var");
+            carp("missing config variable in master_config.txt: $var");
         }
     }
     return $self->{vars}{$var};

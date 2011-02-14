@@ -60,7 +60,7 @@ my $site = $local;
 $site .= " on $virtualhost" if $virtualhost;
 my $config_dir = $virtualhost ? "/etc/apache/sites-available" : "/etc/apache2/conf.d";
 
-my $proxies = proxy('search') . proxy('dataset') . proxy('gc2wmc') . proxy('admin');
+my $proxies = proxy('search') . proxy('dataset') . proxy('gc2wmc') . proxy('admin') . proxy('upload');
 
 my $conf_text = <<EOT;
 
@@ -86,7 +86,8 @@ $proxies
 # Plain Apache settings
 
 # redirect links to old PHP search
-RedirectMatch   $local/sch      $base$local/search
+RedirectMatch   $local/sch                  $base$local/search
+#RedirectMatch   $local/upl/newfiles.php?    $base$local/upload/newfiles
 
 # static files should be served directly from Apache
 Alias               $local/static   $target/lib/MetamodWeb/root/static

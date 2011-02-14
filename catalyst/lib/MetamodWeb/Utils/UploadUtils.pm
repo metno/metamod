@@ -41,7 +41,11 @@ MetamodWeb::Utils::UploadUtils - Utilities for data upload.
 
 =cut
 
+=head2 validate_datafile
 
+Check filename according to set rules and return dataset name (first part)
+
+=cut
 
 sub validate_datafile {
     my $self = shift;
@@ -49,6 +53,36 @@ sub validate_datafile {
 
     return $1 if $filename =~ /^([a-zA-Z0-9]+)_[a-zA-Z0-9_\-]+\.([a-zA-Z]+)/;
     return; # false
+
+}
+
+=head2 process_newfiles
+
+Call upload_indexer on files specified
+
+=cut
+
+sub process_newfiles {
+
+    my ($self, $dataset, $dirkey, $filename) = @_;
+
+    printf STDERR " l4p = '%s'\n", $self->{config}->get('LOG4PERL_CONFIG');
+
+    my @command = ($self->{config}->get('TARGET_DIRECTORY') . "/scripts/upload_indexer.pl",
+        "--dataset=$dataset", "--dirkey=$dirkey");
+    if (ref($filename) eq 'ARRAY') {
+        push @command, @$filename;
+    } else {
+        push @command, $filename;
+    }
+
+    printf STDERR "Running indexer '%s'\n", join(" ", @command);
+
+    # don't use backtick on CGI params - very dangerous! redirect to file instead
+    system(@command) == 0
+    or die "system @command failed: \n$?";
+
+    return "OK, files registered";
 
 }
 

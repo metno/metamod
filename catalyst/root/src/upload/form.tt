@@ -8,11 +8,11 @@ file. Then you upload the archive file</p>
 <p>The following archive formats are accepted:</p>
 
 <div align="center">
-<table class="box" cellspacing="0" cellpadding="8" border="1">
-<tr><th>Archive format</th><th>File extension</th></tr>
-<tr><td align="left">Tar</td><td align="left">.tar</td></tr>
-<tr><td align="left">Compressed tar (gzip)</td><td align="left">.tgz or .tar.gz</td></tr>
-</table>
+    <table class="box" cellspacing="0" cellpadding="8" border="1">
+    <tr><th>Archive format</th><th>File extension</th></tr>
+    <tr><td align="left">Tar</td><td align="left">.tar</td></tr>
+    <tr><td align="left">Compressed tar (gzip)</td><td align="left">.tgz or .tar.gz</td></tr>
+    </table>
 </div>
 
 <hr/>

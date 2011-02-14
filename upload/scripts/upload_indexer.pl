@@ -2,34 +2,34 @@
 
 =begin licence
 
--------------------------------------------------------------------------- 
-METAMOD - Web portal for metadata search and upload 
+--------------------------------------------------------------------------
+METAMOD - Web portal for metadata search and upload
 
-Copyright (C) 2008 met.no 
+Copyright (C) 2008 met.no
 
-Contact information: 
-Norwegian Meteorological Institute 
-Box 43 Blindern 
-0313 OSLO 
-NORWAY 
-email: egil.storen@met.no 
- 
-This file is part of METAMOD 
+Contact information:
+Norwegian Meteorological Institute
+Box 43 Blindern
+0313 OSLO
+NORWAY
+email: egil.storen@met.no
 
-METAMOD is free software; you can redistribute it and/or modify 
-it under the terms of the GNU General Public License as published by 
-the Free Software Foundation; either version 2 of the License, or 
-(at your option) any later version. 
+This file is part of METAMOD
 
-METAMOD is distributed in the hope that it will be useful, 
-but WITHOUT ANY WARRANTY; without even the implied warranty of 
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-GNU General Public License for more details. 
- 
-You should have received a copy of the GNU General Public License 
-along with METAMOD; if not, write to the Free Software 
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
--------------------------------------------------------------------------- 
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+METAMOD is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with METAMOD; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+--------------------------------------------------------------------------
 
 =end licence
 
@@ -37,6 +37,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 use strict;
 use warnings;
+use Carp;
 use File::Spec;
 
 # small routine to get lib-directories relative to the installed file
@@ -90,7 +91,7 @@ upload_indexer.pl
 Simplified version of upload_monitor.pl. The data provider is responsible
 for uploading files directly to the data repository. This script will extract
 metadata from files in the data repository and create/update XML/XMD files
-(using digest_nc.pl), and send error reports to the data provider if 
+(using digest_nc.pl), and send error reports to the data provider if
 neccessary.
 
 =head1 USAGE
@@ -115,7 +116,7 @@ a directory key for the dataset when the dataset was created.
 
 =item file1 file2 file3 ...
 
-Files (residing in the directory given by the $location value - see 
+Files (residing in the directory given by the $location value - see
 below) to be included in the dataset.
 
 =back
@@ -136,14 +137,14 @@ composed as follows:
 
   http://some.thredds.server/path/catalog.html?dataset=urlpath
 
-Using this URL, it is possible to construct two other URL's that are those 
+Using this URL, it is possible to construct two other URL's that are those
 actually used to access the THREDDS server:
 
 - URL to access the dataset:
   http://some.thredds.server/path/catalog.html
   I.e, the '?dataset=urlpath' is discarded.
 
-- URL to access each file: 
+- URL to access each file:
   http://some.thredds.server/path/catalog.html?dataset=urlpath/fileX
   I.e, a slash and the file name is appended to the $catalogurl value.
   (fileX represents any of the file1 file2 file3 ... command line arguments).
@@ -162,7 +163,7 @@ divided into four different categories:
 2. User errors that makes furher prosessing of a file impossible. The file may
    not exist, or the file format may not be netCDF.
 
-3. Other user errors. These are mainly caused by non-complience with the 
+3. Other user errors. These are mainly caused by non-complience with the
    requirements found in the conf_digest_nc.xml file.
 
 Errors of type 2 and 3 are conveyed to the user through the nc_usererrors.out file.
@@ -180,6 +181,11 @@ my $dirkey                    = "";
 my $dirpath                   = "";
 my @files_arr                 = ();
 my @temporary_files_to_remove = ();
+
+unless (@ARGV) {
+    print STDERR "Usage: $0 --dataset=XX --dirkey=YY file1 file2 file3 ... \n";
+    exit 1;
+}
 
 #
 #  Open OUT for progress reporting, and redirect STDERR to OUT:
@@ -221,6 +227,7 @@ sub do_indexing {
     #
     #  Loop through all command line arguments
     #
+
     foreach my $arg (@ARGV) {
         if ( substr( $arg, 0, 2 ) eq '--' ) {
             if ( $arg =~ /^--(\w+)=(.*)$/ ) {
@@ -271,6 +278,8 @@ sub do_indexing {
     %dataset_institution = ();
     &get_dataset_institution( \%dataset_institution );
 
+    print STDERR Dumper(%dataset_institution);
+
     #
     #  Process files:
     #
@@ -286,7 +295,7 @@ sub process_files {
     if ( !defined( $dataset_institution{$dataset_name} ) ) {
         &syserror( "SYS", "dataset_not_initialized", "", "process_files", "Dataset: $dataset_name" );
         @files_arr = ();
-        die "Dataset $dataset_name not found!";
+        croak "Dataset \"$dataset_name\" not found!";
     }
     my $ref_datasetinfo = $dataset_institution{$dataset_name};
     if ( defined( $ref_datasetinfo->{'key'} ) && $ref_datasetinfo->{'key'} ne $dirkey ) {
@@ -299,18 +308,18 @@ sub process_files {
         @files_arr = ();
         die "No access information found for dataset $dataset_name!";
     }
-    if ( $config->get('WMS_XML') ne "" && !defined( $ref_datasetinfo->{'wmsurl'} ) ) {
-        &syserror( "SYSUSER", "dataset_no_wmsurl", "", "process_files", "Dataset: $dataset_name" );
-        @files_arr = ();
-        die "No URL to WMS found for dataset $dataset_name!";
-    }
+    #if ( $config->get('WMS_XML') ne "" && !defined( $ref_datasetinfo->{'wmsurl'} ) ) {
+    #    &syserror( "SYSUSER", "dataset_no_wmsurl", "", "process_files", "Dataset: $dataset_name" );
+    #    @files_arr = ();
+    #    die "No URL to WMS found for dataset $dataset_name!";
+    #}
     if ( $errors == 0 ) {
         my $dirpath    = $ref_datasetinfo->{'location'};
         my $catalogurl = $ref_datasetinfo->{'catalog'};
         my $wmsurl;
-        if ( $config->get('WMS_XML') ne "" ) {
-            $wmsurl = $ref_datasetinfo->{'wmsurl'};
-        }
+        #if ( $config->get('WMS_XML') ne "" ) {
+        #    $wmsurl = $ref_datasetinfo->{'wmsurl'};
+        #}
 
         #
         my @digest_input = ();
@@ -432,7 +441,7 @@ sub process_files {
         #
         if ( length($shell_command_error) > 0 ) {
             &syserror( "SYS", "digest_nc_fails", "", "process_files", "" );
-            die "Not able to parse the files (digest_nc fails)!";
+            confess "Not able to parse the files (digest_nc fails)!";
         }
 
         #
