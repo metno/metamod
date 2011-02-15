@@ -77,7 +77,7 @@ File name: <input name="data" type="file" />
     <td class="list_table">[% fi.f_status %]</td>
     <td class="list_table">
         [% IF fi.f_errurl %]
-            <a href="[% c.uri_for( fi.f_errurl ) %]">Error</a>
+            <a href="[% mm_config.get('BASE_PART_OF_EXTERNAL_URL') %][% fi.f_errurl %]">Error</a>
         [% END %]
     </td>
     </tr>
