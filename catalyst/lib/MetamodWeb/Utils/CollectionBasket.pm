@@ -80,7 +80,7 @@ storage mechanism, whether it is in a cookie or on the server.
 
 Add a new level 1 or level 2 dataset to the collection basket. In the case of
 adding a level 1 dataset it will add level 2 datasets that match the current
-search criteria AND have C<data_file_url> set. In addition it will only try to
+search criteria AND have C<data_file_location> set. In addition it will only try to
 added (max basket size - current basket size) files to the basket for
 efficiency reason.
 
@@ -139,7 +139,7 @@ sub add_dataset {
                 $ds_ids{$dataset->ds_id()} = 1;
                 $new_datasets++;
             } else {
-                $self->logger->debug("Tried to add level 2 dataset without data_file_url to basket. Error in UI");
+                $self->logger->debug("Tried to add level 2 dataset without data_file_location to basket. Error in UI");
                 return;
             }
         }
@@ -250,31 +250,6 @@ sub calculate_size {
     return $total_size;
 }
 
-=head2 $self->calcualte_zip_size()
-
-=over
-
-=item return
-
-The estimated zip size of all the files in the collection basket in bytes.
-
-=back
-
-=cut
-sub calculate_zip_size {
-    my $self = shift;
-
-    my $files = $self->files();
-
-    my $total_size = 0;
-    for my $file (@$files) {
-        $total_size += $file->{data_file_zip_size};
-    }
-
-    return $total_size;
-
-}
-
 =head2 $self->num_files()
 
 =over
@@ -301,8 +276,7 @@ sub num_files {
 
 Returns an array reference with information about all the files in the
 collection basket. Each element in the array is a hash reference with the
-following keys 'data_file_url', 'data_file_size', 'data_file_zip_size',
-'ds_name' and 'ds_id'.
+following keys 'data_file_location', 'data_file_size', 'ds_name' and 'ds_id'.
 
 =back
 
@@ -323,7 +297,7 @@ sub files {
         if ( defined $file_info ) {
             push @files, $file_info;
         } else {
-            $self->logger->debug('Level 2 dataset without data_file_url added to basket. Error in UI.');
+            $self->logger->debug('Level 2 dataset without data_file_location added to basket. Error in UI.');
         }
     }
 
@@ -344,10 +318,9 @@ A C<DBIx::Class> row object for a dataset.
 =item return
 
 A hash reference with file information for the dataset. The hash reference has
-the following keys: 'data_file_url', 'data_file_size', 'data_file_zip_size',
-'ds_name' and 'ds_id'.
+the following keys: 'data_file_location', 'data_file_size', 'ds_name' and 'ds_id'.
 
-Returns false if the dataset does not have a 'data_file_url' as part of the
+Returns false if the dataset does not have a 'data_file_location' as part of the
 metadata.
 
 =back
@@ -358,15 +331,14 @@ sub file_info {
 
     my ($dataset) = @_;
 
-    my $metadata = $dataset->metadata( [qw(data_file_url data_file_size data_file_zip_size)] );
+    my $metadata = $dataset->metadata( [qw(data_file_location data_file_size)] );
 
-    return if !exists $metadata->{data_file_url} || !defined $metadata->{data_file_url}->[0];
+    return if !exists $metadata->{data_file_location} || !defined $metadata->{data_file_location}->[0];
 
     my $file_info = {
         ds_id              => $dataset->ds_id(),
-        data_file_url      => $metadata->{data_file_url}->[0],
+        data_file_location      => $metadata->{data_file_location}->[0],
         data_file_size     => $metadata->{data_file_size}->[0],
-        data_file_zip_size => $metadata->{data_file_zip_size}->[0],
         name               => $dataset->ds_name()
     };
 

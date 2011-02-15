@@ -80,7 +80,7 @@ sub request_download : Path('/search/collectionbasket/request_download') {
         $c->detach('view');
     }
 
-    my @dataset_locations = map { $_->{data_file_url} } @$files;
+    my @dataset_locations = map { $_->{data_file_location} } @$files;
 
     my $queue = Metamod::Queue->new();
     my $job_parameters = {
