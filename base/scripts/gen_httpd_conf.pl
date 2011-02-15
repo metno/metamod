@@ -50,6 +50,7 @@ my $appdir = shift @ARGV or usage();
 my $mm_config = Metamod::Config->new("$appdir/master_config.txt");
 my $source = $mm_config->get('SOURCE_DIRECTORY');
 my $target = $mm_config->get('TARGET_DIRECTORY');
+my $webrun = $mm_config->get('WEBRUN_DIRECTORY');
 my $conf_file = "$target/etc/httpd.conf";
 my $virtualhost = $mm_config->get('VIRTUAL_HOST');
 my $local = $mm_config->get('LOCAL_URL');
@@ -87,12 +88,14 @@ $proxies
 
 # redirect links to old PHP search
 RedirectMatch   $local/sch                  $base$local/search
-#RedirectMatch   $local/upl/newfiles.php?    $base$local/upload/newfiles
+RedirectMatch   $local/upl/newfiles.php?    $base$local/upload/newfiles
 
 # static files should be served directly from Apache
 Alias               $local/static   $target/lib/MetamodWeb/root/static
 # or if running from source (during devel)
 #Alias              $local/static   $source/catalyst/root/static
+
+Alias               $local/upl/uerr $webrun/upl/uerr
 
 # replace this with whatever you want (later might be configurable in master_config)
 Alias               favicon.ico     $source/catalyst/root/favicon.ico
