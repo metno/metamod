@@ -26,9 +26,7 @@ use warnings;
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 use Data::Dump qw(dump);
 use File::Spec;
-use File::Temp qw(tempdir);
 use Log::Log4perl qw(get_logger);
-use LWP::Simple;
 use Params::Validate qw(:all);
 use POSIX qw(strftime);
 
@@ -47,10 +45,9 @@ Metamod::Queue::Job::PrepareDownload - Server side job for prepareing a collecti
 =head1 DESCRIPTION
 
 This module implements a server side job for preparing a collection basket for
-download. It will will fetch a list of files over the network, store the files
-in a temporary directory, create a zip file for all the downloaded files, place
-the zip file in a configurable location and then send an email with the URL to
-the zip file to a specified email address.
+download. It will will fetch a list of files from disk and add them to a zip
+archive. The zip archive will be stored in a WEBRUN_DIRECTORY/download. An
+email will then be sent to the specified email address.
 
 This module shall be indenpendent of the actual job queue system that is used
 to simplify testing and make it easier to replace the job queue system as
@@ -95,27 +92,33 @@ sub prepare_download {
 
     my $logger = get_logger('job');
 
-    my $tmp_dir = tempdir( 'metamod_collection_basket_XXXXX', TMPDIR => 1 );
-
     my $zip = Archive::Zip->new();
     foreach my $location (@$locations) {
 
-        if ( $location =~ /.*\/(.*\.nc)$/ ) {
-            my $destination = File::Spec->catfile( $tmp_dir, $1 );
-            $logger->debug("Downloading $location to $destination");
-
-            my $status = getstore( $location, $destination );
-            $logger->debug("Download status: $status");
-
-            $zip->addFile( $destination, $1 );
-
-        } else {
-            $logger->warn("Location did not have expected format $location");
+        if( !(-r $location)){
+            $logger->error("Cannot read file at location: $location");
+            next;
         }
+
+        my (undef, undef, $filename) = File::Spec->splitpath($location);
+        $logger->debug("Adding $location as $filename to archive");
+        $zip->addFile( $location, $filename );
     }
 
     my $config          = Metamod::Config->new();
     my $download_area   = $config->get('WEBRUN_DIRECTORY') . "/download";
+
+    if( !(-d $download_area) ){
+        $self->error_msg("'$download_area' is not a directory. Cannot continue to create zip");
+        $logger->error($self->error_msg);
+        return;
+    }
+
+    if( !(-w $download_area )){
+        $self->error_msg("'$download_area' is not a writable. Cannot continue to create zip");
+        $logger->error($self->error_msg);
+        return;
+    }
 
     my $now = time;
     my $zip_filename = $email . '_' . $now . '.zip';
