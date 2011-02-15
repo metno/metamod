@@ -562,3 +562,7 @@ AUTH_TYPE = DB
 
 # The LDAP DN where you should start search for the user. Example: dc=met,dc=no
 #AUTH_LDAP_BASE_DN=
+
+# A comma separated list of distribution statements that are interpreted as
+# freely available and can be downloaded via the collection basket.
+#COLLECTION_BASKET_DIST_STATEMENTS = free, something else
