@@ -131,6 +131,13 @@ sub prepare_download {
         return;
     }
 
+    my $operator_email = $config->get('OPERATOR_EMAIL');
+    if(!$operator_email){
+        $self->error_msg("OPERATOR_EMAIL not set. Refusing to send email without it");
+        $logger->error( $self->error_msg );
+        return;
+    }
+
     my $in_one_week = $now + (3600 * 24 * 7);
     my $datestamp = strftime("%Y-%m-%d %H:%M", localtime($in_one_week));
 
@@ -147,7 +154,7 @@ END_EMAIL
     Metamod::Email::send_simple_email(
         {
             to      => [$email],
-            from    => 'oysteint@met.no',
+            from    => $operator_email,
             subject => 'Collection basket download ready',
             body    => $email_body,
         }
