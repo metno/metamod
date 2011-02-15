@@ -13,6 +13,7 @@ use Metamod::Dataset;
 use encoding 'utf-8';
 use MetNo::NcFind;
 use quadtreeuse;
+use Data::Dump qw(dump);
 use Data::Dumper;
 use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 use Metamod::Config;
@@ -109,7 +110,7 @@ my $manyspaces =
 # Each action subroutine is called with the following parameters:
 #
 #   $refval     Reference to the next level in the hierarchy, which
-#               will be a new hash or an array (the current level 
+#               will be a new hash or an array (the current level
 #               corresponds to the key in the %parse_actions hash).
 #
 #   $path       The path of identification keys representing the
@@ -126,7 +127,7 @@ my %parse_actions = (
     att                        => \&att,
     set                        => \&set,
     structure                  => \&structure,
-    vocabulary                 => \&vocabulary, 
+    vocabulary                 => \&vocabulary,
     convert                    => \&convert,
     variable                   => \&variable,
     set_global_attribute_value => \&set_global_attribute_value,
@@ -138,7 +139,7 @@ $parse_actions{ dimensions } = $parse_actions{"vocabulary"};
 
 sub digest {
     my ( $etcdirectory, $pathfilename, $ownertag, $xml_metadata_path, $is_child ) = @_;
-    
+
     eval {
 
         init_escapes($etcdirectory);
@@ -165,14 +166,14 @@ sub digest {
     if ($@) {
         warn $@;
     }
-    
+
     my $usererrors_path = "nc_usererrors.out";
     open (my $USERERRORS,'>', $usererrors_path);
     foreach my $line (@user_errors) {
         print $USERERRORS $line;
     }
-    close ($USERERRORS);    
-        
+    close ($USERERRORS);
+
 }
 
 
@@ -215,7 +216,7 @@ sub global {
 
 sub att {
 #
-#  Add attributes to the %attributes hash using keys as: 
+#  Add attributes to the %attributes hash using keys as:
 #  "<structure name>,<glob_or_var>,<attribute name>" where <structure name>
 #  is "default" or the name of another structure, and <glob_or_var> is either
 #  "global_attributes" or the name of a variable.
@@ -235,7 +236,7 @@ sub att {
       die '$parse_actions{"att"}: ref($refval) ne "HASH"';
    }
 };
- 
+
 sub set {
 #
 # Initialize global switch (in %globswitches) as set.
@@ -279,7 +280,7 @@ sub structure {
 };
 
 sub vocabulary {
-#   
+#
 #     Add to the %vocabularies hash.
 #
 #     The keys to this hash has the form: "<structname>,<glob_or_var>,<attributename>"
@@ -293,7 +294,7 @@ sub vocabulary {
 #     [0]:  Reference to the @content array containing the original lines
 #           within the vocabulary. These are used to search for switches
 #           that are to be set if a line matches an attribute value.
-#     [1]:  Reference to the @rcontent array with regular expressions 
+#     [1]:  Reference to the @rcontent array with regular expressions
 #           corresponding to each @content line. NOTE: The original line
 #           (in @content) must not contain any special characters used in
 #           regular expressions (^ $ [ ] \ ( ) ? | ? * + { } ).
@@ -302,7 +303,7 @@ sub vocabulary {
 #           Is one of: "use", "notuse" or "use_first_in_vocabulary".
 #     [4]:  Error message key (string) to be used if value not found
 #           in vocabulary. Could be an empty string.
-#   
+#
    my ($refcontent, $path, $level) = @_;
    my $ref = $refcontent->[0];
    if (ref($ref) ne "HASH") {
@@ -321,7 +322,7 @@ sub vocabulary {
    } else {
       die '$parse_actions{"vocabulary"}: $ref->{"content"} not found';
    }
-#   
+#
 #     Create two arrays:
 #
 #     @rcontent    For each $value in @content, this array will contain a corresponding
@@ -330,27 +331,27 @@ sub vocabulary {
 #                  string.
 #
 #     @mapcontent  For each $value in @content, this array will contain a corresponding
-#                  map of the sequence of the escapes in $value. The map is a string 
+#                  map of the sequence of the escapes in $value. The map is a string
 #                  of blank separated escape names in the same sequence as in $value.
-#   
+#
    my @rcontent = ();
    my @mapcontent = ();
    foreach my $value (@content) {
-#      
+#
 #       Construct the @mapcontent element. @r1 will contain escape values prepended
 #       by three digits that tells where in the $value string they appear. @r1 will
 #       be sorted, and the escape values will be put into the @mapcontent element
 #       in this sorted sequence.
-#      
+#
       my @r1 = ();
       foreach my $esc (@escapes) {
          my $j1 = 0;
          my $j2 = 0;
          while ($j1 >= 0) {
-#            
+#
 #              Find location of a substring in a larger string (first position = 0):
 #              Start from position $j2
-#            
+#
             $j1 = index($value,$esc,$j2);
             if ($j1 >= 0) {
                my $s3 = sprintf('%03d%-80s',$j1, $esc);
@@ -375,21 +376,21 @@ sub vocabulary {
          }
       }
       push (@mapcontent, $s3);
-#      
+#
 #       Create the @rcontent element:
-#      
+#
       my $rexval = $value;
       foreach my $esc (@escapes) {
          my $j1 = 0;
          while ($j1 >= 0) {
-#            
+#
 #              Find location of a substring in a larger string (first position = 0):
-#            
+#
             $j1 = index($rexval,$esc);
             if ($j1 >= 0) {
-#               
+#
 #                 Replace substring in a string (first character has offset 0):
-#               
+#
                substr($rexval,$j1,length($esc),"(.*)");
             }
          }
@@ -587,7 +588,7 @@ sub dim {
 
 sub init_escapes {
     my ($etcdirectory) = @_;
-    
+
     my $fpath = $etcdirectory . '/standard_name.txt';
     unless (-r $fpath) {die "Can not read from file: $fpath\n";}
     open (STNAMES,$fpath);
@@ -600,16 +601,16 @@ sub init_escapes {
 };
 
 sub hloop {
-#   
+#
 #     Recursively traverse the XML tree:
 #
 #     Split argument array into the following variables:
-#   
+#
 #     $refval   - Reference to subtree inside the larger XML tree. (can both be a HASH
 #                 reference or ARRAY reference):
 #     $level    - Number representing the level where the subtree is rooted.
 #                 The upmost (root) level corresponds to 0.
-#     $path     - String. Sequence of hash keys and array indices separated by "/" 
+#     $path     - String. Sequence of hash keys and array indices separated by "/"
 #                 characters. Each key/index represents a key or index in the XML
 #                 tree. The first key/index corresponds to one of the nodes identified
 #                 by the topmost (root) node. Then follows the keys and indices down
@@ -620,14 +621,14 @@ sub hloop {
 #                 when hloop encounters these keywords in the XML tree.
 #
    my ($refval,$level,$path,$subrhash) = @_;
-#   
+#
 #     Check if reference is a HASH
-#   
+#
    if (ref($refval) eq "HASH") {
-#      
+#
 #       Loop through a given level of tags rooted in a hash reference $refval.
 #       Each $refvalnew is a reference to HASH or ARRAY, or is a scalar.
-#      
+#
       foreach my $hkey (keys %$refval) {
          my $refvalnew = $refval->{$hkey};
          my $newpath = $hkey;
@@ -637,10 +638,10 @@ sub hloop {
          if ($CTR_printconf) {print STDOUT substr($manyspaces,0,3*$level)};
          if (ref($refvalnew)) {
             if ($CTR_printconf) {print STDOUT $hkey . ":\n"};
-#         
+#
 #       If the hash keyword is also found in %$subrhash, call the subroutine
 #       identified by that hash:
-#         
+#
             if ($CTR_parseactions && exists($subrhash->{$hkey})) {
                my $coderef = $subrhash->{$hkey};
                &$coderef($refvalnew,$newpath,$level+1);
@@ -654,11 +655,11 @@ sub hloop {
          }
       }
    } elsif (ref($refval) eq "ARRAY") {
-#      
+#
 #       Loop through all array elements
 #       found through an array reference $refval.
 #       Each $scalarval is a scalar value
-#      
+#
       my $i1 = 0;
       foreach my $refvalnew (@$refval) {
          my $newpath = $path . '/' . $i1;
@@ -702,6 +703,7 @@ sub parse_all {
    open (PATHLIST,$pathfilename);
    my $dataref;
    my $wmsurl;
+   my $destination_path; #destination path is only used when $isChild == 1
    while (<PATHLIST>) {
       chomp($_);
       my $fpath = $_;
@@ -714,6 +716,13 @@ sub parse_all {
          }
       } else {
 
+         # when $isChild == 1 we also receive the destination path for the file
+         # so it can be added to the metadata
+         if($fpath =~ /^(\S+)\s+(\S+)$/) {
+             $fpath = $1;
+             $destination_path = $2;
+         }
+
          my ($vars,$atts) = &parse_file($fpath, $xml_metadata_path);
          $all_variables{$fpath} = $vars;
          $all_globatts{$fpath} = $atts;
@@ -722,7 +731,7 @@ sub parse_all {
    close (PATHLIST);
 #
 #  Construct the %metadata hash which will be the basis for the XML file
-#  to write. 
+#  to write.
 #
 #  Usually, each key in %metadata will correspond to an element identifier
 #  in the XML file. Each value is a reference to an array with values. Each
@@ -778,7 +787,7 @@ sub parse_all {
    }
 #
 #  If a wmsurl has been provided in the input file (second space-separated field
-#  in the first line), then construct a wmsxml element form this based on the 
+#  in the first line), then construct a wmsxml element form this based on the
 #  WMS_XML value in master config:
 #
    if (defined($wmsurl)) {
@@ -788,7 +797,7 @@ sub parse_all {
          my $wmslast = $'; # String after match
          $wmsxml = $wmsfirst . ' url="' . $wmsurl . '"' . $wmslast;
 #
-#  Substitute '&', '<' and '>' with &amp;, &lt; and &gt; so that $wmsxml can appear as 
+#  Substitute '&', '<' and '>' with &amp;, &lt; and &gt; so that $wmsxml can appear as
 #  normal text in a XML dokument:
 #
 #         $wmsxml =~ s/&/&amp;/mg;
@@ -823,7 +832,7 @@ sub parse_all {
 #
 #  Populate the %metadata hash with values from the netCDF files.
 #
-#  XML elements <variable name="..." /> are treated specially. 
+#  XML elements <variable name="..." /> are treated specially.
 #  These elements are taken from two different sources. One source is
 #  all 'standard_name' attributes found in netCDF variables. The other is
 #  the global 'gcmd_keywords' attribute.
@@ -925,12 +934,12 @@ sub parse_all {
 #
    # clear all metadata from the dataset
    $ds->removeMetadata;
-   
+
    # the following might exist in metadata instead of the info
    $info{'status'} = (delete $metadata{'status'})->[0] if exists $metadata{'status'};
    $info{'creationDate'} = (delete $metadata{'creationDate'})->[0] if exists $metadata{'creationDate'};
    $ds->setInfo(\%info);
-   
+
    #
    #  Find QuadTree-nodes from latitude,longitude coordinates, and merge
    #  with existing nodes if found in the previous version of the XML file:
@@ -947,7 +956,7 @@ sub parse_all {
     my $dsRegion = $ds->getDatasetRegion;
     $dsRegion->addRegion($ncRegion);
     $ds->setDatasetRegion($dsRegion);
-    
+
 
    # start and stop date need special handling
    {
@@ -968,7 +977,18 @@ sub parse_all {
    if (defined $south and defined $north and defined $east and defined $west) {
       $metadata{'bounding_box'} = ["$east,$south,$west,$north"];
    }
-   
+
+   # Add information about the actual data file that can be used by the collection basket.
+   if( $isChild && $destination_path ){
+       $metadata{data_file_location} = [$destination_path];
+
+       # This is an ugly assumption, but it works. Since we are in child mode
+       # we know that there is only one path in %all_variables
+       my $fpath = (keys %all_variables)[0];
+       my $data_file_size = (stat($fpath))[7];
+       $metadata{data_file_size} = [$data_file_size];
+   }
+
    # add all metadata
       if ($CTR_printdump == 1) {
          print STDOUT "\n----- NEW METADATA -----\n\n";
@@ -1264,7 +1284,7 @@ sub getDatasetRegion {
     my $region = new Metamod::DatasetRegion();
     foreach my $f (@ncFiles) {
         my $nc = MetNo::NcFind->new($f);
-        eval { 
+        eval {
             my %bb = $nc->findBoundingBoxByGlobalAttributes(qw(northernmost_latitude southernmost_latitude easternmost_longitude westernmost_longitude));
             $region->extendBoundingBox(\%bb);
         }; if ($@) {
@@ -1277,7 +1297,7 @@ sub getDatasetRegion {
         foreach my $p (@{ $lonLatInfo{points} }) {
             $region->addPoint($p);
         }
-        
+
     }
     return $region;
 }
@@ -1286,15 +1306,15 @@ sub getDatasetRegion {
 #---------------------------------------------------------------------------------
 #
 sub parse_file {
-#   
+#
 #     This subroutine parses one netCDF file given by the file or URL
 #     path $fpath (argument to the subroutine).
-#   
+#
    my ($fpath, $xml_metadata_path) = @_;
-#   
+#
 #    Do any changes to the rule hashes (RH) that are prescribed for this
 #    netCDF file. Also initialize list and switch hashes (LSH).
-#   
+#
    my $found_struct = 0;
    foreach my $structname (keys %structures) {
       my $regex = $structures{$structname};
@@ -1338,12 +1358,12 @@ sub parse_file {
 #                                  Possible values: '%Data', '%Coordinate',
 #                                  '%Coordinate_X', '%Coordinate_Y', '%Coordinate_Z',
 #                                  '%Coordinate_T'.
-#    $founvars{}->{"stdname"}      Value of standard name attribute, if found 
+#    $founvars{}->{"stdname"}      Value of standard name attribute, if found
 #                                  (otherwise "").
 #    $founvars{}->{"dimcount"}     Number of dimensions
-#   
+#
 #    Open new ncfind object (see ncfind.pm):
-#      
+#
    my $ncfindobj = MetNo::NcFind->new($fpath);
    foreach my $attname ($ncfindobj->globatt_names()) {
       my $attval = $ncfindobj->globatt_value($attname);
@@ -1867,6 +1887,7 @@ sub parse_file {
          }
       }
    }
+
    return (\%foundvars,\%foundglobatts);
 };
 #
@@ -2081,10 +2102,10 @@ sub extract_global_attribute {
 #---------------------------------------------------------------------------------
 #
 sub do_multivalue {
-#   
+#
 #     Returns an array of values found by splitting the original value
 #     on the separator string $ref->{"separator"}.
-#   
+#
    my ($refcontent, $origvalue) = @_;
    if (ref($refcontent) ne "ARRAY") {
       die ('do_multivalue: $refcontent is not a reference to "ARRAY"');
@@ -2105,11 +2126,11 @@ sub do_multivalue {
 #---------------------------------------------------------------------------------
 #
 sub do_breaklines {
-#   
+#
 #     Returns a modified version of the original value. Newlines are
 #     inserted to ensure no line is larger than the value given in the
 #     breakline tag.
-#   
+#
    my ($refcontent, $origvalue) = @_;
    if (ref($refcontent) ne "ARRAY") {
       die ('do_breaklines: $refcontent is not a reference to "ARRAY"');
@@ -2119,13 +2140,13 @@ sub do_breaklines {
       die ('do_breaklines: $refcontent->[0] is not a reference to "HASH"');
    }
    my $newvalue = "";
-#   
+#
 #     Check if key exists in hash
-#   
+#
    if (exists($ref->{"value"})) {
-#      
+#
 #       foreach value in an array
-#      
+#
       my $maxchars = $ref->{"value"};
       my $curchars = 0;
       foreach my $word (split(/ /,$origvalue)) {
@@ -2146,12 +2167,12 @@ sub do_breaklines {
 #---------------------------------------------------------------------------------
 #
 sub do_vocabulary {
-#   
+#
 #     Check that attribute values correspond to a vocabulary.
 #     See '$parse_actions{"vocabulary"}'
 #
 #     Split argument array into variables
-#   
+#
    my ($what, $globorvar, $refvocab, $valref) = @_;
    if (ref($valref) ne "ARRAY") {
       die ('do_vocabulary: $valref is not a reference to "ARRAY"');
@@ -2191,9 +2212,9 @@ sub do_vocabulary {
    for (my $i1=0; $i1 < $vcount; $i1++) {
       $foundelements[$i1] = 0;
    }
-#   
+#
 #     Foreach attribute value (usually just one):
-#   
+#
    foreach my $value (@$valref) {
       my $value_matches = 0; # Set to 1 later if it does.
 #
@@ -2318,9 +2339,9 @@ sub add_each_value_to_list {
 #---------------------------------------------------------------------------------
 #
 sub do_dimensions {
-#   
+#
 #     Split argument array into variables
-#   
+#
    my ($what, $varname, $refdim, $dimstring_found) = @_;
    if (ref($refdim) ne "ARRAY") {
       die ('do_dimensions: $refdim is not a reference to "ARRAY"');

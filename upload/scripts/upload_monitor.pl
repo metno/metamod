@@ -262,7 +262,10 @@ eval {
     if ( $ARGV[0] && $ARGV[0] eq 'test' ) {
         print STDERR "Testrun: " . $ARGV[0] . "\n";
         main_loop( $ARGV[0] );
-    } else {
+    } elsif(0 == @ARGV) {
+        print STDERR "Not running as daemon. Stop me with Ctrl + C\n";
+        main_loop();
+    }else {
         Metamod::Utils::daemonize( $ARGV[0], $ARGV[1] );
         $SIG{TERM} = \&sigterm;
         &main_loop();
@@ -1080,10 +1083,18 @@ sub process_files {
     } else {
         if ( $ftp_or_web ne 'TAF' ) {
 
+            # Generate destination paths for all data files
+            my %destination_paths = ();
+            foreach my $filepath (@digest_input) {
+                my ( undef, undef, $basename ) = File::Spec->splitpath($filepath);
+                $destination_paths{$filepath} = File::Spec->catfile($destination_dir, $basename);
+            }
+
             #     run digest_nc again for each file with output to dataset/file.xml
             #     this creates the level 2 (children) xml-files
             foreach my $filepath (@uploaded_files) {
                 my ( undef, undef, $basename ) = File::Spec->splitpath($filepath);
+                my $destination_path = $destination_paths{$filepath};
                 my $fileURL =
                       $destination_url
                     . "catalog.html?dataset="
@@ -1091,7 +1102,8 @@ sub process_files {
                     . join( '/', $dataset_institution{$dataset_name}->{'institution'}, $dataset_name, $basename );
                 open( my $digest, ">digest_input" );
                 print $digest $fileURL,  "\n";
-                print $digest $filepath, "\n";
+                print $digest $filepath . " ";
+                print $digest $destination_path . "\n";
                 close $digest;
                 my $pureFile = $basename;
                 $pureFile =~ s/\.[^.]*$//;    # remove extension
@@ -1118,13 +1130,10 @@ sub process_files {
             #     Move new files to the data repository:
             #
             foreach my $filepath (@digest_input) {
-                my $bname = $filepath;
-                if ( $filepath =~ /\/([^\/]+)$/ ) {
-                    $bname = $1;    # First matching ()-expression
-                }
-                if ( $filepath ne $destination_dir . "/$bname" ) {
+                my $destination_path = $destination_paths{$filepath};
+                if ( $filepath ne $destination_path ) {
                     if ( move( $filepath, $destination_dir ) == 0 ) {
-                        &syserrorm( "SYS", "Move $filepath to destination_dir did not succeed. Error code: $!",
+                        &syserrorm( "SYS", "Move $filepath to $destination_dir did not succeed. Error code: $!",
                             "", "process_files", "" );
                     }
                 }
