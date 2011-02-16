@@ -117,7 +117,7 @@ It is seldom necessary to override the end() action in a sub controller.
 
 =cut
 
-sub end : ActionClass('RenderView') :Does('DumpQueryLog')  {
+sub end : ActionClass('RenderView') :Does('DumpQueryLog') :Does('DeleteStash')  {
     my ( $self, $c ) = @_;
 
 
