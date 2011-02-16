@@ -63,6 +63,12 @@ has 'dataset_ids' => ( is => 'rw', isa => 'ArrayRef', lazy => 1, builder => '_bu
 #
 has 'user_msgs' => ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
 
+#
+# Flag used to indicate if the basket is only tempory. That is if it should be
+# stored in the database or cookie or not stored at all.
+#
+has 'temp_basket' => ( is => 'ro', default => 0 );
+
 =head1 NAME
 
 MetamodWeb::Utils::CollectionBasket - The class responsible for implementing the collection basket.
@@ -254,7 +260,7 @@ sub remove_datasets {
     return 1;
 }
 
-=head2 $self->calcualte_size()
+=head2 $self->calculate_size()
 
 =over
 
@@ -391,9 +397,29 @@ Returns 1
 sub update_basket {
     my $self = shift;
 
-    $self->c->res->cookies->{metamod_basket} = { value => $self->dataset_ids };
+    if( $self->c->user ){
+
+        my $user_basket = $self->c->user->infou->search( { i_type => 'BASKET' } )->first();
+        if( !defined $user_basket ){
+            my $infou_rs = $self->user_db->resultset('Infou');
+            $user_basket = $infou_rs->create( { u_id => $self->c->user->u_id, i_type => 'BASKET', i_content => '' } );
+        }
+
+        $user_basket->update( { i_content => join(',', @{ $self->dataset_ids } ) } );
+        $self->remove_basket_cookie()
+
+    } else {
+        $self->c->res->cookies->{metamod_basket} = { value => $self->dataset_ids };
+    }
 
     return 1;
+}
+
+sub remove_basket_cookie {
+    my $self = shift;
+
+    $self->c->res->cookies->{metamod_basket} = { value => [], expires => time - 864000 };
+
 }
 
 =head2 $self->_build_dataset_ids()
@@ -404,15 +430,27 @@ Initialise the C<dataset_ids> attribute on object construction.
 sub _build_dataset_ids {
     my $self = shift;
 
-    my $cookie = $self->c->req->cookies->{metamod_basket};
+    my %dataset_ids = ();
+    if( $self->c->user() ){
 
-    if( !defined $cookie ){
-        return [];
+        my $user_basket = $self->c->user->infou->search( { i_type => 'BASKET' } )->first();
+        if( $user_basket ){
+            my $ds_ids = $user_basket->i_content();
+            my @dataset_ids = split ',', $ds_ids;
+            %dataset_ids = map { $_ => 1 } @dataset_ids;
+        }
     }
 
-    my @dataset_ids = $cookie->value();
+    my $cookie = $self->c->req->cookies->{metamod_basket};
+    if( defined $cookie ){
+        my @cookie_ids = $cookie->value();
 
-    return \@dataset_ids;
+        foreach my $ds_id (@cookie_ids){
+            $dataset_ids{$ds_id} = 1;
+        }
+    }
+
+    return [ keys %dataset_ids ];
 
 }
 
@@ -453,6 +491,15 @@ sub add_user_msg {
 
     push @{ $self->user_msgs }, $msg;
 
+}
+
+sub DESTROY {
+    my $self = shift;
+
+    # temporary basket should not be updated
+    if( !$self->temp_basket() ){
+        $self->update_basket();
+    }
 }
 
 =head1 LICENSE
