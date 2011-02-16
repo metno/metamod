@@ -49,9 +49,6 @@ Controller specific initisialisation for each request.
 sub auto : Private {
     my ( $self, $c ) = @_;
 
-    my $collection_basket = MetamodWeb::Utils::CollectionBasket->new( c => $c );
-    $c->stash( collection_basket => $collection_basket );
-
 }
 
 =head2 request_download()
@@ -112,7 +109,6 @@ sub add_to_basket : Chained("/search/perform_search") : PathPart('add_to_basket'
 
     my $basket = $c->stash->{ collection_basket };
     $basket->add_dataset($ds_id);
-    $basket->update_basket();
 
     $self->add_info_msgs($c, $basket->user_msgs() );
     $c->stash( template => 'search/search_result.tt', );
@@ -143,7 +139,6 @@ sub empty_basket : Path('/search/collectionbasket/empty_basket') : Args(0) {
 
     my $basket = $c->stash->{collection_basket};
     $basket->empty_basket();
-    $basket->update_basket();
 
     $self->add_info_msgs( $c, 'The collection basket has been emptied' );
     $c->detach('view');
@@ -170,10 +165,61 @@ sub remove_selected : Path('/search/collectionbasket/remove_selected') : Args(0)
     my $basket = $c->stash->{collection_basket};
     $basket->remove_datasets(@$dataset_ids);
 
-    $basket->update_basket();
-
     $c->forward('view');
 }
+
+sub link_basket : Path('/search/collectionbasket/link_basket' ) : Args(0) {
+    my ($self, $c) = @_;
+
+    my $dataset_ids = $c->req->params->{'dataset_ids'} || [];
+    if( ref( $dataset_ids ) ne 'ARRAY' ){
+        $dataset_ids = [ $dataset_ids ];
+    }
+
+    my $link_basket = MetamodWeb::Utils::CollectionBasket->new( c => $c, temp_basket => 1, dataset_ids => $dataset_ids );
+
+    $c->stash( template => 'search/collectionbasket/link_basket.tt',
+               link_basket => $link_basket,
+    );
+
+}
+
+sub replace_basket : Path('/search/collectionbasket/replace_basket' ) : Args(0) {
+    my ($self, $c) = @_;
+
+    my $basket = $c->stash->{ collection_basket };
+    $basket->empty_basket();
+    $self->_add_list_to_basket($c);
+
+    $self->add_info_msgs($c, 'Collection basket replaced with file collection' );
+    $c->forward('view');
+
+}
+
+sub merge_basket : Path('/search/collectionbasket/merge_basket' ) : Args(0) {
+    my ($self, $c) = @_;
+
+    $self->_add_list_to_basket($c);
+    $self->add_info_msgs($c, 'Collection basket merged with file collection' );
+    $c->forward('view');
+
+}
+
+sub _add_list_to_basket : Private {
+    my ($self, $c ) = @_;
+
+    my $dataset_ids = $c->req->params->{'dataset_ids'} || [];
+    if( ref( $dataset_ids ) ne 'ARRAY' ){
+        $dataset_ids = [ $dataset_ids ];
+    }
+
+    my $basket = $c->stash->{ collection_basket };
+    foreach my $ds_id (@$dataset_ids){
+        $basket->add_dataset($ds_id);
+    }
+
+}
+
 
 __PACKAGE__->meta->make_immutable;
 

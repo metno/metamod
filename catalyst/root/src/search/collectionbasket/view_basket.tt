@@ -11,7 +11,7 @@
 <form name="request_download" action="[% c.uri_for('/search/collectionbasket/request_download') %]" method="POST" >
     [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
     <label for="email_address">Email</label>
-    <input type="text" name="email_address" id="email_address" size="40" value="[% c.req.params.email_address %]" />
+    <input type="text" name="email_address" id="email_address" size="40" value="[% c.req.params.email_address || c.user.u_email %]" />
     <input type="submit" value="Request download" />
 </form>
 
@@ -27,7 +27,7 @@
                 &nbsp;
             </th>
             <th class="collection-basket">
-                Filename
+                Dataset name
             </th>
             <th class="collection-basket">
                 File size
@@ -57,6 +57,9 @@
 
     <input type="submit" name="collection_basket_remove" value="Remove selected" />
     <a class="button-link" href="[% c.uri_for( '/search/collectionbasket/empty_basket', c.req.params ) %]"><button type="button">Empty basket</a></button>
+
+    [% SET basket_params = { dataset_ids => collection_basket.dataset_ids } %]
+    <a class="button-link" target="_blank" href="[% c.uri_for( '/search/collectionbasket/link_basket', basket_params  ) %]"><button type="button">Get basket URL</a></button>
     </form>
 
 

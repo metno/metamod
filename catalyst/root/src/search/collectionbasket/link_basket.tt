@@ -1,0 +1,58 @@
+[% SET files = link_basket.files() %]
+
+<h2 class="std">File collection</h2>
+
+<br />
+
+[% INCLUDE 'user_msgs.tt' %]
+
+[% IF files.size > 0 %]
+
+<form name="search_form" id="search_form" method="GET" action="/search/collectionbasket/remove_selected">
+    [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
+
+    <br />
+
+    <table class="plain" style="width: 100%">
+
+        <tr>
+            <th class="collection-basket">
+                Dataset name
+            </th>
+            <th class="collection-basket">
+                File size
+            </th>
+        </tr>
+
+        [% FOREACH file IN files %]
+            <tr>
+                <td class="collection-basket">
+                    [% file.name %]
+                </td>
+                <td class="collection-basket" style="text-align: right">
+                    [% link_basket.human_readable_size( file.data_file_size ) %]
+                </td>
+            </tr>
+        [% END %]
+        <tr>
+        <td class="collection-basket">&nbsp;</td>
+        <td class="collection-basket" style="text-align: right;">[% link_basket.human_readable_size( link_basket.calculate_size() ) %]</td>
+        </tr>
+
+    </table>
+
+    <a class="button-link" href="[% c.uri_for( '/search/collectionbasket/replace_basket', c.req.params ) %]"><button type="button">Replace current basket</a></button>
+    <a class="button-link" href="[% c.uri_for( '/search/collectionbasket/merge_basket', c.req.params  ) %]"><button type="button">Merge current basket</a></button>
+    </form>
+
+
+[% ELSE %]
+
+[%# the form is needed since many the search criteria links are dependant upon it %]
+<form name="search_form" id="search_form" method="GET" action="/search/collectionbasket/remove_selected">
+    [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
+</form>
+    There are no files in the file collection.
+[% END %]
+
+</form>
