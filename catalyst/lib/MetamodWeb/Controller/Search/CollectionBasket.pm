@@ -28,7 +28,7 @@ use namespace::autoclean;
 use Metamod::Queue;
 use MetamodWeb::Utils::CollectionBasket;
 
-BEGIN { extends 'Catalyst::Controller'; }
+BEGIN { extends 'MetamodWeb::BaseController::Base'; }
 
 =head1 NAME
 
@@ -92,9 +92,9 @@ sub request_download : Path('/search/collectionbasket/request_download') {
                                       job_parameters => $job_parameters );
 
     if( $success ){
-        $c->stash( info_msgs => ['The download is being prepared for you. Please wait for an email'] );
+        $self->add_info_msgs( $c, 'The download is being prepared for you. Please wait for an email' );
     } else {
-        $c->stash( error_msgs => ['An error occured and your download could not be prepared'] );
+        $self->add_error_msgs( $c, 'An error occured and your download could not be prepared' );
     }
 
     $c->detach('view');
@@ -114,6 +114,7 @@ sub add_to_basket : Chained("/search/perform_search") : PathPart('add_to_basket'
     $basket->add_dataset($ds_id);
     $basket->update_basket();
 
+    $self->add_info_msgs($c, $basket->user_msgs() );
     $c->stash( template => 'search/search_result.tt', );
 
 }
@@ -144,7 +145,7 @@ sub empty_basket : Path('/search/collectionbasket/empty_basket') : Args(0) {
     $basket->empty_basket();
     $basket->update_basket();
 
-    $c->stash( info_msgs => ['The collection basket has been emptied'] );
+    $self->add_info_msgs( $c, 'The collection basket has been emptied' );
     $c->detach('view');
 }
 

@@ -19,6 +19,8 @@ jQuery(document).ready( function () {
 
 <div id="search-result">
 
+[% INCLUDE 'user_msgs.tt' %]
+
 [% IF !dataset_count %]
 
     No datasets that match your search criteria where found.

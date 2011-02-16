@@ -41,11 +41,15 @@
 [% WHILE (child = level2_result.next()) %]
     <tr>
     [%
-       # need to also include 'data_file_location' to diff_names when fetching metadata to know if "add to basket" should
-       # be displayed or not.
+
+       # need to also include 'data_file_location' and 'data_file_size' to
+       # diff_names when fetching metadata to know if "add to basket" should be
+       # displayed or not.
 
       diff_names.push('data_file_location');
+      diff_names.push('data_file_size');
       SET child_metadata = child.metadata( diff_names );
+      SET dummy = diff_names.pop();
       SET dummy = diff_names.pop();
     %]
     <td class="sub_result">
@@ -76,7 +80,11 @@
                     ><img src="[% wmsthumb.datamap %]"/></div>
             [% END %]
 
-            [% IF child_metadata.exists('data_file_location') && child_metadata.data_file_location.0 && search_ui_utils.freely_available(child) %]
+            [% IF child_metadata.exists('data_file_location')
+                  && child_metadata.data_file_location.0
+                  && search_ui_utils.freely_available(child)
+                  && child_metadata.data_file_size.0 < collection_basket.max_size()
+                   %]
                 <a class="btn" href="[% c.uri_for( '/search/page', datasets_pager.current_page(), 'add_to_basket', child.ds_id, c.req.params ) %]"
                    title="Add the dataset to the collection basket"><span>Add to basket</span></a><br/><br/>
             [% END %]

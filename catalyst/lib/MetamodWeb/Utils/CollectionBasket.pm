@@ -58,7 +58,10 @@ has 'logger' => ( is => 'ro', isa => 'Log::Log4perl::Logger', default => sub { g
 #
 has 'dataset_ids' => ( is => 'rw', isa => 'ArrayRef', lazy => 1, builder => '_build_dataset_ids' );
 
-
+#
+# A list of messages to the user
+#
+has 'user_msgs' => ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
 
 =head1 NAME
 
@@ -108,10 +111,13 @@ sub add_dataset {
 
     my $dataset = $self->meta_db->resultset('Dataset')->find($ds_id);
 
-    my $max_basket_size = 100;
-    my $max_additional = $max_basket_size - scalar @ds_ids;
+    my $max_files = 100;
+    my $max_additional = $max_files - scalar @ds_ids;
 
-    my $current_size = 0;
+    # default to 500 MB as max size
+    my $max_size = $self->max_size();
+    my $current_size = $self->calculate_size();
+
     my $new_datasets = 0;
     if( defined $dataset ){
 
@@ -128,6 +134,19 @@ sub add_dataset {
 
                 my $file_info = $self->file_info($child_ds);
                 if ( defined $file_info ) {
+
+                    # when we reach the maximum we stop even if there might smaller files later.
+                    # This probably will seem like less random behaviour.
+                    if( $file_info->{data_file_size} + $current_size > $max_size ){
+                        my $msg = 'Could not add all files to the basket since the basket would then exceed the ';
+                        $msg .= 'allowed maximum size.';
+                        $self->add_user_msg($msg);
+                        $self->logger->debug("Could not add file to collection basket as it exceeds the max size");
+
+                        last;
+                    }
+
+                    $current_size += $file_info->{data_file_size};
                     $ds_ids{$child_ds->ds_id()} = 1;
                     $new_datasets++;
                 }
@@ -136,8 +155,16 @@ sub add_dataset {
 
             my $file_info = $self->file_info($dataset);
             if( defined $file_info ){
-                $ds_ids{$dataset->ds_id()} = 1;
-                $new_datasets++;
+
+                if( $file_info->{data_file_size} + $current_size < $max_size ){
+                    $ds_ids{$dataset->ds_id()} = 1;
+                    $new_datasets++;
+                } else {
+                    my $msg = 'Could not add the file to the basket since the basket would then exceed the ';
+                    $msg .= 'allowed maximum size.';
+                    $self->add_user_msg($msg);
+                    $self->logger->debug("Could not add file to collection basket as it exceeds the max size");
+                }
             } else {
                 $self->logger->debug("Tried to add level 2 dataset without data_file_location to basket. Error in UI");
                 return;
@@ -150,6 +177,7 @@ sub add_dataset {
 
     $self->dataset_ids( [ keys %ds_ids ] );
 
+    $self->add_user_msg("$new_datasets file(s) has been added to the basket.");
     return $new_datasets;
 
 }
@@ -337,7 +365,7 @@ sub file_info {
 
     my $file_info = {
         ds_id              => $dataset->ds_id(),
-        data_file_location      => $metadata->{data_file_location}->[0],
+        data_file_location => $metadata->{data_file_location}->[0],
         data_file_size     => $metadata->{data_file_size}->[0],
         name               => $dataset->ds_name()
     };
@@ -399,6 +427,31 @@ sub human_readable_size {
     my ( $self, $size ) = @_;
 
     return Metamod::Utils::human_readable_size($size);
+
+}
+
+=head2 $self->max_size()
+
+=over
+
+=item return
+
+The maximum total size of the basket in bytes.
+
+=back
+
+=cut
+sub max_size {
+    my $self = shift;
+
+    return $self->config->get('COLLECTION_BASKET_MAX_SIZE') || 524288000;
+
+}
+
+sub add_user_msg {
+    my ($self, $msg) = @_;
+
+    push @{ $self->user_msgs }, $msg;
 
 }
 

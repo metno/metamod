@@ -4,21 +4,7 @@
 
 <br />
 
-[% IF info_msgs %]
-    <div class="info_msg">
-        [% FOREACH msg IN info_msgs %]
-            [% msg %] <br />
-        [% END %]
-    </div>
-[% END %]
-
-[% IF error_msgs %]
-    <div class="error_msg">
-        [% FOREACH msg IN error_msgs %]
-            [% msg %] <br />
-        [% END %]
-    </div>
-[% END %]
+[% INCLUDE 'user_msgs.tt' %]
 
 [% IF files.size > 0 %]
 
