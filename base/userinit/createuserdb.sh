@@ -68,6 +68,16 @@ CREATE TABLE InfoUDS (
 GRANT ALL PRIVILEGES ON InfoUDS TO "[==PG_WEB_USER==]";
 GRANT ALL PRIVILEGES ON InfoUDS_i_id_seq TO "[==PG_WEB_USER==]";
 
+CREATE TABLE InfoU (
+   i_id               SERIAL,
+   u_id               INTEGER       NOT NULL REFERENCES UserTable ON DELETE CASCADE,
+   i_type             VARCHAR(9999) NOT NULL,
+   i_content          TEXT NOT NULL,
+   PRIMARY KEY (i_id)
+);
+GRANT ALL PRIVILEGES ON InfoUDS TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON InfoU_i_id_seq TO "[==PG_WEB_USER==]";
+
 CREATE TABLE File (
    u_id               INTEGER       NOT NULL REFERENCES UserTable ON DELETE CASCADE,
    f_name             VARCHAR(9999) NOT NULL,
