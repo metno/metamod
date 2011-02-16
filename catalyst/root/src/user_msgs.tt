@@ -1,0 +1,23 @@
+[%#
+
+Template for showing message from the application to the user. This template
+reads the stash variables 'info_msgs' and 'error_msgs' and prints the contents
+of these lists inside divs if the exists.
+
+%]
+
+[% IF info_msgs %]
+    <div class="info_msg">
+        [% FOREACH msg IN info_msgs %]
+            [% msg %] <br />
+        [% END %]
+    </div>
+[% END %]
+
+[% IF error_msgs %]
+    <div class="error_msg">
+        [% FOREACH msg IN error_msgs %]
+            [% msg %] <br />
+        [% END %]
+    </div>
+[% END %]
