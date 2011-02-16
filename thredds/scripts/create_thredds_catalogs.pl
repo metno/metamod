@@ -270,8 +270,6 @@ sub inner_loop {
                   } else {
                      $logger->warn("$dset_dir  - No rolename");
                   }
-               } else {
-                  $logger->warn("$dset_dir - No distribution statement");
                }
             }
          }
