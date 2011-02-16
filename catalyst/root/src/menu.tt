@@ -22,6 +22,8 @@
 
 [% IF c.user_exists %]
 <div class="menu-item"><a href="[% c.uri_for( '/logout' )%]">Logout</a></div>
+[% ELSE %]
+<div class="menu-item"><a href="[% c.uri_for( '/login' )%]">Login</a></div>
 [% END %]
 
 
