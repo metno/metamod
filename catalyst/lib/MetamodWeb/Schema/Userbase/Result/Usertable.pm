@@ -89,6 +89,12 @@ __PACKAGE__->has_many(
 # Created by DBIx::Class::Schema::Loader v0.04006 @ 2010-09-15 14:15:48
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Ol3eBbTy1PkS1D/vtd0DCg
 
+__PACKAGE__->has_many(
+  "infou",
+  "MetamodWeb::Schema::Userbase::Result::Infou",
+  { "foreign.u_id" => "self.u_id" },
+);
+
 =begin LICENSE
 
 METAMOD is free software; you can redistribute it and/or modify
