@@ -385,27 +385,32 @@ sub shcommand_scalar {
     #   print SHELLLOG $command . "\n";
     #   print SHELLLOG "                    ------------RESULT-------------\n";
     my $result = `$command 2>$path_to_shell_error`;
+    my $error = $?;
 
     #   print SHELLLOG $result ."\n";
     #   close (SHELLLOG);
-    if ( -s $path_to_shell_error ) {
+    if ( $error && -s $path_to_shell_error ) {
 
         #
         #     Slurp in the content of a file
         #
         unless ( -r $path_to_shell_error ) { die "Can not read from file: shell_command_error\n"; }
         open( ERROUT, $path_to_shell_error );
-        undef $/;
+        local $/ = undef;
         $shell_command_error = <ERROUT>;
-        $/                   = "\n";
+        #$/                   = "\n";
         close(ERROUT);
         if ( unlink($path_to_shell_error) == 0 ) {
             die "Unlink file shell_command_error did not succeed\n";
         }
         $shell_command_error = $command . "\n" . $shell_command_error;
-        return undef;
+        #return undef;
     }
-    return $result;
+    if ($error) {
+        return;
+    } else {
+        return $result;
+    }
 }
 
 #
@@ -418,28 +423,33 @@ sub shcommand_array {
     #   print SHELLLOG "---------------------------------------------------\n";
     #   print SHELLLOG $command . "\n";
     my $result1 = `$command 2>$path_to_shell_error`;
+    my $error = $?;
 
     #   print SHELLLOG "                    ------------RESULT-------------\n";
     #   print SHELLLOG $result1 . "\n";
     #   close (SHELLLOG);
     my @result = split( /\n/, $result1 );
-    if ( scalar @result == 0 && -s $path_to_shell_error ) {
+    if ( $error && -s $path_to_shell_error ) {
 
         #
         #     Slurp in the content of a file
         #
         unless ( -r $path_to_shell_error ) { die "Can not read from file: shell_command_error\n"; }
         open( ERROUT, $path_to_shell_error );
-        undef $/;
+        local $/ = undef;
         $shell_command_error = <ERROUT>;
-        $/                   = "\n";
+        #$/                   = "\n";
         close(ERROUT);
         if ( unlink($path_to_shell_error) == 0 ) {
             die "Unlink file shell_command_error did not succeed\n";
         }
         $shell_command_error = $command . "\n" . $shell_command_error;
     }
-    return @result;
+    if ($error) {
+        return;
+    } else {
+        return @result;
+    }
 }
 
 #
@@ -597,15 +607,15 @@ sub syserror {
     my ( undef, undef, $baseupldname ) = File::Spec->splitpath($uploadname);
 
     if ( $type eq "SYS" || $type eq "SYSUSER" ) {
-        ( my $msg = $errmsg ) =~ s/\n/ | /g;
+        ( my $msg = $errmsg );# =~ s/\n/ | /g;
         my $errMsg = "$type IN: $where: $msg; ";
         $errMsg .= "Uploaded file: $uploadname; " if $uploadname;
         if ($what) {
-            ( $msg = $what ) =~ s/\n/ | /g;
+            ( $msg = $what );# =~ s/\n/ | /g;
             $errMsg .= "Error: $msg; ";
         }
         if ($shell_command_error) {
-            ( $msg = $shell_command_error ) =~ s/\n/ | /g;
+            ( $msg = $shell_command_error );# =~ s/\n/ | /g;
             $errMsg .= "Stderr: $msg; ";
         }
         if ( $errmsg eq 'NORMAL TERMINATION' ) {

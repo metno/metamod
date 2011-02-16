@@ -278,7 +278,7 @@ sub do_indexing {
     %dataset_institution = ();
     &get_dataset_institution( \%dataset_institution );
 
-    print STDERR Dumper(%dataset_institution);
+    #print STDERR Dumper(%dataset_institution);
 
     #
     #  Process files:
@@ -436,10 +436,9 @@ sub process_files {
             open( DIGOUTPUT, ">digest_out" );
             print DIGOUTPUT $result . "\n";
             close(DIGOUTPUT);
-        }
-
+        } else {
         #
-        if ( length($shell_command_error) > 0 ) {
+        #if ( length($shell_command_error) > 0 ) {
             &syserror( "SYS", "digest_nc_fails", "", "process_files", "" );
             confess "Not able to parse the files (digest_nc fails)!";
         }
@@ -493,8 +492,9 @@ sub process_files {
             my $xmlFilePath = File::Spec->catfile( $xmlFileDir, $pureFile . '.xml' );
             my $digestCommand = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlFilePath isChild";
             print OUT "RUN:     $digestCommand\n" if $progress_report == 1;
-            shcommand_scalar($digestCommand);
-            if ( length($shell_command_error) > 0 ) {
+            my $result = shcommand_scalar($digestCommand);
+            if (!defined $result) {
+            #if ( length($shell_command_error) > 0 ) {
                 syserror( "SYS", "digest_nc_file_fails", $filepath, "process_files", "" );
                 die "Not able to parse a file (digest_nc fails on $filepath)!";
             }
@@ -520,6 +520,7 @@ sub user_report {
             push( @files_arr, $fname );
         }
     }
+
     open( USERERRORS, ">>$usererrors_path" );
     foreach my $line (@user_errors) {
         print USERERRORS $line;
@@ -527,27 +528,29 @@ sub user_report {
     close(USERERRORS);
 
     #
-    #  Check if errors were found. Eventually send E-mail to user.
+    # Check if errors were found. Eventually send E-mail to user.
     #
     my $url_to_errors_html = "";
     my $mailbody;
     my $subject = $config->get('EMAIL_SUBJECT_WHEN_UPLOAD_ERROR');
     my $dont_send_email_to_user =
         &string_found_in_file( $dataset_name, $webrun_directory . '/' . 'datasets_for_silent_upload' );
+
     if ( -z $usererrors_path ) {
 
         #
-        #      No user errors:
+        # No user errors:
         #
         if ($dont_send_email_to_user) {
             &notify_web_system( 'Operator reload ', $dataset_name, \@files_arr, "" );
         } else {
             &notify_web_system( 'File accepted ', $dataset_name, \@files_arr, "" );
         }
+
     } else {
 
         #
-        #      User errors found (by digest_nc.pl or this script):
+        # User errors found (by digest_nc.pl or this script):
         #
         $mailbody = $config->get('EMAIL_BODY_WHEN_UPLOAD_ERROR');
         my @bnames        = &get_basenames( \@files_arr );
@@ -567,28 +570,35 @@ sub user_report {
         my $path_to_usererrors_conf  = $path_to_etc . '/usererrors.conf';
 
         #
-        #      Run the print_usererrors.pl script:
+        # Run the print_usererrors.pl script:
         #
-        my $result = &shcommand_scalar(
-            "$path_to_print_usererrors " .
-            "$path_to_usererrors_conf " .
-            "$usererrors_path " .
-            "$errorinfo_path "
-        );
-        if ( length($shell_command_error) > 0 ) {
+
+        ## Ok, so we run a script which process shell_command_error, while redirecting its output to shell_command_error? I don't get it.
+        #&shcommand_scalar(
+        #    "$path_to_print_usererrors " .
+        #    "$path_to_usererrors_conf " .
+        #    "$usererrors_path " .
+        #    "$errorinfo_path "
+        #);
+
+        #if ( length($shell_command_error) > 0 ) {
+        # Lets try this the normal way (but FIXME - rewrite print_usererrors as a perl module later)
+        if (system($path_to_print_usererrors, $path_to_usererrors_conf, $usererrors_path, $errorinfo_path) != 0) {
             &syserror( "SYS", "print_usererrors_fails", "", "process_files", "" );
             return 1;
         }
+
         if ($dont_send_email_to_user) {
             &notify_web_system( 'Operator reload ', $dataset_name, \@files_arr, "" );
         } else {
             &notify_web_system( 'Errors found ', $dataset_name, \@files_arr, $url_to_errors_html );
         }
-    }
-    if ( defined($mailbody) ) {
 
+    }
+
+    if ( defined($mailbody) ) {
         #
-        #      Send mail to owner of the dataset:
+        # Send mail to owner of the dataset:
         #
         my $recipient = $dataset_institution{$dataset_name}->{'email'};
         my $username  = $dataset_institution{$dataset_name}->{'name'} . " ($recipient)";
