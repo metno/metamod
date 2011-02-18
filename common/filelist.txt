@@ -124,6 +124,7 @@ logger_config.ini
 =lib/Metamod/WMS.pm
 =lib/Metamod/mmUserbase.pm
 =lib/Metamod/mmLogView.pm
+=lib/Metamod/DbTableinfo.pm
 =lib/Metamod/test/mmUserbase_test.pl
 =lib/Metamod/test/mmUserbase_test.sh
 =lib/MetNo/Fimex.pm
