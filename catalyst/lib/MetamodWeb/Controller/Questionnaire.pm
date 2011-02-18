@@ -51,15 +51,18 @@ sub auto : Private {
         quest_ui_utils => $quest_ui_utils,
     );
 
+    my $validator = $c->flash->{validator};
+    $c->stash( validator => $validator ) if defined $validator;
+    return 1;
 }
 
 sub check_config : Chained('/') : PathPart('editor') : CaptureArgs(1) {
-    my ($self, $c, $config_id) = @_;
+    my ( $self, $c, $config_id ) = @_;
 
     my $quest_utils = $c->stash->{quest_utils};
-    my $config = $quest_utils->config_for_id($config_id);
+    my $config      = $quest_utils->config_for_id($config_id);
 
-    if(!defined $config){
+    if ( !defined $config ) {
         die 'Invalid config';
     }
 
@@ -78,7 +81,7 @@ sub validate_response : Private {
     my $validation_res     = $validator->validate($response_data);
 
     if ( $validation_res->has_invalid() || $validation_res->has_missing() ) {
-        $c->stash( validator => $validator );
+        $c->flash( validator => $validator );
         return;
     }
 
@@ -90,7 +93,7 @@ sub view_metadata : Chained('check_config') : PathPart('view') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $quest_utils = $c->stash->{quest_utils};
-    my $config_id = $c->stash->{config_id};
+    my $config_id   = $c->stash->{config_id};
 
     my $response_key = $c->req->params->{response_key};
     if ($response_key) {
@@ -110,18 +113,18 @@ sub view_metadata : Chained('check_config') : PathPart('view') : Args(0) {
 
 }
 
-sub save_metadata : Chained('check_config') :PathPart('save') : Args(0) {
+sub save_metadata : Chained('check_config') : PathPart('save') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $config_id = $c->stash->{config_id};
+    my $config_id    = $c->stash->{config_id};
     my $response_key = $c->req->params->{response_key};
 
     my $quest_utils = $c->stash->{quest_utils};
     my $quest_data  = $quest_utils->quest_data();
-    my $is_valid    = $c->forward( 'validate_response', [ $quest_data ] );
+    my $is_valid    = $c->forward( 'validate_response', [$quest_data] );
 
     if ( !$is_valid ) {
-        $c->detach('view_metadata');
+        return $c->res->redirect( $c->uri_for( '/editor', $config_id, 'view', $c->req->params ) );
     }
 
     my $success = $quest_utils->save_anon_metadata( $config_id, $response_key, $quest_data );
@@ -132,7 +135,7 @@ sub save_metadata : Chained('check_config') :PathPart('save') : Args(0) {
         $self->add_error_msgs( $c, 'Failed to save the response on the error. Please contact the administrator.' );
     }
 
-    $c->forward('view_metadata');
+    return $c->res->redirect( $c->uri_for( '/editor', $config_id, 'view', { response_key => $response_key } ) );
 
 }
 

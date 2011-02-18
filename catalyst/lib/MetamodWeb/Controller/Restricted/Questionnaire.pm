@@ -54,6 +54,10 @@ sub auto : Private {
         quest_ui_utils => $quest_ui_utils,
     );
 
+    my $validator = $c->flash->{validator};
+    $c->stash( validator => $validator ) if defined $validator;
+    return 1;
+
 }
 
 
@@ -85,12 +89,13 @@ sub view_metadata :Chained('/questionnaire/check_config') :PathPart('restricted/
 sub save_metadata :Chained('/questionnaire/check_config') :PathPart('restricted/save') :Args(1) {
     my ($self, $c, $userbase_ds_id ) = @_;
 
+    my $config_id   = $c->stash->{config_id};
     my $quest_utils = $c->stash->{quest_utils};
     my $quest_data  = $quest_utils->quest_data();
     my $is_valid    = $c->forward('MetamodWeb::Controller::Questionnaire', 'validate_response', [ $quest_data ] );
 
     if( !$is_valid ) {
-        $c->detach('view_metadata');
+        return $c->res->redirect($c->uri_for('/editor', $config_id, 'restricted/view', $userbase_ds_id, $c->req->params ));
     }
 
     my $success = $quest_utils->save_dataset_metadata( $userbase_ds_id, $quest_data );
@@ -101,7 +106,7 @@ sub save_metadata :Chained('/questionnaire/check_config') :PathPart('restricted/
         $self->add_error_msgs( $c, 'Failed to save the response on the error. Please contact the administrator.' );
     }
 
-    $c->forward('view_metadata');
+    return $c->res->redirect($c->uri_for('/editor', $config_id, 'restricted/view', $userbase_ds_id ));
 
 }
 

@@ -127,21 +127,21 @@ sub quest_data {
 
     # fetch only the relevant metadata to be stored.
     my %quest_data = ();
-    while( my ($name, $value) = each %{ $self->c->req->params } ){
-        if( $name =~ /^quest_(.*)$/ ){
+    while ( my ( $name, $value ) = each %{ $self->c->req->params } ) {
+        if ( $name =~ /^quest_(.*)$/ ) {
 
             # Metamod::Dataset expect that the values are array references
             # so for easier consistency we make single values to array
             # references as well
-            if( !( ref $value eq 'ARRAY' ) ){
-                $value = [ $value ];
+            if ( !( ref $value eq 'ARRAY' ) ) {
+                $value = [$value];
             }
 
-            $quest_data{ $1 } = $value;
+            $quest_data{$1} = $value;
         }
     }
 
-    return \%quest_data
+    return \%quest_data;
 }
 
 =head2 $self->quest_config($config_file)
@@ -186,30 +186,57 @@ sub config_for_id {
 
     my ($config_id) = @_;
 
-    my %mapping = (
-        1 => $self->c->path_to('who-are-you.json'),
-        2 => $self->c->path_to('anon-metadata.json'),
-        3 => $self->c->path_to('quest_config.json'),
+    my $quest_configs = $self->quest_configuration();
+
+    return if !exists $quest_configs->{$config_id};
+
+    return $quest_configs->{$config_id};
+
+}
+
+sub quest_configuration {
+    my $self = shift;
+
+    my $quest_config = $self->config()->get('QUEST_CONFIGURATIONS');
+
+    my %quest_configurations = (
+        'metadata' => {
+        config_file => $self->c->path_to('quest_config.json'),
+        title       => 'Metadata editor',
+        tag         => $self->config->get('QUEST_OWNERTAG'),
+        }
     );
 
-    return $mapping{$config_id};
+    my @configurations = split("\n", $quest_config);
+    foreach my $line (@configurations){
 
+        chomp($line);
+        next if !$line;
+
+        my ($config_id, $config_file, $tag, @title) = split " ", $line;
+        my $title = join " ", @title;
+
+        $quest_configurations{$config_id} = { config_file => $config_file, tag => $tag, title => $title };
+
+    }
+
+    return \%quest_configurations;
 }
 
 sub load_anon_metadata {
     my $self = shift;
 
-    my ($config_id, $response_key) = @_;
+    my ( $config_id, $response_key ) = @_;
 
     my $quest_output_dir = $self->config->get('QUEST_OUTPUT_DIRECTORY');
 
-    if(!(-r $quest_output_dir) ){
+    if ( !( -r $quest_output_dir ) ) {
         $self->logger->error("Cannot read quest response from '$quest_output_dir'");
         return;
     }
 
-    my $input_basename = File::Spec->catfile($quest_output_dir, "${config_id}_${response_key}");
-    if(!(-e "${input_basename}.xmd" )){
+    my $input_basename = File::Spec->catfile( $quest_output_dir, "${config_id}_${response_key}" );
+    if ( !( -e "${input_basename}.xmd" ) ) {
         return {};
     }
 
@@ -223,18 +250,18 @@ sub load_anon_metadata {
 sub save_anon_metadata {
     my $self = shift;
 
-    my ($config_id, $response_key, $metadata) = @_;
+    my ( $config_id, $response_key, $metadata ) = @_;
 
     my $quest_output_dir = $self->config->get('QUEST_OUTPUT_DIRECTORY');
 
-    if(!(-w $quest_output_dir) ){
+    if ( !( -w $quest_output_dir ) ) {
         $self->logger->error("Cannot write quest response to '$quest_output_dir'");
         return;
     }
 
-    my $output_basename = File::Spec->catfile($quest_output_dir, "${config_id}_${response_key}");
+    my $output_basename = File::Spec->catfile( $quest_output_dir, "${config_id}_${response_key}" );
     my $dataset;
-    if(!(-e "${output_basename}.xmd" )){
+    if ( !( -e "${output_basename}.xmd" ) ) {
         $dataset = Metamod::Dataset->new();
     } else {
         $dataset = Metamod::Dataset->newFromFile($output_basename);
@@ -253,7 +280,7 @@ sub load_dataset_metadata {
 
     my $dataset_path = $self->dataset_path($userbase_ds_id);
 
-    if(!$dataset_path){
+    if ( !$dataset_path ) {
         return;
     }
 
@@ -269,11 +296,11 @@ sub load_dataset_metadata {
 sub save_dataset_metadata {
     my $self = shift;
 
-    my ($userbase_ds_id, $metadata ) = @_;
+    my ( $userbase_ds_id, $metadata ) = @_;
 
     my $dataset_path = $self->dataset_path($userbase_ds_id);
 
-    if(!$dataset_path){
+    if ( !$dataset_path ) {
         return;
     }
 
@@ -294,7 +321,7 @@ sub load_dataset {
     my ($dataset_path) = @_;
 
     my $dataset;
-    if( -r $dataset_path ){
+    if ( -r $dataset_path ) {
         $dataset = Metamod::Dataset->newFromFile($dataset_path);
     } else {
         $self->logger->info("Could not find read the file $dataset_path");
@@ -311,14 +338,14 @@ sub dataset_path {
     my ($userbase_ds_id) = @_;
 
     my $userbase_ds = $self->user_db->resultset('Dataset')->find($userbase_ds_id);
-    if(!defined $userbase_ds){
+    if ( !defined $userbase_ds ) {
         $self->logger->error("Could not find dataset with id '$userbase_ds_id' in the userbase");
         return;
     }
 
     my $metabase_ds_name = $userbase_ds->a_id() . "/" . $userbase_ds->ds_name();
-    my $metabase_ds = $self->meta_db->resultset('Dataset')->find($metabase_ds_name, { key => 'dataset_ds_name_key' } );
-    if(!defined $metabase_ds){
+    my $metabase_ds = $self->meta_db->resultset('Dataset')->find( $metabase_ds_name, { key => 'dataset_ds_name_key' } );
+    if ( !defined $metabase_ds ) {
         $self->logger->error("Could not find dataset with ds_name '$metabase_ds_name' in the metabase");
         return;
     }
