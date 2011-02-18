@@ -31,7 +31,8 @@ BEGIN {extends 'MetamodWeb::BaseController::Base'; }
 use Data::Dump qw(dump);
 use Log::Log4perl qw(get_logger);
 
-use MetamodWeb::Utils::EditorUtils;
+use MetamodWeb::Utils::QuestionnaireUtils;
+use MetamodWeb::Utils::UI::Questionnaire;
 
 =head1 NAME
 
@@ -56,9 +57,10 @@ sub auto : Private {
 }
 
 
-sub view_metadata :Path('/editor/restricted') :Args(2) {
-    my ( $self, $c, $config_id, $userbase_ds_id ) = @_;
+sub view_metadata :Chained('/questionnaire/check_config') :PathPart('restricted/view') :Args(1) {
+    my ( $self, $c, $userbase_ds_id ) = @_;
 
+    my $config_id = $c->stash->{config_id};
     my $quest_utils = $c->stash->{quest_utils};
     my $current_data = $quest_utils->load_dataset_metadata( $userbase_ds_id );
 
@@ -66,27 +68,26 @@ sub view_metadata :Path('/editor/restricted') :Args(2) {
         return 'Not valid dataset';
     }
 
-    my $config_file = $quest_utils->config_for_id($config_id);
-    $c->stash( quest_config_file => $config_file );
+    my $config = $quest_utils->config_for_id($config_id);
 
     my $quest_response  = $quest_utils->quest_data();
     my %merged_response = ( %$current_data, %$quest_response );
 
     $c->stash(
-            quest_config_file => $config_file,
+            quest_config_file => $config->{ config_file },
             template   => 'questionnaire/questionnaire.tt',
             quest_data => \%merged_response,
-            quest_save_url => $c->uri_for( '/editor/restricted', 'save', $config_id, $userbase_ds_id ),
+            quest_save_url => $c->uri_for( '/editor', $config_id, 'restricted', 'save', $userbase_ds_id ),
         );
 
 }
 
-sub save_metadata :Path('/editor/restricted/save') :Args(2) {
-    my ($self, $c, $config_id, $userbase_ds_id ) = @_;
+sub save_metadata :Chained('/questionnaire/check_config') :PathPart('restricted/save') :Args(1) {
+    my ($self, $c, $userbase_ds_id ) = @_;
 
     my $quest_utils = $c->stash->{quest_utils};
     my $quest_data  = $quest_utils->quest_data();
-    my $is_valid    = $c->forward('MetamodWeb::Controller::Questionnaire', 'validate_response', [ $config_id, $quest_data ] );
+    my $is_valid    = $c->forward('MetamodWeb::Controller::Questionnaire', 'validate_response', [ $quest_data ] );
 
     if( !$is_valid ) {
         $c->detach('view_metadata');

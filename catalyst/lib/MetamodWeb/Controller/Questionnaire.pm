@@ -53,36 +53,25 @@ sub auto : Private {
 
 }
 
-sub display_questionnaire : Private {
-    my ( $self, $c ) = @_;
+sub check_config : Chained('/') : PathPart('editor') : CaptureArgs(1) {
+    my ($self, $c, $config_id) = @_;
 
-    my $config_id   = $c->stash->{config_id};
     my $quest_utils = $c->stash->{quest_utils};
-    my $config_file = $quest_utils->config_for_id($config_id);
-    $c->stash( quest_config_file => $config_file );
+    my $config = $quest_utils->config_for_id($config_id);
 
-    my $response_key = $c->req->params->{response_key};
-    if ($response_key) {
-
-        my $current_data    = $c->stash->{current_data};
-        my $quest_response  = $quest_utils->quest_data();
-        my %merged_response = ( %$current_data, %$quest_response );
-
-        $c->stash(
-            template   => 'questionnaire/questionnaire.tt',
-            quest_data => \%merged_response,
-        );
-
-    } else {
-        $c->stash( template => 'questionnaire/start_quest.tt' );
+    if(!defined $config){
+        die 'Invalid config';
     }
+
+    $c->stash( quest_config => $config, quest_config_file => $config->{config_file}, config_id => $config_id );
+
 }
 
 sub validate_response : Private {
-    my ($self, $c, $config_id, $response_data) = @_;
+    my ( $self, $c, $response_data ) = @_;
 
     my $quest_utils = $c->stash->{quest_utils};
-    my $config_file = $quest_utils->config_for_id($config_id);
+    my $config_file = $c->stash->{quest_config_file};
 
     my $validation_profile = $quest_utils->quest_validator($config_file);
     my $validator          = MetamodWeb::Utils::FormValidator->new( validation_profile => $validation_profile );
@@ -97,36 +86,41 @@ sub validate_response : Private {
 
 }
 
-sub view_metadata : Path('/editor') : Args(1) {
-    my ( $self, $c, $config_id ) = @_;
+sub view_metadata : Chained('check_config') : PathPart('view') : Args(0) {
+    my ( $self, $c ) = @_;
 
-    $c->stash( config_id => $config_id );
+    my $quest_utils = $c->stash->{quest_utils};
+    my $config_id = $c->stash->{config_id};
 
     my $response_key = $c->req->params->{response_key};
     if ($response_key) {
 
-        my $quest_utils = $c->stash->{quest_utils};
-        my $current_data = $quest_utils->load_anon_metadata( $config_id, $response_key ) || {};
-        $c->stash(
-            current_data   => $current_data,
-            quest_save_url => $c->uri_for( '/editor', 'save', $config_id ),
-        );
-    }
+        my $current_data    = $quest_utils->load_anon_metadata( $config_id, $response_key ) || {};
+        my $quest_response  = $quest_utils->quest_data();
+        my %merged_response = ( %$current_data, %$quest_response );
 
-    $c->forward('display_questionnaire');
+        $c->stash(
+            template       => 'questionnaire/questionnaire.tt',
+            quest_data     => \%merged_response,
+            quest_save_url => $c->uri_for( '/editor', $config_id, 'save' ),
+        );
+    } else {
+        $c->stash( template => 'questionnaire/start_quest.tt' );
+    }
 
 }
 
-sub save_metadata : Path('/editor/save') : Args(1) {
-    my ( $self, $c, $config_id ) = @_;
+sub save_metadata : Chained('check_config') :PathPart('save') : Args(0) {
+    my ( $self, $c ) = @_;
 
+    my $config_id = $c->stash->{config_id};
     my $response_key = $c->req->params->{response_key};
 
     my $quest_utils = $c->stash->{quest_utils};
     my $quest_data  = $quest_utils->quest_data();
-    my $is_valid    = $c->forward('validate_response', [ $config_id, $quest_data ] );
+    my $is_valid    = $c->forward( 'validate_response', [ $quest_data ] );
 
-    if( !$is_valid ) {
+    if ( !$is_valid ) {
         $c->detach('view_metadata');
     }
 
