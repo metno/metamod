@@ -29,7 +29,7 @@ use Data::Dump qw( dump );
 use MetamodWeb::Utils::UI::Common;
 
 # By extending from ActionRole we can apply action roles to actions.
-BEGIN { extends 'Catalyst::Controller::ActionRole' }
+BEGIN { extends 'Catalyst::Controller::ActionRole', 'MetamodWeb::BaseController::Base' }
 
 #
 # Sets the actions in this controller to be registered with no prefix
@@ -107,6 +107,13 @@ sub auto :Private {
                title => $mm_config->get('SEARCH_APP_TITLE'), # FIXME: only true for search, not upload etc
                css_files => [] );
 
+    # read info and error messages from flash and place them in stash if the exists.
+    my $info_msgs = $c->flash->{ info_msgs };
+    $self->add_info_msgs($c, $info_msgs ) if defined $info_msgs;
+    my $error_msgs = $c->flash->{ error_msgs };
+    $self->add_error_msgs($c, $error_msgs ) if defined $error_msgs;
+
+    return 1;
 }
 
 =head2 end

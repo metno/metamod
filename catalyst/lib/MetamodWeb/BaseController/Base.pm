@@ -107,6 +107,7 @@ sub _add_msgs {
     }
 
     $c->stash( $msg_type => $curr_msgs );
+    $c->flash( $msg_type => $curr_msgs );
     return;
 }
 
