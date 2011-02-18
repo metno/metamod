@@ -144,62 +144,6 @@ sub quest_data {
     return \%quest_data
 }
 
-sub save_quest_response {
-    my $self = shift;
-
-    my ($config_id, $response_key, $quest_data) = @_;
-
-    my $quest_output_dir = $self->config->get('QUEST_OUTPUT_DIRECTORY');
-
-    if(!(-w $quest_output_dir) ){
-        $self->logger->error("Cannot write quest response to '$quest_output_dir'");
-        return;
-    }
-
-    my $output_file = File::Spec->catfile($quest_output_dir, "${config_id}_${response_key}.json");
-    my $success = open my $QUEST_RESPONSE, '>', "$output_file";
-    if(!$success){
-        $self->logger->error("Cannot open '$output_file' for writing.");
-        return;
-    }
-
-    my $output = to_json($quest_data);
-    print $QUEST_RESPONSE $output;
-    close $QUEST_RESPONSE;
-
-    return 1;
-}
-
-sub load_quest_response {
-    my $self = shift;
-
-    my ($config_id, $response_key) = @_;
-
-    my $quest_output_dir = $self->config->get('QUEST_OUTPUT_DIRECTORY');
-
-    if(!(-r $quest_output_dir) ){
-        $self->logger->error("Cannot read quest response from '$quest_output_dir'");
-        return;
-    }
-
-    my $input_file = File::Spec->catfile($quest_output_dir, "${config_id}_${response_key}.json");
-
-    if( !(-e $input_file )){
-        return {};
-    }
-
-    my $success = open my $QUEST_RESPONSE, '<', "$input_file";
-    if(!$success){
-        $self->logger->error("Cannot open '$input_file' for reading.");
-        return;
-    }
-
-    my $response_content = do { local $/, <$QUEST_RESPONSE> };
-    my $response_data = from_json($response_content);
-
-    return $response_data;
-}
-
 =head2 $self->quest_config($config_file)
 
 Get the configuration of a questionnaire from a config file.

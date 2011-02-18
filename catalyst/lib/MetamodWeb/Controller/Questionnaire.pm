@@ -53,49 +53,6 @@ sub auto : Private {
 
 }
 
-sub view_questionnaire : Path('/questionnaire') : Args(1) {
-    my ( $self, $c, $config_id ) = @_;
-
-    $c->stash( config_id => $config_id );
-
-    my $response_key = $c->req->params->{response_key};
-    if ($response_key) {
-        my $quest_utils = $c->stash->{quest_utils};
-        my $current_data = $quest_utils->load_quest_response( $config_id, $response_key ) || {};
-        $c->stash(
-            current_data   => $current_data,
-            quest_save_url => $c->uri_for( '/questionnaire', 'save', $config_id ),
-        );
-    }
-
-    $c->forward('display_questionnaire');
-}
-
-sub save_questionnaire : Path('/questionnaire/save') : Args(1) {
-    my ( $self, $c, $config_id ) = @_;
-
-    my $response_key = $c->req->params->{response_key};
-
-    my $quest_utils = $c->stash->{quest_utils};
-    my $quest_data         = $quest_utils->quest_data();
-    my $is_valid = $c->forward('validate_response', [ $config_id, $quest_data ] );
-
-    if ( !$is_valid ) {
-        $c->detach('view_questionnaire');
-    }
-
-    my $success = $quest_utils->save_quest_response( $config_id, $response_key, $quest_data );
-    if ($success) {
-        my $msg = "Thank you. You response has been save. Use '$response_key' if you want to edit your response later.";
-        $self->add_info_msgs( $c, $msg );
-    } else {
-        $self->add_error_msgs( $c, 'Failed to save the response on the error. Please contact the administrator.' );
-    }
-
-    $c->forward('view_questionnaire');
-
-}
-
 sub display_questionnaire : Private {
     my ( $self, $c ) = @_;
 
