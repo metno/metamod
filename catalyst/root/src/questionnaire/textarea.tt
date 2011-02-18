@@ -1,0 +1,16 @@
+<tr>
+    <td class="quest_label">
+        <label for="quest_[% element.name %]">[% element.label | html %]</label>
+    </td>
+</tr>
+
+<tr>
+    <td class="quest_field">
+        <textarea
+            name="quest_[% element.name %]"
+            id="quest_[% element.name %]"
+            rows="[% element.height %]"
+            cols="[% element.length %]"
+            >[% quest_data.item( element.name ).0 | html %]</textarea>
+    </td>
+</tr>

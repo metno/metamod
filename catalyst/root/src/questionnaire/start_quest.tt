@@ -1,0 +1,14 @@
+<h2 class="std">[% quest_heading %]</h2>
+
+<p class="std">
+To answer this questionnaire enter response key below and press "Start questionnaire". The response key can be choosen
+freely and is used to fetch you reponse if you later want to view or edit it.
+</p>
+
+<form name="start_quest" method="GET" action="[% c.uri_for( '/' _ c.req.path ) %]">
+
+<label for="response_key">Response key</label>
+<input type="text" name="response_key" id="response_key" value="[% c.req.params.response_key %]" />
+<button type="submit">Start questionnaire</button>
+
+</form>

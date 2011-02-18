@@ -1,19 +1,19 @@
 <tr>
     <td class="quest_label">
-        <label for="metadata_[% element.name %]">[% element.label | html %]</label>
+        <label for="quest_[% element.name %]">[% element.label | html %]</label>
     </td>
 </tr>
 
 <tr>
     <td class="quest_field">
         <select
-            name="metadata_[% element.name %]",
-            id="metadata_[% element.name %]", >
+            name="quest_[% element.name %]",
+            id="quest_[% element.name %]", >
 
             [% FOR option IN element.value %]
                 <option
                     value="[% option | html %]"
-                    [% metadata.item( element.name ).0 == option ? 'selected="selected"' : '' %] >
+                    [% quest_data.item( element.name ).0 == option ? 'selected="selected"' : '' %] >
                         [% option | html %]
                 </option>
             [% END %]

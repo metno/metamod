@@ -1,0 +1,24 @@
+<tr>
+    <td class="quest_label">
+        <label for="quest_[% element.name %]">[% element.label | html %]</label>
+    </td>
+</tr>
+
+<tr>
+    <td class="quest_field">
+        <select
+            name="quest_[% element.name %]"
+            id="quest_[% element.name %]"
+            multiple="multiple"
+            size="[% element.height %]">
+
+            [% FOREACH option IN quest_ui_utils.gcmdlist( element ) %]
+                <option
+                    [% quest_data.item( element.name ).grep( '^' _ option _ '$' ).size() ? 'selected="selected"' : '' %]
+                    value="[% option | html %]">[% option | html %]</option>
+            [% END %]
+
+        </select>
+    </td>
+</tr>
+
