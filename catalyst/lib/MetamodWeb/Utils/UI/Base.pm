@@ -23,6 +23,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use Moose;
 use namespace::autoclean;
 
+use Metamod::Config;
+
 =head1 NAME
 
 MetamodWeb::Utils::UI::Base - Base class for the UI utility classes
@@ -35,7 +37,7 @@ MetamodWeb::Utils::UI::Base - Base class for the UI utility classes
 
 =cut
 
-has 'config' => ( is => 'ro', required => 1 );
+has 'config' => ( is => 'ro', default => sub { Metamod::Config->new() } );
 has 'c' => (
     is       => 'ro',
     required => 1,
