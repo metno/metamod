@@ -69,7 +69,7 @@ sub view_metadata :Chained('/questionnaire/check_config') :PathPart('restricted/
     my $current_data = $quest_utils->load_dataset_metadata( $userbase_ds_id );
 
     if(!defined $current_data){
-        return 'Not valid dataset';
+        return $c->forward('Root', 'default');
     }
 
     my $config = $quest_utils->config_for_id($config_id);
@@ -98,7 +98,7 @@ sub save_metadata :Chained('/questionnaire/check_config') :PathPart('restricted/
         return $c->res->redirect($c->uri_for('/editor', $config_id, 'restricted/view', $userbase_ds_id, $c->req->params ));
     }
 
-    my $success = $quest_utils->save_dataset_metadata( $userbase_ds_id, $quest_data );
+    my $success = $quest_utils->save_dataset_metadata( $config_id, $userbase_ds_id, $quest_data );
     if ($success) {
         my $msg = "Thank you. You response has been saved.";
         $self->add_info_msgs( $c, $msg );
