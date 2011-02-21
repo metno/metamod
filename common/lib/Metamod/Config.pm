@@ -295,6 +295,53 @@ sub import {
     }
 }
 
+=head2 $self->getDSFilePath($ds_name)
+
+Get the file path to where the XML metadata files are stored on disk.
+
+This method will die if one of the directories on the path to the file is not
+readable.
+
+=over
+
+=item $ds_name
+
+The name of the dataset on the form '<application>/<dataset name>' or
+'<application>/<parent name>/<dataset name>'
+
+=item return
+
+The path to the B<basename> of the XML metadata files. I.e. the .xml or .xmd
+ending is not part of it.
+
+=back
+
+=cut
+sub getDSFilePath {
+    my $self = shift;
+
+    my ($ds_name) = @_;
+
+    my $webrun_dir = $self->get('WEBRUN_DIRECTORY');
+
+    my @dirs = File::Spec->splitdir($ds_name);
+    my $base_filename = pop @dirs;
+    unshift @dirs, 'XML';
+    unshift @dirs, $webrun_dir;
+
+    my $path = '';
+    foreach my $dir (@dirs) {
+        $path = File::Spec->catdir($path, $dir);
+        if( !(-r $path) ){
+            die "Tried to find path for '$ds_name', but cannot read '$path'";
+        }
+    }
+
+    my $ds_path = File::Spec->catfile(@dirs, $base_filename);
+    return $ds_path;
+
+}
+
 1;
 __END__
 
