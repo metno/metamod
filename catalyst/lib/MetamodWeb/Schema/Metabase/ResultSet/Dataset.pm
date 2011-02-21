@@ -55,6 +55,7 @@ Returns a C<DBIx::Class> result sets for the search.
 =back
 
 =cut
+
 sub metadata_search {
     my $self = shift;
 
@@ -68,7 +69,6 @@ sub metadata_search {
             all_levels      => { type => SCALAR, default => 0 },
         }
     );
-
 
     my ( $all_levels, $curr_page, $ownertags, $rows_per_page, $search_criteria ) =
         @params{qw( all_levels curr_page ownertags rows_per_page search_criteria )};
@@ -126,6 +126,7 @@ the condtions to work.
 =back
 
 =cut
+
 sub metadata_search_params {
     my $self = shift;
 
@@ -279,6 +280,7 @@ example.
 =back
 
 =cut
+
 sub two_way_table {
     my $self = shift;
 
@@ -346,6 +348,7 @@ Return a C<DBIx::Class> resultset for all active level 1 datasets that match the
 =back
 
 =cut
+
 sub level1_datasets {
     my $self = shift;
 
@@ -460,6 +463,7 @@ A C<DBIx::Class> search condition that can be used for doing a dataset location 
 =back
 
 =cut
+
 sub dataset_location_search {
     my $self = shift;
 
