@@ -25,9 +25,11 @@ use namespace::autoclean;
 
 use warnings;
 
-use JSON;
+use DateTime;
 use File::Spec;
+use JSON;
 use Log::Log4perl qw(get_logger);
+use POSIX qw(strftime);
 
 use Metamod::Config;
 use Metamod::Dataset;
@@ -213,16 +215,37 @@ sub quest_configuration {
         chomp($line);
         next if !$line;
 
-        my ($config_id, $config_file, $tag, @title) = split " ", $line;
-        my $title = join " ", @title;
+        my ($config_id, $config_file, $tag) = split " ", $line;
 
-        $quest_configurations{$config_id} = { config_file => $config_file, tag => $tag, title => $title };
+        $quest_configurations{$config_id} = { config_file => $config_file, tag => $tag };
 
     }
 
     return \%quest_configurations;
 }
 
+=head2 $self->load_anon_metadata($config_id, $response_key)
+
+Load metadata (and info) from a 'anonmous' dataset. That is a dataset that is
+not stored in the userbase.
+
+=over
+
+=item $config_id
+
+The id of the questionnaire that the metadata is related to.
+
+=item $response_key
+
+The key that the user will use to identify the response.
+
+=item return
+
+Returns the metadata for the dataset as a hash reference.
+
+=back
+
+=cut
 sub load_anon_metadata {
     my $self = shift;
 
@@ -236,17 +259,38 @@ sub load_anon_metadata {
     }
 
     my $input_basename = File::Spec->catfile( $quest_output_dir, "${config_id}_${response_key}" );
-    if ( !( -e "${input_basename}.xmd" ) ) {
-        return {};
-    }
 
-    my $dataset = Metamod::Dataset->newFromFile($input_basename);
-
-    my %metadata = $dataset->getMetadata();
-    return \%metadata;
+    return $self->_load_metadata($input_basename);
 
 }
 
+=head2 $self->save_anon_metadata($config_id, $response_key, $metadata)
+
+Save metadata to an anonomous dataset. That is a dataset that is not stored in
+the userbase.
+
+=over
+
+=item $config_id
+
+The id of the questionnaire that the metadata is related to.
+
+=item $response_key
+
+The key that the user will use to identify the response.
+
+=item $metadata
+
+A hash reference of the metadata to store. The values in that has should be
+array references, even for single values.
+
+=item return
+
+Returns true if the metadata was save successfully. Dies on error.
+
+=back
+
+=cut
 sub save_anon_metadata {
     my $self = shift;
 
@@ -260,78 +304,266 @@ sub save_anon_metadata {
     }
 
     my $output_basename = File::Spec->catfile( $quest_output_dir, "${config_id}_${response_key}" );
-    my $dataset;
-    if ( !( -e "${output_basename}.xmd" ) ) {
-        $dataset = Metamod::Dataset->new();
-    } else {
-        $dataset = Metamod::Dataset->newFromFile($output_basename);
-    }
+    my $config = $self->config_for_id($config_id);
+    my $ownertag = $config->{tag};
 
-    $dataset->removeMetadata();
-    $dataset->addMetadata($metadata);
-    $dataset->writeToFile($output_basename);
+    return $self->_save_metadata($metadata, $output_basename, $ownertag);
 
 }
 
+=head2 $self->load_dataset_metadata($userbase_ds_id)
+
+Load the metadata for a dataset that is stored in the userbase.
+
+=over
+
+=item $userbase_ds_id
+
+The C<ds_id> from the userbase.
+
+=item return
+
+Returns the metadata as a hash reference.
+
+=back
+
+=cut
 sub load_dataset_metadata {
     my $self = shift;
 
     my ($userbase_ds_id) = @_;
 
-    my $dataset_path = $self->dataset_path($userbase_ds_id);
+    my ($dataset_path, $dataset_name) = $self->dataset_path($userbase_ds_id);
 
     if ( !$dataset_path ) {
         return;
     }
 
-    my $dataset = $self->load_dataset($dataset_path);
-
-    return if !defined $dataset;
-
-    my %metadata = $dataset->getMetadata();
-    return \%metadata;
+    return $self->_load_metadata($dataset_path);
 
 }
+
+=head2 $self->save_dataset_metadata($config_id, $userbase_ds_id, $metadata)
+
+Save metadata to a dataset that is stored in the userbase.
+
+=over
+
+=item $config_id
+
+The id of the questionnaire that the metadata is related to.
+
+=item $userbase_ds_id
+
+The C<ds_id> from the userbase for the dataset.
+
+=item $metadata
+
+The metadata as a hash reference. The values should be array references even for single values.
+
+=item return
+
+=back
+
+=cut
 
 sub save_dataset_metadata {
     my $self = shift;
 
-    my ( $userbase_ds_id, $metadata ) = @_;
+    my ( $config_id, $userbase_ds_id, $metadata ) = @_;
 
-    my $dataset_path = $self->dataset_path($userbase_ds_id);
+    my ($dataset_path, $dataset_name) = $self->dataset_path($userbase_ds_id);
 
     if ( !$dataset_path ) {
         return;
     }
 
+    my $config = $self->config_for_id($config_id);
+    my $ownertag = $config->{tag};
+    return $self->_save_metadata($metadata, $dataset_path, $ownertag);
+
+}
+
+=head2 $self->_save_metadata($metadata, $dataset_path, $ownertag )
+
+Helper method for storing metadata and info for a dataset.
+
+=over
+
+=item $metadata
+
+The metadata to store as a hash reference.
+
+=item $dataset_path
+
+The path on disk where the metadata should be stored.
+
+=item $ownertag
+
+The ownertag that should be used for metadata.
+
+=item return
+
+=back
+
+=cut
+sub _save_metadata {
+    my $self = shift;
+
+    my ($metadata, $dataset_path, $ownertag) = @_;
+
+    my (undef, $containing_dir, undef) = File::Spec->splitpath($dataset_path);
+    if( !(-w $containing_dir)){
+        die "Cannot write to '$containing_dir'";
+    }
+
     my $dataset = $self->load_dataset($dataset_path);
+
+    # use a DateTime object to get the timezone correct
+    my $datestamp = DateTime->from_epoch( epoch => time(), time_zone => 'local' );
+
+    my %info = $dataset->getInfo();
+    $info{datestamp} = $datestamp->strftime('%Y-%m-%dT%H:%M:%S%z');
+    $info{metadataFormat} = 'MM2';
+    $info{ownertag} = $ownertag;
+
+    # Changing the name of a dataset is potentially a very bad idea. Since the dataset name
+    # is also used to locate the metadata XML files on disk. Allowing changing
+    # the dataset name works under the following two assumptions:
+    # 1. The dataset name cannot be changed for datasets that are edited through the
+    #    dataset administration interface. This is only enforced by not having the
+    #    dataset name as part of the form.
+    # 2. The file location and dataset name is not related for dataset that are edited
+    #    outside of the dataset administration interface.
+    #
+    if( exists $metadata->{name} ){
+        my $dataset_name = delete $metadata->{name};
+        my $applic_id = $self->config->get('APPLICATION_ID');
+        if( defined $dataset_name ){
+            $dataset_name = $dataset_name->[0];
+
+            # remove potential applic_id
+            if( $dataset_name =~ /$applic_id\/(.*)$/ ){
+                $dataset_name = $1;
+            }
+
+        } else {
+            # make a crappy random dataset name.
+            $dataset_name = int(rand(1_000_000))
+        }
+        $dataset_name = $applic_id . '/' . $dataset_name;
+        $info{name} = $dataset_name;
+    }
+
+    # the creation data can only be set the first time and cannot be updated later
+    $info{creationDate} = $info{datestamp} = $datestamp->strftime('%Y-%m-%dT%H:%M:%S%z') if !exists $info{creationDate};
+
+    my $wms_info = delete $metadata->{wms_info};
+    $dataset->setWMSInfo($wms_info->[0]) if defined $wms_info;
+
+    my $projection_info = delete $metadata->{projection_info};
+    $dataset->setProjectionInfo($projection_info->[0]) if defined $projection_info;
 
     $dataset->removeMetadata();
     $dataset->addMetadata($metadata);
-
+    $dataset->setInfo(\%info);
     $dataset->writeToFile($dataset_path);
 
     return 1;
 
 }
 
+=head2 $self->_load_metadata($dataset_path)
+
+Helper method for loading the metadata for a dataset.
+
+=over
+
+=item $dataset_path
+
+The location on disk where the dataset is stored. This can refere to a location
+that does not yet exist in the case of a new dataset.
+
+=item return
+
+The metadata as a hash reference.
+
+=back
+
+=cut
+sub _load_metadata {
+    my $self = shift;
+
+    my ($dataset_path) = @_;
+
+    my $dataset = $self->load_dataset($dataset_path);
+
+    my %metadata = $dataset->getMetadata();
+    my %info = $dataset->getInfo();
+    while( my($key, $value) = each %info ){
+        $metadata{$key} = [$value];
+    }
+
+    my $wms_info = $dataset->getWMSInfo();
+    $metadata{wms_info} = [$wms_info] if $wms_info;
+
+    my $projection_info = $dataset->getProjectionInfo();
+    $metadata{projection_info} = [$projection_info] if $projection_info;
+
+    return \%metadata;
+
+}
+
+=head2 $self->load_dataset($dataset_path)
+
+Load the dataset as a C<Metamod::Dataset> object. In the case of the dataset
+not yet existing a new empty dataset will be created.
+
+=over
+
+=item $dataset_path
+
+The path on disk where the XML metadata files are stored.
+
+=item return
+
+Returns a C<Metamod::Dataset> object.
+
+=back
+
+=cut
 sub load_dataset {
     my $self = shift;
 
     my ($dataset_path) = @_;
 
     my $dataset;
-    if ( -r $dataset_path ) {
+    if ( -r "${dataset_path}.xmd" ) {
         $dataset = Metamod::Dataset->newFromFile($dataset_path);
     } else {
-        $self->logger->info("Could not find read the file $dataset_path");
-        return;
+        $self->logger->debug("Could not find read the file from '$dataset_path'. Creating new dataset");
+        $dataset = Metamod::Dataset->new();
     }
 
     return $dataset;
 
 }
 
+=head2 $self->dataset_path($userbase_ds_id)
+
+=over
+
+=item $userbase_ds_id
+
+The C<ds_id> of the dataset from the userbase.
+
+=item return
+
+Returns the path to where the XML metadata files are stored on disk.
+
+=back
+
+=cut
 sub dataset_path {
     my $self = shift;
 
@@ -344,14 +576,9 @@ sub dataset_path {
     }
 
     my $metabase_ds_name = $userbase_ds->a_id() . "/" . $userbase_ds->ds_name();
-    my $metabase_ds = $self->meta_db->resultset('Dataset')->find( $metabase_ds_name, { key => 'dataset_ds_name_key' } );
-    if ( !defined $metabase_ds ) {
-        $self->logger->error("Could not find dataset with ds_name '$metabase_ds_name' in the metabase");
-        return;
-    }
+    my $filepath = $self->config->getDSFilePath($metabase_ds_name);
 
-    return $metabase_ds->ds_filepath();
-
+    return ($filepath, $metabase_ds_name);
 }
 
 =head1 LICENSE
