@@ -28,7 +28,7 @@ BEGIN { extends 'Catalyst::Controller'; }
 use Metamod::Dataset;
 use MetamodWeb::Utils::FormValidator;
 use MetamodWeb::Utils::UI::DatasetAdmin;
-use MetamodWeb::Form::DatasetEdit;
+use MetamodWeb::Form::DatasetEdit; # REMOVE
 
 =head1 NAME
 

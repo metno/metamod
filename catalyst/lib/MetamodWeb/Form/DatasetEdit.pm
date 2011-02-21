@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
-use HTML::FormHandler::Moose;
+use HTML::FormHandler::Moose; # REMOVE
 use MetamodWeb::Utils::Exception qw( error_from_exception );
 use Try::Tiny;
 use namespace::autoclean;

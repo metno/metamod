@@ -2,6 +2,6 @@
 
 <div class="level2-menu-item"><a href="[% c.uri_for('/upload') %]">Upload files</a></div>
 <div class="level2-menu-item"><a href="[% c.uri_for('/upload/test') %]">Test a file</a></div>
-<div class="level2-menu-item"><a href="[% c.uri_for('/dataset_admin') %]">Dataset administration</a></div>
+<div class="level2-menu-item"><a href="[% c.uri_for('/upload/dataset') %]">Dataset administration</a></div>
 
 </div>
