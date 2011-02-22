@@ -1,0 +1,207 @@
+[
+
+   {
+    "type" : "h1",
+    "value" : "Metadata submission form"
+    },
+
+    {
+        "type" : "p",
+        "value" : "The information submitted through this form will be included in the metadatabase. It can be used to make the metadatabase point at existing datasets which are available online."
+    },
+    {
+        "type" : "p",
+        "value" : "The list of scientific keywords has been shortened. Please send an email to ipycoord@met.no if you miss any keywords of relevance to operational use."
+    },
+    {
+        "type" : "p",
+        "value" : "Use the Tabulator key to jump between the input fields. Please use English for text input."
+    },
+    {
+        "type" : "sectionstart",
+        "value" : "Data Set Description"
+    },
+    {
+        "type" : "text",
+        "label" : "Dataset title",
+        "length" : 70,
+        "size" : 100,
+        "name" : "title"
+    },
+    {
+        "type" : "textarea",
+        "label" : "Description",
+        "length" : 70,
+        "height" : 10,
+        "name" : "abstract",
+        "mandatory" : true
+    },
+    {
+        "type" : "textarea",
+        "label" : "Projection info",
+        "length" : 70,
+        "height" : 10,
+        "name" : "projection_info",
+        "constraint" : "projection_info"
+    },
+    {
+        "type" : "textarea",
+        "label" : "WMS info",
+        "length" : 70,
+        "height" : 10,
+        "name" : "wms_info",
+        "constraint" : "wms_info"
+    },
+    {
+        "type" : "text",
+        "label" : "URL describing/linking the data",
+        "name" : "dataref",
+        "length" : 70,
+        "size" : 250
+    },
+    {
+        "type" : "list",
+        "label" : "Topic category",
+        "name" : "topiccategory",
+        "value" : [ "Biota", "ClimatologyMeteorologyAtmosphere", "Environment", "Geoscientificinformation", "ImageryBaseMapsEarthCover", "InlandWaters", "Oceans", "Society" ],
+        "mandatory" : true
+    },
+    {
+        "type" : "list",
+        "label" : "Activity type",
+        "name" : "activity_type",
+        "value" : [ "Moored instrument", "Cruise", "Aircraft", "Model run", "Land station", "Ice station", "Submersible", "Float", "Space borne instrument", "Other" ]
+    },
+    {
+        "type" : "text",
+        "label" : "Geogr. Bounding Box (East,South,West,North) (decimal degrees North/East)",
+        "name" : "bounding_box",
+        "length" : 24,
+        "size" : 24,
+        "mandatory" : true
+    },
+    {
+        "type" : "gcmdlist",
+        "label" : "Geographic area (multiple choices)",
+        "name" : "area",
+        "value" : "gcmd-location-keywords.txt",
+        "height" :6,
+        "exclude" : [ "Continent", "Geographic Region", "Solid Earth", "Space", "Vertical Location", "Ocean > Pacific", "Ocean > Indian", "Ocean > Southern", "Ocean > Atlantic > South" ]
+    },
+
+    {
+     "type" : "text",
+     "label" : "Data collection period - start (in the form YYYY-MM-DD HH:MM UTC)",
+     "name" : "datacollection_period_from",
+     "length" : 25,
+     "size" : 25
+    },
+
+    {
+        "type" : "text",
+        "label" : "Data collection period - end (in the form YYYY-MM-DD HH:MM UTC)",
+        "name" : "datacollection_period_to",
+        "length" : 25,
+        "size" : 25
+    },
+
+    {
+        "type" : "list",
+        "label" : "Operational status",
+        "name" : "operational_status",
+        "value" : [ "Operational", "Pre operational", "Experimental", "Scientific" ],
+        "mandatory" : true
+    },
+    {
+        "type" : "gcmdlist",
+        "label" : "Scientific keywords (multiple choices)",
+        "name" : "topic",
+        "value" : "gcmd-science-keywords.txt",
+        "height" : 10,
+        "exclude" : [ "Agriculture", "Biological Classification", "Biosphere", "Human Dimensions", "Atmosphere > Atmospheric Chemistry", "Land Surface > Geomorphology", "Land Surface > Soils", "Land Surface > Landscape", "Land Surface Topography", "Oceans > Aquatic", "Oceans > Bathymetry", "Oceans > Marine", "Oceans > Ocean Chemistry", "Oceans > Ocean Optics", "Climate Indicators" ]
+    },
+    {
+        "type" : "sectionend"
+    },
+
+    {
+        "type" : "sectionstart",
+        "value" : "File Format Information"
+    },
+    {
+        "type" : "list",
+        "label" : "File format",
+        "name" : "file_format",
+        "value" : [ "GRIB", "BUFR", "netCDF", "netCDF/CF", "HDF", "HDF-EOS", "HDF5", "Excel", "CSV", "ASCII", "Other" ],
+        "mandatory" : true
+    },
+    {
+        "type" : "textarea",
+        "label" : "File Format Description (if feasible)",
+        "name" : "format_description",
+        "length" : 70,
+        "height" : 5
+    },
+    {
+        "type" : "text",
+        "label" : "Metadata standard",
+        "name" : "metadata_standard",
+        "length" : 70,
+        "size" : 250
+    },
+    {
+        "type" : "textarea",
+        "label" : "File history (e.g. 2007-09-24 creation)",
+        "name" : "history",
+        "length" : 70,
+        "height" : 5
+    },
+    {
+        "type" : "sectionend"
+    },
+    {
+        "type" : "sectionstart",
+        "value" : "Data Provider/Owner Information"
+    },
+    {
+        "type" : "text",
+        "label" : "PI Name",
+        "length" : 70,
+        "size" : 100,
+        "name" : "PI_name",
+        "mandatory" : true
+    },
+    {
+        "type" : "text",
+        "label" : "Institution",
+        "length" : 70,
+        "size" : 100,
+        "name" : "institution",
+        "mandatory" : true
+    },
+    {
+        "type" : "text",
+        "label" : "Email",
+        "length" : 70,
+        "size" : 100,
+        "name" : "contact",
+        "mandatory" : true
+    },
+    {
+        "type" : "list",
+        "label" : "Distribution statement",
+        "name" : "distribution_statement",
+        "value" : [ "Free", "Restricted to IPY community", "No access first 6 months", "No access first 12 months" ]
+    },
+    {
+        "type" : "text",
+        "label" : "Project",
+        "length" : 70,
+        "size" : 100,
+        "name" : "project_name"
+    },
+    {
+        "type" : "sectionend"
+    }
+]
+
