@@ -25,6 +25,7 @@ use namespace::autoclean;
 
 use warnings;
 
+use Data::FormValidator::Constraints qw( FV_max_length );
 use DateTime;
 use File::Spec;
 use JSON;
@@ -33,6 +34,7 @@ use POSIX qw(strftime);
 
 use Metamod::Config;
 use Metamod::Dataset;
+use MetamodWeb::Utils::FormValidator::Constraints;
 
 #
 # A Metamod::Config object containing the configuration for the application
@@ -94,9 +96,14 @@ sub quest_validator {
 
     my $quest_config = $self->quest_config($config_file);
 
+    my %known_constraints = (
+        wms_info => \&MetamodWeb::Utils::FormValidator::Constraints::wms_info,
+    );
+
     my @required = ();
     my @optional = ();
     my %labels   = ();
+    my %constraints = ();
     foreach my $element (@$quest_config) {
 
         my $name = $element->{name};
@@ -111,13 +118,40 @@ sub quest_validator {
             push @optional, $name;
         }
 
+        if( exists $element->{constraint} ){
+            my $constraint = $element->{constraint};
+
+            my $constraint_func;
+            if( $constraint eq 'wms_info' ){
+                my $wms_schema = $self->config->get("TARGET_DIRECTORY") . '/schema/ncWmsSetup.xsd';
+                $constraint_func = MetamodWeb::Utils::FormValidator::Constraints::xml( $wms_schema )
+            } elsif( $constraint eq 'projection_info') {
+                my $projection_schema = $self->config->get("TARGET_DIRECTORY") . '/schema/fimexProjections.xsd';
+                $constraint_func = MetamodWeb::Utils::FormValidator::Constraints::xml( $projection_schema )
+            } else {
+                die "Unknown constraint '$constraint'";
+            }
+
+            $constraints{$name} = $constraint_func;
+        }
+
+        if( exists $element->{size} ){
+
+            if( !($element->{size} =~ /^\d+$/ ) ){
+                die "'size' is not a number for '$name'";
+            }
+
+            $constraints{$name} = FV_max_length($element->{size});
+        }
+
         $labels{$name} = $element->{label};
     }
 
     my %form_profile = (
-        required => \@required,
-        optional => \@optional,
-        labels   => \%labels,
+        required           => \@required,
+        optional           => \@optional,
+        labels             => \%labels,
+        constraint_methods => \%constraints,
     );
 
     return \%form_profile;

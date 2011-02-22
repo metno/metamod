@@ -92,7 +92,10 @@ sub save_metadata :Chained('/questionnaire/check_config') :PathPart('restricted/
     my $config_id   = $c->stash->{config_id};
     my $quest_utils = $c->stash->{quest_utils};
     my $quest_data  = $quest_utils->quest_data();
-    my $is_valid    = $c->forward('MetamodWeb::Controller::Questionnaire', 'validate_response', [ $quest_data ] );
+
+    #  need to use forward since Metamod::Controller::Questionnaire is not a super class of this
+    #  controller (and it shouldn't be either)
+    my $is_valid    = $c->forward('MetamodWeb::Controller::Questionnaire', 'validate_response' );
 
     if( !$is_valid ) {
         return $c->res->redirect($c->uri_for('/editor', $config_id, 'restricted/view', $userbase_ds_id, $c->req->params ));

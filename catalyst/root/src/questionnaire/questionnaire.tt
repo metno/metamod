@@ -15,12 +15,23 @@
 
     [% SET result = validator.result %]
     <div class="error_msg">
-    <p>The following fields are required, but are missing values:</p>
-    <ul>
-    [% FOREACH missing IN result.missing()  %]
-        <li>[% validator.field_label( missing ) %]</li>
+
+    [% IF result.has_missing() %]
+        <p>The following fields are required, but are missing values:</p>
+        <ul>
+        [% FOREACH missing IN result.missing()  %]
+            <li>[% validator.field_label( missing ) %]</li>
+        [% END %]
+        </ul>
     [% END %]
-    </ul>
+    [% IF result.has_invalid() %]
+        <p>The following fields where invalid:</p>
+        <ul>
+        [% FOREACH invalid_field IN result.invalid()  %]
+            <li>[% validator.field_label( invalid_field ) %] : [% result.invalid( invalid_field ).0 %]</li>
+        [% END %]
+        </ul>
+    [% END %]
     </div>
 [% END %]
 

@@ -68,20 +68,30 @@ sub check_config : Chained('/') : PathPart('editor') : CaptureArgs(1) {
 
     $c->stash( quest_config => $config, quest_config_file => $config->{config_file}, config_id => $config_id );
 
+    # If the valiation failed on the previous page we not so in the flash.
+    # We cannot save the validator in the flash since it can contain code references
+    # that are not handled by the flash serialiser.
+    my $validation_failure = $c->flash->{validation_failure};
+    if( $validation_failure ){
+        $self->validate_response($c);
+    }
+
 }
 
 sub validate_response : Private {
-    my ( $self, $c, $response_data ) = @_;
+    my ( $self, $c ) = @_;
 
-    my $quest_utils = $c->stash->{quest_utils};
-    my $config_file = $c->stash->{quest_config_file};
+    my $quest_utils   = $c->stash->{quest_utils};
+    my $config_file   = $c->stash->{quest_config_file};
+    my $response_data = $quest_utils->quest_data();
 
     my $validation_profile = $quest_utils->quest_validator($config_file);
     my $validator          = MetamodWeb::Utils::FormValidator->new( validation_profile => $validation_profile );
     my $validation_res     = $validator->validate($response_data);
 
     if ( $validation_res->has_invalid() || $validation_res->has_missing() ) {
-        $c->flash( validator => $validator );
+        $c->stash( validator => $validator );
+        $c->flash( validation_failure => 1 );
         return;
     }
 
@@ -121,7 +131,7 @@ sub save_metadata : Chained('check_config') : PathPart('save') : Args(0) {
 
     my $quest_utils = $c->stash->{quest_utils};
     my $quest_data  = $quest_utils->quest_data();
-    my $is_valid    = $c->forward( 'validate_response', [$quest_data] );
+    my $is_valid    = $self->validate_response($c);
 
     if ( !$is_valid ) {
         return $c->res->redirect( $c->uri_for( '/editor', $config_id, 'view', $c->req->params ) );
