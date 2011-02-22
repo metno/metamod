@@ -54,14 +54,17 @@ sub auto : Private {
         quest_ui_utils => $quest_ui_utils,
     );
 
-    my $validator = $c->flash->{validator};
-    $c->stash( validator => $validator ) if defined $validator;
     return 1;
 
 }
 
+sub questionnaire :Chained('/questionnaire/check_config') :PathPart('restricted') :Args(1) :ActionClass('REST') {
+    my ( $self, $c, $userbase_ds_id ) = @_;
 
-sub view_metadata :Chained('/questionnaire/check_config') :PathPart('restricted/view') :Args(1) {
+
+}
+
+sub questionnaire_GET :Private {
     my ( $self, $c, $userbase_ds_id ) = @_;
 
     my $config_id = $c->stash->{config_id};
@@ -81,12 +84,12 @@ sub view_metadata :Chained('/questionnaire/check_config') :PathPart('restricted/
             quest_config_file => $config->{ config_file },
             template   => 'questionnaire/questionnaire.tt',
             quest_data => \%merged_response,
-            quest_save_url => $c->uri_for( '/editor', $config_id, 'restricted', 'save', $userbase_ds_id ),
+            quest_save_url => $c->uri_for( '/editor', $config_id, 'restricted', $userbase_ds_id ),
         );
 
 }
 
-sub save_metadata :Chained('/questionnaire/check_config') :PathPart('restricted/save') :Args(1) {
+sub questionnaire_POST :Private {
     my ($self, $c, $userbase_ds_id ) = @_;
 
     my $config_id   = $c->stash->{config_id};
@@ -98,7 +101,7 @@ sub save_metadata :Chained('/questionnaire/check_config') :PathPart('restricted/
     my $is_valid    = $c->forward('MetamodWeb::Controller::Questionnaire', 'validate_response' );
 
     if( !$is_valid ) {
-        return $c->res->redirect($c->uri_for('/editor', $config_id, 'restricted/view', $userbase_ds_id, $c->req->params ));
+        return $c->res->redirect($c->uri_for('/editor', $config_id, 'restricted', $userbase_ds_id, $c->req->params ));
     }
 
     my $success = $quest_utils->save_dataset_metadata( $config_id, $userbase_ds_id, $quest_data );
@@ -109,7 +112,7 @@ sub save_metadata :Chained('/questionnaire/check_config') :PathPart('restricted/
         $self->add_error_msgs( $c, 'Failed to save the response on the error. Please contact the administrator.' );
     }
 
-    return $c->res->redirect($c->uri_for('/editor', $config_id, 'restricted/view', $userbase_ds_id ));
+    return $c->res->redirect($c->uri_for('/editor', $config_id, 'restricted', $userbase_ds_id ));
 
 }
 

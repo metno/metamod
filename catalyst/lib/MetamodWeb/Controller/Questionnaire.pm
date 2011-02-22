@@ -51,10 +51,9 @@ sub auto : Private {
         quest_ui_utils => $quest_ui_utils,
     );
 
-    my $validator = $c->flash->{validator};
-    $c->stash( validator => $validator ) if defined $validator;
     return 1;
 }
+
 
 sub check_config : Chained('/') : PathPart('editor') : CaptureArgs(1) {
     my ( $self, $c, $config_id ) = @_;
@@ -68,9 +67,9 @@ sub check_config : Chained('/') : PathPart('editor') : CaptureArgs(1) {
 
     $c->stash( quest_config => $config, quest_config_file => $config->{config_file}, config_id => $config_id );
 
-    # If the valiation failed on the previous page we not so in the flash.
+    # If the valiation failed on the previous page we store that in the flash.
     # We cannot save the validator in the flash since it can contain code references
-    # that are not handled by the flash serialiser.
+    # that are not handled by the Perl serialiser.
     my $validation_failure = $c->flash->{validation_failure};
     if( $validation_failure ){
         $self->validate_response($c);
@@ -99,7 +98,12 @@ sub validate_response : Private {
 
 }
 
-sub view_metadata : Chained('check_config') : PathPart('view') : Args(0) {
+sub questionnaire : Chained('check_config') : PathPart('') : Args(0) : ActionClass('REST') {
+    my ($self, $c ) = @_;
+
+}
+
+sub questionnaire_GET :Private {
     my ( $self, $c ) = @_;
 
     my $quest_utils = $c->stash->{quest_utils};
@@ -115,7 +119,7 @@ sub view_metadata : Chained('check_config') : PathPart('view') : Args(0) {
         $c->stash(
             template       => 'questionnaire/questionnaire.tt',
             quest_data     => \%merged_response,
-            quest_save_url => $c->uri_for( '/editor', $config_id, 'save' ),
+            quest_save_url => $c->uri_for( '/editor', $config_id, ),
         );
     } else {
         $c->stash( template => 'questionnaire/start_quest.tt' );
@@ -123,7 +127,7 @@ sub view_metadata : Chained('check_config') : PathPart('view') : Args(0) {
 
 }
 
-sub save_metadata : Chained('check_config') : PathPart('save') : Args(0) {
+sub questionnaire_POST : Private {
     my ( $self, $c ) = @_;
 
     my $config_id    = $c->stash->{config_id};
@@ -134,7 +138,7 @@ sub save_metadata : Chained('check_config') : PathPart('save') : Args(0) {
     my $is_valid    = $self->validate_response($c);
 
     if ( !$is_valid ) {
-        return $c->res->redirect( $c->uri_for( '/editor', $config_id, 'view', $c->req->params ) );
+        return $c->res->redirect( $c->uri_for( '/editor', $config_id, $c->req->params ) );
     }
 
     my $success = $quest_utils->save_anon_metadata( $config_id, $response_key, $quest_data );
@@ -145,7 +149,7 @@ sub save_metadata : Chained('check_config') : PathPart('save') : Args(0) {
         $self->add_error_msgs( $c, 'Failed to save the response on the error. Please contact the administrator.' );
     }
 
-    return $c->res->redirect( $c->uri_for( '/editor', $config_id, 'view', { response_key => $response_key } ) );
+    return $c->res->redirect( $c->uri_for( '/editor', $config_id, { response_key => $response_key } ) );
 
 }
 
