@@ -17,7 +17,7 @@
 [% INCLUDE "${section}/menu.tt" %]
 [% END %]
 
-<div class="menu-item"><a href="[% c.uri_for( '/restricted/subscription' )%]">My subscriptions</a></div>
+<div class="menu-item"><a href="[% c.uri_for( '/subscription' )%]">Subscription</a></div>
 
 
 [% IF c.user_exists %]

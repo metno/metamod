@@ -79,7 +79,7 @@ jQuery(document).ready( function () {
                     <a class="btn" href="[% c.uri_for( '/dataset', dataset.ds_id, 'rss' ) %]" target="_blank" title="The RSS feed for this dataset. The RSS feed will notify you about any new datafiles associated with this dataset"><span>RSS Feed</span></a><br />
 
                     [% IF mm_config.get('SUBSCRIPTION_ENABLED') == 'ENABLED' and search_ui_utils.dataset_in_userbase(dataset) %]
-                        <a class="btn" href="[% mm_config.get('BASE_PART_OF_EXTERNAL_URL') _ mm_config.get('LOCAL_URL') _ '/sch/subscription.php?action=display_email_form&dataset_name=' _ dataset.unqualified_ds_name() %]" title="Setup a subscription to get notified about new datafiles (requires login)"><span>Subscribe</span></a><br />
+                        <a class="btn" href="[% c.uri_for( '/subscription', dataset.unqualified_ds_name() ) %]" title="Setup a subscription to get notified about new datafiles (requires login)"><span>Subscribe</span></a><br />
                     [% END %]
                     <a class="btn" href="[% c.uri_for( '/search/page', datasets_pager.current_page(), 'add_to_basket', dataset.ds_id, c.req.params ) %]"
                        title="Add all child dataset to the collection basket"><span>Add to basket</span></a><br/><br/>

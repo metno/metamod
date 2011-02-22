@@ -25,7 +25,9 @@ use namespace::autoclean;
 
 use Metamod::Subscription;
 
-BEGIN { extends 'Catalyst::Controller' };
+use Log::Log4perl qw( get_logger );
+
+BEGIN { extends 'MetamodWeb::BaseController::Base' };
 
 =head1 NAME
 
@@ -46,18 +48,10 @@ Catalyst Controller.
 sub auto : Private {
     my ( $self, $c ) = @_;
 
-    $c->stash( my_metamod_menu => 1 );
-
+    $c->stash( section => 'subscription' );
 }
 
-sub index : Path : Args(0) {
-    my ( $self, $c ) = @_;
-
-    $c->detach('list_subscriptions');
-
-}
-
-sub list_subscriptions : Private {
+sub index : Path('/subscription') : Args(0) {
     my ( $self, $c ) = @_;
 
     my $model         = $c->model('Userbase');
@@ -80,16 +74,16 @@ sub list_subscriptions : Private {
 
 }
 
-sub ds_name :Chained("/") :PathPart("subscription") :CaptureArgs(1) {
-    my ( $self, $c ) = @_;
+sub subscription :Path("/subscription") :Args(1) :ActionClass('REST') {
+    my ( $self, $c, $ds_name ) = @_;
 
-    $c->stash( ds_name => $c->request->args->[0] );
+    $c->stash( ds_name => $ds_name );
 }
 
-sub display_new_subscription :Chained("ds_name") :PathPart('new') :Args(0)  {
+sub subscription_GET : Private  {
     my ( $self, $c ) = @_;
 
-    my $user = $c->user(); #$self->_get_user( $c );
+    my $user = $c->user();
 
     my $email = $c->request->param('email');
     my $repeated_email = $c->request->param('repeated_email');
@@ -107,15 +101,20 @@ sub display_new_subscription :Chained("ds_name") :PathPart('new') :Args(0)  {
 
 }
 
-sub store_new_subscription : Chained("ds_name") :PathPart('store_new') : Args(0) {
+sub subscription_POST :Private {
     my ( $self, $c ) = @_;
 
+    # We need to do this dispatching our selves since browsers do not support
+    # the HTTP DELETE method
+    return $c->forward('subscription_DELETE') if( 1 == $c->req->param('do_delete') );
+
+    my $ds_name = $c->stash->{ds_name};
     my $email = $c->req->param('email');
     my $repeated_email = $c->req->param( 'repeated_email');
 
     if( $email ne $repeated_email ){
-        $c->stash( error_msg => 'Email addresses are not identical. Subscription not stored' );
-        $c->detach( 'Subscription', 'display_new_subscription');
+        $self->add_error_msgs($c, 'Email addresses are not identical. Subscription not stored' );
+        return $c->res->redirect($c->uri_for('/subscription', $ds_name, $c->req->params ) );
     }
 
 
@@ -125,8 +124,8 @@ sub store_new_subscription : Chained("ds_name") :PathPart('store_new') : Args(0)
     my $dataset = $user_db->resultset('Dataset')->find( { a_id => $applic_id, ds_name => $c->stash->{ds_name} } );
 
     if( !$dataset ){
-        $c->stash( error_msg => 'The dataset name is not found in the database' );
-        $c->detach( 'Subscription', 'display_new_subscription');
+        $self->add_error_msgs($c, 'The dataset name is not found in the database' );
+        return $c->res->redirect($c->uri_for('/subscription', $ds_name, $c->req->params ) );
     }
 
     my $subscription_xml = <<END_XML;
@@ -143,9 +142,35 @@ END_XML
         i_content => $subscription_xml,
     };
 
-    $user_db->resultset('Infouds' )->create( $info_uds );
+    $user_db->resultset('Infouds' )->update_or_create( $info_uds );
 
-    $c->forward( 'Subscription', 'list_subscriptions' );
+    $c->res->redirect( $c->uri_for('/subscription' ) );
+
+}
+
+sub subscription_DELETE : Private {
+    my ($self, $c) = @_;
+
+    my $user = $c->user();
+    my $user_db = $c->model('Userbase');
+    my $mm_config = $c->stash->{ mm_config };
+    my $applic_id = $mm_config->get('APPLICATION_ID');
+    my $dataset = $c->model('Userbase::Dataset')->find( { a_id => $applic_id, ds_name => $c->stash->{ds_name} } );
+
+    my $ds_id = $dataset->ds_id();
+    my $u_id = $user->u_id();
+
+    my $subscriptions = $c->model('Userbase::Infouds')->search( { ds_id => $ds_id, u_id => $u_id, i_type => 'SUBSCRIPTION_XML' } );
+
+    if( $subscriptions->count() != 1 ){
+        get_logger()->debug("The number of matching subscriptions where wrong:" . $subscriptions->count() );
+    }
+
+    $subscriptions->delete_all();
+
+    $self->add_info_msgs($c, 'The subscription has been deleted' );
+
+    $c->res->redirect( $c->uri_for('/subscription' ) );
 
 }
 

@@ -1,29 +1,63 @@
-<h2>My subscriptions</h2>
-<table>
+<script type="text/javascript">
+
+function removeSubscriptionDialog(formId){
+
+    $( "#remove-subscription-dialog" ).dialog({
+        resizable: false,
+        modal: true,
+        buttons: {
+            "Remove subscription": function() {
+            	$('#' + formId ).submit();
+                $( this ).dialog( "close" );
+            },
+            Cancel: function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });
+
+    return false;
+
+}
+
+</script>
+
+<h2 class="std">Current subscriptions</h2>
+<table class="box">
 <tr>
-<th class="subscription">Dataset name</th>
-<th class="subscription">Subscription type</th>
-<th class="subscription">Subscription parameters</th>
-<th class="subscription">&nbsp</th>
+<th>Dataset name</th>
+<th>Subscription type</th>
+<th>Subscription parameters</th>
+<th>&nbsp</th>
 </tr>
 
 [% FOREACH subscription IN subscriptions %]
 <tr>
-<td class="subscription">[% subscription.ds_name %]</td>
-<td class="subscription">[% subscription.type %]</td>
+<td>
+    <a href="[% c.uri_for('/subscription', subscription.ds_name )%]">[% subscription.ds_name %]</a>
+</td>
+<td>[% subscription.type %]</td>
 
-<td class="subscription">
+<td>
     [% FOREACH param IN subscription %]
         [% IF param.key != 'type' && param.key != 'ds_name' %]
             <strong>[% param.key %]:</strong> [% param.value %]<br />
         [% END %]
     [% END %]
 </td>
-<td class="subscription">
-<span class="clickable" onclick="removeSubscriptionDialog()">Remove</span>
+<td>
+<form name="subscription_[% subscription.ds_name %]" id="subscription_[% subscription.ds_name %]" method="POST" action="[% c.uri_for('/subscription', subscription.ds_name )%]">
+<input type="hidden" name="do_delete" value="1" />
+
+[%# When scripts are not enable this will submit the form without any confirmation %]
+<input type="submit" value="Remove" onclick="return removeSubscriptionDialog('subscription_[% subscription.ds_name %]')" />
+</form>
+
 </td>
 </tr>
 [% END %]
 </table>
 
-<div id="remove-subscription-dialog" style="display: none">Really remove subscription</div>
+
+
+<div id="remove-subscription-dialog" style="display: none">Really remove subscription?</div>

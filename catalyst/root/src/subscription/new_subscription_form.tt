@@ -1,34 +1,31 @@
-<h2>Register new subscription</h2>
+<h2 class="std">Register subscription</h2>
 
-[%IF error_msg %]
-<div class="error_msg">
-[% error_msg %]
-</div>
-[% END %]
+[% INCLUDE 'user_msgs.tt' %]
 
 
-<form name="subscription" method="POST" action="[% c.uri_for( '/subscription', ds_name, 'store_new' ) %]">
+<form name="subscription" method="POST" action="[% c.uri_for( '/subscription', ds_name ) %]">
 <input type="hidden" name="action" value="store_email_subscription" />
 
 <table>
 
 <tr>
-<td>Dataset name</td>
-<td><input type="text" size="35" name="ds_name" value="[% ds_name %]" /></td>
+<td><label>Dataset name</label></td>
+<td><input type="text" readonly="readonly" size="35" name="ds_name" value="[% ds_name %]" /></td>
 </tr>
 
 <tr>
-<td>Recipient address</td>
+<td><label>Recipient address</label></td>
 <td><input type="text" size="35" name="email" value="[% email %]" /></td>
 </tr>
 
 <tr>
-<td>Recipient address (repeated)</td>
+<td><label>Recipient address (repeated)</label></td>
 <td><input type="text" size="35" name="repeated_email" value="[% repeated_email %]" /></td>
 </tr>
 
-<tr style="text-align: center">
-<td colspan="2"><button type="submit">Register subscription</button></td>
+<tr>
+<td colspan="2" style="text-align: center; padding-top: 10px;"><button type="submit">Register subscription</button></td>
 </tr>
+</table>
 
 </form>
