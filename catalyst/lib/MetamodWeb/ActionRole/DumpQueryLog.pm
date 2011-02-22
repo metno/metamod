@@ -57,8 +57,14 @@ after 'execute' => sub {
         $c->log->info('SQL::Beautify is not installed. Cannot beautify SQL');
     };
 
-    my $query_log = $c->stash->{ query_log };
-    my $ana = DBIx::Class::QueryLog::Analyzer->new({ querylog => $query_log });
+    my $mb_query_log = $c->stash->{ mb_query_log };
+    _print_query_log($c, $mb_query_log,$beautifier);
+
+    my $ub_query_log = $c->stash->{ ub_query_log };
+    _print_query_log($c, $ub_query_log,$beautifier);
+
+
+    my $ana = DBIx::Class::QueryLog::Analyzer->new({ querylog => $mb_query_log });
 
     my $queries = $ana->get_totaled_queries();
     while( my ( $sql, $info ) = each %$queries ){
@@ -79,6 +85,31 @@ END_MSG
     }
 
 };
+
+sub _print_query_log {
+    my ($c, $query_log, $beautifier) = @_;
+
+    my $ana = DBIx::Class::QueryLog::Analyzer->new({ querylog => $query_log });
+
+    my $queries = $ana->get_totaled_queries();
+    while( my ( $sql, $info ) = each %$queries ){
+
+        if( $beautifier){
+            $beautifier->query($sql);
+            $sql = $beautifier->beautify();
+        }
+
+        my $log_msg = <<END_MSG;
+SQL:
+$sql
+count: $info->{ count }
+time_elapsed: $info->{ time_elapsed }
+END_MSG
+
+        $c->log->debug( $log_msg );
+    }
+
+}
 
 =head1 LICENSE
 
