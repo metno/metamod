@@ -237,7 +237,7 @@ sub quest_configuration {
 
     my %quest_configurations = (
         'metadata' => {
-        config_file => $self->c->path_to('quest_config.json'),
+        config_file => File::Spec->catfile($self->config->get('TARGET_DIRECTORY'), 'etc', 'metadata_quest.json' ),
         title       => 'Metadata editor',
         tag         => $self->config->get('QUEST_OWNERTAG'),
         }
