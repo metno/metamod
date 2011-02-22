@@ -1,0 +1,77 @@
+[% IF ds_id %]
+    <h1 class="std">Edit dataset [% dataset.ds_name %]</h1>
+[% ELSE %]
+    <h1 class="std">Create dataset</h1>
+[% END %]
+
+<form action="[% root %]/5435[% ds_id %]" method="POST" class="datasetedit">
+
+[% IF dataset.mesg %]
+    <div style="color:red; font-weight:bold; padding-bottom: 10px;">[% dataset.mesg%]</div>
+[% END %]
+
+<table>
+
+    <tr>
+        <td><label for="ds_name">Dataset name:</label></td>
+        <td>
+            [% IF ds_id %]
+                [% dataset.ds_name %]
+            [% ELSE %]
+                <input id="ds_name" name="ds_name" value="[% dataset.ds_name %]" size="10">
+            [% END %]
+        </td>
+    </tr>
+
+    <tr>
+        <td><label for="dskey">Dataset key:</label></td>
+        <td><input id="dskey" name="dskey" value="[% dataset.dskey %]" size="10"> (max 10 characters)</td>
+    </tr>
+
+    [% IF mm_config.get('EXTERNAL_REPOSITORY') # used for osisaf et al %]
+    <tr>
+        <td><label for="location">Dataset location:</label></td>
+        <td><input id="location" name="location" value="[% dataset.location %]" size="60"> (absolute directory path)</td>
+    </tr>
+
+    <tr>
+        <td><label for="catalog">Dataset catalog:</label></td>
+        <td><input id="catalog" name="catalog" value="[% dataset.catalog %]" size="60"> (THREDDS URL)</td>
+    </tr>
+    [% END %]
+
+</table>
+
+[% IF ds_id %]
+    <input type="submit" value="Update">
+[% ELSE %]
+    <input type="submit" value="Create">
+[% END %]
+
+</form>
+
+<h1 class="std">Dataset directories you own</h1>
+
+<table class="box">
+    <thead>
+    <tr class="list_table">
+    <th class="list_table">Dataset name</th>
+    <th class="list_table">&nbsp;</th>
+    <th class="list_table">&nbsp;</th>
+    </tr>
+    </thead>
+    [% FOREACH ds IN da_ui_utils.user_datasets() %]
+        <tr class="list_table">
+            <td class="list_table">[% ds.ds_name %]</td>
+            <td class="list_table"><div class="btns"><a class="btn2" style="width:120px" href="[% root _ '/' _ ds.ds_id %]"><span>Edit</span></a></div></td>
+            <td class="list_table"><div class="btns"><a class="btn2" style="width:120px" href="[% c.uri_for( '/dataset_admin/' _ ds.ds_id _ '/questionnaire' ) %]"><span>Edit metadata</span></a></div></td>
+        </tr>
+    [% END %]
+    [% IF ds_id %]
+        <tr class="list_table">
+            <td class="list_table">New dataset</td>
+            <td class="list_table"><div class="btns"><a class="btn2" style="width:120px" href="[% root %]"><span>Create</span></a></div></td>
+            <td class="list_table">&nbsp;</td>
+        </tr>
+    [% END %]
+</table>
