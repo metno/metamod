@@ -80,24 +80,70 @@ sub viewtbl : Path("/admin/viewtable") :Args(1) {
     $c->stash(current_view => 'Raw');
     $c->stash(name => $tbl);
     my $params = $c->req->parameters;
+    my $single_dataset = 0;
+    if (exists($params->{'refcol'})) {
+       $single_dataset = $params->{'refcol'} eq 'ds_id';
+    }
     my $config = $c->stash->{ mm_config };
     my $dbh            = $config->getDBH();
     my $col = DbTableinfo::get_columnnames($dbh,$tbl);
-#    dd $col;
-    my $foreignref = DbTableinfo::get_foreignkeys($dbh,$tbl);
-#     dd $foreignref;
-    my $sql = 'SELECT ' . join(',',@$col) . ' FROM ' . $tbl;
+    my $sth = compose_sql($dbh,$col,$tbl,$params,$single_dataset,0);
+    $sth->execute();
+    my @newcol = @$col;
     if ($tbl eq 'dataset') {
-       $sql .= '  WHERE ds_parent = 0'
+        unshift @newcol, 'Children';
+    }
+    if ($tbl eq 'ds_has_md') {
+       push @newcol, 'mt_name';
+       push @newcol, 'md_content';
+    }
+    push @newcol, 'References';
+    $col = \@newcol;
+    $c->stash(columns => $col);
+    my %colindex;
+    my $ix = 0;
+    foreach my $col1 (@$col) {
+       $colindex{$col1} = $ix;
+       $ix++;
+    }
+    my $wholetable = build_wholetable($c,$col,$tbl,$sth,$dbh,1);
+    $c->stash(wholetable => $wholetable);
+}
+
+sub viewdataset : Path("/admin/viewtable/dataset") :Args(1) {
+    my ( $self, $c, $dsid ) = @_;
+    $c->stash(template => 'admin/viewtbl.tt');
+    $c->stash(current_view => 'Raw');
+    $c->stash(name => 'dataset');
+    my $params = $c->req->parameters;
+    my $config = $c->stash->{ mm_config };
+    my $dbh            = $config->getDBH();
+    my $col = DbTableinfo::get_columnnames($dbh,'dataset');
+    my $sth = compose_sql($dbh,$col,'dataset',$params,0,$dsid);
+    $sth->execute();
+    push @$col, 'References';
+    $c->stash(columns => $col);
+    my $wholetable = build_wholetable($c,$col,'dataset',$sth,$dbh,0);
+    $c->stash(wholetable => $wholetable);
+}
+
+sub compose_sql {
+    my ($dbh,$col,$tbl,$params,$single_dataset,$dsparent) = @_;
+    my $sql = 'SELECT ' . join(',',@$col) . ' FROM ' . $tbl;
+    my $where_is_used = 0;
+    if ($tbl eq 'dataset' and !$single_dataset) {
+       $sql .= ' WHERE ds_parent = ' . $dsparent;
+       $where_is_used = 1;
     }
     if ($tbl eq 'ds_has_md') {
        $sql = "SELECT ds_has_md.ds_id, ds_has_md.md_id, mt_name, md_content" .
               " FROM ds_has_md, metadata WHERE ds_has_md.md_id = metadata.md_id";
+       $where_is_used = 1;
     }
     if (exists($params->{'refcol'})) {
         my $refcol = $params->{'refcol'};
         my $refval = $params->{'refval'};
-        if ($tbl eq 'dataset' or $tbl eq 'ds_has_md') {
+        if ($where_is_used) {
             $sql .= ' AND ';
         } else {
             $sql .= ' WHERE ';
@@ -111,33 +157,32 @@ sub viewtbl : Path("/admin/viewtable") :Args(1) {
         $sql .= $refcol . ' = ' . $refval; 
     }
     my $sth = $dbh->prepare($sql);
-    $sth->execute();
-    my @newcol = @$col;
-    if ($tbl eq 'dataset') {
-        unshift @newcol, 'Children';
-    }
-    if ($tbl eq 'ds_has_md') {
-       push @newcol, 'mt_name';
-       push @newcol, 'md_content';
-    }
-    push @newcol, 'References';
-    $col = \@newcol;
+    return $sth;
+}
+
+sub build_wholetable {
+    my ($c,$col,$tbl,$sth,$dbh,$children_column) = @_;
     my %colindex;
     my $ix = 0;
     foreach my $col1 (@$col) {
        $colindex{$col1} = $ix;
        $ix++;
     }
-    $c->stash(columns => $col);
+    my $foreignref = DbTableinfo::get_foreignkeys($dbh,$tbl);
     my $wholetable = [];
     while (1) {
        my @result = $sth->fetchrow_array;
        if (scalar @result == 0) {
           last;
        }
-       if ($tbl eq 'dataset') {
+       if ($tbl eq 'dataset' and $children_column) {
            my $dsid = $result[0];
-           unshift @result, '<a href="' . $c->uri_for('/admin/viewtable/' . $tbl . '/' . $dsid) . '">Children</a>';
+           my $dsparent = $result[$colindex{'ds_parent'}];
+           my $childrenlink = "";
+           if ($dsparent == 0) {
+              $childrenlink = '<a href="' . $c->uri_for('/admin/viewtable/' . $tbl . '/' . $dsid) . '">Children</a>';
+           }
+           unshift @result, $childrenlink;
        }
        my $references = "";
        foreach my $foreign (@$foreignref) {
@@ -160,31 +205,8 @@ sub viewtbl : Path("/admin/viewtable") :Args(1) {
        push @result, $references; 
        push @$wholetable, \@result;
     }
-    $c->stash(wholetable => $wholetable);
-}
-
-sub viewdataset : Path("/admin/viewtable/dataset") :Args(1) {
-    my ( $self, $c, $dsid ) = @_;
-    $c->stash(template => 'admin/viewtbl.tt');
-    $c->stash(current_view => 'Raw');
-    $c->stash(name => 'dataset');
-    my $config = $c->stash->{ mm_config };
-    my $dbh            = $config->getDBH();
-    my $col = DbTableinfo::get_columnnames($dbh,'dataset');
-    my $sql = 'SELECT ' . join(',',@$col) . ' FROM dataset WHERE ds_parent = ' . $dsid;
-    my $sth = $dbh->prepare($sql);
-    $sth->execute();
-    $c->stash(columns => $col);
-    my $wholetable = [];
-    while (1) {
-       my @result = $sth->fetchrow_array;
-       if (scalar @result == 0) {
-          last;
-       }
-       push @$wholetable, \@result;
-    }
-    $c->stash(wholetable => $wholetable);
-}
+    return $wholetable;
+ }
  
  
 #
