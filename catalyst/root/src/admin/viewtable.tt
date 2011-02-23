@@ -1,0 +1,9 @@
+[% INCLUDE admin/admin_header.tt %]
+<h2>View tables in the METAMOD database</h2>
+<table border=0>
+[% FOREACH tbl IN table_desc %]
+   <tr><th style="text-align: left"><a href="[% tbl.url %]">[% tbl.name %]</a></th>
+   <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[% tbl.columns %]</td>
+[% END %]
+</table>
+[% INCLUDE admin/admin_footer.tt %]

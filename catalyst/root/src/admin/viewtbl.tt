@@ -1,0 +1,17 @@
+[% INCLUDE admin/admin_header.tt %]
+<h2>[% name %]</h2>
+<table border=1>
+    <tr>
+[% FOREACH col IN columns %]
+        <th>[% col %]</th>
+[% END %]
+    </tr>
+[% FOREACH row IN wholetable %]
+    <tr>
+    [% FOREACH item IN row %]
+        <td>[% item %]</td>
+    [% END %]
+    </tr>
+[% END %]
+</table>
+[% INCLUDE admin/admin_footer.tt %]
