@@ -138,6 +138,20 @@ sub get_foreignkeys {
             };
         }
     }
+    $sth = $dbh->foreign_key_info(undef, undef, undef, $catalog, $schema, $tbl);
+    if (defined($sth)) {
+        while (1) {
+            my $fk = $sth->fetchrow_hashref;
+            if (! defined($fk)) {
+                last;
+            }
+            push @foreignkeys, {
+                 COLUMN => $fk->{'FK_COLUMN_NAME'},
+                 FOREIGN_TABLE => $fk->{'UK_TABLE_NAME'},
+                 FOREIGN_COLUMN => $fk->{'UK_COLUMN_NAME'}
+            };
+        }
+    }
 #
     return \@foreignkeys;
 }
