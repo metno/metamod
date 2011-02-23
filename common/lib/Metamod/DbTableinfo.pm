@@ -30,39 +30,40 @@ use DBI;
 Get all tablenames, corresponding column names and primary keys, as well as all foreign
 keys info from a database.
 
-=head2 Usage: my $href = DbTableinfo::getinfo($dbh);
+=head2 my $aref = DbTableinfo::get_tablenames($dbh);
 
-$dbh is the handler of an open database.
+    $dbh is the handler of an open database.
 
-The return value, $href, is a reference to a hash with four elements:
+    The return value, $aref, is a reference to an array with names of all the tables in the database:
 
-$href->{'tables'}
+=head2 my $aref = DbTableinfo::get_columnnames($dbh,$tbl);
 
-    Contains an array of table names
+    $dbh is the handler of an open database, $tbl is the name of one of the tables.
 
-$href->{'columns'}
+    The return value, $aref, is a reference to an array with names of all the columns in the table.
 
-    Contains a hash with keys equal to table names. Each hash value is a reference to an array
-    containing all column names for the table.
+=head2 my $aref = DbTableinfo::get_primarykeys($dbh,$tbl);
 
-$href->{'primarykeys'}
+    $dbh is the handler of an open database, $tbl is the name of one of the tables.
 
-    Contains a hash with keys equal to table names. Each hash value is a reference to an array
-    containing all primary key names for the table.
+    The return value, $aref, is a reference to an array with names of all the primary keys in the table.
 
-$href->{'foreignkeys'}
+=head2 my $aref = DbTableinfo::get_foreignkeys($dbh,$tbl);
 
-    Contains a hash with keys equal to table names. Each hash value is a reference to an array
-    with text strings comprising four space separated elements:
+    $dbh is the handler of an open database, $tbl is the name of one of the tables.
 
-        primarykey foreigntable foreignkey
+    The return value, $aref, is a reference to an array. Each array element is a reference to a hash
+    with the following keys and corresponding text values:
 
+    COLUMN         - The column name in $tbl corresponding to the foreign key.
+    FOREIGN_TABLE  - The table name where the foreign key resides.
+    FOREIGN_COLUMN - The column name of the foreign key in the foreign table.
+    
 =cut
 
-sub getinfo {
+sub get_tablenames {
 #
     my $dbh = shift;
-    my %infohash = ();
     my $catalog = '';
     my $schema = 'public';
     my $table = '%';
@@ -76,58 +77,68 @@ sub getinfo {
         }
         push @tablearr, $tbl->{'table_name'};
     }
-    $infohash{'tables'} = \@tablearr;
+    return \@tablearr;
+}
 #
+sub get_columnnames {
+    my $dbh = shift;
+    my $tbl = shift;
+    my $catalog = '';
+    my $schema = 'public';
     my %columnhash = ();
     my $column ='%';
-    foreach my $tbl (@tablearr) {
-        $columnhash{$tbl} = [];
-        my $sth = $dbh->column_info($catalog, $schema, $tbl, $column);
+    my @colnames = ();
+    my $sth = $dbh->column_info($catalog, $schema, $tbl, $column);
+    while (1) {
+        my $col = $sth->fetchrow_hashref;
+        if (! defined($col)) {
+            last;
+        }
+        push @colnames, $col->{'COLUMN_NAME'};
+    }
+    return \@colnames;
+}
+#
+sub get_primarykeys {
+    my $dbh = shift;
+    my $tbl = shift;
+    my $catalog = '';
+    my $schema = 'public';
+    my @primarykeys = ();
+    my $sth = $dbh->primary_key_info($catalog, $schema, $tbl);
+    if (defined($sth)) {
         while (1) {
             my $col = $sth->fetchrow_hashref;
             if (! defined($col)) {
                 last;
             }
-            push @{$columnhash{$tbl}}, $col->{'COLUMN_NAME'};
+            push @primarykeys, $col->{'COLUMN_NAME'};
         }
     }
-    $infohash{'columns'} = \%columnhash;
+    return \@primarykeys;
+}
 #
-    my %primarykeyhash = ();
-    foreach my $tbl (@tablearr) {
-        $primarykeyhash{$tbl} = [];
-        my $sth = $dbh->primary_key_info($catalog, $schema, $tbl);
-        if (defined($sth)) {
-            while (1) {
-                my $col = $sth->fetchrow_hashref;
-                if (! defined($col)) {
-                    last;
-                }
-                push @{$primarykeyhash{$tbl}}, $col->{'COLUMN_NAME'};
+sub get_foreignkeys {
+    my $dbh = shift;
+    my $tbl = shift;
+    my $catalog = '';
+    my $schema = 'public';
+    my @foreignkeys = ();
+    my $sth = $dbh->foreign_key_info($catalog, $schema, $tbl, undef, undef, undef);
+    if (defined($sth)) {
+        while (1) {
+            my $fk = $sth->fetchrow_hashref;
+            if (! defined($fk)) {
+                last;
             }
+            push @foreignkeys, {
+                 COLUMN => $fk->{'UK_COLUMN_NAME'},
+                 FOREIGN_TABLE => $fk->{'FK_TABLE_NAME'},
+                 FOREIGN_COLUMN => $fk->{'FK_COLUMN_NAME'}
+            };
         }
     }
-    $infohash{'primarykeys'} = \%primarykeyhash;
 #
-    my %foreignkeyhash = ();
-    foreach my $tbl (@tablearr) {
-        $foreignkeyhash{$tbl} = [];
-        my $sth = $dbh->foreign_key_info($catalog, $schema, $tbl, undef, undef, undef);
-        if (defined($sth)) {
-            while (1) {
-                my $fk = $sth->fetchrow_hashref;
-                if (! defined($fk)) {
-                    last;
-                }
-                push @{$foreignkeyhash{$tbl}},
-                     $fk->{'UK_COLUMN_NAME'} . ' ' .
-                     $fk->{'FK_TABLE_NAME'} . ' ' .
-                     $fk->{'FK_COLUMN_NAME'};
-            }
-        }
-    }
-    $infohash{'foreignkeys'} = \%foreignkeyhash;
-#
-    return \%infohash;
+    return \@foreignkeys;
 }
 1;
