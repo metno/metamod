@@ -75,7 +75,15 @@ sub get_tablenames {
         if (! defined($tbl)) {
             last;
         }
-        push @tablearr, $tbl->{'table_name'};
+        my $tbl_name;
+        if (defined($tbl->{'table_name'})) {
+           $tbl_name = $tbl->{'table_name'};
+        } elsif  (defined($tbl->{'TABLE_NAME'})) {
+           $tbl_name = $tbl->{'TABLE_NAME'};
+        }
+        if (defined($tbl_name)) {
+           push @tablearr, $tbl_name;
+        }
     }
     return \@tablearr;
 }
