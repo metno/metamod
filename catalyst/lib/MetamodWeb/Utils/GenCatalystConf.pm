@@ -116,14 +116,17 @@ sub catalyst_conf {
             "realms"        => {
                 "dbix" => {
                     "credential" => {
-                        "class"          => "Password",
-                        "password_field" => "u_password",
-                        "password_type"  => "clear"
+                        "class"              => "Password",
+                        "password_field"     => "u_password",
+                        "password_type"      => "hashed",
+                        "password_hash_type" => "SHA-1",
                     },
                     "store" => {
-                        "class"      => "DBIx::Class",
-                        "user_model" => "Userbase::Usertable",
-                        "id_field"   => "u_loginname"
+                        "class"         => "DBIx::Class",
+                        "user_model"    => "Userbase::Usertable",
+                        "id_field"      => "u_loginname",
+                        "role_relation" => 'roles',
+                        "role_field"    => 'role',
                     }
                 }
             }
