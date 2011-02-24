@@ -25,7 +25,11 @@ use base 'Catalyst::Model::DBIC::Schema';
 
 __PACKAGE__->config(
     schema_class => 'MetamodWeb::Schema::Metabase',
-    connect_info => {}, #add additional connection info here
+    connect_info => {
+        # this flag is necessary to play nice with Catalyst::Plugin::Unicode::Encoding
+        # without it data will be double encoded
+        pg_enable_utf8 => 1
+    },
 );
 
 =head1 NAME
