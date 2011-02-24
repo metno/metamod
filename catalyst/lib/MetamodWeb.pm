@@ -43,10 +43,12 @@ use Catalyst qw/
     ConfigLoader
     Static::Simple
     Authentication
+    Authorization::Roles
     Session
     Session::State::Cookie
     Session::Store::FastMmap
     SmartURI
+    Unicode::Encoding
 /;
 
 extends 'Catalyst';
