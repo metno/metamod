@@ -21,6 +21,12 @@
 
 
 [% IF c.user_exists %]
+<div class="menu-item"><a href="[% c.uri_for( '/userprofile' )%]">User profile</a></div>
+[% IF section == 'userprofile' %]
+[% INCLUDE "${section}/menu.tt" %]
+[% END %]
+
+
 <div class="menu-item"><a href="[% c.uri_for( '/logout' )%]">Logout</a></div>
 [% ELSE %]
 <div class="menu-item"><a href="[% c.uri_for( '/login' )%]">Login</a></div>
