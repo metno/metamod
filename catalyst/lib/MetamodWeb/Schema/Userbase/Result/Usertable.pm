@@ -95,6 +95,12 @@ __PACKAGE__->has_many(
   { "foreign.u_id" => "self.u_id" },
 );
 
+__PACKAGE__->has_many(
+  "roles",
+  "MetamodWeb::Schema::Userbase::Result::Userrole",
+  { "foreign.u_id" => "self.u_id" },
+);
+
 =begin LICENSE
 
 METAMOD is free software; you can redistribute it and/or modify

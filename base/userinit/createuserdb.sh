@@ -89,6 +89,13 @@ CREATE TABLE File (
 );
 GRANT ALL PRIVILEGES ON File TO "[==PG_WEB_USER==]";
 
+CREATE TABLE UserRole (
+   u_id               INTEGER NOT NULL REFERENCES UserTable ON DELETE CASCADE,
+   role               VARCHAR(15) NOT NULL,
+   PRIMARY KEY (u_id, role)
+);
+GRANT ALL PRIVILEGES ON UserRole TO "[==PG_WEB_USER==]";
+
 CREATE TABLE funcmap (
         funcid SERIAL PRIMARY KEY,
         funcname       VARCHAR(255) NOT NULL,
