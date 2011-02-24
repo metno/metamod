@@ -95,7 +95,7 @@ sub add_error_msgs {
 }
 
 sub _add_msgs {
-    my ($self, $c, $msg_type, $msgs) = @_;
+    my ($self, $c, $msg_type, $msgs ) = @_;
 
     my $curr_msgs = $c->stash->{ $msg_type };
     $curr_msgs = [] if !defined $curr_msgs;
@@ -106,8 +106,8 @@ sub _add_msgs {
         push @{ $curr_msgs }, $msgs;
     }
 
-    $c->stash( $msg_type => $curr_msgs );
     $c->flash( $msg_type => $curr_msgs );
+
     return;
 }
 

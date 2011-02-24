@@ -107,12 +107,6 @@ sub auto :Private {
                title => $mm_config->get('SEARCH_APP_TITLE'), # FIXME: only true for search, not upload etc
                css_files => [] );
 
-    # read info and error messages from flash and place them in stash if the exists.
-    my $info_msgs = $c->flash->{ info_msgs };
-    $self->add_info_msgs($c, $info_msgs ) if defined $info_msgs;
-    my $error_msgs = $c->flash->{ error_msgs };
-    $self->add_error_msgs($c, $error_msgs ) if defined $error_msgs;
-
     return 1;
 }
 

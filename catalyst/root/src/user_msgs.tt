@@ -6,17 +6,17 @@ of these lists inside divs if the exists.
 
 %]
 
-[% IF info_msgs %]
+[% IF c.flash.info_msgs %]
     <div class="info_msg">
-        [% FOREACH msg IN info_msgs %]
+        [% FOREACH msg IN c.flash.info_msgs %]
             [% msg %] <br />
         [% END %]
     </div>
 [% END %]
 
-[% IF error_msgs %]
+[% IF c.flash.error_msgs %]
     <div class="error_msg">
-        [% FOREACH msg IN error_msgs %]
+        [% FOREACH msg IN c.flash.error_msgs %]
             [% msg %] <br />
         [% END %]
     </div>
