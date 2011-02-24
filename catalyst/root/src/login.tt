@@ -11,19 +11,17 @@
     </ul>
 </div>
 
+[% INCLUDE 'user_msgs.tt' %]
+[% INCLUDE 'form_errors.tt' %]
+
 <div id="loginform">
 
-    <h2>Login</h2>
-    <p class="form">
-    For already registered users.
-    </p>
+    <h2 class="std">Login</h2>
+
     <form name="login" method="POST" action="[% c.uri_for('/login/authenticate') %]">
         <input type="hidden" name="return_path" value="[% c.req.params.return_path %]" />
         <input type="hidden" name="return_params" value="[% c.req.params.return_params %]" />
         <table>
-            <tr>
-            <td class="error" colspan="2">[% error_msg %]</td>
-            </tr>
 
             <tr>
             <td><label for="username">Username<label></td>
@@ -44,32 +42,38 @@
 
 <div id="registerform">
 
-    <h2>Request new user</h2>
-
-    <span style="font-weight: bolder">[% register_info_msg %]</span>
+    <h2 class="std">Request new user</h2>
 
     <p class="form">
     If you do not already have a username and password you can send a request for one. Be aware that it can take
     some time to process your request as it has to be manually approved.
     </p>
 
-    <form name="register" method="POST" action="/login/register">
-    <input type="hidden" name="return" value="$return" />
-    <input type="hidden" name="params" value="$params" />
+    <form name="register" method="POST" action="[% c.uri_for('/login/register') %]">
         <table>
-            <tr>
-            <td class="error" colspan="2">[% register_error_msg %]</td>
-            </tr>
-
 
             <tr>
-            <td><label for="name">Name</label></td>
-            <td><input type="text" id="name" name="name" value="[% c.req.params.name %]" /></td>
+            <td><label for="email">Username</label></td>
+            <td><input type="text" id="register_username" name="username" value="[% c.req.params.username %]" /></td>
             </tr>
 
             <tr>
             <td><label for="email">Email address</label></td>
-            <td><input type="text" id="email" name="email" value="[% c.req.params.email %]" /></td>
+            <td><input type="text" id="register_email" name="email" value="[% c.req.params.email %]" /></td>
+            </tr>
+
+            <tr>
+            <td><label for="name">Access rights</label></td>
+            <td>
+                <select name="access_rights" id="register_access_rights">
+                    <option value="subscription">Email subscription</option>
+                    <option value="upload">Email subscription, dataset upload and metadata editor</option>
+                </select>
+            </tr>
+
+            <tr>
+            <td><label for="register_realname">Name</label></td>
+            <td><input type="text" id="register_realname" name="realname" value="[% c.req.params.realname %]" /></td>
             </tr>
 
             <tr>
@@ -87,12 +91,18 @@
                         [% SET institution_selected = '' %]
 
                     [% END %]
+                    <option value="other">Other (please specify)</option>
                 </select>
             </tr>
 
             <tr>
+            <td><label for="email">Name of institution (other)</label></td>
+            <td><input type="text" id="register_institution_other" name="institution_other" value="[% c.req.params.institution_other %]" /></td>
+            </tr>
+
+            <tr>
             <td><label for="telephone_number">Telephone number</label></td>
-            <td><input type="text" id="telephone_number" name="telephone_number" value="[% c.req.params.telephone_number %]" /></td>
+            <td><input type="text" id="telephone" name="telephone" value="[% c.req.params.telephone %]" /></td>
             </tr>
 
             <tr>
