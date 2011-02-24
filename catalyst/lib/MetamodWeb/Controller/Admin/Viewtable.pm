@@ -78,16 +78,16 @@ sub viewtbl : Path("/admin/viewtable") :Args(1) {
     my ( $self, $c, $tbl ) = @_;
     $c->stash(template => 'admin/viewtbl.tt');
     $c->stash(current_view => 'Raw');
-    $c->stash(name => $tbl);
+    $c->stash(name => "Metadata table: $tbl");
     my $params = $c->req->parameters;
-    my $single_dataset = 0;
+    my $no_parent_filter = 0;
     if (exists($params->{'refcol'})) {
-       $single_dataset = $params->{'refcol'} eq 'ds_id';
+       $no_parent_filter = $params->{'refcol'} eq 'ds_id';
     }
     my $config = $c->stash->{ mm_config };
     my $dbh            = $config->getDBH();
     my $col = DbTableinfo::get_columnnames($dbh,$tbl);
-    my $sth = compose_sql($dbh,$col,$tbl,$params,$single_dataset,0);
+    my $sth = compose_sql($dbh,$col,$tbl,$params,$no_parent_filter,0);
     $sth->execute();
     my @newcol = @$col;
     if ($tbl eq 'dataset') {
@@ -106,7 +106,7 @@ sub viewtbl : Path("/admin/viewtable") :Args(1) {
        $colindex{$col1} = $ix;
        $ix++;
     }
-    my $wholetable = build_wholetable($c,$col,$tbl,$sth,$dbh,1);
+    my $wholetable = build_wholetable($c,"/admin/viewtable",$col,$tbl,$sth,$dbh,1);
     $c->stash(wholetable => $wholetable);
 }
 
@@ -114,7 +114,7 @@ sub viewdataset : Path("/admin/viewtable/dataset") :Args(1) {
     my ( $self, $c, $dsid ) = @_;
     $c->stash(template => 'admin/viewtbl.tt');
     $c->stash(current_view => 'Raw');
-    $c->stash(name => 'dataset');
+    $c->stash(name => 'Metadata table: dataset');
     my $params = $c->req->parameters;
     my $config = $c->stash->{ mm_config };
     my $dbh            = $config->getDBH();
@@ -123,15 +123,69 @@ sub viewdataset : Path("/admin/viewtable/dataset") :Args(1) {
     $sth->execute();
     push @$col, 'References';
     $c->stash(columns => $col);
-    my $wholetable = build_wholetable($c,$col,'dataset',$sth,$dbh,0);
+    my $wholetable = build_wholetable($c,"/admin/viewtable",$col,'dataset',$sth,$dbh,0);
     $c->stash(wholetable => $wholetable);
 }
 
+sub viewusertable : Path("/admin/viewusertable") :Args(0) {
+    my ( $self, $c ) = @_;
+ 
+    $c->stash(template => 'admin/viewtable.tt');
+    $c->stash(current_view => 'Raw');
+    my $config = $c->stash->{ mm_config };
+    my $dbh            = get_userbase_dbh($config);
+    my $tables_ref     = DbTableinfo::get_tablenames($dbh);
+    my @table_desc = ();
+    foreach my $tbl (@$tables_ref) {
+       my $col_string = "";
+       my $col = DbTableinfo::get_columnnames($dbh,$tbl);
+       foreach my $column_name (@$col) {
+           $col_string .= " " . $column_name;
+       }
+       my $url = $c->uri_for('/admin/viewusertable/' . $tbl);
+       push @table_desc, {name => $tbl, columns => $col_string, url => $url};
+    }
+    $c->stash(table_desc => \@table_desc);
+}
+
+sub viewusertbl : Path("/admin/viewusertable") :Args(1) {
+    my ( $self, $c, $tbl ) = @_;
+    $c->stash(template => 'admin/viewtbl.tt');
+    $c->stash(current_view => 'Raw');
+    $c->stash(name => "User Database table: $tbl");
+    my $params = $c->req->parameters;
+    my $config = $c->stash->{ mm_config };
+    my $dbh            = get_userbase_dbh($config);
+    my $col = DbTableinfo::get_columnnames($dbh,$tbl);
+    my $sth = compose_sql($dbh,$col,$tbl,$params,1,0);
+    $sth->execute();
+    my @newcol = @$col;
+    push @newcol, 'References';
+    $col = \@newcol;
+    $c->stash(columns => $col);
+    my %colindex;
+    my $ix = 0;
+    foreach my $col1 (@$col) {
+       $colindex{$col1} = $ix;
+       $ix++;
+    }
+    my $wholetable = build_wholetable($c,"/admin/viewusertable",$col,$tbl,$sth,$dbh,0);
+    $c->stash(wholetable => $wholetable);
+}
+
+sub get_userbase_dbh {
+    my ($config) = @_;
+    my $dbname = $config->get("USERBASE_NAME") or die "Missing USERBASE_NAME in master_config";
+    my $user   = $config->get("PG_ADMIN_USER") or die "Missing PG_ADMIN_USER in master_config";
+    my $dbh = DBI->connect( "dbi:Pg:dbname=" . $dbname . " " . $config->get("PG_CONNECTSTRING_PERL"), $user, "" ) or die $DBI::errstr;
+    return $dbh;
+}
+
 sub compose_sql {
-    my ($dbh,$col,$tbl,$params,$single_dataset,$dsparent) = @_;
+    my ($dbh,$col,$tbl,$params,$no_parent_filter,$dsparent) = @_;
     my $sql = 'SELECT ' . join(',',@$col) . ' FROM ' . $tbl;
     my $where_is_used = 0;
-    if ($tbl eq 'dataset' and !$single_dataset) {
+    if ($tbl eq 'dataset' and !$no_parent_filter) {
        $sql .= ' WHERE ds_parent = ' . $dsparent;
        $where_is_used = 1;
     }
@@ -161,7 +215,7 @@ sub compose_sql {
 }
 
 sub build_wholetable {
-    my ($c,$col,$tbl,$sth,$dbh,$children_column) = @_;
+    my ($c,$baseurl,$col,$tbl,$sth,$dbh,$children_column) = @_;
     my %colindex;
     my $ix = 0;
     foreach my $col1 (@$col) {
@@ -180,7 +234,7 @@ sub build_wholetable {
            my $dsparent = $result[$colindex{'ds_parent'}];
            my $childrenlink = "";
            if ($dsparent == 0) {
-              $childrenlink = '<a href="' . $c->uri_for('/admin/viewtable/' . $tbl . '/' . $dsid) . '">Children</a>';
+              $childrenlink = '<a href="' . $c->uri_for($baseurl . '/' . $tbl . '/' . $dsid) . '">Children</a>';
            }
            unshift @result, $childrenlink;
        }
@@ -196,7 +250,7 @@ sub build_wholetable {
               $refval1 = $result[$colix];
            }
            $references .= '<a href="' .
-                 $c->uri_for('/admin/viewtable/' . $foreign_table_name,
+                 $c->uri_for($baseurl . '/' . $foreign_table_name,
                      {refcol => $foreign_column_name,
                       refval => $refval1}
                  ) .

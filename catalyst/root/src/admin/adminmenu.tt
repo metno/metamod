@@ -19,6 +19,7 @@
     <a href="[% c.uri_for('/admin/showconfig') %]">View master_config.txt</a><br>
     <a href="[% c.uri_for('/admin/showlog') %]">View METAMOD log</a><br>
     <a href="[% c.uri_for('/admin/viewtable') %]">View metadata table</a><br>
+    <a href="[% c.uri_for('/admin/viewusertable') %]">View userbase table</a><br>
 </td>
 </tr>
 </table>
