@@ -1,0 +1,59 @@
+[% INCLUDE admin/admin_header.tt %]
+
+<h1 class="std">User registration approval</h1>
+<p>
+
+</p>
+
+<table>
+
+<tr>
+    <td>Username</td>
+    <td>[% userbase_user.u_loginname %]</td>
+</tr>
+
+
+<tr>
+    <td>Name</td>
+    <td>[% userbase_user.u_name %]</td>
+</tr>
+
+<tr>
+    <td>Email</td>
+    <td>[% userbase_user.u_email %]</td>
+</tr>
+
+<tr>
+    <td>Institution</td>
+    <td>[% userbase_user.u_institution %]</td>
+</tr>
+
+<tr>
+    <td>Telephone</td>
+    <td>[% userbase_user.u_telephone %]</td>
+</tr>
+
+<tr>
+    <td>Roles</td>
+    <td>
+    [% SET roles = userbase_user.roles() %]
+    [% FOREACH role IN roles %]
+        [% role.role %]<br />
+    [% END %]
+    </td>
+</tr>
+</table>
+
+[% IF !userbase_user.u_password %]
+
+    <form name="confirm" method="POST" action="[% c.uri_for('/admin/confirm_user', userbase_user.u_id ) %]">
+    <input type="submit" value="Approve" />
+    </form>
+
+[% ELSE %]
+    <p>
+    The user has already been approved or declined.
+    </p>
+[% END %]
+
+[% INCLUDE admin/admin_footer.tt %]

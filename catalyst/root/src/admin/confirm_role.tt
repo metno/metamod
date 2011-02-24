@@ -1,0 +1,48 @@
+[% INCLUDE admin/admin_header.tt %]
+
+<h1 class="std">Role approval</h1>
+
+[% INCLUDE 'user_msgs.tt' %]
+
+<table>
+
+<tr>
+    <td>Username</td>
+    <td>[% user_info.username %]</td>
+</tr>
+
+
+<tr>
+    <td>Name</td>
+    <td>[% user_info.name %]</td>
+</tr>
+
+<tr>
+    <td>Email</td>
+    <td>[% user_info.email %]</td>
+</tr>
+
+<tr>
+    <td>Institution</td>
+    <td>[% user_info.institution %]</td>
+</tr>
+
+<tr>
+    <td>Telephone</td>
+    <td>[% user_info.telephone %]</td>
+</tr>
+</table>
+
+[% IF !has_role %]
+
+    <form name="confirm" method="POST" action="[% c.uri_for('/admin/confirm_role', role, user_info.username ) %]">
+    <input type="submit" value="Approve user for role '[% role %]'" />
+    </form>
+
+[% ELSE %]
+    <p>
+    The user already has this role.
+    </p>
+[% END %]
+
+[% INCLUDE admin/admin_footer.tt %]
