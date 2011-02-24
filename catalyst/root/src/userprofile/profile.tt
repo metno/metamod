@@ -1,0 +1,72 @@
+<h2 class="std">User information</h2>
+
+[% INCLUDE 'user_msgs.tt' %]
+[% INCLUDE 'form_errors.tt' %]
+
+<form name="user_info" method="POST" action="[% c.uri_for('/userprofile' ) %]"><a></a>
+
+<table class="plain">
+<tr>
+    <td><label>Username</label></td>
+    <td>[% user_info.username %]</td>
+</tr>
+
+
+<tr>
+    <td><label for="username">Name</label></td>
+    <td><input type="text" name="name" id="name" value="[% user_info.name %]" /></td>
+</tr>
+
+<tr>
+    <td><label for="email">Email</label></td>
+    <td><input type="text" name="email" id="email" value="[% user_info.email %]" /></td>
+</tr>
+
+[% SET institutions = login_ui_utils.user_institutions() %]
+[% SET institution_is_other = 1 %]
+<tr>
+    <td><label for="institution_name">Name of institution</label></td>
+    <td>
+    <select id="institution_name" name="institution_name">
+        [% FOREACH institution IN institutions %]
+            [% IF user_info.institution == institution.key %]
+                [% SET institution_selected = 'selected="selected"' %]
+                [% SET institution_is_other = 0 %]
+            [% END %]
+            <option [% institution_selected %] value="[% institution.key %]">[% institution.value %]</option>
+
+            [%# Template toolkit lacks lexical scoping so need to reset the variable here. %]
+            [% SET institution_selected = '' %]
+
+        [% END %]
+        <option value="other" [% institution_is_other ? 'selected="selected"' : '' %] >Other (please specify)</option>
+    </select>
+</tr>
+
+<tr>
+    <td><label for="email">Name of institution (other)</label></td>
+    <td><input type="text" id="register_institution_other" name="institution_other" value="[% institution_is_other ? user_info.institution : '' %]" /></td>
+</tr>
+
+<tr>
+    <td><label for="telephone">Telephone</label></td>
+    <td><input type="text" name="telephone" id="telephone" value="[% user_info.telephone %]" /></td>
+</tr>
+
+<tr>
+    <td><label>Roles<label></td>
+    <td>
+    [% FOREACH role IN user_info.roles %]
+        [% role %]<br />
+    [% END %]
+    </td>
+</tr>
+<tr>
+    <td colspan="2">
+    <input type="submit" value="Save" />
+    <input type="reset" value="Reset" />
+    </td>
+</tr>
+
+</table>
+</form>

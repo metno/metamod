@@ -1,0 +1,5 @@
+<div class="level2-menu" id="userprofile-menu">
+
+<div class="level2-menu-item"><a href="[% c.uri_for('/userprofile/password') %]">Change password</a></div>
+
+</div>

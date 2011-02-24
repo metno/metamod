@@ -1,0 +1,24 @@
+<h2 class="std">Request role '[% role %]'</h2>
+
+[% INCLUDE 'user_msgs.tt' %]
+
+[% IF c.check_user_roles(role) %]
+
+<p>
+You already have this role in this application.
+</p>
+
+[% ELSE %]
+
+<p>
+
+Do you want to have the role '[% role %]' in this application? Your request
+will need to be manually approved before it can be activated.
+
+</p>
+
+<form name="role" method="POST" action="[% c.uri_for('/userprofile/role', role )%]">
+<input type="submit" value="Request role" />
+</form>
+
+[% END %]
