@@ -34,7 +34,7 @@ use warnings;
 
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 
-our @EXPORT_OK = qw(findFiles isNetcdf trim getFiletype remove_cr_from_file human_readable_size);
+our @EXPORT_OK = qw(findFiles isNetcdf trim getFiletype remove_cr_from_file human_readable_size random_string);
 
 use File::Find qw();
 use POSIX qw();
@@ -200,6 +200,46 @@ sub human_readable_size {
     $size = sprintf( "%.2f", $size );
 
     return "$size $args[0]";
+
+}
+
+=head2 random_string($length, $character_list)
+
+Generate a random string.
+
+=over
+
+=item $length (optional, default=8)
+
+The totalt length of the generated string.
+
+=item @character_list (optional, default = (a...z,0...9) )
+
+The list to draw characters from.
+
+=item return
+
+A random string of the specified length.
+
+=back
+
+=cut
+sub random_string {
+    my ($length, @character_list) = @_;
+
+    $length = 10 if !$length;
+
+    @character_list = ('a' .. 'z', 0 .. 9) if !@character_list;
+    my $list_length = @character_list;
+
+    my $string = '';
+
+    foreach (1..$length){
+        my $rand_index = int(rand($list_length));
+        $string .= $character_list[$rand_index];
+    }
+
+    return $string;
 
 }
 
