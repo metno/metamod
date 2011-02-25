@@ -111,6 +111,64 @@ sub _add_msgs {
     return;
 }
 
+=head2 $self->add_form_errors($c, $validator)
+
+Add form validation errors to the flash for later display.
+
+=over
+
+=item $c
+
+The Catalyst context object.
+
+=item $validator
+
+A C<MetamodWeb::Utils::FormValidator> where the function C<validate()> has
+already been called and the form was not validated successfully.
+
+=item return
+
+Always returns true. Dies if the $validator state is not as expected.
+
+=back
+
+=cut
+sub add_form_errors {
+    my ($self, $c, $validator) = @_;
+
+    my $result = $validator->result();
+    if( !defined $result ){
+        die 'Appears that you are adding form errors before running validate(). Not allowed';
+    }
+
+    if( $result->success() ){
+        die 'Appears that you are trying to add form errors for a valid form. Not allowed';
+    }
+
+    my %error_messages = ();
+
+    my @missing = $result->missing();
+    foreach my $field (@missing) {
+        $error_messages{$field} = { label => $validator->field_label($field), msg => 'Missing required input' };
+    }
+
+    my %msgs = $result->msgs();
+    my $invalid = $result->invalid();
+    while( my ($field, $failed_constraints) = each %$invalid ){
+
+        #it can in theory be more than one constraint per field.
+        my $msg = '';
+        foreach my $failed_constraint (@$failed_constraints){
+            $msg .= $msgs{$failed_constraint};
+        }
+        $error_messages{$field} = { label => $validator->field_label($field), msg => $msg };
+
+    }
+
+    $c->flash( 'form_errors' => \%error_messages );
+    return 1;
+}
+
 
 =head1 LICENSE
 
