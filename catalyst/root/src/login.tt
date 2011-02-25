@@ -12,7 +12,6 @@
 </div>
 
 [% INCLUDE 'user_msgs.tt' %]
-[% INCLUDE 'form_errors.tt' %]
 
 <div id="loginform">
 
@@ -53,8 +52,8 @@
         <table>
 
             <tr>
-            <td><label for="email">Username</label></td>
-            <td><input type="text" id="register_username" name="username" value="[% c.req.params.username %]" /></td>
+            <td><label for="register_username">Username</label></td>
+            <td><input type="text" id="register_username" name="register_username" value="[% c.req.params.register_username %]" /></td>
             </tr>
 
             <tr>
@@ -63,17 +62,17 @@
             </tr>
 
             <tr>
-            <td><label for="name">Access rights</label></td>
+            <td><label for="access_rights">Access rights</label></td>
             <td>
-                <select name="access_rights" id="register_access_rights">
+                <select name="access_rights" id="access_rights">
                     <option value="subscription">Email subscription</option>
                     <option value="upload">Email subscription, dataset upload and metadata editor</option>
                 </select>
             </tr>
 
             <tr>
-            <td><label for="register_realname">Name</label></td>
-            <td><input type="text" id="register_realname" name="realname" value="[% c.req.params.realname %]" /></td>
+            <td><label for="realname">Name</label></td>
+            <td><input type="text" id="realname" name="realname" value="[% c.req.params.realname %]" /></td>
             </tr>
 
             <tr>
@@ -96,12 +95,12 @@
             </tr>
 
             <tr>
-            <td><label for="email">Name of institution (other)</label></td>
-            <td><input type="text" id="register_institution_other" name="institution_other" value="[% c.req.params.institution_other %]" /></td>
+            <td><label for="institution_other">Name of institution (other)</label></td>
+            <td><input type="text" id="institution_other" name="institution_other" value="[% c.req.params.institution_other %]" /></td>
             </tr>
 
             <tr>
-            <td><label for="telephone_number">Telephone number</label></td>
+            <td><label for="telephone">Telephone number</label></td>
             <td><input type="text" id="telephone" name="telephone" value="[% c.req.params.telephone %]" /></td>
             </tr>
 

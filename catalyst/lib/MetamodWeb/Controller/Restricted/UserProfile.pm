@@ -82,12 +82,6 @@ sub user_profile_GET : Private {
 
     $c->stash( user_info => \%user_info );
 
-    # if the validation failed in the previous request we validate again to get the error
-    # messages.
-    if ( $c->flash->{validation_failure} ) {
-        $self->validate_user_profile($c);
-    }
-
     $c->stash( template => 'userprofile/profile.tt' );
 }
 
@@ -96,7 +90,7 @@ sub user_profile_POST : Private {
 
     my $result = $self->validate_user_profile($c);
     if ( !$result->success() ) {
-        $c->flash( validation_failure => 1 );
+        $self->add_form_errors($c, $c->stash->{validator} );
         return $c->res->redirect( $c->uri_for( '/userprofile', $c->req->params ) );
     }
 

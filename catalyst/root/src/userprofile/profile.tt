@@ -1,7 +1,6 @@
 <h2 class="std">User information</h2>
 
 [% INCLUDE 'user_msgs.tt' %]
-[% INCLUDE 'form_errors.tt' %]
 
 <form name="user_info" method="POST" action="[% c.uri_for('/userprofile' ) %]"><a></a>
 
@@ -13,7 +12,7 @@
 
 
 <tr>
-    <td><label for="username">Name</label></td>
+    <td><label for="name">Name</label></td>
     <td><input type="text" name="name" id="name" value="[% user_info.name %]" /></td>
 </tr>
 
@@ -44,7 +43,7 @@
 </tr>
 
 <tr>
-    <td><label for="email">Name of institution (other)</label></td>
+    <td><label for="institution_other">Name of institution (other)</label></td>
     <td><input type="text" id="register_institution_other" name="institution_other" value="[% institution_is_other ? user_info.institution : '' %]" /></td>
 </tr>
 

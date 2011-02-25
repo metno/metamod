@@ -55,14 +55,6 @@ sub auto :Private {
     my $ui_utils = MetamodWeb::Utils::UI::Login->new( { config => $mm_config, c => $c } );
     $c->stash( login_ui_utils => $ui_utils, );
 
-    # If the valiation failed on the previous page we store that in the flash.
-    # We cannot save the validator in the flash since it can contain code references
-    # that are not handled by the Perl serialiser.
-    my $validation_failure = $c->flash->{validation_failure};
-    if( $validation_failure ){
-        $self->validate_new_user($c);
-    }
-
     return 1;
 
 }
@@ -132,7 +124,7 @@ sub register : Path('register') :Args(0) {
 
     my $result = $self->validate_new_user($c);
     if( !$result->success() ){
-        $c->flash( validation_failure => 1 );
+        $self->add_form_errors($c, $c->stash->{validator});
         return $c->res->redirect($c->uri_for('/login', $c->req->params ) );
     }
 
@@ -146,7 +138,7 @@ sub register : Path('register') :Args(0) {
         $institution = $valid_fields->{institution_name};
     }
 
-    my $users = $c->model('Userbase::Usertable')->search( { u_loginname => $valid_fields->{username} } );
+    my $users = $c->model('Userbase::Usertable')->search( { u_loginname => $valid_fields->{register_username} } );
     if( $users->count() != 0 ){
         $self->add_error_msgs($c, "The username has already been taken. Please choose another" );
         return $c->res->redirect($c->uri_for('/login', $c->req->params ));
@@ -156,7 +148,7 @@ sub register : Path('register') :Args(0) {
         a_id => $mm_config->get('APPLICATION_ID'),
         u_name => $valid_fields->{realname},
         u_email => $valid_fields->{email},
-        u_loginname => $valid_fields->{username},
+        u_loginname => $valid_fields->{register_username},
         u_institution => $institution,
         u_telephone => $valid_fields->{telephone},
     };
@@ -183,18 +175,18 @@ sub validate_new_user : Private {
     my ($self, $c) = @_;
 
     my %form_profile = (
-        required => [qw( username email access_rights realname )],
+        required => [qw( register_username email access_rights realname )],
         optional => [qw( institution_name institution_other telephone ) ],
         constraint_methods => {
             email => email(),
-            username => sub { # use a sub so we can set the constraint name and a message
+            register_username => sub { # use a sub so we can set the constraint name and a message
                 my ($dfv, $val) = @_;
                 $dfv->set_current_constraint_name('username_constraint');
                 return $val =~ /^\w{3,20}$/;
             },
         },
         labels => {
-            username => 'Username',
+            register_username => 'Username',
             email => 'Email',
             access_right => 'Access rights',
             institution => 'Institution name',
