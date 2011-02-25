@@ -1,6 +1,6 @@
 <tr>
     <td class="quest_label">
-        <label for="quest_[% element.name %]">[% element.label | html %]</label>
+        <label for="[% element.name %]">[% element.label | html %]</label>
     </td>
 </tr>
 
@@ -8,9 +8,9 @@
     <td class="quest_field">
         <input
             type="text"
-            name="quest_[% element.name %]"
-            id="quest_[% element.name %]"
-            value="[% quest_data.item( element.name ).0 | html %]"
+            name="[% element.name %]"
+            id="[% element.name %]"
+            value="[% quest_data.item( element.name ) | html %]"
             size="[% element.length %]"
             maxlength="[% element.size %]"
             />

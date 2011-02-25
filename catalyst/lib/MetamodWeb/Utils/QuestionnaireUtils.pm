@@ -540,16 +540,20 @@ sub _load_metadata {
     my $dataset = $self->load_dataset($dataset_path);
 
     my %metadata = $dataset->getMetadata();
-    my %info = $dataset->getInfo();
-    while( my($key, $value) = each %info ){
-        $metadata{$key} = [$value];
+    while( my( $key, $value) = each %metadata ){
+        if( 1 == @$value){
+            $metadata{$key} = $value->[0];
+        }
     }
 
+    my %info = $dataset->getInfo();
+    %metadata = (%metadata, %info);
+
     my $wms_info = $dataset->getWMSInfo();
-    $metadata{wms_info} = [$wms_info] if $wms_info;
+    $metadata{wms_info} = $wms_info if $wms_info;
 
     my $projection_info = $dataset->getProjectionInfo();
-    $metadata{projection_info} = [$projection_info] if $projection_info;
+    $metadata{projection_info} = $projection_info if $projection_info;
 
     return \%metadata;
 

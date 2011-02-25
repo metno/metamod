@@ -77,8 +77,7 @@ sub questionnaire_GET :Private {
 
     my $config = $quest_utils->config_for_id($config_id);
 
-    my $quest_response  = $quest_utils->quest_data();
-    my %merged_response = ( %$current_data, %$quest_response );
+    my %merged_response = ( %$current_data, %{ $c->req->params } );
 
     $c->stash(
             quest_config_file => $config->{ config_file },
@@ -94,15 +93,17 @@ sub questionnaire_POST :Private {
 
     my $config_id   = $c->stash->{config_id};
     my $quest_utils = $c->stash->{quest_utils};
-    my $quest_data  = $quest_utils->quest_data();
+    my $config_file   = $c->stash->{quest_config_file};
 
-    #  need to use forward since Metamod::Controller::Questionnaire is not a super class of this
-    #  controller (and it shouldn't be either)
-    my $is_valid    = $c->forward('MetamodWeb::Controller::Questionnaire', 'validate_response' );
+    my $validation_profile = $quest_utils->quest_validator($config_file);
+    my $validator          = MetamodWeb::Utils::FormValidator->new( validation_profile => $validation_profile );
+    my $result             = $validator->validate($c->req->params);
 
-    if( !$is_valid ) {
+    if( !$result->success() ) {
+        $self->add_form_errors($c, $validator );
         return $c->res->redirect($c->uri_for('/editor', $config_id, 'restricted', $userbase_ds_id, $c->req->params ));
     }
+    my $quest_data = $result->valid();
 
     my $success = $quest_utils->save_dataset_metadata( $config_id, $userbase_ds_id, $quest_data );
     if ($success) {

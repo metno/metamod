@@ -67,14 +67,6 @@ sub check_config : Chained('/') : PathPart('editor') : CaptureArgs(1) {
 
     $c->stash( quest_config => $config, quest_config_file => $config->{config_file}, config_id => $config_id );
 
-    # If the valiation failed on the previous page we store that in the flash.
-    # We cannot save the validator in the flash since it can contain code references
-    # that are not handled by the Perl serialiser.
-    my $validation_failure = $c->flash->{validation_failure};
-    if( $validation_failure ){
-        $self->validate_response($c);
-    }
-
 }
 
 sub validate_response : Private {
@@ -82,19 +74,13 @@ sub validate_response : Private {
 
     my $quest_utils   = $c->stash->{quest_utils};
     my $config_file   = $c->stash->{quest_config_file};
-    my $response_data = $quest_utils->quest_data();
 
     my $validation_profile = $quest_utils->quest_validator($config_file);
     my $validator          = MetamodWeb::Utils::FormValidator->new( validation_profile => $validation_profile );
-    my $validation_res     = $validator->validate($response_data);
+    my $validation_res     = $validator->validate($c->req->params);
 
-    if ( $validation_res->has_invalid() || $validation_res->has_missing() ) {
-        $c->stash( validator => $validator );
-        $c->flash( validation_failure => 1 );
-        return;
-    }
-
-    return 1;
+    $c->stash( validator => $validator );
+    return $validation_res;
 
 }
 
@@ -113,9 +99,7 @@ sub questionnaire_GET :Private {
     if ($response_key) {
 
         my $current_data    = $quest_utils->load_anon_metadata( $config_id, $response_key ) || {};
-        my $quest_response  = $quest_utils->quest_data();
-        my %merged_response = ( %$current_data, %$quest_response );
-
+        my %merged_response = ( %$current_data, %{ $c->req->params() } );
         $c->stash(
             template       => 'questionnaire/questionnaire.tt',
             quest_data     => \%merged_response,
@@ -134,10 +118,11 @@ sub questionnaire_POST : Private {
     my $response_key = $c->req->params->{response_key};
 
     my $quest_utils = $c->stash->{quest_utils};
-    my $quest_data  = $quest_utils->quest_data();
-    my $is_valid    = $self->validate_response($c);
+    my $result    = $self->validate_response($c);
+    my $quest_data = $result->valid();
 
-    if ( !$is_valid ) {
+    if ( !$result->success() ) {
+        $self->add_form_errors($c, $c->stash->{validator});
         return $c->res->redirect( $c->uri_for( '/editor', $config_id, $c->req->params ) );
     }
 

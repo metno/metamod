@@ -1,16 +1,16 @@
 <tr>
     <td class="quest_label">
-        <label for="quest_[% element.name %]">[% element.label | html %]</label>
+        <label for="[% element.name %]">[% element.label | html %]</label>
     </td>
 </tr>
 
 <tr>
     <td class="quest_field">
         <textarea
-            name="quest_[% element.name %]"
-            id="quest_[% element.name %]"
+            name="[% element.name %]"
+            id="[% element.name %]"
             rows="[% element.height %]"
             cols="[% element.length %]"
-            >[% quest_data.item( element.name ).0 | html %]</textarea>
+            >[% quest_data.item( element.name ) | html %]</textarea>
     </td>
 </tr>

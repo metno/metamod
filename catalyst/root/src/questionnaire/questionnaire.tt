@@ -11,30 +11,6 @@
 
 [% INCLUDE 'user_msgs.tt' %]
 
-[% IF validator && !validator.result.success() %]
-
-    [% SET result = validator.result %]
-    <div class="error_msg">
-
-    [% IF result.has_missing() %]
-        <p>The following fields are required, but are missing values:</p>
-        <ul>
-        [% FOREACH missing IN result.missing()  %]
-            <li>[% validator.field_label( missing ) %]</li>
-        [% END %]
-        </ul>
-    [% END %]
-    [% IF result.has_invalid() %]
-        <p>The following fields where invalid:</p>
-        <ul>
-        [% FOREACH invalid_field IN result.invalid()  %]
-            <li>[% validator.field_label( invalid_field ) %] : [% result.invalid( invalid_field ).0 %]</li>
-        [% END %]
-        </ul>
-    [% END %]
-    </div>
-[% END %]
-
 <form name="questionnaire" method="POST" action="[% quest_save_url %]">
 <input type="hidden" name="response_key" id="response_key" value="[% c.req.params.response_key %]" />
 
