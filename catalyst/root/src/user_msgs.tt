@@ -6,6 +6,28 @@ of these lists inside divs if the exists.
 
 %]
 
+<script type="text/javascript">
+function markFormErrors(fieldNames){
+
+    var labelSelectors = [];
+
+    for( var i = 0; i < fieldNames.length; i++ ){
+        var fieldName = fieldNames[i];
+
+        // we make the assumption that the name of the form field is identical
+        // to the name of the form field.
+        var selector = 'label[for="' + fieldName + '"]'
+        labelSelectors.push(selector);
+    }
+    var selectors = labelSelectors.join(', ');
+
+    jQuery(selectors).attr('style', 'color: red;');
+}
+
+</script>
+
+
+
 [% IF c.flash.info_msgs %]
     <div class="info_msg">
         [% FOREACH msg IN c.flash.info_msgs %]
@@ -14,10 +36,31 @@ of these lists inside divs if the exists.
     </div>
 [% END %]
 
-[% IF c.flash.error_msgs %]
+[% IF c.flash.error_msgs || c.flash.form_errors %]
     <div class="error_msg">
         [% FOREACH msg IN c.flash.error_msgs %]
             [% msg %] <br />
         [% END %]
+
+        [% IF c.flash.form_errors %]
+
+            <p>The form contains the following errors.</p>
+            <ul>
+            [% SET error_fields = [] %]
+            [% FOREACH error IN c.flash.form_errors %]
+                <li>
+                [% error.value.label %] - [% error.value.msg %]
+                [% error_fields.push('"' _ error.key _ '"' ) %]
+                </li>
+            [% END %]
+
+            <script type="text/javascript">
+        jQuery(document).ready(function(){
+           markFormErrors([ [% error_fields.join(', ') %] ])
+        });
+        </script>
+            </ul>
+        [% END %]
+
     </div>
 [% END %]
