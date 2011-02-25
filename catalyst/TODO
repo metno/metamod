@@ -2,6 +2,8 @@
 Things to do in Catalyst version of Metamod
 -------------------------------------------
 
+* security filters for appid/ownertag?
+
 * File Upload [GA]
   * upload_indexer + webservice
   * dataset admin

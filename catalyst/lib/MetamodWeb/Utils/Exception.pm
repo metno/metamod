@@ -41,6 +41,7 @@ The exception string as thrown by die, croak and confess.
 =back
 
 =cut
+
 sub error_from_exception {
     my ($exception) = @_;
 

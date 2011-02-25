@@ -34,12 +34,12 @@ blah blah blah
 
 use Moose;
 use namespace::autoclean;
-
 use MetamodWeb::Utils::UploadUtils;
+use MetamodWeb::Utils::Exception qw(error_from_exception);
 use Data::Dumper;
 #use Devel::Peek;
 
-BEGIN { extends 'Catalyst::Controller' };
+BEGIN { extends 'MetamodWeb::BaseController::Base' };
 
 sub auto :Private {
     my ( $self, $c ) = @_;
@@ -179,24 +179,30 @@ sub dataset :Path('/upload/dataset') :ActionClass('REST') {
 sub dataset_GET {
     my ( $self, $c ) = @_;
     my $dataset = { };
+    my $para = $c->request->params;
+    my $ds_id = $c->stash->{ds_id};
 
-    if ( my $id = $c->stash->{ds_id} ) {
-        # FIXME: rewrite this later into the Userbase::Dataset model
-        if ( my $row = $c->model('Userbase')->resultset('Dataset')->find({ ds_id => $id }) ) {
-            $$dataset{'ds_name'} = $row->get_column('ds_name');
+    if ( keys %$para ) { # we got errors, or maybe a timeout
+
+        print STDERR Dumper( $para );
+        $c->stash( dataset => $para );
+
+    } elsif ($ds_id) { # db lookup
+
+        $dataset = $c->model('Userbase')->resultset('Dataset')->get_ds($ds_id);
+        if ($dataset) {
+            $c->stash( dataset => $dataset );
+        } else {
+            $c->detach( 'Root', 'default' );
         }
-        foreach my $type ( qw(DSKEY CATALOG LOCATION) ) {
-            if ( my $row = $c->model('Userbase')->resultset('Infods')->find({ ds_id => $id, i_type => $type }) ) {
-                $$dataset{lc $type} = $row->get_column('i_content');
-            }
-        }
+
+    } else {
+
+        # just show blank form
+
     }
-    #print STDERR Dumper($dataset);
 
-    $c->stash(
-        template => 'upload/dataset.tt',
-        dataset => $dataset,
-    );
+    $c->stash( template => 'upload/dataset.tt' );
 
 }
 
@@ -204,13 +210,11 @@ sub dataset_POST  {
     my ( $self, $c ) = @_;
 
     my $para = $c->request->params;
-    my $mm_config = $c->stash->{ mm_config };
-    my $applic_id = $mm_config->get('APPLICATION_ID');
     my $ds_id = $c->stash->{ds_id};
 
     my $row = {
+        a_id => $c->stash->{mm_config}->get('APPLICATION_ID'),
         u_id => $c->user->u_id(),
-        a_id => $applic_id,
     };
 
     print STDERR Dumper $row, $para;
@@ -218,36 +222,30 @@ sub dataset_POST  {
     my $rs = $c->model('Userbase')->resultset('Dataset');
 
     if ($ds_id) {
-        my $ds = $rs->find( $ds_id );
-        $ds->update( $row, {key => 'dataset_pkey'} ) or die "Couldn't update dataset";
+        # update existing dataset
+        if ( my $ds = $rs->find( $ds_id ) ) {
+            $ds->set_info_ds($para);
+        } else {
+            $c->detach( 'Root', 'default' );
+        }
     } else {
-        $$row{ds_name} = $$para{ds_name} or die "Missing ds_name";
-        my $ds = $rs->create( $row, {key => 'dataset_pkey'} );
-        $ds_id = $ds->get_column('ds_id') or die "Didn't get ds_id from database";
-    }
-
-    $rs = $c->model('Userbase')->resultset('Infods');
-
-    foreach ( qw(DSKEY CATALOG LOCATION) ) {
-        if ( my $val = $$para{lc $_} ) {
-            printf STDERR "** %s = \"%s\"\n", $_, $val;
-            my $infods = $rs->search( { ds_id => $ds_id, i_type => $_ } )->first();
-            if ( !defined $infods ) {
-                $rs->create( { ds_id => $ds_id, i_type => $_, i_content => $val } );
-            } else {
-                $infods->update( { i_content => $val } );
-            }
+        # create new dataset
+        eval {
+            $ds_id = $rs->create_ds( $para, $row );
+        };
+        if ($@) {
+            $self->add_error_msgs( $c, error_from_exception($@) );
+            $c->response->redirect( $c->uri_for( "/upload/dataset", $para ) );
+            return;
         }
     }
 
-    #$c->stash(
-    #    template => 'upload/dataset.tt',
-    #    #data => $data,
-    #);
-
+    # success - now go back and read dataset from db
     $c->response->redirect( $c->stash->{root} . "/$ds_id");
 
 }
+
+
 
 =head1 LICENSE
 

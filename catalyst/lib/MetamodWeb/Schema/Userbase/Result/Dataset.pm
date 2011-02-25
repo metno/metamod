@@ -67,8 +67,70 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
+use Carp;
 
-=head2 $self->dataset_key($new_key?)
+=head2 $self->get_info_ds
+
+Get info rows for dataset (only those relevant for editing - e.g. not wmsinfo)
+
+=cut
+
+sub get_info_ds {
+    my $self = shift;
+    my $dataset = {};
+
+    my $ds_id = $self->get_column('ds_id');
+    $$dataset{'ds_name'} = $self->get_column('ds_name');
+
+    foreach my $type ( qw(DSKEY CATALOG LOCATION) ) {
+        if ( my $info = $self->infods()->find({ ds_id => $ds_id, i_type => $type }) ) {
+            $$dataset{lc $type} = $info->get_column('i_content');
+        }
+    }
+
+    return $dataset;
+}
+
+=head2 $self->set_info_ds($params)
+
+Set info rows for dataset
+
+=over
+
+=item $para
+
+Ref to hash with info to set, e.g. from CGI params (keys in lower case)
+
+=item return
+
+The dataset id
+
+=back
+
+=cut
+
+sub set_info_ds {
+    my $self = shift;
+    my $para = shift or croak "Missing params";
+
+    my $ds_id = $self->get_column('ds_id');
+    my $rs = $self->infods;
+
+    foreach ( qw(DSKEY CATALOG LOCATION) ) {
+        #printf STDERR "** %s = \"%s\"\n", $_, $val;
+        my $val = $$para{lc $_};
+        my $infods = $rs->search( { ds_id => $ds_id, i_type => $_ } )->first();
+        if ( !defined $infods ) {
+            $rs->create( { ds_id => $ds_id, i_type => $_, i_content => $val } );
+        } else {
+            $infods->update( { i_content => $val } );
+        }
+    }
+
+    return $ds_id;
+}
+
+=head2 $self->dataset_key($new_key?) B<[DEPRECATED]>
 
 Get or set the dataset key for dataset. If a $new_key is not provided it will
 just get the current key.
@@ -117,7 +179,7 @@ sub dataset_key {
     }
 }
 
-=head2 $self->validate_dskey($key)
+=head2 $self->validate_dskey($key) B<[DEPRECATED]>
 
 Check if dataset key is valid (always true if no key set).
 

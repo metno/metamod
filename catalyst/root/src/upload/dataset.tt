@@ -4,11 +4,9 @@
     <h1 class="std">Create dataset</h1>
 [% END %]
 
-<form action="[% root %]/[% ds_id %]" method="POST" class="datasetedit">
+<form name="dataset" action="[% root %]/[% ds_id %]" method="POST" class="datasetedit">
 
-[% IF dataset.mesg %]
-    <div style="color:red; font-weight:bold; padding-bottom: 10px;">[% dataset.mesg%]</div>
-[% END %]
+[% INCLUDE user_msgs.tt formvalid = "foo" %]
 
 <table>
 
