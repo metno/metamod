@@ -113,7 +113,7 @@ Action for testing uploaded files
 
 =cut
 
-sub test :Path('/upload/test') :ActionClass('REST') : Args(0) {
+sub test :Path('/upload/test') :ActionClass('REST') :Args(0) {
     my ( $self, $c ) = @_;
 }
 
@@ -162,13 +162,65 @@ sub test_POST  {
 
 }
 
+
 =head2 /upload/dataset
 
-Action for uploading files
+Action for dealing with dataset administration.
+
+Without parameters, list (GET) or create (POST) datasets.
+
+With id as parameter, display (GET) or edit (POST) the dataset.
 
 =cut
 
-sub dataset :Path('/upload/dataset') :ActionClass('REST') {
+# all datasets
+
+sub dataset :Path('/upload/dataset') :ActionClass('REST') :Args(0) {
+    my ( $self, $c ) = @_;
+    $c->stash( root => $c->uri_for('/upload/dataset') ); # needed for form action in template
+}
+
+sub dataset_GET { # show list + blank form for creating new datasets
+    my ( $self, $c ) = @_;
+    my $dataset = { };
+    my $para = $c->request->params;
+
+    if ( keys %$para ) {
+        # we got errors, or maybe a login timeout
+        $c->stash( dataset => $para ); # repopulate form
+    }
+
+    $c->stash( template => 'upload/dataset.tt' );
+
+}
+
+sub dataset_POST  { # create a new dataset
+    my ( $self, $c ) = @_;
+
+    my $para = $c->request->params;
+
+    my $row = {
+        a_id => $c->stash->{mm_config}->get('APPLICATION_ID'),
+        u_id => $c->user->u_id(),
+    };
+
+    my $rs = $c->model('Userbase')->resultset('Dataset');
+
+    my $ds_id = eval { $rs->create_ds( $para, $row ) };
+
+    if ($@) {
+        # create record failed
+        $self->add_error_msgs( $c, error_from_exception($@) );
+        $c->response->redirect( $c->uri_for('/upload/dataset', $para ) );
+    } else {
+        # success - now go back and read dataset from db
+        $c->response->redirect( $c->uri_for('/upload/dataset', $ds_id) );
+    }
+}
+
+# single dataset
+
+sub dataset_x :Path('/upload/dataset') :ActionClass('REST') :Args(1) {
     my ( $self, $c ) = @_;
     $c->stash(
         root => $c->uri_for('/upload/dataset'),
@@ -176,37 +228,27 @@ sub dataset :Path('/upload/dataset') :ActionClass('REST') {
     );
 }
 
-sub dataset_GET {
+sub dataset_x_GET { # show editor for a dataset
     my ( $self, $c ) = @_;
     my $dataset = { };
     my $para = $c->request->params;
     my $ds_id = $c->stash->{ds_id};
 
-    if ( keys %$para ) { # we got errors, or maybe a timeout
-
-        print STDERR Dumper( $para );
+    if ( keys %$para ) {
+        # we got errors, or maybe a login timeout
         $c->stash( dataset => $para );
-
-    } elsif ($ds_id) { # db lookup
-
-        $dataset = $c->model('Userbase')->resultset('Dataset')->get_ds($ds_id);
-        if ($dataset) {
-            $c->stash( dataset => $dataset );
-        } else {
-            $c->detach( 'Root', 'default' );
-        }
-
     } else {
-
-        # just show blank form
-
+        # a normal dataset lookup
+        $dataset = $c->model('Userbase')->resultset('Dataset')->get_ds($ds_id);
+        $c->detach( 'Root', 'default' ) unless $dataset; # not found
+        $c->stash( dataset => $dataset );
     }
 
     $c->stash( template => 'upload/dataset.tt' );
 
 }
 
-sub dataset_POST  {
+sub dataset_x_POST  { # update existing dataset
     my ( $self, $c ) = @_;
 
     my $para = $c->request->params;
@@ -217,35 +259,22 @@ sub dataset_POST  {
         u_id => $c->user->u_id(),
     };
 
-    print STDERR Dumper $row, $para;
-
     my $rs = $c->model('Userbase')->resultset('Dataset');
 
-    if ($ds_id) {
-        # update existing dataset
-        if ( my $ds = $rs->find( $ds_id ) ) {
-            $ds->set_info_ds($para);
-        } else {
-            $c->detach( 'Root', 'default' );
-        }
+    my $dataset = $rs->find( $ds_id );
+    $c->detach( 'Root', 'default' ) unless $dataset; # not found
+
+    eval { $dataset->set_info_ds($para); };
+    if ($@) {
+        # update record failed
+        $self->add_error_msgs( $c, error_from_exception($@) );
+        $c->response->redirect( $c->uri_for('/upload/dataset', $ds_id, $para) );
     } else {
-        # create new dataset
-        eval {
-            $ds_id = $rs->create_ds( $para, $row );
-        };
-        if ($@) {
-            $self->add_error_msgs( $c, error_from_exception($@) );
-            $c->response->redirect( $c->uri_for( "/upload/dataset", $para ) );
-            return;
-        }
+        # success - now go back and read dataset from db
+        $c->response->redirect( $c->uri_for('/upload/dataset', $ds_id) );
     }
 
-    # success - now go back and read dataset from db
-    $c->response->redirect( $c->stash->{root} . "/$ds_id");
-
 }
-
-
 
 =head1 LICENSE
 

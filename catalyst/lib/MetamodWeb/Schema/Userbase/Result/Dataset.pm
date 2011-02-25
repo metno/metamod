@@ -116,6 +116,8 @@ sub set_info_ds {
     my $ds_id = $self->get_column('ds_id');
     my $rs = $self->infods;
 
+    #die "Bad key" if length($$para{dskey}) > 10;
+
     foreach ( qw(DSKEY CATALOG LOCATION) ) {
         #printf STDERR "** %s = \"%s\"\n", $_, $val;
         my $val = $$para{lc $_};
