@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
+use File::Spec;
 use JSON;
 use Moose;
 use namespace::autoclean;
@@ -63,8 +64,8 @@ sub gcmdlist {
     my ( $quest_element ) = @_;
 
     my $file = $quest_element->{ value };
-    my $base_dir = $self->config->get('QUEST_CONFIG_DIRECTORY');
-    my $full_path = "$base_dir/$file";
+    my $base_dir = File::Spec->catdir( $self->config->get('TARGET_DIRECTORY'), 'etc', 'qst' );
+    my $full_path = File::Spec->catfile($base_dir, $file );
     if( !(-r $full_path ) ){
         die "Cannot find file '$full_path'";
     }

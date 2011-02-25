@@ -237,7 +237,7 @@ sub quest_configuration {
 
     my %quest_configurations = (
         'metadata' => {
-        config_file => File::Spec->catfile($self->config->get('TARGET_DIRECTORY'), 'etc', 'metadata_quest.json' ),
+        config_file => File::Spec->catfile($self->config->get('TARGET_DIRECTORY'), 'etc', 'qst', 'metadata_quest.json' ),
         title       => 'Metadata editor',
         tag         => $self->config->get('QUEST_OWNERTAG'),
         }
@@ -474,7 +474,7 @@ sub _save_metadata {
         my $dataset_name = delete $metadata->{name};
         my $applic_id = $self->config->get('APPLICATION_ID');
         if( defined $dataset_name ){
-            $dataset_name = $dataset_name->[0];
+            $dataset_name = $dataset_name;
 
             # remove potential applic_id
             if( $dataset_name =~ /$applic_id\/(.*)$/ ){
@@ -493,10 +493,17 @@ sub _save_metadata {
     $info{creationDate} = $info{datestamp} = $datestamp->strftime('%Y-%m-%dT%H:%M:%S%z') if !exists $info{creationDate};
 
     my $wms_info = delete $metadata->{wms_info};
-    $dataset->setWMSInfo($wms_info->[0]) if defined $wms_info;
+    $dataset->setWMSInfo($wms_info) if defined $wms_info;
 
     my $projection_info = delete $metadata->{projection_info};
-    $dataset->setProjectionInfo($projection_info->[0]) if defined $projection_info;
+    $dataset->setProjectionInfo($projection_info) if defined $projection_info;
+
+    # we must convert the meta data to a format that Metamod::Dataset understands
+    while( my ($key, $value) = each %$metadata ){
+        if( ref $value ne 'ARRAY' ){
+            $metadata->{$key} = [ $value ];
+        }
+    }
 
     $dataset->removeMetadata();
     $dataset->addMetadata($metadata);
