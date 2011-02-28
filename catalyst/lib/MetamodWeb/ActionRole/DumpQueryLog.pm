@@ -45,7 +45,9 @@ after 'execute' => sub {
     my ( $self, $controller, $c, $test ) = @_;
 
     # tracing is not enabled, so nothing to do
-    return unless exists $ENV{METAMOD_DBIC_TRACE} && $ENV{METAMOD_DBIC_TRACE} == 1;
+    return if !exists $ENV{METAMOD_DBIC_TRACE};
+
+    return if $ENV{METAMOD_DBIC_TRACE} < 1;
 
     # We use SQL::Beautify to get more readable SQL if it is available, but we
     # do not want to have SQL::Beautify as a requirement for MetamodWeb
@@ -57,32 +59,12 @@ after 'execute' => sub {
         $c->log->info('SQL::Beautify is not installed. Cannot beautify SQL');
     };
 
-    my $mb_query_log = $c->stash->{ mb_query_log };
-    _print_query_log($c, $mb_query_log,$beautifier);
+    my $mb_query_log = $c->model('Metabase')->schema->storage->debugobj();
+    _print_query_log($c, $mb_query_log, $beautifier);
 
-    my $ub_query_log = $c->stash->{ ub_query_log };
-    _print_query_log($c, $ub_query_log,$beautifier);
+    my $ub_query_log = $c->model('Userbase')->schema->storage->debugobj();
+   _print_query_log($c, $ub_query_log, $beautifier);
 
-
-    my $ana = DBIx::Class::QueryLog::Analyzer->new({ querylog => $mb_query_log });
-
-    my $queries = $ana->get_totaled_queries();
-    while( my ( $sql, $info ) = each %$queries ){
-
-        if( $beautifier){
-            $beautifier->query($sql);
-            $sql = $beautifier->beautify();
-        }
-
-        my $log_msg = <<END_MSG;
-SQL:
-$sql
-count: $info->{ count }
-time_elapsed: $info->{ time_elapsed }
-END_MSG
-
-        $c->log->debug( $log_msg );
-    }
 
 };
 

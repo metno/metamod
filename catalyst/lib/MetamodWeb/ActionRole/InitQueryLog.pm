@@ -56,12 +56,10 @@ before 'execute' => sub {
         my $mb_query_log = DBIx::Class::QueryLog->new;
         $c->model('Metabase')->schema->storage->debugobj($mb_query_log);
         $c->model('Metabase')->schema()->storage->debug(1);
-        $c->stash( mb_query_log => $mb_query_log );
 
         my $ub_query_log = DBIx::Class::QueryLog->new;
         $c->model('Userbase')->schema->storage->debugobj($ub_query_log);
         $c->model('Userbase')->schema()->storage->debug(1);
-        $c->stash( ub_query_log => $ub_query_log );
 
     }
 
