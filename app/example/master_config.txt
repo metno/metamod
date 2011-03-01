@@ -105,8 +105,11 @@ PG_CONNECTSTRING_PHP = host=[==PG_HOST==] port=[==PG_PORT==]
 # database:
 PG_CONNECTSTRING_PERL = ;host=[==PG_HOST==];port=[==PG_PORT==]
 
+# Directory for PostgreSQL contrib libs
+PG_CONTRIB = /usr/share/postgresql/8.4/contrib
+
 # the location of the initialization sql-script for the full-text facilities
-PG_TSEARCH2_SCRIPT = /usr/share/postgresql/8.3/contrib/tsearch2.sql
+PG_TSEARCH2_SCRIPT = [==PG_CONTRIB==]/tsearch2.sql
 
 # the location of the initialization sql-script for postGIS
 PG_POSTGIS_SCRIPT = /usr/share/postgresql-8.3-postgis/lwpostgis.sql

@@ -10,6 +10,7 @@ init/update_to_Fulltext.sh
 init/sruSchema.sql
 userinit/createuserdb.sh
 userinit/run_createuserdb.sh
+userinit/upgradeuserdb_26-28.sh
 =scripts/import_dataset.pl
 =scripts/chk_conf.pl
 =scripts/gen_httpd_conf.pl

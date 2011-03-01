@@ -4,11 +4,10 @@ COMMON="[==TARGET_DIRECTORY==]/init/common.sh"
 
 if [ -e  $COMMON ]
 then
-    echo $COMMON found!
     . "$COMMON"
 else
-        echo "Library $COMMON not found."
-        exit 1
+    echo "Library $COMMON not found."
+    exit 1
 fi
 
 USERBASE_NAME=[==USERBASE_NAME==]

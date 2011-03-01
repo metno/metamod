@@ -1,10 +1,13 @@
 #!/bin/sh
 
+# Script for upgrading userdatabase from METAMOD 2.6+ to 2.8.
+# Will create new tables and encrypt all passwords < 40 chars.
+# Should be safe to run repeatedly on same database w/o data loss.
+
 COMMON="[==TARGET_DIRECTORY==]/init/common.sh"
 
 if [ -e  $COMMON ]
 then
-    echo $COMMON found!
     . "$COMMON"
 else
     echo "Library $COMMON not found."
@@ -13,10 +16,20 @@ fi
 
 USERBASE_NAME=[==USERBASE_NAME==]
 check "USERBASE_NAME"
+PG_CRYPTO=[==PG_CONTRIB==]/pgcrypto.sql
+check "PG_CRYPTO" 1
 
 echo "----------------- Database $USERBASE_NAME created ------------------"
 
+$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $USERBASE_NAME < $PG_CRYPTO
+
 $PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $USERBASE_NAME <<'EOF'
+
+-- let's assume all passwords less than 40 chars are plaintext and encrypt them
+
+UPDATE usertable SET u_password = encode(digest(u_password, 'sha1'), 'hex') where length(u_password) < 40;
+
+-- create the new tables needed for METAMOD 2.8
 
 CREATE TABLE InfoU (
    i_id               SERIAL,
