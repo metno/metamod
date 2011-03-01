@@ -17,6 +17,9 @@ BASE_PART_OF_EXTERNAL_URL = Substituted by test_application.sh
 # Initial part of local URLs:
 LOCAL_URL = Substituted by test_application.sh
 
+# Set this if you want to run Apache on a separate hostname in DNS
+VIRTUAL_HOST =
+
 # The administration web application is only accessible from the following
 # domain:
 ADMIN_DOMAIN = Substituted by test_application.sh
