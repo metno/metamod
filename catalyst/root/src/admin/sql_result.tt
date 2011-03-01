@@ -1,0 +1,16 @@
+[% INCLUDE admin/admin_header.tt %]
+<h2>[% database_name %]. SQL sentence:</h2>
+<pre>
+[% sqlsentence %]
+</pre>
+<h2>Result:</h2>
+<table border=1>
+[% FOREACH row IN wholetable %]
+    <tr>
+    [% FOREACH item IN row %]
+        <td>[% item %]</td>
+    [% END %]
+    </tr>
+[% END %]
+</table>
+[% INCLUDE admin/admin_footer.tt %]

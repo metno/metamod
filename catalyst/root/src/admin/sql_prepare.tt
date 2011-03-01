@@ -1,0 +1,23 @@
+[% INCLUDE admin/admin_header.tt %]
+<h3>Enter SQL sentence to perform on the [% database_name %]:</h3>
+<form action="[% action_url %]" method="post">
+<textarea name="sqlsentence" rows="4" cols="120">
+</textarea>
+<input type="submit" value="Submit">
+</form>
+<table border=0>
+[% FOREACH tbl IN table_desc %]
+   <tr><th style="text-align: left">[% tbl.name %]</th>
+   <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[% tbl.columns %]</td>
+[% END %]
+</table>
+<hr />
+<table border=0>
+<tr><td>select * from</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td>where</td></tr>
+<tr><td>select col1, col2 from tb1</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td>where col1 &gt; 5</td></tr>
+<tr><td>select tbl1.col1, tbl2.col2 from tb1, tb2</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td>where tb1.col1 = 'Extra' and tb1.col2 = tb2.col3</td></tr>
+<tr><td>select col1, col2 from tb1 as a, tb2 as b</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td>where col1 in (1, 2, 3)</td></tr>
+<tr><td>select distinct col1, col2 </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td>where col1 like 'abc%' </td></tr>
+<tr><td>select col1 as x, col2 </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td>order by x</td></tr>
+</table>
+[% INCLUDE admin/admin_footer.tt %]
