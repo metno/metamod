@@ -68,8 +68,11 @@ PG_WEB_USER = webuser
 # I.e. PostgreSQL server running on same machine as web server.
 PG_WEB_USER_PASSWORD =
 
+# Directory for PostgreSQL contrib libs
+PG_CONTRIB = /usr/share/postgresql/8.3/contrib
+
 # the location of the initialization sql-script for the full-text facilities
-PG_TSEARCH2_SCRIPT = /usr/share/postgresql/8.3/contrib/tsearch2.sql
+PG_TSEARCH2_SCRIPT = [==PG_CONTRIB==]/tsearch2.sql
 
 # the location of the initialization sql-script for postGIS
 PG_POSTGIS_SCRIPT = /usr/share/postgresql-8.3-postgis/lwpostgis.sql
