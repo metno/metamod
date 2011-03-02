@@ -61,7 +61,13 @@ my $site = $local;
 $site .= " on $virtualhost" if $virtualhost;
 my $config_dir = $virtualhost ? "/etc/apache/sites-available" : "/etc/apache2/conf.d";
 
-my $proxies = proxy('search') . proxy('dataset') . proxy('gc2wmc') . proxy('admin') . proxy('upload');
+my $proxies = proxy('search')
+            . proxy('dataset')
+            . proxy('gc2wmc')
+            . proxy('admin')
+            . proxy('upload')
+            . proxy('login')
+            . proxy('subscription');
 
 my $conf_text = <<EOT;
 
