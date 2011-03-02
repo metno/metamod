@@ -1,0 +1,106 @@
+=head1 METAMOD Datamodel
+
+This text describes the data-model and the data-flow within METAMOD2. It is not
+about the real data files which are often handled by other applications, i.e. thredds.
+
+=head2 The Metadata
+
+All metadata in METAMOD should consist of two files, the .xml-files (META) and
+the .xmd-files (XMD).
+
+The META files contain the discovery metadata as retrieved from
+an metadata-editor, extracted from netcdf-files or harvested from external metadata-
+repositories. The META files should be stored in the format they have been retrieved, e.g.
+DIF, ISO19139 or MM2. They will be converted on export from the L<Metadata Store>.
+
+The XMD files are metamod-related information of the metadata. They contain the following information:
+
+=over 4
+
+=item B<name>: the unique identifier, consisting of 2 or 3 path arguments like
+            APPLICATION_ID/PARENT_NAME/CHILD_NAME or APPLICATION_ID/NAME
+
+=item B<status>: indicate if the metadata is in use (active) or expired (deleted)
+
+=item B<ownertag>: identifies the source of the metadata (usually one tag for uploaded data per APPLICATION_ID
+                and one tag for each harvester source)
+
+=item B<creationDate>: when the metadata whas created/retrieved by metamod
+
+=item B<datestamp>: last change of the xmd-file
+
+=item B<metadataFormat>: The format of the metadata. This is only a best-effort and not a guarantee.
+
+=back
+
+The C<creationDate> and C<datestamp> are only accurate concerning METAMOD and XMD-files.
+The META files might have own means to control the creationDate and datastamp and it is up to the
+metadata-creator to control those fields.
+
+The XMD-files might also contain information which does not fit in discovery-metadata and is usable
+by METAMOD only. That is currently:
+
+=over 4
+
+=item B<quadtree_nodes>: high accuracy geographical region (deprecated since Metamod 2.3)
+
+=item B<datasetRegion>: high accuracy geographical region
+
+=item B<projectionInfo>: control of data-reprojections through fimex
+
+=item B<wmsInfo>: control of WMS-client for the data-representation
+
+=back
+
+=head3 IO-Libraries
+
+To access the XMD files only use L<Metamod::ForeignDataset>. To access the information in the
+META files, too (converted to MM2), use L<Metamod::Dataset>.
+
+=head2 The Metadata Store
+
+The Metadata Store of METAMOD is file-based in the C<webrun/XML> directory of the instanses.
+It is the authoritative source of all information about Metadata and the way Metamod uses it
+(META and XMD files). It has no information related to metamod-users, though.
+
+EGIL, PLEASE CHECK THIS. ARE SEVERAL APPLICATION_IDs REALLY NEEDED? WHAT IS THE DIFFERENCE
+BETWEEN APPLICATION_ID AND OWNERTAG?
+
+The XMD and META files are stored in directories named APPLICATION_ID. There may be several
+APPLICATION_IDs per instance in the case of ???
+
+=head2 The (SQL) Database
+
+The SQL Database consists of two parts, called Index- and User-databse. The database
+can be used by several instances of metamod. Currently, one instance will have the ownership
+of the database. That intance is then responsible for database-creation and all metadata-indexing.
+That instance will need the path to all instances C<webrun/XML> directories.
+
+=head3 Index-Database
+
+The Index-database is an excerpt of all Metadata Stores for faster (indexed) access.
+All META files are converted to MM2 metadata to be searchable in an easy way. Only the
+web-needed information from the META-files can be found in the database.
+
+=head3 User-Database
+
+The User-database stores all information related directly to users of metamod. That is:
+
+=over 4
+
+=item B<user, user-names, passwords, ...>: (might be externalized, i.e. LDAP) This information is unique
+      among all instances.
+
+=item B<user-roles in instances>: roles for the instances are prepended by the 'APPLICATION_ID'
+
+=item B<datasets ownerships> (owned by users)
+
+=item B<access-keys for users to datasets> (dirkeys)
+
+=item B<user-subscriptions to datasets>
+
+=item B<collection-baskets of users> (temporary?)
+
+=item WHAT DID I FORGET?
+
+=back
