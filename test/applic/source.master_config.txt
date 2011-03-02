@@ -114,7 +114,7 @@ DATABASE_NAME = Substituted by test_application.sh
 USERBASE_NAME = Substituted by test_application.sh
 
 # LDAP server used for authentication + base DN
-LDAP_SERVER = ldaps://ldap-dev.met.no
+#LDAP_SERVER = ldaps://ldap-dev.met.no
 LDAP_BASE_DN = ou=user,ou=internal,dc=met,dc=no
 
 # URL of OPeNDAP server:
