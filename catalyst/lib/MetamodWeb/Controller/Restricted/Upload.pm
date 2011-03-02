@@ -34,6 +34,7 @@ blah blah blah
 
 use Moose;
 use namespace::autoclean;
+use MetamodWeb::Utils::UI::Upload;
 use MetamodWeb::Utils::UploadUtils;
 use MetamodWeb::Utils::Exception qw(error_from_exception);
 use Data::Dumper;
@@ -43,8 +44,8 @@ BEGIN { extends 'MetamodWeb::BaseController::Base' };
 
 sub auto :Private {
     my ( $self, $c ) = @_;
-    my $da_ui_utils = MetamodWeb::Utils::UI::DatasetAdmin->new( c => $c, config => $c->stash->{mm_config} );
-    $c->stash( da_ui_utils => $da_ui_utils );
+    my $upload_ui_utils = MetamodWeb::Utils::UI::Upload->new( c => $c );
+    $c->stash( da_ui_utils => $upload_ui_utils );
     $c->stash( section => 'upload' );
 }
 

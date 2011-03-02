@@ -1,4 +1,4 @@
-package MetamodWeb::Utils::UI::DatasetAdmin;
+package MetamodWeb::Utils::UI::Upload;
 
 =begin LICENSE
 
