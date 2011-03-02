@@ -58,7 +58,7 @@
     <th class="list_table">&nbsp;</th>
     </tr>
     </thead>
-    [% FOREACH ds IN da_ui_utils.user_datasets() %]
+    [% FOREACH ds IN upload_ui_utils.user_datasets() %]
         <tr class="list_table">
             <td class="list_table">[% ds.ds_name %]</td>
             <td class="list_table"><div class="btns"><a class="btn2" style="width:120px" href="[% root _ '/' _ ds.ds_id %]"><span>Edit</span></a></div></td>

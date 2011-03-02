@@ -45,7 +45,7 @@ BEGIN { extends 'MetamodWeb::BaseController::Base' };
 sub auto :Private {
     my ( $self, $c ) = @_;
     my $upload_ui_utils = MetamodWeb::Utils::UI::Upload->new( c => $c );
-    $c->stash( da_ui_utils => $upload_ui_utils );
+    $c->stash( upload_ui_utils => $upload_ui_utils );
     $c->stash( section => 'upload' );
 }
 
