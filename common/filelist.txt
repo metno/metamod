@@ -104,6 +104,7 @@ logger_config.ini
 =lib/Metamod/Dataset.pm
 =lib/Metamod/DatasetDb.pm
 =lib/Metamod/DatasetRegion.pm
+=lib/Metamod/Email.pm
 =lib/Metamod/ForeignDataset.pm
 =lib/Metamod/LonLatPoint.pm
 =lib/Metamod/LonLatPolygon.pm
