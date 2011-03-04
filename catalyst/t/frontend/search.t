@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 22;
+use Test::More;
 use Test::WWW::Mechanize::Catalyst;
 
 use FindBin;
@@ -8,24 +8,34 @@ use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin/../../lib";
 use lib "$FindBin::Bin/../../../common/lib";
 
-use MetamodWeb::Test::Init;
+use MetamodWeb::Test::Helper;
 
-my $init;
+my $helper;
 
 BEGIN {
-    $init = MetamodWeb::Test::Init->new(
-        catalyst_root       => "$FindBin::Bin/../../",
-        import_dataset_path => "$FindBin::Bin/../../../base/scripts/import_dataset.pl",
-        dataset_dir         => "$FindBin::Bin/datasets"
-    );
-    $init->setup_environment();
+
+    $helper = MetamodWeb::Test::Helper->new( dataset_dir => "$FindBin::Bin/datasets", );
+    $helper->setup_environment();
+    $helper->run_import_dataset();
+
+    if( !$helper->valid_metabase() ){
+        plan skip_all => "Could not connect to the metabase database: " . $helper->errstr();
+    }
+
+    if( !$helper->valid_userbase() ){
+        plan skip_all => "Could not connect to the userbase database: " . $helper->errstr();
+    }
+
+    plan tests => 22;
+
 }
+
 
 BEGIN { use_ok 'MetamodWeb' }
 BEGIN { use_ok 'MetamodWeb::Controller::Search' }
 
 my $mech = Test::WWW::Mechanize::Catalyst->new( catalyst_app => 'MetamodWeb' );
-$mech->get_ok( '/search', 'Request should succeed' );
+$mech->get_ok( '/search', 'Request to front page' );
 
 # These are basic parameters that are needed for all the search requests
 my $basic_search_params = '';

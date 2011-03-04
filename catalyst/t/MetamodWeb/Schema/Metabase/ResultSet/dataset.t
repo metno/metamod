@@ -8,21 +8,26 @@ use lib "$FindBin::Bin/../../../../lib";
 use lib "$FindBin::Bin/../../../../../lib";
 use lib "$FindBin::Bin/../../../../../../common/lib";
 
-use MetamodWeb::Test::Init;
+use MetamodWeb::Test::Helper;
 
-use Test::More tests => 29;
+use Test::More;
 
-my $init;
+my $helper;
 my $metabase;
 
 BEGIN {
-    $init = MetamodWeb::Test::Init->new(
-        catalyst_root       => "$FindBin::Bin/../../../../../",
-        import_dataset_path => "$FindBin::Bin/../../../../../../base/scripts/import_dataset.pl",
-        dataset_dir         => "$FindBin::Bin/datasets"
-    );
-    $init->setup_environment();
-    $metabase = $init->connect_to_metabase();
+    $helper = MetamodWeb::Test::Helper->new( dataset_dir => "$FindBin::Bin/datasets" );
+
+    if( !$helper->valid_metabase() ){
+        plan skip_all => "Could not connect to the metabase database: " . $helper->errstr();
+    }
+
+    plan tests => 29;
+
+    $metabase = $helper->metabase();
+    $helper->setup_environment();
+    $helper->run_import_dataset();
+
 }
 
 #Teste med søk
@@ -181,11 +186,11 @@ test_metadata_search( { topics => { hk_ids => [ 23211 ] } }, 1, [], 'Search for 
 
 test_metadata_search( { topics => { bk_ids => [ 809, 56 ] } }, 1, [ qw( TEST/dataset2 TEST/dataset1 )], 'Search for topic bk_ids with mathces' );
 
-test_metadata_search( { topics => { hk_ids => [ 62, 711 ] } }, 1, [ qw( TEST/dataset3 TEST/dataset1 ) ], 'Search for topic hk_ids with mathces' );
+test_metadata_search( { topics => { hk_ids => [ 62, 720 ] } }, 1, [ qw( TEST/dataset3 TEST/dataset1 ) ], 'Search for topic hk_ids with mathces' );
 
-test_metadata_search( { topics => { bk_ids => [ 809, 56 ], hk_ids => [ 711 ] } }, 1, [qw( TEST/dataset2 TEST/dataset3 TEST/dataset1 )], 'Search for both topic bk_ids and hk_ids' );
+test_metadata_search( { topics => { bk_ids => [ 809, 56 ], hk_ids => [ 720 ] } }, 1, [qw( TEST/dataset2 TEST/dataset3 TEST/dataset1 )], 'Search for both topic bk_ids and hk_ids' );
 
-test_metadata_search( { topics => { bk_ids => [809, 56], hk_ids => [62, 711] }, freetext => [ 'dataset1' ] }, 1, [qw( TEST/dataset1 )], 'Search for both topic bk_ids and hk_id and freetext' );
+test_metadata_search( { topics => { bk_ids => [809, 56], hk_ids => [62, 720] }, freetext => [ 'dataset1' ] }, 1, [qw( TEST/dataset1 )], 'Search for both topic bk_ids and hk_id and freetext' );
 
 sub test_metadata_search {
     my ( $search_criteria, $curr_page, $expected_names, $test_name ) = @_;

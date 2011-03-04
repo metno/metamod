@@ -1,5 +1,7 @@
-# this is a example config file needed for internal testing
-# do not remove, do not install
+#
+# This is a master config file that is used for automatic testing. It has been stripped of all configuration that
+# are not directly required by the tests.
+#
 
 SERVER = localhost
 BASE_DIRECTORY = /home/oysteint/projects
@@ -44,9 +46,9 @@ PG_ADMIN_USER = admin
 
 # PG_WEB_USER is a PostgreSQL user who may read/write data in the metadata
 # database.
-PG_WEB_USER = webuser
+PG_WEB_USER = admin
 
-PG_WEB_USER_PASSWORD = webuser
+PG_WEB_USER_PASSWORD = admin
 
 # the location of the initialization sql-script for the full-text facilities
 PG_TSEARCH2_SCRIPT = /usr/share/postgresql/8.1/contrib/tsearch2.sql
@@ -436,3 +438,7 @@ LDAP_SERVER = ou=user,ou=internal,dc=met,dc=no
 LDAP_BASE_DN = ldaps://ldap-dev.met.no
 
 SUBSCRIPTION_ENABLED = ENABLED
+
+PMH_REPOSITORY_IDENTIFIER =
+
+IMPORT_DATASET_WAIT_SECONDS =
