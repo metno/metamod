@@ -53,11 +53,18 @@ LOG4PERL_WATCH_TIME = 30
 LOG4PHP_CONFIG = [==TARGET_DIRECTORY==]/log4php_config.ini
 LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
 
+# ============== Catalyst configuration =================
+## File path for generated Catalyst config
+##CATALYST_SITE_CONFIG = [==TARGET_DIRECTORY==]/metamodweb.json
+CATALYST_SITE_CONFIG =
+
 # Port for running local catalyst server
 CATALYST_PORT = 3000
 
 # lib for Catalyst etc
 CATALYST_LIB = /opt/metno-catalyst-dependencies-ver1/lib/perl5
+
+# ============== PostgreSQL configuration =================
 
 # PG_ADMIN_USER is the PostgreSQL user who may freely create, modify and
 # delete the metadata database.
@@ -115,6 +122,7 @@ USERBASE_NAME = Substituted by test_application.sh
 
 # LDAP server used for authentication + base DN
 #LDAP_SERVER = ldaps://ldap-dev.met.no
+LDAP_SERVER =
 LDAP_BASE_DN = ou=user,ou=internal,dc=met,dc=no
 
 # URL of OPeNDAP server:
