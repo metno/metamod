@@ -60,7 +60,7 @@ File name: <input name="data" type="file" />
    <colgroup width="37%" />
    <colgroup width="10%" />
 -->   <tr>
-      <th>Replace</th>
+      <!--<th>Replace</th>-->
       <th>File name</th>
       <th>Size</th>
       <th>Time</th>
@@ -68,9 +68,11 @@ File name: <input name="data" type="file" />
       <th>Show errors</th>
    </tr>
 
+<h3>Previously uploaded files</h3>
+
 [% FOREACH fi IN upload_ui_utils.user_files() %]
     <tr class="list_table">
-    <td class="list_table"><input type="radio" name="selrec"/></td>
+    <!--<td class="list_table"><input type="radio" name="selrec"/></td>-->
     <td class="list_table">[% fi.f_name %]</td>
     <td class="list_table">[% fi.f_size %]</td>
     <td class="list_table">[% fi.f_timestamp %]</td>
