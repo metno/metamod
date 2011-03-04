@@ -118,14 +118,16 @@ sub set_info_ds {
 
     #die "Bad key" if length($$para{dskey}) > 10;
 
-    foreach ( qw(DSKEY CATALOG LOCATION) ) {
+    foreach ( qw(DSKEY CATALOG LOCATION) ) { # FIXME - define keys elsewhere
         #printf STDERR "** %s = \"%s\"\n", $_, $val;
         my $val = $$para{lc $_};
         my $infods = $rs->search( { ds_id => $ds_id, i_type => $_ } )->first();
         if ( !defined $infods ) {
             $rs->create( { ds_id => $ds_id, i_type => $_, i_content => $val } );
-        } else {
+        } elsif ($val) {
             $infods->update( { i_content => $val } );
+        } else {
+            $infods->delete;
         }
     }
 
