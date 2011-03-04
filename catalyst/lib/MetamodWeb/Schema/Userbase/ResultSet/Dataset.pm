@@ -57,6 +57,8 @@ sub create_ds {
     my $data = shift or die "Missing credentials";
 
     $$data{ds_name} = $$para{ds_name} or croak "Missing ds_name";
+    croak "Dataset name too long" if length $$para{ds_name} > 20;
+    die "Dataset " . $$data{ds_name} . " is already registered!" if ( $self->find({ ds_name => $$data{ds_name} }) );
     my $ds = $self->create( $data, {key => 'dataset_pkey'} );
     return $ds->set_info_ds($para); # returns ds_id
 }
