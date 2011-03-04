@@ -181,8 +181,9 @@ sub validate_new_user : Private {
             email => email(),
             register_username => sub { # use a sub so we can set the constraint name and a message
                 my ($dfv, $val) = @_;
+                my $email = $dfv->get_filtered_data->{email};
                 $dfv->set_current_constraint_name('username_constraint');
-                return $val =~ /^\w{3,20}$/;
+                return $val =~ /^(\w{3,20})|$email$/;
             },
         },
         labels => {
@@ -196,7 +197,7 @@ sub validate_new_user : Private {
         },
         msgs => sub {
             email => 'Invalid email address',
-            username_constraint => "Invalid username. Only user letters, '_' and numbers",
+            username_constraint => "Invalid username. Only user letters, '_' and numbers, or same as email",
         }
     );
     my $validator = MetamodWeb::Utils::FormValidator->new( validation_profile => \%form_profile );
