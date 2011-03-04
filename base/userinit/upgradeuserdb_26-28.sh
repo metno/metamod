@@ -2,7 +2,8 @@
 
 # Script for upgrading userdatabase from METAMOD 2.6+ to 2.8.
 # Will create new tables and encrypt all passwords < 40 chars.
-# Should be safe to run repeatedly on same database w/o data loss.
+# Should be safe to run repeatedly on same database w/o data loss
+# (ignore all "xxx  already exists" error messages).
 
 COMMON="[==TARGET_DIRECTORY==]/init/common.sh"
 

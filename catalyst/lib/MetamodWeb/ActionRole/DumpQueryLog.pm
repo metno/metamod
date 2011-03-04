@@ -56,7 +56,7 @@ after 'execute' => sub {
         require SQL::Beautify;
         $beautifier = SQL::Beautify->new();
     } catch {
-        $c->log->info('SQL::Beautify is not installed. Cannot beautify SQL');
+        $c->log->debug('SQL::Beautify is not installed. Cannot beautify SQL');
     };
 
     my $mb_query_log = $c->model('Metabase')->schema->storage->debugobj();

@@ -4,11 +4,15 @@ Things to do in Catalyst version of Metamod
 
 * security filters for appid/ownertag?
 
-* File Upload [GA]
-  * upload_indexer + webservice
-  * dataset admin
-    * wms setup
+* config for godiva instead of openlayers?
 
+* use config::general?
+
+* fix bug where init.d doesn't restart/stop catalyst
+
+* make gen_httpd_conf run during update_target
+
+* check if user registration works on dev-vm140
 
 * check that wmsinfo data gets imported from test xmlfiles [GA]
   * not really a catalyst issue
@@ -20,6 +24,10 @@ Things to do in Catalyst version of Metamod
   * test a file
   * upload file
     * check key
+  * upload_indexer + webservice
+  * dataset admin
+  * metadata editor [ØT]
+    * wms setup
 
 * Implement support for reprojections (Lat/long and Stereo). This can be implemented as a port of the current PHP code.
   At a later time this should be supported using some type of WPS service, but not for this version. [HK]
