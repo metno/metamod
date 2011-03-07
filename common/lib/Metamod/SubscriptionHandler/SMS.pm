@@ -21,7 +21,7 @@ Metamod::SubscriptionHandler::SMS - Subscription handler for email.
 
 =head1 DESCRIPTION
 
-This module implements a subscription handler that sends transfers files to 
+This module implements a subscription handler that sends transfers files to
 subscribers via Met.no SMS system. This module is responsible for notifying SMS
 that a new transfer is needed and then the SMS system is responsible actually
 transfering the file to subscriber.
@@ -101,7 +101,7 @@ Returns 1 on success. False on error.
 
 =back
 
-=cut 
+=cut
 
 sub _notify_sms {
     my $self = shift;
@@ -202,7 +202,7 @@ sub _get_file_location {
         return;
     }
 
-    my $location = $userbase->infoDS_get('LOCATION');
+    my $location = $userbase->dset_get('LOCATION');
 
     if ( !$location ) {
         $self->{_logger}->warn("No location information found for dataset ('$applic_id','$ds_name')");
@@ -334,7 +334,7 @@ sub _join_location_dataset_path {
 =head2 $self->_ds_file_name( $ds_name )
 
 Get the file name part of a dataset name.
-    
+
 =over
 
 =item $ds_name
