@@ -54,11 +54,11 @@ SELECT pg_catalog.setval('usertable_u_id_seq', 4, true);
 -- Data for Name: usertable; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY usertable (u_id, a_id, u_name, u_email, u_password, u_institution, u_telephone, u_session) FROM stdin;
-1	TEST	tester	metamod@met.no	\N	\N	\N	\N
-2	TEST	owner	metamod@met.no	\N	\N	\N	\N
-3	OTHER	other	metamod@met.no	\N	\N	\N	\N
-4	TEST	tester2	metamod@met.no	\N	\N	\N	\N
+COPY usertable (u_id, a_id, u_name, u_loginname, u_email, u_password, u_institution, u_telephone) FROM stdin;
+1	TEST	tester	metamod1	metamod@met.no	\N	\N	\N
+2	TEST	owner	metamod2	metamod@met.no	\N	\N	\N
+3	OTHER	other	metamod3	metamod@met.no	\N	\N	\N
+4	TEST	tester2	metamod4	metamod@met.no	\N	\N	\N
 \.
 
 --
@@ -71,16 +71,6 @@ COPY dataset (ds_id, u_id, a_id, ds_name) FROM stdin;
 1	2	TEST	hirlam12
 2	3	OTHER	itp04
 5	2	TEST	itp05
-\.
-
-
---
--- TOC entry 1779 (class 0 OID 19502)
--- Dependencies: 1487
--- Data for Name: file; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY file (ds_id, f_name, f_timestamp, f_size, f_status, f_errurl) FROM stdin;
 \.
 
 
