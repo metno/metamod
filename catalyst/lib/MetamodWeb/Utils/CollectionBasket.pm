@@ -107,6 +107,7 @@ Returns undef if for some reason the dataset could not be added.
 =back
 
 =cut
+
 sub add_dataset {
     my $self = shift;
 
@@ -215,6 +216,7 @@ Returns 1;
 =back
 
 =cut
+
 sub empty_basket {
     my $self = shift;
 
@@ -241,6 +243,7 @@ Returns 1.
 =back
 
 =cut
+
 sub remove_datasets {
     my $self = shift;
 
@@ -271,6 +274,7 @@ The size of all the files in the collection basket in bytes.
 =back
 
 =cut
+
 sub calculate_size {
     my $self = shift;
 
@@ -295,6 +299,7 @@ Returns the number of files in the basket currently.
 =back
 
 =cut
+
 sub num_files {
     my $self = shift;
 
@@ -315,6 +320,7 @@ following keys 'data_file_location', 'data_file_size', 'ds_name' and 'ds_id'.
 =back
 
 =cut
+
 sub files {
     my $self = shift;
 
@@ -360,6 +366,7 @@ metadata.
 =back
 
 =cut
+
 sub file_info {
     my $self = shift;
 
@@ -394,6 +401,7 @@ Returns 1
 =back
 
 =cut
+
 sub update_basket {
     my $self = shift;
 
@@ -427,6 +435,7 @@ sub remove_basket_cookie {
 Initialise the C<dataset_ids> attribute on object construction.
 
 =cut
+
 sub _build_dataset_ids {
     my $self = shift;
 
@@ -479,6 +488,7 @@ The maximum total size of the basket in bytes.
 =back
 
 =cut
+
 sub max_size {
     my $self = shift;
 

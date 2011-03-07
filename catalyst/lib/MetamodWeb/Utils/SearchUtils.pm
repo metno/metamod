@@ -86,6 +86,7 @@ the internal has is a list of hk ids and bk ids.
 =back
 
 =cut
+
 sub selected_criteria {
     my $self = shift;
 

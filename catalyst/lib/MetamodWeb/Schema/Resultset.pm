@@ -68,6 +68,7 @@ to a scalar is so that C<DBIx::Class> interprets it as a raw SQL.
 =back
 
 =cut
+
 sub fulltext_search {
     my $self = shift;
 
@@ -102,6 +103,7 @@ The value which has now been quoted.
 =back
 
 =cut
+
 sub quote_sql_value {
     my $self = shift;
 

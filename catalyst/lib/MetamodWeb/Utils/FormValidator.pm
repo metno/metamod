@@ -55,7 +55,7 @@ A hash reference of field labels. Set automatically when validation profile is s
 
 has 'field_labels' => ( is => 'rw', isa => 'HashRef' );
 
-=head2
+=head2 result
 
 The C<Data::FormValidator::Result> object from the last validation.
 

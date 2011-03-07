@@ -117,6 +117,7 @@ __PACKAGE__->has_many(
 
 
 # You can replace this text with custom content, and it will be preserved on regeneration
+
 =begin LICENSE
 
 METAMOD is free software; you can redistribute it and/or modify
@@ -149,6 +150,7 @@ the ds name is not qualified it just returns C<ds_name>.
 =back
 
 =cut
+
 sub unqualified_ds_name {
     my $self = shift;
 
@@ -184,6 +186,7 @@ specific mt_name.
 =back
 
 =cut
+
 sub metadata {
     my $self = shift;
 
@@ -232,6 +235,7 @@ Returns a Metamod::FimexProjections object (never null)
 =back
 
 =cut
+
 sub fimex_projections {
     my ($self) = @_;
     my $config = Metamod::Config->new();
@@ -370,6 +374,7 @@ Returns 1 if the dataset is a level 1 dataset. 0 otherwise.
 =back
 
 =cut
+
 sub is_level1_dataset {
     my $self = shift;
 
@@ -388,6 +393,7 @@ Returns 1 if the dataset is a level 2 dataset. 0 otherwise.
 =back
 
 =cut
+
 sub is_level2_dataset {
     my $self = shift;
 
@@ -406,6 +412,7 @@ Get the number of children for a level 1 dataset. For a level 2 dataset it will 
 =back
 
 =cut
+
 sub num_children {
     my $self = shift;
 
@@ -427,6 +434,7 @@ if the file location cannot be calculated.
 =back
 
 =cut
+
 sub file_location {
     my $self = shift;
 

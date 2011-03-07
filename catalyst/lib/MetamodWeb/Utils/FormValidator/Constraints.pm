@@ -61,6 +61,7 @@ Returns a constraint functions that will validate a field according to the schem
 =back
 
 =cut
+
 sub xml {
     my ($schema) = @_;
 
@@ -107,4 +108,5 @@ sub xml {
 GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
 
 =cut
+
 1;

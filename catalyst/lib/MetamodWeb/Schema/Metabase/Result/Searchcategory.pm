@@ -82,6 +82,7 @@ The contents of the C<sc_fnc> is parsed returned as a hash reference.
 =back
 
 =cut
+
 sub sc_fnc_parsed {
     my $self = shift;
 

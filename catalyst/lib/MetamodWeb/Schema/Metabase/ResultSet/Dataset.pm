@@ -391,6 +391,7 @@ The datasets are returned as a list of C<DBIx::Class> row objects.
 =back
 
 =cut
+
 sub level2_datasets {
     my $self = shift @_;
 

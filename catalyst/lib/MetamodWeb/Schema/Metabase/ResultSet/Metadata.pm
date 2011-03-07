@@ -37,6 +37,7 @@ A reference to a list of available mt_names.
 =back
 
 =cut
+
 sub available_metadata {
 	my $self = shift;
 

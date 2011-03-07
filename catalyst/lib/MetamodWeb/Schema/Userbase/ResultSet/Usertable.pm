@@ -58,6 +58,7 @@ Returns the new user as a C<DBIx::Class> row object.
 =back
 
 =cut
+
 sub new_user {
     my $self = shift;
 

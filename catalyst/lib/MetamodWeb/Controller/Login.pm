@@ -48,6 +48,7 @@ Controller for handling user login and registration.
 Controller specific initialisation.
 
 =cut
+
 sub auto :Private {
     my ( $self, $c ) = @_;
 
@@ -81,6 +82,7 @@ first place or to main page if they where not redirected to the
 login page.
 
 =cut
+
 sub authenticate :Path('authenticate') :Args(0) {
     my ( $self, $c ) = @_;
 
@@ -119,6 +121,7 @@ sub authenticate :Path('authenticate') :Args(0) {
 Action for registering a new user in the system.
 
 =cut
+
 sub register : Path('register') :Args(0) {
     my ($self, $c) = @_;
 
@@ -279,4 +282,5 @@ __PACKAGE__->meta->make_immutable;
 GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
 
 =cut
+
 1;

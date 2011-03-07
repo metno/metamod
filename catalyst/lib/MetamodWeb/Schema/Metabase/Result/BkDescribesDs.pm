@@ -55,5 +55,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
 
 =cut
+
 # You can replace this text with custom content, and it will be preserved on regeneration
 1;

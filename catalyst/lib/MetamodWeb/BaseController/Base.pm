@@ -59,6 +59,7 @@ Always returns false.
 =back
 
 =cut
+
 sub add_info_msgs {
     my ($self, $c, $msgs) = @_;
 
@@ -87,6 +88,7 @@ Always returns false.
 =back
 
 =cut
+
 sub add_error_msgs {
     my ($self, $c, $msgs) = @_;
 
@@ -133,6 +135,7 @@ Always returns true. Dies if the $validator state is not as expected.
 =back
 
 =cut
+
 sub add_form_errors {
     my ($self, $c, $validator) = @_;
 

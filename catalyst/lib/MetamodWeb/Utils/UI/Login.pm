@@ -51,6 +51,7 @@ used as a display name.
 =back
 
 =cut
+
 sub user_institutions {
     my $self = shift;
 

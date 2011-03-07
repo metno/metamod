@@ -280,6 +280,7 @@ Returns the metadata for the dataset as a hash reference.
 =back
 
 =cut
+
 sub load_anon_metadata {
     my $self = shift;
 
@@ -325,6 +326,7 @@ Returns true if the metadata was save successfully. Dies on error.
 =back
 
 =cut
+
 sub save_anon_metadata {
     my $self = shift;
 
@@ -362,6 +364,7 @@ Returns the metadata as a hash reference.
 =back
 
 =cut
+
 sub load_dataset_metadata {
     my $self = shift;
 
@@ -441,6 +444,7 @@ The ownertag that should be used for metadata.
 =back
 
 =cut
+
 sub _save_metadata {
     my $self = shift;
 
@@ -532,6 +536,7 @@ The metadata as a hash reference.
 =back
 
 =cut
+
 sub _load_metadata {
     my $self = shift;
 
@@ -577,6 +582,7 @@ Returns a C<Metamod::Dataset> object.
 =back
 
 =cut
+
 sub load_dataset {
     my $self = shift;
 
@@ -609,6 +615,7 @@ Returns the path to where the XML metadata files are stored on disk.
 =back
 
 =cut
+
 sub dataset_path {
     my $self = shift;
 

@@ -293,6 +293,7 @@ The mt_name of the default column for the specific C<$col_num>.
 =back
 
 =cut
+
 sub default_mt_name {
     my $self = shift;
 
@@ -319,6 +320,7 @@ The default mt_name for the vertical column in a two way table.
 =back
 
 =cut
+
 sub default_vertical_mt_name {
     my $self = shift;
 
@@ -344,6 +346,7 @@ The default mt_name for the horisontal column in a two way table.
 =back
 
 =cut
+
 sub default_horisontal_mt_name {
     my $self = shift;
 
@@ -373,6 +376,7 @@ information about one metadata type that can be displayed in the search result.
 =back
 
 =cut
+
 sub search_app_show_columns {
     my $self = shift;
 
@@ -689,6 +693,7 @@ A DBIx::Class resultset for the level 2 datasets. The dataset will be paged.
 =back
 
 =cut
+
 sub level2_result {
 	my $self = shift;
 
@@ -739,6 +744,7 @@ A reference to a list of metadata column names.
 =back
 
 =cut
+
 sub level2_metadata_columns {
     my $self = shift;
 
@@ -815,6 +821,7 @@ Returns true if we can link to it. False otherwise.
 =back
 
 =cut
+
 sub looks_like_url {
     my ($self, $dataref) = @_;
 
@@ -842,6 +849,7 @@ where it is present.
 =back
 
 =cut
+
 sub remove_hidden_flag {
     my ($self, $bks) = @_;
 
@@ -874,6 +882,7 @@ Returns 1 if dataset is also found in the user base. False otherwise.
 =back
 
 =cut
+
 sub dataset_in_userbase {
     my $self = shift;
 
@@ -915,6 +924,7 @@ An array reference with the page numbers to show.
 =back
 
 =cut
+
 sub pages_to_show {
     my $self = shift;
 
@@ -958,6 +968,7 @@ The C<$url_template> string with the C<$page> inserted at the correct place.
 =back
 
 =cut
+
 sub navigation_url {
     my ($self, $url_template, $page ) = @_;
 
@@ -993,6 +1004,7 @@ statement and the configuration variable COLLECTION_BASKET_DIST_STATEMENTS.
 =back
 
 =cut
+
 sub freely_available {
     my $self = shift;
 
