@@ -30,7 +30,7 @@ has 'catalyst_root' => ( is => 'ro', builder => '_build_catalyst_root' );
 sub _build_catalyst_root {
     my $self = shift;
 
-    if ( $FindBin::Bin =~ /^(.* \/ catalyst) \/ t \/ .* /x ) {
+    if ( $FindBin::Bin =~ /^(.* \/ catalyst) \/ t (\/)? .* /x ) {
         return $1;
     } else {
         die "Could not determine the path to the catalyst directroy from the test script path: $FindBin::Bin";
