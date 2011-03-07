@@ -63,11 +63,7 @@ The Metadata Store of METAMOD is file-based in the C<webrun/XML> directory of th
 It is the authoritative source of all information about Metadata and the way Metamod uses it
 (META and XMD files). It has no information related to metamod-users, though.
 
-EGIL, PLEASE CHECK THIS. ARE SEVERAL APPLICATION_IDs REALLY NEEDED? WHAT IS THE DIFFERENCE
-BETWEEN APPLICATION_ID AND OWNERTAG?
-
-The XMD and META files are stored in directories named APPLICATION_ID. There may be several
-APPLICATION_IDs per instance in the case of ???
+The XMD and META files are stored in directories named APPLICATION_ID.
 
 =head2 The (SQL) Database
 
@@ -101,6 +97,7 @@ The User-database stores all information related directly to users of metamod. T
 
 =item B<collection-baskets of users> (temporary?)
 
-=item WHAT DID I FORGET?
+=item B<temporary information> i.e. database-tables for queues and everything which is faster/simpler to store (medium temporary)
+in a database than in the file-system.
 
 =back
