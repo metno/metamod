@@ -8,10 +8,17 @@ use FindBin;
 
 use lib "$FindBin::Bin/../../";
 
-my $num_tests = 0; 
+my $num_tests = 0;
 use File::Path;
 use Test::More;
 use Test::Files;
+
+BEGIN {
+    $ENV{METAMOD_MASTER_CONFIG} = "$FindBin::Bin/../master_config.txt" unless exists $ENV{METAMOD_MASTER_CONFIG};
+    $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/../log4perl_config.ini";
+}
+
+use Metamod::Config qw(:init_logger);
 
 use MetNo::NcDigest qw( digest );
 
@@ -22,7 +29,7 @@ my $baseline_dir = "$FindBin::Bin/../data/MetNo"; # dir with the correct xml fil
 if( !( -e $out_dir ) ){
     mkpath( $out_dir ) or die $!;
 }
- 
+
 my $digest_file = "$FindBin::Bin/../data/MetNo/nc_files_to_digest.txt";
 
 {
@@ -30,12 +37,12 @@ my $digest_file = "$FindBin::Bin/../data/MetNo/nc_files_to_digest.txt";
     my $baseline_file = "$baseline_dir/$file_to_test";
     my $out_file = "$out_dir/$file_to_test";
 
-    #remove any previous version of the out file since the order of some values will be 
+    #remove any previous version of the out file since the order of some values will be
     # different in the second run
-    unlink $out_file; 
-    digest( "$FindBin::Bin/..", $digest_file, 'DAM', $out_file );        
-    
-    compare_ok( $baseline_file, $out_file, 'Parsing NC file' );               
+    unlink $out_file;
+    digest( "$FindBin::Bin", $digest_file, 'DAM', $out_file );
+
+    compare_ok( $baseline_file, $out_file, 'Parsing NC file' );
 
     BEGIN { $num_tests += 1 }
 }

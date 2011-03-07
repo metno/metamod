@@ -12,7 +12,7 @@ BEGIN {$ENV{METAMOD_XSLT_DIR} = "$FindBin::Bin/../../schema/";}
 
 BEGIN {use_ok('Metamod::DatasetTransformer::ToDIF', "foreignDataset2Dif")};
 
-Log::Log4perl::init( "log4perl_config.ini" );
+Log::Log4perl::init( "$FindBin::Bin/log4perl_config.ini" );
 
 my $DataDir = $FindBin::Bin.'/data/XML/';
 my $fds = Metamod::ForeignDataset->newFromFileAutocomplete($DataDir."exampleDIF");
@@ -31,7 +31,7 @@ isa_ok(Metamod::DatasetTransformer::autodetect($fds), 'Metamod::DatasetTransform
 my $difFromISO = foreignDataset2Dif($fds);
 isa_ok($difFromISO, 'Metamod::ForeignDataset');
 my $dti = Metamod::DatasetTransformer::autodetect($difFromISO);
-isa_ok($dti, 'Metamod::DatasetTransformer::DIF'); 
+isa_ok($dti, 'Metamod::DatasetTransformer::DIF');
 
 # mm2 -> dif
 $fds = Metamod::ForeignDataset->newFromFileAutocomplete($DataDir."exampleMM2");
@@ -41,5 +41,5 @@ isa_ok(Metamod::DatasetTransformer::autodetect($fds), 'Metamod::DatasetTransform
 my $difFromMM2 = foreignDataset2Dif($fds);
 isa_ok($difFromMM2, 'Metamod::ForeignDataset');
 my $dtm = Metamod::DatasetTransformer::autodetect($difFromMM2);
-isa_ok($dtm, 'Metamod::DatasetTransformer::DIF'); 
+isa_ok($dtm, 'Metamod::DatasetTransformer::DIF');
 

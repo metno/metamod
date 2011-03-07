@@ -64,10 +64,12 @@ PG_CONNECTSTRING_PHP =
 
 # String used in Perl DBI->connect function to connect to the
 # database:
-PG_CONNECTSTRING_PERL = host=localhost;port=15432;
+PG_CONNECTSTRING_PERL = host=localhost;password=admin
 
 # Name of the PostgreSQL database:
-DATABASE_NAME = damocles
+DATABASE_NAME = metamod-unittest
+
+USERBASE_NAME = metamod-unittest_userbase
 
 # URL of Metadata Search application:
 METADATA_SEARCH_URL = [==LOCAL_URL==]/sch/index.php
@@ -368,3 +370,4 @@ TEST_EMAIL_RECIPIENT =
 
 LOG4PERL_CONFIG = logger_config.ini
 LOG4ALL_SYSTEM_LOG = system_log.log
+LOG4PERL_WATCH_TIME = 30

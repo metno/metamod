@@ -13,6 +13,8 @@ use Test::More;
 BEGIN {
     my $config_file = "$FindBin::Bin/../master_config.txt";
     $ENV{METAMOD_MASTER_CONFIG} = $config_file unless exists $ENV{METAMOD_MASTER_CONFIG};
+    $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/../log4perl_config.ini";
+    $ENV{METAMOD_SOURCE_DIRECTORY} = "$FindBin::Bin/../../../..";
 }
 
 use Metamod::Config qw( :init_logger );
@@ -125,7 +127,7 @@ END_XML
     };
 
     is_deeply( $result, $expected, 'Dataset is in user database and has subscriptions.' );
-    
+
     BEGIN { $num_tests += 4 };
 }
 

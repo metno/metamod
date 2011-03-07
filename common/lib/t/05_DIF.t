@@ -37,10 +37,15 @@ use lib "$FindBin::Bin/../";
 
 use Test::More tests => 19;
 
-BEGIN{$ENV{METAMOD_XSLT_DIR} = '../../schema/';}
+BEGIN{
+    $ENV{METAMOD_MASTER_CONFIG} = "$FindBin::Bin/master_config.txt";
+    $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/log4perl_config.ini";
+    $ENV{METAMOD_SOURCE_DIRECTORY} = "$FindBin::Bin/../../..";
+}
+
+use Metamod::Config qw(:init_logger);
 
 BEGIN {use_ok('Metamod::DatasetTransformer::DIF');}
-Log::Log4perl::init( "log4perl_config.ini" );
 
 my $DataDir = $FindBin::Bin.'/data/XML/';
 my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent($DataDir."exampleDIF");
@@ -62,7 +67,7 @@ my $dr = $ds->getDatasetRegion;
 my %bb = $dr->getBoundingBox;
 is_deeply(\%bb, {north => '90.00', south => '-90.00', east => '180.00', west => '-180.00'}, "bounding box in datasetRegion");
 my @polygons = $dr->getPolygons;
-is(2, scalar @polygons, "two polygons transformed from DIF"); 
+is(2, scalar @polygons, "two polygons transformed from DIF");
 
 my $obj2 = new Metamod::DatasetTransformer::DIF('bla', 'blub');
 isa_ok($obj2, 'Metamod::DatasetTransformer::DIF');

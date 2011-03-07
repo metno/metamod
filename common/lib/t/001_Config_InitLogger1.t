@@ -44,6 +44,11 @@ use Test::Files;
 # set the master_config to use in the enviroment so that it is availble to Metamod::Config
 BEGIN {
     $ENV{ METAMOD_MASTER_CONFIG } = "$FindBin::Bin/master_config.txt";
+    $ENV{ METAMOD_LOG4PERL_CONFIG } = "$FindBin::Bin/test_initlogger_config.ini";
+
+    # To fix the placement of the logger output relative to the test script we must define it here
+    $ENV{INITLOGGER_TEST_OUTPUT} = "$FindBin::Bin/log4perl_test.log";
+
 }
 
 use Metamod::Config qw( :init_logger );
@@ -53,4 +58,4 @@ my $logger = get_logger( 'test' );
 $logger->info( 'Test 1' );
 $logger->error( 'Test 2' );
 
-compare_ok( "$FindBin::Bin/expected_log.log", "$FindBin::Bin/log4perl_test.log", 'Compile-time initialised logger output' );
+compare_ok( "$FindBin::Bin/log4perl_test.log", "$FindBin::Bin/expected_log.log", 'Compile-time initialised logger output' );

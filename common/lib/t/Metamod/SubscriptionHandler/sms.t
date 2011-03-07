@@ -11,6 +11,7 @@ use lib "$FindBin::Bin/../../..";
 BEGIN {
     my $config_file = "$FindBin::Bin/../../master_config.txt";
     $ENV{METAMOD_MASTER_CONFIG} = $config_file unless exists $ENV{METAMOD_MASTER_CONFIG};
+    $ENV{ METAMOD_LOG4PERL_CONFIG } = "$FindBin::Bin/../../log4perl_config.ini";
 }
 
 use Cwd qw( abs_path );
@@ -292,7 +293,7 @@ sub add_location {
         die "Could not find the dataset '$ds_name' in the user database";
     }
 
-    $userbase->infoDS_put( 'LOCATION', "$location" );
+    $userbase->dset_put( 'LOCATION', "$location" );
     $userbase->close();
 
 }

@@ -38,7 +38,7 @@ use Test::More tests => 10;
 BEGIN{$ENV{METAMOD_XSLT_DIR} = $FindBin::Bin.'/../../schema/';}
 
 BEGIN {use_ok('Metamod::DatasetTransformer::OldDataset');}
-Log::Log4perl::init( "log4perl_config.ini" );
+Log::Log4perl::init( "$FindBin::Bin/log4perl_config.ini" );
 
 my $DataDir = $FindBin::Bin.'/data/XML/';
 my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent($DataDir."oldDataset");

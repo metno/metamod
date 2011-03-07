@@ -39,11 +39,16 @@ use Test::More tests => 51;
 
 use Data::Dumper qw(Dumper);
 
-BEGIN{$ENV{METAMOD_XSLT_DIR} = '../../schema/';}
+BEGIN{
+    $ENV{METAMOD_MASTER_CONFIG} = "$FindBin::Bin/master_config.txt";
+    $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/log4perl_config.ini";
+    $ENV{METAMOD_SOURCE_DIRECTORY} = "$FindBin::Bin/../../..";
+}
+
+use Metamod::Config qw(:init_logger);
 
 BEGIN {use_ok('Metamod::ForeignDataset')};
 BEGIN {use_ok('Metamod::Dataset');}
-Log::Log4perl::init( "log4perl_config.ini" );
 
 my $string = pack('U4',"65","66","31","67");
 

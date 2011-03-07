@@ -12,7 +12,7 @@ BEGIN {$ENV{METAMOD_XSLT_DIR} = "$FindBin::Bin/../../schema/";}
 
 BEGIN {use_ok('Metamod::DatasetTransformer::ToISO19115', "foreignDataset2iso19115")};
 
-Log::Log4perl::init( "log4perl_config.ini" );
+Log::Log4perl::init( "$FindBin::Bin/log4perl_config.ini" );
 
 # iso -> iso
 my $DataDir = $FindBin::Bin.'/data/XML/';
@@ -41,5 +41,4 @@ isa_ok(Metamod::DatasetTransformer::autodetect($fds), 'Metamod::DatasetTransform
 my $isoFromMM2 = foreignDataset2iso19115($fds);
 isa_ok($isoFromMM2, 'Metamod::ForeignDataset');
 my $dtm = Metamod::DatasetTransformer::autodetect($isoFromMM2);
-isa_ok($dtm, 'Metamod::DatasetTransformer::ISO19115'); 
- 
+isa_ok($dtm, 'Metamod::DatasetTransformer::ISO19115');

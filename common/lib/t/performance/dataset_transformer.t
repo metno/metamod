@@ -8,7 +8,15 @@ use FindBin;
 
 use lib "$FindBin::Bin/../../";
 
-my $num_tests = 0; 
+BEGIN {
+    $ENV{METAMOD_MASTER_CONFIG} = "$FindBin::Bin/../master_config.txt";
+    $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/../log4perl_config.ini";
+    $ENV{METAMOD_SOURCE_DIRECTORY} = "$FindBin::Bin/../../../..";
+}
+
+use Metamod::Config qw(:init_logger);
+
+my $num_tests = 0;
 use Test::More;
 
 use Metamod::ForeignDataset;
@@ -22,19 +30,19 @@ my $data_dir = "$FindBin::Bin/../data/performance";
 # performance tests for MM2 files
 {
     my $mm2_file = "$data_dir/mm2";
-    
-    my $autodetect_sub = sub { 
+
+    my $autodetect_sub = sub {
         my $transformer = Metamod::DatasetTransformer::autodetect($mm2_file);
-        return $transformer; 
+        return $transformer;
     };
-    
+
     my $autodetect_check = sub {
-        my ($transformer) = @_;   
+        my ($transformer) = @_;
         return isa_ok( $transformer, 'Metamod::DatasetTransformer::MM2', '$transformer' );
     };
-    
+
     $perf->statistic_perf_ok( $autodetect_sub, $autodetect_check, 'MM2 autodetect()' );
-    
+
     my $transformer = Metamod::DatasetTransformer::autodetect($mm2_file);
     $perf->statistic_perf_ok( sub { $transformer->transform(); }, 1, 'MM2 transform()', );
 
@@ -44,24 +52,24 @@ my $data_dir = "$FindBin::Bin/../data/performance";
 # performance test for DIF files
 {
     my $dif_file = "$data_dir/dif";
-    
-    my $autodetect_sub = sub { 
+
+    my $autodetect_sub = sub {
         my $transformer = Metamod::DatasetTransformer::autodetect($dif_file);
-        return $transformer; 
+        return $transformer;
     };
-    
+
     my $autodetect_check = sub {
-        my ($transformer) = @_;   
+        my ($transformer) = @_;
         return isa_ok( $transformer, 'Metamod::DatasetTransformer::DIF', '$transformer' );
     };
-    
+
     $perf->statistic_perf_ok( $autodetect_sub, $autodetect_check, 'DIF autodetect()' );
-    
+
     my $transformer = Metamod::DatasetTransformer::autodetect($dif_file);
     $perf->statistic_perf_ok( sub { $transformer->transform(); }, 1, 'DIF transform()', );
 
     BEGIN { $num_tests += 3 }
-    
+
 }
 
 BEGIN { plan tests => $num_tests }

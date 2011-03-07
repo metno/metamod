@@ -36,7 +36,7 @@ use lib "$FindBin::Bin/../";
 use Test::More tests => 10;
 
 BEGIN {use_ok('Metamod::DatasetTransformer::MM2');}
-Log::Log4perl::init( "log4perl_config.ini" );
+Log::Log4perl::init( "$FindBin::Bin/log4perl_config.ini" );
 
 my $DataDir = $FindBin::Bin.'/data/XML/';
 my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent($DataDir."exampleMM2");
