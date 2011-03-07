@@ -53,8 +53,8 @@ sub init_metadb_test {
         return 'Cannot connect to the database: ' . $@;
     }
 
-    my $user    = $config->get('PG_ADMIN_USER') || die 'Missing PG_ADMING_USER in master_config.txt';
-    my $db_name = $config->get('DATABASE_NAME') || die 'Missing DDATABASE_NAME in master_config.txt';
+    my $user    = 'admin';
+    my $db_name = 'metamod-unittest';
     my $result  = populate_database( $dump_file, $user, $db_name );
     return $result;
 
@@ -81,9 +81,9 @@ sub init_userdb_test {
     my $config = Metamod::Config->new();
     $config->initLogger();
 
-    my $user    = $config->get('PG_WEB_USER') || die 'Missing PG_WEB_USER in master_config.txt';
-    my $db_name = $config->get('USERBASE_NAME') || die 'Missing USERBASE_NAME in master_config.txt';
-    
+    my $user    = 'admin';
+    my $db_name = 'metamod-unittest_userbase';
+
     my $result  = populate_database( $dump_file, $user, $db_name );
     return $result;
 
@@ -119,6 +119,7 @@ sub populate_database {
 
     my $command = "psql -U $user --dbname $db_name --file $dump_file -o $output_file";
     my $success = system $command;
+
 
     if ( $? == -1 ) {
         return "Failed to execute '$command': $!\n";
@@ -207,8 +208,8 @@ Always returns false.
 sub empty_userdb {
     my $config = Metamod::Config->new();
 
-    my $dbname  = $config->get("USERBASE_NAME");
-    my $user    = $config->get("PG_WEB_USER");
+    my $dbname  = 'metamod-unittest_userbase';
+    my $user    = 'admin';
     my $connect = "dbi:Pg:dbname=" . $dbname . " " . $config->get("PG_CONNECTSTRING_PERL");
     my $dbh     = DBI->connect_cached(
         $connect, $user, "",
@@ -220,10 +221,10 @@ sub empty_userdb {
     );
 
     my @tables = qw(
-        dataset
         file
         infods
         infouds
+        dataset
         usertable
     );
 
@@ -239,11 +240,12 @@ sub empty_userdb {
             or print STDERR $dbh->errstr();
     }
 
-    foreach my $sequences (@sequences) {
-        $dbh->do("SELECT setval('$sequences', 1, false)") or print STDERR $dbh->errstr();
+    foreach my $sequence (@sequences) {
+        $dbh->do("SELECT setval('$sequence', 1, false)") or print STDERR $dbh->errstr();
     }
     $dbh->commit();
 
+    print "Done\n";
     return;
 
 }
