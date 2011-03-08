@@ -75,9 +75,9 @@ PG_CONNECTSTRING_PHP =
 PG_CONNECTSTRING_PERL = password=admin
 
 # Name of the PostgreSQL database:
-DATABASE_NAME = metamod-unittest
+DATABASE_NAME = metamod_unittest
 
-USERBASE_NAME = metamod-unittest_userbase
+USERBASE_NAME = metamod_unittest_userbase
 
 # URL of Metadata Search application:
 METADATA_SEARCH_URL = [==LOCAL_URL==]/sch/index.php
