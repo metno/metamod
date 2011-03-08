@@ -26,7 +26,7 @@ my $coverage = '';
 
 GetOptions('smolder' => \$send_to_smolder, 'verbose' => \$verbose, 'coverage' => \$coverage ) or pod2usage(1);
 
-# we want to test post as well.
+# we want to test POD as well.
 $ENV{TEST_POD} = 1;
 
 my $output_file = 'auto_test_result.tar.gz';
