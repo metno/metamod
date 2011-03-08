@@ -135,6 +135,8 @@ sub setup_environment {
     $ENV{METAMOD_MASTER_CONFIG} = File::Spec->catfile( $self->master_config_dir, $self->master_config_file );
     $ENV{CATALYST_DEBUG} = 0;
 
+    $ENV{METAMOD_LOG4PERL_CONFIG} = File::Spec->catfile($self->catalyst_root(), 't', 'log4perl_config.ini');
+
     return 1;
 }
 
