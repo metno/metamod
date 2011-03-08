@@ -95,6 +95,9 @@ my %default_config = (
             __PACKAGE__->config->{root},
         ],
         dirs => [ 'static', 'download' ],
+        mime_types => {
+            xmd => 'text/xml',
+        },
     }
 );
 

@@ -199,6 +199,7 @@ sub dataset_POST  { # create a new dataset
     my ( $self, $c ) = @_;
 
     my $para = $c->request->params;
+    my $path = "/" . $c->req->match;
 
     my $row = {
         a_id => $c->stash->{mm_config}->get('APPLICATION_ID'),
@@ -212,10 +213,10 @@ sub dataset_POST  { # create a new dataset
     if ($@) {
         # create record failed
         $self->add_error_msgs( $c, error_from_exception($@) );
-        $c->response->redirect( $c->uri_for('/upload/dataset', $para ) );
+        $c->response->redirect( $c->uri_for($path, $para ) );
     } else {
         # success - now go back and read dataset from db
-        $c->response->redirect( $c->uri_for('/upload/dataset', $ds_id) );
+        $c->response->redirect( $c->uri_for($path, $ds_id) );
     }
 }
 
@@ -254,6 +255,7 @@ sub dataset_x_POST  { # update existing dataset
 
     my $para = $c->request->params;
     my $ds_id = $c->stash->{ds_id};
+    my $path = "/" . $c->req->match;
 
     my $row = {
         a_id => $c->stash->{mm_config}->get('APPLICATION_ID'),
@@ -269,10 +271,10 @@ sub dataset_x_POST  { # update existing dataset
     if ($@) {
         # update record failed
         $self->add_error_msgs( $c, error_from_exception($@) );
-        $c->response->redirect( $c->uri_for('/upload/dataset', $ds_id, $para) );
+        $c->response->redirect( $c->uri_for($path, $ds_id, $para) );
     } else {
         # success - now go back and read dataset from db
-        $c->response->redirect( $c->uri_for('/upload/dataset', $ds_id) );
+        $c->response->redirect( $c->uri_for($path, $ds_id) );
     }
 
 }

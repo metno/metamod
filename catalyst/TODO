@@ -2,6 +2,8 @@
 Things to do in Catalyst version of Metamod
 -------------------------------------------
 
+* mm-xml file editor [GA]
+
 * add dialog to confirm overwriting previously uploaded files
 
 * security filters for appid/ownertag?
@@ -10,7 +12,7 @@ Things to do in Catalyst version of Metamod
 
 * use config::general?
 
-* fix bug where init.d doesn't restart/stop catalyst
+* fix bug where init.d doesn't restart/stop catalyst (when?)
 
 * make gen_httpd_conf run during update_target
 
