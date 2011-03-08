@@ -18,6 +18,7 @@
 <td bgcolor="#f5f5dc">
     <a href="[% c.uri_for('/admin/showconfig') %]">View master_config.txt</a><br>
     <a href="[% c.uri_for('/admin/showlog') %]">View METAMOD log</a><br>
+    <a href="[% c.uri_for('/admin/dsmanager') %]">Dataset manager</a><br>
     <a href="[% c.uri_for('/admin/viewtable') %]">View table in Metadatabase</a><br>
     <a href="[% c.uri_for('/admin/sql_prepare_meta') %]">Run SQL command on Metadatabase</a><br>
     <a href="[% c.uri_for('/admin/viewusertable') %]">View table in User database</a><br>

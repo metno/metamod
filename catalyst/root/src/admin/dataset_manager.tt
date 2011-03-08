@@ -1,0 +1,76 @@
+[% INCLUDE admin/admin_header.tt %]
+<h2>Dataset manager:</h2>
+<form action="[% dsmanager_url %]" method="post">
+<table border="0" bgcolor="#f5f5dc" width="100%">
+<tr>
+   <td align="right">Select datasets with names corresponding to regular expression: </td>
+   <td>&nbsp;</td>
+   <td><input type="text"  size="40" name="regexp" value="[% regexp_value %]"/></td>
+   <td><input type="submit" name="exp" value="Use regexp" /></td>
+</tr>
+<tr>
+   <td align="right">Select all datasets: </td>
+   <td>&nbsp;</td>
+   <td>&nbsp;</td>
+   <td><input type="submit" name="all" value="Select all" /></td>
+</tr>
+<tr>
+   <td align="right">Flip selected/unselected: </td>
+   <td>&nbsp;</td>
+   <td>&nbsp;</td>
+   <td><input type="submit" name="flip" value="Flip" /></td>
+</tr>
+<tr>
+   <td align="right">Which datasets to show: </td>
+   <td>&nbsp;</td>
+   <td>[% select_html %]</td>
+   <td><input type="submit" name="refresh" value="Refresh" /></td>
+</tr>
+<tr>
+   <td colspan="4">&nbsp;</td>
+</tr>
+<tr>
+   <td align="right">Mark selected datasets as deleted: </td>
+   <td>&nbsp;</td>
+   <td>&nbsp;</td>
+   <td><input type="submit" name="mdel" value="Delete" /></td>
+</tr>
+<tr>
+   <td align="right">Mark selected datasets as active: </td>
+   <td>&nbsp;</td>
+   <td>&nbsp;</td>
+   <td><input type="submit" name="activate" value="Activate" /></td>
+</tr>
+<tr>
+   <td align="right">Change ownertag on all selected datasets. New ownertag: </td>
+   <td>&nbsp;</td>
+   <td><input type="text"  size="40" name="newtag" value="[% newtag %]"/></td>
+   <td><input type="submit" name="owner" value="Change" /></td>
+</tr>
+<tr>
+   <td colspan="4">&nbsp;</td>
+</tr>
+<tr>
+   <td colspan="3"><small><i><b>Note:</b> The last three actions (Delete, Activate and Change) 
+      will not be effectuated until the next automatic database update.
+      <br />Accordingly, no change in the status or ownertag column 
+      will be seen immideately.</i></small></td>
+   <td>&nbsp;</td>
+</tr>
+</table>
+<br />
+<table bgcolor="#ffffff" border="1" cellspacing="0" width="100%">
+<tr>
+   <th bgcolor="#f5f5dc">Select</th>
+   <th>Id</th>
+   <th>Name</th>
+   <th>Status</th>
+   <th>Ownertag</th>
+   <th>File path</th>
+</tr>
+[% FOREACH row IN wholetable %]
+     [% row %]
+[% END %]
+</table>
+</form>
+[% INCLUDE admin/admin_footer.tt %]
