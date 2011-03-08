@@ -101,7 +101,7 @@ sub authenticate :Path('authenticate') :Args(0) {
             # For that we use the CGI param 'return_path' if set.
             my $return_path = $c->request->param( 'return_path' ) || '/';
             $c->log->debug( "Return:" . $return_path );
-            my $return_params = $c->request->param('return_params');
+            my $return_params = $c->request->param('return_params') || '';
 
             $c->response->redirect($c->uri_for($return_path) . "?$return_params" );
             return;
