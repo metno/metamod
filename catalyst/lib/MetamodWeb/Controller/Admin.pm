@@ -46,7 +46,7 @@ sub index :Path :Args(0) {
 =cut
 
 sub adminmenu :Path :Args(0) {
-     my ( $self, $c ) = @_;
+    my ( $self, $c ) = @_;
 
      $c->stash(template => 'admin/adminmenu.tt');
      $c->stash(current_view => 'Raw');
@@ -57,20 +57,20 @@ sub adminmenu :Path :Args(0) {
 =cut
 
 sub showconfig :Local :Args(0) {
-     my ( $self, $c ) = @_;
+    my ( $self, $c ) = @_;
 
-     $c->stash(template => 'admin/showconfig.tt');
-     $c->stash(current_view => 'Raw');
-     my $mm_config = $c->stash->{ mm_config };
-     my $config_filename = $mm_config->{ filename };
-     my $config_content;
-     {
-         local $/;
-         open (CONFIG,$config_filename);
-         $config_content = <CONFIG>;
-         close (CONFIG);
-     }
-     $c->stash(config_content => $config_content);
+    $c->stash(template => 'admin/showconfig.tt');
+    $c->stash(current_view => 'Raw');
+    my $mm_config = $c->stash->{ mm_config };
+    my $config_filename = $mm_config->{ filename };
+    my $config_content;
+    {
+        local $/;
+        open (CONFIG,$config_filename);
+        $config_content = <CONFIG>;
+        close (CONFIG);
+    }
+    $c->stash(config_content => $config_content);
 }
 
 =head2 showlog
@@ -78,85 +78,85 @@ sub showconfig :Local :Args(0) {
 =cut
 
 sub showlog :Local :Args(0) {
-     my ( $self, $c ) = @_;
+    my ( $self, $c ) = @_;
 
-     my $mm_config = $c->stash->{ mm_config };
-     my $log_filename = $mm_config->get("LOG4ALL_SYSTEM_LOG");
-     my $pars = $c->req->parameters;
-     my $result = "";
-     my $get_result = 0;
-     my $fromdate = "";
-     if (exists($pars->{'fromdate'})) {
+    my $mm_config = $c->stash->{ mm_config };
+    my $log_filename = $mm_config->get("LOG4ALL_SYSTEM_LOG");
+    my $pars = $c->req->parameters;
+    my $result = "";
+    my $get_result = 0;
+    my $fromdate = "";
+    if (exists($pars->{'fromdate'})) {
         $fromdate = $pars->{'fromdate'};
-     }
-     my $todate = "";
-     if (exists($pars->{'todate'})) {
+    }
+    my $todate = "";
+    if (exists($pars->{'todate'})) {
         $todate = $pars->{'todate'};
-     }
-     if ($todate eq "") {
+    }
+    if ($todate eq "") {
         $todate = $fromdate;
-     }
-     if ($fromdate eq "") {
+    }
+    if ($fromdate eq "") {
         $fromdate = $todate;
-     }
-     my $logger = "";
-     if (exists($pars->{'logger'})) {
+    }
+    my $logger = "";
+    if (exists($pars->{'logger'})) {
         $logger = $pars->{'logger'};
-     }
-     my $level = "";
-     if (exists($pars->{'level'})) {
+    }
+    my $level = "";
+    if (exists($pars->{'level'})) {
         $level = $pars->{'level'};
-     }
-     my $multiline_is_checked = "";
-     my $multiline = "";
-     if (exists($pars->{'multiline'})) {
+    }
+    my $multiline_is_checked = "";
+    my $multiline = "";
+    if (exists($pars->{'multiline'})) {
         $multiline = $pars->{'multiline'};
-     }
-     if ($multiline eq "multiline") {
+    }
+    if ($multiline eq "multiline") {
         $multiline_is_checked = "checked";
-     }
-     my $optionstring = $multiline . " logfile=" . $log_filename . " ";
-     if (exists($pars->{'summarydate'})) {
+    }
+    my $optionstring = $multiline . " logfile=" . $log_filename . " ";
+    if (exists($pars->{'summarydate'})) {
         $optionstring .= 'summarydate ';
         $fromdate = "";
         $todate = "";
         $get_result = 1;
-     } elsif (exists($pars->{'summarylogger'})) {
+    } elsif (exists($pars->{'summarylogger'})) {
         $optionstring .= 'summarylogger ';
         $logger = "";
         $get_result = 1;
-     } elsif (exists($pars->{'summarylevel'})) {
+    } elsif (exists($pars->{'summarylevel'})) {
         $optionstring .= 'summarylevel ';
         $level = "";
         $get_result = 1;
-     } elsif (exists($pars->{'getmessages'})) {
+    } elsif (exists($pars->{'getmessages'})) {
         $result = mmLogView::run($optionstring);
         $get_result = 1;
-     }
-     if ($fromdate ne "") {
+    }
+    if ($fromdate ne "") {
         $optionstring .= "from=" . $fromdate . " ";
-     }
-     if ($todate ne "") {
+    }
+    if ($todate ne "") {
         $optionstring .= "to=" . $todate . " ";
-     }
-     if ($logger ne "") {
+    }
+    if ($logger ne "") {
         $optionstring .= "logger=" . $logger . " ";
-     }
-     if ($level ne "") {
+    }
+    if ($level ne "") {
         $optionstring .= "level=" . $level . " ";
-     }
-     if ($get_result == 1) {
+    }
+    if ($get_result == 1) {
         $result = mmLogView::run($optionstring);
-     }
-     $c->stash(template => 'admin/showlog.tt');
-     $c->stash(current_view => 'Raw');
-     $c->stash(result => $result);
-     $c->stash(optionstring => $optionstring);
-     $c->stash(fromdate => $fromdate);
-     $c->stash(todate => $todate);
-     $c->stash(logger => $logger);
-     $c->stash(level => $level);
-     $c->stash(multiline_is_checked => $multiline_is_checked);
+    }
+    $c->stash(template => 'admin/showlog.tt');
+    $c->stash(current_view => 'Raw');
+    $c->stash(result => $result);
+    $c->stash(optionstring => $optionstring);
+    $c->stash(fromdate => $fromdate);
+    $c->stash(todate => $todate);
+    $c->stash(logger => $logger);
+    $c->stash(level => $level);
+    $c->stash(multiline_is_checked => $multiline_is_checked);
 }
 
 =head1 AUTHOR
