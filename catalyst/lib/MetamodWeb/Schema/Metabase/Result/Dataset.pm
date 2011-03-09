@@ -138,6 +138,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
+use Carp;
+use Try::Tiny;
+
 =head2 $self->unqualified_ds_name()
 
 =over
@@ -280,8 +283,17 @@ sub wmsinfo {
 
     my $parser = new XML::LibXML;
     my $dom = $parser->parse_string( $wmsinfo_row->wi_content() );
-    # TODO: add check for ncWMSsetup namespace in preparation for other formats
-    my $url = $dom->documentElement->getAttribute('url');
+    my $root = $dom->documentElement;
+    # check if correct wmsinfo format
+    if ($root->namespaceURI ne 'http://www.met.no/schema/metamod/ncWmsSetup') {
+        carp "Wrong WMSinfo format!\n";
+        return;
+    }
+    my $url = $root->getAttribute('url');
+    if (!$url) {
+        carp "Missing url in wmsinfo!";
+        return;
+    }
 
     my ($tag, $parent, $dataset) = split '/', $self->ds_name;
     #printf STDERR " *** %s\n", join '|', ($tag, $parent, $dataset);
@@ -289,8 +301,9 @@ sub wmsinfo {
     $url =~ s|%DATASET_PARENT%|$parent|;
     $dom->documentElement->setAttribute('url', $url);
     #printf STDERR " ******** WMSINFO: %s\n", $wmsinfo_row->wi_content();
+
     return $dom;
-    #return $wmsinfo_row->wi_content();
+
 }
 
 =head2 $self->wmsthumb()
@@ -311,56 +324,58 @@ sub wmsthumb {
     my $self = shift;
     my ($size) = @_;
 
-    my $config = Metamod::Config->new();
+    try {
+        my $config = Metamod::Config->new();
 
-    my $setup = $self->wmsinfo;
-    if (!$setup) {
-        printf STDERR "Error: Missing wmsSetup for dataset %s\n", $self->ds_name;
+        my $setup = $self->wmsinfo or die "Error: Missing wmsSetup for dataset " . $self->ds_name;
+
+        #printf STDERR "* Setup (%s) = %s\n", ref $setup, $setup->toString;
+        my $sxc = XML::LibXML::XPathContext->new( $setup->documentElement() );
+        $sxc->registerNs('s', "http://www.met.no/schema/metamod/ncWmsSetup");
+
+        # find base URL from wmsinfo
+        my $wms_url = $sxc->findvalue('/*/@url') or die "Missing URL in wmsinfo";
+
+        # find area info (dimensions, projection)
+        my (%area, %layer);
+        foreach ( $sxc->findnodes('/*/s:displayArea[1]/@*') ) {
+            $area{$_->nodeName} = $_->getValue;
+        }
+        # find metadata of first layer (name, style)
+        foreach ( $sxc->findnodes('/*/s:layer[1]/@*') ) {
+            $layer{$_->nodeName} = $_->getValue;
+        }
+
+        # build WMS params for maps
+        my $wmsparams = "SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&FORMAT=image%2Fpng"
+            . "&SRS=$area{crs}&BBOX=$area{left},$area{bottom},$area{right},$area{top}&WIDTH=$size&HEIGHT=$size"
+            . "&EXCEPTIONS=application%2Fvnd.ogc.se_inimage";
+
+        # these map url's should really be configured somewhere else
+        my $mapserver = $config->get('WMS_BACKGROUND_MAPSERVER');
+        my $map = $config->get('WMS_WORLD_MAP');
+        if ($area{crs} eq "EPSG:32661") {
+            $map = $config->get('WMS_NORTHPOLE_MAP');
+        } elsif ($area{crs} eq "EPSG:32761") {
+            $map = $config->get('WMS_SOUTHPOLE_MAP');
+        }
+
+        #print STDERR Dumper($wms_url, \%area, \%layer ); #$metadata
+
+        my $out = {
+            xysize  => $size,
+            datamap => "$wms_url?$wmsparams&LAYERS=$layer{name}&STYLES=$layer{style}",
+            outline => "$mapserver$map?$wmsparams&TRANSPARENT=true&LAYERS=borders&STYLES=",
+        };
+
+        #print STDERR Dumper($out);
+
+        return $out;
+
+    } catch {
+        carp $_; # use logger - FIXME
         return;
     }
-    #printf STDERR "* Setup (%s) = %s\n", ref $setup, $setup->toString;
-    my $sxc = XML::LibXML::XPathContext->new( $setup->documentElement() );
-    $sxc->registerNs('s', "http://www.met.no/schema/metamod/ncWmsSetup");
-
-    # find base URL from wmsinfo
-    my $wms_url = $sxc->findvalue('/*/@url') or die "Missing URL in wmsinfo";
-
-    # find area info (dimensions, projection)
-    my (%area, %layer);
-    foreach ( $sxc->findnodes('/*/s:displayArea[1]/@*') ) {
-        $area{$_->nodeName} = $_->getValue;
-    }
-    # find metadata of first layer (name, style)
-    foreach ( $sxc->findnodes('/*/s:layer[1]/@*') ) {
-        $layer{$_->nodeName} = $_->getValue;
-    }
-
-    # build WMS params for maps
-    my $wmsparams = "SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&FORMAT=image%2Fpng"
-        . "&SRS=$area{crs}&BBOX=$area{left},$area{bottom},$area{right},$area{top}&WIDTH=$size&HEIGHT=$size"
-        . "&EXCEPTIONS=application%2Fvnd.ogc.se_inimage";
-
-    # these map url's should really be configured somewhere else
-    my $mapserver = $config->get('WMS_BACKGROUND_MAPSERVER');
-    my $map = $config->get('WMS_WORLD_MAP');
-    if ($area{crs} eq "EPSG:32661") {
-        $map = $config->get('WMS_NORTHPOLE_MAP');
-    } elsif ($area{crs} eq "EPSG:32761") {
-        $map = $config->get('WMS_SOUTHPOLE_MAP');
-    }
-
-    #print STDERR Dumper($wms_url, \%area, \%layer ); #$metadata
-
-    my $out = {
-        xysize  => $size,
-        datamap => "$wms_url?$wmsparams&LAYERS=$layer{name}&STYLES=$layer{style}",
-        outline => "$mapserver$map?$wmsparams&TRANSPARENT=true&LAYERS=borders&STYLES=",
-    };
-
-    #print STDERR Dumper($out);
-
-    return $out;
-
 }
 
 =head2 $self->is_level1_dataset()
