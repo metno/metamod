@@ -115,7 +115,7 @@ sub new {
     }, $class;
 
     if ($str) {
-        my $doc = XML::LibXML->load_xml(string => $str)
+        my $doc = XML::LibXML->new()->parse_string($str)
             or $logger->error_die("Cannot xml-parse string $str");
         if ($validate) {
             my $xmlschema = XML::LibXML::Schema->new( location => $class->getFimexProjectionsSchemaPath() )
