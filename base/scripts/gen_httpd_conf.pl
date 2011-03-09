@@ -67,6 +67,7 @@ my $proxies = proxy('search')
             . proxy('admin')
             . proxy('upload')
             . proxy('login')
+            . proxy('logout')
             . proxy('subscription');
 
 my $conf_text = <<EOT;
