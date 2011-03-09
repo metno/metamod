@@ -25,6 +25,12 @@ use Metamod::SubscriptionHandler::EmailToFile;
 
 my $num_tests = 0;
 
+my $config = Metamod::Config->new();
+my $from_address = $config->get('FROM_ADDRESS');
+
+# We must set this so Mail::Util::mailaddress() gives a consistent address;
+$ENV{MAILADDRESS} = $from_address;
+
 # file that will store sent email
 my $mail_file = "$FindBin::Bin/mail.out";
 
@@ -49,16 +55,16 @@ my $ds = Metamod::Dataset->newFromFile( $dataset_file );
 
     $handler->push_to_subscribers( $ds, $subscriptions1 );
 
-    my $expected_mail = <<'END_MAIL';
+    my $expected_mail = <<"END_MAIL";
 
 ===
 test 1 TIMESTAMP
-from: oysteint@pc2988
-to:  oysteint@met.no, oystein.torget@met.no
+from: ${from_address}
+to:  oysteint\@met.no, oystein.torget\@met.no
 
 Subject: [METAMOD] New dataset available for TEST/itp04
-From: someuser@somedomain.com
-Bcc: oysteint@met.no, oystein.torget@met.no
+From: ${from_address}
+Bcc: oysteint\@met.no, oystein.torget\@met.no
 
 
 A new data file has just become available for the dataset TEST/itp04
