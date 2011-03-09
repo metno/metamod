@@ -54,7 +54,7 @@ sub init_metadb_test {
     }
 
     my $user    = 'admin';
-    my $db_name = 'metamod-unittest';
+    my $db_name = 'metamod_unittest';
     my $result  = populate_database( $dump_file, $user, $db_name );
     return $result;
 
@@ -82,7 +82,7 @@ sub init_userdb_test {
     $config->initLogger();
 
     my $user    = 'admin';
-    my $db_name = 'metamod-unittest_userbase';
+    my $db_name = 'metamod_unittest_userbase';
 
     my $result  = populate_database( $dump_file, $user, $db_name );
     return $result;
