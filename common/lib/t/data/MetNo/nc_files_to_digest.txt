@@ -1,2 +1,0 @@
-http://thredds.met.no/thredds/catalog/data/met.no/ecmwf/catalog.html?dataset=met.no/ecmwf/ecmwf_atmo0_5_2010-08-09_00.nc
-/home/oysteint/projects/metamod/common/lib/t/data/MetNo/ecmwf_atmo0_5_2010-08-09_00.nc
