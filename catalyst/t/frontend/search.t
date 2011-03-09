@@ -65,23 +65,24 @@ $mech->text_contains('dataset1', 'Search found matching datasets');
 $mech->text_unlike( qr/dataset2/, 'Search did not return non-matching dataset');
 
 $mech->get_ok( "/search/page/1/expand/$dataset1id?bk_id_2_1619=on" . $basic_search_params , 'Expand children of first hit' );
-$mech->text_contains('dataset1_2008-09-17_12', 'Expanded matching level 2 dataset (num 1, page 1)' );
-$mech->text_contains('dataset1_2010-02-01_12', 'Expanded matching level 2 dataset (num 2, page 1)' );
-$mech->text_contains('dataset1_2008-07-30_12', 'Expanded matching level 2 dataset (num 3, page 1)' );
+$mech->text_contains('dataset1_2008-07-30_12', 'Expanded matching level 2 dataset (num 1, page 1)' );
+$mech->text_contains('dataset1_2008-09-17_12', 'Expanded matching level 2 dataset (num 2, page 1)' );
+$mech->text_contains('dataset1_2010-01-01_12', 'Expanded matching level 2 dataset (num 3, page 1)' );
 
 $mech->get_ok( "/search/page/1/level2page/$dataset1id/2?show_level2_4=1&bk_id_2_1619=on" . $basic_search_params , 'Navigate to second page of children' );
-$mech->text_contains('dataset1_2010-01-01_12', 'Expanded matching level 2 dataset (num 1, page 2)' );
+$mech->text_contains('dataset1_2010-02-01_12', 'Expanded matching level 2 dataset (num 1, page 2)' );
 $mech->text_contains('dataset1_2010-03-01_12', 'Expanded matching level 2 dataset (num 2, page 2)' );
 
 $mech->get_ok( "/search/page/1/deflate/$dataset1id?bk_id_2_1619=on" . $basic_search_params , 'Do not show children for first dataset' );
 $mech->text_unlike(qr/dataset1_2008-09-17_12/, 'First level 2 dataset not shown.' );
 
 $mech->get_ok( '/search/page/1/result?' . $basic_search_params , 'Search with no criteria' );
-$mech->text_contains('dataset4', 'Search found matching datasets (num 1, page 1)');
-$mech->text_contains('dataset3', 'Search found matching datasets (num 2, page 1)');
-$mech->text_contains('dataset2', 'Search found matching datasets (num 3, page 1)');
+$mech->text_contains('dataset1', 'Search found matching datasets (num 1, page 1)');
+$mech->text_contains('dataset2', 'Search found matching datasets (num 2, page 1)');
+$mech->text_contains('dataset3', 'Search found matching datasets (num 3, page 1)');
 
 $mech->get_ok( '/search/page/2/result?' . $basic_search_params , 'Search with no criteria' );
-$mech->text_contains('dataset1', 'Search found matching datasets (num 1, page 2)');
+$mech->text_contains('dataset4', 'Search found matching datasets (num 1, page 2)');
+
 $mech->text_unlike( qr/dataset2/, 'Matching dataset only on one page');
 

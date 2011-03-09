@@ -39,9 +39,9 @@ BEGIN {
 # - Flere kategorier.
 # - Test alle kategorier
 
-test_metadata_search( {}, 1, [qw( TEST/dataset4 TEST/dataset2 TEST/dataset3 )], 'No search criteria. First page' );
+test_metadata_search( {}, 1, [qw( TEST/dataset1 TEST/dataset2 TEST/dataset3 )], 'No search criteria. First page' );
 
-test_metadata_search( {}, 2, [qw( TEST/dataset1 )], 'No search criteria. Second page' );
+test_metadata_search( {}, 2, [qw( TEST/dataset4 )], 'No search criteria. Second page' );
 
 test_metadata_search( {}, 3, [], 'No search criteria. Non existant third page' );
 
@@ -50,14 +50,14 @@ test_metadata_search( { basickey => [ [1616] ] }, 1, [qw( TEST/dataset2 )], 'Sea
 test_metadata_search(
     { basickey => [ [ 1616, 1619, 1613 ] ] },
     1,
-    [qw( TEST/dataset2 TEST/dataset3 TEST/dataset1 )],
+    [qw( TEST/dataset1 TEST/dataset2 TEST/dataset3 )],
     'Search for several basic keys in same category'
 );
 
 test_metadata_search(
     { basickey => [ [ 1616, 1619, 1613 ], [1605] ] },
     1,
-    [qw( TEST/dataset3 TEST/dataset1 )],
+    [qw( TEST/dataset1 TEST/dataset3 )],
     'Search for several basic keys across categories'
 );
 
@@ -67,14 +67,14 @@ test_metadata_search( { dates => { 8 => { from => '20090101', to => '20091231' }
 test_metadata_search(
     { dates => { 8 => { from => '20090101', to => '20100731' } } },
     1,
-    [qw( TEST/dataset2 TEST/dataset3 TEST/dataset1 )],
+    [qw( TEST/dataset1 TEST/dataset2 TEST/dataset3 )],
     'Search for dates. Several completely enclosed by interval'
 );
 
 test_metadata_search(
     { dates => { 8 => { from => '20100102', to => '20100201' } } },
     1,
-    [qw( TEST/dataset3 TEST/dataset1 )],
+    [qw( TEST/dataset1 TEST/dataset3 )],
     'Search for dates. Start date equal to "to date"'
 );
 
@@ -84,14 +84,14 @@ test_metadata_search( { dates => { 8 => { from => '20100102', to => '20100131' }
 test_metadata_search(
     { dates => { 8 => { from => '20100201', to => '20100202' } } },
     1,
-    [qw( TEST/dataset3 TEST/dataset1 )],
+    [qw( TEST/dataset1 TEST/dataset3 )],
     'Search for dates. Start date equal to "from date"'
 );
 
 test_metadata_search(
     { dates => { 8 => { from => '20100205', to => '20100801' } } },
     1,
-    [qw( TEST/dataset2  TEST/dataset3 TEST/dataset1 )],
+    [qw( TEST/dataset1  TEST/dataset2 TEST/dataset3 )],
     'Search for dates. Partial overlap between search dates and dataset dates'
 );
 
@@ -115,7 +115,7 @@ test_metadata_search(
 test_metadata_search(
     { freetext => ['Model'], },
     1,
-    [qw( TEST/dataset3 TEST/dataset1 )],
+    [qw( TEST/dataset1 TEST/dataset3 )],
     'Free text search that match the full text search vector',
 );
 
@@ -166,7 +166,7 @@ test_metadata_search(
         coords => { srid => 93995, x1 => 296, x2 => 363, y1 => 505, y2 => 517 },
     },
     1,
-    [ qw( TEST/dataset2 TEST/dataset3 TEST/dataset1 ) ],
+    [ qw( TEST/dataset1 TEST/dataset2 TEST/dataset3 ) ],
     'Map search that matches dataset from disjoint bounding boxes',
 );
 
@@ -184,11 +184,11 @@ test_metadata_search( { topics => { bk_ids => [ 10222 ] } }, 1, [], 'Search for 
 
 test_metadata_search( { topics => { hk_ids => [ 23211 ] } }, 1, [], 'Search for topic hk_ids without any matches' );
 
-test_metadata_search( { topics => { bk_ids => [ 809, 56 ] } }, 1, [ qw( TEST/dataset2 TEST/dataset1 )], 'Search for topic bk_ids with mathces' );
+test_metadata_search( { topics => { bk_ids => [ 809, 56 ] } }, 1, [ qw( TEST/dataset1 TEST/dataset2 )], 'Search for topic bk_ids with mathces' );
 
-test_metadata_search( { topics => { hk_ids => [ 62, 720 ] } }, 1, [ qw( TEST/dataset3 TEST/dataset1 ) ], 'Search for topic hk_ids with mathces' );
+test_metadata_search( { topics => { hk_ids => [ 62, 720 ] } }, 1, [ qw( TEST/dataset1 TEST/dataset3 ) ], 'Search for topic hk_ids with mathces' );
 
-test_metadata_search( { topics => { bk_ids => [ 809, 56 ], hk_ids => [ 720 ] } }, 1, [qw( TEST/dataset2 TEST/dataset3 TEST/dataset1 )], 'Search for both topic bk_ids and hk_ids' );
+test_metadata_search( { topics => { bk_ids => [ 809, 56 ], hk_ids => [ 720 ] } }, 1, [qw( TEST/dataset1 TEST/dataset2 TEST/dataset3 )], 'Search for both topic bk_ids and hk_ids' );
 
 test_metadata_search( { topics => { bk_ids => [809, 56], hk_ids => [62, 720] }, freetext => [ 'dataset1' ] }, 1, [qw( TEST/dataset1 )], 'Search for both topic bk_ids and hk_id and freetext' );
 

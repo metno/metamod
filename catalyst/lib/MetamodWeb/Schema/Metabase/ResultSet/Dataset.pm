@@ -237,7 +237,7 @@ sub metadata_search_params {
     my %search_attrs = (
             join     => [ { 'ds_has_mds' => 'md_id' } ],
             distinct => 1,
-            order_by => 'me.ds_id',
+            order_by => 'me.ds_name',
     );
 
     return ( \%search_cond, \%search_attrs );
