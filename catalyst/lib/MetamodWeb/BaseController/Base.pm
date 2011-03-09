@@ -20,13 +20,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
+use Log::Log4perl qw(get_logger);
 use Moose;
 use namespace::autoclean;
 use warnings;
 
 BEGIN {extends 'Catalyst::Controller'; }
 
-
+#
+# The logger object that is used for all controllers.
+#
+has 'logger' => ( is => 'ro', default => sub { get_logger('metamodweb::control') } );
 
 =head1 NAME
 
@@ -171,7 +175,6 @@ sub add_form_errors {
     $c->flash( 'form_errors' => \%error_messages );
     return 1;
 }
-
 
 =head1 LICENSE
 
