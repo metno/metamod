@@ -69,35 +69,6 @@ sub _generate_email_header {
 
 }
 
-sub _generate_email_body {
-    my $self = shift;
-
-    my ( $ds ) = @_;
-
-    my %metadata = $ds->getMetadata();
-    my $dataref = $metadata{ dataref };
-    my $parentname = $ds->getParentName();
-
-    my $config = $self->{ _config };
-    my $baseURL = $config->get('BASE_PART_OF_EXTERNAL_URL');
-    my $localURL = $config->get('LOCAL_URL');
-    my $fullURL = $baseURL . $localURL . "/sch/subscription?action=display_remove_subscription&dataset_name=$parentname";
-
-    if( !defined $dataref ){
-        $self->{ _logger }->error('Trying to send email for a file without a dataref');
-        return;
-    }
-
-    my $email_body = <<END_BODY;
-A new data file has just become available for the dataset $parentname
-
-You can download it here: $dataref->[0]
-
-If you wish to
-END_BODY
-
-}
-
 sub _send_email {
     my $self = shift;
 
