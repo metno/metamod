@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use Moose;
 use namespace::autoclean;
 
-BEGIN {extends 'Catalyst::Controller'; }
+BEGIN {extends 'MetamodWeb::BaseController::Base'; }
 
 =head1 NAME
 

@@ -1,61 +1,61 @@
 package MetamodWeb::Controller::Admin::DatasetManager;
- 
+
 =begin LICENSE
- 
+
 METAMOD is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
- 
+
 METAMOD is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
- 
+
 You should have received a copy of the GNU General Public License
 along with METAMOD; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- 
+
 =end LICENSE
- 
+
 =cut
- 
+
 use Moose;
 use namespace::autoclean;
 
-BEGIN {extends 'Catalyst::Controller'; }
+BEGIN {extends 'MetamodWeb::BaseController::Base'; }
 
 use Metamod::Config;
 use Metamod::Dataset;
 # use Data::Dump;
- 
+
 =head1 NAME
- 
+
 <package name> - <description>
- 
+
 =head1 DESCRIPTION
- 
+
 =head1 METHODS
- 
+
 =cut
- 
+
 =head2 auto
- 
+
 =cut
- 
+
 sub auto :Private {
     my ( $self, $c ) = @_;
- 
+
     # Controller specific initialisation for each request.
 }
- 
+
 =head2 index
- 
+
 =cut
- 
+
 sub dataset_manager : Path("/admin/dsmanager") :Args(0) {
     my ( $self, $c ) = @_;
- 
+
     $c->stash(template => 'admin/dataset_manager.tt');
     $c->stash(current_view => 'Raw');
     $c->stash(dsmanager_url => $c->uri_for('/admin/dsmanager'));
@@ -79,7 +79,7 @@ sub dataset_manager : Path("/admin/dsmanager") :Args(0) {
        } elsif ($params->{'which'} and $params->{'which'} eq $select_status) {
           $chk = "checked ";
        }
-       $select_html .= $select_status . 
+       $select_html .= $select_status .
                        ': <input type="radio" name="which" ' .
                        $chk.'value="'. $select_status .'" />' .
                        '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
@@ -158,15 +158,15 @@ sub dataset_manager : Path("/admin/dsmanager") :Args(0) {
     }
     $c->stash(wholetable => \@wholetable);
 }
- 
+
 #
 # Remove comment if you want a controller specific begin(). This
 # will override the less specific begin()
 #
 #sub begin {
-#    my ( $self, $c ) = @_;    
+#    my ( $self, $c ) = @_;
 #}
- 
+
 #
 # Remove comment if you want a controller specific end(). This
 # will override the less specific end()
@@ -174,14 +174,14 @@ sub dataset_manager : Path("/admin/dsmanager") :Args(0) {
 #sub end {
 #    my ( $self, $c ) = @_;
 #}
- 
- 
+
+
 __PACKAGE__->meta->make_immutable;
- 
+
 =head1 LICENSE
- 
+
 GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
- 
+
 =cut
- 
+
 1;

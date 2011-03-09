@@ -3,7 +3,7 @@ use Moose;
 use namespace::autoclean;
 use Metamod::mmLogView;
 
-BEGIN {extends 'Catalyst::Controller'; }
+BEGIN {extends 'MetamodWeb::BaseController::Base'; }
 
 =head1 NAME
 

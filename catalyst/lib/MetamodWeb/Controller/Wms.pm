@@ -41,7 +41,7 @@ use MetamodWeb::Utils::XML::Generator;
 use MetamodWeb::Utils::XML::WMC;
 use Metamod::WMS;
 
-BEGIN { extends 'Catalyst::Controller'; }
+BEGIN { extends 'MetamodWeb::BaseController::Base'; }
 
 
 sub auto :Private {

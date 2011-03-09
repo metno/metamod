@@ -38,7 +38,7 @@ use namespace::autoclean;
 use MetamodWeb::Utils::UploadUtils;
 use Data::Dumper;
 
-BEGIN { extends 'Catalyst::Controller' };
+BEGIN { extends 'MetamodWeb::BaseController::Base' };
 
 sub auto :Private {
     my ( $self, $c ) = @_;
