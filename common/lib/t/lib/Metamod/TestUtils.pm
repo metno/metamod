@@ -208,7 +208,7 @@ Always returns false.
 sub empty_userdb {
     my $config = Metamod::Config->new();
 
-    my $dbname  = 'metamod-unittest_userbase';
+    my $dbname  = 'metamod_unittest_userbase';
     my $user    = 'admin';
     my $connect = "dbi:Pg:dbname=" . $dbname . " " . $config->get("PG_CONNECTSTRING_PERL");
     my $dbh     = DBI->connect_cached(
