@@ -11,11 +11,13 @@ use lib "$FindBin::Bin/../../../common/lib";
 use MetamodWeb::Test::Helper;
 
 my $helper;
+my $dataset1id;
 
 BEGIN {
 
     $helper = MetamodWeb::Test::Helper->new( dataset_dir => "$FindBin::Bin/datasets", );
     $helper->setup_environment();
+
     $helper->run_import_dataset();
 
     if( !$helper->valid_metabase() ){
@@ -26,10 +28,18 @@ BEGIN {
         plan skip_all => "Could not connect to the userbase database: " . $helper->errstr();
     }
 
+    my $metabase = $helper->metabase();
+    my $dataset1 = $metabase->resultset('Dataset')->search({ ds_name => 'TEST/dataset1' } )->first();
+
+    if( !defined $dataset1 ){
+        plan skip_all => "Could not find 'TEST/dataset1'. Probably an import failure";
+    }
+
+    $dataset1id = $dataset1->ds_id();
+
     plan tests => 22;
 
 }
-
 
 BEGIN { use_ok 'MetamodWeb' }
 BEGIN { use_ok 'MetamodWeb::Controller::Search' }
@@ -54,16 +64,16 @@ $mech->get_ok( '/search/page/1/result?bk_id_2_1619=on' . $basic_search_params , 
 $mech->text_contains('dataset1', 'Search found matching datasets');
 $mech->text_unlike( qr/dataset2/, 'Search did not return non-matching dataset');
 
-$mech->get_ok( '/search/page/1/expand/4?bk_id_2_1619=on' . $basic_search_params , 'Expand children of first hit' );
+$mech->get_ok( "/search/page/1/expand/$dataset1id?bk_id_2_1619=on" . $basic_search_params , 'Expand children of first hit' );
 $mech->text_contains('dataset1_2008-09-17_12', 'Expanded matching level 2 dataset (num 1, page 1)' );
 $mech->text_contains('dataset1_2010-02-01_12', 'Expanded matching level 2 dataset (num 2, page 1)' );
 $mech->text_contains('dataset1_2008-07-30_12', 'Expanded matching level 2 dataset (num 3, page 1)' );
 
-$mech->get_ok( '/search/page/1/level2page/4/2?show_level2_4=1&bk_id_2_1619=on' . $basic_search_params , 'Navigate to second page of children' );
+$mech->get_ok( "/search/page/1/level2page/$dataset1id/2?show_level2_4=1&bk_id_2_1619=on" . $basic_search_params , 'Navigate to second page of children' );
 $mech->text_contains('dataset1_2010-01-01_12', 'Expanded matching level 2 dataset (num 1, page 2)' );
 $mech->text_contains('dataset1_2010-03-01_12', 'Expanded matching level 2 dataset (num 2, page 2)' );
 
-$mech->get_ok( '/search/page/1/deflate/4?bk_id_2_1619=on' . $basic_search_params , 'Do not show children for first dataset' );
+$mech->get_ok( "/search/page/1/deflate/$dataset1id?bk_id_2_1619=on" . $basic_search_params , 'Do not show children for first dataset' );
 $mech->text_unlike(qr/dataset1_2008-09-17_12/, 'First level 2 dataset not shown.' );
 
 $mech->get_ok( '/search/page/1/result?' . $basic_search_params , 'Search with no criteria' );
