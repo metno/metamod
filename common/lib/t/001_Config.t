@@ -49,7 +49,7 @@ ok($config->get('TARGET_DIRECTORY'), 'get TARGET_DIRECTORY');
 ok(!$config->get('NOT_THERE'), 'getting false value on NOT_THERE');
 ok(index($config->get("SOURCE_DIRECTORY"), $config->get("BASE_DIRECTORY")) == 0, "get sustitutes variables");
 
-is($config->getDSN(), "dbi:Pg:dbname=metamod-unittest;host=localhost;password=admin", "getDSN");
+is($config->getDSN(), "dbi:Pg:dbname=metamod_unittest;host=localhost;password=admin", "getDSN");
 
 my $config2 = new Metamod::Config($FindBin::Bin.'/../t/master_config.txt');
 is($config, $config2, "config-singleton on same file");
