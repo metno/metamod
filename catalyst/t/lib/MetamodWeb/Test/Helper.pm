@@ -118,6 +118,17 @@ sub _build_userbase {
 #
 has 'errstr' => ( is => 'rw', isa => 'Str' );
 
+#
+# Flag used to tell if the metabase was used and should be cleaned when the script has finished
+#
+has 'metabase_used' => ( is => 'rw', isa => 'Bool', default => 0 );
+
+#
+# Flag used to tell if the userbase was used should be cleaned when the script has finished
+#
+has 'userbase_used' => ( is => 'rw', isa => 'Bool', default => 0 );
+
+
 sub BUILD {
     my $self = shift;
 
@@ -150,6 +161,8 @@ sub run_import_dataset {
     my $output        = `$import_script $dataset_dir`;
 
     print $output;
+
+    $self->metabase_used(1);
 }
 
 sub valid_metabase {
@@ -230,7 +243,127 @@ END_MSG
 
 }
 
+=head2 $self->populate_metabase($dump_file)
+
+Populate the metabase with the contents of a SQL dump file.
+
+=over
+
+=item $dump_file
+
+Path to the sql dump file.
+
+=item return
+
+Return true on success and false otherwise. If there is an error it also sets errstr().
+
+=back
+
+=cut
+
+sub populate_metabase {
+    my $self = shift;
+
+    my ($dump_file) = @_;
+
+    my $success = $self->populate_database($dump_file, 'metamod_unittest' );
+
+    $self->metabase_used(1);
+    return $success;
+
+}
+
+=head2 $self->populate_userbase($dump_file)
+
+Populate the userbase with the contents of a SQL dump file.
+
+=over
+
+=item $dump_file
+
+Path to the sql dump file.
+
+=item return
+
+Return true on success and false otherwise. If there is an error it also sets errstr().
+
+=back
+
+=cut
+
+sub populate_userbase {
+    my $self = shift;
+
+    my ($dump_file) = @_;
+
+    my $success = $self->populate_database( $dump_file, 'metamod_unittest_userbase' );
+
+    $self->userbase_used(1);
+    return $success;
+
+}
+
+=head2 $self->populate_database( $dump_file, $db_name )
+
+Populate the database based on a PostgreSQL dump file.
+
+=item $dump_file
+
+A PostgreSQL dump file that is used to populate the database. This dump file
+should B<NOT> contain any structure commands (DDL), only data.
+
+=item $db_name
+
+The name of the database.
+
+=item return
+
+Returns false on success and an error message otherwise.
+
+=cut
+
+sub populate_database {
+    my $self = shift;
+
+    my ( $dump_file, $db_name ) = @_;
+
+    my $output_file = "$FindBin::Bin/postgresql.out";
+
+    my $command = "psql -U admin --dbname $db_name --file $dump_file -o $output_file";
+    my $success = system $command;
+
+    if ( $? == -1 ) {
+        $self->errstr("Failed to execute '$command': $!\n");
+        return;
+    } elsif ( $? & 127 ) {
+        $self->errstr("PostgreSQL command died with a signal\n");
+        return;
+    } else {
+        return 1;
+    }
+}
+
 sub DEMOLISH {
+    my $self = shift;
+
+    if( $self->metabase_used ){
+        $self->clean_metabase();
+    }
+
+    if( $self->userbase_used ){
+        $self->clean_userbase();
+    }
+
+}
+
+=head2 $self->clean_metabase()
+
+Cleans the metabase be deleting all data from the tables that do not contain
+configuration data. Also resets sequences.
+
+=cut
+
+sub clean_metabase {
     my $self = shift;
 
     my @clean_tables = qw(
@@ -249,42 +382,91 @@ sub DEMOLISH {
         wmsinfo
     );
 
-    my $dbh;
+    my @reset_sequences = qw(
+        dataset_ds_id_seq
+    );
+
     try {
-        $dbh = $self->mm_config->getDBH();
+        my $metabase_schema = $self->metabase();
+        my $dbh = $metabase_schema->storage()->dbh();
+        $self->_clean_database($dbh, \@clean_tables, \@reset_sequences)
     }
     catch {
-        get_logger()->error("Failed to get database handle");
+        get_logger()->error("Failed to clean metabase: $_");
     };
 
-    if ($dbh) {
-        foreach my $table (@clean_tables) {
+}
 
-            try {
-                $dbh->do("DELETE FROM $table");
-                $dbh->commit();
-            }
-            catch {
-                get_logger()->error("Failed to delete table '$table': $_");
-            };
+=head2 $self->clean_userbase()
+
+Clean the userbase by deleting data from all tables and resetting all sequences.
+
+=cut
+
+sub clean_userbase {
+    my $self = shift;
+
+    my @clean_tables = qw(
+        dataset
+        error
+        exitstatus
+        file
+        funcmap
+        infods
+        infou
+        infouds
+        job
+        note
+        userrole
+        usertable
+    );
+
+    my @reset_sequences = qw(
+        dataset_ds_id_seq
+        funcmap_funcid_seq
+        infods_i_id_seq
+        infou_i_id_seq
+        infouds_i_id_seq
+        job_jobid_seq
+        usertable_u_id_seq
+    );
+
+    try {
+        my $userbase_schema = $self->userbase();
+        my $dbh = $userbase_schema->storage()->dbh();
+        $self->_clean_database($dbh, \@clean_tables, \@reset_sequences)
+    }
+    catch {
+        get_logger()->error("Failed to clean userbase: $_");
+    };
+
+}
+
+sub _clean_database {
+    my $self = shift;
+
+    my ($dbh, $tables, $sequences) = @_;
+
+
+    foreach my $table (@$tables) {
+
+        try {
+            $dbh->do("DELETE FROM $table");
         }
-
-        my @reset_sequence = qw(
-            dataset_ds_id_seq
-        );
-
-        foreach my $sequence (@reset_sequence) {
-
-            try {
-                $dbh->do("SELECT setval('$sequence', 1, false)");
-                $dbh->commit();
-            }
-            catch {
-                get_logger()->error("Failed to reset sequence '$sequence': $_");
-            };
-        }
+        catch {
+            get_logger()->error("Failed to delete table '$table': $_");
+        };
     }
 
+    foreach my $sequence (@$sequences) {
+
+        try {
+            $dbh->do("SELECT setval('$sequence', 1, false)");
+        }
+        catch {
+            get_logger()->error("Failed to reset sequence '$sequence': $_");
+        };
+    }
 }
 
 1;
