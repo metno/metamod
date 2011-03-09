@@ -28,7 +28,7 @@ use Data::Dump qw( dump );
 use MetamodWeb::Utils::UI::Search;
 use MetamodWeb::Utils::SearchUtils;
 
-BEGIN {extends 'Catalyst::Controller'; }
+BEGIN {extends 'MetamodWeb::BaseController::Base'; }
 
 =head1 NAME
 
@@ -180,7 +180,7 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
         my $mt_name = $c->req->param( 'shown_mt_name_' . $col_num );
         if( !$mt_name ){
             $mt_name = $c->stash->{ search_ui_utils }->default_mt_name($col_num);
-            $c->log->debug( "Ups! no mt name set for that column: $col_num, so using default" );
+            $self->logger->debug( "Ups! no mt name set for that column: $col_num, so using default" );
         }
         push @md_cols, $mt_name;
 

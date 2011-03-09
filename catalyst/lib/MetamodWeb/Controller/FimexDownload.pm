@@ -42,7 +42,7 @@ use Metamod::Config qw();
 use namespace::autoclean;
 
 
-BEGIN {extends 'Catalyst::Controller'; }
+BEGIN {extends 'MetamodWeb::BaseController::Base'; }
 
 sub fimexDownload :Path('/search/fimexdownload') :Args(0) {
     my ( $self, $c ) = @_;
@@ -53,27 +53,27 @@ sub fimexDownload :Path('/search/fimexdownload') :Args(0) {
     my $dsName = $c->req->params->{ dataset_name } || 0;
     my $projection = $c->req->params->{ projection } || 0;
 
-    $c->log->debug("Projection of $dsName, $projection");
+    $self->logger->debug("Projection of $dsName, $projection");
     if (!$dsName or !$projection) {
         $c->response->status(400); # bad request
         $c->response->body("Required parameters: dataset_name, projection");
         $c->response->content_type("text/plain");
-        $c->log->debug("missing dataset_name or projection");
+        $self->logger->debug("missing dataset_name or projection");
         return;
     }
 
     # get the fimexProjection and dataref of the $dsName
     my $ds = $c->model('Metabase::Dataset')->search({ds_name => $dsName})->first; # only one
-    $c->log->debug("found dataset for $dsName: ". $ds->ds_id);
+    $self->logger->debug("found dataset for $dsName: ". $ds->ds_id);
     unless ($ds) {
         # TODO error page
-        $c->log->warn("no dataset for $dsName");
+        $self->logger->warn("no dataset for $dsName");
         return;
     }
     my $projectioninfo = $ds->projectioninfos->first;
     unless ($projectioninfo) {
         # TODO error page
-        $c->log->warn("no projectioninfos for dataset: $dsName");
+        $self->logger->warn("no projectioninfos for dataset: $dsName");
         return;
     }
     my $fiProjection = Metamod::FimexProjections->new($projectioninfo->pi_content);
@@ -84,7 +84,7 @@ sub fimexDownload :Path('/search/fimexdownload') :Args(0) {
 
     unless ($dataref) {
         # TODO error page
-        $c->log->warn("no dataref for dataset: $dsName");
+        $self->logger->warn("no dataref for dataset: $dsName");
         return;
     }
 
@@ -97,8 +97,8 @@ sub fimexDownload :Path('/search/fimexdownload') :Args(0) {
     my $inputX = $dataref;
     $inputX =~ s^$regex^$1/fileServer/data/$2^;
 
-    $c->log->debug("trying to retrieve data for fimex from $input from  $dataref  =~ s/ $regex / $replace /");
-    $c->log->debug("$inputX");
+    $self->logger->debug("trying to retrieve data for fimex from $input from  $dataref  =~ s/ $regex / $replace /");
+    $self->logger->debug("$inputX");
 
     # run fimex
     my $fimex = MetNo::Fimex->new();
@@ -113,10 +113,10 @@ sub fimexDownload :Path('/search/fimexdownload') :Args(0) {
         my $isMetric = $fiProjection->getProjectionProperty($projection, 'isDegree') ? 0 : 1;
         $fimex->metricAxes($isMetric);
     }
-    eval {my $command = $fimex->doWork(); $c->log->debug("running fimex-command: $command");};
+    eval {my $command = $fimex->doWork(); $self->logger->debug("running fimex-command: $command");};
     if ($@) {
         # TODO error page
-        $c->log->error("cannot run fimex: $@");
+        $self->logger->error("cannot run fimex: $@");
         return;
     }
 

@@ -27,7 +27,7 @@ use Metamod::Dataset;
 
 use XML::RSS::LibXML;
 
-BEGIN {extends 'Catalyst::Controller'; }
+BEGIN {extends 'MetamodWeb::BaseController::Base'; }
 
 =head1 NAME
 
@@ -83,7 +83,7 @@ sub ds_id :Chained("") :PathPart("dataset") :CaptureArgs(1) {
     my $ds = $c->model('Metabase::Dataset')->find($ds_id);
 
     if( !defined $ds ){
-        $c->log->warn("Could not find dataset for ds_id '$ds_id'");
+        $self->logger->warn("Could not find dataset for ds_id '$ds_id'");
         $c->detach('Root', 'default' );
     }
 
@@ -111,7 +111,7 @@ sub xml :Chained("ds_id") :PathPart("xml") :Args(0) {
     };
 
     if( $@ ){
-        $c->log->error("Error in dataset xml output: $@");
+        $self->logger->error("Error in dataset xml output: $@");
         print STDERR ("Error in dataset xml output: $@\n");
         $c->detach( 'Root', 'default' );
     }
@@ -151,7 +151,7 @@ sub wmssetup :Chained("ds_id") :PathPart("wmssetup") :Args(0) {
     };
 
     if( $@ ){
-        $c->log->error("Error in dataset (missing wmsinfo?): $@");
+        $self->logger->error("Error in dataset (missing wmsinfo?): $@");
         print STDERR "Error in dataset (missing wmsinfo?): $@\n";
         $c->detach( 'Root', 'default' );
     }

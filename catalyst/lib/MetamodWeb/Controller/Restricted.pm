@@ -20,12 +20,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
-use Log::Log4perl qw(get_logger);
 use Moose;
 use namespace::autoclean;
 use URI::Escape;
 
-BEGIN {extends 'Catalyst::Controller'; }
+BEGIN {extends 'MetamodWeb::BaseController::Base'; }
 
 =head1 NAME
 
@@ -55,7 +54,7 @@ sub auto :Private {
     if (!$c->user_exists) {
 
         # Dump a log message to the development server debug output
-        $c->log->debug('***Restricted::auto User not found, forwarding to /login');
+        $self->logger->debug('***Restricted::auto User not found, forwarding to /login');
 
         my $wanted_path = '/' . $c->request->path();
         my $wanted_params = $c->request->params();
@@ -64,11 +63,11 @@ sub auto :Private {
             $wanted_string .= "$key=" . uri_escape($value) . "&";
         }
         chop $wanted_string;
-        get_logger('metamodweb')->debug("Wanted: $wanted_string");
+        $self->logger->debug("Wanted: $wanted_string");
 
         # Redirect the user to the login page
         my $url = $c->uri_for('/login', { return_path => $wanted_path, return_params => $wanted_string } );
-        get_logger('metamodweb')->debug("* url = $url" );
+        $self->logger->debug("* url = $url" );
         $c->response->redirect($url);
 
         # Return 0 to cancel 'post-auto' processing and prevent use of application

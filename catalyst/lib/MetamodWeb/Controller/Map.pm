@@ -27,7 +27,7 @@ use Imager::Fill;
 use Moose;
 use namespace::autoclean;
 
-BEGIN {extends 'Catalyst::Controller'; }
+BEGIN {extends 'MetamodWeb::BaseController::Base'; }
 
 =head1 NAME
 
@@ -53,7 +53,7 @@ sub map :Path('/search/map') :Args(1) {
     my $y1 = $c->req->params->{ y1 };
     my $y2 = $c->req->params->{ y2 };
 
-    $c->log->debug("Coordinates: ($x1,$y1) ($x2,$y2)");
+    $self->logger->debug("Coordinates: ($x1,$y1) ($x2,$y2)");
 
     my $image_srid = $c->req->args->[0];
 

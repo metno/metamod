@@ -29,7 +29,6 @@ use namespace::autoclean;
 BEGIN {extends 'MetamodWeb::BaseController::Base'; }
 
 use Data::Dump qw(dump);
-use Log::Log4perl qw(get_logger);
 
 use MetamodWeb::Utils::QuestionnaireUtils;
 use MetamodWeb::Utils::UI::Questionnaire;
