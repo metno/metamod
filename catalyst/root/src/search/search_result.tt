@@ -41,7 +41,8 @@ jQuery(document).ready( function () {
 
     [% FOREACH dataset IN datasets %]
 
-        [% SET metadata = dataset.metadata( metadata_columns ) %]
+        [%# we need to fetch metadata for all selected column AND the dataref %]
+        [% SET metadata = dataset.metadata( metadata_columns.merge( ['dataref'] ) ) %]
         <tr>
         <td class="result">
             <div class="btns">
