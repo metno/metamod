@@ -54,7 +54,7 @@ has 'mm_config' => ( is => 'ro', isa => 'Metamod::Config', default => sub { retu
 #
 # The TheSchwartz client that is used to insert jobs into the queue
 #
-has 'job_client' => ( is => 'ro', isa => 'TheSchwartz', builder => '_build_job_client' );
+has 'job_client' => ( is => 'ro', isa => 'TheSchwartz', lazy => 1, builder => '_build_job_client' );
 
 sub _build_job_client {
     my $self = shift;
