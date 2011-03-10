@@ -366,6 +366,10 @@ fi
 # keep it running after testing
 su $WEBUSER -c "$basedir/target/metamodInit.sh start"
 
+#
+# Run the automatic test suite
+perl $basedir/source/run_automatic_tests.pl --smolder
+
 # enable tomcat (SRU2jdbc) connection to database
 # this is a hack, TODO: make configurable
 /root/apache-tomcat-6.0.16/bin/catalina.sh start
