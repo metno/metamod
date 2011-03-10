@@ -47,6 +47,12 @@ requires 'XML::LibXSLT';
 requires 'XML::RSS::LibXML';
 
 test_requires 'Test::More' => '0.88';
+test_requires 'Test::WWW::Mechanize::Catalyst';
+test_requires 'TAP::Harness::Archive';
+test_requires 'Test::Files';
+test_requires 'Benchmark::Timer';
+test_requires 'JSON::Any';
+test_requires 'Test::Pod::Coverage';
 
 catalyst;
 
