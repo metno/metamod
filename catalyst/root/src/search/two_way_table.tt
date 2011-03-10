@@ -1,4 +1,9 @@
-<h2 class="std">Two-way table</h2>
+<div style="width: 100%; text-align: right">
+    <a href="[% c.uri_for('/search/options', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/options' ) %]')">Search options</a>
+    <a href="[% c.uri_for('/search/page/1/result', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/page/1/result' ) %]')">Result list</a>
+</div>
+
+<h2 class="std">Pivot table</h2>
 
 <form name="search_form" id="search_form" method="GET" action="/collectionbasket/remove_selected">
     [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
