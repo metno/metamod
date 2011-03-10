@@ -82,8 +82,11 @@ jQuery(document).ready( function () {
                     [% IF mm_config.get('SUBSCRIPTION_ENABLED') == 'ENABLED' and search_ui_utils.dataset_in_userbase(dataset) %]
                         <a class="btn" href="[% c.uri_for( '/subscription', dataset.unqualified_ds_name() ) %]" title="Setup a subscription to get notified about new datafiles (requires login)"><span>Subscribe</span></a><br />
                     [% END %]
-                    <a class="btn" href="[% c.uri_for( '/search/page', datasets_pager.current_page(), 'add_to_basket', dataset.ds_id, c.req.params ) %]"
+
+                    [% c.req.params.return_path = c.uri_for(c.req.path) %]
+                    <a class="btn" href="[% c.uri_for( '/search/add_to_basket', dataset.ds_id, c.req.params ) %]"
                        title="Add all child dataset to the collection basket"><span>Add to basket</span></a><br/><br/>
+                    [% c.req.params.delete('return_path') %]
                 [% END %]
             </div>
         </td>

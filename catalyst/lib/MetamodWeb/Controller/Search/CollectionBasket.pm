@@ -65,16 +65,18 @@ sub request_download : Path('/search/collectionbasket/request_download') {
 
     my $email_address = $c->req->params->{email_address};
     if ( !$email_address || !Email::Valid->address($email_address) ) {
-        $c->stash( error_msgs => ['You must supply a valid email address before requesting a download'] );
-        $c->detach('view');
+        $self->add_error_msgs($c, 'You must supply a valid email address before requesting a download');
+        $c->res->redirect($c->uri_for('/search/collectionbasket'));
+        return;
     }
 
     my $basket = $c->stash->{collection_basket};
     my $files = $basket->files();
 
     if ( 0 == @$files ) {
-        $c->stash( info_msgs => ['There are no files in the collection basket to download'] );
-        $c->detach('view');
+        $self->add_info_msgs($c, 'There are no files in the collection basket to download');
+        $c->res->redirect($c->uri_for('/search/collectionbasket'));
+        return;
     }
 
     my @dataset_locations = map { $_->{data_file_location} } @$files;
@@ -94,7 +96,7 @@ sub request_download : Path('/search/collectionbasket/request_download') {
         $self->add_error_msgs( $c, 'An error occured and your download could not be prepared' );
     }
 
-    $c->detach('view');
+    $c->res->redirect($c->uri_for('/search/collectionbasket'));
 
 }
 
@@ -104,14 +106,18 @@ Action for adding a dataset to the collection basket.
 
 =cut
 
-sub add_to_basket : Chained("/search/perform_search") : PathPart('add_to_basket') : Args(1) {
-    my ( $self, $c, $ds_id ) = @_;
+sub add_to_basket : Path("/search/add_to_basket/") : Args(1) {
+    my ($self, $c, $ds_id) = @_;
 
     my $basket = $c->stash->{ collection_basket };
     $basket->add_dataset($ds_id);
 
     $self->add_info_msgs($c, $basket->user_msgs() );
-    $c->stash( template => 'search/search_result.tt', );
+
+    my $params = $c->req->params;
+    my $return_path = delete $params->{return_path};
+
+    $c->res->redirect($c->uri_for($return_path, $params) );
 
 }
 
@@ -141,7 +147,7 @@ sub empty_basket : Path('/search/collectionbasket/empty_basket') : Args(0) {
     $basket->empty_basket();
 
     $self->add_info_msgs( $c, 'The collection basket has been emptied' );
-    $c->detach('view');
+    $c->res->redirect($c->uri_for('/search/collectionbasket'));
 }
 
 =head2 remove_selected()
@@ -165,7 +171,7 @@ sub remove_selected : Path('/search/collectionbasket/remove_selected') : Args(0)
     my $basket = $c->stash->{collection_basket};
     $basket->remove_datasets(@$dataset_ids);
 
-    $c->forward('view');
+    $c->res->redirect($c->uri_for('/search/collectionbasket'));
 }
 
 sub link_basket : Path('/search/collectionbasket/link_basket' ) : Args(0) {
@@ -192,7 +198,7 @@ sub replace_basket : Path('/search/collectionbasket/replace_basket' ) : Args(0) 
     $self->_add_list_to_basket($c);
 
     $self->add_info_msgs($c, 'Collection basket replaced with file collection' );
-    $c->forward('view');
+    $c->res->redirect($c->uri_for('/search/collectionbasket'));
 
 }
 
@@ -201,7 +207,7 @@ sub merge_basket : Path('/search/collectionbasket/merge_basket' ) : Args(0) {
 
     $self->_add_list_to_basket($c);
     $self->add_info_msgs($c, 'Collection basket merged with file collection' );
-    $c->forward('view');
+    $c->res->redirect($c->uri_for('/search/collectionbasket'));
 
 }
 

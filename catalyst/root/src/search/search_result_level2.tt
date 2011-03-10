@@ -85,8 +85,10 @@
                   && search_ui_utils.freely_available(child)
                   && child_metadata.data_file_size.0 < collection_basket.max_size()
                    %]
-                <a class="btn" href="[% c.uri_for( '/search/page', datasets_pager.current_page(), 'add_to_basket', child.ds_id, c.req.params ) %]"
+                [% c.req.params.return_path = c.uri_for(c.req.path) %]
+                <a class="btn" href="[% c.uri_for( '/search/add_to_basket', child.ds_id, c.req.params ) %]"
                    title="Add the dataset to the collection basket"><span>Add to basket</span></a><br/><br/>
+                [% c.req.params.delete('return_path') %]
             [% END %]
         </div>
     </td>
