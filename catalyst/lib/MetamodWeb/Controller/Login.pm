@@ -112,7 +112,7 @@ sub authenticate :Path('authenticate') :Args(0) {
         $self->add_error_msgs($c, 'Empty username or password.' );
     }
 
-    $c->forward('index');
+    $c->res->redirect($c->uri_for('/login', $c->req->params() ) );
 
 }
 
