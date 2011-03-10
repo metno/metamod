@@ -60,6 +60,6 @@ $prove->argv( [ "$FindBin::Bin/common/lib/t", "$FindBin::Bin/catalyst/t" ] );
 $prove->run();
 
 if( $send_to_smolder ){
-    system 'smolder_smoke_signal', '--server', 'dev-vm081', '--port', '8080', '--username', 'admin', '--password',
+    system "$FindBin::Bin/test/smolder_smoke_signal.pl", '--server', 'dev-vm081', '--port', '8080', '--username', 'admin', '--password',
         'qa_rocks', '--project', 'metamod', '--platform', $^O, '--file', $output_file;
 }
