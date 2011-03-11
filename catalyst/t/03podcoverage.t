@@ -20,6 +20,16 @@ my @modules = ();
 my $start_dir = "$FindBin::Bin/../lib/";
 find(\&wanted, $start_dir );
 
+plan tests => scalar @modules;
+
+#my @modules = all_modules(Cwd::realpath("$FindBin::Bin/../lib"));
+foreach my $m ( @modules ){
+
+    # there is no requirement to document auto, begin and end since their meaning is defined
+    # by Catalyst
+    pod_coverage_ok( $m, { also_private => [ qr/^(auto)|(begin)|(end)$/ ] }, "Pod coverage for $m" );
+}
+
 sub wanted {
 
     return if !( $_ =~ /.*\.pm$/ );
@@ -33,10 +43,3 @@ sub wanted {
     push @modules, $filepath;
 
 }
-
-
-#my @modules = all_modules(Cwd::realpath("$FindBin::Bin/../lib"));
-foreach my $m ( @modules ){
-    pod_coverage_ok( $m, "Pod coverage for $m" );
-}
-
