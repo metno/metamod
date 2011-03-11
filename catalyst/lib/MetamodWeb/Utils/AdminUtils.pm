@@ -23,15 +23,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =head1 NAME
 
-blah blah blah
+MetamodWeb::Utils::AdminUtils
 
 =head1 DESCRIPTION
 
-blah blah blah
+Various utility methods for sysadmin interface
 
 =head1 METHODS
-
-blah blah blah
 
 =cut
 
@@ -45,17 +43,30 @@ use MetamodWeb::Utils::FormValidator;
 
 #has 'config' => ( is => 'ro', default => sub { Metamod::Config->new() } );
 
-=head1 NAME
 
-blah blah blah
+=head2 list_files($dir, $path, $maxfiles)
 
-=head1 DESCRIPTION
+Counts and lists the files belonging to a dataset. B<NB:> Does not (yet) support
+multiple hierarchies of directories (like used in OSI SAF).
 
-blah blah blah
+Returns a ref to an array [$count, \@files], where $count is the total number
+of files and @files contains the names of the first $maxfiles files (without extensions).
 
-=head1 METHODS
+=over
 
-blah blah blah
+=item $dir
+
+The path to the xml file directory (metadata)
+
+=item $path
+
+The dataset name
+
+=item $maxfiles
+
+Only return this many filenames. If undef, returns all.
+
+=back
 
 =cut
 
@@ -68,7 +79,7 @@ sub list_files {
         if (-d $base) { # check if level 2
             my @files = map /$base\/(.+)\.xml$/, <$base/*.xml>; # strip file ext
             my $count = @files;
-            if ($count > $maxfiles) {
+            if ( $maxfiles && ($count > $maxfiles) ) {
                 my @short = splice @files, 0, $maxfiles;
                 $$list{$base} = [$maxfiles, \@short];
             }
@@ -80,10 +91,24 @@ sub list_files {
     return $list;
 }
 
+=head2 read_file($file)
+
+Read the contents of a file and return as string.
+
+=over
+
+=item $file
+
+The complete pathname to the file
+
+=back
+
+=cut
+
 sub read_file {
     my ($self, $file) = @_;
 
-    printf STDERR "Opening file %s for reading...\n", $file;
+    #printf STDERR "Opening file %s for reading...\n", $file;
     open FH, $file or croak("Couldn't open file $file");
     local $/ = undef;
     my $content = <FH>;
@@ -91,14 +116,51 @@ sub read_file {
     return $content;
 }
 
+=head2 write_file($file, $content)
+
+Write $content data to $file (via tempfile so won't clobber if aborted).
+
+=over
+
+=item $file
+
+The complete pathname to the file
+
+=item $content
+
+Data string to be written
+
+=back
+
+=cut
+
 sub write_file {
     my ($self, $file, $content) = @_;
 
-    printf STDERR "Opening file %s for writing...\n", $file;
-    open FH, ">", "$file._" or croak("Couldn't open file $file");
+    #printf STDERR "Opening file %s for writing...\n", $file;
+    croak "No permission to write file '$file'" unless -w $file;
+    open FH, ">", "$file._" or croak("Couldn't write to disk");
     print FH $content;
     close(FH) && rename("$file._", $file);
 }
+
+=head2 validate($xml, $schema)
+
+Validate XML string against XML Schema file
+
+=over
+
+=item $xml
+
+XML string to check
+
+=item $schema
+
+Full path to XML Schema file
+
+=back
+
+=cut
 
 sub validate {
     my ($self, $xml, $schema) = @_;
@@ -106,16 +168,15 @@ sub validate {
     my $parser        = XML::LibXML->new();
 
     my $dom = eval { $parser->parse_string($xml); } or return $@;
-    print STDERR "..XML is well-formed\n";
+    #print STDERR "..XML is well-formed\n";
     if ( eval { $xsd_validator->validate($dom) == 0 } ) {
-        print STDERR "..XML is valid\n";
+        #print STDERR "..XML is valid\n";
         return undef;
     } else {
-        print STDERR "..XML is invalid\n";
+        #print STDERR "..XML is invalid\n";
         return $@;
     }
 }
-
 
 =head1 LICENSE
 

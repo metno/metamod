@@ -29,18 +29,13 @@ BEGIN { extends 'MetamodWeb::BaseController::Base'; }
 
 =head1 NAME
 
-MetamodWeb::Controller::Admin::ShowXML - Catalyst Controller
+MetamodWeb::Controller::Admin::ShowXML
 
 =head1 DESCRIPTION
 
-Catalyst Controller.
+Catalyst Controller for system administration of XML metadata files
 
 =head1 METHODS
-
-=cut
-
-
-=head2 index
 
 =cut
 
@@ -60,8 +55,14 @@ sub auto : Private {
     );
 }
 
+=head2 /admin/showxml
+
+Use for listing XML metadata files
+
+=cut
+
 sub listfiles :Path('/admin/showxml') :Args(0) {
-    # show list of files in xml dir
+    # if no args, show list of files in xml dir
     my ( $self, $c ) = @_;
 
     $c->stash( path => '' );
@@ -86,7 +87,15 @@ sub getfile :Path('/admin/showxml') {
     }
 }
 
-###
+=head2 /admin/showxml
+
+Sysadmin section for editing XML metadata files.
+
+File path (w/o extension) used as argument.
+Use GET for reading and POST for writing.
+
+=cut
+
 
 sub editxml :Path('/admin/editxml') :ActionClass('REST') {
     my ( $self, $c ) = @_;
@@ -162,12 +171,11 @@ sub editxml_POST  { # update existing xml files
 
 =head1 AUTHOR
 
-geira,,,
+geira@met.no
 
 =head1 LICENSE
 
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
+GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
 
 =cut
 

@@ -58,6 +58,10 @@ The path to a XSD schema.
 
 Returns a constraint functions that will validate a field according to the schema.
 
+=item TODO
+
+Locate schema file using URI and XML Catalog.
+
 =back
 
 =cut

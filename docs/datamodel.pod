@@ -11,7 +11,7 @@ the .xmd-files (XMD).
 The META files contain the discovery metadata as retrieved from
 an metadata-editor, extracted from netcdf-files or harvested from external metadata-
 repositories. The META files should be stored in the format they have been retrieved, e.g.
-DIF, ISO19139 or MM2. They will be converted on export from the L<Metadata Store>.
+DIF, ISO19139 or MM2. They will be converted on export from the L<"The Metadata Store">.
 
 The XMD files are metamod-related information of the metadata. They contain the following information:
 

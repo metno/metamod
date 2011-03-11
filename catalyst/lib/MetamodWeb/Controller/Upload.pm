@@ -45,7 +45,7 @@ sub auto :Private {
     #$c->stash( section => 'upload' );
 }
 
-=head2 newfiles
+=head2 /upload/newfiles
 
 Webservice used for OSISAF-like sites (EXTERNAL_REPOSITORY = true) where files are stored externally.
 This is called as a webservice to trigger indexing from file system.
