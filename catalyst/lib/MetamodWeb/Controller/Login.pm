@@ -252,7 +252,10 @@ sub send_operator_email {
     my $mm_config = $c->stash->{mm_config};
     my $base_url = $mm_config->get('BASE_PART_OF_EXTERNAL_URL');
     my $local_url = $mm_config->get('LOCAL_URL');
-    my $approve_url = "${base_url}${local_url}admin/confirm_user/" . $new_user->u_id();
+
+    # Normally uri_for will return relative URI's when Plugin::SmartURI is loaded,
+    # so we must explicitly ask for the absolute URI.
+    my $approve_url = $c->uri_for('/admin/confirm_user', $new_user->u_id())->absolute;
 
     my $email_body = <<"END_BODY";
 A new user has been registred. Please check the information
