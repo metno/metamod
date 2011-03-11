@@ -1,0 +1,115 @@
+Configurable texts in web pages and E-mail to users
+===================================================
+
+The texts in web pages that vary between METAMOD instances are all configured through master_config.txt.
+This overview shows which config variables are used for this purpose, which source files in METAMOD 2.6
+are relevant and a small explanation on how the texts are used. Configurable texts found in E-mail sent
+to users are also included.
+
+Config variable            Source file (2.6)      Explanation
+-------------------------------------------------------------------------------------------------------
+
+APPLICATION_NAME           upl/login.php          Used in <title> for the Upload login page
+                           upl/newuserok.php      The user has filled in application form for new user
+                                                  account, and receives a preliminary response page.
+                           upl/newuser.php        In subject field in mail sent to operator after user
+                                                  filled in application form for new user account.
+                           upl/maintable.php      In the general description of the file upload page
+                           upl/funcs.inc          In welcome mail sent to new users
+                           adm/user_admin.php     In function sendUsernameEmail
+
+APP_MENU                   upl/testafile.php      Contains a text with several lines. Each line has
+                           upl/mainadm.php        an URL followed by free text. The free text is used
+                           upl/login.php          as the link text in the menu.
+                           upl/newuserok.php
+                           upl/projEdit.php
+                           upl/maintable.php
+                           upl/wmsEdit.php
+                           sch/normal.php
+
+APP_HEADER_HTML            sch/subscription.php   Contains HTML used to show a standard header for
+                           upl/testafile.php      various web pages.
+                           upl/mainadm.php
+                           upl/login.php
+                           upl/newuserok.php
+                           upl/projEdit.php
+                           upl/maintable.php
+                           upl/wmsEdit.php
+                           sch/normal.php
+                           qst/fmmeta.php
+                           common/login.php
+
+APP_FOOTER_HTML            sch/subscription.php   Contains HTML used to show a standard footer for
+                           upl/testafile.php      various web pages.
+                           upl/mainadm.php
+                           upl/login.php
+                           upl/newuserok.php
+                           upl/projEdit.php
+                           upl/maintable.php
+                           upl/wmsEdit.php
+                           sch/normal.php
+                           qst/fmmeta.php
+                           common/login.php
+
+SEARCH_APP_NAME            sch/updsession.php     Used in (error) messages to the user
+
+SEARCH_APP_TITLE           sch/search.php         Used in <title> (HTML header) and heading (HTML body)
+                           sch/normal.php
+
+SEARCH_APP_HEADER_HTML     sch/normal.php         Contains HTML used to show header for the seach
+                                                  application.
+
+SEARCH_APP_DESCRIPTION     sch/normal.php         HTML describing how to use the search application
+
+SEARCH_APP_PRESENTATION_HTML
+                           sch/presentation.php   HTML used in the search page before any search has
+                                                  been done.
+
+UPLOAD_APP_TITLE           upl/login.php          Used in <title> (HTML header) and heading (HTML body)
+                           upl/mainadm.php
+                           upl/maintable.php
+                           upl/newuserok.php
+                           upl/projEdit.php
+                           upl/testafile.php
+                           upl/wmsEdit.php
+
+UPLOAD_APP_LOGIN_TEXT      upl/login.php          Introductory text shown in Upload login page
+
+UPLOAD_APP_COMMON_TEXT     upl/testafile.php      Common text in the heading for all upload pages
+                           upl/mainadm.php
+                           upl/login.php
+                           upl/projEdit.php
+                           upl/maintable.php
+                           upl/wmsEdit.php
+
+UPLOAD_APP_INLOGGED_TEXT   upl/testafile.php      Common text in the heading for all upload pages
+                           upl/mainadm.php        except the login page (prepends UPLOAD_APP_COMMON_TEXT)
+                           upl/projEdit.php
+                           upl/maintable.php
+                           upl/wmsEdit.php
+
+EMAIL_BODY_WHEN_UPLOAD_ERROR
+                           scripts/upload_monitor.pl
+                           scripts/upload_indexer.pl
+                                                  Text in E-mail sent to upload users where errors in
+                                                  metadata has been discovered (by digest_nc.pl)
+
+EMAIL_SUBJECT_WHEN_UPLOAD_ERROR
+                           scripts/upload_monitor.pl
+                           scripts/upload_indexer.pl
+                                                  Subject field in E-mail sent to upload users where
+                                                  errors in metadata has been discovered (by
+                                                  digest_nc.pl)
+
+EMAIL_SIGNATURE            upl/newuser.php
+                           adm/approve.php
+                           scripts/upload_monitor.pl
+                           scripts/upload_indexer.pl
+                                                  E-mail signature for all E-mails sent to users.
+
+QUEST_TITLE                qst/fmmeta.php         <title> in HTML heading in the QUEST module
+
+QUEST_OKMESSAGE            qst/fmmeta.php         HTML shown to the user when the form has been
+                                                  submitted.
+
+QUEST_ADM_BACKGROUND       adm/fmfadm.php         Background image for QUEST file administration page
