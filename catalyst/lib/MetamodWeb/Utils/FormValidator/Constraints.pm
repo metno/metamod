@@ -79,7 +79,7 @@ sub xml {
 
             # probably a abuse of name_this(), but cannot find any other way to set
             # a informative error message
-            $dfv->name_this("Not valid XML: $_");
+            $dfv->name_this("Not valid XML:\n$_");
             return;
         };
 
@@ -94,7 +94,7 @@ sub xml {
 
             # probably a abuse of name_this(), but cannot find any other way to set
             # a informative error message
-            $dfv->name_this("XML failed schema validation: $_");
+            $dfv->name_this("XML failed schema validation:\n$_");
         };
 
         return $success;

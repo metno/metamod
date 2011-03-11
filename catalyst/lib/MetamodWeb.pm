@@ -139,6 +139,10 @@ MetamodWeb - Catalyst based application
 
 L<MetamodWeb::Controller::Root>, L<Catalyst>
 
+=head1 AUTHOR
+
+Copyright 2011 The Norwegian Meteorological Institute
+
 =head1 LICENSE
 
 GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>

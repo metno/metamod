@@ -2,6 +2,8 @@
 Things to do in Catalyst version of Metamod
 -------------------------------------------
 
+* modify xml validator to use xml catalogs
+
 * mm-xml file editor [GA]
 
 * add dialog to confirm overwriting previously uploaded files

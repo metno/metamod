@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use Moose;
 use namespace::autoclean;
 use MetamodWeb::Utils::AdminUtils;
+use MetamodWeb::Utils::FormValidator;
 
 BEGIN { extends 'MetamodWeb::BaseController::Base'; }
 
@@ -52,7 +53,10 @@ sub auto : Private {
     $c->stash(
         #xmldir => $xmldir,
         xmldir => '/home/user/projects/metamod28/src/test/xmlinput',
-        current_view => 'Raw'
+        current_view => 'Raw',
+        template => 'admin/showxml.tt',
+        admin_utils => MetamodWeb::Utils::AdminUtils->new(),
+        maxfiles => 3,
     );
 }
 
@@ -60,24 +64,99 @@ sub listfiles :Path('/admin/showxml') :Args(0) {
     # show list of files in xml dir
     my ( $self, $c ) = @_;
 
-    $c->stash(
-        template => 'admin/showxml.tt',
-        admin_utils => MetamodWeb::Utils::AdminUtils->new(),
-    );
+    $c->stash( path => '' );
 }
 
 sub getfile :Path('/admin/showxml') {
     # download file as spec'd in args
     my ( $self, $c ) = @_;
 
-    $c->req->path =~ m|admin/showxml/(.+)| or die "Chose the wrong path";
-    my $file = $c->stash->{xmldir} ."/$1";
-    #printf STDERR "+++++++++++++ $file ... %s\n", -e $file ? 'OK' : 'ERROR';
+    my ($path) = $c->req->path =~ m|admin/showxml/(.+)| or die "Chose the wrong path";
 
-    if( -r $file ){
-        $c->serve_static_file( $file );
+    if ( $path =~ /\.xm(l|d)$/ ) {
+        my $file = $c->stash->{xmldir} ."/$path";
+        #printf STDERR "+++++++++++++ $file ... %s\n", -e $file ? 'OK' : 'ERROR';
+        if( -r $file ){
+            $c->serve_static_file( $file );
+        } else {
+            $c->detach('Root', 'default' );
+        }
     } else {
-        $c->detach('Root', 'default' );
+        $c->stash( path => $path );
+    }
+}
+
+###
+
+sub editxml :Path('/admin/editxml') :ActionClass('REST') {
+    my ( $self, $c ) = @_;
+
+    my ($path) = $c->req->path =~ m|admin/editxml/+(.+)| or die "Chose the wrong path";
+
+    $c->stash(
+        template => 'admin/editxml.tt',
+        path => $path,
+    );
+}
+
+sub editxml_GET { # show editor for xml files
+    my ( $self, $c ) = @_;
+
+    my $schema = $c->stash->{mm_config}->get("TARGET_DIRECTORY") . "/schema/";
+
+    my $admin_utils = $c->stash->{admin_utils};
+    my $base = $c->stash->{xmldir} . "/" . $c->stash->{path};
+
+    print STDERR "Checking XMD file...\n";
+    my $xmd = $admin_utils->read_file("$base.xmd");
+    my $xmdvalid = $admin_utils->validate($xmd, "$schema/dataset.xsd");
+
+    print STDERR "Checking XML file...\n";
+    my $xml = $admin_utils->read_file("$base.xml");
+    my $xmlvalid = $admin_utils->validate($xml, "$schema/MM2.xsd");
+
+    $c->stash(
+        xml => { data => $xml, invalid => $xmlvalid },
+        xmd => { data => $xmd, invalid => $xmdvalid }
+    );
+
+}
+
+sub editxml_POST  { # update existing xml files
+    my ( $self, $c ) = @_;
+
+    my $schema = $c->stash->{mm_config}->get("TARGET_DIRECTORY") . "/schema";
+    my $base = $c->stash->{xmldir} . "/" . $c->stash->{path};
+
+    my %xmlform = (
+        required => [qw( xmdContent xmlContent )],
+        optional => [],
+        constraint_methods => {
+            xmdContent => MetamodWeb::Utils::FormValidator::Constraints::xml( "$schema/dataset.xsd" ),
+            xmlContent => MetamodWeb::Utils::FormValidator::Constraints::xml( "$schema/MM2.xsd" ),
+        },
+        labels => {
+            xmdContent => 'Dataset Content',
+            xmlContent => 'Metadata Content',
+        },
+        msgs => sub {
+            xmdContent => "Invalid XMD",
+            xmlContent => "Invalid MM2",
+        }
+    );
+
+    my $validator = MetamodWeb::Utils::FormValidator->new( validation_profile => \%xmlform );
+    my $results = $validator->validate($c->req->params);
+    if ( $results->has_invalid or $results->has_missing or ($c->req->params->{submitValue} eq 'Validate') ) {
+        $c->stash(
+            xmd => { data => $c->req->params->{xmdContent}, invalid => $results->invalid('xmdContent') },
+            xml => { data => $c->req->params->{xmlContent}, invalid => $results->invalid('xmlContent') },
+        );
+    } else {
+        # store files
+        $c->stash->{admin_utils}->write_file("$base.xml", $c->req->params->{xmlContent});
+        $c->stash->{admin_utils}->write_file("$base.xmd", $c->req->params->{xmdContent});
+        $c->response->redirect( $c->uri_for('/admin/editxml', $c->stash->{path}) );
     }
 }
 
