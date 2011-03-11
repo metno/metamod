@@ -342,6 +342,8 @@ if ($appuser) {
    warn "Webrun directory ($webrun) should be owned by user $appuser (not $owner)" unless $owner eq $appuser;
 }
 
+system "$targetdir/scripts/gen_httpd_conf.pl", $targetdir;
+
 #----------------------------------------------------------------------
 # END
 #----------------------------------------------------------------------

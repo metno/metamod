@@ -4,8 +4,6 @@ Things to do in Catalyst version of Metamod
 
 * modify xml validator to use xml catalogs
 
-* mm-xml file editor [GA]
-
 * add dialog to confirm overwriting previously uploaded files
 
 * security filters for appid/ownertag?
@@ -25,6 +23,8 @@ Things to do in Catalyst version of Metamod
 
     DONE
 ------------------------------------------
+
+* mm-xml file editor [GA]
 
 * File Upload [GA]
   * test a file

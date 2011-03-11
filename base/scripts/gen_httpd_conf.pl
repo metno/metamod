@@ -39,7 +39,7 @@ use strict;
 use warnings;
 
 use FindBin qw($Bin);
-use lib "$Bin/../../common/lib";
+use lib "$Bin/../../common/lib", , "$Bin/../lib";
 use Metamod::Config;
 use Getopt::Std;
 
@@ -71,6 +71,12 @@ my $proxies = proxy('search')
             . proxy('subscription')
             . proxy('userprofile');
 
+# running catalyst from target or source?
+my $from_target = $Bin eq "$target/scripts";
+my %paths = $from_target ?
+    ( root => "$target/lib/MetamodWeb/root" ) :
+    ( root => "$source/catalyst/root" );
+
 my $conf_text = <<EOT;
 
 #
@@ -99,19 +105,19 @@ RedirectMatch   $local/sch                  $base$local/search
 RedirectMatch   $local/upl/newfiles.php?    $base$local/upload/newfiles
 
 # static files should be served directly from Apache
-Alias               $local/static   $target/lib/MetamodWeb/root/static
-# or if running from source (during devel)
-#Alias              $local/static   $source/catalyst/root/static
+Alias               $local/static   $paths{root}/static
 
+# error reports
 Alias               $local/upl/uerr $webrun/upl/uerr
 
-# replace this with whatever you want (later might be configurable in master_config)
-Alias               favicon.ico     $source/catalyst/root/favicon.ico
+# if you don't want the default favicon, put custom file in applic-dir and update filelist.txt
+Alias               favicon.ico     $paths{root}/favicon.ico
 
 # The remaining lines are used when installing to a clean Apache.
 # If you've already configured your server manually you have to
 # figure out what each directive means and copy/change what you need.
 
+# other links go to old PHP files (for now)
 Alias $local	$target/htdocs
 
 <Directory $target/htdocs>
@@ -160,9 +166,21 @@ B<gen_httpd_conf.pl> - Apache config generator for Metamod
 This utility generates a stub Apache config to be placed somewhere in sites-available
 (if using VirtualHosts) or conf.d (if using path to specify different sites).
 
+The generated file is written to $target/etc/httpd.conf, or stdout if using -p.
+
 =head1 USAGE
 
+=head2 Running script from source
+
  trunk/gen_httpd_conf.pl application_directory
+
+This will assume you want to proxy Apache against Catalyst running from trunk
+
+=head2 Running script from target
+
+ target/gen_httpd_conf.pl .
+
+This will assume you want to proxy Apache against Catalyst running from target
 
 =head1 OPTIONS
 
