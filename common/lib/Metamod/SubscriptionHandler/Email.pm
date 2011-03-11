@@ -129,7 +129,7 @@ sub _get_email_body {
     my $config = $self->{ _config };
     my $base_url = $config->get('BASE_PART_OF_EXTERNAL_URL');
     my $local_url = $config->get('LOCAL_URL');
-    my $cancel_url = $base_url . $local_url . "/sch/subscription?action=display_remove_subscription&dataset_name=$parentname";
+    my $cancel_url = $base_url . $local_url . "/subscription";
     my $file_url = $dataref->[0];
 
     if( !defined $dataref ){
