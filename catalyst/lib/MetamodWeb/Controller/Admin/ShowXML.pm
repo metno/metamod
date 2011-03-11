@@ -51,12 +51,12 @@ sub auto : Private {
     my $xmldir = $mm_config->get('WEBRUN_DIRECTORY') ."/XML/" . $mm_config->get('APPLICATION_ID');
 
     $c->stash(
-        #xmldir => $xmldir,
-        xmldir => '/home/user/projects/metamod28/src/test/xmlinput',
+        xmldir => $xmldir,
+        #xmldir => '/home/user/projects/metamod28/src/test/xmlinput',
         current_view => 'Raw',
         template => 'admin/showxml.tt',
         admin_utils => MetamodWeb::Utils::AdminUtils->new(),
-        maxfiles => 3,
+        maxfiles => 5,
     );
 }
 
