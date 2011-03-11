@@ -102,7 +102,6 @@ logger_config.ini
 =lib/Metamod/DatasetTransformer/ToDIF.pm
 =lib/Metamod/DatasetTransformer/ToISO19115.pm
 =lib/Metamod/Dataset.pm
-=lib/Metamod/DatasetDb.pm
 =lib/Metamod/DatasetRegion.pm
 =lib/Metamod/Email.pm
 =lib/Metamod/ForeignDataset.pm
@@ -115,7 +114,6 @@ logger_config.ini
 =lib/Metamod/Queue.pm
 =lib/Metamod/Queue/Job/PrepareDownload.pm
 =lib/Metamod/Queue/Worker/PrepareDownload.pm
-=lib/Metamod/Search/Feed.pm
 =lib/Metamod/Subscription.pm
 =lib/Metamod/SubscriptionHandler.pm
 =lib/Metamod/SubscriptionHandler/Email.pm
