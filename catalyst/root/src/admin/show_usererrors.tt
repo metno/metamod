@@ -1,0 +1,7 @@
+[% INCLUDE admin/admin_header.tt %]
+<h2>User error reports:</h2>
+[% FOREACH row IN wholetable %]
+     [% row.datetime %]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     <a href="[%baseurl%][%localurl%]/upl/uerr/[% row.filename %]">[% row.filename %]</a><br />
+[% END %]
+[% INCLUDE admin/admin_footer.tt %]

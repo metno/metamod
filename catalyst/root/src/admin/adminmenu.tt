@@ -23,6 +23,7 @@
     <a href="[% c.uri_for('/admin/sql_prepare_meta') %]">Run SQL command on Metadatabase</a><br>
     <a href="[% c.uri_for('/admin/viewusertable') %]">View table in User database</a><br>
     <a href="[% c.uri_for('/admin/sql_prepare_user') %]">Run SQL command on User database</a><br>
+    <a href="[% c.uri_for('/admin/usererrors') %]">Show user error reports</a><br>
 </td>
 </tr>
 </table>
