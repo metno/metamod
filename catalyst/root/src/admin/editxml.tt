@@ -1,0 +1,34 @@
+[% INCLUDE admin/admin_header.tt %]
+
+<h2><a href="[% c.uri_for("./") %]">XML directory</a> - [% path %]</h2>
+
+<form class="editxml" method="post">
+
+    <div>
+        <h4><label for="xmdContent">Dataset Content</label></h4>
+        [% IF xmd.invalid %]
+            <pre class="error">[% xmd.invalid.0 | html %]</pre>
+        [% ELSE %]
+            <pre>File is valid</pre>
+        [% END %]
+        <textarea name="xmdContent">[% xmd.data | html %]</textarea>
+    </div>
+
+    <div>
+        <h4><label for="xmlContent">Metadata Content</label></h4>
+        [% IF xml.invalid %]
+            <pre class="error">[% xml.invalid.0 | html %]</pre>
+        [% ELSE %]
+            <pre>File is valid</pre>
+        [% END %]
+        <textarea name="xmlContent">[% xml.data | html %]</textarea>
+    </div>
+
+    <p>
+        <input type="submit" name="submitValue" value="Validate" />
+        <input type="submit" name="submitValue" value="Save" />
+    </p>
+
+</form>
+
+[% INCLUDE admin/admin_footer.tt %]

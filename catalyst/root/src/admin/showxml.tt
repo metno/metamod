@@ -1,0 +1,47 @@
+[% INCLUDE admin/admin_header.tt %]
+
+<h2><a href="[% c.uri_for("./") %]">XML directory</a></h2>
+
+<p>Files in [% xmldir %]</p>
+
+[% IF path # data file %]
+   <h3>[% path %]</h3>
+[% END %]
+
+[% FOREACH ds IN admin_utils.list_files(xmldir, path, maxfiles) %]
+
+   <div>
+
+      [% IF path # data file %]
+         [% ds.key %]
+      [% ELSE  # dataset %]
+         <b>[% ds.key %]</b>
+      [% END %]
+
+      <a href="[% c.uri_for(path, ds.key) %].xmd">(xmd)</a>
+      <a href="[% c.uri_for(path, ds.key) %].xml">(xml)</a>
+      <a href="
+         [%- path ? # hackety hack
+            c.uri_for('/admin/editxml', path, ds.key) :
+            c.uri_for('/admin/editxml', ds.key)
+         -%]
+      ">(edit)</a>
+      <ul>
+      [% FOREACH fi IN ds.value.1 %]
+         <li>
+            [% fi %]
+            <a href="[% c.uri_for(ds.key, fi) %].xmd">(xmd)</a>
+            <a href="[% c.uri_for(ds.key, fi) %].xml">(xml)</a>
+            <a href="[% c.uri_for('/admin/editxml', ds.key, fi) %]">(edit)</a>
+         </li>
+      [% END %]
+      [% IF ds.value.0 > maxfiles %]
+         <li><i>Total of <a href="[% c.uri_for(ds.key) %]">[% ds.value.0 %] files</a></i></li>
+      [% END %]
+      </ul>
+
+   </div>
+
+[% END %]
+
+[% INCLUDE admin/admin_footer.tt %]
