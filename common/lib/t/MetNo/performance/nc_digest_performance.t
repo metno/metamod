@@ -19,6 +19,10 @@ my $num_tests = 0;
 use Test::More;
 use Test::Files;
 
+BEGIN {
+    plan skip_all => 'unset NO_PERF_TESTS to run performance tests' if $ENV{NO_PERF_TESTS};
+}
+
 use MetNo::NcDigest qw( digest );
 
 use Test::PerformanceRegression;

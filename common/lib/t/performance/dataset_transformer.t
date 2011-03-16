@@ -19,6 +19,10 @@ use Metamod::Config qw(:init_logger);
 my $num_tests = 0;
 use Test::More;
 
+BEGIN {
+    plan skip_all => 'unset NO_PERF_TESTS to run performance tests' if $ENV{NO_PERF_TESTS};
+}
+
 use Metamod::ForeignDataset;
 use Metamod::DatasetTransformer;
 
