@@ -4,8 +4,6 @@ Things to do in Catalyst version of Metamod
 
 * modify xml validator to use xml catalogs
 
-* add dialog to confirm overwriting previously uploaded files
-
 * security filters for appid/ownertag?
 
 * config for godiva instead of openlayers?
@@ -14,8 +12,6 @@ Things to do in Catalyst version of Metamod
 
 * fix bug where init.d doesn't restart/stop catalyst (when?)
 
-* make gen_httpd_conf run during update_target
-
 * check if user registration works on dev-vm140
 
 * check that wmsinfo data gets imported from test xmlfiles [GA]
@@ -23,6 +19,10 @@ Things to do in Catalyst version of Metamod
 
     DONE
 ------------------------------------------
+
+* add dialog to confirm overwriting previously uploaded files
+
+* make gen_httpd_conf run during update_target
 
 * mm-xml file editor [GA]
 

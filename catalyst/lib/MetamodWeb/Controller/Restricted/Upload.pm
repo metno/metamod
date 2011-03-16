@@ -72,40 +72,72 @@ sub upload_GET {
 sub upload_POST  {
     my ( $self, $c ) = @_;
 
+    my $institution = $c->user->u_institution;
+    my $updir = $c->stash->{mm_config}->get('UPLOAD_DIRECTORY');
     my $upload_utils = MetamodWeb::Utils::UploadUtils->new( { c => $c, config => $c->stash->{ mm_config } } );
 
-    #my $cru = new Catalyst::Request::Upload;
-    my $upload = $c->req->upload('data');
-    my $data = $upload->filename . " (" . $upload->size . "B) uploaded. ";
-    my $fn = $upload->filename;
+    $c->stash( template => 'upload/form.tt' );
 
-    if (! $upload->size) {
-        $data = "ERROR: File size is zero bytes.";
-    } elsif ( !( my $dsname = $upload_utils->validate_datafile($fn) ) ) {
-        $data .= "FAILED validation!";
-    } elsif ( !( my $dataset = $c->model('Userbase::Dataset')->search( { ds_name => $dsname } )->first() ) ) {
-        $data .= "No such dataset '$dsname' registered!";
-    } elsif ( ! $dataset->validate_dskey( $c->req->param('dirkey') ) ) {
-        $data = "Invalid key!";
-    } else {
-        my $institution = $c->user->u_institution;
-        my $updir = $c->stash->{mm_config}->get('UPLOAD_DIRECTORY');
-        my $target = join( '/', $updir, $institution, $dsname, $fn);
+    if ( my $overwrite = $c->req->params->{BTN_overwrite} ) {
 
-        printf STDERR "* file %s\n", $target;
+        my $file = $c->req->params->{filename};
 
-        mkdir "$updir/$institution";
-        mkdir "$updir/$institution/$dsname";
-        $upload->copy_to($target) or die $!;
+        if ($overwrite ne 'OK') { # user pressed cancel ... presumably
+            $self->logger->debug("Cancelled upload of file '$file'");
+            unlink "$updir/${file}_" or warn "Temp file '${file}_' mysteriously gone.";
+            $c->response->redirect('/upload', 303);
+            $c->detach();
+        }
 
-        #$c->response->redirect('/upload/test');
-        #$c->detach();
+        # OK to overwrite file
+        $self->logger->info("Existing file '$file' uploaded");
+        rename("$updir/${file}_", "$updir/$file") or die "Can't overwrite file '$file'";
+        $c->stash( data => "File $file replaced." );
+        return;
     }
 
-    $c->stash(
-        template => 'upload/form.tt',
-        data => $data,
-    );
+    # move most of this stuff to uploadutils.... FIXME
+
+    my $upload = $c->req->upload('data');
+    my $data = $upload->filename . " (" . $upload->size . "B) uploaded.\n";
+    my $fn = $upload->filename;
+    my $dsname = $upload_utils->validate_datafile($fn);
+
+    my $target = join( '/', $institution, $dsname, $fn) if $dsname;
+    mkdir "$updir/$institution";
+    mkdir "$updir/$institution/$dsname";
+    $self->logger->info("Uploaded file '$target'.");
+
+    if ( ! $dsname ) { # not validated
+
+        $data .= "ERROR: Invalid filename!"; # or whatever
+
+    } elsif ( $c->model('Userbase::File')->search( { f_name => $upload->filename } )->first() ) { # file exists
+
+        $upload->copy_to("$updir/${target}_") or die "$!"; # temp file
+        $data = "File already exists in database. Overwrite?";
+        $c->stash( overwrite_file => $target );
+
+    } elsif (! $upload->size) { # empty file
+
+        $data = "ERROR: File size is zero bytes!";
+
+    } elsif ( !( my $dataset = $c->model('Userbase::Dataset')->search( { ds_name => $dsname } )->first() ) ) { # missing dataset
+
+        $data .= "ERROR: No such dataset '$dsname' registered!";
+
+    } elsif ( ! $dataset->validate_dskey( $c->req->params->{dirkey} ) ) { # wrong key supplied
+
+        $data = "ERROR: Incorrect key supplied!";
+
+    } else {
+
+        $self->logger->info("New file '$target' uploaded");
+        $upload->copy_to("$updir/$target") or die $!;
+
+    }
+
+    $c->stash( data => $data );
 }
 
 =head2 /upload/test

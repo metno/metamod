@@ -19,6 +19,29 @@ file. Then you upload the archive file</p>
 
 <h2 class="std">Upload file</h2>
 
+[% IF overwrite_file %]
+
+<p style="color: red">[% data %]</p>
+
+<form action="[% c.uri_for('/upload') %]" method="post">
+
+    <label>Overwrite file?
+        <input type="hidden" name="filename" value="[% overwrite_file %]" />
+        <input type="submit" name="BTN_overwrite" value="Cancel" />
+        <input type="submit" name="BTN_overwrite" value="OK" />
+    </label>
+
+</form>
+
+[% ELSE %]
+
+
+[% IF data %]
+
+<p style="color: red">[% data %]</p>
+
+[% ELSE %]
+
 <p>Use the "Browse..." button below to enter the name of a file on your local file system
 that you want to upload to the Catalyst testbed data repository.</p>
 
@@ -39,6 +62,8 @@ user directory followed by an underscore (_)</b>.</p>
 institution). In that case you must obtain the directory key from the owner of the
 directory, and fill it into the entry field below. Otherwise, you should leave the directory
 key field empty.</p>
+
+[% END %]
 
 <form enctype="multipart/form-data" action="[% c.uri_for('/upload') %]" method="post">
 
@@ -90,9 +115,5 @@ File name: <input name="data" type="file" />
 </table>
 
 </form>
-
-[% IF data %]
-
-<p style="color: red">[% data %]</p>
 
 [% END %]
