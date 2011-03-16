@@ -150,21 +150,17 @@ sub empty_metadb {
     my $dbh    = $config->getDBH();
 
     my @tables = qw(
-        basickey
         bk_describes_ds
         dataset
         dataset_location
         ds_has_md
         ga_contains_gd
         ga_describes_ds
-        geographicalarea
-        hierarchicalkey
         hk_represents_bk
         metadata
         metadatatype
         numberitem
         projectioninfo
-        searchcategory
         sessions
         wmsinfo
     );
