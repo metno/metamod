@@ -87,6 +87,8 @@ sub dataset_manager : Path("/admin/dsmanager") :Args(0) {
     $c->stash(select_html => $select_html);
     my @columns = qw/ds_id ds_name ds_status ds_ownertag ds_filepath/;
     my $resultset = $c->model('Metabase::Dataset')->search({ds_parent => 0}, {columns => \@columns, order_by => 'ds_id'});
+    my $names_status_change = "";
+    my $names_ownertag_change = "";
     my @wholetable = ();
     while (my $row = $resultset->next) {
        my $rowstring = "";
@@ -144,17 +146,32 @@ sub dataset_manager : Path("/admin/dsmanager") :Args(0) {
           my %dset_values = $dsobj->getInfo;
           if ($params->{'mdel'}) {
              $dset_values{'status'} = "deleted";
+             $names_status_change .= " " . $vals{'ds_name'};
           }
           if ($params->{'activate'}) {
              $dset_values{'status'} = "active";
+             $names_status_change .= " " . $vals{'ds_name'};
           }
           if ($params->{'owner'}) {
              $dset_values{'ownertag'} = $newtag;
+             $names_ownertag_change .= " " . $vals{'ds_name'};
           }
           $dsobj->setInfo(\%dset_values);
           $dsobj->writeToFile($filepath);
        }
        push @wholetable, $rowstring;
+    }
+    if (length($names_status_change) > 0) {
+       my $status_change = "";
+       if ($params->{'mdel'}) {
+          $status_change = "Deleted";
+       } elsif ($params->{'activate'}) {
+          $status_change = "Activated";
+       }
+       $self->logger->info($status_change . " datasets:" . $names_status_change);
+    }
+    if (length($names_ownertag_change) > 0) {
+       $self->logger->info("Ownertag change to " . $newtag . " for datasets:" . $names_ownertag_change);
     }
     $c->stash(wholetable => \@wholetable);
 }
