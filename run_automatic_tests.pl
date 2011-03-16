@@ -12,6 +12,8 @@ run_automatic_tests.pl [options]
     --smolder Send the test result to our Smolder server
     --verbose Run the tests with verbose output
     --coverage Turn on coverage reporting with Devel::Cover
+    --perf Turn on performance testing
+    --pod Turn on POD testing (default). Use --no-pod to turn of
 
 =cut
 
@@ -21,22 +23,35 @@ use Getopt::Long;
 use Pod::Usage;
 
 my $send_to_smolder = '';
-my $verbose = '';
-my $coverage = '';
+my $verbose         = '';
+my $coverage        = '';
+my $performance     = '';
+my $pod             = 1;
 
-GetOptions('smolder' => \$send_to_smolder, 'verbose' => \$verbose, 'coverage' => \$coverage ) or pod2usage(1);
+GetOptions(
+    'smolder'     => \$send_to_smolder,
+    'verbose'     => \$verbose,
+    'coverage'    => \$coverage,
+    'performance' => \$performance,
+    'pod!'        => \$pod,
+) or pod2usage(1);
 
-# we want to test POD as well.
-$ENV{TEST_POD} = 1;
+if( !$pod ){
+    $ENV{NO_TEST_POD} = 1;
+}
+
+if( !$performance ){
+    $ENV{NO_PERF_TESTS} = 1;
+}
 
 my $output_file = 'auto_test_result.tar.gz';
 
 # run Devel::Cover to get some information about the test coverage
-if($coverage){
+if ($coverage) {
 
     eval { require Devel::Cover; };
 
-    if($@){
+    if ($@) {
         print "Could not load Devel::Cover. Cannot run tests with coverage statistics\n";
         print "$@";
         exit 1;
@@ -50,7 +65,7 @@ my $prove = App::Prove->new();
 # setting lib using $prove->lib() does not work for some reason
 $prove->process_args('-I/opt/metno-perl-webdev-ver1/lib/perl5');
 
-if($verbose){
+if ($verbose) {
     $prove->verbose(1);
 }
 
@@ -59,7 +74,8 @@ $prove->archive($output_file);
 $prove->argv( [ "$FindBin::Bin/common/lib/t", "$FindBin::Bin/catalyst/t" ] );
 $prove->run();
 
-if( $send_to_smolder ){
-    system "$FindBin::Bin/test/smolder_smoke_signal.pl", '--server', 'dev-vm081', '--port', '8080', '--username', 'admin', '--password',
+if ($send_to_smolder) {
+    system "$FindBin::Bin/test/smolder_smoke_signal.pl", '--server', 'dev-vm081', '--port', '8080', '--username',
+        'admin', '--password',
         'qa_rocks', '--project', 'metamod', '--platform', $^O, '--file', $output_file;
 }
