@@ -10,14 +10,14 @@ Test::PerformanceRegression - Test::Builder based module for doing regression te
 =head1 SYNOPSIS
 
  my $perf = Test::PerformanceRegression->new();
- 
+
  my $sub_to_perf_test = sub { my $result = run_some_code() };
-  
+
  my $check_of_result = sub { my (@result) = @_; #is result as expected };
- 
+
  # check that a single run of the function has ok performance.
  perf_ok($sub_to_perf, $check_of_result, 'A unique tag for the test');
- 
+
  # run the sub enough times that we a statistically certain that we have achieved a the real
  # mean runtime for the sub and then check if the performance is ok.
  statistic_perf_ok
@@ -29,15 +29,15 @@ Test::Builder so it is compatible with the standard Perl testing libraries.
 
 The purpose of this module is B<NOT> to measure the actual performance of a piece of code, but
 instead to ensure that a change does not introduce reduced performance without it being reported
-to the developer. 
+to the developer.
 
-Since running times can vary greatly between different machines and it can be difficult to 
+Since running times can vary greatly between different machines and it can be difficult to
 measure the speed of some code against a fixed number. For this reason this module will instead
 compare the current performance against a previous performance on the same machine. The first time
-a performance test is run for a piece of code it will be stored in a file. On later runs the 
+a performance test is run for a piece of code it will be stored in a file. On later runs the
 performance will be compared with the stored version.
 
-If you want to update all the performance benchmarks for a test script you can just delete the 
+If you want to update all the performance benchmarks for a test script you can just delete the
 file containing the cached performance results.
 
 =head1 FUNCTIONS/METHODS
@@ -91,16 +91,16 @@ sub new {
     my ( $class, $params ) = @_;
 
     my $self = bless {}, $class;
-    
+
     my $accepted_error = $params->{ accepted_error } || 10;
     $self->accepted_error($accepted_error);
-    my $statistic_error = $params->{ statistic_error } || 10;    
+    my $statistic_error = $params->{ statistic_error } || 10;
     $self->statistic_error($statistic_error);
     my $statistict_confidence = $params->{ statistic_confidence } || 95;
     $self->statistic_confidence($statistict_confidence);
     my $statistic_minimum = $params->{ statistic_minimum } || 5;
     $self->statistic_minimum($statistic_minimum);
-    
+
     $self->{_result_file} = $params->{ result_file } || $self->_default_filename();
     $self->previous_result( $self->_read_result() );
 
@@ -109,6 +109,24 @@ sub new {
     return $self;
 
 }
+
+=head2 $self->accepted_error($accepted_error)
+
+Set/get the accepted error (see constructor for details).
+
+=over
+
+=item $accepted_error (optional)
+
+If provided will set the accepted error to the provided value.
+
+=item return
+
+Returns the accepted error value.
+
+=back
+
+=cut
 
 sub accepted_error {
     my $self = shift;
@@ -119,6 +137,24 @@ sub accepted_error {
     return $self->{_accepted_error};
 }
 
+=head2 $self->statistic_error($statistic_error)
+
+Set/get the statistic error (see constructor for details).
+
+=over
+
+=item $statistic_error (optional)
+
+If provided will set the statistic error to the provided value.
+
+=item return
+
+Returns the statistic error value.
+
+=back
+
+=cut
+
 sub statistic_error {
     my $self = shift;
 
@@ -127,6 +163,24 @@ sub statistic_error {
     }
     return $self->{_statistic_error};
 }
+
+=head2 $self->statistic_confidence($statistic_confidence)
+
+Set/get the statistic confidence (see constructor for details).
+
+=over
+
+=item $statistic_confidence (optional)
+
+If provided will set the statistic confidence to the provided value.
+
+=item return
+
+Returns the statistic confidence value.
+
+=back
+
+=cut
 
 sub statistic_confidence {
     my $self = shift;
@@ -137,6 +191,24 @@ sub statistic_confidence {
     return $self->{_statistic_confidence};
 }
 
+=head2 $self->statistic_minimum($statistic_minimum)
+
+Set/get the statistic minimum (see constructor for details).
+
+=over
+
+=item $statistic_minimum (optional)
+
+If provided will set the statistic minimum to the provided value.
+
+=item return
+
+Returns the statistic minimum value.
+
+=back
+
+=cut
+
 sub statistic_minimum {
     my $self = shift;
 
@@ -146,6 +218,25 @@ sub statistic_minimum {
     return $self->{_statistic_minimum};
 }
 
+=head2 $self->previous_result($previous_result)
+
+Set/get the previous result.
+
+=over
+
+=item $previous_result (optional)
+
+If provided will set previous result to the value provided. The value should be
+a hash reference with tags as keys and times as values.
+
+=item return
+
+Returns the previous result.
+
+=back
+
+=cut
+
 sub previous_result {
     my $self = shift;
 
@@ -153,7 +244,7 @@ sub previous_result {
         $self->{_previous_result} = shift;
     }
     return $self->{_previous_result};
-    
+
 }
 
 =head2 $self->perf_ok($code, $pre_test, $tag, $testname)
@@ -223,7 +314,7 @@ sub perf_ok {
 =head2 $self->statistic_perf_ok($code, $pre_test, $tag, $testname)
 
 Check the performance of a sub by running it enough times that we are certain that the recorded
-running time is within a margin of error of the real running time. Optionally performing an 
+running time is within a margin of error of the real running time. Optionally performing an
 additional test first about the correctness of the result returned by the sub.
 
 If the previous running time of the sub has not been recorded the test will be skipped, but
@@ -469,11 +560,11 @@ The name of the file to remove. If a file is not specified it will remove the de
 =cut
 sub remove_performance_log {
     my ($filename) = @_;
-    
+
     $filename = _default_filename() if !defined $filename;
-    
+
     unlink $filename;
-    
-} 
+
+}
 
 1;

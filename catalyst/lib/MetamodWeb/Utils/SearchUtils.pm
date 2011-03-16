@@ -154,6 +154,18 @@ sub selected_criteria {
     return \%criteria;
 }
 
+=head2 $self->get_ownertags()
+
+=over
+
+=item return
+
+Returns a list of ownertags that should be used in the search conditions. The
+ownertags are found by looking at DATASET_TAGS in master_config.txt
+
+=back
+
+=cut
 sub get_ownertags {
     my $self = shift;
 

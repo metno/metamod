@@ -22,6 +22,10 @@ This module is a base class for all subscription handlers.
 
 =cut
 
+=head2 new()
+
+=cut
+
 sub new {
     my $class = shift;
 

@@ -38,6 +38,18 @@ MetamodWeb::Utils::UI::Common - Utility functions used for building the UI commo
 
 extends 'MetamodWeb::Utils::UI::Base';
 
+=head2 $self->app_menu()
+
+=over
+
+=item return
+
+Returns the APP_MENU configuration variable as a hash reference. The key is the
+text to display and the value is the link for the item.
+
+=back
+
+=cut
 sub app_menu {
     my $self = shift;
 

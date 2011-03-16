@@ -93,7 +93,7 @@ sub _remove_labels {
 
 }
 
-=head2 $self->check($params)
+=head2 $self->validate($params)
 
 Validate the parameters against the validation profile using C<Data::FormValidator::check()>
 

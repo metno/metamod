@@ -37,7 +37,7 @@ MetamodWeb::Utils::UI::Login - Utility functions used for building the UI common
 
 extends 'MetamodWeb::Utils::UI::Base';
 
-=head2 $self->user_institituions()
+=head2 $self->user_institutions()
 
 Get the list of institutions that a new user can belong to.
 

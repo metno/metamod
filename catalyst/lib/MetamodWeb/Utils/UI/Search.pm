@@ -144,6 +144,24 @@ sub search_categories {
 
 }
 
+=head2 $self->selected_bks($category_id)
+
+Get the selected basic keys for a category.
+
+=over
+
+=item $category_id
+
+The C<sc_id> of the category.
+
+=item return
+
+Returns a hash reference with all the selected basic keys for the category. The key is the basic key id and
+the value is the name of the basic key.
+
+=back
+
+=cut
 sub selected_bks {
     my $self = shift;
 
@@ -173,6 +191,25 @@ sub _basickey_rows {
 
 }
 
+=head2 $self->basickeys($category_id)
+
+Get all the basic keys for a category.
+
+=over
+
+=item $category_id
+
+The C<sc_id> for the category.
+
+=item return
+
+Returns the basic keys as reference to a list. Each element in the list is hash
+reference with the colum values for the basic key.
+
+=back
+
+=cut
+
 sub basickeys {
     my $self = shift;
 
@@ -188,6 +225,23 @@ sub basickeys {
     return \@basickeys;
 
 }
+
+=head2 $self->two_way_table_h_keys($two_way_table)
+
+=over
+
+=item $two_way_table
+
+A two way table structure as returned by
+C<MetamodWeb::Schema::Metabase::ResultSet::Dataset::two_way_table>.
+
+=item return
+
+Returns all the horisontal keys in the two way table sorted alphabetically.
+
+=back
+
+=cut
 
 sub two_way_table_h_keys {
     my $self = shift;
@@ -206,6 +260,18 @@ sub two_way_table_h_keys {
     my @horisontal_keys = sort { lc($a) cmp lc($b) } keys %horisontal_keys;
     return \@horisontal_keys;
 }
+
+=head2 $self->num_search_cols()
+
+=over
+
+=item return
+
+Returns SEARCH_APP_MAX_COLUMNS from master_config.txt
+
+=back
+
+=cut
 
 sub num_search_cols {
     my $self = shift;
@@ -412,6 +478,23 @@ sub search_app_show_columns {
     return \@show_columns;
 }
 
+=head2 $self->mt_name_to_display_name($mt_name)
+
+=over
+
+=item $mt_name
+
+A <mt_name> column value.
+
+=item return
+
+Returns the display name for a metadata column if it exists in
+SEARCH_APP_SHOW_COLUMNS. Otherwise just returns the C<mt_name> again.
+
+=back
+
+=cut
+
 sub mt_name_to_display_name {
     my ($self, $mt_name) = @_;
 
@@ -419,10 +502,7 @@ sub mt_name_to_display_name {
 
     die "*** ERROR: Missing mt_name\n" unless $mt_name;
 
-    #print STDERR Dumper(@$show_columns);
-
     foreach my $column_info (@$show_columns){
-        #next unless defined $column_info->{mt_name}; # not needed after fixed in search_app_show_columns
         if($column_info->{mt_name} eq $mt_name ){
             return $column_info->{shown_name};
         }
@@ -432,6 +512,19 @@ sub mt_name_to_display_name {
     return $mt_name;
 
 }
+
+=head2 $self->selected_map()
+
+=over
+
+=item return
+
+Returns the SRID for the currently selected map. If the user has not selected a
+map yet, the first map in the map list will be selected.
+
+=back
+
+=cut
 
 sub selected_map {
     my $self = shift;
@@ -446,6 +539,20 @@ sub selected_map {
     return $srid_columns[0];
 
 }
+
+=head2 $self->available_maps()
+
+=over
+
+=item return
+
+Returns a reference to a list of available maps. Each map is returned as a hash
+reference with the following keys: C<srid>, C<name> and optionally <selected>
+for the currently selected map.
+
+=back
+
+=cut
 
 sub available_maps {
     my $self = shift;
@@ -470,6 +577,20 @@ sub available_maps {
 
 }
 
+=head2 map_coordinates()
+
+=over
+
+=item return
+
+Returns a hash reference with the currently selected map coordinates. The map
+coordinates are given as two points. The keys in the hash are: C<x1>, C<y1>,
+C<x2> and C<y2>.
+
+=back
+
+=cut
+
 sub map_coordinates {
     my $self = shift;
 
@@ -481,6 +602,21 @@ sub map_coordinates {
     return { x1 => $x1, y1 => $y1, x2 => $x2, y2 => $y2 };
 
 }
+
+=head2 $self->topics_tree()
+
+Generate the hierarchical topics and variables tree.
+
+=over
+
+=item return
+
+Returns a reference to a list of roots. Each root is the start of a tree
+structure.
+
+=back
+
+=cut
 
 sub topics_tree {
     my $self = shift;
@@ -633,6 +769,21 @@ sub _gen_topics_tree {
 
 }
 
+=head2 $self->selected_topics()
+
+Get a list of all the selected topics.
+
+=over
+
+=item return
+
+Returns a reference to a list of selected topics. Each selected topic is a hash
+reference with the following keys: C<type>, C<name> and C<id>
+
+=back
+
+=cut
+
 sub selected_topics {
     my $self = shift;
 
@@ -714,11 +865,6 @@ sub level2_result {
 	my $level2_datasets = $dataset->child_datasets()->search( $conds, \%attrs );
 
 	return $level2_datasets;
-
-}
-
-sub _search_params {
-    my $self = shift;
 
 }
 
@@ -975,6 +1121,19 @@ sub navigation_url {
     return sprintf( $url_template, $page );
 }
 
+=head2 $self->dist_statements()
+
+=over
+
+=item return
+
+Returns a list of distribution statements that can be downloaded via the
+collection basket.
+
+=back
+
+=cut
+
 sub dist_statements {
     my $self = shift;
 
@@ -1024,6 +1183,26 @@ sub freely_available {
 
 }
 
+=head2 $self->html_id_for_bk($category_id, $bk_id)
+
+=over
+
+=item $category_id
+
+The C<sc_id> for the category that the basic key belongs to.
+
+=item $bk_id
+
+The C<bk_id> if the basic key.
+
+=item return
+
+Returns the html id that will be used for the basic key form element.
+
+=back
+
+=cut
+
 sub html_id_for_bk {
     my $self = shift;
 
@@ -1033,6 +1212,25 @@ sub html_id_for_bk {
 
 }
 
+=head2 $self->html_id_for_ni($category_id, $bk_id)
+
+=over
+
+=item $category_id
+
+The C<sc_id> for the category that the number item belongs to.
+
+=item $bk_id
+
+The C<bk_id> if the basic key.
+
+=item return
+
+Returns the html id that will be used for the number item form element.
+
+=back
+
+=cut
 sub html_id_for_ni {
     my ( $self, $category_id, $bk_id ) = @_;
 
@@ -1040,12 +1238,46 @@ sub html_id_for_ni {
 
 }
 
+=head2 $self->html_id_for_freetext($category_id)
+
+=over
+
+=item $category_id
+
+The C<sc_id> for the category that the freetext field belongs to.
+
+=item return
+
+Returns the html id that will be used for freetext the form element.
+
+=back
+
+=cut
 sub html_id_for_freetext {
     my ( $self, $category_id ) = @_;
 
     return 'freetext_' . $category_id;
 }
 
+=head2 $self->html_id_for_date($category_id, $date_type)
+
+=over
+
+=item $category_id
+
+The C<sc_id> for the category that the date field belongs to.
+
+=item $date_type
+
+The type of date for the form element. Either C<to> or C<from>.
+
+=item return
+
+Returns the html id that will be used for the form element.
+
+=back
+
+=cut
 sub html_id_for_date {
     my ( $self, $category_id, $date_type ) = @_;
 
@@ -1053,6 +1285,21 @@ sub html_id_for_date {
 
 }
 
+=head2 $self->html_id_for_map($coord_id)
+
+=over
+
+=item $coord_id
+
+The coordinate id for the form element. Either C<x1>, C<x2>, C<y1> or C<y2>.
+
+=item return
+
+Returns the html id that will be used for the form element.
+
+=back
+
+=cut
 sub html_id_for_map {
     my ( $self, $coord_id ) = @_;
 
@@ -1060,6 +1307,21 @@ sub html_id_for_map {
 
 }
 
+=head2 $self->html_id_for_hk_topic($hk_id)
+
+=over
+
+=item $hk_id
+
+The C<hk_id> for the topic.
+
+=item return
+
+Returns the html id that will be used for the form element.
+
+=back
+
+=cut
 sub html_id_for_hk_topic {
     my ( $self, $hk_id ) = @_;
 
@@ -1067,11 +1329,43 @@ sub html_id_for_hk_topic {
 
 }
 
+=head2 $self->html_id_for_bk_topic($bk_id)
+
+=over
+
+=item $bk_id
+
+The C<bk_id> if the basic key in the topic tree.
+
+=item return
+
+Returns the html id that will be used for the form element in the topic tree.
+
+=back
+
+=cut
 sub html_id_for_bk_topic {
     my ( $self, $bk_id ) = @_;
 
     return 'bk_id_topic_' . $bk_id;
 }
+
+=head2 $self->trim($string)
+
+=over
+
+=item $string
+
+The string to trim.
+
+=item return
+
+Returns the string with any whitespaces removed from the start and end of the
+string.
+
+=back
+
+=cut
 
 sub trim {
     my ( $self, $string ) = @_;

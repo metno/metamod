@@ -31,6 +31,10 @@ match a new file.
 
 =cut
 
+=head2 new()
+
+=cut
+
 sub new {
     my $class = shift;
 
@@ -148,7 +152,7 @@ A reference to a dataset object.
 
 =item return
 
-Returns a hash reference with subscription type as key and a list of hashreferences as values. 
+Returns a hash reference with subscription type as key and a list of hashreferences as values.
 Each hash reference contains information about a single subscription.
 
 On error the method returns C<undef>.
