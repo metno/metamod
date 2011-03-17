@@ -293,7 +293,7 @@ sub get_dataset_institution {
         }
     } else {
         my @properties  = qw(u_institution u_email u_name);
-        my @properties2 = qw(ds_name DSKEY LOCATION CATALOG WMS_URL);
+        my @properties2 = qw(ds_name DSKEY LOCATION CATALOG);
         do {
             my @user_values = ();
             for ( my $i1 = 0 ; $i1 < 3 ; $i1++ ) {
@@ -323,7 +323,7 @@ sub get_dataset_institution {
             } else {
                 do {
                     my @dset_values = ();
-                    for ( my $i2 = 0 ; $i2 < 5 ; $i2++ ) {
+                    for ( my $i2 = 0 ; $i2 < 4 ; $i2++ ) {
                         if ($ok_to_now) {
 
                             #
@@ -353,7 +353,6 @@ sub get_dataset_institution {
                             $ref_dataset_institution->{$dataset_name}->{'key'}         = $dset_values[1];
                             $ref_dataset_institution->{$dataset_name}->{'location'}    = $dset_values[2];
                             $ref_dataset_institution->{$dataset_name}->{'catalog'}     = $dset_values[3];
-                            $ref_dataset_institution->{$dataset_name}->{'wmsurl'}      = $dset_values[4];
                         }
                     }
                 } until ( !$userbase->dset_next() );
@@ -368,6 +367,7 @@ sub get_dataset_institution {
             $ok_to_now = 0;
         }
     }
+
     $userbase->close();
     if ( !$ok_to_now ) {
         &syserror( "SYS", "Could not create the dataset_institution hash", "", "get_dataset_institution", "" );
