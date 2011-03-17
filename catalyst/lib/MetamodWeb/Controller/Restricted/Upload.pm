@@ -24,11 +24,9 @@ MetamodWeb::Controller::Restricted:Upload - Catalyst Controller for file upload
 
 =head1 DESCRIPTION
 
-blah blah blah
+Catalyst Controller for file upload
 
-=head1 METHODS
-
-blah blah blah
+=head1 RESOLVES
 
 =cut
 
@@ -103,10 +101,10 @@ sub upload_POST  {
     my $fn = $upload->filename;
     my $dsname = $upload_utils->validate_datafile($fn);
 
-    my $target = join( '/', $institution, $dsname, $fn) if $dsname;
+    my $filepath = join( '/', $institution, $dsname, $fn) if $dsname;
     mkdir "$updir/$institution";
     mkdir "$updir/$institution/$dsname";
-    $self->logger->info("Uploaded file '$target'.");
+    $self->logger->info("Uploaded file '$filepath'.");
 
     if ( ! $dsname ) { # not validated
 
@@ -114,9 +112,9 @@ sub upload_POST  {
 
     } elsif ( $c->model('Userbase::File')->search( { f_name => $upload->filename } )->first() ) { # file exists
 
-        $upload->copy_to("$updir/${target}_") or die "$!"; # temp file
+        $upload->copy_to("$updir/${filepath}_") or die "$!"; # temp file
         $data = "File already exists in database. Overwrite?";
-        $c->stash( overwrite_file => $target );
+        $c->stash( overwrite_file => $filepath );
 
     } elsif (! $upload->size) { # empty file
 
@@ -132,8 +130,8 @@ sub upload_POST  {
 
     } else {
 
-        $self->logger->info("New file '$target' uploaded");
-        $upload->copy_to("$updir/$target") or die $!;
+        $self->logger->info("New file '$filepath' uploaded");
+        $upload->copy_to("$updir/$filepath") or die $!;
 
     }
 
@@ -176,10 +174,10 @@ sub test_POST  {
             $data = "File name must start with \"dir_\" where dir is a destination directory (which need not exist)";
         } else {
             # FIXME - move this from controller to uploadutils
-            my $target = $c->stash->{mm_config}->get('WEBRUN_DIRECTORY') . "/upl";
+            my $updir = $c->stash->{mm_config}->get('WEBRUN_DIRECTORY') . "/upl";
 
-            $upload->copy_to("$target/ftaf/$fn") or die $!;
-            open(my $etaf, '>', "$target/etaf/$fn") or die $!;
+            $upload->copy_to("$updir/ftaf/$fn") or die $!;
+            open(my $etaf, '>', "$updir/etaf/$fn") or die $!;
             print $etaf $c->user->u_email . "\n";
             close $etaf;
             $data = sprintf "File $fn (%s bytes) uploaded successfully. Test report will be sent on e-mail.", $upload->size;
