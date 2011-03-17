@@ -478,6 +478,10 @@ sub process_files {
             } else {
                 print $digest $fileURL, "\n";
             }
+
+            # The upload index will not move files so the path of the file to read is the same
+            # as the destination path
+            print $digest $filepath . " ";
             print $digest $filepath, "\n";
             close $digest;
             my ( undef, undef, $pureFile ) = File::Spec->splitpath($filepath);
