@@ -1,11 +1,6 @@
-<h1 class="std">Uploads to the Data Repository</h1>
 
-<p>You are currently logged in to the METAMOD data file upload service.</p>
+<h1 class="std">[% app.upload.title %]</h1>
 
-<p>The data repository is divided into directories owned by individual users
-(data providers). As a data provider, you may create new directories (using the
-"Administration" page), and upload files to these directories (using the "Upload
-files" page). New files are checked against a set of file format requirements.
-If the file does not comply with these requirements, you will recieve an E-mail
-explaining the errors found. </p>
+<p>[% app.upload.inlogged_text %]</p>
 
+<p>[% app.upload.common_text %]</p>

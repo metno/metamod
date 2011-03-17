@@ -1,1 +1,3 @@
-<h1 class="std">Metadata search</h1>
+<h1 class="std">[% app.search.title %]</h1>
+
+<p>(since this works...) <br> [% app.search.description %]</p>

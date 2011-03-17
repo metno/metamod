@@ -2,13 +2,7 @@
 
 [% INCLUDE search/keep_search_params.tt category_type = 'none' category_id = 'none' %]
 
-<p>
-Search the DAMOCLES Metadata Catalogue. Use the links on the left hand side to
-access pages for setting search conditions. Then use the menu below to view
-results. Initially, only directory level datasets are shown. For each directory
-level dataset containing files on a second level, there is a small [+] button
-that may be used to show metadata about the files.
-</p>
+<p>[% app.search.description %] (why doesn't this work?)</p>
 
 <p>
 The catalogue contains information about datasets as well as references to

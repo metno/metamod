@@ -1,0 +1,9 @@
+[%# this is an empty template. If you want to use custom texts just let
+   update_target.pl override this file.
+%]
+
+[%
+
+    # app.search.title = "Hello, world!"
+
+%]

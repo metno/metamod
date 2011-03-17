@@ -1,5 +1,5 @@
 [% IF in_search_app %]
-    [% mm_config.get('SEARCH_APP_HEADER_HTML') %]
+    [% app.search.header_html || app.common.header_html %]
 [% ELSE %]
-    [% mm_config.get('APP_HEADER_HTML') %]
+    [% app.common.header_html %]
 [% END %]

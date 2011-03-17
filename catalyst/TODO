@@ -2,7 +2,11 @@
 Things to do in Catalyst version of Metamod
 -------------------------------------------
 
-* modify xml validator to use xml catalogs
+* move default text strings out of master_config
+
+* move admin controller to restricted?
+
+* modify xml validator to use xml catalogs (not possible with XML::LibXML::Schema?)
 
 * security filters for appid/ownertag?
 

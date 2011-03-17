@@ -1,0 +1,109 @@
+[%
+
+# Default texts for Template Toolkit. Supply your own custom.tt to override specific values
+
+mm_logo = c.uri_for('/static/images/metamod_logo.png')
+
+app = {
+
+    common = {
+
+        # HTML code for a header across the top of applications:
+        header_html = "<img src='$mm_logo' style='clear:left;border: none;' />"
+
+        # HTML code for a footer across the bottom of applications:
+        footer_html = ""
+
+    }
+
+    upload = {
+
+        title = "Uploads to the Data Repository"
+
+        # Common text in the heading for all upload pages:
+        login_text =
+        "This web interface is for data producers for uploading files to
+        the data repository. Please log in using your E-mail address
+        and password. New users will be sent a password on E-mail by filling in the
+        \"New users\" form below. This form can also be used if you have forgotten your
+        password."
+
+        # Text shown in the upload and administration pages:
+        inlogged_text =
+        "You are currently logged in to the METAMOD data file upload service."
+
+        common_text =
+        "The data repository is divided into directories owned by individual users
+        (data providers). As a data provider, you may create new directories (using the
+        \"Administration\" page), and upload files to these directories (using the \"Upload
+        files\" page). New files are checked against a set of file format requirements.
+        If the file does not comply with these requirements, you will recieve an E-mail
+        explaining the errors found."
+
+    }
+
+    search = {
+
+        # Name of web-based search application as seen by users:
+        name = "METAMOD search"
+
+        # Title to appear on all web pages in the web search application:
+        title = "Metadata Catalogue Search"
+
+        # HTML code for a header across the top of the search application
+        # (leave blank if same as common):
+        header_html = ""
+
+        # Description of the web application:
+        description =
+        "Search the METAMOD Catalogue. Use the links on the left hand side
+        to access pages for setting search conditions. Then use the menu below to
+        view results. Initially, only directory level datasets are shown. For each
+        directory level dataset containing files on a second level, there is a small
+        [+] button that may be used to show metadata about the files."
+
+        # HTML to fill an initial page where no results are shown (can be empty):
+        presentation_html = ""
+
+    }
+
+    email = {
+
+        # Text in mail body sent to a dataset owner when errors are found in an
+        # uploaded file. The string [OWNER] is replaced by the name of the dataset
+        # owner when the mail is sent. [DATASET] is replaced by the actual dataset
+        # name, and [URL] is replaced by an url to the html-file describing the errors:
+        body_when_upload_error =
+        " Dear [OWNER],\n\n"
+        _ "The METAMOD system that automatically check files uploaded to the data \n"
+        _ "repository, have found errors in files recently uploaded to the [DATASET] \n"
+        _ "dataset. Please find the details on the URL below:\n\n[URL].\n"
+
+        # Subject field in E-mails sent to a dataset owner when errors are found
+        # in an uploaded file:
+        subject_when_upload_error = "METAMOD file upload error"
+
+        # Mail address used in the "from" field on automatically sent E-mails to
+        # users:
+        from_address = mm_config.get("OPERATOR_EMAIL")
+
+        # Final greetings and signature included in E-mail to users:
+        email_signature = " Best regards,\n The project team for the EXAMPLE project"
+
+    }
+
+    quest = { # these don't seem to be implemented in Catalyst templates for 2.6
+
+        title = "Meta data form"
+
+        # Message shown to the user (as a web page) when the form has been submitted:
+        okmessage = "Thanks for submitting information!\n <a href='" _ c.uri_for('/') _ "'>Return to the main page</a>."
+
+        # Background image for file administration page
+        adm_background = c.uri_for('/static/images/ipydis_background.jpg')
+
+    }
+
+}
+
+%]

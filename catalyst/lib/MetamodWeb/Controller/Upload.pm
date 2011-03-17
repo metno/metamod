@@ -20,15 +20,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =head1 NAME
 
-MetamodWeb::Controller::Restricted:Upload - Catalyst Controller for file upload
+MetamodWeb::Controller:Upload - Catalyst Controller for non-restriced functions
 
 =head1 DESCRIPTION
 
-blah blah blah
+This is used for handlers that don't require login.
 
 =head1 METHODS
-
-blah blah blah
 
 =cut
 
