@@ -67,7 +67,7 @@ app = {
 
     }
 
-    email = {
+    email = { # NOT IN USE - current email system doesn't use Template Toolkit
 
         # Text in mail body sent to a dataset owner when errors are found in an
         # uploaded file. The string [OWNER] is replaced by the name of the dataset

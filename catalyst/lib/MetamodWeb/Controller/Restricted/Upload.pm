@@ -47,7 +47,6 @@ sub auto :Private {
     $c->stash( section => 'upload' );
 }
 
-
 =head2 /upload
 
 Action for uploading files
@@ -306,6 +305,21 @@ sub dataset_x_POST  { # update existing dataset
         # success - now go back and read dataset from db
         $c->response->redirect( $c->uri_for($path, $ds_id) );
     }
+
+}
+
+=head2 /upload/help
+
+Help texts for dummies
+
+=cut
+
+sub help :Path('/upload/help') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->stash(
+        template => 'upload/help.tt',
+    );
 
 }
 

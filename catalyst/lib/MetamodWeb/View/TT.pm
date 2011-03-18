@@ -27,7 +27,8 @@ use base 'Catalyst::View::TT';
 
 __PACKAGE__->config(
     #TEMPLATE_EXTENSION => '.tt',
-    WRAPPER => 'wrapper.tt'
+    WRAPPER => 'wrapper.tt',
+    PRE_PROCESS => ['defaults.tt', 'custom.tt'],
 );
 
 =head1 NAME

@@ -2,8 +2,6 @@
 
 [% INCLUDE search/keep_search_params.tt category_type = 'none' category_id = 'none' %]
 
-<p>[% app.search.description %] (why doesn't this work?)</p>
-
 <p>
 The catalogue contains information about datasets as well as references to
 actual data which are available through a THREDDS Data Server. Always remember

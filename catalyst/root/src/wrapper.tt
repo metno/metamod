@@ -33,8 +33,8 @@
     <script type="text/javascript" src="[% file %]"></script>
 [% END %]
 
-[% PROCESS 'defaults.tt' %]
-[% PROCESS 'custom.tt' %]
+[%# PROCESS 'defaults.tt' %]
+[%# PROCESS 'custom.tt' %]
 
 </head>
 <body>

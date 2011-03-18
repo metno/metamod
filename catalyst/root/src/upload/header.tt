@@ -3,4 +3,3 @@
 
 <p>[% app.upload.inlogged_text %]</p>
 
-<p>[% app.upload.common_text %]</p>
