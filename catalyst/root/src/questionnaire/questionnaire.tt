@@ -7,6 +7,8 @@
     type_files.textarea = 'questionnaire/textarea.tt',
     type_files.list = 'questionnaire/list.tt',
     type_files.gcmdlist = 'questionnaire/gcmdlist.tt',
+    type_files.wms = 'questionnaire/wms.tt',
+    type_files.projection = 'questionnaire/projection.tt'
 %]
 
 [% INCLUDE 'user_msgs.tt' %]
