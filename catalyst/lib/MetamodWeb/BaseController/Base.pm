@@ -166,7 +166,13 @@ sub add_form_errors {
         #it can in theory be more than one constraint per field.
         my $msg = '';
         foreach my $failed_constraint (@$failed_constraints){
-            $msg .= $msgs{$failed_constraint};
+
+            if( exists $msgs{$failed_constraint} ){
+                $msg .= $msgs{$failed_constraint};
+            } else {
+                $msg .= $failed_constraint;
+            }
+
         }
         $error_messages{$field} = { label => $validator->field_label($field), msg => $msg };
 
