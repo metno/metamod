@@ -102,6 +102,10 @@ app = {
         # Background image for file administration page
         adm_background = c.uri_for('/static/images/ipydis_background.jpg')
 
+        wms_default = ''
+
+        projection_default = ''
+
     }
 
 }
