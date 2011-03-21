@@ -1,0 +1,35 @@
+[
+
+   {
+    "type" : "h1",
+    "value" : "WMS and Projection setup form"
+    },
+    {
+        "type" : "p",
+        "value" : "On this page you can configure the WMS and projection setup for a file."
+    },
+    {
+        "type" : "sectionstart",
+        "value" : "WMS and Projection setup"
+    },
+    {
+        "type" : "projection",
+        "label" : "Projection info",
+        "length" : 70,
+        "height" : 10,
+        "name" : "projection_info",
+        "constraint" : "projection_info"
+    },
+    {
+        "type" : "wms",
+        "label" : "WMS info",
+        "length" : 70,
+        "height" : 10,
+        "name" : "wms_info",
+        "constraint" : "wms_info"
+    },
+    {
+        "type" : "sectionend"
+    }
+]
+

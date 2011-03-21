@@ -56,6 +56,7 @@
     <th class="list_table">Dataset name</th>
     <th class="list_table">&nbsp;</th>
     <th class="list_table">&nbsp;</th>
+    <th class="list_table">&nbsp;</th>
     </tr>
     </thead>
     [% FOREACH ds IN upload_ui_utils.user_datasets() %]
@@ -63,6 +64,7 @@
             <td class="list_table">[% ds.ds_name %]</td>
             <td class="list_table"><div class="btns"><a class="btn2" style="width:120px" href="[% root _ '/' _ ds.ds_id %]"><span>Edit</span></a></div></td>
             <td class="list_table"><div class="btns"><a class="btn2" style="width:120px" href="[% c.uri_for( '/editor/metadata/restricted', ds.ds_id ) %]"><span>Edit metadata</span></a></div></td>
+            <td class="list_table"><div class="btns"><a class="btn2" style="width:120px;"href="[% c.uri_for( '/editor/wms_and_projection/restricted', ds.ds_id ) %]"><span>Edit WMS/projection</span></a></div></td>
         </tr>
     [% END %]
     [% IF ds_id %]

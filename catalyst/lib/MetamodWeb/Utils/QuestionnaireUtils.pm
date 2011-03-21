@@ -152,6 +152,7 @@ sub quest_validator {
         optional           => \@optional,
         labels             => \%labels,
         constraint_methods => \%constraints,
+        missing_optional_valid => 1,
     );
 
     return \%form_profile;
@@ -239,6 +240,11 @@ sub quest_configuration {
         'metadata' => {
         config_file => File::Spec->catfile($self->config->get('TARGET_DIRECTORY'), 'etc', 'qst', 'metadata_quest.json' ),
         title       => 'Metadata editor',
+        tag         => $self->config->get('QUEST_OWNERTAG'),
+        },
+        'wms_and_projection' => {
+        config_file => File::Spec->catfile($self->config->get('TARGET_DIRECTORY'), 'etc', 'qst', 'wms_and_projection.json' ),
+        title       => 'WMS and projection setup',
         tag         => $self->config->get('QUEST_OWNERTAG'),
         }
     );
@@ -496,14 +502,24 @@ sub _save_metadata {
     # the creation data can only be set the first time and cannot be updated later
     $info{creationDate} = $info{datestamp} = $datestamp->strftime('%Y-%m-%dT%H:%M:%S%z') if !exists $info{creationDate};
 
-    my $wms_info = delete $metadata->{wms_info};
-    $dataset->setWMSInfo($wms_info) if defined $wms_info;
+    if( exists $metadata->{wms_info}){
+        my $wms_info = delete $metadata->{wms_info};
+        $wms_info = '' if !defined $wms_info;
+        $dataset->setWMSInfo($wms_info);
+    }
 
-    my $projection_info = delete $metadata->{projection_info};
-    $dataset->setProjectionInfo($projection_info) if defined $projection_info;
+    if( exists $metadata->{projection_info} ){
+        my $projection_info = delete $metadata->{projection_info};
+        $projection_info = '' if !defined $projection_info;
+        $dataset->setProjectionInfo($projection_info);
+    }
 
     # we must convert the meta data to a format that Metamod::Dataset understands
     while( my ($key, $value) = each %$metadata ){
+
+        # empty fields are set to undef by Data::FormValidator
+        $value = '' if !defined $value;
+
         if( ref $value ne 'ARRAY' ){
             $metadata->{$key} = [ $value ];
         }

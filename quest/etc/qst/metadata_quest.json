@@ -37,22 +37,6 @@
         "mandatory" : true
     },
     {
-        "type" : "textarea",
-        "label" : "Projection info",
-        "length" : 70,
-        "height" : 10,
-        "name" : "projection_info",
-        "constraint" : "projection_info"
-    },
-    {
-        "type" : "textarea",
-        "label" : "WMS info",
-        "length" : 70,
-        "height" : 10,
-        "name" : "wms_info",
-        "constraint" : "wms_info"
-    },
-    {
         "type" : "text",
         "label" : "URL describing/linking the data",
         "name" : "dataref",
