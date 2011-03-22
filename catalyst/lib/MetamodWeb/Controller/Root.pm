@@ -75,6 +75,21 @@ sub default :Path {
     $c->response->status(404);
 }
 
+=head2 unauthorized
+
+Standard 403 error page
+
+FIXME - needs better user interface
+
+=cut
+
+sub unauthorized :Path {
+    my ( $self, $c ) = @_;
+    $c->response->body( "<h1>Not autorized</h1>\n" );
+    $c->response->content_type('text/html');
+    $c->response->status(403);
+}
+
 =head2 begin()
 
 Default begin action.

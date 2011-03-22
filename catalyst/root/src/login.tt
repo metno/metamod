@@ -67,6 +67,7 @@
                 <select name="access_rights" id="access_rights">
                     <option value="subscription">Email subscription</option>
                     <option value="upload">Email subscription, dataset upload and metadata editor</option>
+                    <option value="admin">Master of all he surveys</option>
                 </select>
             </tr>
 

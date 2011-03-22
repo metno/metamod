@@ -112,5 +112,7 @@ CREATE INDEX exitstatus_deleteafter ON exitstatus (delete_after);
 
 GRANT ALL PRIVILEGES ON exitstatus TO "[==PG_WEB_USER==]";
 
+INSERT INTO UserRole SELECT u_id, 'admin' FROM UserTable WHERE u_email='[==OPERATOR_EMAIL==]';
+
 \q
 EOF

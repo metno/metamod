@@ -25,6 +25,7 @@
     <a href="[% c.uri_for('/admin/sql_prepare_user') %]">Run SQL command on User database</a><br>
     <a href="[% c.uri_for('/admin/showxml') %]">Show XML dataset files</a><br>
     <a href="[% c.uri_for('/admin/usererrors') %]">Show user error reports</a><br>
+    <a href="[% c.uri_for('/logout') %]">Logout</a><br>
 </td>
 </tr>
 </table>

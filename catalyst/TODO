@@ -2,9 +2,7 @@
 Things to do in Catalyst version of Metamod
 -------------------------------------------
 
-* move default text strings out of master_config
-
-* move admin controller to restricted?
+* better error page for unauthorized access
 
 * modify xml validator to use xml catalogs (not possible with XML::LibXML::Schema?)
 
@@ -23,6 +21,10 @@ Things to do in Catalyst version of Metamod
 
     DONE
 ------------------------------------------
+
+* move default text strings out of master_config
+
+* move admin controller to restricted?
 
 * add dialog to confirm overwriting previously uploaded files
 

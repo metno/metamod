@@ -11,24 +11,26 @@ MetamodWeb::Controller::Admin - Catalyst Controller
 
 =head1 DESCRIPTION
 
-Catalyst Controller.
+Catalyst Controller for sysadmin functions.
 
 =head1 METHODS
 
 =cut
 
-=head2 end
 
-=cut
+sub auto :Private {
+    my ($self, $c) = @_;
 
-sub auto : Private {
-    my ( $self, $c ) = @_;
+    return 0 unless $self->chk_logged_in($c);
+    $c->detach("Root", "unauthorized") unless $c->check_user_roles("admin");
 
     my $mm_config = $c->stash->{ mm_config };
     my $application_id = $mm_config->get('APPLICATION_ID');
     my $application_name = $mm_config->get('APPLICATION_NAME');
     $c->stash(application_id => $application_id);
     $c->stash(application_name => $application_name);
+
+    return 1;
 }
 
 =head2 index

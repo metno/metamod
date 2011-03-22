@@ -25,13 +25,6 @@ use Moose;
 use namespace::autoclean;
 use warnings;
 
-BEGIN {extends 'Catalyst::Controller'; }
-
-#
-# The logger object that is used for all controllers.
-#
-has 'logger' => ( is => 'ro', default => sub { get_logger('metamodweb::control') } );
-
 =head1 NAME
 
 MetamodWeb::BaseController::Base - Base controller that adds some additional utility methods.
@@ -41,6 +34,62 @@ MetamodWeb::BaseController::Base - Base controller that adds some additional uti
 =head1 FUNCTIONS/METHODS
 
 =cut
+
+BEGIN {extends 'Catalyst::Controller'; }
+
+#
+# The logger object that is used for all controllers.
+#
+has 'logger' => ( is => 'ro', default => sub { get_logger('metamodweb::control') } );
+
+=head2 $self->chk_logged_in($c)
+
+Check that user of request is logged in
+
+=over
+
+=item $c
+
+The Catalyst context object.
+
+=item return
+
+Return 1 if logged in, 0 otherwise.
+
+=back
+
+=cut
+
+sub chk_logged_in {
+    my ($self, $c) = @_;
+
+    if (!$c->user_exists) {
+
+        # Dump a log message to the development server debug output
+        $self->logger->debug('***User not found, forwarding to /login');
+
+        my $wanted_path = '/' . $c->request->path();
+        my $wanted_params = $c->request->params();
+        my $wanted_string = '';
+        while( my ( $key, $value ) = each %$wanted_params ){
+            $wanted_string .= "$key=" . uri_escape($value) . "&";
+        }
+        chop $wanted_string;
+        $self->logger->debug("Wanted: $wanted_string");
+
+        # Redirect the user to the login page
+        my $url = $c->uri_for('/login', { return_path => $wanted_path, return_params => $wanted_string } );
+        $self->logger->debug("* url = $url" );
+        $c->response->redirect($url);
+
+        # Return 0 to cancel 'post-auto' processing and prevent use of application
+        return 0;
+    }
+
+    # User found, so return 1 to continue with processing after this 'auto'
+    return 1;
+
+}
 
 =head2 $self->add_info_msgs($c, $msgs)
 

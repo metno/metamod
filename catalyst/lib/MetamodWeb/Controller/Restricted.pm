@@ -50,32 +50,7 @@ not logged in we forward the user to the login page.
 
 sub auto :Private {
     my ($self, $c) = @_;
-
-    if (!$c->user_exists) {
-
-        # Dump a log message to the development server debug output
-        $self->logger->debug('***Restricted::auto User not found, forwarding to /login');
-
-        my $wanted_path = '/' . $c->request->path();
-        my $wanted_params = $c->request->params();
-        my $wanted_string = '';
-        while( my ( $key, $value ) = each %$wanted_params ){
-            $wanted_string .= "$key=" . uri_escape($value) . "&";
-        }
-        chop $wanted_string;
-        $self->logger->debug("Wanted: $wanted_string");
-
-        # Redirect the user to the login page
-        my $url = $c->uri_for('/login', { return_path => $wanted_path, return_params => $wanted_string } );
-        $self->logger->debug("* url = $url" );
-        $c->response->redirect($url);
-
-        # Return 0 to cancel 'post-auto' processing and prevent use of application
-        return 0;
-    }
-
-    # User found, so return 1 to continue with processing after this 'auto'
-    return 1;
+    return $self->chk_logged_in($c);
 }
 
 __PACKAGE__->meta->make_immutable;

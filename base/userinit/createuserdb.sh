@@ -10,7 +10,7 @@ else
     exit 1
 fi
 
-USERBASE_NAME=[==USERBASE_NAME==]
+USERBASE_NAME=[==USERBASE_NAME==];
 check "USERBASE_NAME"
 
 $DROPDB -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] $USERBASE_NAME
@@ -157,6 +157,10 @@ CREATE INDEX exitstatus_funcid ON exitstatus (funcid);
 CREATE INDEX exitstatus_deleteafter ON exitstatus (delete_after);
 
 GRANT ALL PRIVILEGES ON exitstatus TO "[==PG_WEB_USER==]";
+
+INSERT INTO UserTable (u_id, a_id, u_name, u_email, u_loginname)
+    VALUES (1, '[==APPLICATION_ID==]', 'Admin', '[==OPERATOR_EMAIL==]', '[==OPERATOR_EMAIL==]');
+INSERT INTO UserRole VALUES (1, 'admin');
 
 \q
 EOF
