@@ -139,21 +139,14 @@ METADATA_SEARCH_URL = [==LOCAL_URL==]/sch/index.php
 # URL of Upload application:
 UPLOAD_URL = [==LOCAL_URL==]/upl/index.php
 
-# Main menu beneath the application header. Each line should start with
+# Main menu beneath the application header.Each line should start with
 # an URL followed by a space and some text. The text will be shown in
 # the application as a menu item, and the URL will be activated when the
-# text is clicked:
+# text is clicked.
+# Note that standard sections in METAMOD are always displayed below this menu.
+# You only need to configure any external links here.
 APP_MENU =
- [==METADATA_SEARCH_URL==] Metadata Search
- [==UPLOAD_URL==] File Upload
- [==OPENDAP_URL==] Browse data repository
-
-# HTML code for a header across the top of applications:
-APP_HEADER_HTML =
-   <img src="[==LOCAL_URL==]/img/metamod_logo.png" style="clear:left;border: none;" />
-
-# HTML code for a footer across the bottom of applications:
-APP_FOOTER_HTML =
+# http://example.com Link description
 
 # Comma-separated list of dataset tags accessible from this application:
 DATASET_TAGS = 'MM'
@@ -236,25 +229,6 @@ WMS_SOUTHPOLE_MAP = southpole.map
 WMS_WORLD_MAP     = world.map
 
 # ============ METAMODSEARCH configuration ==============
-# Name of web-based search application as seen by users:
-SEARCH_APP_NAME = METAMOD search
-
-# Title to appear on all web pages in the web search application:
-SEARCH_APP_TITLE = Metadata Catalogue Search
-
-# HTML code for a header across the top of the search application:
-SEARCH_APP_HEADER_HTML = [==APP_HEADER_HTML==]
-
-# Description of the web application:
-SEARCH_APP_DESCRIPTION =
- Search the METAMOD Catalogue. Use the links on the left hand side
- to access pages for setting search conditions. Then use the menu below to
- view results. Initially, only directory level datasets are shown. For each
- directory level dataset containing files on a second level, there is a small
- [+] button that may be used to show metadata about the files.<BR /><BR />
-
-# HTML to fill an initial page where no results are shown (can be empty):
-SEARCH_APP_PRESENTATION_HTML =
 
 # Max number of columns allowed in the search result page:
 SEARCH_APP_MAX_COLUMNS = 5
@@ -325,31 +299,6 @@ EXTERNAL_REPOSITORY = false
 # check the files and eventually report any irregularities back
 # to the data provider.
 #EXTERNAL_REPOSITORY = true
-
-# Title to appear on all web pages in the file upload application:
-UPLOAD_APP_TITLE = Uploads to the Data Repository
-
-# Text shown in the login page:
-UPLOAD_APP_LOGIN_TEXT =
- This web interface is for data producers for uploading files to
- the data repository. Please log in using your E-mail address
- and password. New users will be sent a password on E-mail by filling in the
- "New users" form below. This form can also be used if you have forgotten your
- password.
-
-# Text shown in the upload and administration pages:
-UPLOAD_APP_INLOGGED_TEXT =
- You are currently logged in to the METAMOD data file upload service.
-
-# Common text in the heading for all upload pages:
-UPLOAD_APP_COMMON_TEXT =
- The data repository is divided into directories owned by individual
- users (data providers). As a data provider, you may create new directories
- (using the "Administration" page), and upload files to these directories
- (using the "Upload files" page). New files are checked against a set of file
- format requirements. If the file does not comply
- with these requirements, you will recieve an E-mail explaining the errors
- found.
 
 # For unknown reasons, sometimes it is neccessary to convert all POST-data
 # from UTF8 to latin-1. If this is the case, set the following variable to
@@ -456,7 +405,6 @@ INSTITUTION_LIST =
 #
 
 !substitute_to_file_with_new_name htdocs/qst/quest.php => htdocs/qst/fmmeta.php
-QUEST_TITLE = Damocles meta data form
 QUEST_FORM_DEFINITON_FILE = config/metamod2-meta-config.txt
 QUEST_OUTPUT_DIRECTORY = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
 !end_substitute_to_file_with_new_name
@@ -475,13 +423,6 @@ QUEST_SENDER_ADDRESS = [==OPERATOR_EMAIL==]
 # Comma-separated list of E-mail addresses for administrator personell.
 # A summary of the filled in forms will be sent to these addresses:
 QUEST_RECIPIENTS = [==OPERATOR_EMAIL==]
-
-# Message shown to the user (as a web page) when the form has been submitted:
-QUEST_OKMESSAGE = Thanks for submitting information!
- <a href="[==LOCAL_URL==]/index.php">Return to the main page</a>.
-
-# Background image for file administration page
-QUEST_ADM_BACKGROUND = [==LOCAL_URL==]/img/ipydis_background.jpg
 
 # Top directory for the file administration utility:
 QUEST_ADM_TOPDIR = [==WEBRUN_DIRECTORY==]/XML
