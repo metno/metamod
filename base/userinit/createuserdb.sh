@@ -158,9 +158,12 @@ CREATE INDEX exitstatus_deleteafter ON exitstatus (delete_after);
 
 GRANT ALL PRIVILEGES ON exitstatus TO "[==PG_WEB_USER==]";
 
-INSERT INTO UserTable (u_id, a_id, u_name, u_email, u_loginname)
-    VALUES (1, '[==APPLICATION_ID==]', 'Admin', '[==OPERATOR_EMAIL==]', '[==OPERATOR_EMAIL==]');
+INSERT INTO UserTable (u_id, a_id, u_name, u_email, u_loginname, u_password)
+    VALUES (1, '[==APPLICATION_ID==]', 'Admin', '[==OPERATOR_EMAIL==]', '[==OPERATOR_EMAIL==]',
+    encode(digest('admin123', 'sha1'), 'hex'));
 INSERT INTO UserRole VALUES (1, 'admin');
 
 \q
 EOF
+
+echo "Password for admin user '[==OPERATOR_EMAIL==]' set to 'admin123'. Please login and change asap."
