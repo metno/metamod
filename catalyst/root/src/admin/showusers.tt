@@ -1,0 +1,25 @@
+[% INCLUDE admin/admin_header.tt %]
+
+<h2>Registered users</h2>
+
+<table class="list">
+
+[% FOREACH u IN users %]
+
+<tr>
+    <td>[% u.u_id %]:</td>
+    <td><a href="[% c.uri_for('/admin/useradmin', u.u_id) %]">[% u.u_loginname %]</a></td>
+    <td>[% u.u_name %]</td>
+    <td>([% u.u_email %])</td>
+    <td>
+        <i>([% FOREACH role IN u.roles %]
+            [% role.role %]
+            [% END %])
+        </i>
+    </td>
+</tr>
+
+[% END %]
+</table>
+
+[% INCLUDE admin/admin_footer.tt %]

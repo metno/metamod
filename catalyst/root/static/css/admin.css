@@ -8,7 +8,15 @@ form.editxml textarea {
     height: 300px;
 }
 
-pre.error {
+.error {
     color: red;
+}
+
+pre.error {
     font-size: small;
+}
+
+table.list tr td {
+    padding: 3px 8px 4px 8px;
+    border-bottom: solid 1px #AAAAFF;
 }

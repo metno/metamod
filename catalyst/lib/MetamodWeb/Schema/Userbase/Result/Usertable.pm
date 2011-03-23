@@ -89,18 +89,6 @@ __PACKAGE__->has_many(
 # Created by DBIx::Class::Schema::Loader v0.04006 @ 2010-09-15 14:15:48
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Ol3eBbTy1PkS1D/vtd0DCg
 
-__PACKAGE__->has_many(
-  "infou",
-  "MetamodWeb::Schema::Userbase::Result::Infou",
-  { "foreign.u_id" => "self.u_id" },
-);
-
-__PACKAGE__->has_many(
-  "roles",
-  "MetamodWeb::Schema::Userbase::Result::Userrole",
-  { "foreign.u_id" => "self.u_id" },
-);
-
 =begin LICENSE
 
 METAMOD is free software; you can redistribute it and/or modify
@@ -120,6 +108,76 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 =end LICENSE
 
 =cut
+
+__PACKAGE__->has_many(
+  "infou",
+  "MetamodWeb::Schema::Userbase::Result::Infou",
+  { "foreign.u_id" => "self.u_id" },
+);
+
+__PACKAGE__->has_many(
+  "roles",
+  "MetamodWeb::Schema::Userbase::Result::Userrole",
+  { "foreign.u_id" => "self.u_id" },
+);
+
+use Data::Dumper;
+use Carp;
+
+use constant ROLETYPES => qw(admin upload subscription);
+
+=head2 $self->merge_roles
+
+Set roles in list to 0 unless already set to 1
+
+=cut
+
+sub merge_roles {
+    my ($self, $list) = @_;
+    $$list{$_} ||= 0 foreach ROLETYPES;
+    #print STDERR "Merge " . Dumper $list;
+    return $list;
+}
+
+=head2 $self->get_roles
+
+Return a hash over all possible roles, set to 0 or 1 as for current user
+
+=cut
+
+sub get_roles {
+    my $self = shift;
+    my %roles = ();
+    %roles = map { $_->get_column('role') => 1 } $self->roles;
+    $self->merge_roles(\%roles);
+    #print STDERR Dumper \%roles;
+    return \%roles;
+}
+
+=head2 $self->set_roles
+
+Takes a ref to a hash with roles, setting those who are true and deletes all others
+
+=cut
+
+sub set_roles {
+    my ($self, $roles) = @_;
+    print STDERR "Setting " . Dumper $roles;
+    foreach ( $self->roles ) {
+        $_->delete; # first delete all roles
+    }
+    foreach my $role (keys %$roles) {
+        croak "Unknown role '$role'" unless grep /^$role$/, ROLETYPES;
+        next unless $$roles{$role}; # skip 0's
+        #print STDERR "/////// $role //////\n";
+        $self->roles->create(
+            {
+                u_id => $self->get_column('u_id'),
+                role => $role
+            }
+        );
+    }
+}
 
 =head1 LICENSE
 

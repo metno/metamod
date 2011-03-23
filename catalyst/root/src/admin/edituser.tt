@@ -1,0 +1,48 @@
+[% INCLUDE admin/admin_header.tt %]
+
+<h2>Edit user #[% u.u_id %]</h2>
+
+<form action="[% c.uri_for('/admin/useradmin', u.u_id) %]" method="POST">
+<table>
+
+<tr>
+   <td>Login:</td>
+   <td><input name="u_loginname" value="[% u.u_loginname %]"/></td>
+</tr>
+<tr>
+   <td>Name:</td>
+   <td><input name="u_name" value="[% u.u_name %]"/></td>
+</tr>
+<tr>
+   <td>Email:</td>
+   <td><input name="u_email" value="[% u.u_email %]"/></td>
+</tr>
+
+[% FOREACH role IN roles.keys.sort %]
+   <tr>
+      <td></td>
+      <td>
+         <input type="checkbox" name="role_[% role %]" [% IF roles.$role %]checked="checked" [% END %]/>
+         [% role %]
+      </td>
+   </tr>
+[% END %]
+
+<tr>
+   <td colspan="2" align="right"><input type="submit" value="Update"/></td>
+</tr>
+
+</table>
+
+
+</form>
+
+[% IF error %]
+<p class="error">ERROR: [% error %]</p>
+[% END %]
+
+<p><i>(Todo: reset password?)</i></p>
+
+<p><a href="[% c.uri_for('/admin/useradmin') %]">Back to list</a></p>
+
+[% INCLUDE admin/admin_footer.tt %]
