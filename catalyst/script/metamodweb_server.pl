@@ -45,7 +45,7 @@ use MetamodWeb::Utils::GenCatalystConf;
 $ENV{CATALYST_SCRIPT_GEN} = 40;
 
 if( !exists $ENV{METAMOD_MASTER_CONFIG } ){
-    $FindBin::Bin =~ qw!(.+)/(catalyst/script|bin)$! or die "This script doesn't recognize its surroundings";
+    $FindBin::Bin =~ qw!(.+)/(catalyst/script|bin)$! or die "Couldn't find master_config around here. Try setting ENV.";
     $ENV{METAMOD_MASTER_CONFIG} = "$1/master_config.txt";
 }
 die "Cannot open master config $ENV{METAMOD_MASTER_CONFIG}" unless -r $ENV{METAMOD_MASTER_CONFIG};
