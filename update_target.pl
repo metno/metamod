@@ -334,8 +334,8 @@ if ($missing_variables > 0) {
                 "      were substituted with empty values\n";
 }
 
-my $appuser = $conf{'APPLICATION_USER'};
-my $webrun = $conf{'WEBRUN_DIRECTORY'};
+my $appuser = &substituteval($conf{'APPLICATION_USER'}) if exists $conf{APPLICATION_USER};
+my $webrun = &substituteval($conf{'WEBRUN_DIRECTORY'}) if exists $conf{WEBRUN_DIRECTORY};
 if ($appuser) {
    my $owner = getpwuid( (stat($webrun))[4] );
    print STDERR "webrun dir '$webrun' is owned by user '$owner'\n";
