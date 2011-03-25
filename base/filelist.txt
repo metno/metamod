@@ -14,15 +14,3 @@ userinit/upgradeuserdb_26-28.sh
 =scripts/import_dataset.pl
 =scripts/chk_conf.pl
 =scripts/gen_httpd_conf.pl
-=htdocs/adm/highlight.html
-=htdocs/adm/highlight.php
-=htdocs/adm/gettables.php
-=htdocs/adm/viewdbform.php
-=htdocs/adm/phptest.php
-=htdocs/adm/viewdb.php
-=htdocs/adm/dosql.php
-=htdocs/adm/userbase_sql.php
-=htdocs/adm/show_databaselog.php
-=htdocs/adm/show_xml.php
-=htdocs/adm/edit_xml.php
-=htdocs/adm/manage_datasets.php

@@ -61,16 +61,6 @@ my $site = $local;
 $site .= " on $virtualhost" if $virtualhost;
 my $config_dir = $virtualhost ? "/etc/apache/sites-available" : "/etc/apache2/conf.d";
 
-my $proxies = proxy('search')
-            . proxy('dataset')
-            . proxy('gc2wmc')
-            . proxy('admin')
-            . proxy('upload')
-            . proxy('login')
-            . proxy('logout')
-            . proxy('subscription')
-            . proxy('userprofile');
-
 # running catalyst from target or source?
 my $from_target = $Bin eq "$target/scripts";
 my %paths = $from_target ?
@@ -85,7 +75,6 @@ my $conf_text = <<EOT;
 
 # NOTE: use EITHER sites-available (if using virtual hostnames in DNS) OR conf.d (with path prefix).
 # DO NOT PUT PARTIAL METAMOD CONFIGURATION IN BOTH!!!!!
-# The $local/static Alias MUST be processed before the $local Alias or it will fail!
 
 # --------------
 # Catalyst proxy settings
@@ -95,30 +84,27 @@ my $conf_text = <<EOT;
     Allow from all
 </Proxy>
 
-$proxies
+ProxyPass           $local/pmh      !
+ProxyPass           $local/static   !
+ProxyPass           $local/upl      !
+
+ProxyPass           $local          http://127.0.0.1:$port
+ProxyPassReverse    $local          http://127.0.0.1:$port
 
 # -----------
 # Plain Apache settings
 
-# redirect links to old PHP search
-RedirectMatch   $local/sch                  $base$local/search
-RedirectMatch   $local/upl/newfiles.php?    $base$local/upload/newfiles
+# OAI-PMH still running PHP
+Alias               $local/pmh      $target/pmh
 
 # static files should be served directly from Apache
 Alias               $local/static   $paths{root}/static
 
-# error reports
+# ditto for error reports (which has a hardcoded url)
 Alias               $local/upl/uerr $webrun/upl/uerr
 
 # if you don't want the default favicon, put custom file in applic-dir and update filelist.txt
 Alias               favicon.ico     $paths{root}/favicon.ico
-
-# The remaining lines are used when installing to a clean Apache.
-# If you've already configured your server manually you have to
-# figure out what each directive means and copy/change what you need.
-
-# other links go to old PHP files (for now)
-Alias $local	$target/htdocs
 
 <Directory $target/htdocs>
     Options Indexes FollowSymLinks MultiViews
@@ -141,15 +127,6 @@ if ($conf_file && !$opt_p) {
     print FH $conf_text;
 } else {
     print $conf_text;
-}
-
-sub proxy {
-    my $path = shift or die "Missing argument to proxy";
-    return <<EOT;
-ProxyPass           $local/$path http://127.0.0.1:$port/$path
-ProxyPassReverse    $local/$path http://127.0.0.1:$port/$path
-
-EOT
 }
 
 sub usage {

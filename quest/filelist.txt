@@ -1,9 +1,3 @@
 =etc/qst/metadata_quest.json
 =etc/qst/gcmd-location-keywords.txt
 =etc/qst/gcmd-science-keywords.txt
-=htdocs/qst/funcs/fmquestfuncs.php
-=htdocs/qst/config/cf-standard-name-table.xml
-=htdocs/qst/config/gcmd-location-keywords.txt
-=htdocs/qst/config/gcmd-science-keywords.txt
-=htdocs/adm/fmfadm.php
-=htdocs/qst/quest.php
