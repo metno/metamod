@@ -25,7 +25,6 @@ use namespace::autoclean;
 
 BEGIN {extends 'MetamodWeb::BaseController::Base'; }
 
-use Metamod::Config;
 use Metamod::DbTableinfo;
 # use Data::Dump;
 
@@ -58,8 +57,7 @@ sub index : Path("/admin/viewtable") :Args(0) {
 
     $c->stash(template => 'admin/viewtable.tt');
     $c->stash(current_view => 'Raw');
-    my $config = $c->stash->{ mm_config };
-    my $dbh            = $config->getDBH();
+    my $dbh            = $c->model('Metabase')->storage()->dbh();
     my $tables_ref     = DbTableinfo::get_tablenames($dbh);
     my @table_desc = ();
     foreach my $tbl (@$tables_ref) {
@@ -85,7 +83,7 @@ sub viewtbl : Path("/admin/viewtable") :Args(1) {
        $no_parent_filter = $params->{'refcol'} eq 'ds_id';
     }
     my $config = $c->stash->{ mm_config };
-    my $dbh            = $config->getDBH();
+    my $dbh = $c->model('Metabase')->storage()->dbh();
     my $col = DbTableinfo::get_columnnames($dbh,$tbl);
     my $sth = compose_sql($dbh,$col,$tbl,$params,$no_parent_filter,0);
     $sth->execute();
@@ -116,8 +114,7 @@ sub viewdataset : Path("/admin/viewtable/dataset") :Args(1) {
     $c->stash(current_view => 'Raw');
     $c->stash(name => 'Metadata table: dataset');
     my $params = $c->req->parameters;
-    my $config = $c->stash->{ mm_config };
-    my $dbh            = $config->getDBH();
+    my $dbh = $c->model('Metabase')->storage()->dbh();
     my $col = DbTableinfo::get_columnnames($dbh,'dataset');
     my $sth = compose_sql($dbh,$col,'dataset',$params,0,$dsid);
     $sth->execute();
@@ -132,8 +129,7 @@ sub viewusertable : Path("/admin/viewusertable") :Args(0) {
 
     $c->stash(template => 'admin/viewtable.tt');
     $c->stash(current_view => 'Raw');
-    my $config = $c->stash->{ mm_config };
-    my $dbh            = get_userbase_dbh($config);
+    my $dbh            = $c->model('Userbase')->storage()->dbh();
     my $tables_ref     = DbTableinfo::get_tablenames($dbh);
     my @table_desc = ();
     foreach my $tbl (@$tables_ref) {
@@ -154,8 +150,7 @@ sub viewusertbl : Path("/admin/viewusertable") :Args(1) {
     $c->stash(current_view => 'Raw');
     $c->stash(name => "User Database table: $tbl");
     my $params = $c->req->parameters;
-    my $config = $c->stash->{ mm_config };
-    my $dbh            = get_userbase_dbh($config);
+    my $dbh = $c->model('Userbase')->storage()->dbh();
     my $col = DbTableinfo::get_columnnames($dbh,$tbl);
     my $sth = compose_sql($dbh,$col,$tbl,$params,1,0);
     $sth->execute();
@@ -171,14 +166,6 @@ sub viewusertbl : Path("/admin/viewusertable") :Args(1) {
     }
     my $wholetable = build_wholetable($c,"/admin/viewusertable",$col,$tbl,$sth,$dbh,0);
     $c->stash(wholetable => $wholetable);
-}
-
-sub get_userbase_dbh {
-    my ($config) = @_;
-    my $dbname = $config->get("USERBASE_NAME") or die "Missing USERBASE_NAME in master_config";
-    my $user   = $config->get("PG_ADMIN_USER") or die "Missing PG_ADMIN_USER in master_config";
-    my $dbh = DBI->connect( "dbi:Pg:dbname=" . $dbname . " " . $config->get("PG_CONNECTSTRING_PERL"), $user, "" ) or die $DBI::errstr;
-    return $dbh;
 }
 
 sub compose_sql {

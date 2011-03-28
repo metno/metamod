@@ -27,7 +27,6 @@ use namespace::autoclean;
 BEGIN {extends 'MetamodWeb::BaseController::Base'; }
 
 use DBI;
-use Metamod::Config;
 use Metamod::DbTableinfo;
 # use Data::Dump;
 
@@ -64,7 +63,7 @@ sub sql_prepare_meta : Path("/admin/sql_prepare_meta") :Args(0) {
     $c->stash(action_url => $c->uri_for('/admin/sql_result_meta'));
     $c->stash(database_name => 'Metadatabase');
     my $config = $c->stash->{ mm_config };
-    my $dbh            = $config->getDBH();
+    my $dbh = $c->model('Metabase')->storage()->dbh();
     prepare($c, $dbh);
 }
 
@@ -74,7 +73,7 @@ sub sql_prepare_user : Path("/admin/sql_prepare_user") :Args(0) {
     $c->stash(action_url => $c->uri_for('/admin/sql_result_user'));
     $c->stash(database_name => 'User database');
     my $config = $c->stash->{ mm_config };
-    my $dbh = get_userbase_dbh($config);
+    my $dbh = $c->model('Userbase')->storage()->dbh();
     prepare($c, $dbh);
 }
 
@@ -99,8 +98,7 @@ sub sql_result_meta : Path("/admin/sql_result_meta") :Args(0) {
     my ( $self, $c ) = @_;
 
     $c->stash(database_name => 'Metadatabase');
-    my $config = $c->stash->{ mm_config };
-    my $dbh            = $config->getDBH();
+    my $dbh = $c->model('Metabase')->storage()->dbh();
     run_sql($c,$dbh);
 }
 
@@ -108,8 +106,7 @@ sub sql_result_user : Path("/admin/sql_result_user") :Args(0) {
     my ( $self, $c ) = @_;
 
     $c->stash(database_name => 'User database');
-    my $config = $c->stash->{ mm_config };
-    my $dbh = get_userbase_dbh($config);
+    my $dbh = $c->model('Userbase')->storage()->dbh();
     run_sql($c,$dbh);
 }
 
@@ -140,16 +137,7 @@ sub run_sql {
             push @$wholetable, \@resultarr;
         }
     }
-    $dbh->disconnect;
     $c->stash(wholetable => $wholetable);
-}
-
-sub get_userbase_dbh {
-    my ($config) = @_;
-    my $dbname = $config->get("USERBASE_NAME") or die "Missing USERBASE_NAME in master_config";
-    my $user   = $config->get("PG_ADMIN_USER") or die "Missing PG_ADMIN_USER in master_config";
-    my $dbh = DBI->connect( "dbi:Pg:dbname=" . $dbname . " " . $config->get("PG_CONNECTSTRING_PERL"), $user, "" ) or die $DBI::errstr;
-    return $dbh;
 }
 
 #
