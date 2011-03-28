@@ -98,7 +98,13 @@ my %default_config = (
         mime_types => {
             xmd => 'text/xml',
         },
-    }
+    },
+
+    'Plugin::Session' => {
+        #expires => 3600,
+        storage => '/tmp/' . $mm_config->get('APPLICATION_ID') . '/session_data'
+    },
+
 );
 
 # we generate a Catalyst configuration hash at runtime from the master config file.
