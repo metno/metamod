@@ -41,6 +41,7 @@ sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
 
     $c->response->body('Matched MetamodWeb::Controller::Admin in Admin.');
+    return 1;
 }
 
 =head2 menu
