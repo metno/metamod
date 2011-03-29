@@ -4010,4 +4010,6 @@
 <mt name="dataref" share="FALSE" def="URL reference to data, or short name" />
 <mt name="gtsInstancePattern" share="FALSE" def="Pattern to locate data in GTS" />
 <mt name="gtsFileIdentifier" share="FALSE" def="Identifier for data in GTS" />
+<mt name="data_file_location" share="FALSE" def="The location of the dataset on disk. Only for level 2 datasets" />
+<mt name="data_file_size" share="FALSE" def="The size of the file in bytes. Only for level 2 datasets" />
 </searchdata>
