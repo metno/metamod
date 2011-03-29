@@ -19,6 +19,13 @@
 
 <div class="menu-item"><a href="[% c.uri_for( '/subscription' )%]">Subscription</a></div>
 
+[%
+    redirect_params = {
+        return_path => '/' _ c.req.path(),
+        return_params => ui_utils.stringify_params(c.req.params),
+    }
+%]
+
 
 [% IF c.user_exists %]
 <div class="menu-item"><a href="[% c.uri_for( '/userprofile' )%]">User profile</a></div>
@@ -27,10 +34,12 @@
 [% END %]
 
 
-<div class="menu-item"><a href="[% c.uri_for( '/logout' )%]">Logout</a></div>
+<div class="menu-item"><a href="[% c.uri_for( '/logout', redirect_params )%]">Logout</a></div>
+
 [% ELSE %]
-<div class="menu-item"><a href="[% c.uri_for( '/login' )%]">Login</a></div>
+<div class="menu-item"><a href="[% c.uri_for( '/login', redirect_params )%]">Login</a></div>
 [% END %]
+
 
 
 <!--

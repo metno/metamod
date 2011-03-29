@@ -25,6 +25,8 @@ use Moose;
 use namespace::autoclean;
 use warnings;
 
+use MetamodWeb::Utils::UI::Common;
+
 =head1 NAME
 
 MetamodWeb::BaseController::Base - Base controller that adds some additional utility methods.
@@ -69,12 +71,8 @@ sub chk_logged_in {
         $self->logger->debug('***User not found, forwarding to /login');
 
         my $wanted_path = '/' . $c->request->path();
-        my $wanted_params = $c->request->params();
-        my $wanted_string = '';
-        while( my ( $key, $value ) = each %$wanted_params ){
-            $wanted_string .= "$key=" . uri_escape($value) . "&";
-        }
-        chop $wanted_string;
+        my $ui_utils = MetamodWeb::Utils::UI::Common->new( { c => $c } );
+        my $wanted_string = $ui_utils->stringify_params($c->request->params());
         $self->logger->debug("Wanted: $wanted_string");
 
         # Redirect the user to the login page

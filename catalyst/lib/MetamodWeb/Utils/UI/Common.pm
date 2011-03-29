@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use Data::Dump qw( dump );
 use Moose;
 use namespace::autoclean;
+use URI::Escape;
 
 =head1 NAME
 
@@ -72,6 +73,40 @@ sub app_menu {
         }
     }
     return \%items;
+
+}
+
+=head2 $self->stringify_params($params)
+
+Make an URL escaped version of the request parameters. Usefull when you need to
+keep the current request parameters across several request.
+
+=over
+
+=item $params
+
+A hash reference with the CGI parameters that you want to stringify. All values
+will be URI escaped.
+
+=item return
+
+The stringified version of the parameters.
+
+=back
+
+=cut
+sub stringify_params {
+    my $self = shift;
+
+    my ($params) = @_;
+
+    my $params_string = '';
+    while( my ( $key, $value ) = each %$params ){
+        $params_string .= "$key=" . uri_escape($value) . "&";
+    }
+    chop $params_string;
+
+    return $params_string;
 
 }
 

@@ -45,8 +45,11 @@ sub index :Path :Args(0) {
     # Clear the user's state
     $c->logout;
 
-    # Send the user to the starting point
-    $c->response->redirect($c->uri_for('/'));
+    my $request_params = $c->req->params();
+    my $return_path = $request_params->{return_path} || '/';
+    my $return_params = $request_params->{return_params} || '';
+
+    $c->response->redirect($c->uri_for( $return_path) . '?' . $return_params);
 }
 
 __PACKAGE__->meta->make_immutable;
