@@ -19,5 +19,5 @@ BEGIN {
 BEGIN { use_ok 'Catalyst::Test', 'MetamodWeb' }
 BEGIN { use_ok 'MetamodWeb::Controller::Admin' }
 
-ok( request('/admin')->is_success, 'Request should succeed' );
+ok( request('/admin')->is_redirect, 'Request should redirect to login for unauthorized users' );
 done_testing();
