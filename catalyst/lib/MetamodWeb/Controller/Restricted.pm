@@ -22,7 +22,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 use Moose;
 use namespace::autoclean;
-use URI::Escape;
 
 BEGIN {extends 'MetamodWeb::BaseController::Base'; }
 
