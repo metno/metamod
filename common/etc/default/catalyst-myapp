@@ -1,0 +1,14 @@
+### edit & copy this file to /etc/default/catalyst-[==APPLICATION_ID==]
+
+export METAMOD_MASTER_CONFIG=[==TARGET_DIRECTORY==]/master_config.txt
+export CATALYST_ENGINE=HTTP::Prefork
+
+port=[==CATALYST_PORT==]
+#min_servers=x
+#max_servers=y
+#min_spare_servers=z
+#max_spare_servers=w
+#--min_servers=2 --max_servers=5 --min_spare_servers=1 --max_spare_servers=3
+
+# export MYAPP_DEBUG=1
+# export DBIC_TRACE=1

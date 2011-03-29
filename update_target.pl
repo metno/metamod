@@ -105,6 +105,7 @@ if ($optcount == 0) { # Supress this message if only "copy with substitution" is
 # Process master_config
 #
 my %conf;
+$conf{MAJORVERSION} = $majorVersion;
 my $missing_variables = 0;
 
 #  Open config file for reading
@@ -196,17 +197,17 @@ if (! -f "$targetdir/$configMaster" or ($config_modified > (stat _)[9])) {
 
 # install link from /etc/metamod-$majorVersoin/$appName.cfg to $targetdir/$configMaster
 # NOTE: this only works when running as root, and should not be run on development servers
-{
-    my $etcDir = "/etc/metamod-$majorVersion";
-    if (-d $etcDir) {
-        my $etcConfig = "$etcDir/$appName.cfg";
-        unlink $etcConfig; # need root for this
-        symlink("$targetdir/$configMaster", $etcConfig)
-            or print STDERR "unable to create symlink from $etcConfig -> $targetdir/$configMaster\n";
-    } else {
-        print STDERR "Cannot create configuration-symlink in $etcDir: no such directory\n\n";
-    }
-}
+#{
+#    my $etcDir = "/etc/metamod-$majorVersion";
+#    if (-d $etcDir) {
+#        my $etcConfig = "$etcDir/$appName.cfg";
+#        unlink $etcConfig; # need root for this
+#        symlink("$targetdir/$configMaster", $etcConfig)
+#            or print STDERR "unable to create symlink from $etcConfig -> $targetdir/$configMaster\n";
+#    } else {
+#        print STDERR "Cannot create configuration-symlink in $etcDir: no such directory\n\n";
+#    }
+#}
 
 #
 # get list over files to process

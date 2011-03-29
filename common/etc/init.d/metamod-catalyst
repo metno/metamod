@@ -5,6 +5,7 @@
 #
 # 1. copy this file to /etc/init.d/catalyst-[==APPLICATION_ID==]
 # 2. edit file "default" and copy to /etc/default/catalyst-[==APPLICATION_ID==]
+# or do it the simple way, just run install_jobs.sh
 
 ### BEGIN INIT INFO
 # Provides: MetamodWeb
@@ -97,7 +98,8 @@ status() {
 _start() {
     start-stop-daemon --start --verbose --pidfile $PIDFILE -m --chdir $APPDIR \
         ${USER:+"--chuid"} $USER ${GROUP:+"--group"} $GROUP --background \
-        --startas $BINDIR/${UNIXNAME}_server.pl -- -p $PORT
+        --startas $BINDIR/${UNIXNAME}_server.pl -- --port $port \
+        --min_servers=2 --max_servers=5 --min_spare_servers=1 --max_spare_servers=3
 
     for i in 1 2 3 4 5 ; do
         sleep 1

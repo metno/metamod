@@ -1,6 +1,11 @@
 prepare_runtime_env.sh
 metamodInit.sh
+install_jobs.sh
 logger_config.ini
+etc/init.d/metamod-catalyst
+etc/default/catalyst-myapp
+=scripts/chk_conf.pl
+=scripts/gen_httpd_conf.pl
 =schema/oldDataset2Dataset.xslt
 =schema/oldDataset2MM2.xslt
 =schema/dif2dataset.xslt

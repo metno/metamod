@@ -1,5 +1,3 @@
-etc/init.d/metamod-catalyst
-etc/default/catalyst-myapp
 init/create_and_load_all.sh
 init/createdb.sh
 init/createusers.sh
@@ -12,5 +10,3 @@ userinit/createuserdb.sh
 userinit/run_createuserdb.sh
 userinit/upgradeuserdb_26-28.sh
 =scripts/import_dataset.pl
-=scripts/chk_conf.pl
-=scripts/gen_httpd_conf.pl

@@ -2,6 +2,8 @@
 Things to do in Catalyst version of Metamod
 -------------------------------------------
 
+* generate install script for httpd.conf and init.d scripts
+
 * better error page for unauthorized access
 
 * modify xml validator to use xml catalogs (not possible with XML::LibXML::Schema?)
