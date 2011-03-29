@@ -83,7 +83,7 @@ FIXME - needs better user interface
 
 =cut
 
-sub unauthorized :Path {
+sub unauthorized :Private {
     my ( $self, $c ) = @_;
     $c->response->body( "<h1>Not autorized</h1>\n" );
     $c->response->content_type('text/html');
