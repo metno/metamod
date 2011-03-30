@@ -26,8 +26,6 @@ use warnings;
 use Moose;
 use namespace::autoclean;
 
-use Digest;
-
 use Metamod::Email;
 use Metamod::Utils qw(random_string);
 
@@ -65,12 +63,9 @@ sub confirm_user_GET {
 sub confirm_user_POST {
     my ( $self, $c, $u_id ) = @_;
 
-    my $random_pass = random_string();
-
-    my $pass_digest = Digest->new('SHA-1')->add($random_pass)->hexdigest();
-
     my $userbase_user = $c->stash->{userbase_user};
-    $userbase_user->update( { u_password => $pass_digest } );
+    my $random_pass = $userbase_user->reset_password();
+
 
     my $mm_config        = $c->stash->{mm_config};
     my $operator_email   = $mm_config->get('OPERATOR_EMAIL');

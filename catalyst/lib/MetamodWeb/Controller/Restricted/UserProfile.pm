@@ -27,7 +27,6 @@ use Moose;
 use namespace::autoclean;
 
 use Data::FormValidator::Constraints qw(:closures);
-use Digest;
 
 use Metamod::Email;
 use MetamodWeb::Utils::UI::Login;
@@ -193,8 +192,7 @@ sub password_POST : Private {
         die 'Could not find the database user';
     }
 
-    my $pass_digest = Digest->new('SHA-1')->add($password)->hexdigest();
-    $user_row->update( { u_password => $pass_digest } );
+    $user_row->update_password($password);
 
     $self->add_info_msgs( $c, 'Password has been changed' );
 
