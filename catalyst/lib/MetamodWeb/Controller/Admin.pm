@@ -22,7 +22,14 @@ sub auto :Private {
     my ($self, $c) = @_;
 
     return 0 unless $self->chk_logged_in($c);
-    $c->detach("Root", "unauthorized") unless $c->check_user_roles("admin");
+
+    if( !$c->check_user_roles("admin") ){
+
+        # detach() does not work correctly in auto()
+        $c->forward("Root", "unauthorized", ['admin']);
+        return 0;
+    }
+
 
     my $mm_config = $c->stash->{ mm_config };
     my $application_id = $mm_config->get('APPLICATION_ID');

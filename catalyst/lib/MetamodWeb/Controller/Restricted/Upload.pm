@@ -44,7 +44,14 @@ sub auto :Private {
     my ( $self, $c ) = @_;
 
     return 0 unless $self->chk_logged_in($c);
-    $c->detach("Root", "unauthorized") unless $c->check_user_roles("upload");
+
+    if( !$c->check_user_roles("upload") ){
+
+        # detach() does not work correctly in auto()
+        $c->forward("Root", "unauthorized", ['upload']);
+        return 0;
+    }
+
 
     my $upload_ui_utils = MetamodWeb::Utils::UI::Upload->new( c => $c );
     $c->stash( upload_ui_utils => $upload_ui_utils );
