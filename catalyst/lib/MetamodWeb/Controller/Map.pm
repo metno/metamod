@@ -26,8 +26,9 @@ use Imager;
 use Imager::Fill;
 use Moose;
 use namespace::autoclean;
+use POSIX qw(strftime);
 
-BEGIN {extends 'MetamodWeb::BaseController::Base'; }
+BEGIN { extends 'MetamodWeb::BaseController::Base'; }
 
 =head1 NAME
 
@@ -41,17 +42,21 @@ Catalyst Controller.
 
 =cut
 
-
-sub map :Path('/search/map') :Args(1) {
+sub map : Path('/search/map') : Args(1) {
     my ( $self, $c ) = @_;
 
-    my $filetype = 'png';
+    $c->response->content_type('image/png');
+    my $time_to_live = 60 * 60 * 24 * 14;
+    $c->response->header(
+        'Cache-control' => "max-age: $time_to_live",
+        'Expires'       => strftime( "%a %d %b %Y %H:%M:%S GMT", localtime( time + $time_to_live ) ),
+    );
 
-    my $ui_utils = $c->stash->{ ui_utils };
-    my $x1 = $c->req->params->{ x1 };
-    my $x2 = $c->req->params->{ x2 };
-    my $y1 = $c->req->params->{ y1 };
-    my $y2 = $c->req->params->{ y2 };
+    my $ui_utils = $c->stash->{ui_utils};
+    my $x1       = $c->req->params->{x1};
+    my $x2       = $c->req->params->{x2};
+    my $y1       = $c->req->params->{y1};
+    my $y2       = $c->req->params->{y2};
 
     $self->logger->debug("Coordinates: ($x1,$y1) ($x2,$y2)");
 
@@ -59,12 +64,11 @@ sub map :Path('/search/map') :Args(1) {
 
     # The user has not set any points so there is no reason to get the additional overhead
     # of using Imager. Read the image bytes and serve them.
-    if( !$x1 && !$y1 ){
+    if ( !$x1 && !$y1 ) {
 
         open my $IMAGE, '<', $c->path_to("/root/static/images/map_$image_srid.png") or die $!;
         my $image_bytes = do { local $/; <$IMAGE> };
 
-        $c->response->content_type('image/png');
         $c->response->body($image_bytes);
         return;
     }
@@ -73,18 +77,18 @@ sub map :Path('/search/map') :Args(1) {
     $image->read( file => $c->path_to("/root/static/images/map_$image_srid.png") ) or die $image->errstr();
 
     # have only the first x,y pair so mark it on the map.
-    if( $x1 && $y1 && !( $x2 && $y2 ) ){
+    if ( $x1 && $y1 && !( $x2 && $y2 ) ) {
         my $black = Imager::Color->new( 0, 0, 0 );
         $image->box( color => $black, xmin => $x1, ymin => $y1, xmax => $x1 + 5, ymax => $y1 + 5, filled => 1 );
-    } elsif( $x1 && $y1 && $x2 && $y2 ){
+    } elsif ( $x1 && $y1 && $x2 && $y2 ) {
 
-        if( $x1 > $x2 ){
+        if ( $x1 > $x2 ) {
             my $tmp = $x1;
             $x1 = $x2;
             $x2 = $tmp;
         }
 
-        if( $y1 > $y2 ){
+        if ( $y1 > $y2 ) {
             my $tmp = $y1;
             $y1 = $y2;
             $y2 = $tmp;
@@ -93,18 +97,15 @@ sub map :Path('/search/map') :Args(1) {
         my $fill_color = Imager::Color->new( 0, 0, 100, 30 );
         my $fill = Imager::Fill->new( solid => $fill_color, combine => 'normal' );
         my $outline_color = Imager::Color->new( 0, 0, 180 );
-        $image->box( xmin => $x1, ymin => $y1, xmax => $x2, ymax => $y2, fill => $fill  );
-        $image->box( xmin => $x1, ymin => $y1, xmax => $x2, ymax => $y2, color => $outline_color  );
+        $image->box( xmin => $x1, ymin => $y1, xmax => $x2, ymax => $y2, fill  => $fill );
+        $image->box( xmin => $x1, ymin => $y1, xmax => $x2, ymax => $y2, color => $outline_color );
     }
 
-
-
     my $image_bytes;
+    my $filetype = 'png';
     $image->write( data => \$image_bytes, type => $filetype );
 
-    $c->response->content_type('image/png');
     $c->response->body($image_bytes);
-
 
 }
 
