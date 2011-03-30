@@ -83,11 +83,11 @@ FIXME - needs better user interface
 
 =cut
 
-sub unauthorized :Private {
-    my ( $self, $c ) = @_;
-    $c->response->body( "<h1>Not autorized</h1>\n" );
-    $c->response->content_type('text/html');
+sub unauthorized :Private : Args {
+    my ( $self, $c, $required_role ) = @_;
+    $self->logger->debug("Required role: $required_role");
     $c->response->status(403);
+    $c->stash( template => 'unauthorized.tt', required_role => $required_role );
 }
 
 =head2 begin()

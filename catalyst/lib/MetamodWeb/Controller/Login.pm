@@ -355,6 +355,91 @@ END_BODY
     return;
 }
 
+=head2 /login/request_role
+
+Request a new role for the current user. The request will send an email to the
+site operator and a receipt to the user.
+
+=cut
+sub request_role : Path('/login/request_role') : Args(0) {
+    my ($self, $c ) = @_;
+
+    return if !$self->chk_logged_in($c);
+
+    my $role = $c->req->param('role');
+
+    $self->send_role_request($c, $role);
+
+    $self->send_role_request_receipt($c, $role);
+
+    $self->add_info_msgs( $c, 'Role has been requested' );
+
+    $c->stash( template => 'unauthorized.tt' );
+}
+
+sub send_role_request {
+    my $self = shift;
+
+    my ( $c, $role ) = @_;
+
+    my $mm_config = $c->stash->{mm_config};
+    my $base_url = $mm_config->get('BASE_PART_OF_EXTERNAL_URL');
+    my $local_url = $mm_config->get('LOCAL_URL');
+
+    # Normally uri_for will return relative URI's when Plugin::SmartURI is loaded,
+    # so we must explicitly ask for the absolute URI.
+    my $approve_url = $c->uri_for('/admin/confirm_role', $role, $c->user()->u_loginname() )->absolute;
+
+    my $email_body = <<"END_BODY";
+A user has requested a new role. Please check the information
+and approve the user if the information is ok.
+
+$approve_url
+END_BODY
+
+    my $operator_email = $mm_config->get('OPERATOR_EMAIL');
+    my $application_name = $mm_config->get('APPLICATION_NAME');
+
+    Metamod::Email::send_simple_email(
+        to => [ $operator_email ],
+        from => 'dummy@example.com',
+        subject => "$application_name new role requested",
+        body => $email_body,
+    );
+
+    return;
+}
+
+sub send_role_request_receipt {
+    my ($self, $c, $role) = @_;
+
+    my $user_name = $c->user()->u_name();
+
+    my $mm_config = $c->stash->{mm_config};
+    my $operator_email = $mm_config->get('OPERATOR_EMAIL');
+    my $application_name = $mm_config->get('APPLICATION_NAME');
+    my $signature = $mm_config->get('EMAIL_SIGNATURE') || '';
+
+    my $email_body = <<"END_BODY";
+Dear $user_name,
+
+we have received your request for the role '$role'. The request will be manually reviewed
+before and you will receive an email once it has been reviewed.
+
+$signature
+END_BODY
+
+    Metamod::Email::send_simple_email(
+        to => [ $c->user()->u_email() ],
+        from => $operator_email,
+        subject => "$application_name new role requested",
+        body => $email_body,
+    );
+
+    return;
+
+}
+
 __PACKAGE__->meta->make_immutable;
 
 =head1 LICENSE
