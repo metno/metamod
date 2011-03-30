@@ -501,3 +501,9 @@ AUTH_TYPE = DB
 SUBSCRIPTION_SMS_DIRECTORY = some dir
 
 SUBSCRIPTION_ENABLED = ENABLED
+
+# ======= Collection basket configuration =========
+
+# A comma separated list of distribution statements that are interpreted as
+# freely available and can be downloaded via the collection basket.
+COLLECTION_BASKET_DIST_STATEMENTS = free
