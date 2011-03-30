@@ -30,9 +30,13 @@ use Metamod::DbTableinfo;
 
 =head1 NAME
 
-<package name> - <description>
+MetamodWeb::Controller::Admin::Viewtable
 
 =head1 DESCRIPTION
+
+Prepare data structures representing overview and detailed content of the SQL
+databases (Metadatabase and User database). These data structures will be used
+in the Template Toolkit templates (View).
 
 =head1 METHODS
 
@@ -40,15 +44,25 @@ use Metamod::DbTableinfo;
 
 =head2 auto
 
+Controller specific initialisation for each request.
+Currently empty.
+
 =cut
 
 sub auto :Private {
     my ( $self, $c ) = @_;
-
-    # Controller specific initialisation for each request.
 }
 
 =head2 index
+
+Build array @table_desc. Each array element is a reference to a hash with the following
+entries:
+
+   name      Table name in the SQL Meta database
+   columns   Sting with column names for the table (blank separated)
+   url       Url used to view the table content
+
+Stash a reference to @table_desc under the name 'table_desc'.
 
 =cut
 
@@ -71,6 +85,31 @@ sub index : Path("/admin/viewtable") :Args(0) {
     }
     $c->stash(table_desc => \@table_desc);
 }
+
+=head2 viewtbl
+
+Prepare for presenting table rows from a SQL Metadatabase table.
+
+Activated by URLs like:
+
+   http://.../admin/viewtable/<tablename>
+
+where <tablename> is the name of a table in the SQL Metadatabase. This table name
+is available as the third argument ($tbl) to this routine. The URL may also contain
+parameters like:
+
+   ?refcol=<colname>&refval=<colval>
+
+If this is the case, only table rows with <colname> values equal to <colval> are
+fetched from the database and presented to the user.
+
+Build an array (referenced by $wholetable). Each array element represents one table
+row in the SQL Metadatabase table given by the $tbl argument. The array element is
+a reference to an array with column values from this row.
+
+Stash the $wholetable reference.
+
+=cut
 
 sub viewtbl : Path("/admin/viewtable") :Args(1) {
     my ( $self, $c, $tbl ) = @_;
@@ -98,15 +137,36 @@ sub viewtbl : Path("/admin/viewtable") :Args(1) {
     push @newcol, 'References';
     $col = \@newcol;
     $c->stash(columns => $col);
-    my %colindex;
-    my $ix = 0;
-    foreach my $col1 (@$col) {
-       $colindex{$col1} = $ix;
-       $ix++;
-    }
     my $wholetable = build_wholetable($c,"/admin/viewtable",$col,$tbl,$sth,$dbh,1);
     $c->stash(wholetable => $wholetable);
 }
+
+=head2 viewdataset
+
+Prepare for presenting table rows from the 'dataset' SQL Metadatabase table.
+Level 2 datasets where the parent dataset has ds_id == $dsid are fetched from the
+database.
+
+Activated by URLs like:
+
+   http://.../admin/viewtable/dataset/<ds_id>
+
+where <ds_id> is the unique identifier of the parent dataset table row. This identifier
+is available as the third argument ($dsid) to this routine. The URL may also contain
+parameters like:
+
+   ?refcol=<colname>&refval=<colval>
+
+If this is the case, only table rows with <colname> values equal to <colval> are
+fetched from the database and presented to the user.
+
+Build an array (referenced by $wholetable). Each array element represents one table
+row in the SQL Metadatabase table. The array element is a reference to an array with
+column values from this row.
+
+Stash the $wholetable reference.
+
+=cut
 
 sub viewdataset : Path("/admin/viewtable/dataset") :Args(1) {
     my ( $self, $c, $dsid ) = @_;
@@ -123,6 +183,19 @@ sub viewdataset : Path("/admin/viewtable/dataset") :Args(1) {
     my $wholetable = build_wholetable($c,"/admin/viewtable",$col,'dataset',$sth,$dbh,0);
     $c->stash(wholetable => $wholetable);
 }
+
+=head2 viewusertable
+
+Build array @table_desc. Each array element is a reference to a hash with the following
+entries:
+
+   name      Table name in SQL User database
+   columns   Sting with column names for the table (blank separated)
+   url       Url used to view the table content
+
+Stash a reference to @table_desc under the name 'table_desc'.
+
+=cut
 
 sub viewusertable : Path("/admin/viewusertable") :Args(0) {
     my ( $self, $c ) = @_;
@@ -143,6 +216,31 @@ sub viewusertable : Path("/admin/viewusertable") :Args(0) {
     }
     $c->stash(table_desc => \@table_desc);
 }
+
+=head2 viewusertbl
+
+Prepare for presenting table rows from a SQL User database table.
+
+Activated by URLs like:
+
+   http://.../admin/viewusertable/<tablename>
+
+where <tablename> is the name of a table in the SQL User database. This table name
+is available as the third argument ($tbl) to this routine. The URL may also contain
+parameters like:
+
+   ?refcol=<colname>&refval=<colval>
+
+If this is the case, only table rows with <colname> values equal to <colval> are
+fetched from the database and presented to the user.
+
+Build an array (referenced by $wholetable). Each array element represents one table
+row in the SQL User database table given by the $tbl argument. The array element is
+a reference to an array with column values from this row.
+
+Stash the $wholetable reference.
+
+=cut
 
 sub viewusertbl : Path("/admin/viewusertable") :Args(1) {
     my ( $self, $c, $tbl ) = @_;
@@ -167,6 +265,30 @@ sub viewusertbl : Path("/admin/viewusertable") :Args(1) {
     my $wholetable = build_wholetable($c,"/admin/viewusertable",$col,$tbl,$sth,$dbh,0);
     $c->stash(wholetable => $wholetable);
 }
+
+=head2 compose_sql
+
+Build and prepare an SQL statement for execution. This routine takes the following
+arguments:
+
+   $dbh                Database handle
+   $col                Reference to array with column names that represents the columns
+                       to be fetched
+   $tbl                Name of SQL table. Note: The 'ds_has_md' table is treated specially:
+                       Some columns are taken from the metadata table.
+   $params             Reference to hash with parameter key - value pairs taken from the
+                       activating URL
+   $no_parent_filter   Used for the Metadatabase if the table name is 'dataset'. For such
+                       tables, this variable may be set to a false value (i.e == 0). Then
+                       filtering according to the ds_parent column values are activated.
+                       Otherwise, this value will be true (i.e == 1), and no filtering on
+                       ds_parent values are done.
+   $dsparent           The value that the ds_parent column must match if such parent
+                       filtering is activated.
+
+Return the SQL statement handle, ready for execution.
+
+=cut
 
 sub compose_sql {
     my ($dbh,$col,$tbl,$params,$no_parent_filter,$dsparent) = @_;
@@ -201,6 +323,29 @@ sub compose_sql {
     return $sth;
 }
 
+=head2 build_wholetable
+
+Create table to be presented to the user.
+
+The table will be set up as an array containing references to arrays with row
+values.
+
+Return value: A ref to this table array.
+
+This routine takes the following arguments:
+
+   $c                 Context
+   $baseurl           Initial part of URL used to link to other tables
+   $col               Ref to array containing column names for the current table
+   $tbl               Name of SQL table to access
+   $sth               DBI statement handle for an SQL object that has been executed
+                      and now used to fetch rows from the SQL result
+   $dbh               DBI database handle
+   $children_column   True (== 1) if the first column in the table presented to the
+                      user should contain links to children dataset
+
+=cut
+
 sub build_wholetable {
     my ($c,$baseurl,$col,$tbl,$sth,$dbh,$children_column) = @_;
     my %colindex;
@@ -218,12 +363,14 @@ sub build_wholetable {
        }
        if ($tbl eq 'dataset' and $children_column) {
            my $dsid = $result[0];
-           my $dsparent = $result[$colindex{'ds_parent'}];
            my $childrenlink = "";
+           unshift @result, $childrenlink;
+           my $dsparent = $result[$colindex{'ds_parent'}];
            if ($dsparent == 0) {
               $childrenlink = '<a href="' . $c->uri_for($baseurl . '/' . $tbl . '/' . $dsid) . '">Children</a>';
            }
-           unshift @result, $childrenlink;
+#           print "dsparent, Childrenlink = " . $dsparent . ", " . $childrenlink . "\n";
+           $result[0] = $childrenlink;
        }
        my $references = "";
        foreach my $foreign (@$foreignref) {
