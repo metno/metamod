@@ -33,7 +33,8 @@
             </tr>
 
             <tr>
-            <td colspan="2"><input type="submit" value="Login" /></td>
+            <td><input type="submit" value="Login" /></td>
+            <td><a href="[% c.uri_for('/login/reset_password_form', { username => c.req.params.username } ) %]">Forgotton your passord?</a>
             </tr>
         </table>
     </form>

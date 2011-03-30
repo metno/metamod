@@ -278,6 +278,83 @@ END_BODY
 
 }
 
+=head2 /login/reset_password_form
+
+Display a password reset form.
+
+=cut
+sub reset_password_form : Path('/login/reset_password_form') : Args(0) {
+    my ($self, $c) = @_;
+
+    $c->stash( template => 'reset_password.tt' );
+
+}
+
+=head2 /login/reset_password
+
+Reset the users password with a new random password and send the new password
+to the users email.
+
+=cut
+sub reset_password : Path('/login/reset_password') : Args(0) {
+    my ($self, $c) = @_;
+
+    my $username = $c->req->param('username');
+
+    if( !$username ){
+        $self->add_error_msgs($c, 'You must supply a username to reset the password');
+        $c->res->redirect($c->uri_for('/login/reset_password_form' ) );
+        return
+    }
+
+    my $user = $c->model('Userbase::Usertable')->search( { u_loginname => $username } )->first();
+    if( defined $user ){
+
+        # this should really never happen due to database constraints, but it often pays to be
+        # carefull.
+        if( !$user->u_email() ){
+            my $msg = 'User does not have an email address so the password cannot be reset. ';
+            $msg .= 'Please contact ' . $c->stash->{ mm_config }->get('OPERATOR_EMAIL') . ' for assistance.';
+            $self->add_error_msgs($c, $msg );
+            $c->res->redirect($c->uri_for('/login/reset_password_form', { username => $username } ) );
+            return;
+        }
+
+        my $new_pass = $user->reset_password();
+        $self->send_reset_email( $c, $user, $new_pass );
+
+    }
+
+    $self->add_info_msgs($c, 'A new password has been sent to your email address');
+    $c->res->redirect($c->uri_for('/login/reset_password_form', { username => $username } ) );
+
+}
+
+sub send_reset_email {
+    my ($self, $c, $user, $new_password) = @_;
+
+    my $mm_config = $c->stash->{mm_config};
+    my $signature = $mm_config->get('EMAIL_SIGNATURE') || '';
+
+    my $email_body = <<"END_BODY";
+Your password has been reset. Your new password is $new_password
+
+$signature
+END_BODY
+
+    my $operator_email = $mm_config->get('OPERATOR_EMAIL');
+    my $application_name = $mm_config->get('APPLICATION_NAME');
+
+    Metamod::Email::send_simple_email(
+        to => [ $user->u_email() ],
+        from => $operator_email,
+        subject => "$application_name password reset",
+        body => $email_body,
+    );
+
+    return;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 =head1 LICENSE

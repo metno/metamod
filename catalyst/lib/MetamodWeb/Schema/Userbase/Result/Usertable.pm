@@ -122,7 +122,9 @@ __PACKAGE__->has_many(
 );
 
 use Data::Dumper;
+use Digest;
 use Carp;
+use Metamod::Utils qw(random_string);
 
 use constant ROLETYPES => qw(admin upload subscription);
 
@@ -177,6 +179,61 @@ sub set_roles {
             }
         );
     }
+}
+
+=head2 $self->update_password($password)
+
+Hash the supplied password and update the password.
+
+=over
+
+=item $password
+
+The password in clear text that should be hashed and stored in the database.
+
+=item return
+
+Returns the row object.
+
+=back
+
+=cut
+
+sub update_password {
+    my $self = shift;
+
+    my ($password) = @_;
+
+    my $pass_digest = Digest->new('SHA-1')->add($password)->hexdigest();
+
+    return $self->update( { u_password => $pass_digest } );
+
+}
+
+=head2 $self->reset_password()
+
+Reset the users password with a new random password. This function will
+generate the new random password, hash it and store it in the database.
+
+=over
+
+=item return
+
+Returns the new random password in clear text.
+
+=back
+
+=cut
+
+sub reset_password {
+    my $self = shift;
+
+    my $random_pass = random_string();
+
+    $self->update_password($random_pass);
+
+    return $random_pass;
+
 }
 
 =head1 LICENSE
