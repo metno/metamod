@@ -261,6 +261,7 @@ foreach my $filelistpath (@flistpathes) {
       next unless /\w+/;
       my $filename = $_;
       my $ch1 = substr($filename,0,1);
+      next if $ch1 eq '#'; # allow comments in file
       if ($ch1 eq '=') { # File will be copied unmodified
          $filename = substr($filename,1);
       }
@@ -356,7 +357,7 @@ sub install_catalyst {
    system 'make';
    system 'make', 'install';
    chdir $catalyst_lib_dir;
-   system 'find . -exec chmod +w {} \;';
+   system 'find . -exec chmod u+w {} \;';
 
    chdir $back;
 }
