@@ -40,6 +40,7 @@ use File::Copy;
 use File::Path;
 use File::Spec;
 use FindBin qw($Bin);
+use Cwd;
 
 use lib "$Bin/common/lib";
 use Metamod::LoggerConfigParser;
@@ -229,6 +230,10 @@ foreach my $module qw(METAMODBASE METAMODSEARCH METAMODUPLOAD METAMODQUEST METAM
 }
 push (@flistpathes, $appdir . '/filelist.txt');
 
+#
+# install Catalyst files before $appdir to avoid clobbering custom files
+#
+&install_catalyst;
 
 #
 # start processing source files
@@ -316,20 +321,6 @@ my $logger_config = File::Spec->catfile( $targetdir, 'logger_config.ini' );
 my $lcp = Metamod::LoggerConfigParser->new( { verbose => 1 } );
 $lcp->create_and_write_configs($configfile,$logger_config);
 
-# install the catalyst application
-my $catalyst_dir = "$sourcedir/catalyst";
-my $catalyst_install_dir = "$targetdir";
-my $catalyst_lib_dir = "$catalyst_install_dir/lib";
-chdir $catalyst_dir or die "Could not chdir to $catalyst_dir: $!";
-
-# If local::lib has been installed on the machine then PERL_MM_OPT will be set with INSTALL_BASE
-# which conflicts with PREFIX. We want to use PREFIX since it allows us to set LIB as well.
-$ENV{PERL_MM_OPT} = '' if exists $ENV{PERL_MM_OPT};
-
-system 'perl', 'Makefile.PL', "PREFIX=$catalyst_install_dir", "LIB=$catalyst_lib_dir";
-system 'make';
-system 'make install';
-
 if ($missing_variables > 0) {
    print "NOTE: All [==...==] constructs found that were not defined in the configuration file\n" .
                 "      were substituted with empty values\n";
@@ -348,6 +339,24 @@ system "$targetdir/scripts/gen_httpd_conf.pl", $targetdir;
 #----------------------------------------------------------------------
 # END
 #----------------------------------------------------------------------
+
+sub install_catalyst {
+   # install the catalyst application
+   my $catalyst_dir = "$sourcedir/catalyst";
+   my $catalyst_install_dir = "$targetdir";
+   my $catalyst_lib_dir = "$catalyst_install_dir/lib";
+   my $back = getcwd();
+   chdir $catalyst_dir or die "Could not chdir to $catalyst_dir: $!";
+
+   # If local::lib has been installed on the machine then PERL_MM_OPT will be set with INSTALL_BASE
+   # which conflicts with PREFIX. We want to use PREFIX since it allows us to set LIB as well.
+   $ENV{PERL_MM_OPT} = '' if exists $ENV{PERL_MM_OPT};
+
+   system 'perl', 'Makefile.PL', "PREFIX=$catalyst_install_dir", "LIB=$catalyst_lib_dir";
+   system 'make';
+   system 'make', 'install';
+   chdir $back;
+}
 
 sub substcopy {
    # copies a file with inline processing
