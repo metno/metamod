@@ -355,6 +355,9 @@ sub install_catalyst {
    system 'perl', 'Makefile.PL', "PREFIX=$catalyst_install_dir", "LIB=$catalyst_lib_dir";
    system 'make';
    system 'make', 'install';
+   chdir $catalyst_lib_dir;
+   system 'find . -exec chmod +w {} \;';
+
    chdir $back;
 }
 
