@@ -1,11 +1,11 @@
 #!/bin/sh
 
-if [ ! -w /etc/apache2 ] then
+if [ ! -w /etc/apache2 ]; then
     echo "Please run this script as root (sudo)."
     exit 1
 fi
 
-if [ "[==VIRTUAL_HOST==]" = "" ] then
+if [ "[==VIRTUAL_HOST==]" = "" ]; then
     ln -s [==TARGET_DIRECTORY==]/etc/httpd.conf  /etc/apache2/conf.d/[==APPLICATION_ID==]
 else
     ln -s [==TARGET_DIRECTORY==]/etc/httpd.conf  /etc/apache/sites-available/[==VIRTUAL_HOST==]
