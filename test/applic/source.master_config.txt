@@ -416,6 +416,11 @@ PMH_EARLIEST_DATESTAMP = 2000-01-01
 # Repository Identifier
 PMH_REPOSITORY_IDENTIFIER = Substituted by test_application.sh
 
+# ============ make OAI-PMH identifier the same as ISO-identifier
+# i.e. oai:...:metamod/APP/file -> urn:...:APP_file
+PMH_SYNCHRONIZE_ISO_IDENTIFIER = 1
+
+
 # List of ownertags availabele for export:
 PMH_EXPORT_TAGS = Substituted by test_application.sh
 

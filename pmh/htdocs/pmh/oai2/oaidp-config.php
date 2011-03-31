@@ -20,12 +20,12 @@
 * | Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA         |
 * |                                                                      |
 * +----------------------------------------------------------------------+
-* | Derived from work by U. Müller, HUB Berlin, 2002                     |
+* | Derived from work by U. Mï¿½ller, HUB Berlin, 2002                     |
 * |                                                                      |
 * | Written by Heinrich Stamerjohanns, May 2002                          |
 * |            stamer@uni-oldenburg.de                                   |
 * |                                                                      |
-* | Adapted to METAMOD2 by Egil Støren, August 2008                      |
+* | Adapted to METAMOD2 by Egil Stï¿½ren, August 2008                      |
 * |            egil.storen@met.no                                        |
 * +----------------------------------------------------------------------+
 */
@@ -277,13 +277,14 @@ $SQL['identifier'] = 'DS_name';
 
 // If you want to expand the internal identifier in some way
 // use this (but not for OAI stuff, see next line)
-$idPrefix = 'metamod/';
+$idPrefix = $mmConfig->getVar('PMH_SYNCHRONIZE_ISO_IDENTIFIER') ? '' : 'metamod/';
 
 // this is your external (OAI) identifier for the item
 // this will be expanded to
 // oai:$repositoryIdentifier:$idPrefix$SQL['identifier']
 // should not be changed
-$oaiprefix = "oai".$delimiter.$repositoryIdentifier.$delimiter.$idPrefix;
+$oaiScheme = $mmConfig->getVar('PMH_SYNCHRONIZE_ISO_IDENTIFIER') ? 'urn' : 'oai';
+$oaiprefix = $oaiScheme.$delimiter.$repositoryIdentifier.$delimiter.$idPrefix;
 
 // adjust anIdentifier with sample contents an identifier
 $sampleIdentifier     = $oaiprefix.'anIdentifier';
@@ -380,7 +381,7 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
          '', 'Data_Set_Citation Version', 'Not Available', '',
          '', '*Personnel Role', 'Technical Contact', '',
          '', 'Personnel First_Name', 'Egil', '',
-         '', 'Personnel Last_Name', 'Støren', '',
+         '', 'Personnel Last_Name', 'Stï¿½ren', '',
          '', 'Personnel Email', 'Not Available', '',
          '', 'Personnel Phone', '+4722963000', '',
          '', 'Personnel Contact_Address Address', "Norwegian Meteorological Institute\nP.O. Box 43\nBlindern",'',
@@ -420,7 +421,7 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
          '', 'Data_Center Data_Center_URL', 'http://met.no/','',
          '', 'Data_Center Personnel Role', 'Data Center Contact','',
          '', 'Data_Center Personnel First_Name', 'Egil','',
-         '', 'Data_Center Personnel Last_Name', 'Støren','',
+         '', 'Data_Center Personnel Last_Name', 'Stï¿½ren','',
          '', 'Data_Center Personnel Phone', '+4722963000','',
          '', 'Data_Center Personnel Contact_Address Address', "Norwegian Meteorological Institute\nP.O. Box 43\nBlindern",'',
          '', 'Data_Center Personnel Contact_Address City', 'Oslo','',
@@ -443,10 +444,16 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
          '', 'Private', 'False','',
       );
    }
-   $query = 'SELECT DS_id, DS_name, DS_status, DS_datestamp, DS_creationDate, DS_ownertag, DS_metadataFormat FROM DataSet WHERE ' .
-            "DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN (".$mmConfig->getVar('PMH_EXPORT_TAGS').") ";
+   if ($mmConfig->getVar('PMH_SYNCHRONIZE_ISO_IDENTIFIER')) {
+		$dsName = "REPLACE(DS_name, '/', '_') AS DS_name";
+   } else {
+   	$dsName = 'DS_name';
+   }
+   $query = "SELECT DS_id, $dsName, DS_status, DS_datestamp, DS_creationDate, DS_ownertag, DS_metadataFormat FROM DataSet WHERE " .
+     	      "DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN (".$mmConfig->getVar('PMH_EXPORT_TAGS').") ";
+
    if ($id != '') {
-      $query .= "AND DS_name = '$id' ";
+      $query .= $mmConfig->getVar('PMH_SYNCHRONIZE_ISO_IDENTIFIER') ? "AND REPLACE(DS_name, '/', '_') = '$id' " : "AND DS_name = '$id' ";
    }
    if ($from != '') {
       $query .= "AND DS_datestamp >= '$from' ";
@@ -534,18 +541,26 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
 function idQuery ($id = '')
 {
 	global $SQL, $mmConfig;
-
+	if ($mmConfig->getVar('PMH_SYNCHRONIZE_ISO_IDENTIFIER')) {
+		$idName = 'REPLACE('.$SQL['identifier'].', \'/\', \'_\') AS '.$SQL['identifier'];
+   } else {
+   	$idName = 'DS_name';
+   }
 	if ($SQL['set'] != '') {
-		$query = 'select distinct '.$SQL['identifier'].','.$SQL['datestamp'].','.
+		$query = 'select distinct '.$idName.','.$SQL['datestamp'].','.
                          $SQL['deleted'].','.$SQL['set'].' FROM '.$SQL['table'];
 	} else {
-		$query = 'select distinct '.$SQL['identifier'].','.$SQL['datestamp'].','.
+		$query = 'select distinct '.$idName.','.$SQL['datestamp'].','.
                          $SQL['deleted'].' FROM '.$SQL['table'];
 	}
         $query .= " WHERE DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN (".$mmConfig->getVar('PMH_EXPORT_TAGS').")";
 
 	if ($id != '') {
-		$query .= ' AND '.$SQL['identifier']." = '$id'";
+		if ($mmConfig->getVar('PMH_SYNCHRONIZE_ISO_IDENTIFIER')) {
+			$query .= " AND REPLACE(".$SQL['identifier'].",'/','_') = '$id'";
+		} else {
+		   $query .= ' AND '.$SQL['identifier']." = '$id'";
+		}
 	}
 
 	return $query;
