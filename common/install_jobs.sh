@@ -21,7 +21,7 @@ ln -s /etc/init.d/$catalyst_app                             /etc/rc2.d/$catalyst
 
 
 # install metamodInit.sh job
-cat > /etc/init.d/damoclesServices <<EOT
+cat > /etc/init.d/metamodServices-[==APPLICATION_ID==] <<EOT
 #! /bin/sh
 su -c "[==TARGET_DIRECTORY==]/metamodInit.sh $*" -s /bin/sh [==APPLICATION_ID==]
 EOT
