@@ -14,9 +14,14 @@
   <xsl:variable name="lc" select="'abcdefghijklmnopqrstuvwxyz'"/>
 
   <xsl:template match="dif:DIF">
-    <gmd:MD_Metadata xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://www.isotc211.org/2005/gmd/gmd.xsd"
+    <gmd:MD_Metadata xmlns:gco="http://www.isotc211.org/2005/gco"
+                     xmlns:gmd="http://www.isotc211.org/2005/gmd"
+                     xmlns:xlink="http://www.w3.org/1999/xlink"
+                     xmlns:gml="http://www.opengis.net/gml"
+                     xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                     xmlns:gts="http://www.isotc211.org/2005/gts"
                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                     xmlns:gmd="http://www.isotc211.org/2005/gmd">
+                     xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.ngdc.noaa.gov/metadata/published/xsd/schema.xsd">
 
       <!-- fileIdentifier -->
       <!-- Hack: WMO requires special identifier for data available in GTS -->
@@ -32,12 +37,18 @@
           </xsl:choose>
         </gco:CharacterString>
       </gmd:fileIdentifier>
-      
+
 
       <!-- language ? -->
       <gmd:language>
-        <gco:CharacterString>en</gco:CharacterString>
+        <gmd:LanguageCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/gmxCo
+delists.xml#LanguageCode" codeListValue="eng">eng</gmd:LanguageCode>
       </gmd:language>
+      <gmd:characterSet>
+        <gmd:MD_CharacterSetCode
+codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/gmxCo
+delists.xml#MD_CharacterSetCode" codeListValue="utf8">UTF 8</gmd:MD_CharacterSetCode>
+      </gmd:characterSet>
 
       <!-- contact 1 -->
       <gmd:contact>
@@ -171,12 +182,13 @@
 
       <!-- metadataStandardname -->
       <gmd:metadataStandardName>
-        <gco:CharacterString xmlns:srv="http://www.isotc211.org/2005/srv">ISO 19115:2003/19139</gco:CharacterString>
+        <gco:CharacterString>ISO 19115-2 Geographic information - Metadata - Part 2: Extensions for imagery and gridded
+data</gco:CharacterString>
       </gmd:metadataStandardName>
 
       <!-- metadataStandardVersion -->
       <gmd:metadataStandardVersion>
-        <gco:CharacterString>1.0</gco:CharacterString>
+        <gco:CharacterString>ISO 19115-2:2009-02-15</gco:CharacterString>
       </gmd:metadataStandardVersion>
 
       <xsl:if test="/dif:DIF/dif:Data_Set_Citation/dif:Online_Resource">
@@ -211,6 +223,7 @@
                   </gmd:dateType>
                 </gmd:CI_Date>
               </gmd:date>
+              <!-- instance pattern dropped out?
               <xsl:if test="/dif:DIF/dif:Related_URL[normalize-space(dif:URL_Content_Type/dif:Type) = 'GTSInstancePattern']">
               <gmd:identifier>
                 <gmd:RS_Identifier id="InstancePattern">
@@ -223,6 +236,7 @@
                 </gmd:RS_Identifier>
               </gmd:identifier>
               </xsl:if>
+              -->
             </gmd:CI_Citation>
           </gmd:citation>
           <gmd:abstract>
@@ -346,22 +360,20 @@
               <xsl:for-each select="/dif:DIF/dif:Parameters">
                 <gmd:keyword>
                   <gco:CharacterString>
-                    <xsl:copy-of select="./dif:Category/child::text()"/>
-                    <xsl:text>|</xsl:text>
                     <xsl:copy-of select="./dif:Topic/child::text()"/>
-                    <xsl:text>|</xsl:text>
+                    <xsl:text> &gt; </xsl:text>
                     <xsl:copy-of select="./dif:Term/child::text()"/>
                     <xsl:if test="./dif:Variable_Level_1">
-                      <xsl:text>|</xsl:text>
+                      <xsl:text> &gt; </xsl:text>
                       <xsl:copy-of select="./dif:Variable_Level_1/child::text()"/>
                       <xsl:if test="./dif:Variable_Level_2">
-                        <xsl:text>|</xsl:text>
+                        <xsl:text> &gt; </xsl:text>
                         <xsl:copy-of select="./dif:Variable_Level_2/child::text()"/>
                         <xsl:if test="./dif:Variable_Level_3">
-                          <xsl:text>|</xsl:text>
+                          <xsl:text> &gt; </xsl:text>
                           <xsl:copy-of select="./dif:Variable_Level_3/child::text()"/>
                           <xsl:if test="./dif:Detailed_Variable">
-                            <xsl:text>|</xsl:text>
+                            <xsl:text> &gt; </xsl:text>
                             <xsl:copy-of select="./dif:Detailed_Variable/child::text()"/>
                           </xsl:if>
                         </xsl:if>
@@ -371,8 +383,17 @@
                 </gmd:keyword>
               </xsl:for-each>
               <gmd:type>
-                <gmd:MD_KeywordTypeCode codeList="http://wis.wmo.int/2008/catalogues/draft_version_1-1/WMO_Codelists_ver1_1.xml#MD_KeywordTypeCode" codeListValue="theme"/>
+                <gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/gmxCodelists.xm
+l#MD_KeywordTypeCode" codeListValue="theme">theme</gmd:MD_KeywordTypeCode>
               </gmd:type>
+              <gmd:thesaurusName>
+                <gmd:CI_Citation>
+                  <gmd:title>
+                    <gco:CharacterString>Global Change Master Directory (GCMD) Scientific Keywords, Version
+6.0.0.0.0</gco:CharacterString>
+                  </gmd:title>
+                </gmd:CI_Citation>
+              </gmd:thesaurusName>
             </gmd:MD_Keywords>
           </gmd:descriptiveKeywords>
 
@@ -387,6 +408,9 @@
                   </gmd:MD_RestrictionCode>
                 </gmd:accessConstraints>
               </xsl:if>
+                <gmd:useLimitations>
+                  <gco:CharacterString>No conditions apply</gco:CharacterString>
+                </gmd:useLimitations>
               <xsl:if test="/dif:DIF/dif:Use_Constraints">
                 <gmd:useConstraints>
                   <gmd:MD_RestrictionCode
@@ -518,6 +542,62 @@
             </gmd:transferOptions>
           </gmd:MD_Distribution>
         </gmd:distributionInfo>
+        <gmd:dataQualityInfo>
+          <gmd:DQ_DataQuality>
+            <gmd:scope>
+              <gmd:DQ_Scope>
+                <gmd:level>
+                  <gmd:MD_ScopeCode codeList="http://www.wmo.int/pages/prog/wis/2010/metadata/version_1-2/WMOCodelists.xml#MD_ScopeCode" codeListValue="dataset"/>
+                </gmd:level>
+              </gmd:DQ_Scope>
+            </gmd:scope>
+            <gmd:report>
+              <gmd:DQ_DomainConsistency>
+                <gmd:result>
+                  <gmd:DQ_ConformanceResult>
+                    <gmd:specification>
+                      <gmd:CI_Citation>
+                        <gmd:title>
+                          <gco:CharacterString>Metamod dataset import conformance rules</gco:CharacterString>
+                        </gmd:title>
+                        <gmd:date>
+                          <gmd:CI_Date>
+                            <gmd:date>
+                              <gco:Date><xsl:value-of select="substring($DATASET_TIMESTAMP,1,10)"/></gco:Date>
+                            </gmd:date>
+                            <gmd:dateType>
+                              <gmd:CI_DateTypeCode codeList="http://www.wmo.int/pages/prog/wis/2010/metadata/version_1-2/WMOCodelists.xml#CI_DateTypeCode" codeListValue="publication"/>
+                            </gmd:dateType>
+                          </gmd:CI_Date>
+                        </gmd:date>
+                      </gmd:CI_Citation>
+                    </gmd:specification>
+                    <gmd:explanation>
+                      <gco:CharacterString>The dataset manage to pass a basic upload and metadata-extraction/conversion test within Metamod2</gco:CharacterString>
+                    </gmd:explanation>
+                    <gmd:pass>
+                      <gco:Boolean>true</gco:Boolean>
+                    </gmd:pass>
+                  </gmd:DQ_ConformanceResult>
+                </gmd:result>
+              </gmd:DQ_DomainConsistency>
+            </gmd:report>
+            <gmd:lineage>
+              <gmd:LI_Lineage>
+                <gmd:statement>
+                  <gco:CharacterString>Data content layout controlled by Metamod</gco:CharacterString>
+                </gmd:statement>
+                <gmd:processStep>
+                  <gmd:LI_ProcessStep>
+                    <gmd:description>
+                      <gco:CharacterString>This metadata record was created automatically on a "best effort" basis by Metamod2. The current metadata record is therefore provided more for information than for reference.</gco:CharacterString>
+                    </gmd:description>
+                  </gmd:LI_ProcessStep>
+                </gmd:processStep>
+              </gmd:LI_Lineage>
+            </gmd:lineage>
+          </gmd:DQ_DataQuality>
+        </gmd:dataQualityInfo>
       </xsl:if>
     </gmd:MD_Metadata>
   </xsl:template>

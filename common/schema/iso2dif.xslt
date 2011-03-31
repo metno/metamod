@@ -28,7 +28,7 @@
           <Dataset_Creator>
              <xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='principalInvestigator']/gmd:individualName/gco:CharacterString/child::text()"/>
           </Dataset_Creator>
-        </xsl:if>  
+        </xsl:if>
         <xsl:if test="/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL">
           <Online_Resource>
             <xsl:copy-of select="/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/child::text()"/>
@@ -115,7 +115,7 @@
       </Personnel>
       <xsl:for-each select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords">
         <xsl:variable name="name-parts">
-          <xsl:copy-of select="str:split(/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString/child::text(), '|')"/>
+          <xsl:copy-of select="str:split(/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString/child::text(), ' &gt; ')"/>
         </xsl:variable>
         <Parameters>
           <Category>
