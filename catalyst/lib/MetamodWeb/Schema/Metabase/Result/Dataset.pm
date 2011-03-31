@@ -351,7 +351,7 @@ sub wmsthumb {
             . "&SRS=$area{crs}&BBOX=$area{left},$area{bottom},$area{right},$area{top}&WIDTH=$size&HEIGHT=$size"
             . "&EXCEPTIONS=application%2Fvnd.ogc.se_inimage";
 
-        # these map url's should really be configured somewhere else
+        # get map url's according to projection
         my $mapserver = $config->get('WMS_BACKGROUND_MAPSERVER');
         my $map = $config->get('WMS_WORLD_MAP');
         if ($area{crs} eq "EPSG:32661") {
