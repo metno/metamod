@@ -1,4 +1,4 @@
-[% mm_config.get('APP_FOOTER_HTML') %]
+[% app.common.footer_html %]
 
 
 
