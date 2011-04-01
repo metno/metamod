@@ -107,7 +107,7 @@ _start() {
             return 0
         fi
     done
-    chown $USER:$GROUP $PIDFILE
+    # chown $USER:$GROUP $PIDFILE # this only works when root
     return 1
 }
 

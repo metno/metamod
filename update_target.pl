@@ -46,7 +46,7 @@ use lib "$Bin/common/lib";
 use Metamod::LoggerConfigParser;
 
 #
-#  Check command line arguments
+#  Check command line arguments (FIXME: rewrite using Getopt::Long)
 #
 my %commandline_options = (); # Hash containing commandline options of the form --opt or --opt=val
                               # $commandline_options{"--opt"} == "val" (or empty)
@@ -185,6 +185,7 @@ if (!exists($conf{'TARGET_DIRECTORY'})) {
 #
 my @flistpathes = ();
 my $targetdir = $conf{'TARGET_DIRECTORY'};
+die "Cannot write to target dir" unless -w $targetdir;
 $targetdir = &substituteval($targetdir);
 
 #
@@ -348,6 +349,7 @@ sub install_catalyst {
    my $catalyst_lib_dir = "$catalyst_install_dir/lib";
    my $back = getcwd();
    chdir $catalyst_dir or die "Could not chdir to $catalyst_dir: $!";
+   die "Cannot write to Catalyst source dir" unless -w $catalyst_dir;
 
    # If local::lib has been installed on the machine then PERL_MM_OPT will be set with INSTALL_BASE
    # which conflicts with PREFIX. We want to use PREFIX since it allows us to set LIB as well.
