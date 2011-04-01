@@ -54,11 +54,13 @@
 </div>
 
 <div id="content" class="g720">
+<div id="inner-content">
 [% IF section %]
 [% INCLUDE "${section}/header.tt" %]
 [% END %]
 <hr/>
 [% content %]
+</div>
 </div>
 
 <div id="footer" class="g960">

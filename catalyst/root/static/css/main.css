@@ -40,6 +40,10 @@ div#content{
 
 }
 
+div#inner-content {
+    padding-right: 10px;
+}
+
 div#footer{
     padding-top: 10px;
 }
