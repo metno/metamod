@@ -95,7 +95,7 @@ ProxyPassReverse    $local          http://127.0.0.1:$port
 # Plain Apache settings
 
 # OAI-PMH still running PHP
-Alias               $local/pmh      $target/pmh
+Alias               $local/pmh      $target/htdocs/pmh
 
 # static files should be served directly from Apache
 Alias               $local/static   $paths{root}/static
