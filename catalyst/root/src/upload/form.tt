@@ -68,9 +68,8 @@ File name: <input name="data" type="file" />
     </tr>
 [% END %]
 
-</div>
-
 </table>
+</div>
 
 </form>
 
