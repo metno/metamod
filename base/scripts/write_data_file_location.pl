@@ -7,6 +7,7 @@ use FindBin;
 
 use lib "$FindBin::Bin/../../common/lib";
 use lib "$FindBin::Bin/../../catalyst/lib";
+use lib "$FindBin::Bin/../lib";
 
 use Cwd qw(abs_path);
 use File::Find;
