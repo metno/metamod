@@ -16,7 +16,7 @@ html, body, div{
 
 
 
-.main{margin:0 auto;  width:970px; padding-top:10px;}
+.main{margin:0 auto;  width:960px; padding-top:0px;}
 
 
 .g160,
@@ -48,18 +48,18 @@ html, body, div{
 .g720{width:720px;}
 .g880{width:880px;}
 
-.ml80 {margin-left:90px;}
-.ml160{margin-left:170px;}
-.ml240{margin-left:250px;}
-.ml320{margin-left:330px;}
-.ml400{margin-left:410px;}
-.ml480{margin-left:490px;}
+.ml80 {margin-left:80px;}
+.ml160{margin-left:160px;}
+.ml240{margin-left:240px;}
+.ml320{margin-left:320px;}
+.ml400{margin-left:400px;}
+.ml480{margin-left:480px;}
 .ml560{margin-left:560px;}
-.ml640{margin-left:650px;}
-.ml720{margin-left:730px;}
-.ml800{margin-left:810px;}
-.ml880{margin-left:890px;}
-.ml960{margin-left:970px;}
+.ml640{margin-left:640px;}
+.ml720{margin-left:720px;}
+.ml800{margin-left:800px;}
+.ml880{margin-left:880px;}
+.ml960{margin-left:960px;}
 
 
 .inside{margin-left:0;}
