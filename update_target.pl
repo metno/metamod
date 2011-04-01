@@ -349,15 +349,15 @@ sub install_catalyst {
    my $catalyst_lib_dir = "$catalyst_install_dir/lib";
    my $back = getcwd();
    chdir $catalyst_dir or die "Could not chdir to $catalyst_dir: $!";
-   die "Cannot write to Catalyst source dir" unless -w $catalyst_dir;
+   die "Cannot write to Catalyst source dir $catalyst_dir" unless -w $catalyst_dir;
 
    # If local::lib has been installed on the machine then PERL_MM_OPT will be set with INSTALL_BASE
    # which conflicts with PREFIX. We want to use PREFIX since it allows us to set LIB as well.
    $ENV{PERL_MM_OPT} = '' if exists $ENV{PERL_MM_OPT};
 
-   system 'perl', 'Makefile.PL', "PREFIX=$catalyst_install_dir", "LIB=$catalyst_lib_dir";
-   system 'make';
-   system 'make', 'install';
+   system('perl', 'Makefile.PL', "PREFIX=$catalyst_install_dir", "LIB=$catalyst_lib_dir") == 0 or die $@;
+   system('make') == 0 or die $@;
+   system('make', 'install') == 0 or die $@;
    chdir $catalyst_lib_dir;
    system 'find . -exec chmod u+w {} \;';
 

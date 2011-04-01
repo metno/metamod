@@ -8,7 +8,7 @@ ordie () {
     if [ $? != 0 ]
     then
         echo "Please remove target file(s) before trying automatic install:"
-        echo "sudo rm /etc/default/$CATALYST_APP /etc/init.d/$CATALYST_APP /etc/rc2.d/$CATALYST_APP /etc/apache2/conf.d/[==APPLICATION_ID==]"
+        echo "sudo rm /etc/default/$CATALYST_APP /etc/init.d/$CATALYST_APP /etc/init.d/metamodServices-[==APPLICATION_ID==] /etc/rc2.d/$CATALYST_APP /etc/apache2/conf.d/[==APPLICATION_ID==]"
         exit 1
     fi
 }

@@ -88,8 +88,10 @@ ProxyPass           $local/pmh      !
 ProxyPass           $local/static   !
 ProxyPass           $local/upl      !
 
-ProxyPass           $local          http://127.0.0.1:$port
-ProxyPassReverse    $local          http://127.0.0.1:$port
+ProxyPass           $local/         http://127.0.0.1:$port
+ProxyPassReverse    $local/         http://127.0.0.1:$port
+
+Redirect seeother   $local          $base$local/
 
 # -----------
 # Plain Apache settings
@@ -104,7 +106,8 @@ Alias               $local/static   $paths{root}/static
 Alias               $local/upl/uerr $webrun/upl/uerr
 
 # if you don't want the default favicon, put custom file in applic-dir and update filelist.txt
-Alias               favicon.ico     $paths{root}/favicon.ico
+# FIXME: make custom icon per app
+#Alias               favicon.ico     $paths{root}/favicon.ico
 
 <Directory $target/htdocs>
     Options Indexes FollowSymLinks MultiViews
