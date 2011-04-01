@@ -32,15 +32,15 @@ sudo ln -s /etc/init.d/$CATALYST_APP /etc/rc2.d/$CATALYST_APP; ordie
 # install metamodInit.sh job [code copied from Egil]
 APPLICATION_USER=[==APPLICATION_USER==]
 if [ $APPLICATION_USER ]; then
-	cat > metamodServices-[==APPLICATION_ID==] <<- EOT
+	cat > /tmp/metamodServices-[==APPLICATION_ID==] <<- EOT
 		#! /bin/sh
 		su -c "[==TARGET_DIRECTORY==]/metamodInit.sh $*" -s /bin/sh $APPLICATION_USER
 		# not sure if this will work since you need the password for APPLICATION_USER to su (rewrite to sudo?)
 	EOT
 	# make sure the tabs above are not replaced with spaces (or the script will break)
-	sudo mv metamodServices-[==APPLICATION_ID==] /etc/init.d/; ordie
+	sudo mv /tmp/metamodServices-[==APPLICATION_ID==] /etc/init.d/; ordie
 fi
 
 # install config link
-sudo mkdir /etc/metamod-[==MAJORVERSION==]
+sudo mkdir -p /etc/metamod-[==MAJORVERSION==]
 sudo ln -s [==TARGET_DIRECTORY==]/master_config.txt  /etc/metamod-[==MAJORVERSION==]/[==APPLICATION_ID==].cfg; ordie

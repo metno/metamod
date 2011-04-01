@@ -185,8 +185,8 @@ if (!exists($conf{'TARGET_DIRECTORY'})) {
 #
 my @flistpathes = ();
 my $targetdir = $conf{'TARGET_DIRECTORY'};
-die "Cannot write to target dir" unless -w $targetdir;
 $targetdir = &substituteval($targetdir);
+die "Cannot write to target dir $targetdir" unless -w $targetdir;
 
 #
 # Install the config-file
