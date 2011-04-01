@@ -420,6 +420,8 @@ PMH_REPOSITORY_IDENTIFIER = Substituted by test_application.sh
 # i.e. oai:...:metamod/APP/file -> urn:...:APP_file
 PMH_SYNCHRONIZE_ISO_IDENTIFIER = 1
 
+# enable validation of PMH-results and map them to 'status=delete' if they don't validate
+PMH_VALIDATION = on
 
 # List of ownertags availabele for export:
 PMH_EXPORT_TAGS = Substituted by test_application.sh
