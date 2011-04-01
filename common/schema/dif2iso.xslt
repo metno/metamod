@@ -21,7 +21,7 @@
                      xmlns:gmx="http://www.isotc211.org/2005/gmx"
                      xmlns:gts="http://www.isotc211.org/2005/gts"
                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                     xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.ngdc.noaa.gov/metadata/published/xsd/schema.xsd">
+                     xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://www.isotc211.org/2005/gmd/gmd.xsd">
 
       <!-- fileIdentifier -->
       <!-- Hack: WMO requires special identifier for data available in GTS -->
@@ -392,6 +392,16 @@ l#MD_KeywordTypeCode" codeListValue="theme">theme</gmd:MD_KeywordTypeCode>
                     <gco:CharacterString>Global Change Master Directory (GCMD) Scientific Keywords, Version
 6.0.0.0.0</gco:CharacterString>
                   </gmd:title>
+                  <gmd:date>
+                    <gmd:CI_Date>
+                      <gmd:date>
+                        <gco:Date>2008-02-05</gco:Date>
+                      </gmd:date>
+                      <gmd:dateType>
+                        <gmd:CI_DateTypeCode codeList="http://www.wmo.int/pages/prog/wis/2010/metadata/version_1-2/WMOCodelists.xml#CI_DateTypeCode" codeListValue="publication"/>
+                      </gmd:dateType>
+                    </gmd:CI_Date>
+                  </gmd:date>
                 </gmd:CI_Citation>
               </gmd:thesaurusName>
             </gmd:MD_Keywords>
@@ -399,6 +409,9 @@ l#MD_KeywordTypeCode" codeListValue="theme">theme</gmd:MD_KeywordTypeCode>
 
           <gmd:resourceConstraints>
             <gmd:MD_LegalConstraints>
+                <gmd:useLimitation>
+                  <gco:CharacterString>No conditions apply</gco:CharacterString>
+                </gmd:useLimitation>
               <xsl:if test="/dif:DIF/dif:Access_Constraints">
                 <gmd:accessConstraints>
                   <gmd:MD_RestrictionCode
@@ -408,9 +421,6 @@ l#MD_KeywordTypeCode" codeListValue="theme">theme</gmd:MD_KeywordTypeCode>
                   </gmd:MD_RestrictionCode>
                 </gmd:accessConstraints>
               </xsl:if>
-                <gmd:useLimitations>
-                  <gco:CharacterString>No conditions apply</gco:CharacterString>
-                </gmd:useLimitations>
               <xsl:if test="/dif:DIF/dif:Use_Constraints">
                 <gmd:useConstraints>
                   <gmd:MD_RestrictionCode
@@ -524,7 +534,7 @@ l#MD_KeywordTypeCode" codeListValue="theme">theme</gmd:MD_KeywordTypeCode>
           </xsl:for-each>
         </gmd:MD_DataIdentification>
       </gmd:identificationInfo>
-      <xsl:if test="/dif:DIF/dif:Data_Set_Citation/dif:Online_Resource">
+      <xsl:if test="/dif:DIF/dif:Related_URL[normalize-space(dif:URL_Content_Type/dif:Type) = normalize-space('VIEW RELATED INFORMATION')]/dif:URL">
         <gmd:distributionInfo>
           <gmd:MD_Distribution>
             <gmd:transferOptions>
@@ -533,7 +543,7 @@ l#MD_KeywordTypeCode" codeListValue="theme">theme</gmd:MD_KeywordTypeCode>
                   <gmd:CI_OnlineResource>
                     <gmd:linkage>
                       <gmd:URL>
-                        <xsl:copy-of select="/dif:DIF/dif:Data_Set_Citation/dif:Online_Resource/child::text()"/>
+                        <xsl:copy-of select="/dif:DIF/dif:Related_URL[normalize-space(dif:URL_Content_Type/dif:Type) = normalize-space('VIEW RELATED INFORMATION')]/dif:URL/child::text()"/>
                       </gmd:URL>
                     </gmd:linkage>
                   </gmd:CI_OnlineResource>
@@ -573,7 +583,7 @@ l#MD_KeywordTypeCode" codeListValue="theme">theme</gmd:MD_KeywordTypeCode>
                       </gmd:CI_Citation>
                     </gmd:specification>
                     <gmd:explanation>
-                      <gco:CharacterString>The dataset manage to pass a basic upload and metadata-extraction/conversion test within Metamod2</gco:CharacterString>
+                      <gco:CharacterString>The dataset managed to pass a basic upload and metadata-extraction/conversion test within Metamod2</gco:CharacterString>
                     </gmd:explanation>
                     <gmd:pass>
                       <gco:Boolean>true</gco:Boolean>

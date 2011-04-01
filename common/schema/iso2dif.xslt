@@ -29,11 +29,6 @@
              <xsl:value-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty[gmd:role/gmd:CI_RoleCode/@codeListValue='principalInvestigator']/gmd:individualName/gco:CharacterString/child::text()"/>
           </Dataset_Creator>
         </xsl:if>
-        <xsl:if test="/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL">
-          <Online_Resource>
-            <xsl:copy-of select="/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/child::text()"/>
-          </Online_Resource>
-        </xsl:if>
       </Data_Set_Citation>
       <Personnel>
         <xsl:for-each select="/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:role">
@@ -353,6 +348,17 @@
       <Summary>
         <xsl:copy-of select="/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract/gco:CharacterString/child::text()"/>
       </Summary>
+      <xsl:if test="/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL">
+      <Related_URL>
+        <URL_Content_Type>
+          <Type>VIEW RELATED INFORMATION</Type>
+        </URL_Content_Type>
+        <URL>
+          <xsl:copy-of select="/gmd:MD_Metadata/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/child::text()"/>
+        </URL>
+      </Related_URL>
+      </xsl:if>
+
       <Metadata_Name>CEOS IDN DIF</Metadata_Name>
       <Metadata_Version>9.7</Metadata_Version>
     </DIF>
