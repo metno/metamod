@@ -26,6 +26,7 @@ use namespace::autoclean;
 
 use Catalyst::Runtime 5.80;
 use Catalyst::Log::Log4perl;
+use FindBin;
 
 use Metamod::Config;
 use MetamodWeb::Utils::GenCatalystConf;
@@ -73,6 +74,7 @@ my %default_config = (
 
     'View::TT' => {
         INCLUDE_PATH => [
+            path_to_metamod_root() . "/custom/templates",
             __PACKAGE__->path_to( 'root', 'src' ),
         ],
         TEMPLATE_EXTENSION => '.tt',
@@ -91,6 +93,7 @@ my %default_config = (
 
     static => {
         include_path => [
+            path_to_metamod_root() . "/custom",
             $mm_config->get('WEBRUN_DIRECTORY'),
             __PACKAGE__->config->{root},
         ],
@@ -128,6 +131,28 @@ __PACKAGE__->log( Catalyst::Log::Log4perl->new() );
 # Start the application
 __PACKAGE__->setup();
 
+
+=head2 path_to_metamod_root()
+
+Determine the absolute path to the Metamod root directory. This directory will
+be different between development and deployment.
+
+=over
+
+=item return
+
+=back
+
+=cut
+sub path_to_metamod_root {
+
+    if( $FindBin::Bin =~ qw!(.+)/(catalyst/script|bin)$! ){
+        return $1;
+    }
+
+    die "Could not determine the absolute path to the metamod root directory. Are you using one of the standard server scripts?";
+
+}
 
 =head1 NAME
 
