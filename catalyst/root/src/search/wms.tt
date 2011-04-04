@@ -73,7 +73,7 @@
 //                alert("layer = " + event.layer.name);
                 document.getElementById('legend').src = "/static/img/blank.gif";
                 if (event.layer.isBaseLayer && event.layer.visibility) {
-                    buildStyleSelector(event.layer.styles, event.layer.params.LAYERS);
+                    buildStyleSelector(event.layer.metadata.styles, event.layer.params.LAYERS);
                 }
 
             }
@@ -152,10 +152,10 @@
 
                 layersw.maximizeControl(true);
                 var layer0 = map.layers[0].params.LAYERS;
-                buildStyleSelector(map.layers[0].styles, layer0);
+                buildStyleSelector(map.layers[0].metadata.styles, layer0);
 
                 // set legend URL (have to set both LAYER and LAYERS due to bug in ncWMS)
-                document.getElementById('legend').src = map.layers[0].styles[0].legend.href + '&LAYERS=' + layer0;
+                document.getElementById('legend').src = map.layers[0].metadata.styles[0].legend.href + '&LAYERS=' + layer0;
 
                 // Print resource link for debugging
                 var a = document.createElement("a");
