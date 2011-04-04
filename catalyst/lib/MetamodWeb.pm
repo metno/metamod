@@ -146,7 +146,7 @@ be different between development and deployment.
 =cut
 sub path_to_metamod_root {
 
-    if( $FindBin::Bin =~ qw!(.+)/(catalyst/script|bin)$! ){
+    if( $FindBin::Bin =~ qw!(.+)/(catalyst/script|bin|catalyst/t.*)$! ){
         return $1;
     }
 
