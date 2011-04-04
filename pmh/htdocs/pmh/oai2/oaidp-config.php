@@ -273,16 +273,15 @@ $SQL['id_column'] = 'DS_id';
 // the name of the column where you store the unique identifiers
 // pointing to your item.
 // this is your internal identifier for the item
-$SQL['identifier'] = 'DS_name';
+$SQL['identifier'] = 'OAI_identifier';
 
 // If you want to expand the internal identifier in some way
 // use this (but not for OAI stuff, see next line)
 $idPrefix = $mmConfig->getVar('PMH_SYNCHRONIZE_ISO_IDENTIFIER') ? '' : 'metamod/';
 
 // this is your external (OAI) identifier for the item
-// this will be expanded to
-// oai:$repositoryIdentifier:$idPrefix$SQL['identifier']
-// should not be changed
+// this is just a rough example, the real identifier is taken
+// from the document during upload to the database
 $oaiScheme = $mmConfig->getVar('PMH_SYNCHRONIZE_ISO_IDENTIFIER') ? 'urn' : 'oai';
 $oaiprefix = $oaiScheme.$delimiter.$repositoryIdentifier.$delimiter.$idPrefix;
 
@@ -337,16 +336,14 @@ function mmPutLog($string) {
 function selectallQuery ($id = '')
 {
 	global $SQL;
-	$query = 'SELECT * FROM '.$SQL['table'].' WHERE ';
-	if ($id == '') {
-		$query .= $SQL['id_column'].' = '.$SQL['id_column'];
-	}
-	else {
-		$query .= $SQL['identifier']." ='$id'";
+	$query = 'SELECT * FROM '.$SQL['table'].',OAIInfo WHERE Dataset.DS_id = OAIInfo.DS_id ';
+	if (strlen($id)) {
+		$query .= "AND ".$SQL['identifier']." ='$id'";
 	}
 	return $query;
 }
 function getRecords ($id = '', $from = '', $until = '', $set = '') {
+	global $SQL;
    global $mmDbConnection, $mmConfig;
    global $metadataPrefix;
    global $key_conversion;
@@ -444,16 +441,11 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
          '', 'Private', 'False','',
       );
    }
-   if ($mmConfig->getVar('PMH_SYNCHRONIZE_ISO_IDENTIFIER')) {
-		$dsName = "REPLACE(DS_name, '/', '_') AS DS_name";
-   } else {
-   	$dsName = 'DS_name';
-   }
-   $query = "SELECT DS_id, $dsName, DS_status, DS_datestamp, DS_creationDate, DS_ownertag, DS_metadataFormat FROM DataSet WHERE " .
-     	      "DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN (".$mmConfig->getVar('PMH_EXPORT_TAGS').") ";
 
+   $query = "SELECT DataSet.DS_id, ".$SQL['identifier'].", DS_status, DS_datestamp, DS_creationDate, DS_ownertag, DS_metadataFormat FROM DataSet,OAIInfo WHERE " .
+     	      "Dataset.DS_id = OAIInfo.DS_id AND DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN (".$mmConfig->getVar('PMH_EXPORT_TAGS').") ";
    if ($id != '') {
-      $query .= $mmConfig->getVar('PMH_SYNCHRONIZE_ISO_IDENTIFIER') ? "AND REPLACE(DS_name, '/', '_') = '$id' " : "AND DS_name = '$id' ";
+      $query .= "AND " . $SQL['identifier'] . " = '$id' ";
    }
    if ($from != '') {
       $query .= "AND DS_datestamp >= '$from' ";
@@ -541,26 +533,17 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
 function idQuery ($id = '')
 {
 	global $SQL, $mmConfig;
-	if ($mmConfig->getVar('PMH_SYNCHRONIZE_ISO_IDENTIFIER')) {
-		$idName = 'REPLACE('.$SQL['identifier'].', \'/\', \'_\') AS '.$SQL['identifier'];
-   } else {
-   	$idName = 'DS_name';
-   }
 	if ($SQL['set'] != '') {
-		$query = 'select distinct '.$idName.','.$SQL['datestamp'].','.
-                         $SQL['deleted'].','.$SQL['set'].' FROM '.$SQL['table'];
+		$query = 'select distinct '.$SQL['identifier'].','.$SQL['datestamp'].','.
+                         $SQL['deleted'].','.$SQL['set'].' FROM '.$SQL['table'].',OAIInfo';
 	} else {
-		$query = 'select distinct '.$idName.','.$SQL['datestamp'].','.
-                         $SQL['deleted'].' FROM '.$SQL['table'];
+		$query = 'select distinct '.$SQL['identifier'].','.$SQL['datestamp'].','.
+                         $SQL['deleted'].' FROM '.$SQL['table'].',OAIInfo';
 	}
-        $query .= " WHERE DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN (".$mmConfig->getVar('PMH_EXPORT_TAGS').")";
+   $query .= " WHERE Dataset.DS_id = OAIInfo.DS_id AND DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN (".$mmConfig->getVar('PMH_EXPORT_TAGS').")";
 
 	if ($id != '') {
-		if ($mmConfig->getVar('PMH_SYNCHRONIZE_ISO_IDENTIFIER')) {
-			$query .= " AND REPLACE(".$SQL['identifier'].",'/','_') = '$id'";
-		} else {
-		   $query .= ' AND '.$SQL['identifier']." = '$id'";
-		}
+      $query .= ' AND '.$SQL['identifier']." = '$id'";
 	}
 
 	return $query;

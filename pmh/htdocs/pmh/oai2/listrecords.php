@@ -20,12 +20,12 @@
 * | Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA         |
 * |                                                                      |
 * +----------------------------------------------------------------------+
-* | Derived from work by U. Müller, HUB Berlin, 2002                     |
+* | Derived from work by U. Mï¿½ller, HUB Berlin, 2002                     |
 * |                                                                      |
 * | Written by Heinrich Stamerjohanns, May 2002                          |
 * /            stamer@uni-oldenburg.de                                   |
 * |                                                                      |
-* | Adapted to METAMOD2 by Egil Støren, August 2008                      |
+* | Adapted to METAMOD2 by Egil Stï¿½ren, August 2008                      |
 * |            egil.storen@met.no                                        |
 * +----------------------------------------------------------------------+
 */
@@ -207,7 +207,7 @@ $ix = $deliveredrecords;
 while ($countrec++ < $maxrec) {
         $record = $allrecords[$dsidarray[$ix++]];
 
-	$identifier = $oaiprefix.$record[$SQL['identifier']];
+	$identifier = $record[$SQL['identifier']];
 	$datestamp = formatDatestamp($record[$SQL['datestamp']]);
 
 	if (isset($record[$SQL['deleted']]) && ($record[$SQL['deleted']] == 'true') &&

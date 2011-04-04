@@ -20,12 +20,12 @@
 * | Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA         |
 * |                                                                      |
 * +----------------------------------------------------------------------+
-* | Derived from work by U. Müller, HUB Berlin, 2002                     |
+* | Derived from work by U. Mï¿½ller, HUB Berlin, 2002                     |
 * |                                                                      |
 * | Written by Heinrich Stamerjohanns, May 2002                          |
 * |            stamer@uni-oldenburg.de                                   |
 * |                                                                      |
-* | Adapted to METAMOD2 by Egil Støren, August 2008                      |
+* | Adapted to METAMOD2 by Egil Stï¿½ren, August 2008                      |
 * |            egil.storen@met.no                                        |
 * +----------------------------------------------------------------------+
 */
@@ -36,7 +36,7 @@
 // parse and check arguments
 foreach($args as $key => $val) {
 
-	switch ($key) { 
+	switch ($key) {
 		case 'from':
 			if (!isset($from)) {
 				$from = $val;
@@ -47,7 +47,7 @@ foreach($args as $key => $val) {
 
 		case 'until':
 			if (!isset($until)) {
-				$until = $val; 
+				$until = $val;
 			} else {
 				$errors .= oai_error('badArgument', $key, $val);
 			}
@@ -59,11 +59,11 @@ foreach($args as $key => $val) {
 			} else {
 				$errors .= oai_error('badArgument', $key, $val);
 			}
-			break;      
+			break;
 
 		case 'metadataPrefix':
 			if (!isset($metadataPrefix)) {
-				if (is_array($METADATAFORMATS[$val]) 
+				if (is_array($METADATAFORMATS[$val])
 					&& isset($METADATAFORMATS[$val]['myhandler'])) {
 					$metadataPrefix = $val;
 					$inc_record  = $METADATAFORMATS[$val]['myhandler'];
@@ -89,7 +89,7 @@ foreach($args as $key => $val) {
 }
 
 // Resume previous session?
-if (isset($args['resumptionToken'])) {            
+if (isset($args['resumptionToken'])) {
 	if (count($args) > 1) {
 		// overwrite all other errors
 		$errors = oai_error('exclusiveArgument');
@@ -101,7 +101,7 @@ if (isset($args['resumptionToken'])) {
 			$deliveredrecords = (int)$textparts[0];
 			$extquery = $textparts[1];
 			$metadataPrefix = $textparts[2];
-			fclose($fp); 
+			fclose($fp);
 			unlink ("tokens/id-$resumptionToken");
 		} else {
 			$errors .= oai_error('badResumptionToken', '', $resumptionToken);
@@ -121,19 +121,19 @@ else {
 		if (!checkDateFormat($from)) {
 			$errors .= oai_error('badGranularity', 'from', $from);
 		}
-		$extquery .= fromQuery($from);     
+		$extquery .= fromQuery($from);
 	}
 
         if (isset($args['until'])) {
 	    if (!checkDateFormat($until)) {
-		    $errors .= oai_error('badGranularity', 'until', $until); 
+		    $errors .= oai_error('badGranularity', 'until', $until);
 	    }
 	    $extquery .= untilQuery($until);
         }
 
         if (isset($args['from']) && isset($args['until'])) {
             if (!checkDateRange($from,$until)) {
-		    $errors .= oai_error('badDateRange','',"$from > $until"); 
+		    $errors .= oai_error('badDateRange','',"$from > $until");
             }
         }
 
@@ -141,7 +141,7 @@ else {
 	    if (is_array($SETS)) {
 		    $extquery .= setQuery($set);
 	    } else {
-			$errors .= oai_error('noSetHierarchy'); 
+			$errors .= oai_error('noSetHierarchy');
 			oai_exit();
 		}
 	}
@@ -149,12 +149,12 @@ else {
 
 if (empty($errors)) {
 	$query = idQuery() . $extquery;
-	$res = pg_query($mmDbConnection,$query); 
+	$res = pg_query($mmDbConnection,$query);
 	if (! $res) {
                 mmPutLog(__FILE__ . __LINE__ . " Could not $query");
 	        $errors .= oai_error('noRecordsMatch');
 	} else {
-		$num_rows = pg_numrows($res);  
+		$num_rows = pg_numrows($res);
 		if (!$num_rows) {
 			$errors .= oai_error('noRecordsMatch');
 		}
@@ -170,20 +170,20 @@ $output .= " <ListIdentifiers>\n";
 
 // Will we need a ResumptionToken?
 if ($num_rows - $deliveredrecords > $MAXIDS) {
-	$token = get_token(); 
+	$token = get_token();
 	$fp = fopen ("tokens/id-$token", 'w');
 	$thendeliveredrecords = (int)$deliveredrecords + $MAXIDS;
-	fputs($fp, "$thendeliveredrecords#"); 
-	fputs($fp, "$extquery#"); 
-	fclose($fp); 
-	$restoken = 
+	fputs($fp, "$thendeliveredrecords#");
+	fputs($fp, "$extquery#");
+	fclose($fp);
+	$restoken =
 '  <resumptionToken expirationDate="'.$expirationdatetime.'"
      completeListSize="'.$num_rows.'"
      cursor="'.$deliveredrecords.'">'.$token."</resumptionToken>\n";
 }
 // Last delivery, return empty ResumptionToken
 elseif (isset($set_resumptionToken)) {
-	$restoken = 
+	$restoken =
 '  <resumptionToken completeListSize="'.$num_rows.'"
      cursor="'.$deliveredrecords.'"></resumptionToken>'."\n";
 }
@@ -194,15 +194,15 @@ $countrec = 0;
 
 while ($countrec++ < $maxrec) {
 	if ($countrec == 1 && $deliveredrecords) {
-		$record = pg_fetch_row($res, $deliveredrecords); 
+		$record = pg_fetch_row($res, $deliveredrecords);
 	} else {
-		$record = pg_fetch_row($res); 
+		$record = pg_fetch_row($res);
 	}
 
-	$identifier = $oaiprefix.$record[0]; 
-	$datestamp = formatDatestamp($record[1]); 
+	$identifier = $record[0];
+	$datestamp = formatDatestamp($record[1]);
 
-	if (isset($record[2]) && ($record[2] == 0) && 
+	if (isset($record[2]) && ($record[2] == 0) &&
 		($deletedRecord == 'transient' || $deletedRecord == 'persistent')) {
 		$status_deleted = TRUE;
 	} else {
@@ -210,20 +210,20 @@ while ($countrec++ < $maxrec) {
 	}
 
 
-	$output .= 
+	$output .=
 '  <header';
 	if ($status_deleted) {
 		$output .= ' status="deleted"';
-	}  
+	}
 	$output .='>'."\n";
 
 	// use xmlrecord since we use stuff from database
 	$output .= xmlrecord($identifier, 'identifier', '', 3);
 	$output .= xmlformat($datestamp, 'datestamp', '', 3);
-	if (!$status_deleted and $SQL['set'] != '') 
+	if (!$status_deleted and $SQL['set'] != '')
 		$output .= xmlrecord($record[3], 'setSpec', '', 3);
 	$output .=
-'  </header>'."\n"; 
+'  </header>'."\n";
 }
 
 // ResumptionToken
@@ -231,5 +231,5 @@ if (isset($restoken)) {
 	$output .= $restoken;
 }
 
-$output .= " </ListIdentifiers>\n"; 
+$output .= " </ListIdentifiers>\n";
 ?>

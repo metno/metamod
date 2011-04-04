@@ -20,12 +20,12 @@
 * | Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA         |
 * |                                                                      |
 * +----------------------------------------------------------------------+
-* | Derived from work by U. Müller, HUB Berlin, 2002                     |
+* | Derived from work by U. Mï¿½ller, HUB Berlin, 2002                     |
 * |                                                                      |
 * | Written by Heinrich Stamerjohanns, May 2002                          |
 * |            stamer@uni-oldenburg.de                                   |
 * |                                                                      |
-* | Adapted to METAMOD2 by Egil Støren, August 2008                      |
+* | Adapted to METAMOD2 by Egil Stï¿½ren, August 2008                      |
 * |            egil.storen@met.no                                        |
 * +----------------------------------------------------------------------+
 */
@@ -37,9 +37,9 @@
 // parse and check arguments
 foreach($args as $key => $val) {
 
-	switch ($key) { 
+	switch ($key) {
 		case 'identifier':
-			$identifier = $val; 
+			$identifier = $val;
 			break;
 
 		case 'metadataPrefix':
@@ -59,8 +59,7 @@ foreach($args as $key => $val) {
 }
 
 if (isset($args['identifier'])) {
-	// remove the OAI part to get the identifier
-	$id = str_replace($oaiprefix, '', $identifier); 
+	$id = $identifier;
 
 	$query = idQuery($id);
 	$res = pg_query ($mmDbConnection, $query);
@@ -69,7 +68,7 @@ if (isset($args['identifier'])) {
 	        $errors .= oai_error('idDoesNotExist', 'identifier', $identifier);
 	} elseif (! pg_numrows($res)) {
 		$errors .= oai_error('idDoesNotExist', 'identifier', $identifier);
-	}    
+	}
 }
 
 //break and clean up on error
@@ -79,7 +78,7 @@ if ($errors != '') {
 
 // currently it is assumed that an existing identifier
 // can be served in all available metadataformats...
-// 
+//
 if (is_array($METADATAFORMATS)) {
 	$output .= " <ListMetadataFormats>\n";
 	foreach($METADATAFORMATS as $key=>$val) {
@@ -89,10 +88,10 @@ if (is_array($METADATAFORMATS)) {
 		$output .= xmlformat($val['metadataNamespace'], 'metadataNamespace', '', 3);
 		$output .= "  </metadataFormat>\n";
 	}
-	$output .= " </ListMetadataFormats>\n"; 
+	$output .= " </ListMetadataFormats>\n";
 }
 else {
-	$errors .= oai_error('noMetadataFormats'); 
+	$errors .= oai_error('noMetadataFormats');
 	oai_exit();
 }
 
