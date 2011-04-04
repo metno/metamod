@@ -27,6 +27,7 @@ use namespace::autoclean;
 use Catalyst::Runtime 5.80;
 use Catalyst::Log::Log4perl;
 use FindBin;
+use Log::Log4perl qw(get_logger);
 
 use Metamod::Config;
 use MetamodWeb::Utils::GenCatalystConf;
@@ -74,7 +75,7 @@ my %default_config = (
 
     'View::TT' => {
         INCLUDE_PATH => [
-            path_to_metamod_root() . "/custom/templates",
+            path_to_custom() . "/templates",
             __PACKAGE__->path_to( 'root', 'src' ),
         ],
         TEMPLATE_EXTENSION => '.tt',
@@ -93,7 +94,7 @@ my %default_config = (
 
     static => {
         include_path => [
-            path_to_metamod_root() . "/custom",
+            path_to_custom(),
             $mm_config->get('WEBRUN_DIRECTORY'),
             __PACKAGE__->config->{root},
         ],
@@ -131,7 +132,6 @@ __PACKAGE__->log( Catalyst::Log::Log4perl->new() );
 # Start the application
 __PACKAGE__->setup();
 
-
 =head2 path_to_metamod_root()
 
 Determine the absolute path to the Metamod root directory. This directory will
@@ -144,13 +144,16 @@ be different between development and deployment.
 =back
 
 =cut
-sub path_to_metamod_root {
+sub path_to_custom {
 
     if( $FindBin::Bin =~ qw!(.+)/(catalyst/script|bin|catalyst/t.*)$! ){
-        return $1;
+        return "$1/custom";
     }
 
-    die "Could not determine the absolute path to the metamod root directory. Are you using one of the standard server scripts?";
+    my $msg = "Could not determine the absolute path from $FindBin::Bin to the metamod root directory.";
+    $msg .= "Custom styles will probably not work";
+    get_logger('MetamodWeb')->error($msg);
+    return "/none-existant-dir/dummy";
 
 }
 
