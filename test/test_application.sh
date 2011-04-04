@@ -375,4 +375,4 @@ perl $basedir/source/run_automatic_tests.pl --smolder --no-pod
 /root/apache-tomcat-6.0.16/bin/catalina.sh start
 
 # start the catalyst servers
-/etc/init.d/catalyst-$idstring stop
+/etc/init.d/catalyst-$idstring start
