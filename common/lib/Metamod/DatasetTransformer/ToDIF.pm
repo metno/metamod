@@ -56,21 +56,21 @@ my $jifStyle;
 my $_init = 0;
 sub _init {
     return if $_init++;
-    
+
     my $styleDoc = Metamod::DatasetTransformer->XMLParser->parse_file($mm2ToDifXslt);
     $mm2ToDifStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet($styleDoc);
     if (!$mm2ToDifStyle) {
-        $_logger->logcroak("cannot parse stylesheet $mm2ToDifXslt");   
+        $_logger->logcroak("cannot parse stylesheet $mm2ToDifXslt");
     }
     $styleDoc = Metamod::DatasetTransformer->XMLParser->parse_file($isoToDifXslt);
     $isoToDifStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet($styleDoc);
     if (!$isoToDifStyle) {
-        $_logger->logcroak("cannot parse stylesheet $isoToDifXslt");   
+        $_logger->logcroak("cannot parse stylesheet $isoToDifXslt");
     }
     $styleDoc = Metamod::DatasetTransformer->XMLParser->parse_file($jifXslt);
     $jifStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet($styleDoc);
     if (!$jifStyle) {
-        $_logger->logcroak("cannot parse stylesheet $jifXslt");   
+        $_logger->logcroak("cannot parse stylesheet $jifXslt");
     }
 }
 
@@ -102,8 +102,11 @@ sub foreignDataset2Dif {
         }
         # transform to dif
         my %info = $foreignDataset->getInfo();
+        # path-separator / changed to _
+        my $dsName = $info{name};
+        $dsName =~ s:([^/]+)/:$1_:;
         my %params = (
-            DS_name => $info{name},
+            DS_name => $dsName,
             DS_creationdate => $info{creationDate},
             DS_datestamp => $info{datestamp},
         );
@@ -117,10 +120,10 @@ sub foreignDataset2Dif {
 
         return Metamod::ForeignDataset->newFromDoc($difDoc, $foreignDataset->getXMD_DOC());
     }
-    
+
     # each working case returns with result, throw exception
     my %info = $foreignDataset->getInfo();
-    $_logger->error_die('cannot translate dataset '.$info{name}.' to internal format');    
+    $_logger->error_die('cannot translate dataset '.$info{name}.' to internal format');
 }
 
 1;
@@ -140,9 +143,9 @@ Metamod::DatasetTransformer::ToDIF - transform foreign datasets to DIF
 
 =head1 DESCRIPTION
 
-The Metamod::DatasetTransformer::ToDIF reads (DIF, ISO, MM2, OldDataset) file formats and 
-converts them to DIF by either using direct transformations, or by converting to the 
-internal format first. In constrast to the Metamod::DatasetTransformer::DIF module, 
+The Metamod::DatasetTransformer::ToDIF reads (DIF, ISO, MM2, OldDataset) file formats and
+converts them to DIF by either using direct transformations, or by converting to the
+internal format first. In constrast to the Metamod::DatasetTransformer::DIF module,
 this module is able to convert the datasets to DIF instead of an
 internal format.
 

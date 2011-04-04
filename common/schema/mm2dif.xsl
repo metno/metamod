@@ -21,7 +21,7 @@
   <xsl:output encoding="UTF-8" indent="yes"/>
   <xsl:variable name="lc" select="'abcdefghijklmnopqrstuvwxyz'"/>
   <xsl:variable name="uc" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
- 
+
   <xsl:key name="mm2" match="/*/mm:metadata" use="@name"/>
 
   <xsl:template match="/">
@@ -39,12 +39,10 @@
         <Version>Not Available</Version>
       </Data_Set_Citation>
 
-      <xsl:apply-templates select="key('mm2', 'gtsFileIdentifier')"/>
-      <xsl:apply-templates select="key('mm2', 'gtsInstancePattern')"/>
       <xsl:call-template name="personell">
         <xsl:with-param name="role" select="'Technical Contact'"/>
       </xsl:call-template>
-      
+
       <xsl:comment>start of variables</xsl:comment>
       <xsl:apply-templates select="key('mm2', 'variable')"/>
       <xsl:comment>end of variables</xsl:comment>
@@ -272,7 +270,7 @@
       <Easternmost_Longitude><xsl:value-of select="$E"/></Easternmost_Longitude>
     </Spatial_Coverage>
   </xsl:template>
-  
+
   <xsl:template name="personell">
     <xsl:param name="role"/>
     <Personnel>

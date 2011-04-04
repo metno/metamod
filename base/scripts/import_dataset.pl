@@ -641,7 +641,7 @@ sub update_database {
         } else {
            $logger->debug("No wmsxml\n");
         }
-        updateSru2Jdbc($dbh, $ds, $dsid, $inputBaseFile);
+        _updateExtraSearch($dbh, $ds, $dsid, $inputBaseFile);
     }
 
     if( $config->get("USERBASE_NAME") && $ds->getParentName() && $activateSubscriptions ){
@@ -662,29 +662,86 @@ sub update_database {
     }
 }
 
-sub updateSru2Jdbc {
+sub _updateExtraSearch {
     my ($dbh, $ds, $dsid, $inputBaseFile) = @_;
+
+    # only main datasets (parents) included in extra-search
+    if ($ds->getParentName()) {
+        return;
+    }
+
+    # extra searches need ISO representation
+    my $isoFds;
+    my %info = $ds->getInfo();
+    if ($info{status} eq 'active') {
+        # convert to ISO19115 by reading original format from disk
+        my $fds = Metamod::ForeignDataset->newFromFileAutocomplete($inputBaseFile);
+        eval {
+            my %options;
+            if ($config->get('PMH_REPOSITORY_IDENTIFIER')) {
+                $options{REPOSITORY_IDENTIFIER} = $config->get('PMH_REPOSITORY_IDENTIFIER');
+            }
+            $isoFds = foreignDataset2iso19115($fds, \%options);
+        }; if ($@) {
+            $logger->warn("problems converting to iso19115 of $info{name}: $@\n");
+        }
+    }
+    _updateSru2Jdbc($dbh, $ds, $dsid, $inputBaseFile, $isoFds);
+    _updateOAIPMH($dbh, $ds, $dsid, $inputBaseFile, $isoFds);
+}
+
+sub _updateOAIPMH {
+    my ($dbh, $ds, $dsid, $inputBaseFile, $isoFds) = @_;
+    my $sth = $dbh->prepare_cached('SELECT OAI_identifier FROM OAIInfo WHERE DS_id = ?');
+    $sth->execute($dsid);
+    my $currentIdentifier;
+    while (my $row = $sth->fetchrow_arrayref) {
+        $currentIdentifier = $row->[0];
+    }
+
+    # get the new identifier
+    my $newIdentifier;
+    if ($config->get('PMH_SYNCHRONIZE_ISO_IDENTIFIER')) {
+        my $xpc = XML::LibXML::XPathContext->new();
+        $xpc->registerNs('gmd', 'http://www.isotc211.org/2005/gmd');
+        $newIdentifier = scalar _get_text_from_doc($isoFds->getMETA_DOC(), '/gmd:MD_Metadata/gmd:fileIdentifier', $xpc);
+    } else {
+        my $pmhIdentifier = $config->get('PMH_REPOSITORY_IDENTIFIER');
+        my %info = $ds->getInfo();
+        $newIdentifier = 'oai:'.$pmhIdentifier.':metamod/'.$info{name};
+    }
+    if ($currentIdentifier) {
+        if ($newIdentifier) {
+            if ($newIdentifier ne $currentIdentifier) {
+                $logger->warn("changing oai-identifier from $currentIdentifier to $newIdentifier");
+                $dbh->prepare_cached('UPDATE OAIInfo SET OAI_identifier = ? WHERE DS_id = ?');
+                $dbh->execute($newIdentifier, $dsid);
+            }
+        }
+    } else {
+        if ($newIdentifier) {
+            my $sth = $dbh->prepare_cached('INSERT INTO OAIInfo (OAI_identifier, DS_id) VALUES (?,?)');
+            $sth->execute($newIdentifier, $dsid);
+        }
+    }
+}
+
+sub _updateSru2Jdbc {
+    my ($dbh, $ds, $dsid, $inputBaseFile, $isoFds) = @_;
     my $ownertag = _get_sru_ownertags();
     my %info = $ds->getInfo();
-    if ($ownertag->{cleanContent($info{ownertag})} and not $ds->getParentName()) {
+    if ($ownertag->{cleanContent($info{ownertag})}) {
         $logger->debug("running updateSru2Jdbc on $info{name}\n");
         # ownertag matches and not a child (no parent)
         # delete existing metadata
         my $deleteSth = $dbh->prepare_cached('DELETE FROM sru.products where id_product = ?');
         $deleteSth->execute($dsid);
         # check status
-        if ($info{status} eq 'active') {
-            # convert to ISO19115 by reading original format from disk
-            my $fds = Metamod::ForeignDataset->newFromFileAutocomplete($inputBaseFile);
+        if ($isoFds and ($info{status} eq 'active')) {
             eval {
-                my %options;
-                if ($config->get('PMH_REPOSITORY_IDENTIFIER')) {
-                    $options{REPOSITORY_IDENTIFIER} = $config->get('PMH_REPOSITORY_IDENTIFIER');
-                }
-                $fds = foreignDataset2iso19115($fds, \%options);
-                isoDoc2SruDb($dbh, $fds, $dsid);
+                _isoDoc2SruDb($dbh, $isoFds, $dsid);
             }; if ($@) {
-                $logger->warn("problems converting to iso19115 and adding to sru-db: $@\n");
+                $logger->warn("problems adding to sru-db: $@\n");
             }
         }
     } else {
@@ -694,7 +751,7 @@ sub updateSru2Jdbc {
 
 # read a parsed iso19115 libxml document
 # and put it into the sru database
-sub isoDoc2SruDb {
+sub _isoDoc2SruDb {
     my ($dbh, $isods, $dsid) = @_;
     my %info = $isods->getInfo;
     return unless $info{status} eq 'active';

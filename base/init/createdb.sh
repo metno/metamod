@@ -102,6 +102,13 @@ CREATE TABLE WMSInfo (
 );
 GRANT SELECT ON WMSInfo TO "[==PG_WEB_USER==]";
 
+-- extension column to Dataset, uncoupled
+CREATE TABLE OAIInfo (
+   DS_id              INTEGER       UNIQUE NOT NULL REFERENCES DataSet ON DELETE CASCADE,
+   OAI_identifier     TEXT          UNIQUE
+);
+GRANT SELECT ON OAIInfo TO "[==PG_WEB_USER==]";
+
 
 CREATE TABLE SearchCategory (
    SC_id              INTEGER       NOT NULL,
