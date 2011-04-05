@@ -104,7 +104,8 @@ GRANT SELECT ON WMSInfo TO "[==PG_WEB_USER==]";
 
 -- extension column to Dataset, uncoupled
 CREATE TABLE OAIInfo (
-   DS_id              INTEGER       UNIQUE NOT NULL REFERENCES DataSet ON DELETE CASCADE,
+   -- soft REFERENCE to DataSet, should not be deleted with dataset
+   DS_id              INTEGER       UNIQUE NOT NULL, 
    OAI_identifier     TEXT          UNIQUE
 );
 GRANT SELECT ON OAIInfo TO "[==PG_WEB_USER==]";
