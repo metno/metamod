@@ -5,23 +5,30 @@ use lib "$FindBin::Bin/../../common/lib";
 
 use strict;
 use warnings;
+use Getopt::Long;
 use TheSchwartz;
 
-use Log::Log4perl qw(:easy);
+use Log::Log4perl qw(:easy get_logger);
 Log::Log4perl->easy_init($DEBUG);
 
 use Metamod::Config;
+use Metamod::Utils;
 use Metamod::Queue::Worker::PrepareDownload;
 
-if ( 1 != @ARGV ) {
-    print "usage: $0 <path to master_config.txt>\n";
-    exit 1;
-}
 
-my $master_config = shift @ARGV;
+# Parse cmd line params
+my ($pid, $errlog, $ownertag);
+GetOptions ('pid|p=s' => \$pid,     # name of pid file - if given, run as daemon
+            'log|l=s' => \$errlog,  # optional, redirect STDERR and STDOUT here
+) or usage();
+
+# init config + logger
+my $master_config = shift @ARGV or usage();
 $ENV{METAMOD_MASTER_CONFIG} = $master_config;
-
 my $mm_config    = Metamod::Config->new($master_config);
+my $log = get_logger('metamod.basket');
+
+# setup queue
 my $queue_worker = TheSchwartz->new(
     databases => [
         {
@@ -32,5 +39,34 @@ my $queue_worker = TheSchwartz->new(
     ]
 );
 
-$queue_worker->can_do('Metamod::Queue::Worker::PrepareDownload');
-$queue_worker->work();
+# now we're ready for demonization
+if ($pid) {
+    # start daemon
+    eval { Metamod::Utils::daemonize($errlog, $pid); };
+    if ($@) {
+        $log->fatal($@);
+    } else {
+        $log->info("prepare_download daemon started successfully");
+    }
+}
+
+
+our $SIG_TERM = 0;
+sub sigterm {++$SIG_TERM;} # please explain why we're counting TERM signals
+$SIG{TERM} = \&sigterm;
+
+eval {
+    $queue_worker->can_do('Metamod::Queue::Worker::PrepareDownload');
+    $queue_worker->work();
+};
+if ($@) {
+    $log->error($@);
+}
+
+
+# END
+
+sub usage {
+    print "usage: $0 <path to master_config.txt>\n";
+    exit 1;
+}

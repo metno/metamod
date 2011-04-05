@@ -67,22 +67,24 @@ with the URL to the generated zip file.
 =back
 
 =cut
+
 sub work {
     my ( $class, $job ) = @_;
 
     eval {
-    my $jobid = $job->jobid();
-    my $locations = $job->arg->{locations};
-    my $email = $job->arg->{email};
 
-    my $mm_job = Metamod::Queue::Job::PrepareDownload->new();
-    my $success = $mm_job->prepare_download($jobid, $locations, $email);
+        my $jobid = $job->jobid();
+        my $locations = $job->arg->{locations};
+        my $email = $job->arg->{email};
 
-    if( !$success ){
-        die $mm_job->error_msg();
-    }
+        my $mm_job = Metamod::Queue::Job::PrepareDownload->new();
+        my $success = $mm_job->prepare_download($jobid, $locations, $email);
 
-    $job->completed();
+        if( !$success ){
+            die $mm_job->error_msg();
+        }
+
+        $job->completed();
 
     } or print $@;
 

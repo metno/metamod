@@ -5,6 +5,7 @@ system_log="[==LOG4ALL_SYSTEM_LOG==]"
 
 upload_monitor_pid=$webrun_directory/upload_monitor.pid
 import_dataset_pid=$webrun_directory/import_dataset.pid
+prepare_download_pid=$webrun_directory/prepare_download.pid
 harvester_pid=$webrun_directory/harvester.pid
 create_thredds_catalogs_pid=$webrun_directory/create_thredds_catalogs.pid
 
@@ -34,7 +35,7 @@ running() {
     then
         return 1
     fi
-    
+
     return 0
 }
 
@@ -84,6 +85,17 @@ start() {
          echo "import_dataset already running"
       fi
    fi
+   if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/prepare_download.pl ]; then
+      if ! running $prepare_download_pid; then
+         start_daemon -n 10 -p $prepare_download_pid $target_directory/scripts/prepare_download.pl $system_log $prepare_download_pid
+         if [ $? -ne 0 ]; then
+            echo "prepare_download failed: $?"
+            return $?;
+         fi
+      else
+         echo "prepare_download already running"
+      fi
+   fi
    if [ "[==METAMODHARVEST_DIRECTORY==]" != "" -a -r $target_directory/scripts/harvester.pl ]; then
       if ! running $harvester_pid; then
          start_daemon -n 10 -p $harvester_pid $target_directory/scripts/harvester.pl -log $system_log -pid $harvester_pid
@@ -94,7 +106,7 @@ start() {
       else
          echo "harvester already running"
       fi
-   fi   
+   fi
    if [ "[==METAMODTHREDDS_DIRECTORY==]" != "" -a -r $target_directory/scripts/create_thredds_catalogs.pl ]; then
       if ! running $create_thredds_catalogs_pid; then
          start_daemon -n 10 -p $create_thredds_catalogs_pid $target_directory/scripts/create_thredds_catalogs.pl $system_log $create_thredds_catalogs_pid
@@ -105,7 +117,7 @@ start() {
       else
          echo "create_thredds_catalogs already running"
       fi
-   fi   
+   fi
 }
 
 stop() {
@@ -114,6 +126,9 @@ stop() {
    fi
    if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/import_dataset.pl ]; then
       killproc -p $import_dataset_pid $target_directory/scripts/import_dataset.pl SIGTERM
+   fi
+   if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/prepare_download.pl ]; then
+      killproc -p $prepare_download_pid $target_directory/scripts/prepare_download.pl SIGTERM
    fi
    if [ "[==METAMODHARVEST_DIRECTORY==]" != "" -a -r $target_directory/scripts/harvester.pl ]; then
       killproc -p $harvester_pid $target_directory/scripts/harvester.pl SIGTERM
@@ -146,6 +161,14 @@ status() {
          retval=2
       fi
    fi
+   if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/prepare_download.pl ]; then
+      if running $prepare_download; then
+         echo "prepare_download running"
+      else
+         echo "prepare_download not running"
+         retval=2
+      fi
+   fi
    if [ "[==METAMODHARVEST_DIRECTORY==]" != "" -a -r $target_directory/scripts/harvester.pl ]; then
       if running $harvester_pid; then
          echo "harvester running"
@@ -153,7 +176,7 @@ status() {
          echo "harvester not running"
          retval=3
       fi
-   fi  
+   fi
    if [ "[==METAMODTHREDDS_DIRECTORY==]" != "" -a -r $target_directory/scripts/create_thredds_catalogs.pl ]; then
       if running $create_thredds_catalogs_pid; then
          echo "create_thredds_catalogs running"
@@ -161,7 +184,7 @@ status() {
          echo "create_thredds_catalogs not running"
          retval=4
       fi
-   fi  
+   fi
    if [ $retval -ne 0 ]; then
       exit 3;
    fi
@@ -190,5 +213,3 @@ case "$1" in
 esac
 
 exit 0
-
-        
