@@ -1,0 +1,38 @@
+h1.std {
+
+}
+
+/* Use this to set the background color of the surrounding the application */
+body {
+
+}
+
+/* This can be used to adjust the top margin of the page */
+div.main {
+
+}
+
+/* This is the level 1 item in the top left menu */
+div.menu-item {
+
+}
+
+/* This is the level 2 item in the top left menu */
+div.level2-menu-item {
+
+}
+
+/* The header cells in the result table */
+th.result {
+
+}
+
+/* The table cells in the result table */
+td.result {
+
+}
+
+/* The current active criteria in the left menu */
+div.criteria-item-active {
+
+}

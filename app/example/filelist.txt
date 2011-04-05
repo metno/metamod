@@ -12,3 +12,6 @@ htdocs/style.css
 =testdata/test1_arctic20.200611.cdl
 =testdata/test2_arctic20.200611.cdl
 =testdata/test1_synop_99710.cdl
+=custom/static/css/custom.css
+=custom/static/images/logo.png
+=custom/templates/custom.tt

@@ -1,0 +1,7 @@
+[%
+
+    SET header_image_url = c.uri_for('/static/images/logo.png');
+    app.common.header_html = '<img src="' _ header_image_url _ '" />';
+
+
+%]

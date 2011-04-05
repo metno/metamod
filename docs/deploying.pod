@@ -37,7 +37,7 @@ administration of the SQL databases are done through this application, which is 
 application.
 
 Although the METAMOD instances in a cluster may operate on different servers, they must share a common
-file system where the XML archive and the Data repository resides. Technically they may reside on 
+file system where the XML archive and the Data repository resides. Technically they may reside on
 different file systems, but for each file, the file paths on the various servers must be the same.
 Furthermore, for a smooth operation, the clocks on all the involved servers must be synchronized.
 
@@ -86,14 +86,14 @@ access the data repository.
 =head2 Directory structure
 
 On each server where METAMOD should run, the generic METAMOD software must be available in some directory.
-In the description below, this directory is called the B<source> directory. 
+In the description below, this directory is called the B<source> directory.
 
 When deploying a METAMOD application, files in the source directory are copied to a B<target> directory.
 The target directory is part of the runtime environment for the METAMOD application. Each application has
 its own target directory, and the actual scripts and web generation tools are taken from the target
 directory. The source directory has no role to play in the runtime environment.
 
-In addition to the generic source directory, the METAMOD target directory is built from an 
+In addition to the generic source directory, the METAMOD target directory is built from an
 B<application source directory>. This directory contains configuration files, style sheets etc., and also
 files regulating metadata requirements. An example application source directory is included in the generic
 source directory (the C<app/example> subdirectory of the source directory).
@@ -146,7 +146,7 @@ METAMOD documentation directory
 
 The module directories (base, search, upload, harvest, pmh, thredds) and also the common directory
 (which in the following is implicitly included among the module directories),
-all have a similar set of subdirectories: 
+all have a similar set of subdirectories:
 
 =over
 
@@ -171,17 +171,17 @@ all have a similar set of subdirectories:
 =back
 
 A module directory will not contain all of these subdirectories. Some subdirectories are only
-found in one module directory. 
+found in one module directory.
 
 While deploying a METAMOD application, after the top level target directory is created, this directory
 structure will be created directly beneath the top level target directory. The division between
 modules will not be passed on to the target directory. Instead, a merging process will take place. Files
-from different module directories, but contained in the same subdirectory, will all end up in the 
+from different module directories, but contained in the same subdirectory, will all end up in the
 same subdirectory in the target directory. For example: C<source/upload/etc/file1> and
 C<source/base/etc/file2> will end up as C<target/etc/file1> and C<target/etc/file2>.
 
 The application source directory will have the same structure as the target directory (or any of
-the module directories). Not all the subdirectories listed above need to be present in the application 
+the module directories). Not all the subdirectories listed above need to be present in the application
 source directory.
 
 In each of the module directories, and also in the application source directory there exists
@@ -195,8 +195,8 @@ application source directory. In this case, a file in the application source dir
 Collisions like this between different module directories are not supposed to happen.
 
 Since files in the application source directory have precedence, this fact can be used to replace any
-file in any of the module directories with an application specific file. For the basic software (Perl 
-scripts etc.) this is not a recommended practice. But for typical configuration files, this is the 
+file in any of the module directories with an application specific file. For the basic software (Perl
+scripts etc.) this is not a recommended practice. But for typical configuration files, this is the
 intended mechanism for tailoring a METAMOD instance to the users needs.
 
 =head2 METAMOD configuration
@@ -212,7 +212,7 @@ The master_config.txt file is a text file containing lines as follows:
    VARNAME = VALUE
 
 'VARNAME' must start from the first character on the line, and be all uppercase letters [A-Z], underscore
-or digits. Any number of white space characters may separate 'VARNAME' and '=', and also '=' and 
+or digits. Any number of white space characters may separate 'VARNAME' and '=', and also '=' and
 'VALUE'. 'VALUE' starts with the first non-whitespace character and ends with
 the last non-whitespace character on the line. Additional lines may be
 appended to 'VALUE' immediately after the initial 'VARNAME = ...' line. Such
@@ -250,12 +250,12 @@ format has a similar structure as Dublin core; it is a flat structure with freel
 keywords. For each keyword one or more values may be found. Other metadata frameworks, like DIF or
 ISO19115, are also accepted, and such frameworks will typically emerge when harvesting from other
 metadata providers through OAI-PMH. While such frameworks (DIF, ISO19115) are hierarchical in nature,
-a flattening of these structures takes place when they are imported to the SQL database and 
+a flattening of these structures takes place when they are imported to the SQL database and
 presented through the METAMOD search interface.
 
-The following configuration files regulate which metadata are imported to the SQL database and 
+The following configuration files regulate which metadata are imported to the SQL database and
 available for search, how metadata imported by the HARVEST module are translated into the internal
-flat structure used in the SQL database, and how metadata found in the uploaded netCDF files are 
+flat structure used in the SQL database, and how metadata found in the uploaded netCDF files are
 translated to MM2 XML files.
 
 =over
@@ -263,7 +263,7 @@ translated to MM2 XML files.
 =item staticdata/searchdata.xml
 
 This XML file contains metadata vocabularies that are imported into the SQL database, and used
-in the SEARCH module for setting up the interactive forms for web users searching the database. 
+in the SEARCH module for setting up the interactive forms for web users searching the database.
 
 =item etc/conf_digest_nc.xml
 
@@ -281,7 +281,7 @@ uploaded netCDF files using the UPLOAD module. Each template corresponds to an e
 defined in the etc/conf_digest_nc.xml file. An example file in the C<app/example/etc> directory
 corresponds to the C<conf_digest_nc.xml> in the same directory.
 
-=item XSLT 
+=item XSLT
 
 Files for translating from foreign metadata formats (... more text is needed)
 
@@ -289,7 +289,92 @@ Files for translating from foreign metadata formats (... more text is needed)
 
 =head3 Stylesheets and other web configuration
 
-... more text
+METAMOD can be configured with custom texts and stylesheets. To modify the
+styles of the application add the following directories to your application
+directory and add all files that you want copy during the update_target.pl
+process to filelist.txt.
+
+=over
+
+=item custom/templates
+
+This directory contains the Template::Toolkit templates that you want to
+override in your configuration. It is generally never a good idea to override
+anything other than the C<custom.tt> file.
+
+=item custom/static/css
+
+This directory contains the CSS files that you want to override in your
+configuration. It is generally never a good idea to override anything but the
+C<custom.css> file in this folder.
+
+=item custom/static/images
+
+This folder contains the images that you use in your style configuration.
+
+=back
+
+=head3 Overriding texts
+
+To override texts in the application you use the C<custom.tt> file.
+C<custom.tt> is a file in C<Template::Toolkit> format.
+
+The way it is used is that it re-defines the default texts found in
+C<defaults.tt>.
+
+For instance the following would re-define the HTML used for the header of the
+application.
+
+  [%
+
+    # get a safe path to the header image that works in both Apache and outside of Apache
+    SET header_image_url = c.uri_for('/static/images/logo.png');
+    app.common.header_html = '<img src="' _ header_image_url _ '" />';
+
+  %]
+
+In the same way you can re-define any of the variables found in C<defaults.tt>
+
+=head3 Overriding the CSS
+
+In METAMOD you can override any of the CSS styles in the application using
+C<custom.css> since this stylesheet will be the last one loaded by the
+application. It is however wise to C<only> modify properties such as background
+colors, foreground colors, borders and font size. Modifying the height, width,
+padding, margins, display type etc. of elements can lead to the application not
+displaying properly in different browsers. Also modifying these properties can
+break between different versions of METAMOD.
+
+The style for any element can be modified, but only a few are usually needed.
+For an example of the common ones see C<app/example/custom/css/custom.css>
+
+=head3 Path to images
+
+One of the most common customisations are adding a logo image to the header and
+the footer of the page. When adding images to the style it is important to get
+the path to the image right.
+
+=over
+
+=item custom.tt
+
+To get the path correct in the C<custom.tt> file you can use the following helper function.
+
+ SET image_url = c.uri_for('/static/images/<your image name here>');
+
+This makes a variable C<image_url> that contains the correct URL to the image file.
+
+=item custom.css
+
+To get the path correct in the C<custom.css> file you can use the following path.
+
+  url("../images/aboutheader.gif");
+
+as in
+
+  background-image: url("../images/aboutheader.gif");
+
+=back
 
 =head2 Source file modification
 
@@ -322,7 +407,7 @@ this variable in C<master_config.txt>.
 
 After the initial configuration has been completed, a number of scripts must be run before the
 application is up and running. As these scripts will create files and directories that also are used
-by the Apache runtime environment, it is important that 
+by the Apache runtime environment, it is important that
 I<the user running these scripts is the same as the user running Apache>.
 
 The first script should be run from the generic source directory. It will set up the target directory
@@ -331,14 +416,14 @@ and do some preparatory work:
    update_target.pl application_directory
 
 The argument is the absolute or relative path of the application source directory, the
-directory containing the master_config.txt file for the application. This script will do the 
+directory containing the master_config.txt file for the application. This script will do the
 following tasks:
 
 =over
 
 =item *
 
-Copy all files that are needed for the application, either from the generic source directory, or 
+Copy all files that are needed for the application, either from the generic source directory, or
 from the application source directory. Only files used for modules included in the
 master_config.txt file are copied. In each of the module directories only the files listed in
 C<filelist.txt> are copied, and if a file is listed in C<filelist.txt> in the application source
@@ -356,12 +441,12 @@ Create an Apache configuration file for the application. more text ...
 
 =back
 
-After a successful run of the C<update_target.pl> script, the following script must be run from the 
+After a successful run of the C<update_target.pl> script, the following script must be run from the
 target directory:
 
    prepare_runtime_env.sh
 
-This script will initialize a runtime directory used by the application for logging, temporary 
+This script will initialize a runtime directory used by the application for logging, temporary
 files etc.
 
 At this point, the deployment of the application is complete for all instances not using the BASE
@@ -379,16 +464,16 @@ defined in the PostgreSQL database environment before the database initializatio
 run. The C<init/createusers.sh> script may be used for this purpose. It is only necessary to run this
 script once for a PostgreSQL database environment.
 
-The first SQL database initialization script will create the Meta database. This script must be run 
+The first SQL database initialization script will create the Meta database. This script must be run
 from the C<init> subdirectory of the target directory:
 
    create_and_load_all.sh
 
-This script will create the database, and load the static content of the database (taken from 
-C<staticdata/searchdata.xml>). You may check the output of this script in the 
+This script will create the database, and load the static content of the database (taken from
+C<staticdata/searchdata.xml>). You may check the output of this script in the
 C<create_and_load_all.out> file in the same C<init> directory.
 
-The next SQL database initialization script will create the User database. This script must be run 
+The next SQL database initialization script will create the User database. This script must be run
 from the C<userinit> subdirectory of the target directory:
 
    run_createuserdb.sh
