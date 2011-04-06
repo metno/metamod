@@ -1,5 +1,3 @@
-<h1 class="std" style="color: red">Not authorized</h1>
-
 [%#
 
     This is not strictly necessary since the not authorized page should not be
@@ -11,6 +9,8 @@
     [% INCLUDE user_msgs.tt %]
 
     [% IF !role_requested %]
+        <h1 class="std" style="color: red">Not authorized</h1>
+
         <p>
 
         You are not authorized to view this page. You can request additional access
