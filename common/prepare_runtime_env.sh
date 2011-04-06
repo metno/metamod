@@ -1,30 +1,5 @@
 #!/bin/sh
-if [ -d [==TARGET_DIRECTORY==]/htdocs/adm ]; then
-#
-#  Set up .htaccess files:
-#
-   if [ ! -f [==TARGET_DIRECTORY==]/htdocs/adm/.htaccess ]; then
-      if [ '[==ADMIN_WEBUSER==]' != '' ]; then
-         cat >[==TARGET_DIRECTORY==]/htdocs/adm/.htaccess <<EOF
-AuthType Basic
-AuthName "Password Required"
-AuthUserFile [==AUTH_USERFILE==]
-Require user [==ADMIN_WEBUSER==]
-Order Deny,Allow
-Deny from all
-Allow from [==ADMIN_DOMAIN==]
-Satisfy all
-EOF
-      else
-         cat >[==TARGET_DIRECTORY==]/htdocs/adm/.htaccess <<EOF
-AuthType Basic
-AuthName "Domain required"
-Order Deny,Allow
-Deny from all
-Allow from [==ADMIN_DOMAIN==]
-EOF
-      fi
-   fi
+
 #
 #  Set up links to import directories:
 #
