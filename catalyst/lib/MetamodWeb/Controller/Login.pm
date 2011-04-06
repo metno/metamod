@@ -371,9 +371,10 @@ sub request_role : Path('/login/request_role') : Args(0) {
 
     $self->send_role_request_receipt($c, $role);
 
-    $self->add_info_msgs( $c, 'Role has been requested' );
+    my $msg = 'Role has been requested. Please wait for an email that informs you if the role has been approved';
+    $self->add_info_msgs( $c, $msg );
 
-    $c->stash( template => 'unauthorized.tt' );
+    $c->stash( role_requested => 1, template => 'unauthorized.tt' );
 }
 
 sub send_role_request {

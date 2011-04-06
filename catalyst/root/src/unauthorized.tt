@@ -10,20 +10,22 @@
 
     [% INCLUDE user_msgs.tt %]
 
-    <p>
+    [% IF !role_requested %]
+        <p>
 
-    You are not authorized to view this page. You can request additional access
-    rights that will have to be manually approved.
+        You are not authorized to view this page. You can request additional access
+        rights that will have to be manually approved.
 
-    </p>
+        </p>
 
-    <form name="request_role" action="[% c.uri_for('/login/request_role') %]" method="POST">
-    <label for="role">Role</label>
-    <select name="role" id="role">
-        <option value="upload" [% required_role == 'upload' ? 'selected="selected"' : '' %]>File upload</option>
-        <option value="admin" [% required_role == 'admin' ? 'selected="selected"' : '' %]>Administrator</option>
-    </select>
-    <input type="submit" value="Request role" />
+        <form name="request_role" action="[% c.uri_for('/login/request_role') %]" method="POST">
+        <label for="role">Role</label>
+        <select name="role" id="role">
+            <option value="upload" [% required_role == 'upload' ? 'selected="selected"' : '' %]>File upload</option>
+            <option value="admin" [% required_role == 'admin' ? 'selected="selected"' : '' %]>Administrator</option>
+        </select>
+        <input type="submit" value="Request role" />
 
-    </form>
+        </form>
+    [% END %]
 [% END %]
