@@ -122,10 +122,6 @@ __PACKAGE__->config(
     %master_catalyst_config
 );
 
-if ( my $catconf = $mm_config->get('CATALYST_SITE_CONFIG') ) {
-    __PACKAGE__->config( 'Plugin::ConfigLoader' => { file => $catconf } );
-}
-
 # Log::Log4perl is already initialised so the Catalyst logger will not initialise it again
 __PACKAGE__->log( Catalyst::Log::Log4perl->new() );
 

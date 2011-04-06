@@ -60,9 +60,6 @@ LOG4PHP_CONFIG = [==TARGET_DIRECTORY==]/log4php_config.ini
 LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
 
 # ============== Catalyst configuration =================
-## File path for generated Catalyst config (is this still in use?)
-##CATALYST_SITE_CONFIG = [==TARGET_DIRECTORY==]/metamodweb.json
-
 # lib for Catalyst etc
 CATALYST_LIB = /opt/metno-catalyst-dependencies-ver1
 
