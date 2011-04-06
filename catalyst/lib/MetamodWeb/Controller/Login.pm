@@ -250,12 +250,11 @@ sub send_operator_email {
     my ($self, $c, $new_user) = @_;
 
     my $mm_config = $c->stash->{mm_config};
-    my $base_url = $mm_config->get('BASE_PART_OF_EXTERNAL_URL');
     my $local_url = $mm_config->get('LOCAL_URL');
 
     # Normally uri_for will return relative URI's when Plugin::SmartURI is loaded,
     # so we must explicitly ask for the absolute URI.
-    my $approve_url = $c->uri_for('/admin/confirm_user', $new_user->u_id())->absolute;
+    my $approve_url = $c->uri_for( $local_url, 'admin/confirm_user', $new_user->u_id())->absolute();
 
     my $email_body = <<"END_BODY";
 A new user has been registred. Please check the information
@@ -383,12 +382,11 @@ sub send_role_request {
     my ( $c, $role ) = @_;
 
     my $mm_config = $c->stash->{mm_config};
-    my $base_url = $mm_config->get('BASE_PART_OF_EXTERNAL_URL');
     my $local_url = $mm_config->get('LOCAL_URL');
 
     # Normally uri_for will return relative URI's when Plugin::SmartURI is loaded,
     # so we must explicitly ask for the absolute URI.
-    my $approve_url = $c->uri_for('/admin/confirm_role', $role, $c->user()->u_loginname() )->absolute;
+    my $approve_url = $c->uri_for( $local_url, 'admin/confirm_role', $role, $c->user()->u_loginname() )->absolute();
 
     my $email_body = <<"END_BODY";
 A user has requested a new role. Please check the information
