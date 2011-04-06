@@ -2,11 +2,7 @@
 
 [% INCLUDE search/keep_search_params.tt category_type = 'none' category_id = 'none' %]
 
-<p>
-The catalogue contains information about datasets as well as references to
-actual data which are available through a THREDDS Data Server. Always remember
-to cite data providers when using data. It is good practise to contact the PI
-listed for each dataset prior to using it.
-</p>
+
+[% app.search.presentation_html %]
 
 </form>
