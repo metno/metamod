@@ -673,18 +673,16 @@ sub _updateExtraSearch {
     # extra searches need ISO representation
     my $isoFds;
     my %info = $ds->getInfo();
-    if ($info{status} eq 'active') {
-        # convert to ISO19115 by reading original format from disk
-        my $fds = Metamod::ForeignDataset->newFromFileAutocomplete($inputBaseFile);
-        eval {
-            my %options;
-            if ($config->get('PMH_REPOSITORY_IDENTIFIER')) {
-                $options{REPOSITORY_IDENTIFIER} = $config->get('PMH_REPOSITORY_IDENTIFIER');
-            }
-            $isoFds = foreignDataset2iso19115($fds, \%options);
-        }; if ($@) {
-            $logger->warn("problems converting to iso19115 of $info{name}: $@\n");
+    # convert to ISO19115 by reading original format from disk
+    my $fds = Metamod::ForeignDataset->newFromFileAutocomplete($inputBaseFile);
+    eval {
+        my %options;
+        if ($config->get('PMH_REPOSITORY_IDENTIFIER')) {
+            $options{REPOSITORY_IDENTIFIER} = $config->get('PMH_REPOSITORY_IDENTIFIER');
         }
+        $isoFds = foreignDataset2iso19115($fds, \%options);
+    }; if ($@) {
+        $logger->warn("problems converting to iso19115 of $info{name}: $@\n");
     }
     _updateSru2Jdbc($dbh, $ds, $dsid, $inputBaseFile, $isoFds);
     _updateOAIPMH($dbh, $ds, $dsid, $inputBaseFile, $isoFds);
@@ -702,9 +700,11 @@ sub _updateOAIPMH {
     # get the new identifier
     my $newIdentifier;
     if ($config->get('PMH_SYNCHRONIZE_ISO_IDENTIFIER')) {
-        my $xpc = XML::LibXML::XPathContext->new();
-        $xpc->registerNs('gmd', 'http://www.isotc211.org/2005/gmd');
-        $newIdentifier = scalar _get_text_from_doc($isoFds->getMETA_DOC(), '/gmd:MD_Metadata/gmd:fileIdentifier', $xpc);
+        if ($isoFds) {
+            my $xpc = XML::LibXML::XPathContext->new();
+            $xpc->registerNs('gmd', 'http://www.isotc211.org/2005/gmd');
+            $newIdentifier = scalar _get_text_from_doc($isoFds->getMETA_DOC(), '/gmd:MD_Metadata/gmd:fileIdentifier', $xpc);
+        }
     } else {
         my $pmhIdentifier = $config->get('PMH_REPOSITORY_IDENTIFIER');
         my %info = $ds->getInfo();
