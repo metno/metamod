@@ -83,6 +83,9 @@ access the data repository.
 
 =back
 
+B<Note:> SEARCH and UPLOAD are now integrated with Catalyst and will always be installed (however
+you are free not to start it).
+
 =head2 Directory structure
 
 On each server where METAMOD should run, the generic METAMOD software must be available in some directory.
@@ -238,6 +241,9 @@ in the application. For this purpose, the following variables are used:
 If any of these variables are missing, the corresponding module will not be part
 of the application. The value of these variables should be the absolute path of the subdirectory
 in the generic source directory where the module is defined (i.e. the module directory).
+
+B<Note:> SEARCH and UPLOAD are now integrated with Catalyst and will always be installed (however
+you are free not to start it).
 
 A complete inventory of the variables that should be part of the master_config.txt file is found
 in the C<app/example/master_config.txt> file in the generic source directory.
@@ -408,7 +414,10 @@ this variable in C<master_config.txt>.
 After the initial configuration has been completed, a number of scripts must be run before the
 application is up and running. As these scripts will create files and directories that also are used
 by the Apache runtime environment, it is important that
-I<the user running these scripts is the same as the user running Apache>.
+I<the user running these scripts is the same as the user running Apache>. 
+[This is probably in error. You must run update_target with write permissions to both source and target.]
+
+=head3 Generating target files
 
 The first script should be run from the generic source directory. It will set up the target directory
 and do some preparatory work:
@@ -433,21 +442,44 @@ the B<Source file modification> paragraph above.
 
 =item *
 
-Install the Perl Catalyst framework onto the target directory. more text ...
+Install the Perl Catalyst framework onto the target directory. This is done
+automatically by Module::Install using the Makefile.PL specified, building
+into the blib directory (which is why you need write permission to the source
+dir).
 
 =item *
 
-Create an Apache configuration file for the application. more text ...
+Create an Apache configuration file for the application. This is done by get_httpd_conf.pl,
+which creates a file target/etc/httpd.conf with the necessary configuration.
+
+=item *
+
+Create init.d scripts for automatic starting and stopping of Catalyst and the various METAMOD
+services.
 
 =back
 
-After a successful run of the C<update_target.pl> script, the following script must be run from the
-target directory:
+=head3 Creating the webrun
 
-   prepare_runtime_env.sh
+After a successful run of the C<update_target.pl> script, the following script
+must be run from the target directory as APPLICATION_USER:
+
+	./prepare_runtime_env.sh
 
 This script will initialize a runtime directory used by the application for logging, temporary
 files etc.
+
+=head3 Installing services
+
+After installation, you should now install the application services where the
+operating system can find it. Currently only Debian-based Linux systems are
+supported. The following scripts will generate symlinks in /etc for Apache and
+init.d pointing back to the target directory, as well as a small script for running
+metamodInit.sh. You will need sudo permissions to successfully run the script.
+
+	./install_jobs.sh
+
+=head3 Initializing the BASE module
 
 At this point, the deployment of the application is complete for all instances not using the BASE
 module. For an application using the BASE module, a few steps remains:
@@ -467,7 +499,7 @@ script once for a PostgreSQL database environment.
 The first SQL database initialization script will create the Meta database. This script must be run
 from the C<init> subdirectory of the target directory:
 
-   create_and_load_all.sh
+	./create_and_load_all.sh
 
 This script will create the database, and load the static content of the database (taken from
 C<staticdata/searchdata.xml>). You may check the output of this script in the
@@ -476,7 +508,7 @@ C<create_and_load_all.out> file in the same C<init> directory.
 The next SQL database initialization script will create the User database. This script must be run
 from the C<userinit> subdirectory of the target directory:
 
-   run_createuserdb.sh
+	./run_createuserdb.sh
 
 Note that I<this script must only be used during setup of a completely new METAMOD cluster>. If a
 User database already exists, all data in the database will be lost. If this should happen, you must
@@ -489,3 +521,41 @@ used on an existing installation, without harming existing data. The C<create_an
 will take some time to complete, though. On an existing installation, all metadata in the database
 will be loaded from the XML archive.
 
+=head2 Starting METAMOD
+
+=head3 Catalyst daemon
+
+Start Catalyst by running
+
+	sudo /etc/init.d/catalyst-APPLICATION_ID start
+
+Then check if METAMOD is responding (usually on port 3000, use server name if not running locally):
+
+	http://localhost:3000/
+
+If all set you should see the METAMOD search interface.
+
+=head3 Apache
+
+Restart Apache:
+
+	sudo apache2ctl restart
+
+or if the site is busy:
+
+	sudo apache2ctl graceful
+
+which will wait until all connections are terminated before restarting.
+
+The site should now hopefully be available on 
+
+	http://localhost/APPLICATION_ID
+	
+
+=head3 METAMOD services
+
+Start METAMOD:
+
+	sudo /etc/init.d//metamodServices-APPLICATION_ID start
+
+This should start the required services daemons.
