@@ -1,17 +1,15 @@
 #!/bin/sh
-
 #
 #  Set up links to import directories:
 #
-   if [ '[==METAMODBASE_DIRECTORY==]' != '' ]; then
-      for path in `cat <<EOF
+if [ '[==METAMODBASE_DIRECTORY==]' != '' ]; then
+   for path in `cat <<EOF
 [==IMPORTDIRS==]
 EOF
 `
-      do
-         ln -s $path [==TARGET_DIRECTORY==]/htdocs/adm
-      done
-   fi
+   do
+      ln -s $path [==TARGET_DIRECTORY==]/htdocs/adm
+   done
 fi
 #
 #  Initialise webrun directory:
@@ -23,33 +21,22 @@ if [ '[==WEBRUN_DIRECTORY==]' = '' ]; then
    exit
 fi
 mkdir -p [==WEBRUN_DIRECTORY==]
-if [ -d [==TARGET_DIRECTORY==]/htdocs/upl ]; then
-   mkdir -p [==WEBRUN_DIRECTORY==]/u0
-   mkdir -p [==WEBRUN_DIRECTORY==]/u1
-   mkdir -p [==WEBRUN_DIRECTORY==]/u2
+if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" ]; then
    mkdir -p [==WEBRUN_DIRECTORY==]/upl
    mkdir -p [==WEBRUN_DIRECTORY==]/upl/problemfiles
    mkdir -p [==WEBRUN_DIRECTORY==]/upl/uerr
    mkdir -p [==WEBRUN_DIRECTORY==]/upl/ftaf
    mkdir -p [==WEBRUN_DIRECTORY==]/upl/etaf
-   cd [==TARGET_DIRECTORY==]/htdocs/upl
-   rm -f uerr
-   ln -s [==WEBRUN_DIRECTORY==]/upl/uerr
    if [ ! -f [==WEBRUN_DIRECTORY==]/ftp_events ]; then
       cat >[==WEBRUN_DIRECTORY==]/ftp_events <<EOF
 [==FTP_EVENTS_INITIAL_CONTENT==]
 EOF
    fi
-fi
-if [ -d [==TARGET_DIRECTORY==]/htdocs/upl -o -d [==TARGET_DIRECTORY==]/htdocs/qst ]; then
 #
 #  Initialise XML directory:
 #
    mkdir -p [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
    mkdir -p [==WEBRUN_DIRECTORY==]/XML/history
-fi
-#
-if [ -d [==TARGET_DIRECTORY==]/htdocs/upl ]; then
 #
 #  Initialize upload and OPeNDAP directories:
 #
@@ -57,7 +44,7 @@ if [ -d [==TARGET_DIRECTORY==]/htdocs/upl ]; then
    if [ '[==UPLOAD_FTP_DIRECTORY==]' != '' ]; then mkdir -p [==UPLOAD_FTP_DIRECTORY==]; fi
    if [ '[==OPENDAP_DIRECTORY==]' != '' ]; then
       mkdir -p [==OPENDAP_DIRECTORY==]
-      if [ ! -f [==OPENDAP_DIRECTORY==]/.htaccess ]; then
+      if [ -w [==OPENDAP_DIRECTORY==] -a ! -f [==OPENDAP_DIRECTORY==]/.htaccess ]; then
          cat >[==OPENDAP_DIRECTORY==]/.htaccess <<EOF
 Order Deny,Allow
 Deny from all
