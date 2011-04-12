@@ -2,6 +2,7 @@
 
 use FindBin;
 use lib "$FindBin::Bin/../../common/lib";
+use lib "$FindBin::Bin/../lib";
 
 use strict;
 use warnings;
