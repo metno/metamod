@@ -99,6 +99,7 @@
             [% SET md_content = search_ui_utils.remove_hidden_flag( md_content )%]
         [% END %]
         [% IF metadata_name != 'dataref' %]
+            [% SET md_content = search_ui_utils.urls_to_links( md_content ) %]
             <td class="sub_result">[% md_content.join('<br />') %]</td>
         [% END %]
     [%END %]

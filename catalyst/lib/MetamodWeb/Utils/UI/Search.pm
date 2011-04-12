@@ -1011,6 +1011,47 @@ sub remove_hidden_flag {
     return \@without_flag;
 }
 
+=head2 $self->urls_to_links($md_content)
+
+Replace text URLs in the content with HTML links.
+
+=over
+
+=item $md_content
+
+A reference to a list of md_content values.
+
+=item return
+
+A reference to a list of md_content values where the URLs have been replaced
+with HTML links.
+
+=back
+
+=cut
+
+sub urls_to_links {
+    my ($self, $md_content) = @_;
+
+
+    # insert spaces brackets around urls
+    foreach my $content (@$md_content){
+
+        # insert spaces brackets around urls
+        $content =~ s/\(((https?|ftp|irc|mailto):\S+)\)([.,;]?(\s|$))/($1 )$3/g;
+
+        # make long (>20 chars) urls short  and clickable
+        $content =~ s/(((https?|ftp|irc|mailto):\S{20})\S+)/<a href="$1" target="_new">$2...<\/a> /g;
+
+        # make short (<=20chars) urls clickable
+        $content =~ s/((https?|ftp|irc|mailto):\S{1,20})(\s|$)/<a href="$1" target="_new">$1<\/a> /g;
+
+    }
+
+    return $md_content;
+
+}
+
 =head2 $self->dataset_in_userbase($ds)
 
 Check wether a level 1 dataset is found in the user base or not.
