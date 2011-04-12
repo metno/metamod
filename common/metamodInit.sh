@@ -87,7 +87,7 @@ start() {
    fi
    if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/prepare_download.pl ]; then
       if ! running $prepare_download_pid; then
-         start_daemon -n 10 -p $prepare_download_pid $target_directory/scripts/prepare_download.pl $system_log $prepare_download_pid
+         start_daemon -n 10 -p $prepare_download_pid $target_directory/scripts/prepare_download.pl -log $system_log -pid $prepare_download_pid $target_directory/master_config.txt
          if [ $? -ne 0 ]; then
             echo "prepare_download failed: $?"
             return $?;
