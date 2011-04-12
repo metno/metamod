@@ -162,7 +162,7 @@ status() {
       fi
    fi
    if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/prepare_download.pl ]; then
-      if running $prepare_download; then
+      if running $prepare_download_pid; then
          echo "prepare_download running"
       else
          echo "prepare_download not running"
