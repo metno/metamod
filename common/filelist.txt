@@ -7,6 +7,8 @@ etc/default/catalyst-myapp
 =htdocs/funcs/mmConfig.inc
 =htdocs/funcs/mmDataset.inc
 =htdocs/funcs/mmOAIPMH.inc
+=htdocs/funcs/mmLogging.inc
+=htdocs/funcs/mmTtime.inc
 =scripts/chk_conf.pl
 =scripts/gen_httpd_conf.pl
 =scripts/prepare_download.pl
