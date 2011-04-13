@@ -4,6 +4,9 @@ install_jobs.sh
 logger_config.ini
 etc/init.d/metamod-catalyst
 etc/default/catalyst-myapp
+=funcs/htdocs/mmConfig.inc
+=funcs/htdocs/mmDataset.inc
+=funcs/htdocs/mmOAIPMH.inc
 =scripts/chk_conf.pl
 =scripts/gen_httpd_conf.pl
 =scripts/prepare_download.pl
