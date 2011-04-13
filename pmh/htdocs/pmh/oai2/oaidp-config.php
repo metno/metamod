@@ -442,7 +442,7 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
       );
    }
 
-   $query = "SELECT DataSet.DS_id, ".$SQL['identifier'].", DS_status, DS_datestamp, DS_creationDate, DS_ownertag, DS_metadataFormat FROM DataSet,OAIInfo WHERE " .
+   $query = "SELECT DataSet.DS_id, DS_name, DS_status, DS_datestamp, DS_creationDate, DS_ownertag, DS_metadataFormat, ".$SQL['identifier']." FROM DataSet,OAIInfo WHERE " .
      	      "Dataset.DS_id = OAIInfo.DS_id AND DS_parent = 0 AND DS_status <= 2 AND DS_ownertag IN (".$mmConfig->getVar('PMH_EXPORT_TAGS').") ";
    if ($id != '') {
       $query .= "AND " . $SQL['identifier'] . " = '$id' ";
@@ -469,7 +469,7 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
             $rowarr = pg_fetch_row($result1,$i1);
             $dsid = $rowarr[0];
             $dsids[$i1] = $dsid;
-            $allresults[$dsid][$SQL['identifier']] = $rowarr[1];
+            $allresults[$dsid]['DS_name'] = $rowarr[1];
             if ($rowarr[2] == 1) {
                $allresults[$dsid]['DS_status'] = 'false';
             } else {
@@ -482,6 +482,7 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
             $allresults[$dsid]['DS_creationDate'] = substr($rowarr[4], 0, 10);
             $allresults[$dsid]['DS_ownertag'] = $rowarr[5];
 				$allresults[$dsid]['DS_metadataFormat'] = $rowarr[6];
+            $allresults[$dsid][$SQL['identifier']] = $rowarr[7];
             $allresults[$dsid]['DS_set'] = '';
          }
          $mtnames = array();
