@@ -84,14 +84,17 @@ my $conf_text = <<EOT;
     Allow from all
 </Proxy>
 
+# static doesn't work due to the way custom files is implemented in metamod 2.8
+#ProxyPass           $local/static   !
+
 ProxyPass           $local/pmh      !
-ProxyPass           $local/static   !
 ProxyPass           $local/upl      !
 
-ProxyPass           $local/         http://127.0.0.1:$port
-ProxyPassReverse    $local/         http://127.0.0.1:$port
+ProxyPass           $local/         http://127.0.0.1:$port/
+ProxyPassReverse    $local/         http://127.0.0.1:$port/
 
-Redirect seeother   $local          $base$local/
+# broken - generates infinite redirect loop
+#Redirect seeother   $local          $base$local/
 
 # -----------
 # Plain Apache settings
@@ -100,7 +103,7 @@ Redirect seeother   $local          $base$local/
 Alias               $local/pmh      $target/htdocs/pmh
 
 # static files should be served directly from Apache
-Alias               $local/static   $paths{root}/static
+#Alias               $local/static   $paths{root}/static
 
 # ditto for error reports (which has a hardcoded url)
 Alias               $local/upl/uerr $webrun/upl/uerr
