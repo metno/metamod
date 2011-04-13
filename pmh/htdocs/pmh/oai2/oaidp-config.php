@@ -469,7 +469,7 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
             $rowarr = pg_fetch_row($result1,$i1);
             $dsid = $rowarr[0];
             $dsids[$i1] = $dsid;
-            $allresults[$dsid]['DS_name'] = $rowarr[1];
+            $allresults[$dsid][$SQL['identifier']] = $rowarr[1];
             if ($rowarr[2] == 1) {
                $allresults[$dsid]['DS_status'] = 'false';
             } else {
