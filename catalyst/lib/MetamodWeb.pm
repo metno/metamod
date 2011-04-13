@@ -140,6 +140,7 @@ be different between development and deployment.
 =back
 
 =cut
+
 sub path_to_custom {
 
     if( $FindBin::Bin =~ qw!(.+)/(catalyst/script|bin|catalyst/t.*)$! ){
