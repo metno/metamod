@@ -13,7 +13,7 @@ use Metamod::Dataset;
 use encoding 'utf-8';
 use MetNo::NcFind;
 use quadtreeuse;
-use Data::Dump qw(dump);
+# use Data::Dump qw(dump);
 use Data::Dumper;
 use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
 use Metamod::Config;
