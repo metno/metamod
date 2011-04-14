@@ -2,12 +2,6 @@
 Things to do in Catalyst version of Metamod
 -------------------------------------------
 
-* fix styles chooser in new version of openlayers
-
-* generate install script for httpd.conf and init.d scripts
-
-* better error page for unauthorized access
-
 * modify xml validator to use xml catalogs (not possible with XML::LibXML::Schema?)
 
 * security filters for appid/ownertag?
@@ -25,6 +19,12 @@ Things to do in Catalyst version of Metamod
 
     DONE
 ------------------------------------------
+
+* better error page for unauthorized access
+
+* fix styles chooser in new version of openlayers
+
+* generate install script for httpd.conf and init.d scripts
 
 * move default text strings out of master_config
 
