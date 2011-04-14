@@ -26,7 +26,7 @@
         <td><input id="dskey" name="dskey" value="[% dataset.dskey %]" size="10"> (max 10 characters)</td>
     </tr>
 
-    [% IF mm_config.get('EXTERNAL_REPOSITORY') # used for osisaf et al %]
+    [% IF mm_config.get('EXTERNAL_REPOSITORY') == "true" # used for osisaf et al %]
     <tr>
         <td><label for="location">Dataset location:</label></td>
         <td><input id="location" name="location" value="[% dataset.location %]" size="60"> (absolute directory path)</td>

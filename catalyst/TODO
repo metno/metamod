@@ -2,6 +2,10 @@
 Things to do in Catalyst version of Metamod
 -------------------------------------------
 
+* more descriptive error msg on upload
+  invalid filename -> file name must start with "dir_" where dir is the destination directory
+  DBIx::Class::ResultSet::create(): DBI Exception: DBD::Pg::st execute failed: ERROR: null value in column "i_content" violates not-null constraint [for Statement "INSERT INTO infods ( ds_id, i_content, i_type) VALUES ( ?, ?, ? ) RETURNING i_id" with ParamValues: 1='16', 2=undef, 3='CATALOG'] 
+
 * modify xml validator to use xml catalogs (not possible with XML::LibXML::Schema?)
 
 * security filters for appid/ownertag?
