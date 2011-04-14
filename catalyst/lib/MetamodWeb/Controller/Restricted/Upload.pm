@@ -188,7 +188,7 @@ sub test_POST  {
 
             $upload->copy_to("$updir/ftaf/$fn") or die $!;
             open(my $etaf, '>', "$updir/etaf/$fn") or die $!;
-            print $etaf $c->user->u_email . "\n";
+            printf $etaf "%s %s\n", $c->user->u_email, $c->user->u_name;
             close $etaf;
             $data = sprintf "File $fn (%s bytes) uploaded successfully. Test report will be sent on e-mail.", $upload->size;
         }
