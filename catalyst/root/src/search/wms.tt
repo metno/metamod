@@ -103,7 +103,7 @@
 
                 wmcParser = new OpenLayers.Format.WMC();
                 try {
-                    map = wmcParser.read( wmsContext, { map: 'map' } );
+                    map = wmcParser.read( wmsContext, { map: {div: 'map', controls: [] } } );
                 } catch (error) {
                     alert("Invalid GetMapContext:\n" + error + "\n" + response.responseText);
                     //return 0;
