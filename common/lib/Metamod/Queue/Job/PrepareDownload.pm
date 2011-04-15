@@ -123,7 +123,7 @@ sub prepare_download {
     my $now = time;
     my $zip_filename = $email . '_' . $now . '.zip';
     my $zip_destination = File::Spec->catfile( $download_area, $zip_filename );
-    my $zip_url = $config->get('BASE_PART_OF_EXTERNAL_URL') . $config->get('LOCAL_URL') . 'download/' . $zip_filename;
+    my $zip_url = $config->get('BASE_PART_OF_EXTERNAL_URL') . $config->get('LOCAL_URL') . '/download/' . $zip_filename;
 
     if ( $zip->writeToFileNamed($zip_destination) != AZ_OK ) {
         $self->error_msg("Failed to write zip file to '$zip_destination'");
