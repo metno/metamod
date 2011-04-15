@@ -20,12 +20,12 @@
 * | Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA         |
 * |                                                                      |
 * +----------------------------------------------------------------------+
-* | Derived from work by U. Mï¿½ller, HUB Berlin, 2002                     |
+* | Derived from work by U. Müller, HUB Berlin, 2002                     |
 * |                                                                      |
 * | Written by Heinrich Stamerjohanns, May 2002                          |
 * |            stamer@uni-oldenburg.de                                   |
 * |                                                                      |
-* | Adapted to METAMOD2 by Egil Stï¿½ren, August 2008                      |
+* | Adapted to METAMOD2 by Egil Støren, August 2008                      |
 * |            egil.storen@met.no                                        |
 * +----------------------------------------------------------------------+
 */
@@ -378,7 +378,7 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
          '', 'Data_Set_Citation Version', 'Not Available', '',
          '', '*Personnel Role', 'Technical Contact', '',
          '', 'Personnel First_Name', 'Egil', '',
-         '', 'Personnel Last_Name', 'Stï¿½ren', '',
+         '', 'Personnel Last_Name', 'Støren', '',
          '', 'Personnel Email', 'Not Available', '',
          '', 'Personnel Phone', '+4722963000', '',
          '', 'Personnel Contact_Address Address', "Norwegian Meteorological Institute\nP.O. Box 43\nBlindern",'',
@@ -418,7 +418,7 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
          '', 'Data_Center Data_Center_URL', 'http://met.no/','',
          '', 'Data_Center Personnel Role', 'Data Center Contact','',
          '', 'Data_Center Personnel First_Name', 'Egil','',
-         '', 'Data_Center Personnel Last_Name', 'Stï¿½ren','',
+         '', 'Data_Center Personnel Last_Name', 'Støren','',
          '', 'Data_Center Personnel Phone', '+4722963000','',
          '', 'Data_Center Personnel Contact_Address Address', "Norwegian Meteorological Institute\nP.O. Box 43\nBlindern",'',
          '', 'Data_Center Personnel Contact_Address City', 'Oslo','',
