@@ -240,6 +240,7 @@ sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 cd $basedir
 # stop metamod if it is still running
 target/metamodInit.sh stop
+/etc/init.d/catalyst-$idstring stop
 rm -rf target/*
 rm -rf webrun/*
 rm -rf webupload/*
