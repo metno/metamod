@@ -15,7 +15,7 @@
     <input type="submit" value="Request download" />
 </form>
 
-<form name="search_form" id="search_form" method="GET" action="/search/collectionbasket/remove_selected">
+<form name="search_form" id="search_form" method="GET" action="[% c.uri_for('/search/collectionbasket/remove_selected' ) %]">
     [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
 
     <br />
@@ -66,7 +66,7 @@
 [% ELSE %]
 
 [%# the form is needed since many the search criteria links are dependant upon it %]
-<form name="search_form" id="search_form" method="GET" action="/search/collectionbasket/remove_selected">
+<form name="search_form" id="search_form" method="GET" action="[% c.uri_for( '/search/collectionbasket/remove_selected' ) %]">
     [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
 </form>
     There are no files in the basket.
