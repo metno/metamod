@@ -24,6 +24,7 @@ use Moose;
 use namespace::autoclean;
 use MetamodWeb::Utils::AdminUtils;
 use MetamodWeb::Utils::FormValidator;
+use Metamod::ForeignDataset;
 
 BEGIN { extends 'MetamodWeb::BaseController::Base'; }
 
@@ -163,8 +164,14 @@ sub editxml_POST  { # update existing xml files
         );
     } else {
         # store files
-        $c->stash->{admin_utils}->write_file("$base.xml", $c->req->params->{xmlContent});
-        $c->stash->{admin_utils}->write_file("$base.xmd", $c->req->params->{xmdContent});
+        eval {
+            my $fds = Metamod::ForeignDataset->newFromDoc($c->req->params->{xmlContent}, $c->req->params->{xmdContent});
+            $fds->writeToFile($base);
+            $self->logger->info('Change metadata in file '.$base);
+        }; if ($@) {
+            # TODO: error should be returned to user instead
+            $self->logger->error('Cannot change metadata in file '.$base . ': '.$@);
+        }
         $c->response->redirect( $c->uri_for('/admin/editxml', $c->stash->{path}) );
     }
 }
