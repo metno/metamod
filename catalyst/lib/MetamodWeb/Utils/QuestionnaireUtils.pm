@@ -467,7 +467,7 @@ sub _save_metadata {
     my $datestamp = DateTime->from_epoch( epoch => time(), time_zone => 'local' );
 
     my %info = $dataset->getInfo();
-    $info{datestamp} = $datestamp->strftime('%Y-%m-%dT%H:%M:%S%z');
+    $info{datestamp} = $datestamp->strftime('%Y-%m-%dT%H:%M:%SZ');
     $info{metadataFormat} = 'MM2';
     $info{ownertag} = $ownertag;
 
@@ -500,7 +500,7 @@ sub _save_metadata {
     }
 
     # the creation data can only be set the first time and cannot be updated later
-    $info{creationDate} = $info{datestamp} = $datestamp->strftime('%Y-%m-%dT%H:%M:%S%z') if !exists $info{creationDate};
+    $info{creationDate} = $info{datestamp} = $datestamp->strftime('%Y-%m-%dT%H:%M:%SZ') if !exists $info{creationDate};
 
     if( exists $metadata->{wms_info}){
         my $wms_info = delete $metadata->{wms_info};
