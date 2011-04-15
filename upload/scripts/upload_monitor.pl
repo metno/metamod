@@ -1019,7 +1019,7 @@ sub process_files {
             }
         } else {
             mkpath($destination_dir);
-            logger->info("Created directory " . $destination_dir);
+            $logger->info("Created directory " . $destination_dir);
         }
         foreach my $fname (@uploaded_files) {
             push( @digest_input, $fname );
@@ -1146,7 +1146,7 @@ sub process_files {
                     }
                 }
             }
-            logger->info("Upload_monitor has moved " . $movecount . " files for dataset " . 
+            $logger->info("Upload_monitor has moved " . $movecount . " files for dataset " . 
                           $dataset_name . " to the data repository");
         }
         my $url_to_errors_html = "";
