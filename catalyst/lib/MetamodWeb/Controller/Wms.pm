@@ -101,8 +101,8 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
 
     } elsif ( $$p{getcap} ) {
         # fetch GetCapabilites directly (for files w/o setup docs)
-        printf STDERR "Fetching GetCap at %s...\n", $$p{getcap};
-        printf STDERR " * URL = %s\n", $c->request->uri;
+        $self->logger->debug("Fetching GetCap at " . $$p{getcap});
+        #printf STDERR " * URL = %s\n", $c->request->uri;
         $wms = $$p{getcap};
         $setup = defaultWMC();
         #printf STDERR "Default WMC = \n%s\n", $setup->toString;
@@ -110,7 +110,7 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
 
     my $wmc = eval { $c->stash->{wmc}->setup2wmc($setup, $wms) };
     if ($@) {
-        printf STDERR "setup2wmc failed: %s\n", $@;
+        $self->logger->warn("setup2wmc failed: $@");
         error($c, 502, $@);
     } else {
         my $out = $wmc->toString;
@@ -148,7 +148,7 @@ sub qtips :Path("/qtips") :Args(0) {
             push @params, $dom->tag($_, $$p{$_});
         }
     }
-    print STDERR $c->request->query_keywords || '-' . "\n";
+    #print STDERR $c->request->query_keywords || '-' . "\n";
 
     $dom->setDocumentElement(
         $dom->tag('request', \@params )

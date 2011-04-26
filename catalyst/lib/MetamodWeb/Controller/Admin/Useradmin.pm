@@ -104,7 +104,7 @@ sub edituser_POST  { # update existing user
             $cols{$_} = $$p{$_};
         }
     }
-    print STDERR Dumper \%roles, \%cols;
+    #print STDERR Dumper \%roles, \%cols;
     $c->stash->{u}->merge_roles(\%roles);
 
     try {

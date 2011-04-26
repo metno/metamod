@@ -112,7 +112,7 @@ sub xml :Chained("ds_id") :PathPart("xml") :Args(0) {
 
     if( $@ ){
         $self->logger->error("Error in dataset xml output: $@");
-        print STDERR ("Error in dataset xml output: $@\n");
+        #print STDERR ("Error in dataset xml output: $@\n");
         $c->detach( 'Root', 'default' );
     }
 
@@ -152,7 +152,7 @@ sub wmssetup :Chained("ds_id") :PathPart("wmssetup") :Args(0) {
 
     if( $@ ){
         $self->logger->error("Error in dataset (missing wmsinfo?): $@");
-        print STDERR "Error in dataset (missing wmsinfo?): $@\n";
+        #print STDERR "Error in dataset (missing wmsinfo?): $@\n";
         $c->detach( 'Root', 'default' );
     }
 

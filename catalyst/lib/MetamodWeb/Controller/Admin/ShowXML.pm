@@ -117,11 +117,11 @@ sub editxml_GET { # show editor for xml files
     my $admin_utils = $c->stash->{admin_utils};
     my $base = $c->stash->{xmldir} . "/" . $c->stash->{path};
 
-    print STDERR "Checking XMD file...\n";
+    $self->logger->debug("Checking XMD file...");
     my $xmd = $admin_utils->read_file("$base.xmd");
     my $xmdvalid = $admin_utils->validate($xmd, "$schema/dataset.xsd");
 
-    print STDERR "Checking XML file...\n";
+    $self->logger->debug("Checking XML file...");
     my $xml = $admin_utils->read_file("$base.xml");
     my $xmlvalid = $admin_utils->validate($xml, "$schema/MM2.xsd");
 
