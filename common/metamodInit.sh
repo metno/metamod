@@ -3,6 +3,8 @@ webrun_directory="[==WEBRUN_DIRECTORY==]"
 target_directory="[==TARGET_DIRECTORY==]"
 system_log="[==LOG4ALL_SYSTEM_LOG==]"
 
+export PERL5LIB="$PERL5LIB:[==CATALYST_LIB==]"
+
 upload_monitor_pid=$webrun_directory/upload_monitor.pid
 import_dataset_pid=$webrun_directory/import_dataset.pid
 prepare_download_pid=$webrun_directory/prepare_download.pid
