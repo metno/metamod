@@ -133,24 +133,35 @@ __PACKAGE__->setup();
 Determine the absolute path to the Metamod root directory. This directory will
 be different between development and deployment.
 
-=over
+=cut
 
-=item return
+sub path_to_metamod_root {
 
-=back
+    if( $FindBin::Bin =~ qw!(.+)/(catalyst/script|bin|catalyst/t.*)$! ){
+        return $1;
+    }
+
+    die "Could not determine the absolute path from $FindBin::Bin to the METAMOD root directory.";
+
+}
+
+=head2 path_to_custom()
+
+Determine the absolute path to the custom directory under Metamod root (see over).
 
 =cut
 
 sub path_to_custom {
 
-    if( $FindBin::Bin =~ qw!(.+)/(catalyst/script|bin|catalyst/t.*)$! ){
-        return "$1/custom";
-    }
+    my $root = eval path_to_metamod_root();
 
-    my $msg = "Could not determine the absolute path from $FindBin::Bin to the metamod root directory.";
-    $msg .= "Custom styles will probably not work";
-    get_logger('MetamodWeb')->error($msg);
-    return "/none-existant-dir/dummy";
+    if ($@) {
+        my $msg = "$@ Custom styles will probably not work";
+        get_logger('MetamodWeb')->error($msg);
+        return "/none-existant-dir/dummy"; # [how about returning undef instead? -ga]
+    } else {
+        return "$root/custom";
+    }
 
 }
 

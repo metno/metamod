@@ -236,14 +236,18 @@ sub quest_configuration {
 
     my $quest_config = $self->config()->get('QUEST_CONFIGURATIONS');
 
+    my $root = MetamodWeb::path_to_metamod_root(); #$self->config->get('TARGET_DIRECTORY');
+    $root .= "/quest" unless $root eq $self->config->get('TARGET_DIRECTORY');
+    #printf STDERR "** root = %s | target = %s\n", $root, $self->config->get('TARGET_DIRECTORY');
+
     my %quest_configurations = (
         'metadata' => {
-        config_file => File::Spec->catfile($self->config->get('TARGET_DIRECTORY'), 'etc', 'qst', 'metadata_quest.json' ),
+        config_file => File::Spec->catfile($root, 'etc', 'qst', 'metadata_quest.json' ),
         title       => 'Metadata editor',
         tag         => $self->config->get('QUEST_OWNERTAG'),
         },
         'wms_and_projection' => {
-        config_file => File::Spec->catfile($self->config->get('TARGET_DIRECTORY'), 'etc', 'qst', 'wms_and_projection.json' ),
+        config_file => File::Spec->catfile($root, 'etc', 'qst', 'wms_and_projection.json' ),
         title       => 'WMS and projection setup',
         tag         => $self->config->get('QUEST_OWNERTAG'),
         }
