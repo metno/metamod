@@ -21,6 +21,12 @@ if [ '[==WEBRUN_DIRECTORY==]' = '' ]; then
    exit
 fi
 mkdir -p [==WEBRUN_DIRECTORY==]
+
+#
+# Initialise the collection basket download directory
+#
+mkdir -p [==WEBRUN_DIRECTORY==]/download
+
 if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" ]; then
    mkdir -p [==WEBRUN_DIRECTORY==]/upl
    mkdir -p [==WEBRUN_DIRECTORY==]/upl/problemfiles
