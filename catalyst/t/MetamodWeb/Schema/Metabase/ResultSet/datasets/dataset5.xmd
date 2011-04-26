@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset xmlns="http://www.met.no/schema/metamod/dataset"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.met.no/schema/metamod/dataset https://wiki.met.no/_media/metamod/dataset.xsd">
+    <info name="TEST/dataset5" status="deleted" creationDate="2009-03-23T23:02:07Z"
+        datestamp="2009-03-23T23:02:07Z" ownertag="TEST" metadataFormat="MM2" />
+</dataset>
