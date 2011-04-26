@@ -130,16 +130,21 @@ The complete pathname to the file
 
 Data string to be written
 
+=item $charset
+
+I<(Optional)> Write file using specified encoding (using Perl-specific names, e.g. 'UTF-8')
+
 =back
 
 =cut
 
 sub write_file {
-    my ($self, $file, $content) = @_;
+    my ($self, $file, $content, $charset) = @_;
 
     #printf STDERR "Opening file %s for writing...\n", $file;
     croak "No permission to write file '$file'" unless -w $file;
     open FH, ">", "$file._" or croak("Couldn't write to disk");
+    binmode FH, ":encoding($charset)" if $charset;
     print FH $content;
     close(FH) && rename("$file._", $file);
 }
