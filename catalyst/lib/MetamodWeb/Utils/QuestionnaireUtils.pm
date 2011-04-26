@@ -415,7 +415,7 @@ sub save_dataset_metadata {
 
     my ( $config_id, $userbase_ds_id, $metadata ) = @_;
 
-    my ($dataset_path, $dataset_name) = $self->dataset_path($userbase_ds_id);
+    my ($dataset_path, $metabase_ds_name) = $self->dataset_path($userbase_ds_id);
 
     if ( !$dataset_path ) {
         return;
@@ -423,7 +423,7 @@ sub save_dataset_metadata {
 
     my $config = $self->config_for_id($config_id);
     my $ownertag = $config->{tag};
-    return $self->_save_metadata($metadata, $dataset_path, $ownertag);
+    return $self->_save_metadata($metadata, $dataset_path, $ownertag, $metabase_ds_name );
 
 }
 
@@ -445,6 +445,11 @@ The path on disk where the metadata should be stored.
 
 The ownertag that should be used for metadata.
 
+=item $metabase_ds_name (optional)
+
+The ds name as found in the metabase. This is only relevant for datasets and
+not anonymous metadata not tied to a specific dataset.
+
 =item return
 
 =back
@@ -454,7 +459,7 @@ The ownertag that should be used for metadata.
 sub _save_metadata {
     my $self = shift;
 
-    my ($metadata, $dataset_path, $ownertag) = @_;
+    my ($metadata, $dataset_path, $ownertag, $metabase_ds_name) = @_;
 
     my (undef, $containing_dir, undef) = File::Spec->splitpath($dataset_path);
     if( !(-w $containing_dir)){
@@ -481,22 +486,26 @@ sub _save_metadata {
     #    outside of the dataset administration interface.
     #
     if( exists $metadata->{name} ){
-        my $dataset_name = delete $metadata->{name};
+        my $new_dataset_name = delete $metadata->{name};
         my $applic_id = $self->config->get('APPLICATION_ID');
-        if( defined $dataset_name ){
-            $dataset_name = $dataset_name;
+        if( defined $new_dataset_name ){
 
             # remove potential applic_id
-            if( $dataset_name =~ /$applic_id\/(.*)$/ ){
-                $dataset_name = $1;
+            if( $new_dataset_name =~ /$applic_id\/(.*)$/ ){
+                $new_dataset_name = $1;
             }
 
         } else {
             # make a crappy random dataset name.
-            $dataset_name = int(rand(1_000_000))
+            $new_dataset_name = int(rand(1_000_000))
         }
-        $dataset_name = $applic_id . '/' . $dataset_name;
-        $info{name} = $dataset_name;
+        $new_dataset_name = $applic_id . '/' . $new_dataset_name;
+        $info{name} = $new_dataset_name;
+    }
+
+    # we don't have dataset name so we use the one provided
+    if( (!exists $info{name} || $info{name} eq '/') && defined $metabase_ds_name ){
+        $info{name} = $metabase_ds_name;
     }
 
     # the creation data can only be set the first time and cannot be updated later
