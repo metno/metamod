@@ -51,7 +51,7 @@ sub validate_datafile {
     my $self = shift;
     my $filename = shift or die "Missing filename";
 
-    return $1 if $filename =~ /^([a-zA-Z0-9]+)_[a-zA-Z0-9_\-]+\.([a-zA-Z]+)/;
+    return $1 if $filename =~ /^([a-zA-Z0-9\-]+)_[a-zA-Z0-9_\-]+\.([a-zA-Z]+)/;
     return; # false
 
 }
