@@ -170,7 +170,10 @@ sub editxml_POST  { # update existing xml files
             $self->logger->info('Change metadata in file '.$base);
         }; if ($@) {
             # TODO: error should be returned to user instead
-            $self->logger->error('Cannot change metadata in file '.$base . ': '.$@);
+            $self->add_error_msgs( $c, "Cannot change metadata in file $base: " . error_from_exception($@) );
+            $self->logger->error("Cannot change metadata in file $base: ".$@);
+        } else {
+            $self->add_info_msgs( $c, "Files saved successfully <timestamp>");
         }
         $c->response->redirect( $c->uri_for('/admin/editxml', $c->stash->{path}) );
     }

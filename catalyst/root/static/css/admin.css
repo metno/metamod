@@ -20,3 +20,17 @@ table.list tr td {
     padding: 3px 8px 4px 8px;
     border-bottom: solid 1px #AAAAFF;
 }
+
+div.info_msg {
+    border: 1px solid #0b5a00;
+    padding: 5px 5px 5px 5px;
+    margin: 5px 5px 5px 5px;
+    background-color: #cdfbc7;
+}
+
+div.error_msg {
+        border: 1px solid #ff1212;
+    padding: 5px 5px 5px 5px;
+    margin: 5px 5px 5px 5px;
+        background-color: #ffd7d7;
+}

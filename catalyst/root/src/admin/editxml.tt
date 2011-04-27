@@ -2,6 +2,8 @@
 
 <h2><a href="[% c.uri_for("./") %]">XML directory</a> - [% path %]</h2>
 
+[% INCLUDE user_msgs.tt %]
+
 <form class="editxml" method="post">
 
     <div>
