@@ -70,12 +70,14 @@ $VERSION = eval $VERSION;
 my $mm_config = Metamod::Config->new();
 $mm_config->initLogger();
 
+my $custdir = path_to_custom();
+
 my %default_config = (
     disable_component_resolution_regex_fallback => 1,
 
     'View::TT' => {
         INCLUDE_PATH => [
-            path_to_custom() . "/templates",
+            $custdir ? "$custdir/templates" : undef,
             __PACKAGE__->path_to( 'root', 'src' ),
         ],
         TEMPLATE_EXTENSION => '.tt',
@@ -139,9 +141,11 @@ sub path_to_metamod_root {
 
     if( $FindBin::Bin =~ qw!(.+)/(catalyst/script|bin|catalyst/t.*)$! ){
         return $1;
+    } else {
+        get_logger('MetamodWeb')->error("Could not determine the absolute path from $FindBin::Bin to the METAMOD root directory.");
+        return;
     }
 
-    die "Could not determine the absolute path from $FindBin::Bin to the METAMOD root directory.";
 
 }
 
@@ -153,15 +157,12 @@ Determine the absolute path to the custom directory under Metamod root (see over
 
 sub path_to_custom {
 
-    my $root = eval path_to_metamod_root();
-
-    if ($@) {
-        my $msg = "$@ Custom styles will probably not work";
-        get_logger('MetamodWeb')->error($msg);
-        return "/none-existant-dir/dummy"; # [how about returning undef instead? -ga]
-    } else {
+    if ( my $root = path_to_metamod_root() ) {
         return "$root/custom";
     }
+
+    get_logger('MetamodWeb')->error("$@ Custom styles will probably not work");
+    return;
 
 }
 
