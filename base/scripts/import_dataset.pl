@@ -714,8 +714,8 @@ sub _updateOAIPMH {
         if ($newIdentifier) {
             if ($newIdentifier ne $currentIdentifier) {
                 $logger->warn("changing oai-identifier from $currentIdentifier to $newIdentifier");
-                $dbh->prepare_cached('UPDATE OAIInfo SET OAI_identifier = ? WHERE DS_id = ?');
-                $dbh->execute($newIdentifier, $dsid);
+                my $sth = $dbh->prepare_cached('UPDATE OAIInfo SET OAI_identifier = ? WHERE DS_id = ?');
+                $sth->execute($newIdentifier, $dsid);
             }
         }
     } else {
