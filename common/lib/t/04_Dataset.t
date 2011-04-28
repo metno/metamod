@@ -105,8 +105,8 @@ $testFD->setWMSInfo($wmsInfo); # throw exception
 ok(1, 'adding WMSInfo'); # made it here
 $testFD->setProjectionInfo($projectionInfo); # throw exception
 ok(1, 'adding ProjectionInfo'); # made it here
-ok($wmsInfo eq $testFD->getWMSInfo(), 'wmsInfo unchanged');
-ok($projectionInfo eq $testFD->getProjectionInfo(), 'projectionInfo unchanged');
+ok( $testFD->getWMSInfo() =~ /$wmsInfo$/s, 'wmsInfo unchanged' );
+ok( $testFD->getProjectionInfo() =~ /$projectionInfo$/s, 'projectionInfo unchanged');
 
 my $region = new Metamod::DatasetRegion();
 $region->addPoint([0, 0]);
