@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://www.met.no/schema/metamod/ncWmsSetup" 
+        targetNamespace="http://www.met.no/schema/metamod/ncWmsSetup"
         xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup"
         elementFormDefault="qualified"
         attributeFormDefault="unqualified">
-                
+
     <!-- root element -->
     <element name='ncWmsSetup' type="w:NcWmsSetup" />
     <!-- embedded elements -->
     <element name='displayArea' type="w:DisplayArea" />
     <element name='layer' type="w:Layer" />
- 
+
     <complexType name='NcWmsSetup'>
         <sequence>
             <element ref='w:displayArea' minOccurs='0' maxOccurs='1'/>
             <element ref='w:layer' minOccurs='0' maxOccurs="unbounded"/>
         </sequence>
-        <attribute name="url" type="anyURI" use="required"/>
+        <attribute name="url" type="string" use="required"/>
     </complexType>
-    
+
     <complexType name='DisplayArea'>
         <attribute name="crs" type="string" use="required"/>
         <attribute name="left" type="double" use="optional"/>
@@ -30,6 +30,6 @@
         <attribute name="name" type="string" use="required"/>
         <attribute name="style" type="string" use="optional"/>
     </complexType>
-    
-    
+
+
 </schema>
