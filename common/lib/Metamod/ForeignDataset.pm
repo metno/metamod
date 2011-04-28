@@ -75,7 +75,7 @@ sub _decode {
 sub newFromDoc {
     my ($class, $metaXML, $xmdXML, %options) = @_;
     unless ($metaXML) {
-        $logger->logconfess("no metadata"); 
+        $logger->logconfess("no metadata");
     }
     my $parser = Metamod::DatasetTransformer->XMLParser;
     unless ($xmdXML) {
@@ -107,7 +107,7 @@ sub newFromFileAutocomplete {
         if ($transformer) {
             $logger->debug('autocompleting file with '.ref($transformer));
             my ($xmdDoc, $metaDoc) = $transformer->transform();
-            $retVal = $class->newFromDoc($metaXML, $xmdDoc, %options);            
+            $retVal = $class->newFromDoc($metaXML, $xmdDoc, %options);
         } else {
             $logger->error('cannot read/autocomplete file: '.$basename);
         }
@@ -133,7 +133,7 @@ sub _initSelf {
     if ($infoNodeList->size() != 1) {
         $logger->error_die("could not find /d:dataset/d:info in xmd ". $self->{docXMD}->toString);
     }
-               
+
     return bless $self, $class;
 }
 
@@ -157,7 +157,7 @@ sub writeToFile {
     $self->{docMETA}->toFH($xmlF, 1);
     close $xmlF;
     close $xmdF;
-    
+
     return 1;
 }
 
@@ -281,7 +281,7 @@ sub _getLastNodeBefore {
             if (@lastNodesBefore) {
                 return $lastNodesBefore[-1];
             }
-        } 
+        }
     }
     return undef;
 }
@@ -320,49 +320,42 @@ sub setQuadtree {
 }
 
 sub getWMSInfo {
-	my ($self) = @_;
-	my $retVal;
-	my ($node) = $self->{xpath}->findnodes('/d:dataset/d:wmsInfo', $self->{docXMD});
-	if ($node) {
-		$retVal = "";
-		foreach my $child ($node->childNodes) {
-			$retVal .= $child->toString();
-		}
-	}
-    return $retVal;
+    my ($self) = @_;
+    my ($node) = $self->{xpath}->findnodes('/d:dataset/d:wmsInfo/*[1]', $self->{docXMD}) or return;
+    my $doc = XML::LibXML->createDocument( "1.0", "UTF-8" );
+    $doc->setDocumentElement( $node->cloneNode(1) );
+    #printf STDERR "***************\n%s***************\n", $doc->toString;
+    return $doc->toString;
 }
 
 sub setWMSInfo {
-	my ($self, $content) = @_;
-	my $oldContent = $self->getWMSInfo;
+    my ($self, $content) = @_;
+    my $oldContent = $self->getWMSInfo;
     foreach my $node ($self->{xpath}->findnodes('/d:dataset/d:wmsInfo', $self->{docXMD})) {
-        # remove old value
-        $node->parentNode->removeChild($node);
+	# remove old value
+	$node->parentNode->removeChild($node);
     }
-	if ($content) {
-		# create node with new content
-		my $el = $self->{docXMD}->createElementNS($self->NAMESPACE_DS, 'wmsInfo');
-		my $parser = Metamod::DatasetTransformer->XMLParser;
-		my $contentDoc = $parser->parse_string($content);
-		$el->appendChild($contentDoc->documentElement);
-		
-		# add content to doc, before optional projectionInfo 
+    if ($content) {
+	# create node with new content
+	my $el = $self->{docXMD}->createElementNS($self->NAMESPACE_DS, 'wmsInfo');
+	my $parser = Metamod::DatasetTransformer->XMLParser;
+	my $contentDoc = $parser->parse_string($content);
+	$el->appendChild($contentDoc->documentElement);
+
+	# add content to doc, before optional projectionInfo
         $self->{docXMD}->documentElement->insertAfter($el, $self->_getLastNodeBefore('d:wmsInfo'));
-	}
-	return $oldContent;
+    }
+    return $oldContent;
 }
 
 sub getProjectionInfo {
     my ($self) = @_;
     my $retVal;
-    my ($node) = $self->{xpath}->findnodes('/d:dataset/d:projectionInfo', $self->{docXMD});
-    if ($node) {
-        $retVal = "";
-        foreach my $child ($node->childNodes) {
-            $retVal .= $child->toString();
-        }
-    }
-    return $retVal;	
+    my ($node) = $self->{xpath}->findnodes('/d:dataset/d:projectionInfo/*[1]', $self->{docXMD});
+    my $doc = XML::LibXML->createDocument( "1.0", "UTF-8" );
+    $doc->setDocumentElement( $node->cloneNode(1) );
+    #printf STDERR "***************\n%s***************\n", $doc->toString;
+    return $doc->toString;
 }
 
 sub setProjectionInfo {
@@ -378,17 +371,17 @@ sub setProjectionInfo {
         my $parser = Metamod::DatasetTransformer->XMLParser;
         my $contentDoc = $parser->parse_string($content);
         $el->appendChild($contentDoc->documentElement);
-        
+
         # add element to doc
         $self->{docXMD}->documentElement->insertAfter($el, $self->_getLastNodeBefore('d:projectionInfo'));
     }
-    return $oldContent;	
+    return $oldContent;
 }
 
 sub getDatasetRegion {
     my ($self) = @_;
     my ($node) = $self->{xpath}->findnodes('/d:dataset/r:datasetRegion', $self->{docXMD});
-    return new Metamod::DatasetRegion($node); 
+    return new Metamod::DatasetRegion($node);
 }
 
 sub deleteDatasetRegion {
@@ -398,7 +391,7 @@ sub deleteDatasetRegion {
         # remove old value
         $node->parentNode->removeChild($node);
     }
-    return $oldRegion;    
+    return $oldRegion;
 }
 
 sub setDatasetRegion {
@@ -456,13 +449,13 @@ Metamod::ForeignDataset - working with Metamod datasets without known Metadata
 =head1 SYNOPSIS
 
   use Metamod::ForeignDataset;
-  
+
   # create a new dataset/mm2
   $ds = new Metamod::ForeignDataset('<DIF></DIF>');
   %info = ('name' => 'NEW/Name',
               'ownertag' => 'DAM');
   $ds->setInfo(\%info);
-  
+
   # read an existing dataset from $basename.xml and $basename.xmd
   $ds = newFromFile Metamod::ForeignDataset($basename);
   %info = $ds->getInfo;
@@ -530,7 +523,7 @@ Dies on missing xml-file, or on invalid xml-strings in xml or xmd files.
 =item newFromFileAutocomplete($basename)
 
 Read a dataset from a file. If only a .xml file is given without .xml file,
-try to autdetect the DatasetTransformer plugin and let it generate the xmd information. 
+try to autdetect the DatasetTransformer plugin and let it generate the xmd information.
 
 =item writeToFile($basename)
 
@@ -540,7 +533,7 @@ overwrite an existing file! Dies on error.
 =item deleteDatasetFile($basename)
 
 delete the files belonging to the dataset $basename (.xml and .xmd).
-Return false on failure, true on success. 
+Return false on failure, true on success.
 This is a class rather than a object-method.
 
 =item getXMD_XML
@@ -585,7 +578,7 @@ Return: undef
 =item getParentName
 
 The dataset-name can consist on 2 or 3 parts: project/parentname/filename or project/filename
-In the first case, this method will return project/parentname in the second case undef. 
+In the first case, this method will return project/parentname in the second case undef.
 
 =item originalFormat()
 
@@ -649,4 +642,3 @@ Heiko Klein, E<lt>H.Klein@met.noE<gt>
 L<XML::LibXML>, L<Metamod::Dataset>
 
 =cut
-
