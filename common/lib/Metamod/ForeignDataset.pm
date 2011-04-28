@@ -351,7 +351,7 @@ sub setWMSInfo {
 sub getProjectionInfo {
     my ($self) = @_;
     my $retVal;
-    my ($node) = $self->{xpath}->findnodes('/d:dataset/d:projectionInfo/*[1]', $self->{docXMD});
+    my ($node) = $self->{xpath}->findnodes('/d:dataset/d:projectionInfo/*[1]', $self->{docXMD}) or return;
     my $doc = XML::LibXML->createDocument( "1.0", "UTF-8" );
     $doc->setDocumentElement( $node->cloneNode(1) );
     #printf STDERR "***************\n%s***************\n", $doc->toString;
