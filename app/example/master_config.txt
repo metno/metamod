@@ -61,7 +61,7 @@ LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
 
 # ============== Catalyst configuration =================
 # lib for Catalyst etc
-CATALYST_LIB = /opt/metno-catalyst-dependencies-ver1
+CATALYST_LIB = /opt/metno-perl-webdev-ver1/lib/perl5
 
 # port used by the Catalyst server
 CATALYST_PORT = 3000
