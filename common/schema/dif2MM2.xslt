@@ -33,7 +33,7 @@ along with METAMOD; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 -->
 
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 xmlns:dif="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/"
 version="1.0">
     <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
@@ -45,10 +45,10 @@ version="1.0">
         <xsl:element name="MM2" xmlns="http://www.met.no/schema/metamod/MM2">
             <xsl:attribute name="schemaLocation" namespace="http://www.w3.org/2001/XMLSchema-instance">http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd</xsl:attribute>
             <xsl:apply-templates select="*" />
-        </xsl:element>    
+        </xsl:element>
     </xsl:template>
-    
-    
+
+
     <xsl:template match="*">
         <!-- Handling items not specified otherwise, just use full xpath (without /dif:Dif) as beginning -->
         <xsl:choose>
@@ -61,9 +61,9 @@ version="1.0">
                     <xsl:value-of select="." />
                 </xsl:element>
             </xsl:otherwise>
-        </xsl:choose>        
+        </xsl:choose>
     </xsl:template>
-    
+
     <xsl:template match="*" mode="buildRecursivePath">
         <xsl:if test="local-name() != 'DIF'"><xsl:apply-templates select=".." mode="buildRecursivePath" />dif:<xsl:value-of select="name()"/>/</xsl:if>
     </xsl:template>
@@ -105,13 +105,13 @@ version="1.0">
     <xsl:template match="dif:Parameters">
         <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
             <xsl:attribute name="name">variable</xsl:attribute>
-            <xsl:value-of select="dif:Topic" /> &gt; <xsl:value-of select="dif:Term" /><xsl:if test="dif:Variable_Level_1"> &gt; <xsl:value-of select="dif:Variable_Level_1" /></xsl:if><xsl:if test="dif:Variable_Level_2"> &gt; <xsl:value-of select="dif:Variable_Level_2" /></xsl:if><xsl:if test="dif:Variable_Level_3"> &gt; <xsl:value-of select="dif:Variable_Level_3" /></xsl:if> &gt; HIDDEN
-        </xsl:element>        
+            <xsl:value-of select="dif:Topic" /> &gt; <xsl:value-of select="dif:Term" /><xsl:if test="dif:Variable_Level_1/*"> &gt; <xsl:value-of select="dif:Variable_Level_1" /></xsl:if><xsl:if test="dif:Variable_Level_2/*"> &gt; <xsl:value-of select="dif:Variable_Level_2" /></xsl:if><xsl:if test="dif:Variable_Level_3/*"> &gt; <xsl:value-of select="dif:Variable_Level_3" /></xsl:if> &gt; HIDDEN
+        </xsl:element>
 		<xsl:if test="dif:Detailed_Variable">
         	<xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
             	<xsl:attribute name="name">variable</xsl:attribute>
            		<xsl:value-of select="dif:Detailed_Variable" />
-        	</xsl:element>        
+        	</xsl:element>
 		</xsl:if>
     </xsl:template>
 
