@@ -104,6 +104,7 @@ PG_CONNECTSTRING_PERL = ;host=[==PG_HOST==];port=[==PG_PORT==]
 
 # Directory for PostgreSQL contrib libs
 PG_CONTRIB = /usr/share/postgresql/8.4/contrib
+# for lucid; change to 8.3 for hardy
 
 # the location of the initialization sql-script for the full-text facilities
 PG_TSEARCH2_SCRIPT = [==PG_CONTRIB==]/tsearch2.sql
@@ -211,7 +212,7 @@ LONLAT_SRID = 4035
 FIMEX_PROGRAM = fimex
 
 # ============ WMS configuration =======================
-# The WMS server URL to send the WMC page to
+# The WMS server URL to send the WMC page to [NOTE: this is probably no longer in use? -ga]
 WMS_URL = http://wms.met.no/wmcConfig?wmcDoc=
 
 # URL to background map server delivering coastlines and reticules
