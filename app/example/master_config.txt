@@ -103,6 +103,7 @@ PG_CONNECTSTRING_PHP = host=[==PG_HOST==] port=[==PG_PORT==]
 PG_CONNECTSTRING_PERL = ;host=[==PG_HOST==];port=[==PG_PORT==]
 
 # Directory for PostgreSQL contrib libs
+# i.e. tsearch2.sql, pgcrypto.sql and lwpostgis.sql
 PG_CONTRIB = /usr/share/postgresql/8.4/contrib
 # for lucid; change to 8.3 for hardy
 
@@ -278,13 +279,11 @@ DEFAULT_FONTSIZE = 80
 # and to the testlog file:
 DEBUG = 0
 
-# METAMOD is the owner of the data repository. It will monitor
-# directories where data providers can upload netCDF files, and
-# move the files from there into the data repository. While doing
-# this, METAMOD will extract metadata for the XML Metadata
-# repository, and check the files and eventually report to the
-# user any errors or missing metadata encountered. This is the
-# normal mode.
+# If EXTERNAL_REPOSITORY = false, METAMOD is the owner of the data repository
+# (normal mode). Data will be uploaded through web-frontend or ftp and METAMOD
+# will move data to its repository. Otherwise, METAMOD will only get information
+# about new data in the external repository and harvest metadata there, without
+# moving any data.
 EXTERNAL_REPOSITORY = false
 
 # In this case, METAMOD has no responsibilty for moving netCDF
