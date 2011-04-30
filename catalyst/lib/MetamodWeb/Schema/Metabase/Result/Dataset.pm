@@ -300,9 +300,9 @@ sub wmsinfo {
     $url =~ s|%DATASET%|$dataset|;
     $url =~ s|%DATASET_PARENT%|$parent|;
     if ($url =~ m|%THREDDS_DATAREF%|) {
-        $metadata = $self->metadata(['dataref']);
+        my $metadata = $self->metadata(['dataref']);
         if (exists $metadata->{dataref}) {
-            $threddsDataref = $metadata->{dataref}[0];
+            my $threddsDataref = $metadata->{dataref}[0];
             # translate url like
             # http://osisaf.met.no/thredds/catalog/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/catalog.html?dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
             # to
