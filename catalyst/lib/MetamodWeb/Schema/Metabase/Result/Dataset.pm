@@ -299,6 +299,22 @@ sub wmsinfo {
     #printf STDERR " *** %s\n", join '|', ($tag, $parent, $dataset);
     $url =~ s|%DATASET%|$dataset|;
     $url =~ s|%DATASET_PARENT%|$parent|;
+    if ($url =~ m|%THREDDS_DATAREF%|) {
+        $metadata = $self->metadata(['dataref']);
+        if (exists $metadata->{dataref}) {
+            $threddsDataref = $metadata->{dataref}[0];
+            # translate url like
+            # http://osisaf.met.no/thredds/catalog/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/catalog.html?dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
+            # to
+            # http://osisaf.met.no/thredds/wms/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/05/ice_drift_nh_polstere-625_amsr-aqua_201005291200-201005311200.nc.gz
+            #                          dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
+            $threddsDataref =~ s:(.*/thredds)/catalog/.*\?dataset=(.*):$1/wms/$2":;
+            $url =~ s|%THREDDS_DATAREF%|$threddsDataref|;
+        } else {
+            # TODO: some logging
+        }
+    }
+
     $dom->documentElement->setAttribute('url', $url);
     #printf STDERR " ******** WMSINFO: %s\n", $wmsinfo_row->wi_content();
 
