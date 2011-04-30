@@ -34,7 +34,7 @@ APPLICATION_USER=[==APPLICATION_USER==]
 if [ $APPLICATION_USER ]; then
 	cat > /tmp/metamodServices-[==APPLICATION_ID==] <<- EOT
 		#! /bin/sh
-		su -c "[==TARGET_DIRECTORY==]/metamodInit.sh $*" -s /bin/sh $APPLICATION_USER
+		su -c "[==TARGET_DIRECTORY==]/metamodInit.sh \$*" -s /bin/sh $APPLICATION_USER
 	EOT
 	# make sure the tabs above are not replaced with spaces (or the script will break)
 	sudo mv /tmp/metamodServices-[==APPLICATION_ID==] /etc/init.d/; ordie
