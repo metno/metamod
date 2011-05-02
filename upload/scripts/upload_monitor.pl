@@ -998,28 +998,24 @@ sub process_files {
         @uploaded_basenames = &get_basenames( \@uploaded_files );
         $destination_dir = File::Spec->catdir( $opendap_directory, $dataset_institution{$dataset_name}->{'institution'},
             $dataset_name );
-        my @reprocess_basenames = ();
-        if (-e $destination_dir and -d $destination_dir) {
-            my @existing_files = findFiles( $destination_dir, eval 'sub {$_[0] =~ /\Q$dataset_name\E_/o;}' );
-            if ( length($shell_command_error) > 0 ) {
-                &syserrorm( "SYS", "find_fails_2", "", "process_files", "" );
-                return;
-            }
-            @existing_basenames = &get_basenames( \@existing_files );
-            my @reuploaded_basenames = &intersect( \@uploaded_basenames, \@existing_basenames );
-            $xmlpath = File::Spec->catfile( $webrun_directory, 'XML', $application_id, $dataset_name . '.xml' );
-            if ( scalar @reuploaded_basenames > 0 ) {
-    
-                #
-                #  Some of the new files have been uploaded before:
-                #
-                @reprocess_basenames =
-                    &revert_XML_history( $dataset_name, \@existing_basenames, \@reuploaded_basenames, \@uploaded_basenames,
-                    $xmlpath );
-            }
-        } else {
-            mkpath($destination_dir);
+        if (! -e $destination_dir) {
+            mkpath($destination_dir) or $logger->error("unable to mkdir $destination_dir");
             $logger->info("Created directory " . $destination_dir);
+        }
+        my @existing_files = findFiles( $destination_dir, eval 'sub {$_[0] =~ /\Q$dataset_name\E_/o;}' );
+        if ( length($shell_command_error) > 0 ) {
+            &syserrorm( "SYS", "find_fails_2", "", "process_files", "" );
+            return;
+        }
+        @existing_basenames = &get_basenames( \@existing_files );
+        my @reuploaded_basenames = &intersect( \@uploaded_basenames, \@existing_basenames );
+        my @reprocess_basenames = ();
+        $xmlpath = File::Spec->catfile( $webrun_directory, 'XML', $application_id, $dataset_name . '.xml' );
+        if ( scalar @reuploaded_basenames > 0 ) {
+            #  Some of the new files have been uploaded before:
+            @reprocess_basenames =
+                &revert_XML_history( $dataset_name, \@existing_basenames, \@reuploaded_basenames, \@uploaded_basenames,
+                $xmlpath );
         }
         foreach my $fname (@uploaded_files) {
             push( @digest_input, $fname );
@@ -1146,7 +1142,7 @@ sub process_files {
                     }
                 }
             }
-            $logger->info("Upload_monitor has moved " . $movecount . " files for dataset " . 
+            $logger->info("Upload_monitor has moved " . $movecount . " files for dataset " .
                           $dataset_name . " to the data repository");
         }
         my $url_to_errors_html = "";
