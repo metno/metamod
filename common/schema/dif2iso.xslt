@@ -448,7 +448,7 @@ l#MD_KeywordTypeCode" codeListValue="theme">theme</gmd:MD_KeywordTypeCode>
                   <xsl:when test="translate(./child::text(), $uc, $lc) = 'boundaries'">
                     <xsl:text>boundaries</xsl:text>
                   </xsl:when>
-                  <xsl:when test="translate(./child::text(), $uc, $lc) = 'climatology/meteorology/atmosphere'">
+                  <xsl:when test="translate(translate(./child::text(), $uc, $lc), '/', '') = 'climatologymeteorologyatmosphere'">
                     <xsl:text>climatologyMeteorologyAtmosphere</xsl:text>
                   </xsl:when>
                   <xsl:when test="translate(./child::text(), $uc, $lc) = 'economy'">
@@ -466,10 +466,10 @@ l#MD_KeywordTypeCode" codeListValue="theme">theme</gmd:MD_KeywordTypeCode>
                   <xsl:when test="translate(./child::text(), $uc, $lc) = 'health'">
                     <xsl:text>health</xsl:text>
                   </xsl:when>
-                  <xsl:when test="translate(./child::text(), $uc, $lc) = 'imagery/base maps/earth cover'">
+                  <xsl:when test="translate(translate(./child::text(), $uc, $lc), '/', '') = 'imagerybase mapsearth cover'">
                     <xsl:text>imageryBaseMapsEarthCover</xsl:text>
                   </xsl:when>
-                  <xsl:when test="translate(./child::text(), $uc, $lc) = 'intelligence/military'">
+                  <xsl:when test="translate(translate(./child::text(), $uc, $lc), '/', '') = 'intelligencemilitary'">
                     <xsl:text>intelligenceMilitary</xsl:text>
                   </xsl:when>
                   <xsl:when test="translate(./child::text(), $uc, $lc) = 'inland waters'">
@@ -493,7 +493,7 @@ l#MD_KeywordTypeCode" codeListValue="theme">theme</gmd:MD_KeywordTypeCode>
                   <xsl:when test="translate(./child::text(), $uc, $lc) = 'transportation'">
                     <xsl:text>transportation</xsl:text>
                   </xsl:when>
-                  <xsl:when test="translate(./child::text(), $uc, $lc) = 'utilities/communications'">
+                  <xsl:when test="translate(translate(./child::text(), $uc, $lc), '/', '') = 'utilitiescommunications'">
                     <xsl:text>utilitiesCommunication</xsl:text>
                   </xsl:when>
                 </xsl:choose>
