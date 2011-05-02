@@ -421,6 +421,18 @@ QUEST_RECIPIENTS = [==OPERATOR_EMAIL==]
 # Top directory for the file administration utility:
 QUEST_ADM_TOPDIR = [==WEBRUN_DIRECTORY==]/XML
 
+#
+# Configuration of additional metadata editors. You can have as many editors
+# a you like. Each line is used for the definition of an additional editor.
+#
+# The format for each line is a follows.
+# <editor id> <path to editor configuration file in json format> <dataset tag>
+#
+# The URL to each editor is editor/<editor id>
+#
+#QUEST_CONFIGURATIONS =
+# expedition [==TARGET_DIRECTORY==]/qst/expedition.json NOT_IMPORT
+
 
 # ============ Metamod HARVEST configuration
 OAI_HARVEST_VALIDATION_SCHEMA = [==TARGET_DIRECTORY==]/schema/OAI-PMH.xsd
