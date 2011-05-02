@@ -213,9 +213,6 @@ LONLAT_SRID = 4035
 FIMEX_PROGRAM = fimex
 
 # ============ WMS configuration =======================
-# The WMS server URL to send the WMC page to [NOTE: this is probably no longer in use? -ga]
-WMS_URL = http://wms.met.no/wmcConfig?wmcDoc=
-
 # URL to background map server delivering coastlines and reticules
 WMS_BACKGROUND_MAPSERVER = http://wms.met.no/maps/
 
