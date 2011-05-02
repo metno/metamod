@@ -470,6 +470,12 @@ sub _save_metadata {
 
     my $dataset = $self->load_dataset($dataset_path);
 
+    # As the metadata form may not necessarily contain all metadata we need to add
+    # all the current metadata to the metadata to save.
+    my %current_metadata = $dataset->getMetadata();
+    my %merged_metadata = ( %current_metadata, %$metadata );
+    $metadata = \%merged_metadata;
+
     # use a DateTime object to get the timezone correct
     my $datestamp = DateTime->from_epoch( epoch => time(), time_zone => 'local' );
 
