@@ -407,6 +407,7 @@ sub shcommand_scalar {
         #return undef;
     }
     if ($error) {
+        $logger->warn("unable to execute: $command");
         return;
     } else {
         return $result;
