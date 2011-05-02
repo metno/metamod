@@ -243,12 +243,10 @@ sub quest_configuration {
     my %quest_configurations = (
         'metadata' => {
         config_file => File::Spec->catfile($root, 'etc', 'qst', 'metadata_quest.json' ),
-        title       => 'Metadata editor',
         tag         => $self->config->get('QUEST_OWNERTAG'),
         },
         'wms_and_projection' => {
         config_file => File::Spec->catfile($root, 'etc', 'qst', 'wms_and_projection.json' ),
-        title       => 'WMS and projection setup',
         tag         => $self->config->get('QUEST_OWNERTAG'),
         }
     );
