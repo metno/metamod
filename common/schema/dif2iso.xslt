@@ -14,14 +14,13 @@
   <xsl:variable name="lc" select="'abcdefghijklmnopqrstuvwxyz'"/>
 
   <xsl:template match="dif:DIF">
-    <gmd:MD_Metadata xmlns:gco="http://www.isotc211.org/2005/gco"
-                     xmlns:gmd="http://www.isotc211.org/2005/gmd"
-                     xmlns:xlink="http://www.w3.org/1999/xlink"
-                     xmlns:gml="http://www.opengis.net/gml"
-                     xmlns:gmx="http://www.isotc211.org/2005/gmx"
-                     xmlns:gts="http://www.isotc211.org/2005/gts"
-                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                     xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://www.isotc211.org/2005/gmd/gmd.xsd">
+  <gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd"
+                   xmlns="http://www.isotc211.org/2005/gmd"
+                   xmlns:gco="http://www.isotc211.org/2005/gco"
+                   xmlns:gml="http://www.opengis.net/gml/3.2"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:gmi="http://www.isotc211.org/2005/gmi"
+                   xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://wis.wmo.int/2011/schemata/iso19139_2007/schema/gmd/gmd.xsd http://www.opengis.net/gml/3.2 http://wis.wmo.int/2011/schemata/iso19139_2007/schema/gml/gml.xsd">
 
       <!-- fileIdentifier -->
       <!-- Hack: WMO requires special identifier for data available in GTS -->
