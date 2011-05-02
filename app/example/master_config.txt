@@ -389,34 +389,16 @@ INSTITUTION_LIST =
 # (htdocs/qst/quest.php). Each having its own values for the
 # following macro variables:
 #
-#  QUEST_TITLE                Title for the questionnaire
-#  QUEST_FORM_DEFINITON_FILE  File defining the content of the form
 #  QUEST_OUTPUT_DIRECTORY     The directory (absolute path) where
 #                             XML output files should be written.
 #
 
 !substitute_to_file_with_new_name htdocs/qst/quest.php => htdocs/qst/fmmeta.php
-QUEST_FORM_DEFINITON_FILE = config/metamod2-meta-config.txt
 QUEST_OUTPUT_DIRECTORY = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
 !end_substitute_to_file_with_new_name
 
-# use this form for editing UPLOAD metadata by QUEST
-# make sure the output directory of the form
-# is set to one of the IMPORTDIRS
-QUEST_METADATA_UPLOAD_FORM = [==LOCAL_URL==]/qst/fmmeta.php
-
 # Ownertag used to tag all dataset entries sent to the database:
 QUEST_OWNERTAG = [==UPLOAD_OWNERTAG==]
-
-# Sender address to appear on E-mail sent from this application:
-QUEST_SENDER_ADDRESS = [==OPERATOR_EMAIL==]
-
-# Comma-separated list of E-mail addresses for administrator personell.
-# A summary of the filled in forms will be sent to these addresses:
-QUEST_RECIPIENTS = [==OPERATOR_EMAIL==]
-
-# Top directory for the file administration utility:
-QUEST_ADM_TOPDIR = [==WEBRUN_DIRECTORY==]/XML
 
 #
 # Configuration of additional metadata editors. You can have as many editors
