@@ -498,3 +498,8 @@ AUTH_TYPE = DB
 # A comma separated list of distribution statements that are interpreted as
 # freely available and can be downloaded via the collection basket.
 COLLECTION_BASKET_DIST_STATEMENTS = free, something else
+
+# The maximum number of bytes that are allowed in a collection basket download.
+# Used to restrict the load on the server. If this is not set the collection basket
+# will use a hard coded default value.
+#COLLECTION_BASKET_MAX_SIZE = 524288000
