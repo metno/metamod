@@ -26,10 +26,6 @@ VIRTUAL_HOST =
 # Initial part of local URLs:
 LOCAL_URL = /metamod
 
-# The administration web application is only accessible from the following
-# domain:
-ADMIN_DOMAIN = example.com
-
 # posix user for web stuff (in 2.7, only used for catalyst)
 # must be same as owner of webrun directory
 APPLICATION_USER = www-data
