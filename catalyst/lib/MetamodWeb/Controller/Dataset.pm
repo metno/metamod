@@ -104,10 +104,12 @@ sub xml :Chained("ds_id") :PathPart("xml") :Args(0) {
         my $ds_id = $c->stash->{ ds_id };
         my $meta_db = $c->model('Metabase');
         my $ds = $meta_db->resultset('Dataset')->find( $ds_id );
-        my $mmDs = Metamod::Dataset->newFromFile( $ds->ds_filepath() );
+        my $mmDs = Metamod::ForeignDataset->newFromFile( $ds->ds_filepath() );
 
         $c->response->content_type('text/xml');
-        $c->response->body( $mmDs->getMETA_XML() );
+        # return the document in utf encoding
+        $c->response->body( '<?xml version="1.0" encoding="UTF-8"?>'."\n"
+                            . $mmDs->getMETA_DOC()->documentElement()->toString(1) );
     };
 
     if( $@ ){
