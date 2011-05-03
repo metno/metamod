@@ -41,7 +41,6 @@ use MetamodWeb::Utils::GenCatalystConf;
 #                 directory
 
 use Catalyst qw/
-    -Debug
     ConfigLoader
     Static::Simple
     Authentication
