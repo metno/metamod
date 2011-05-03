@@ -497,4 +497,4 @@ AUTH_TYPE = DB
 
 # A comma separated list of distribution statements that are interpreted as
 # freely available and can be downloaded via the collection basket.
-#COLLECTION_BASKET_DIST_STATEMENTS = free, something else
+COLLECTION_BASKET_DIST_STATEMENTS = free, something else
