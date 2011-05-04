@@ -418,16 +418,43 @@ HARVEST_HOUR = 1
 
 
 # ============ Metamod OAI_PMH configuration
+# The content-type the WWW-server delivers back. For debug-puposes,
+# "text/plain" is easier to view. On a production site you should use
+# "text/xml".
 PMH_CONTENT_TYPE = text/xml
-PMH_REPOSITORY_NAME = TEST
+
+# If an unusual port number is used for the base URL, set the following to
+# a string like:
+#                     .':8080'
+# Othervise, leave this empty.
+PMH_PORT_NUMBER =
+
+# Repository name:
+PMH_REPOSITORY_NAME = Test
+
+# Earliest datastamp:
 PMH_EARLIEST_DATESTAMP = 1900-01-01
+
+# Repository Identifier
 PMH_REPOSITORY_IDENTIFIER = met.no-TEST
-# ============ make OAI-PMH identifier the same as ISO-identifier
+
+# ** make OAI-PMH identifier the same as ISO-identifier
 # i.e. oai:...:metamod/APP/file -> urn:...:APP_file
-PMH_SYNCHRONIZE_ISO_IDENTIFIER = 1
+# This is Perl-eval'ed, so use 1 for yes, 0 for no
+PMH_SYNCHRONIZE_ISO_IDENTIFIER = 0
+
+# Maximum mumber of the records to deliver. If there are more records to
+# deliver a ResumptionToken will be generated.
 PMH_MAXRECORDS = 1000
+
+# List of ownertags availabele for export:
 PMH_EXPORT_TAGS = [==DATASET_TAGS==]
+
+# The XML is validated before it is sent to the requester. Metadata
+# records that do not validate are marked as deleted. To turn this validation
+# off, set PMH_VALIDATION to off.
 PMH_VALIDATION = on
+
 # optional set configuration, one set per row ownertag|name|description
 # the ownertag needs to be one of the export-tags
 PMH_SETCONFIG =
