@@ -117,12 +117,19 @@ sub editxml_GET { # show editor for xml files
     my $admin_utils = $c->stash->{admin_utils};
     my $base = $c->stash->{xmldir} . "/" . $c->stash->{path};
 
+    $self->logger->debug("Reading XMD/XML file...");
+    my $ds = Metamod::ForeignDataset->newFromFile($base);
+
+    # get data in utf-8 representation
+    my $xmd = '<?xml version="1.0" encoding="UTF-8"?>'."\n".
+              $ds->getXMD_DOC()->documentElement()->toString(1);
+    my $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n".
+              $ds->getMETA_DOC()->documentElement()->toString(1);
+
     $self->logger->debug("Checking XMD file...");
-    my $xmd = $admin_utils->read_file("$base.xmd");
     my $xmdvalid = $admin_utils->validate($xmd, "$schema/dataset.xsd");
 
     $self->logger->debug("Checking XML file...");
-    my $xml = $admin_utils->read_file("$base.xml");
     my $xmlvalid = $admin_utils->validate($xml, "$schema/MM2.xsd");
 
     $c->stash(
