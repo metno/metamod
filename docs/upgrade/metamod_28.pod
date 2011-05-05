@@ -15,7 +15,12 @@ Upgrading is mostly the same as 2.6.
 
 All <sc id=“x” type=“x”…> have change to <sc id=“1” idname=“activity_types” type=“basickey”…> (named ids + named rather than numeric types), see app/example for names and types.
 
-Add dataset_file_location and dataset_file_size (see app/example).
+Add dataset_file_location and dataset_file_size (see app/example):
+
+  <mt name="data_file_location" share="FALSE"
+   def="The location of the dataset on disk. Only for level 2 datasets" />
+  <mt name="data_file_size" share="FALSE"
+   def="The size of the file in bytes. Only for level 2 datasets" />
 
 =back
 
@@ -79,11 +84,16 @@ See app/example for more information.
 
 =head3 Database
 
-Some minor changes to the metadata database. Suggested running ./init/createdb.sh
-to recreate tables and ./scripts/import_dataset.pl to repopulate.
+Some minor changes to the metadata database. Suggest recreating the database
+and reimporting the metadata files:
+
+  cd target/init
+  ./create_and_load_all.sh
 
 The userdatabase has been extensively modified, including support for login roles and
-SHA1-hashed passwords. Run ./userinit/upgradeuserdb_26-28.sh to upgrade.
+SHA1-hashed passwords. Upgrade by running this script:
+
+  target/userinit/upgradeuserdb_26-28.sh
 
 =head3 XML metadata files
 
