@@ -295,6 +295,26 @@ sub import {
     }
 }
 
+=head2 $self->getVarNames()
+
+=over
+
+=item return
+
+A list of all the variables names in the configuration file.
+
+=back
+
+=cut
+
+sub getVarNames {
+    my $self = shift;
+
+    $self->_checkFile();
+    return keys %{ $self->{vars} };
+
+}
+
 =head2 $self->getDSFilePath($ds_name)
 
 Get the file path to where the XML metadata files are stored on disk.
