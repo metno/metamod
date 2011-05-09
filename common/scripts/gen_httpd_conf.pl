@@ -123,10 +123,12 @@ Alias               $local/upl/uerr $webrun/upl/uerr
 EOT
 
 if ($virtualhost) {
+    my $serveralias = ( $virtualhost =~ /^([^.]+)/ ) ? "ServerAlias $1" : '';
     $conf_text = <<EOT2;
 <VirtualHost *>
 
 ServerName $virtualhost
+$serveralias
 ServerAdmin $operator_email
 $conf_text
 
