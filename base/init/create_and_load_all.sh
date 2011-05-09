@@ -15,8 +15,9 @@ exec >create_and_load_all.out 2>&1
 echo "------------ Reinitialize the database, create dynamic tables:"
 . ./createdb.sh
 echo ""
-echo "------------ Run cload scripts:"
+echo "------------ Importing searchdata:"
 ./import_searchdata.pl ../staticdata/searchdata.xml
+echo "------------ Importing datasets:"
 cat >t_1 <<EOF
 [==IMPORTDIRS==]
 EOF
