@@ -225,7 +225,7 @@ sub doWork {
     my $input;
     if ($self->inputURL) {
         $inputTemp = _downloadToTemp($self->inputURL, $self->outputDirectory);
-        $inut = $self-fileName();
+        $input = $self-fileName();
     } else {
         $input = $self->inputFile;
     }
