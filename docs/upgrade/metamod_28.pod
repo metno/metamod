@@ -70,6 +70,8 @@ concerns the following directives
 The following other directives are also no longer in use and should be removed:
 
     ADMIN_DOMAIN
+    ADMIN_WEBUSER
+    CATALINA_HOME
     CATALYST_SITE_CONFIG
     WMS_URL
     WMS_ONLINE_RESOURCE
