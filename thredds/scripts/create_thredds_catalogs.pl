@@ -286,7 +286,7 @@ sub inner_loop {
       }
       my $new_entry_count = 0;
       my $removed_entry_count = 0;
-      open (THREDDSCAT,">$thredds_catalog_path");
+      open (THREDDSCAT,">$thredds_catalog_path") or die "Could not open THREDDS catalog $thredds_catalog_path";
       flock (THREDDSCAT, LOCK_EX);
       $old_catalog_signature = $catalog_signature;
       $catalog_signature .= "dummy/dummy dummy";
