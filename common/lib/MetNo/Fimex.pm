@@ -221,9 +221,11 @@ Returns the fimex command, mostly for debugging reasons
 =cut
 sub doWork {
     my ($self) = @_;
+    my $inputTemp; # make sure the temporary file object survives the fimex-call
     my $input;
     if ($self->inputURL) {
-        $input = _downloadToTemp($self->inputURL, $self->outputDirectory);
+        $inputTemp = _downloadToTemp($self->inputURL, $self->outputDirectory);
+        $inut = $self-fileName();
     } else {
         $input = $self->inputFile;
     }

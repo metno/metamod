@@ -103,7 +103,11 @@ sub fimexDownload :Path('/search/fimexdownload') :Args(0) {
     # run fimex
     my $fimex = MetNo::Fimex->new();
     $fimex->program($config->get('FIMEX_PROGRAM'));
-    $fimex->inputURL($input);
+    if ($input =~ m^\s*(http://|ftp:)^) {
+        $fimex->inputURL($input);
+    } else {
+        $fimex->inputFile($input);
+    }
     my $projString = $fiProjection->getProjectionProperty($projection, 'projString');
     if ($projString) {
         $fimex->interpolateMethod($fiProjection->getProjectionProperty($projection, 'method'));
