@@ -281,12 +281,12 @@ sub _downloadToTemp {
     my $temp = File::Temp->new(TEMPLATE => 'fimexDownloadXXXXX',
                                SUFFIX => '.nc',
                                DIR => $dir,
-                               UNLINK => 0);
+                               UNLINK => 1);
     my $rc = LWP::Simple::getstore($url, $temp->filename());
     unless (LWP::Simple::is_success($rc)) {
         die "cannot download from $url: $rc";
     }
-    return $temp->filename();
+    return $temp;
 }
 
 no Moose;
