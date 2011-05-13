@@ -114,7 +114,7 @@ sub fimexDownload :Path('/search/fimexdownload') :Args(0) {
         $fimex->projString($projString);
         $fimex->xAxisValues($fiProjection->getProjectionProperty($projection, 'xAxis'));
         $fimex->yAxisValues($fiProjection->getProjectionProperty($projection, 'yAxis'));
-        my $isMetric = $fiProjection->getProjectionProperty($projection, 'isDegree') ? 0 : 1;
+        my $isMetric = ($fiProjection->getProjectionProperty($projection, 'isDegree') eq "true") ? 0 : 1;
         $fimex->metricAxes($isMetric);
     }
     eval {my $command = $fimex->doWork(); $self->logger->debug("running fimex-command: $command");};
