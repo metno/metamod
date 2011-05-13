@@ -472,6 +472,11 @@ THREDDS_TOP_DATASET_NAME = EXAMPLE
 # Top directory of the Apache-tomcat installation:
 CATALINA_HOME =
 
+# Path to THREDDS catalog directory:
+THREDDS_CATALOG_DIR = /path/to/metamod/threddsContent
+
+# File name of THREDDS catalog:
+THREDDS_CATALOG_FILE = catalog.xml
 
 # ============ Test configuration ==============
 #

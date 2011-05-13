@@ -42,6 +42,7 @@
 use strict;
 use warnings;
 use File::Spec;
+
 # small routine to get lib-directories relative to the installed file
 sub getTargetDir {
     my ($finalDir) = @_;
@@ -61,6 +62,7 @@ use Log::Log4perl;
 use DBI;
 use File::Spec qw();
 use File::Copy;
+use File::Path;
 use Fcntl ':flock';
 use mmTtime;
 
@@ -75,9 +77,10 @@ my $thredds_config_path = $webrun_directory . "/thredds_config";
 my $thredds_catalog_name = $config->get("THREDDS_CATALOG_NAME");
 my $thredds_top_dataset_name = $config->get("THREDDS_TOP_DATASET_NAME");
 my $java_home = $config->get("JAVA_HOME");
-my $catalina_home = $config->get("CATALINA_HOME");
+#my $catalina_home = $config->get("CATALINA_HOME");
 my $catalog_file = $config->get("THREDDS_CATALOG_FILE");
-my $thredds_catalog_path = $catalina_home . "/content/thredds/" . $catalog_file;
+my $catalog_dir = $config->get("THREDDS_CATALOG_DIR");
+my $thredds_catalog_path = "$catalog_dir/$catalog_file";
 my $path_to_syserrors = $webrun_directory . "/syserrors";
 my $old_catalog_signature = "";
 my %old_catalog_hash = ();
@@ -286,6 +289,9 @@ sub inner_loop {
       }
       my $new_entry_count = 0;
       my $removed_entry_count = 0;
+      if (! -e $catalog_dir) {
+         File::Path::mkpath($catalog_dir) or die "Can't make THREDDS catalog directory $catalog_dir";
+      }
       open (THREDDSCAT,">$thredds_catalog_path") or die "Could not open THREDDS catalog $thredds_catalog_path";
       flock (THREDDSCAT, LOCK_EX);
       $old_catalog_signature = $catalog_signature;
