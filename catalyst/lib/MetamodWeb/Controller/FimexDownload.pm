@@ -30,7 +30,7 @@ MetamodWeb::Controller::FimexDownload - catalyst controller for downloads throug
 
 =cut
 
-our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
+our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); @r ? sprintf "0.%d", @r : 0 };
 
 our $DEBUG = 0;
 
