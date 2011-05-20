@@ -75,6 +75,8 @@ The following other directives are also no longer in use and should be removed:
     CATALYST_SITE_CONFIG
     WMS_URL
     WMS_ONLINE_RESOURCE
+    METADATA_SEARCH_URL
+    UPLOAD_URL
 
 SEARCH_CATEGORY_SEQUENCE must now use the alphabetical idnames from searchdata.xml
 (as modified in previous section) instead of numeric ids. Also, remove dataref

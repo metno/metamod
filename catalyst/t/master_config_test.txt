@@ -79,23 +79,12 @@ DATABASE_NAME = metamod_unittest
 
 USERBASE_NAME = metamod_unittest_userbase
 
-# URL of Metadata Search application:
-METADATA_SEARCH_URL = [==LOCAL_URL==]/sch/index.php
-
-# URL of Upload application:
-UPLOAD_URL = [==LOCAL_URL==]/upl/index.php
-
 # Main menu beneath the application header. Each line should start with
 # an URL followed by a space and some text. The text will be shown in
 # the application as a menu item, and the URL will be activated when the
 # text is clicked:
 APP_MENU =
- /search Metadata Search
- /dataset_admin Dataset administration
- [==UPLOAD_URL==] File Upload
  [==OPENDAP_URL==] Browse data repository
- /subscription/ My METAMOD
- /logout Logout
 
 # HTML code for a header across the top of applications:
 APP_HEADER_HTML =

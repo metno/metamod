@@ -1,32 +1,32 @@
-<?php 
-#---------------------------------------------------------------------------- 
-#  METAMOD - Web portal for metadata search and upload 
-# 
-#  Copyright (C) 2008 met.no 
-# 
-#  Contact information: 
-#  Norwegian Meteorological Institute 
-#  Box 43 Blindern 
-#  0313 OSLO 
-#  NORWAY 
-#  email: egil.storen@met.no 
-#   
-#  This file is part of METAMOD 
-# 
-#  METAMOD is free software; you can redistribute it and/or modify 
-#  it under the terms of the GNU General Public License as published by 
-#  the Free Software Foundation; either version 2 of the License, or 
-#  (at your option) any later version. 
-# 
-#  METAMOD is distributed in the hope that it will be useful, 
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-#  GNU General Public License for more details. 
-#   
-#  You should have received a copy of the GNU General Public License 
-#  along with METAMOD; if not, write to the Free Software 
-#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
-#---------------------------------------------------------------------------- 
+<?php
+#----------------------------------------------------------------------------
+#  METAMOD - Web portal for metadata search and upload
+#
+#  Copyright (C) 2008 met.no
+#
+#  Contact information:
+#  Norwegian Meteorological Institute
+#  Box 43 Blindern
+#  0313 OSLO
+#  NORWAY
+#  email: egil.storen@met.no
+#
+#  This file is part of METAMOD
+#
+#  METAMOD is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  METAMOD is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with METAMOD; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#----------------------------------------------------------------------------
 ?>
 <?php
 require_once("../funcs/mmConfig.inc");
@@ -48,8 +48,8 @@ function fmquestmenu() {
 
     global $mmConfig;
 
-    $mybasepage = $mmConfig->getVar('METADATA_SEARCH_URL');
-    
+    $mybasepage = $mmConfig->getVar('LOCAL_URL')."/search/";
+
     $mytext = "<FORM METHOD=\"LINK\" ACTION=\"$mybasepage\">";
     $mytext .= "<INPUT TYPE=\"submit\" VALUE=\"Return to Search menu\">";
     $mytext .= "</FORM>\n";
@@ -68,7 +68,7 @@ function fmcreateform($outputdst, $filename, $edit=false) {
 	# not as md5 hash
 	# TODO: check for password in this case
     $uploadDir = $_REQUEST["uploadDirectory"];
-    
+
     if ($edit) { // read data from session
     	$xmlStringDS = $_SESSION["tempDataset"];
     	$xmlStringMM2 = $_SESSION["tempMM2"];
@@ -86,7 +86,7 @@ function fmcreateform($outputdst, $filename, $edit=false) {
 	if ($ds) {
 		$currentData = fmDataset2ArrayData($ds);
 	}
-	
+
     $mytempl = file($filename);
 
     echo(fmstartform());
@@ -128,7 +128,7 @@ function fmcreateform($outputdst, $filename, $edit=false) {
 		}
     	echo(fmcreatehidden("uploadDirectory", $uploadDir));
     	echo(fmcreatehidden("institutionId", $_REQUEST["institutionId"]));
-    	
+
     }
     echo(fmcreatebutton("Submit","Check form"));
     echo(fmcreatebutton("Reset","Clear form"));
@@ -271,7 +271,7 @@ function fmcreateradio($myname,$label,$mylist,$checked,$curData=array()) {
 	if (isset($curData[$myname])) {
 		list($curValue) = $curData[$myname];
 		$checked = -1; // unset $checked
-	} 
+	}
     $myarr = split("\|",chop($mylist));
     $mystr = fmcreaterecordstart();
     $mystr .= fmlabelstart().htmlspecialchars($label).fmlabelend();
@@ -282,7 +282,7 @@ function fmcreateradio($myname,$label,$mylist,$checked,$curData=array()) {
 		if (($checked == $rec) || ($curValue == $myrecord)) {
 	    	$mystr .= "checked=\"checked\" ";
 		}
-		
+
 		$mystr .= "value=\"$myrecord\">";
 		$mystr .= " ".htmlspecialchars($myrecord)."<br>\n";
 		$rec++;
@@ -544,7 +544,7 @@ function fmDataset2ArrayData(MM_Dataset $ds) {
 	if (count($ds->getQuadtree())) {
 		$currentData["quadtree_nodes"] = $ds->getQuadtree();
 	}
-	
+
 	return $currentData;
 }
 
@@ -565,7 +565,7 @@ function fmForm2XmlHtml(MM_Dataset $ds) {
 		"metadataFormat" => true,
 		"quadtree_nodes" => true
 	);
-	
+
 	// handle the info tags
 	$info = $ds->getInfo();
 	foreach ( $specialTags as $st => $value ) {
@@ -577,7 +577,7 @@ function fmForm2XmlHtml(MM_Dataset $ds) {
     				$info[$st] = $_POST[$st];
     			}
     		}
-    	}   
+    	}
 	}
 	$info["ownertag"] = $mmConfig->getVar('QUEST_OWNERTAG'); // hard-coded ownertag
 	$ds->addInfo($info);
@@ -586,14 +586,14 @@ function fmForm2XmlHtml(MM_Dataset $ds) {
 		$nodes = preg_split("/\s+/", $_POST["quadtree_nodes"], -1, PREG_SPLIT_NO_EMPTY);
 		$ds->setQuadtree($nodes);
 	}
-	
+
 	// handle other metadata
     $html = "<html>\n<head>\n</head>\n<body>\n";
 	foreach ($_POST as $mykey=>$myvalue) {
 		if ($mykey == "Submit" || $mykey == "cmd" || $mykey == "institutionId" || $mykey == "uploadDirectory" || $mykey == "drpath") {
 	    	continue;
 		}
-	
+
 		if (is_array($myvalue)) {
     		if (! isset($specialTags[$mykey])) {
     			$xmlValues = array();
@@ -601,7 +601,7 @@ function fmForm2XmlHtml(MM_Dataset $ds) {
     				$xmlValues[] = ereg_replace("\r", "",$value);
 				}
     			$ds->addMetadata(array($mykey => $myvalue));
-    		}			
+    		}
 	    	$html .= "<b>$mykey</b><br/>\n";
 	    	foreach ($myvalue as $singleitem) {
 				$html .= "<p>".wordwrap(ereg_replace("\n","<br />\n",htmlspecialchars($singleitem)."<br />"),70)."</p>\n";
@@ -626,7 +626,7 @@ function fmForm2XmlHtml(MM_Dataset $ds) {
 function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
 	global $mmConfig;
     $mymsg = $mystdmsg;
-	
+
 	if (! is_dir($outputdst)) {
    		$mymsg = "Output destination could not be configured, inform the administrator!";
    		echo(fmcreateerrmsg($mymsg));
@@ -669,7 +669,7 @@ function fmprocessform($outputdst,$mystdmsg,$mysender,$myrecipents) {
 			return;
     	}
 	}
-	
+
 	$ds = new MM_Dataset();
 	$myhtmlcontent = fmForm2XmlHtml($ds);
 	{	# get old creationDate
@@ -714,7 +714,7 @@ function fmcheckform($outputdst, $filename) {
     if (! file_exists($filename)) {
 		echo(fmcreateerrmsg("Could not open configuration file"));
 		return("No form created");
-    } 
+    }
 
     $mytempl = file($filename);
 
@@ -726,7 +726,7 @@ function fmcheckform($outputdst, $filename) {
 		}
 	} elseif ( ! $_POST["keyphrase"]) {
 		echo(fmcreateerrmsg("Record "."Key phrase"." is mandatory and missing"));
-		$errors = true;	
+		$errors = true;
 	}
 
     foreach ($mytempl as $line) {
@@ -776,8 +776,8 @@ function fmcheckform($outputdst, $filename) {
 		echo(fmcreatehidden("uploadDirectory", $_REQUEST["uploadDirectory"]));
     	echo(fmcreatehidden("institutionId", $_REQUEST["institutionId"]));
 	}
-	
-    
+
+
     if ($errors) {
 		echo(fmcreateerrmsg("Please use the Edit button ".
 			"to correct these problems"));
@@ -795,7 +795,7 @@ function fmcheckform($outputdst, $filename) {
     		if (is_array($myvalue)) {
     			$myHiddenValue = array();
 				foreach ($myvalue as $myitem => $singleval) {
-		    		$myHiddenValue[$myitem] = $myvalue[$myitem]; 
+		    		$myHiddenValue[$myitem] = $myvalue[$myitem];
 				}
     		} else {
 				$myHiddenValue = $myvalue; # not modified value
