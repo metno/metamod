@@ -240,7 +240,7 @@ data</gco:CharacterString>
           </gmd:citation>
           <gmd:abstract>
             <gco:CharacterString>
-              <xsl:copy-of select="/dif:DIF/dif:Summary/child::text()"/>
+              <xsl:copy-of select="/dif:DIF/dif:Summary/descendant::text()"/>
             </gco:CharacterString>
           </gmd:abstract>
 
