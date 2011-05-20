@@ -274,9 +274,7 @@ sub get_dataset_institution {
         return 0;
     }
 
-    #
-    #  Loop through all users
-    #
+    # Loop through all users
     if ( !$userbase->user_first() ) {
         if ( $userbase->exception_is_error() ) {
             $logger->error( $userbase->get_exception() . "\n" );
@@ -286,13 +284,12 @@ sub get_dataset_institution {
         my @properties  = qw(u_institution u_email u_name);
         my @properties2 = qw(ds_name DSKEY LOCATION CATALOG);
         do {
+
             my @user_values = ();
             for ( my $i1 = 0 ; $i1 < 3 ; $i1++ ) {
                 if ($ok_to_now) {
 
-                    #
-                    #          Get user property
-                    #
+                    # Get user property
                     my $val = $userbase->user_get( $properties[$i1] );
                     if ( !$val ) {
                         $logger->warn( $userbase->get_exception() . "\n" );
@@ -305,58 +302,58 @@ sub get_dataset_institution {
                 }
             }
 
-            next unless @user_values; # skip users w/ missing info (like admins)
+            if (@user_values) { # skip users w/ missing info (like admins)
+                # Loop through all datasets owned by current user
+                if ( !$userbase->dset_first() ) {
+                    if ( $userbase->exception_is_error() ) {
+                        $logger->error( $userbase->get_exception() . "\n" );
+                        $ok_to_now = 0;
+                    }
+                } else {
+                    do {
+                        my @dset_values = ();
+                        for ( my $i2 = 0 ; $i2 < 4 ; $i2++ ) {
+                            if ($ok_to_now) {
 
-            #
-            #          Loop through all datasets owned by current user
-            #
-            if ( !$userbase->dset_first() ) {
-                if ( $userbase->exception_is_error() ) {
-                    $logger->error( $userbase->get_exception() . "\n" );
-                    $ok_to_now = 0;
-                }
-            } else {
-                do {
-                    my @dset_values = ();
-                    for ( my $i2 = 0 ; $i2 < 4 ; $i2++ ) {
+                                #
+                                #                  Get content field in current dataset
+                                #
+                                my $val2 = $userbase->dset_get( $properties2[$i2] );
+                                if ( ( !$val2 ) and $userbase->exception_is_error() ) {
+                                    $logger->error( $userbase->get_exception() );
+                                    $ok_to_now = 0;
+                                }
+                                if ( !$val2 ) {
+                                    $val2 = undef;
+                                }
+                                push( @dset_values, $val2 );
+                            }
+                        }
                         if ($ok_to_now) {
-
-                            #
-                            #                  Get content field in current dataset
-                            #
-                            my $val2 = $userbase->dset_get( $properties2[$i2] );
-                            if ( ( !$val2 ) and $userbase->exception_is_error() ) {
-                                $logger->error( $userbase->get_exception() );
+                            my $dataset_name = $dset_values[0];
+                            if ( !defined($dataset_name) ) {
+                                $logger->error("Dataset name (ds_name) not found in DataSet row in the User database\n");
                                 $ok_to_now = 0;
+                            } else {
+                                $ref_dataset_institution->{$dataset_name}                  = {};
+                                $ref_dataset_institution->{$dataset_name}->{'institution'} = $user_values[0];
+                                $ref_dataset_institution->{$dataset_name}->{'email'}       = $user_values[1];
+                                $ref_dataset_institution->{$dataset_name}->{'name'}        = $user_values[2];
+                                $ref_dataset_institution->{$dataset_name}->{'key'}         = $dset_values[1];
+                                $ref_dataset_institution->{$dataset_name}->{'location'}    = $dset_values[2];
+                                $ref_dataset_institution->{$dataset_name}->{'catalog'}     = $dset_values[3];
                             }
-                            if ( !$val2 ) {
-                                $val2 = undef;
-                            }
-                            push( @dset_values, $val2 );
                         }
+                    } until ( !$userbase->dset_next() );
+                    if ( $userbase->exception_is_error() ) {
+                        $logger->error( $userbase->get_exception() . "\n" );
+                        $ok_to_now = 0;
                     }
-                    if ($ok_to_now) {
-                        my $dataset_name = $dset_values[0];
-                        if ( !defined($dataset_name) ) {
-                            $logger->error("Dataset name (ds_name) not found in DataSet row in the User database\n");
-                            $ok_to_now = 0;
-                        } else {
-                            $ref_dataset_institution->{$dataset_name}                  = {};
-                            $ref_dataset_institution->{$dataset_name}->{'institution'} = $user_values[0];
-                            $ref_dataset_institution->{$dataset_name}->{'email'}       = $user_values[1];
-                            $ref_dataset_institution->{$dataset_name}->{'name'}        = $user_values[2];
-                            $ref_dataset_institution->{$dataset_name}->{'key'}         = $dset_values[1];
-                            $ref_dataset_institution->{$dataset_name}->{'location'}    = $dset_values[2];
-                            $ref_dataset_institution->{$dataset_name}->{'catalog'}     = $dset_values[3];
-                        }
-                    }
-                } until ( !$userbase->dset_next() );
-                if ( $userbase->exception_is_error() ) {
-                    $logger->error( $userbase->get_exception() . "\n" );
-                    $ok_to_now = 0;
                 }
             }
+
         } until ( !$userbase->user_next() );
+
         if ( $userbase->exception_is_error() ) {
             $logger->error( $userbase->get_exception() . "\n" );
             $ok_to_now = 0;
