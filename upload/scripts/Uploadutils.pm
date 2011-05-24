@@ -320,7 +320,7 @@ sub get_dataset_institution {
                                 #
                                 my $val2 = $userbase->dset_get( $properties2[$i2] );
                                 if ( ( !$val2 ) and $userbase->exception_is_error() ) {
-                                    $logger->error( $userbase->get_exception() );
+                                    $logger->error( $userbase->get_exception() . " (*ACTUALLY*, $properties2[$i2] is not defined)" );
                                     $ok_to_now = 0;
                                 }
                                 if ( !$val2 ) {
