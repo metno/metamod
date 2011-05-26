@@ -41,6 +41,6 @@ if [ $APPLICATION_USER ]; then
     sudo ln -s /etc/init.d/metamodServices-[==APPLICATION_ID==] /etc/rc2.d/S99metamodServices-[==APPLICATION_ID==]; ordie
 fi
 
-# install config link
-sudo mkdir -p /etc/metamod-[==MAJORVERSION==]
-sudo ln -s [==TARGET_DIRECTORY==]/master_config.txt  /etc/metamod-[==MAJORVERSION==]/[==APPLICATION_ID==].cfg; ordie
+# install config link (no longer in use?)
+#sudo mkdir -p /etc/metamod-[==MAJORVERSION==]
+#sudo ln -s [==TARGET_DIRECTORY==]/master_config.txt  /etc/metamod-[==MAJORVERSION==]/[==APPLICATION_ID==].cfg; ordie
