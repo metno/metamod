@@ -292,7 +292,7 @@ sub get_dataset_institution {
                     # Get user property
                     my $val = $userbase->user_get( $properties[$i1] );
                     if ( !$val ) {
-                        $logger->warn( $userbase->get_exception() . "\n" );
+                        #$logger->warn( $userbase->get_exception() . "\n" );
                         # $ok_to_now = 0;  # not a fatal error - u_institution is not required
                         @user_values = (); # empty the fields list
                         last;              # we're ignoring this user
@@ -320,7 +320,7 @@ sub get_dataset_institution {
                                 #
                                 my $val2 = $userbase->dset_get( $properties2[$i2] );
                                 if ( ( !$val2 ) and $userbase->exception_is_error() ) {
-                                    $logger->error( $userbase->get_exception() . " (*ACTUALLY*, $properties2[$i2] is not defined)" );
+                                    $logger->error( $userbase->get_exception() . " (*ACTUALLY*, $properties2[$i2] is not set)" );
                                     $ok_to_now = 0;
                                 }
                                 if ( !$val2 ) {
