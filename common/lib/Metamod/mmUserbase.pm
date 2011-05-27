@@ -835,7 +835,7 @@ Return value: Property value on success, FALSE on error.
         if ( defined( $user_array->{$property} ) ) {
             return $user_array->{$property};
         } else {
-            $self->_note_exception( 1, "Property '" . $property . "' not set" );
+            $self->_note_exception( 0, "Property '" . $property . "' not set" );
             return FALSE();
         }
     }
