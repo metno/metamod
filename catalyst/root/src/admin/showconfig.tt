@@ -1,5 +1,14 @@
+[% INCLUDE admin/admin_header.tt %]
+    [% IF config_content %]
+        <h2>Master config file (unprocessed)</h2>
+        <pre>[% config_content | html %]</pre>
+        <p><a href="./showconfig">Show generated config</a></p>
+    [% ELSE %]
+        <h2>Generated config</h2>
+        [% FOREACH key IN mm_config.vars.keys.sort %]
+            <pre>[% key %] = [% mm_config.get(key) | html %]</pre>
+        [% END %]
+        <p><a href="./showconfigfile">Show original file</a></p>
+    [% END%]
 
-
-[% FILTER html %]
-    <p>[% mm_config.get('EMAIL_BODY_WHEN_UPLOAD_ERROR') %]</p>
-[% END %]
+[% INCLUDE admin/admin_footer.tt %]
