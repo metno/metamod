@@ -1,7 +1,5 @@
-[% INCLUDE admin/admin_header.tt %]
-<pre>
+
+
 [% FILTER html %]
-[% config_content %]
+    <p>[% mm_config.get('EMAIL_BODY_WHEN_UPLOAD_ERROR') %]</p>
 [% END %]
-</pre>
-[% INCLUDE admin/admin_footer.tt %]

@@ -62,11 +62,13 @@ sub adminmenu :Path :Args(0) {
      $c->stash(current_view => 'Raw');
 }
 
-=head2 showconfig
+=head2 showconfigfile
+
+Read in master_config.txt from disk (before merged with defaults – not so useful)
 
 =cut
 
-sub showconfig :Local :Args(0) {
+sub showconfigfile :Local :Args(0) {
     my ( $self, $c ) = @_;
 
     $c->stash(template => 'admin/showconfig.tt');
@@ -81,6 +83,19 @@ sub showconfig :Local :Args(0) {
         close (CONFIG);
     }
     $c->stash(config_content => $config_content);
+}
+
+=head2 showconfig
+
+Show generated config as in memory after merged with defaults
+
+=cut
+
+sub showconfig :Local :Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->stash(template => 'admin/showconfig.tt');
+    $c->stash(current_view => 'Raw');
 }
 
 =head2 showlog

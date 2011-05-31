@@ -367,7 +367,7 @@ sub default_mt_name {
 
     my $show_columns = $self->search_app_show_columns();
     foreach my $column_info (@$show_columns){
-        if( $column_info->{ col } eq $col_num ){
+        if( defined $column_info->{ col } and $column_info->{ col } eq $col_num ){
             return $column_info->{ mt_name };
         }
     }
