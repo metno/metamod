@@ -27,7 +27,7 @@ APPID=[==APPLICATION_ID==]
 # settings for running from target
 APPDIR=[==TARGET_DIRECTORY==]
 COMMON_LIB=[==TARGET_DIRECTORY==]/lib
-BINDIR=[==TARGET_DIRECTORY==]/bin
+BINDIR=[==TARGET_DIRECTORY==]/scripts
 
 # settings for running from source (DOESN'T SEEM TO WORK)
 #APPDIR=[==SOURCE_DIRECTORY==]/catalyst
