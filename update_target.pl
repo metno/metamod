@@ -263,7 +263,7 @@ foreach my $filelistpath (@flistpathes) {
       my $filename = $_;
       my $ch1 = substr($filename,0,1);
       next if $ch1 eq '#'; # allow comments in file
-      if ($ch1 eq '=') { # File will be copied unmodified
+      if ($ch1 eq '=' ) { # File will be copied unmodified
          $filename = substr($filename,1);
       }
       my $srcfilepath = $topdir . '/' . $filename;
@@ -344,24 +344,26 @@ system "$targetdir/scripts/gen_httpd_conf.pl", $targetdir;
 
 sub install_catalyst {
    # install the catalyst application
-   my $catalyst_dir = "$sourcedir/catalyst";
-   my $catalyst_install_dir = "$targetdir";
-   my $catalyst_lib_dir = "$catalyst_install_dir/lib";
-   my $back = getcwd();
-   chdir $catalyst_dir or die "Could not chdir to $catalyst_dir: $!";
-   die "Cannot write to Catalyst source dir $catalyst_dir" unless -w $catalyst_dir;
+   my $cata_dir = "$sourcedir/catalyst";
+   my $cata_inst_dir = "$targetdir/";
+   my $catalyst_lib_dir = "$cata_inst_dir/lib";
 
-   # If local::lib has been installed on the machine then PERL_MM_OPT will be set with INSTALL_BASE
-   # which conflicts with PREFIX. We want to use PREFIX since it allows us to set LIB as well.
-   $ENV{PERL_MM_OPT} = '' if exists $ENV{PERL_MM_OPT};
+   my @required_dirs = ("$cata_inst_dir/scripts", "$cata_inst_dir/lib", "$cata_inst_dir/root");
 
-   system('perl', 'Makefile.PL', "PREFIX=$catalyst_install_dir", "LIB=$catalyst_lib_dir") == 0 or die $@;
-   system('make') == 0 or die $@;
-   system('make', 'install') == 0 or die $@;
-   chdir $catalyst_lib_dir;
-   system 'find . -exec chmod u+w {} \;';
+   foreach my $dir (@required_dirs){
+      if( ! -e $dir ){
+         mkdir $dir or die "Failed to create directory: $dir";
+      }
+   }
 
-   chdir $back;
+   dircopy("$cata_dir/script/*", "$cata_inst_dir/scripts");
+   dircopy("$cata_dir/lib/*", "$cata_inst_dir/lib");
+   dircopy("$cata_dir/root/*", "$cata_inst_dir/root");
+
+   open my $DUMMY_MAKE, '>', "$cata_inst_dir/Makefile.PL";
+   print $DUMMY_MAKE "#This is a dummy make file so that catalyst finds the root directory as in source";
+   close $DUMMY_MAKE;
+
 }
 
 sub substcopy {
@@ -461,6 +463,25 @@ sub substituteval {
    }
    return $textline;
 }
+
+=head2 dircopy($src, $dest)
+
+Directory copy implemented via Unix 'cp' command.
+
+IMPLEMENTATION NOTE: This could be implemented in a more portal fashion with
+C<File::Copy::Recursive>, but we don't want any none core dependencies in
+update_target.pl.
+
+=cut
+sub dircopy {
+    my ($src, $dest) = @_;
+
+use Carp;
+    my $output = qx/cp -ru $src $dest/;
+    print "$output\n" if $output;
+
+}
+
 #----------------------------------------------------------------------
 
 =head1 NAME
