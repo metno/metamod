@@ -233,7 +233,7 @@ sub basickeys {
 =item $two_way_table
 
 A two way table structure as returned by
-C<MetamodWeb::Schema::Metabase::ResultSet::Dataset::two_way_table>.
+C<Metamod::DBIxSchema::Metabase::ResultSet::Dataset::two_way_table>.
 
 =item return
 
