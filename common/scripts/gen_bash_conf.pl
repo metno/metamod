@@ -45,17 +45,17 @@ use lib "$FindBin::Bin/../lib";
 use Metamod::Config;
 
 if( @ARGV != 1 ) {
-    print STDERR "usage $0 <path to config directory>\n";
+    print STDERR "usage $0 <path to master config>\n";
     exit 1;
 }
 
-my $config_directory = shift @ARGV;
-if( !( -e $config_directory ) || !( -r $config_directory ) ){
-    print STDERR "'$config_directory' does not exist or is not readable\n";
+my $master_config_file = shift @ARGV;
+
+if( !( -f $master_config_file ) ){
+    print STDERR "'$master_config_file' is not a file\n";
     exit 1;
 }
 
-my $master_config_file = "$config_directory/master_config.txt";
 if( !( -e $master_config_file ) || !( -r $master_config_file ) ){
     print STDERR "'$master_config_file' does not exist or is not readable\n";
     exit 1;
