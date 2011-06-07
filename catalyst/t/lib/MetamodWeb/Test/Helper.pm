@@ -11,8 +11,8 @@ use Log::Log4perl qw(get_logger);
 use Moose;
 use Try::Tiny;
 
-use MetamodWeb::Schema::Metabase;
-use MetamodWeb::Schema::Userbase;
+use Metamod::DBIxSchema::Metabase;
+use Metamod::DBIxSchema::Userbase;
 use MetamodWeb::Utils::GenCatalystConf;
 
 has 'master_config_file' => ( is => 'ro', default => 'master_config_test.txt' );
@@ -78,7 +78,7 @@ sub _build_metabase {
 
     my $mm_config = $self->mm_config();
 
-    my $metabase = MetamodWeb::Schema::Metabase->connect(
+    my $metabase = Metamod::DBIxSchema::Metabase->connect(
         $mm_config->getDSN(),
         $mm_config->get('PG_WEB_USER'),
         $mm_config->get('PG_WEB_USER_PASSWORD')
@@ -100,7 +100,7 @@ sub _build_userbase {
     my $self = shift;
 
     my $conf     = $self->mm_config();
-    my $userbase = MetamodWeb::Schema::Userbase->connect(
+    my $userbase = Metamod::DBIxSchema::Userbase->connect(
         $conf->getDSN_Userbase(),
         $conf->get('PG_WEB_USER'),
         $conf->get('PG_WEB_USER_PASSWORD')
@@ -158,7 +158,8 @@ sub run_import_dataset {
 
     my $import_script = $self->import_dataset_path;
     my $dataset_dir   = $self->dataset_dir;
-    my $output        = `$import_script $dataset_dir`;
+    my $master_config_dir = $self->master_config_dir();
+    my $output        = `$import_script $master_config_dir $dataset_dir`;
 
     print $output;
 
