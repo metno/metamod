@@ -41,7 +41,7 @@
 
 [% ELSE %]
     <p>
-    The user already has this role.
+    The user is now approved for the following roles: [% user_info.roles.join(', ') %]
     </p>
 [% END %]
 

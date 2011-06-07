@@ -114,10 +114,12 @@ sub confirm_role_GET : Private {
     } else {
 
         my $roles = $user->roles();
+        my @role_names = ();
         while( my $r = $roles->next() ){
             if( $r->role eq $role ) {
                 $has_role = 1;
             }
+            push @role_names, $r->role();
         }
 
         %user_info = (
@@ -126,6 +128,7 @@ sub confirm_role_GET : Private {
             username    => $user->u_loginname(),
             institution => $user->u_institution(),
             telephone   => $user->u_telephone(),
+            roles       => \@role_names,
         );
     }
 
