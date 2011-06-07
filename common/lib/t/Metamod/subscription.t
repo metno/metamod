@@ -17,14 +17,19 @@ BEGIN {
     $ENV{METAMOD_SOURCE_DIRECTORY} = "$FindBin::Bin/../../../..";
 }
 
-use Metamod::Config qw( :init_logger );
+#use Metamod::Config qw( :init_logger );
 use Metamod::Dataset;
 use Metamod::Subscription;
-use Metamod::TestUtils qw( init_userdb_test empty_userdb );
+use Metamod::Test::Setup;
 
 my $num_tests = 0;
 
-init_userdb_test("$FindBin::Bin/subscription_test_data.sql");
+my $test_setup = Metamod::Test::Setup->new( master_config_file => $ENV{METAMOD_MASTER_CONFIG } );
+$test_setup->mm_config->initLogger();
+$test_setup->populate_userbase("$FindBin::Bin/subscription_test_data.sql");
+
+
+#init_userdb_test("$FindBin::Bin/subscription_test_data.sql");
 
 my $ms = Metamod::Subscription->new();
 
@@ -133,6 +138,3 @@ END_XML
 
 BEGIN { plan tests => $num_tests }
 
-END {
-    empty_userdb();
-}
