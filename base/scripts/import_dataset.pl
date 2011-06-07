@@ -50,7 +50,7 @@ use lib ("$FindBin::Bin/../../common/lib", getTargetDir('lib'), getTargetDir('sc
 
 use Metamod::Dataset;
 use Metamod::DatasetTransformer::ToISO19115 qw(foreignDataset2iso19115);
-use Metamod::Config qw(:init_logger);
+use Metamod::Config;
 use Metamod::Subscription;
 use Log::Log4perl qw();
 use Metamod::Utils qw();
@@ -60,7 +60,17 @@ use XML::LibXML::XPathContext;
 use File::Spec qw();
 use mmTtime;
 
-my $config = new Metamod::Config();
+if ( scalar @ARGV > 3 ) {
+    die "\nUsage:\n\n   Import single XML file:     $0 path-to-config filename\n"
+      . "   Import a directory:         $0 path-to-config directory\n"
+      . "   Infinite monitoring loop:   $0 path-to-config\n"
+      . "   Infinite daemon monitor:    $0 path-to-config logfile pidfile\n\n";
+}
+
+my $master_config_file = shift @ARGV;
+
+my $config = new Metamod::Config($master_config_file);
+$config->initLogger();
 my $logger = Log::Log4perl->get_logger('metamod.base.import_dataset');
 
 #
@@ -93,12 +103,7 @@ my $path_to_logfile            = $config->get("LOG4ALL_SYSTEM_LOG");
 #
 #  Check number of command line arguments
 #
-if ( scalar @ARGV > 2 ) {
-    die "\nUsage:\n\n   Import single XML file:     $0 filename\n"
-      . "   Import a directory:         $0 directory\n"
-      . "   Infinite monitoring loop:   $0\n"
-      . "   Infinite daemon monitor:    $0 logfile pidfile\n\n";
-}
+
 my $inputfile;
 my $inputDir;
 
