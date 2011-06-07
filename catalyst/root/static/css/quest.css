@@ -1,9 +1,20 @@
 td.quest_field {
-		
+
 }
 
 td.quest_label {
 	padding-top: 7px;
 	font-size: 1em;
-	
+
+}
+
+fieldset.questionnaire legend {
+    font-size: 1.3em;
+    font-weight: bolder;
+    padding: 0px 5px 0px 5px;
+}
+
+fieldset.questionnaire {
+    border: 1px solid black;
+    padding: 5px;
 }
