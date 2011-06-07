@@ -1,6 +1,22 @@
-#!/bin/sh
+#!/bin/bash
 
-COMMON="[==TARGET_DIRECTORY==]/init/common.sh"
+if [ $# != 1 ]
+then
+	echo "You must supply the master config file as a parameter"
+	exit 1
+fi
+
+if [ ! -r $1 ]
+then
+	echo "Cannot read the file "$1
+	exit 1
+fi
+
+# Load the configuration dynamically
+SCRIPT_PATH="`dirname \"$0\"`"
+source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" $1)
+
+COMMON="$SCRIPT_PATH/common.sh"
 
 if [ -e  $COMMON ]
 then
@@ -11,10 +27,10 @@ else
         exit 1
 fi
 
-PG_TSEARCH2_SCRIPT=[==PG_TSEARCH2_SCRIPT==]
-PG_POSTGIS_SCRIPT=[==PG_POSTGIS_SCRIPT==]
-PG_POSTGIS_SYSREF_SCRIPT=[==PG_POSTGIS_SYSREF_SCRIPT==]
-SRUSCHEMA=[==TARGET_DIRECTORY==]/init/sruSchema.sql
+#PG_TSEARCH2_SCRIPT=[==PG_TSEARCH2_SCRIPT==]
+#PG_POSTGIS_SCRIPT=[==PG_POSTGIS_SCRIPT==]
+#PG_POSTGIS_SYSREF_SCRIPT=[==PG_POSTGIS_SYSREF_SCRIPT==]
+SRUSCHEMA="$SCRIPT_PATH/sruSchema.sql"
 
 check "PG_TSEARCH2_SCRIPT" 1
 check "PG_POSTGIS_SCRIPT" 1
@@ -34,21 +50,21 @@ EOF
 
 # install additional features
 echo "----------- Trying to install Fulltext-search: tsearch2.sql --"
-$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $PG_TSEARCH2_SCRIPT
+$PSQL -q -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $PG_TSEARCH2_SCRIPT
 echo "----------------- Database Fulltext-search prepared ---------"
 echo "----------- Trying to install PostGIS ---------------------"
-$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $PG_POSTGIS_SCRIPT
+$PSQL -q -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $PG_POSTGIS_SCRIPT
 echo "----------- Trying to install PostGIS Coordinate systems ---------------------"
-$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $PG_POSTGIS_SYSREF_SCRIPT
+$PSQL -q -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $PG_POSTGIS_SYSREF_SCRIPT
 echo "----------- Trying to install PostGIS Additional Coordinate systems ---------------------"
 # this may be blank
-$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<'EOT'
-[==PG_POSTGIS_ADDITIONAL_SYSREF==]
+$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<EOT
+$PG_POSTGIS_ADDITIONAL_SYSREF
 EOT
 
 # start creating tables and functions
 #
-$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<'EOF'
+$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<EOF
 
 -- drop eventuelly existing stuff
 DROP TRIGGER IF EXISTS update_MD_content_fulltext ON Metadata;
@@ -59,18 +75,18 @@ DROP LANGUAGE IF EXISTS plpgsql;
 
 -- allow full-text search
 -- pg < 8.2
-GRANT SELECT ON pg_ts_cfg TO "[==PG_WEB_USER==]";
-GRANT SELECT ON pg_ts_cfgmap TO "[==PG_WEB_USER==]";
+GRANT SELECT ON pg_ts_cfg TO $PG_WEB_USER;
+GRANT SELECT ON pg_ts_cfgmap TO $PG_WEB_USER;
 -- pg >= 8.3
-GRANT SELECT ON pg_ts_config TO "[==PG_WEB_USER==]";
-GRANT SELECT ON pg_ts_config_map TO "[==PG_WEB_USER==]";
+GRANT SELECT ON pg_ts_config TO $PG_WEB_USER;
+GRANT SELECT ON pg_ts_config_map TO $PG_WEB_USER;
 -- all pg
-GRANT SELECT ON pg_ts_parser TO "[==PG_WEB_USER==]";
-GRANT SELECT ON pg_ts_dict TO "[==PG_WEB_USER==]";
+GRANT SELECT ON pg_ts_parser TO $PG_WEB_USER;
+GRANT SELECT ON pg_ts_dict TO $PG_WEB_USER;
 
 -- allow postgis
-GRANT ALL ON geometry_columns TO "[==PG_WEB_USER==]";
-GRANT SELECT ON spatial_ref_sys TO "[==PG_WEB_USER==]";
+GRANT ALL ON geometry_columns TO $PG_WEB_USER;
+GRANT SELECT ON spatial_ref_sys TO $PG_WEB_USER;
 
 CREATE TABLE DataSet (
    DS_id              SERIAL,
@@ -84,7 +100,7 @@ CREATE TABLE DataSet (
    DS_filePath        VARCHAR(1024),
    PRIMARY KEY (DS_id)
 );
-GRANT SELECT ON DataSet TO "[==PG_WEB_USER==]";
+GRANT SELECT ON DataSet TO $PG_WEB_USER;
 
 -- extension column to Dataset, uncoupled
 CREATE TABLE ProjectionInfo (
@@ -92,7 +108,7 @@ CREATE TABLE ProjectionInfo (
    PI_content         TEXT,
    UNIQUE (DS_id)
 );
-GRANT SELECT ON ProjectionInfo TO "[==PG_WEB_USER==]";
+GRANT SELECT ON ProjectionInfo TO $PG_WEB_USER;
 
 -- extension column to Dataset, uncoupled
 CREATE TABLE WMSInfo (
@@ -100,15 +116,15 @@ CREATE TABLE WMSInfo (
    WI_content         TEXT,
    UNIQUE (DS_id)
 );
-GRANT SELECT ON WMSInfo TO "[==PG_WEB_USER==]";
+GRANT SELECT ON WMSInfo TO $PG_WEB_USER;
 
 -- extension column to Dataset, uncoupled
 CREATE TABLE OAIInfo (
    -- soft REFERENCE to DataSet, should not be deleted with dataset
-   DS_id              INTEGER       UNIQUE NOT NULL, 
+   DS_id              INTEGER       UNIQUE NOT NULL,
    OAI_identifier     TEXT          UNIQUE
 );
-GRANT SELECT ON OAIInfo TO "[==PG_WEB_USER==]";
+GRANT SELECT ON OAIInfo TO $PG_WEB_USER;
 
 
 CREATE TABLE SearchCategory (
@@ -118,7 +134,7 @@ CREATE TABLE SearchCategory (
    SC_fnc             VARCHAR(9999) NOT NULL,
    PRIMARY KEY (SC_id)
 );
-GRANT SELECT ON SearchCategory TO "[==PG_WEB_USER==]";
+GRANT SELECT ON SearchCategory TO $PG_WEB_USER;
 
 CREATE TABLE HierarchicalKey (
    HK_id              SERIAL,
@@ -129,7 +145,7 @@ CREATE TABLE HierarchicalKey (
    UNIQUE (SC_id, HK_parent, HK_name),
    PRIMARY KEY (HK_id)
 );
-GRANT SELECT ON HierarchicalKey TO "[==PG_WEB_USER==]";
+GRANT SELECT ON HierarchicalKey TO $PG_WEB_USER;
 
 CREATE TABLE BasicKey (
    BK_id              SERIAL,
@@ -138,21 +154,21 @@ CREATE TABLE BasicKey (
    UNIQUE (SC_id, BK_name),
    PRIMARY KEY (BK_id)
 );
-GRANT SELECT ON BasicKey TO "[==PG_WEB_USER==]";
+GRANT SELECT ON BasicKey TO $PG_WEB_USER;
 
 CREATE TABLE HK_Represents_BK (
    HK_id              INTEGER       NOT NULL REFERENCES HierarchicalKey ON DELETE CASCADE,
    BK_id              INTEGER       NOT NULL REFERENCES BasicKey ON DELETE CASCADE,
    PRIMARY KEY (HK_id, BK_id)
 );
-GRANT SELECT ON HK_Represents_BK TO "[==PG_WEB_USER==]";
+GRANT SELECT ON HK_Represents_BK TO $PG_WEB_USER;
 
 CREATE TABLE BK_Describes_DS (
    BK_id              INTEGER       NOT NULL REFERENCES BasicKey ON DELETE CASCADE,
    DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
    PRIMARY KEY (BK_id, DS_id)
 );
-GRANT SELECT ON BK_Describes_DS TO "[==PG_WEB_USER==]";
+GRANT SELECT ON BK_Describes_DS TO $PG_WEB_USER;
 
 CREATE TABLE NumberItem (
    SC_id              INTEGER       NOT NULL REFERENCES SearchCategory ON DELETE CASCADE,
@@ -161,28 +177,28 @@ CREATE TABLE NumberItem (
    DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
    PRIMARY KEY (SC_id, NI_from, NI_to, DS_id)
 );
-GRANT SELECT ON NumberItem TO "[==PG_WEB_USER==]";
+GRANT SELECT ON NumberItem TO $PG_WEB_USER;
 
 CREATE TABLE GeographicalArea (
    GA_id              SERIAL,
    GA_name            VARCHAR(9999),
    PRIMARY KEY (GA_id)
 );
-GRANT SELECT ON GeographicalArea TO "[==PG_WEB_USER==]";
+GRANT SELECT ON GeographicalArea TO $PG_WEB_USER;
 
 CREATE TABLE GA_Contains_GD (
    GA_id              INTEGER       NOT NULL REFERENCES GeographicalArea ON DELETE CASCADE,
    GD_id              VARCHAR(9999) NOT NULL,
    PRIMARY KEY (GA_id, GD_id)
 );
-GRANT SELECT ON GA_Contains_GD TO "[==PG_WEB_USER==]";
+GRANT SELECT ON GA_Contains_GD TO $PG_WEB_USER;
 
 CREATE TABLE GA_Describes_DS (
    GA_id              INTEGER       NOT NULL,
    DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
    PRIMARY KEY (GA_id, DS_id)
 );
-GRANT SELECT ON GA_Describes_DS TO "[==PG_WEB_USER==]";
+GRANT SELECT ON GA_Describes_DS TO $PG_WEB_USER;
 
 CREATE TABLE MetadataType (
    MT_name            VARCHAR(99),
@@ -190,7 +206,7 @@ CREATE TABLE MetadataType (
    MT_def             VARCHAR(9999) NOT NULL,
    PRIMARY KEY (MT_name)
 );
-GRANT SELECT ON MetadataType TO "[==PG_WEB_USER==]";
+GRANT SELECT ON MetadataType TO $PG_WEB_USER;
 
 CREATE TABLE Metadata (
    MD_id              SERIAL,
@@ -199,27 +215,27 @@ CREATE TABLE Metadata (
    MD_content_vector  TSVECTOR, -- full-text vector
    PRIMARY KEY (MD_id)
 );
-GRANT SELECT ON Metadata TO "[==PG_WEB_USER==]";
+GRANT SELECT ON Metadata TO $PG_WEB_USER;
 
 -- create the full text index
 CREATE INDEX MD_content_vector_idx
 ON Metadata
 USING gist(MD_content_vector);
 
-CREATE FUNCTION to_mmDefault_tsvector(IN text) RETURNS tsvector AS $$
+CREATE FUNCTION to_mmDefault_tsvector(IN text) RETURNS tsvector AS \$\$
     BEGIN
-        RETURN to_tsvector('[==PG_TSEARCH_LANGUAGE==]', $1);
+        RETURN to_tsvector('$PG_TSEARCH_LANGUAGE', \$1);
     END;
-$$ LANGUAGE plpgsql;
+\$\$ LANGUAGE plpgsql;
 
 -- do not use this function, postgres will need to see the language, to determine index use
-CREATE FUNCTION to_mmDefault_tsquery(IN text) RETURNS tsquery AS $$
+CREATE FUNCTION to_mmDefault_tsquery(IN text) RETURNS tsquery AS \$\$
     BEGIN
-        RETURN to_tsquery('[==PG_TSEARCH_LANGUAGE==]', $1);
+        RETURN to_tsquery('$PG_TSEARCH_LANGUAGE', \$1);
     END;
-$$ LANGUAGE plpgsql;
+\$\$ LANGUAGE plpgsql;
 
-CREATE FUNCTION update_MD_content_fulltext() RETURNS trigger AS $$
+CREATE FUNCTION update_MD_content_fulltext() RETURNS trigger AS \$\$
     BEGIN
         -- Check that name is given (error on delete!)
         IF NEW.MT_name IS NULL THEN
@@ -230,7 +246,7 @@ CREATE FUNCTION update_MD_content_fulltext() RETURNS trigger AS $$
         NEW.MD_content_vector := to_mmDefault_tsvector(NEW.MD_content);
         RETURN NEW;
     END;
-$$ LANGUAGE plpgsql;
+\$\$ LANGUAGE plpgsql;
 
 CREATE TRIGGER update_MD_content_fulltext BEFORE INSERT OR UPDATE ON Metadata
     FOR EACH ROW EXECUTE PROCEDURE update_MD_content_fulltext();
@@ -243,7 +259,7 @@ CREATE TABLE DS_Has_MD (
 -- search on ds_has_md is most often executed query
 -- table may fit completely in memory, so consider 'set random_page_cost = 2 (or even 1.5)' see postgresql.conf
 CREATE INDEX idx_ds_has_md_mdid ON ds_has_md(md_id);
-GRANT SELECT ON DS_Has_MD TO "[==PG_WEB_USER==]";
+GRANT SELECT ON DS_Has_MD TO $PG_WEB_USER;
 
 CREATE TABLE Sessions (
    sessionid          VARCHAR(9999)NOT NULL,
@@ -251,10 +267,10 @@ CREATE TABLE Sessions (
    sessionstate       VARCHAR(99999) NOT NULL,
    PRIMARY KEY (sessionid)
 );
-GRANT ALL ON Sessions TO "[==PG_WEB_USER==]";
+GRANT ALL ON Sessions TO $PG_WEB_USER;
 
 CREATE TABLE Dataset_Location (DS_id INTEGER NOT NULL REFERENCES DataSet ON DELETE CASCADE) WITHOUT OIDS;
-GRANT ALL ON Dataset_Location TO "[==PG_WEB_USER==]";
+GRANT ALL ON Dataset_Location TO $PG_WEB_USER;
 
 CREATE TABLE HarvestStatus (
    HS_application     VARCHAR(99)    NOT NULL,
@@ -274,7 +290,7 @@ EOF
 done
 
 echo "----------------- ADDING SRU2JDBC SUPPORT -----------"
-$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $SRUSCHEMA
+$PSQL -a --set PG_WEB_USER=$PG_WEB_USER -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $SRUSCHEMA
 
 
 date +'%Y-%m-%d %H:%M Database re-initialized, dynamic tables created'

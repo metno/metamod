@@ -40,6 +40,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use strict;
 use warnings;
 use File::Spec;
+use File::Basename;
 # small routine to get lib-directories relative to the installed file
 sub getTargetDir {
     my ($finalDir) = @_;
@@ -63,11 +64,18 @@ use vars qw($dbh @logarr %searchdata @ancestors
             );
 
 
-my $config = new Metamod::Config();
+
 if (scalar @ARGV != 1) {
-   die "\nUsage:\n\n     $0 name_of_xml_file\n\n";
+   die "\nUsage:\n\n     $0 <path to config directory>\n\n";
 }
-my $searchdataxml = $ARGV[0];
+
+
+my $master_config_file = shift @ARGV;
+my $config_directory = dirname($master_config_file);
+
+my $config = new Metamod::Config($master_config_file);
+my $searchdataxml = File::Spec->catfile($config_directory, 'staticdata', 'searchdata.xml');
+
 #
 #  Connect to PostgreSQL database:
 #

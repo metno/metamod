@@ -1,29 +1,43 @@
-#!/bin/sh
+#!/bin/bash
 
 IMP=import
-if [ $# -eq 1 ]; then
-   IMP=$1
+if [ $# -eq 1 ]
+then
+	CONFIG_FILE=$1
+elif [ $# -eq 2 ]
+then
+    CONFIG_FILE=$1
+    IMP=$2
+else
+    echo "usage $0 <master config file> [import|no-import]"
+    exit 1
 fi
 PSQL=psql
 CREATEDB=createdb
 DROPDB=dropdb
+
+# Load the configuration dynamically
+SCRIPT_PATH="`dirname \"$0\"`"
+source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" $1)
 
 #
 # Re-initialize the data base, and load all static search data and datasets
 #
 exec >create_and_load_all.out 2>&1
 echo "------------ Reinitialize the database, create dynamic tables:"
-. ./createdb.sh
+. ./createdb.sh $CONFIG_FILE
 echo ""
 echo "------------ Importing searchdata:"
-./import_searchdata.pl ../staticdata/searchdata.xml
+PERL5LIB=$PERL5LIB:/opt/metno-perl-webdev-ver1/lib/perl5
+./import_searchdata.pl $CONFIG_FILE
+
 echo "------------ Importing datasets:"
 cat >t_1 <<EOF
-[==IMPORTDIRS==]
+$IMPORTDIRS
 EOF
 if [ $IMP != "noimport" ]; then
    for dir in `cat t_1`; do
-      ../scripts/import_dataset.pl $dir
+      ../scripts/import_dataset.pl $CONFIG_FILE $dir
    done
 fi
 rm t_1
