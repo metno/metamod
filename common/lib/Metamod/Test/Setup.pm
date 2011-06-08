@@ -92,8 +92,8 @@ sub _build_metabase {
 
     my $metabase = Metamod::DBIxSchema::Metabase->connect(
         $mm_config->getDSN(),
-        $mm_config->get('PG_WEB_USER'),
-        $mm_config->get('PG_WEB_USER_PASSWORD')
+        $mm_config->get('PG_ADMIN_USER'),
+        $mm_config->get('PG_ADMIN_USER_PASSWORD')
     );
 
     my $query_log = DBIx::Class::QueryLog->new;
@@ -114,8 +114,8 @@ sub _build_userbase {
     my $conf     = $self->mm_config();
     my $userbase = Metamod::DBIxSchema::Userbase->connect(
         $conf->getDSN_Userbase(),
-        $conf->get('PG_WEB_USER'),
-        $conf->get('PG_WEB_USER_PASSWORD')
+        $conf->get('PG_ADMIN_USER'),
+        $conf->get('PG_ADMIN_USER_PASSWORD')
     );
 
     my $query_log = DBIx::Class::QueryLog->new;
@@ -321,6 +321,15 @@ sub populate_database {
 sub DEMOLISH {
     my $self = shift;
 
+    my ( $is_global_destruction ) = @_;
+
+    # under global destruction we have no controll over which attributes will still be
+    # defined and therefore cleanup might not work.
+    # You should rather call "undef" on the object before the script ends.
+    if( $is_global_destruction ){
+        print STDERR "We are in global destruction. Cleanup of database might fail!\n";
+    }
+
     $self->clean_metabase();
     $self->clean_userbase();
 
@@ -351,15 +360,19 @@ sub clean_metabase {
         projectioninfo
         sessions
         wmsinfo
+        sru.meta_contact
+        sru.products
     );
 
     my @reset_sequences = qw(
         dataset_ds_id_seq
+        sru.meta_contact_id_contact_seq
     );
 
     try {
         my $metabase_schema = $self->metabase();
         my $dbh = $metabase_schema->storage()->dbh();
+
         $self->_clean_database($dbh, \@clean_tables, \@reset_sequences)
     }
     catch {
