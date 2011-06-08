@@ -38,6 +38,7 @@ use warnings;
 use Encode;
 use Fcntl qw(:DEFAULT :flock); # import LOCK_* constants
 use POSIX qw();
+use Metamod::DatasetImporter;
 use Metamod::DatasetTransformer qw();
 use Metamod::DatasetRegion qw();
 use XML::LibXML::XPathContext qw();
@@ -158,7 +159,34 @@ sub writeToFile {
     close $xmlF;
     close $xmdF;
 
+    $self->_writeToDatabase($fileBase);
+
     return 1;
+}
+
+=head2 $self->_writeToDatabase($filename)
+
+Write the information in the dataset to the metabase database.
+
+=over
+
+=item $filename
+
+The filename for this dataset.
+
+=item return
+
+=back
+
+=cut
+sub _writeToDatabase {
+    my $self = shift;
+
+    my ($filename) = @_;
+
+    my $importer = Metamod::DatasetImporter->new();
+    $importer->write_to_database( $filename );
+
 }
 
 sub deleteDatasetFile {
