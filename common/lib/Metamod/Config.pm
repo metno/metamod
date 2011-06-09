@@ -42,6 +42,7 @@ use strict;
 use warnings;
 
 use Carp;
+#use Data::Dumper;
 use File::Spec qw();
 use Cwd qw();
 # read ABS_PATH early, in case somebody uses a chdir
@@ -50,7 +51,7 @@ BEGIN {
     die "cannot get abs_path from ".__FILE__ unless ABS_PATH;
 }
 
-our %_config; #_config{file} => $config
+our $_config; #_config{file} => $config
 
 # we only initialise the logger once during the entire run. Different configuration
 # files cannot have their own logger config.
@@ -67,15 +68,15 @@ sub new {
         die "Cannot read $fileFlag config-file: $file";
     }
     $file = _normalizeFile($file);
-    unless (exists $_config{$file}) {
+    unless (defined $_config) {
         my $config = {
             mtime => '0',
             filename => $file,
             vars => {}, # lazy loading on first get
         };
-        $_config{$file} = bless $config, $class;
+        $_config = bless $config, $class;
     }
-    return $_config{$file};
+    return $_config;
 }
 
 # get the file from METAMOD_MASTER_CONFIG or in (source|target)/master_config.txt
