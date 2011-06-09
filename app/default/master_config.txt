@@ -378,6 +378,15 @@ TEST_IMPORT_BASETIME = 1213793125
 # to [==OPERATOR_EMAIL==].
 TEST_EMAIL_RECIPIENT =
 
+# ============ Subscription configuration ==============
+#
+# Configuration of the METAMOD subscription services
+
+# The directory where SMS will look for new transfers to perform.
+SUBSCRIPTION_SMS_DIRECTORY =
+
+SUBSCRIPTION_ENABLED = ENABLED
+
 # ============ Authentication configuration ============
 #
 # Configuration of METAMOD configuration
