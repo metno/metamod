@@ -63,10 +63,10 @@ my $nameReg = qr{^([^/]*)/([^/]*/)?([^/]*)$}; # project/[parent/]name where pare
 sub _decode {
 	my ($self, $string) = @_;
 	if (!Encode::is_utf8($string)) {
-		$logger->debug("String not properly encoded, assuming utf8: $string\n");
+		$logger->debug("String not properly encoded, assuming utf8: $string");
         eval {$string = Encode::decode('utf8', $string, Encode::FB_CROAK);};
         if ($@) {
-        	$logger->warn("Unable to properly decode string: $string\n");
+        	$logger->warn("Unable to properly decode string: $string");
         	$string = Encode::decode('utf8', $string);
         }
 	}

@@ -77,14 +77,14 @@ sub test {
         }
     }
     return 0 unless $self->{oldDoc}; # $doc not initialized
-    
+
     # test of content in xmlStr
     my $root = $self->{oldDoc}->getDocumentElement();
     my $nodeList = $root->findnodes('/dataset/@ownertag');
     if ($nodeList->size() == 1) {
         return 1;
     } else {
-        $logger->debug("found ".$nodeList->size." nodes with /dataset/\@ownertag\n");
+        $logger->debug("found ".$nodeList->size." nodes with /dataset/\@ownertag");
     }
     return 0;
 }
@@ -92,14 +92,14 @@ sub test {
 sub transform {
     my $self = shift;
     croak("Cannot run transform if test fails\n") unless $self->test;
-    
+
     my $mm2Doc;
     {
-        my $styleDoc = $self->XMLParser->parse_file($self->{mm2Xslt});    
+        my $styleDoc = $self->XMLParser->parse_file($self->{mm2Xslt});
         my $stylesheet = $self->XSLTParser->parse_stylesheet($styleDoc);
         $mm2Doc = $stylesheet->transform($self->{oldDoc});
     }
-    
+
     my $xmdDoc;
     {
         my $styleDoc = $self->XMLParser->parse_file($self->{xmdXslt});
@@ -169,4 +169,3 @@ Heiko Klein, E<lt>H.Klein@met.noE<gt>
 L<XML::LibXML>, L<XML::LibXSLT>, L<Metamod::DatasetTransformer>
 
 =cut
-

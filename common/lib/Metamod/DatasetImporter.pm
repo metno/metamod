@@ -273,7 +273,7 @@ sub write_to_database {
                 my $mdid;
                 if ( exists( $shared_metadatatypes{$mtname} ) ) {
                     my $mdkey = $mtname . ':' . cleanContent($mdcontent);
-                    $logger->debug("mdkey: $mdkey\n");
+                    $logger->debug("mdkey: $mdkey");
                     if ( exists( $dbMetadata{$mdkey} ) ) {
                         $mdid = $dbMetadata{$mdkey};
                     } else {
@@ -290,7 +290,7 @@ sub write_to_database {
                         $sql_insert_DSMD->execute( $dsid, $mdid );
                     } else {
                         # duplicate key happens all the times, in particular when converting formats
-                        $logger->debug("duplicate metadata: $mdkey\n");
+                        $logger->debug("duplicate metadata: $mdkey");
                     }
                 } elsif ( exists( $rest_metadatatypes{$mtname} ) ) {
                     $sql_getkey_MD->execute();
@@ -315,9 +315,9 @@ sub write_to_database {
                             $sql_insert_BKDS->execute( $bkid, $dsid );
                         } else {
                             # duplicate key happens all the times, in particular when converting formats
-                            $logger->debug("duplicate basic key: '$skey'\n");
+                            $logger->debug("duplicate basic key: '$skey'");
                         }
-                        $logger->debug(" -OK: $bkid,$dsid\n");
+                        $logger->debug(" -OK: $bkid,$dsid");
                     } elsif ( $mtname eq 'datacollection_period' ) {
                         my $scid = $searchcategories{$mtname};
                         if ( $mdcontent =~ /(\d{4,4})-(\d{2,2})-(\d{2,2}) to (\d{4,4})-(\d{2,2})-(\d{2,2})/ ) {
@@ -460,7 +460,7 @@ sub write_to_database {
             my $sql_insert_WMSInfo = $dbh->prepare_cached("INSERT INTO WMSInfo (DS_id, WI_content) VALUES (?, ?)");
             $sql_insert_WMSInfo->execute($dsid, $wmsInfo);
         } else {
-           $logger->debug("No wmsxml\n");
+           $logger->debug("No wmsxml");
         }
         $self->_updateExtraSearch($ds, $dsid, $inputBaseFile);
     }
@@ -508,7 +508,7 @@ sub _updateExtraSearch {
     my $fds = Metamod::ForeignDataset->newFromFileAutocomplete($inputBaseFile);
     eval {
         my %options;
-        if ($config->get('PMH_REPOSITORY_IDENTIFIER')) {
+        if ($config->has('PMH_REPOSITORY_IDENTIFIER')) {
             $options{REPOSITORY_IDENTIFIER} = $config->get('PMH_REPOSITORY_IDENTIFIER');
         }
         $isoFds = foreignDataset2iso19115($fds, \%options);
@@ -536,7 +536,7 @@ sub _updateOAIPMH {
 
     # get the new identifier
     my $newIdentifier;
-    if ($config->get('PMH_SYNCHRONIZE_ISO_IDENTIFIER')) {
+    if ($config->has('PMH_SYNCHRONIZE_ISO_IDENTIFIER') && $config->get('PMH_SYNCHRONIZE_ISO_IDENTIFIER')) {
         if ($isoFds) {
             my $xpc = XML::LibXML::XPathContext->new();
             $xpc->registerNs('gmd', 'http://www.isotc211.org/2005/gmd');
@@ -574,7 +574,7 @@ sub _updateSru2Jdbc {
     my $ownertag = $self->_get_sru_ownertags();
     my %info = $ds->getInfo();
     if ($ownertag->{cleanContent($info{ownertag})}) {
-        $self->logger->debug("running updateSru2Jdbc on $info{name}\n");
+        $self->logger->debug("running updateSru2Jdbc on $info{name}");
         # ownertag matches and not a child (no parent)
         # delete existing metadata
         my $deleteSth = $dbh->prepare_cached('DELETE FROM sru.products where id_product = ?');
@@ -584,11 +584,11 @@ sub _updateSru2Jdbc {
             eval {
                 $self->_isoDoc2SruDb($isoFds, $dsid);
             }; if ($@) {
-                $self->logger->warn("problems adding to sru-db: $@\n");
+                $self->logger->warn("problems adding to sru-db: $@");
             }
         }
     } else {
-        $self->logger->debug("not including sru-searchdata for $info{name}, $info{ownertag}\n");
+        $self->logger->debug("not including sru-searchdata for $info{name}, $info{ownertag}");
     }
 }
 
@@ -668,7 +668,7 @@ sub _isoDoc2SruDb {
     push @values, $self->_get_contact_id($dbh, $isods->getMETA_DOC(), $xpc);
 
     # insert into db
-    $self->logger->debug("Trying to insert sru-searchdata\n");
+    $self->logger->debug("Trying to insert sru-searchdata");
     my $paramNames = join ', ', @params;
     my $placeholder = join ', ', map {'?'} @values;
     my $sth = $dbh->prepare_cached(<<"SQL");
@@ -721,7 +721,7 @@ sub _get_contact_id {
 
     # TODO: get author from other places if other code-list is used
 
-    $self->logger->debug("found contact-(author,organization)=($author,$organization) in sru/iso19115\n") if $self->logger->is_debug();
+    $self->logger->debug("found contact-(author,organization)=($author,$organization) in sru/iso19115") if $self->logger->is_debug();
 
     # search for existing author/organization
     ($author, $organization) =  map {defined $_ ? uc($_) : undef} ($author, $organization);
@@ -738,7 +738,7 @@ SQL
     my $contact_id;
     while (my $row = $sth_search->fetchrow_arrayref) {
         $contact_id = $row->[0]; # max one row, schema enforces uniqueness
-        $self->logger->debug("found contact_id for $author, $organization: $contact_id\n") if $self->logger->is_debug();
+        $self->logger->debug("found contact_id for $author, $organization: $contact_id") if $self->logger->is_debug();
     }
     return $contact_id if defined $contact_id;
 

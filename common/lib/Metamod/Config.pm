@@ -113,6 +113,14 @@ sub get {
     return $self->_substituteVariable($var);
 }
 
+sub has {
+    my ($self, $var) = @_;
+    return undef unless $var;
+
+    $self->_checkFile();
+    return exists $self->{vars}{$var};
+}
+
 # check for updates of config and reread
 sub _checkFile {
     my ($self) = @_;
@@ -263,7 +271,7 @@ sub initLogger {
     }
 
     if( !( -r $log_config ) ){
-        die "Cannot read from '$log_config'";
+        croak "Cannot read from '$log_config'";
     }
 
     $ENV{ 'METAMOD_SYSTEM_LOG' } = $system_log;
@@ -407,6 +415,11 @@ if the same config file is opened several times.
 =item get("configVar")
 
 return the configuration variable configVar as currently set. This will reread the
+config-file each time it has been changed.
+
+=item has("configVar")
+
+return true if the configuration variable configVar is currently set. This will reread the
 config-file each time it has been changed.
 
 =item initLogger()
