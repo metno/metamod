@@ -48,84 +48,44 @@ sub getTargetDir {
 use FindBin;
 use lib ("$FindBin::Bin/../../common/lib", getTargetDir('lib'), getTargetDir('scripts'), '.');
 
-use Metamod::Dataset;
 use Metamod::DatasetImporter;
-use Metamod::DatasetTransformer::ToISO19115 qw(foreignDataset2iso19115);
-use Metamod::Config qw(:init_logger);
-use Metamod::Subscription;
+use Metamod::Config;
 use Log::Log4perl qw();
 use Metamod::Utils qw();
 use Data::Dumper;
-use DBI;
-use XML::LibXML::XPathContext;
-use File::Spec qw();
-use mmTtime;
 
 my $config = new Metamod::Config();
+$config->initLogger();
 my $logger = Log::Log4perl->get_logger('metamod.base.import_dataset');
 
 #
 #  Import datasets from XML files into the database.
 #
-#  With no command line arguments, this program will enter a loop
-#  while monitoring a number of directories (@importdirs) where XML files are
-#  found. As new XML files are created or updated in these directories,
-#  they are imported into the database. The loop will continue as long as
-#  you terminate the process.
-#
 #  With one command line argument, the program will import the XML file
 #  given by this argument.
 #
 
-# wait-time between re-checking files
-my $sleeping_seconds = $config->get('IMPORT_DATASET_WAIT_SECONDS');
-if ( $config->get('TEST_IMPORT_SPEEDUP') > 1 ) {
-    $sleeping_seconds = 0; # don't wait in test-case
-}
-if (!defined $sleeping_seconds or $sleeping_seconds < 0) {
-    $sleeping_seconds = 600; # default 10minutes
-}
-my $importdirs_string          = $config->get("IMPORTDIRS");
-my @importdirs                 = split( /\n/, $importdirs_string );
-my $path_to_import_updated     = $config->get("WEBRUN_DIRECTORY").'/import_updated';
-my $path_to_import_updated_new = $config->get("WEBRUN_DIRECTORY").'/import_updated.new';
-my $path_to_logfile            = $config->get("LOG4ALL_SYSTEM_LOG");
-
 #
 #  Check number of command line arguments
 #
-if ( scalar @ARGV > 2 ) {
-    die "\nUsage:\n\n   Import single XML file:     $0 filename\n"
+if ( scalar @ARGV != 1 ) {
+    die "\nUsage:\n\n"
+      . "   Import single XML file:     $0 filename\n"
       . "   Import a directory:         $0 directory\n"
-      . "   Infinite monitoring loop:   $0\n"
-      . "   Infinite daemon monitor:    $0 logfile pidfile\n\n";
 }
 my $inputfile;
 my $inputDir;
 
-# should subscription be activated or not. We do not want to activate subscriptions
-# when the metabase is re-indexed i.e. the script is running in batch mode.
-my $activateSubscriptions = 0;
 
-if( @ARGV == 0 ){
-    $activateSubscriptions = 1;
-} elsif ( @ARGV == 1 ) {
-    if ( -f $ARGV[0] ) {
-        $inputfile = $ARGV[0];
-    }
-    elsif ( -d $ARGV[0] ) {
-        $inputDir = $ARGV[0];
-    }
-    else {
-        die "Unknown inputfile or inputdir: $ARGV[0]\n";
-    }
-} elsif ( @ARGV == 2 ) {
-    $activateSubscriptions = 1;
-    Metamod::Utils::daemonize($ARGV[0], $ARGV[1]);
+if ( -f $ARGV[0] ) {
+    $inputfile = $ARGV[0];
 }
-our $SIG_TERM = 0;
-sub sigterm {++$SIG_TERM;}
-$SIG{TERM} = \&sigterm;
+elsif ( -d $ARGV[0] ) {
+    $inputDir = $ARGV[0];
+}
+else {
+    die "Unknown inputfile or inputdir: $ARGV[0]\n";
+}
 
 #
 if ( defined($inputfile) ) {
@@ -135,7 +95,7 @@ if ( defined($inputfile) ) {
     #  (including "die()")
     #
     my $dbh = $config->getDBH();
-    eval { &update_database($inputfile, $dbh); };
+    eval { update_database($inputfile); };
 
     #
     #  Check error string returned from eval
@@ -152,53 +112,22 @@ if ( defined($inputfile) ) {
     $dbh->disconnect;
 }
 elsif ( defined($inputDir) ) {
-   process_directories(-1, $inputDir);
-}
-else {
-    &process_xml_loop();
+   process_directories($inputDir);
 }
 
-# ------------------------------------------------------------------
-sub process_xml_loop {
-
-    #
-    #  Infinite loop that checks for new or modified XML files as long as
-    #  SIG_TERM (standard kill, Ctrl-C) has not been called.
-    #
-    $logger->info("Check for new datasets in @importdirs\n");
-    while ( ! $SIG_TERM ) {
-
-#    The file $path_to_import_updated was last modified in the previous
-#    turn of this loop. All XML files that are modified later are candidates
-#    for import in the current turn of the loop.
-#    Get the modification time corresponding to the previous turn of the loop:
-#
-        my @status = stat($path_to_import_updated);
-        if ( scalar @status == 0 ) {
-            $logger->logdie("Could not stat $path_to_import_updated\n");
-        }
-        my $last_updated = $status[9];    # Seconds since the epoch
-        my $checkTime = time();
-        process_directories($last_updated, @importdirs);
-        utime($checkTime, $checkTime, $path_to_import_updated)
-            or die "Cannot touch $path_to_import_updated";
-        sleep($sleeping_seconds);
-    }
-    $logger->info("Check for new datasets stopped\n");
-}
 
 # callback function from File::Find for directories
-sub processFoundFile {
-    my ($dbh, $last_updated) = @_;
+sub process_found_file {
+    my ($dbh) = @_;
     my $file = $File::Find::name;
-    if ($file =~ /\.xm[ld]$/ and -f $file and (stat(_))[9] >= $last_updated) {
+    if ($file =~ /\.xm[ld]$/ and -f $file) {
         $logger->info("$file -accepted\n");
         my $basename = substr $file, 0, length($file)-4; # remove .xm[ld]
-        if ($file eq "$basename.xml" and -f "$basename.xmd" and (stat(_))[9] >= $last_updated) {
+        if ($file eq "$basename.xml" and -f "$basename.xmd") {
             # ignore .xml file, will be processed together with .xmd file
         } else {
             # import to database
-            eval { &update_database( $file, $dbh ); };
+            eval { update_database( $file ); };
             if ($@) {
                 $dbh->rollback or $logger->logdie( $dbh->errstr . "\n");
                 my $stm = $dbh->{"Statement"};
@@ -213,7 +142,7 @@ sub processFoundFile {
 }
 
 sub process_directories {
-    my ($last_updated,@dirs) = @_;
+    my (@dirs) = @_;
 
     my $dbh = $config->getDBH();
     foreach my $xmldir (@dirs) {
@@ -223,7 +152,7 @@ sub process_directories {
         my @files_to_consume;
         if ( -d $xmldir1 ) {
             # xm[ld] files newer than $last_updated
-            File::Find::find({wanted => sub {processFoundFile($dbh, $last_updated)},
+            File::Find::find({wanted => sub {process_found_file($dbh)},
                               no_chdir => 1},
                               $xmldir1);
         }
@@ -234,7 +163,7 @@ sub process_directories {
 
 # ------------------------------------------------------------------
 sub update_database {
-    my ($inputBaseFile, $dbh) = @_;
+    my ($inputBaseFile) = @_;
 
     my $importer = Metamod::DatasetImporter->new();
     $importer->write_to_database($inputBaseFile);
