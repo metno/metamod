@@ -89,7 +89,7 @@ sub write_to_database {
     my $stm       = $dbh->prepare_cached("SELECT BK_id,SC_id,BK_name FROM BasicKey");
     $stm->execute();
     while ( my @row = $stm->fetchrow_array ) {
-        my $key = $row[1] . ':' . cleanContent($row[2]);
+        my $key = $row[1] . ':' . $self->clean_content($row[2]);
         $basickeys{$key} = $row[0];
     }
 
@@ -106,7 +106,7 @@ sub write_to_database {
         . "MetadataType.MT_share = TRUE" );
     $stm->execute();
     while ( my @row = $stm->fetchrow_array ) {
-        my $key = $row[0] . ':' . cleanContent($row[1]);
+        my $key = $row[0] . ':' . $self->clean_content($row[1]);
         $dbMetadata{$key} = $row[2];
     }
 
@@ -273,7 +273,7 @@ sub write_to_database {
                 my $mdcontent = $mref->[1];
                 my $mdid;
                 if ( exists( $shared_metadatatypes{$mtname} ) ) {
-                    my $mdkey = $mtname . ':' . cleanContent($mdcontent);
+                    my $mdkey = $mtname . ':' . $self->clean_content($mdcontent);
                     $logger->debug("mdkey: $mdkey");
                     if ( exists( $dbMetadata{$mdkey} ) ) {
                         $mdid = $dbMetadata{$mdkey};
@@ -306,7 +306,7 @@ sub write_to_database {
                 #  Insert searchdata:
                 #
                 if ( exists( $searchcategories{$mtname} ) ) {
-                    my $skey = $searchcategories{$mtname} . ':' . cleanContent($mdcontent);
+                    my $skey = $searchcategories{$mtname} . ':' . $self->clean_content($mdcontent);
                     $logger->debug("Insert searchdata. Try: '$skey'");
                     if ( exists( $basickeys{$skey} ) ) {
                         my $bkid = $basickeys{$skey};
@@ -482,7 +482,7 @@ sub _get_sru_ownertags {
 
     unless ($self->ownertags) {
         my $sru2jdbc_tags = $self->config->get('SRU2JDBC_TAGS') or die "Missing config param SRU2JDBC_TAGS";
-        my %ownertags = map {cleanContent($_) => 1} map {s/'//g; $_} split (',', $sru2jdbc_tags);
+        my %ownertags = map {$self->clean_content($_) => 1} map {s/'//g; $_} split (',', $sru2jdbc_tags);
         $self->ownertags(\%ownertags);
     }
     return $self->ownertags;
@@ -541,7 +541,7 @@ sub _updateOAIPMH {
         if ($isoFds) {
             my $xpc = XML::LibXML::XPathContext->new();
             $xpc->registerNs('gmd', 'http://www.isotc211.org/2005/gmd');
-            $newIdentifier = scalar _get_text_from_doc($isoFds->getMETA_DOC(), '/gmd:MD_Metadata/gmd:fileIdentifier', $xpc);
+            $newIdentifier = scalar $self->_get_text_from_doc($isoFds->getMETA_DOC(), '/gmd:MD_Metadata/gmd:fileIdentifier', $xpc);
         }
     } else {
         my $pmhIdentifier = $config->get('PMH_REPOSITORY_IDENTIFIER');
@@ -574,7 +574,7 @@ sub _updateSru2Jdbc {
 
     my $ownertag = $self->_get_sru_ownertags();
     my %info = $ds->getInfo();
-    if ($ownertag->{cleanContent($info{ownertag})}) {
+    if ($ownertag->{$self->clean_content($info{ownertag})}) {
         $self->logger->debug("running updateSru2Jdbc on $info{name}");
         # ownertag matches and not a child (no parent)
         # delete existing metadata
@@ -636,33 +636,33 @@ sub _isoDoc2SruDb {
     push @values, $isods->getMETA_DOC()->textContent();
 
     push @params, "title";
-    push @values, uc(scalar _get_text_from_doc($isods->getMETA_DOC(), '//gmd:title', $xpc));
+    push @values, uc(scalar $self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:title', $xpc));
 
     push @params, "abstract";
-    push @values, uc(scalar _get_text_from_doc($isods->getMETA_DOC(), '//gmd:abstract', $xpc));
+    push @values, uc(scalar $self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:abstract', $xpc));
 
     push @params, "subject";
-    push @values, uc(scalar _get_text_from_doc($isods->getMETA_DOC(), '//gmd:subject', $xpc)); # TODO: does this exist?
+    push @values, uc(scalar $self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:subject', $xpc)); # TODO: does this exist?
 
     push @params, "search_strings";
-    push @values, uc(scalar _get_text_from_doc($isods->getMETA_DOC(), '//gmd:keyword', $xpc)); # TODO: word separator?
+    push @values, uc(scalar $self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:keyword', $xpc)); # TODO: word separator?
 
     # TODO, not in document yet ???
     #push @params, "begin_date";
-    #push @values, uc(scalar _get_text_from_doc($isods->getMETA_DOC(), '//gmd:XXXX', $xpc));
+    #push @values, uc(scalar $self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:XXXX', $xpc));
 
     # TODO, not in document yet ???
     #push @params, "end_date";
-    #push @values, uc(scalar _get_text_from_doc($isods->getMETA_DOC(), '//gmd:XXXX', $xpc));
+    #push @values, uc(scalar $self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:XXXX', $xpc));
 
     push @params, "west";
-    push @values, min(_get_text_from_doc($isods->getMETA_DOC(), '//gmd:westBoundLongitude', $xpc));
+    push @values, min($self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:westBoundLongitude', $xpc));
     push @params, "east";
-    push @values, max(_get_text_from_doc($isods->getMETA_DOC(), '//gmd:eastBoundLongitude', $xpc));
+    push @values, max($self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:eastBoundLongitude', $xpc));
     push @params, "south";
-    push @values, min(_get_text_from_doc($isods->getMETA_DOC(), '//gmd:southBoundLatitude', $xpc));
+    push @values, min($self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:southBoundLatitude', $xpc));
     push @params, "north";
-    push @values, max(_get_text_from_doc($isods->getMETA_DOC(), '//gmd:northBoundLatitude', $xpc));
+    push @values, max($self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:northBoundLatitude', $xpc));
 
     # id_contact parameter
     push @params, "id_contact";
@@ -694,9 +694,9 @@ sub _get_contact_id {
 
     # fetch author and org from document, publisher or principalInvestigator
     my $authorXP = '//gmd:pointOfContact/gmd:CI_ResponsibleParty[ gmd:role/gmd:CI_RoleCode[ @codeListValue="publisher" or @codeListValue="principalInvestigator" ] ]/gmd:individualName';
-    my $author = _get_text_from_doc($doc, $authorXP, $xpc);
+    my $author = $self->_get_text_from_doc($doc, $authorXP, $xpc);
     my $orgXP = '//gmd:pointOfContact/gmd:CI_ResponsibleParty[ gmd:role/gmd:CI_RoleCode[ @codeListValue="publisher" or @codeListValue="principalInvestigator" ] ]/gmd:organisationName';
-    my $organization = _get_text_from_doc($doc, $orgXP, $xpc);
+    my $organization = $self->_get_text_from_doc($doc, $orgXP, $xpc);
 
     # TODO: get author from other places if other code-list is used
 
@@ -745,6 +745,8 @@ SQL
 #   list-context: list of text-contents
 #   scalar: white-space joined context, or undef
 sub _get_text_from_doc {
+    my $self = shift;
+
     my ($doc, $xpath, $xpc) = @_;
     my @nodes = $xpc->findnodes($xpath, $doc);
     my @results;
@@ -763,7 +765,9 @@ sub _get_text_from_doc {
     }
 }
 
-sub cleanContent {
+sub clean_content {
+    my $self = shift;
+
     my ($content) = @_;
     # trim
     $content =~ s/(^\s+|\s+$)//go;
