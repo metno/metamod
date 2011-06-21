@@ -3,7 +3,6 @@
 =scripts/print_usererrors.pl
 =scripts/upload_monitor.pl
 =scripts/upload_indexer.pl
-=scripts/Uploadutils.pm
 =scripts/show_time_now.pl
 =scripts/createChildDatasets.pl
 =scripts/load_userbase.pl
