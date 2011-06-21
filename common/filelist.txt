@@ -30,6 +30,7 @@ etc/default/catalyst-myapp
 =schema/fimexProjections.xsd
 =schema/ncWmsSetup.xsd
 =schema/wmcSetup.xsd
+=lib/Metamod/DatasetImporter.pm
 =lib/Metamod/DatasetTransformer.pm
 =lib/Metamod/DatasetTransformer/MM2.pm
 =lib/Metamod/DatasetTransformer/OldDataset.pm
@@ -80,13 +81,17 @@ etc/default/catalyst-myapp
 =lib/Metamod/LoggerConfigParser.pm
 =lib/Metamod/Queue.pm
 =lib/Metamod/Queue/Job/PrepareDownload.pm
+=lib/Metamod/Queue/Job/Upload.pm
 =lib/Metamod/Queue/Worker/PrepareDownload.pm
+=lib/Metamod/Queue/Worker/Upload.pm
 =lib/Metamod/Subscription.pm
 =lib/Metamod/SubscriptionHandler.pm
 =lib/Metamod/SubscriptionHandler/Email.pm
 =lib/Metamod/SubscriptionHandler/EmailToFile.pm
 =lib/Metamod/SubscriptionHandler/SMS.pm
 =lib/Metamod/SubscriptionUtils.pm
+=lib/Metamod/UploadMonitor.pm
+=lib/Metamod/UploadUtils.pm
 =lib/Metamod/WMS.pm
 =lib/Metamod/mmUserbase.pm
 =lib/Metamod/mmLogView.pm

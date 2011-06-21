@@ -59,7 +59,7 @@ use Data::Dumper;
 use Mail::Mailer;
 use mmTtime;
 use Metamod::Utils qw(findFiles getFiletype remove_cr_from_file);
-use Uploadutils qw(notify_web_system
+use Metamod::UploadUtils qw(notify_web_system
     get_dataset_institution
     shcommand_scalar
     get_basenames
