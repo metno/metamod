@@ -27,7 +27,7 @@ use Log::Log4perl;
 use Moose;
 
 use Metamod::Dataset;
-use Metamod::DatasetTransformer::ToISO19115 qw(foreignDataset2iso19115);
+use Metamod::DatasetTransformer::ToISO19115;
 
 =head1 NAME
 
@@ -511,7 +511,7 @@ sub _updateExtraSearch {
         if ($config->has('PMH_REPOSITORY_IDENTIFIER')) {
             $options{REPOSITORY_IDENTIFIER} = $config->get('PMH_REPOSITORY_IDENTIFIER');
         }
-        $isoFds = foreignDataset2iso19115($fds, \%options);
+        $isoFds = Metamod::DatasetTransformer::ToISO19115::foreignDataset2iso19115($fds, \%options);
     }; if ($@) {
         $self->logger->warn("problems converting to iso19115 of $info{name}: $@\n");
     }
