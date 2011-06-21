@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use strict;
 use warnings;
 
+use List::Util qw(max min);
 use Log::Log4perl;
 use Moose;
 
@@ -678,28 +679,6 @@ SQL
     $self->logger->debug("Inserted sru-searchdata\n");
 }
 
-
-# get the minimum of a list of values
-sub min {
-    my $val = shift;
-    foreach my $vn (@_) {
-        if ($val > $vn) {
-            $val = $vn;
-        }
-    }
-    return $val;
-}
-
-# get the maximum of a list of values
-sub max {
-    my $val = shift;
-    foreach my $vn (@_) {
-        if ($val < $vn) {
-            $val = $vn;
-        }
-    }
-    return $val;
-}
 
 #
 # get the author and organization from the document
