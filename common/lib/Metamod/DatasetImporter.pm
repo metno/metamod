@@ -48,6 +48,109 @@ has 'logger' => ( is => 'ro', default => sub { Log::Log4perl::get_logger('metamo
 
 has 'ownertags' => ( is => 'rw', isa => 'HashRef' );
 
+#
+#  Hash with existing metadata in the database that may be shared between
+#  datasets. The keys in this hash have the form: 'MT_name:MD_content' with
+#  MD_content in lower-case and the values are the corresponding 'MD_id's.
+#
+has '_db_metadata' => ( is => 'ro', isa => 'HashRef', lazy => 1, builder => '_build__db_metadata' );
+
+#
+#  Hash with all MetadataTypes that prescribes sharing of common metadata
+#  values between datasets.
+#
+has '_shared_metadatatypes' => ( is => 'ro', isa => 'HashRef', lazy => 1, builder => '_build__shared_metadatatypes' );
+
+#
+#  Hash with the rest of the MetadataTypes (i.e. no sharing).
+#
+has '_unshared_metadatatypes' => ( is => 'ro', isa => 'HashRef', lazy => 1, builder => '_build__unshared_metadatatypes' );
+
+#
+#  Hash with all existing basic keys in the database.
+#  The keys in this hash have the form: 'SC_id:BK_name' and
+#  the values are the corresponding 'BK_id's.
+#  The BK_name are used as lower case.
+#
+has '_basickeys' => ( is => 'ro', isa => 'HashRef', lazy => 1, builder => '_build__basickeys' );
+
+
+sub _build__db_metadata {
+    my $self = shift;
+
+    my $config = $self->config();
+    my $dbh = $config->getDBH();
+
+    my %dbMetadata = ();
+    my $stm =
+      $dbh->prepare_cached(
+        "SELECT Metadata.MT_name,MD_content,MD_id FROM Metadata, MetadataType "
+        . "WHERE Metadata.MT_name = MetadataType.MT_name AND "
+        . "MetadataType.MT_share = TRUE" );
+    $stm->execute();
+    while ( my @row = $stm->fetchrow_array ) {
+        my $key = $row[0] . ':' . $self->clean_content($row[1]);
+        $dbMetadata{$key} = $row[2];
+    }
+
+    return \%dbMetadata;
+
+}
+
+sub _build__shared_metadatatypes {
+    my $self = shift;
+
+    my $config = $self->config();
+    my $dbh = $config->getDBH();
+
+    my %shared_metadatatypes = ();
+    my $stm =
+      $dbh->prepare_cached("SELECT MT_name FROM MetadataType WHERE MT_share = TRUE");
+    $stm->execute();
+    while ( my @row = $stm->fetchrow_array ) {
+        $shared_metadatatypes{ $row[0] } = 1;
+    }
+
+    return \%shared_metadatatypes;
+}
+
+sub _build__unshared_metadatatypes {
+    my $self = shift;
+
+    my $config = $self->config();
+    my $dbh = $config->getDBH();
+
+    my %rest_metadatatypes = ();
+    my $stm =
+      $dbh->prepare_cached("SELECT MT_name FROM MetadataType WHERE MT_share = FALSE");
+      $stm->execute();
+    while ( my @row = $stm->fetchrow_array ) {
+        $rest_metadatatypes{ $row[0] } = 1;
+    }
+
+    return \%rest_metadatatypes;
+
+}
+
+sub _build__basickeys {
+    my $self = shift;
+
+    my $config = $self->config();
+    my $dbh = $config->getDBH();
+
+    my %basickeys = ();
+    my $stm       = $dbh->prepare_cached("SELECT BK_id,SC_id,BK_name FROM BasicKey");
+    $stm->execute();
+    while ( my @row = $stm->fetchrow_array ) {
+        my $key = $row[1] . ':' . $self->clean_content($row[2]);
+        $basickeys{$key} = $row[0];
+    }
+
+    return \%basickeys;
+
+}
+
+
 sub write_to_database {
     my $self = shift;
 
@@ -79,119 +182,9 @@ sub write_to_database {
         operational_status    => 10,
     );
 
-    #
-    #  Create hash with all existing basic keys in the database.
-    #  The keys in this hash have the form: 'SC_id:BK_name' and
-    #  the values are the corresponding 'BK_id's.
-    #  The BK_name are used as lower case.
-    #
-    my %basickeys = ();
-    my $stm       = $dbh->prepare_cached("SELECT BK_id,SC_id,BK_name FROM BasicKey");
-    $stm->execute();
-    while ( my @row = $stm->fetchrow_array ) {
-        my $key = $row[1] . ':' . $self->clean_content($row[2]);
-        $basickeys{$key} = $row[0];
-    }
-
-#
-#  Create hash with existing metadata in the database that may be shared between
-#  datasets. The keys in this hash have the form: 'MT_name:MD_content' with
-#  MD_content in lower-case and the values are the corresponding 'MD_id's.
-#
-    my %dbMetadata = ();
-    $stm =
-      $dbh->prepare_cached(
-        "SELECT Metadata.MT_name,MD_content,MD_id FROM Metadata, MetadataType "
-        . "WHERE Metadata.MT_name = MetadataType.MT_name AND "
-        . "MetadataType.MT_share = TRUE" );
-    $stm->execute();
-    while ( my @row = $stm->fetchrow_array ) {
-        my $key = $row[0] . ':' . $self->clean_content($row[1]);
-        $dbMetadata{$key} = $row[2];
-    }
-
-#
-#  Create hash with all MetadataTypes that prescribes sharing of common metadata
-#  values between datasets.
-#
-    my %shared_metadatatypes = ();
-    $stm =
-      $dbh->prepare_cached("SELECT MT_name FROM MetadataType WHERE MT_share = TRUE");
-    $stm->execute();
-    while ( my @row = $stm->fetchrow_array ) {
-        $shared_metadatatypes{ $row[0] } = 1;
-    }
-
-    #
-    #  Create hash with the rest of the MetadataTypes (i.e. no sharing).
-    #
-    my %rest_metadatatypes = ();
-    $stm =
-      $dbh->prepare_cached("SELECT MT_name FROM MetadataType WHERE MT_share = FALSE");
-      $stm->execute();
-    while ( my @row = $stm->fetchrow_array ) {
-        $rest_metadatatypes{ $row[0] } = 1;
-    }
 
     {
-        my %metadata = $ds->getMetadata;
-        my $period_from;
-        my $period_to;
-        my @metaarray   = ();
-        my @searcharray = ();
-        unless ( $info{name} ) {
-            die "Dataset with no drpath/name";
-        }
-
-        foreach my $name ( keys %metadata ) {
-            my $ref2 = $metadata{$name};
-            if ( $name eq 'abstract' ) {
-                my $mref = [ $name, $ref2->[0] ];
-                push( @metaarray, $mref );
-            } elsif ( $name eq 'datacollection_period_from' ) {
-                $period_from = $ref2->[0];
-                if ( $period_from =~ /(\d\d\d\d-\d\d-\d\d)/ ) {
-                    # Remove HH:MM UTC originating from questionnaire data.
-                    $period_from = $1;
-                } else {
-                    undef $period_from;
-                }
-            } elsif ( $name eq 'datacollection_period_to' ) {
-                $period_to = $ref2->[0];
-                if ( $period_to =~ /(\d\d\d\d-\d\d-\d\d)/ ) {
-                    # Remove HH:MM UTC originating from questionnaire data.
-                    $period_to = $1;
-                } else {
-                    undef $period_to;
-                }
-            } elsif ( $name eq 'topic' ) {
-                foreach my $topic (@$ref2) {
-                    my $variable = $topic . ' > HIDDEN';
-                    my $mref = [ 'variable', $variable ];
-                    push( @metaarray, $mref );
-                }
-            } elsif ( $name eq 'area' ) {
-                foreach my $str1 (@$ref2) {
-                    my $area = $str1;
-                    # Remove upper components of hierarchical name originating from
-                    # questionnaire data.
-                    $area =~ s/^.*>\s*//;
-
-                    my $mref = [ 'area', $area ];
-                    push( @metaarray, $mref );
-                }
-            } else {
-                foreach my $str1 (@$ref2) {
-                    my $mref = [ $name, $str1 ];
-                    push( @metaarray, $mref );
-                }
-            }
-        }
-        if ( defined($period_from) && defined($period_to) ) {
-            my $period = $period_from . ' to ' . $period_to;
-            my $mref = [ 'datacollection_period', $period ];
-            push( @metaarray, $mref );
-        }
+        my @metaarray = $self->_transform_metadata($ds);
 
         my $sql_getIDByName_DS = $dbh->prepare_cached("SELECT DS_id FROM Dataset WHERE DS_name = ?");
         $sql_getIDByName_DS->execute( $info{name} );
@@ -268,6 +261,10 @@ sub write_to_database {
             #  Insert metadata:
             #  Metadata with metadata type name not in the database are ignored.
             #
+            my %dbMetadata = %{ $self->_db_metadata() };
+            my %shared_metadatatypes = %{ $self->_shared_metadatatypes() };
+            my %rest_metadatatypes = %{ $self->_unshared_metadatatypes() };
+
             foreach my $mref (@metaarray) {
                 my $mtname = $mref->[0];
                 my $mdcontent = $mref->[1];
@@ -305,6 +302,7 @@ sub write_to_database {
                 #
                 #  Insert searchdata:
                 #
+                my %basickeys = %{ $self->_basickeys };
                 if ( exists( $searchcategories{$mtname} ) ) {
                     my $skey = $searchcategories{$mtname} . ':' . $self->clean_content($mdcontent);
                     $logger->debug("Insert searchdata. Try: '$skey'");
@@ -355,84 +353,8 @@ sub write_to_database {
                 $sql_insert_GADS->execute( $gaid, $dsid );
             }
         }
-        #
-        #  Insert new geographical location (region)
-        #
-        my $sql_delete_Location = $dbh->prepare_cached("DELETE FROM Dataset_Location where DS_id = ?");
-        $sql_delete_Location->execute($dsid);
-        if (defined (my $region = $ds->getDatasetRegion)) {
-            my @srids = split ' ', $config->get('SRID_ID_COLUMNS');
-            my @regions;
-            foreach my $srid (@srids) {
-                my %sridBB;
-                @sridBB{qw(north east south west)} =  split ' ', $config->get('SRID_NESW_BOUNDING_BOX_'.$srid);
-                if (defined $sridBB{west}) {
-                    if ($region->overlapsBoundingBox(\%sridBB)) {
-                        push @regions, $srid;
-                    }
-                } else {
-                    # no bounding box defined for srid, use anyway
-                    push @regions, $srid;
-                }
-            }
-            if (@regions) {
-                my $regionColumns = join ',', map {"geom_$_"} @regions;
-                my $lonlat = $config->get('LONLAT_SRID') or die "Missing config directive LONLAT_SRID";
-                my $regionValues = join ',', map {"ST_TRANSFORM(ST_GeomFromText(?,$lonlat), $_)"} @regions;
-                my $sql_insert_Location = $dbh->prepare_cached("INSERT INTO Dataset_Location (DS_id, $regionColumns) VALUES (?, $regionValues)");
 
-                my $regionAdded = 0;
-                foreach my $p ($region->getPolygons) {
-                    my $pString = $p->toProjectablePolygon->toWKT;
-                    if (length($pString) > 10  and length($pString) < 1_000_000) {
-                        my $parCound = 0;
-                        $sql_insert_Location->bind_param(++$parCound, $dsid);
-                        foreach my $srid (@regions) {
-                            $sql_insert_Location->bind_param(++$parCound, $pString);
-                        }
-                        $sql_insert_Location->execute();
-                        $regionAdded++;
-                    }
-                }
-                my @points = $region->getPoints;
-                if (@points) {
-                    my $pString = 'MULTIPOINT('. join(',', @points) . ')';
-                    if (length($pString) > 10 and length($pString) < 1_000_000) {
-                        my $parCound = 0;
-                        $sql_insert_Location->bind_param(++$parCound, $dsid);
-                        foreach my $srid (@regions) {
-                            $sql_insert_Location->bind_param(++$parCound, $pString);
-                        }
-                        $sql_insert_Location->execute();
-                        $regionAdded++;
-                    }
-                    $regionAdded++;
-                }
-                if (!$regionAdded) {
-                    # trying to add boundingBox
-                    my %bb = $region->getBoundingBox;
-                    if (scalar keys %bb >= 4) {
-                        my $polygon;
-                        eval {
-                            $polygon = Metamod::LonLatPolygon->new([$bb{west}, $bb{south}],
-                                                                   [$bb{west}, $bb{north}],
-                                                                   [$bb{east}, $bb{north}],
-                                                                   [$bb{east}, $bb{south}],
-                                                                   [$bb{west}, $bb{south}]);
-                        }; if (!$@) { # ignore warnings/errors
-                            my $pString = $polygon->toProjectablePolygon->toWKT;
-                            my $parCound = 0;
-                            $sql_insert_Location->bind_param(++$parCound, $dsid);
-                            foreach my $srid (@regions) {
-                                $sql_insert_Location->bind_param(++$parCound, $pString);
-                            }
-                            $sql_insert_Location->execute();
-                            $regionAdded++;
-                        }
-                    }
-                }
-            }
-        }
+        $self->_update_geo_location($ds, $dsid);
 
         #
         #   Insert new projectionInformation
@@ -473,6 +395,181 @@ sub write_to_database {
 #    }
 
     $dbh->commit;
+}
+
+=head2 $self->_transform_metadata($ds)
+
+Transform the dataset metadata to a format understood by the database.
+
+=over
+
+=item $ds
+
+A reference to a C<Metamod::ForeignDataset>
+
+=item return
+
+An array where all the values are tuples of the type [ <metadata name>, <value>]
+
+=back
+
+=cut
+sub _transform_metadata {
+    my $self = shift;
+
+    my ($ds) = @_;
+
+    my %info = $ds->getInfo;
+
+    my %metadata = $ds->getMetadata;
+    my $period_from;
+    my $period_to;
+    my @metaarray   = ();
+    unless ( $info{name} ) {
+        die "Dataset with no drpath/name";
+    }
+
+    foreach my $name ( keys %metadata ) {
+        my $ref2 = $metadata{$name};
+        if ( $name eq 'abstract' ) {
+            my $mref = [ $name, $ref2->[0] ];
+            push( @metaarray, $mref );
+        } elsif ( $name eq 'datacollection_period_from' ) {
+            $period_from = $ref2->[0];
+            if ( $period_from =~ /(\d\d\d\d-\d\d-\d\d)/ ) {
+                # Remove HH:MM UTC originating from questionnaire data.
+                $period_from = $1;
+            } else {
+                undef $period_from;
+            }
+        } elsif ( $name eq 'datacollection_period_to' ) {
+            $period_to = $ref2->[0];
+            if ( $period_to =~ /(\d\d\d\d-\d\d-\d\d)/ ) {
+                # Remove HH:MM UTC originating from questionnaire data.
+                $period_to = $1;
+            } else {
+                undef $period_to;
+            }
+        } elsif ( $name eq 'topic' ) {
+            foreach my $topic (@$ref2) {
+                my $variable = $topic . ' > HIDDEN';
+                my $mref = [ 'variable', $variable ];
+                push( @metaarray, $mref );
+            }
+        } elsif ( $name eq 'area' ) {
+            foreach my $str1 (@$ref2) {
+                my $area = $str1;
+                # Remove upper components of hierarchical name originating from
+                # questionnaire data.
+                $area =~ s/^.*>\s*//;
+
+                my $mref = [ 'area', $area ];
+                push( @metaarray, $mref );
+            }
+        } else {
+            foreach my $str1 (@$ref2) {
+                my $mref = [ $name, $str1 ];
+                push( @metaarray, $mref );
+            }
+        }
+    }
+    if ( defined($period_from) && defined($period_to) ) {
+        my $period = $period_from . ' to ' . $period_to;
+        my $mref = [ 'datacollection_period', $period ];
+        push( @metaarray, $mref );
+    }
+
+    return @metaarray;
+
+}
+
+sub _update_geo_location {
+    my $self = shift;
+
+    my ($ds, $dsid) = @_;
+
+    my $config = $self->config();
+    my $dbh = $config->getDBH();
+
+    #
+    #  Insert new geographical location (region)
+    #
+    my $sql_delete_Location = $dbh->prepare_cached("DELETE FROM Dataset_Location where DS_id = ?");
+    $sql_delete_Location->execute($dsid);
+    if (defined (my $region = $ds->getDatasetRegion)) {
+        my @srids = split ' ', $config->get('SRID_ID_COLUMNS');
+        my @regions;
+        foreach my $srid (@srids) {
+            my %sridBB;
+            @sridBB{qw(north east south west)} =  split ' ', $config->get('SRID_NESW_BOUNDING_BOX_'.$srid);
+            if (defined $sridBB{west}) {
+                if ($region->overlapsBoundingBox(\%sridBB)) {
+                    push @regions, $srid;
+                }
+            } else {
+                # no bounding box defined for srid, use anyway
+                push @regions, $srid;
+            }
+        }
+        if (@regions) {
+            my $regionColumns = join ',', map {"geom_$_"} @regions;
+            my $lonlat = $config->get('LONLAT_SRID') or die "Missing config directive LONLAT_SRID";
+            my $regionValues = join ',', map {"ST_TRANSFORM(ST_GeomFromText(?,$lonlat), $_)"} @regions;
+            my $sql_insert_Location = $dbh->prepare_cached("INSERT INTO Dataset_Location (DS_id, $regionColumns) VALUES (?, $regionValues)");
+
+            my $regionAdded = 0;
+            foreach my $p ($region->getPolygons) {
+                my $pString = $p->toProjectablePolygon->toWKT;
+                if (length($pString) > 10  and length($pString) < 1_000_000) {
+                    my $parCound = 0;
+                    $sql_insert_Location->bind_param(++$parCound, $dsid);
+                    foreach my $srid (@regions) {
+                        $sql_insert_Location->bind_param(++$parCound, $pString);
+                    }
+                    $sql_insert_Location->execute();
+                    $regionAdded++;
+                }
+            }
+            my @points = $region->getPoints;
+            if (@points) {
+                my $pString = 'MULTIPOINT('. join(',', @points) . ')';
+                if (length($pString) > 10 and length($pString) < 1_000_000) {
+                    my $parCound = 0;
+                    $sql_insert_Location->bind_param(++$parCound, $dsid);
+                    foreach my $srid (@regions) {
+                        $sql_insert_Location->bind_param(++$parCound, $pString);
+                    }
+                    $sql_insert_Location->execute();
+                    $regionAdded++;
+                }
+                $regionAdded++;
+            }
+            if (!$regionAdded) {
+                # trying to add boundingBox
+                my %bb = $region->getBoundingBox;
+                if (scalar keys %bb >= 4) {
+                    my $polygon;
+                    eval {
+                        $polygon = Metamod::LonLatPolygon->new([$bb{west}, $bb{south}],
+                                                               [$bb{west}, $bb{north}],
+                                                               [$bb{east}, $bb{north}],
+                                                               [$bb{east}, $bb{south}],
+                                                               [$bb{west}, $bb{south}]);
+                    }; if (!$@) { # ignore warnings/errors
+                        my $pString = $polygon->toProjectablePolygon->toWKT;
+                        my $parCound = 0;
+                        $sql_insert_Location->bind_param(++$parCound, $dsid);
+                        foreach my $srid (@regions) {
+                            $sql_insert_Location->bind_param(++$parCound, $pString);
+                        }
+                        $sql_insert_Location->execute();
+                        $regionAdded++;
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 
