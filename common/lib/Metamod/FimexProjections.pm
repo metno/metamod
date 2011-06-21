@@ -63,7 +63,6 @@ use Params::Validate qw();
 use Log::Log4perl;
 
 my $logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
-my $config = Metamod::Config->new();
 
 =head1 METHODS
 
@@ -77,6 +76,7 @@ my $config = Metamod::Config->new();
 
 =cut
 sub getFimexProjectionsSchemaPath {
+    my $config = Metamod::Config->new();
     return $config->get('TARGET_DIRECTORY') . "/schema/fimexProjections.xsd";
 }
 
