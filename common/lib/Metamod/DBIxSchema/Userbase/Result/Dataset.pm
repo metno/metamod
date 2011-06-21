@@ -69,8 +69,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 use Carp;
 
-my $config = Metamod::Config->new();
-
 =head2 $self->get_info_ds
 
 Get info rows for dataset (only those relevant for editing - e.g. not wmsinfo)
@@ -119,7 +117,7 @@ sub set_info_ds {
     my $rs = $self->infods;
 
     #die "Bad key" if length($$para{dskey}) > 10;
-
+    my $config = Metamod::Config->new();
     my @infos = $config->get('EXTERNAL_REPOSITORY') eq 'true' ? qw(DSKEY CATALOG LOCATION) : qw(DSKEY);
 
     foreach ( @infos ) { # FIXME - define keys elsewhere
