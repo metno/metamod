@@ -141,6 +141,35 @@ sub _initSelf {
 
 sub writeToFile {
     my ($self, $fileBase) = @_;
+
+    $self->_writeToFileHelper($fileBase);
+    $self->_writeToDatabase($fileBase);
+
+    return 1;
+}
+
+=head2 $self->_writeToFileHelper($fileBase)
+
+Writes the dataset information to .xml and .xmd files.
+
+B<IMPLEMTATION NOTE:> This has been separated as its own function to facilitate
+unit testing of writing to file without involving the database.
+
+=over
+
+=item $fileBase
+
+The base filename
+
+=item return
+
+Returns 1 on success. Throws and exception on failure.
+
+=back
+
+=cut
+sub _writeToFileHelper {
+    my ($self, $fileBase) = @_;
     $fileBase = Metamod::DatasetTransformer::getBasename($fileBase);
 
     my ($xmlF, $xmdF);
@@ -159,9 +188,8 @@ sub writeToFile {
     close $xmlF;
     close $xmdF;
 
-    $self->_writeToDatabase($fileBase);
-
     return 1;
+
 }
 
 =head2 $self->_writeToDatabase($filename)
