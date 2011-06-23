@@ -58,6 +58,22 @@ my $base = $mm_config->get('BASE_PART_OF_EXTERNAL_URL');
 my $port = $mm_config->get('CATALYST_PORT');
 my $operator_email = $mm_config->get('OPERATOR_EMAIL');
 
+my %obsolete = (
+    sch => '/search',
+    upl => '/upload',
+    qst => '/editor',
+)
+my $old_redirect = "";
+if ( $mm_config->has('OLD_REDIRECT') ) {
+    my $prefix =  $mm_config->get('OLD_REDIRECT');
+    foreach ( keys %obsolete ) {
+        $old_redirect .= <<EOT
+RedirectMatch   301     /$prefix/$_     $base$local$obsolete{$_}
+EOT        
+    }
+}
+
+
 
 my $site = $local;
 $site .= " on $virtualhost" if $virtualhost;
@@ -99,6 +115,8 @@ ProxyPassReverse    $local/         http://127.0.0.1:$port/
 
 # -----------
 # Plain Apache settings
+
+$old_redirect
 
 # OAI-PMH still running PHP
 Alias               $local/pmh      $target/htdocs/pmh
