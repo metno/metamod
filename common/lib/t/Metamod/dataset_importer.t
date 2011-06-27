@@ -101,7 +101,7 @@ my $importer = Metamod::DatasetImporter->new();
 
     test_sru($metabase, 1, $sru_row, "SRU information for active dataset");
 
-    test_dataset_location( $metabase, 1, [{ ds_id => 1, geom_93995 => '01010000202B6F010035A0B30250F824C188822FBEEA133041', geom_93031 => undef }], 'Dataset location for level 1 dataset' );
+    test_dataset_location( $metabase, 1, [{ geom_93995 => 'POINT(-687144.005276686 1053674.74291244)', }], 'Dataset location for level 1 dataset' );
 
     BEGIN { $num_tests += 10 }
 }
@@ -337,7 +337,7 @@ sub test_dataset_location {
 
     my $dbh = $metabase->storage()->dbh();
 
-    my $dl_select = 'SELECT * FROM dataset_location WHERE ds_id = ?';
+    my $dl_select = 'SELECT ST_AsText(geom_93995) AS geom_93995 FROM dataset_location WHERE ds_id = ?';
     my $dl_rows = $dbh->selectall_arrayref($dl_select, { Slice => {} }, $ds_id);
 
     is_deeply( $dl_rows, $expected_locations, $test_name );
