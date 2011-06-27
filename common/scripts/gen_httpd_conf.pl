@@ -62,17 +62,17 @@ my %obsolete = (
     sch => '/search',
     upl => '/upload',
     qst => '/editor',
-)
+);
+
 my $old_redirect = "";
+
 if ( $mm_config->has('OLD_REDIRECT') ) {
     my $prefix =  $mm_config->get('OLD_REDIRECT');
+
     foreach ( keys %obsolete ) {
-        $old_redirect .= <<EOT
-RedirectMatch   301     /$prefix/$_     $base$local$obsolete{$_}
-EOT        
+        $old_redirect .= "RedirectMatch   301     /$prefix/$_     $base$local$obsolete{$_}\n";
     }
 }
-
 
 
 my $site = $local;
