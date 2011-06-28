@@ -229,31 +229,6 @@ sub write_to_database {
             $self->_insert_metadata($ds, $dsid);
         }
 
-        #
-        #   Insert quadtree nodes:
-        #
-        {
-            my @quadtreenodes = $ds->getQuadtree;
-            if ( @quadtreenodes > 0 ) {
-                my $sql_getkey_GA = $dbh->prepare_cached("SELECT nextval('GeographicalArea_GA_id_seq')");
-                my $sql_insert_GA = $dbh->prepare_cached("INSERT INTO GeographicalArea (GA_id) VALUES (?)");
-                my $sql_insert_GAGD = $dbh->prepare_cached("INSERT INTO GA_Contains_GD (GA_id, GD_id) VALUES (?, ?)");
-
-                $sql_getkey_GA->execute();
-                my @result = $sql_getkey_GA->fetchrow_array;
-                my $gaid   = $result[0];
-                $sql_getkey_GA->finish;
-                $sql_insert_GA->execute($gaid);
-                foreach my $node (@quadtreenodes) {
-                    if ( length($node) > 0 ) {
-                        $sql_insert_GAGD->execute( $gaid, $node );
-                    }
-                }
-            my $sql_insert_GADS = $dbh->prepare_cached("INSERT INTO GA_Describes_DS (GA_id, DS_id) VALUES (?, ?)");
-                $sql_insert_GADS->execute( $gaid, $dsid );
-            }
-        }
-
         $self->_update_geo_location($ds, $dsid);
 
         #
@@ -436,13 +411,7 @@ sub _remove_old_metadata {
 
     my $dbh = $self->config()->getDBH();
 
-    # Delete existing dataset and corresponding GeographicalArea (if found).
-    # This will cascade to BK_Describes_DS, GA_Describes_DS, GD_Ispartof_GA
-    # and also DS_Has_MD:
-    my $sql_delete_GA = $dbh->prepare_cached( "DELETE FROM GeographicalArea WHERE GA_id IN "
-                                     . "(SELECT GA_id FROM GA_Describes_DS AS g, DataSet AS d WHERE "
-                                     . "g.DS_id = d.DS_id AND (d.DS_id = ?))" );
-    $sql_delete_GA->execute( $dsid );
+    # This will cascade to BK_Describes_DS and DS_Has_MD:
     my $sql_delete_DS = $dbh->prepare_cached("DELETE FROM DataSet WHERE DS_id = ?");
     $sql_delete_DS->execute( $dsid );
 

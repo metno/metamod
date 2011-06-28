@@ -44,7 +44,6 @@ etc/default/catalyst-myapp
 =lib/Metamod/DBIxSchema/Metabase/ResultSet/Metadata.pm
 =lib/Metamod/DBIxSchema/Metabase/ResultSet/Dataset.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Numberitem.pm
-=lib/Metamod/DBIxSchema/Metabase/Result/GaContainsGd.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/HkRepresentsBk.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Metadatatype.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Sessions.pm
@@ -54,12 +53,10 @@ etc/default/catalyst-myapp
 =lib/Metamod/DBIxSchema/Metabase/Result/Hierarchicalkey.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Dataset.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Wmsinfo.pm
-=lib/Metamod/DBIxSchema/Metabase/Result/GaDescribesDs.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/DatasetLocation.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Searchcategory.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Projectioninfo.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/DsHasMd.pm
-=lib/Metamod/DBIxSchema/Metabase/Result/Geographicalarea.pm
 =lib/Metamod/DBIxSchema/Userbase/ResultSet/Dataset.pm
 =lib/Metamod/DBIxSchema/Userbase/ResultSet/Usertable.pm
 =lib/Metamod/DBIxSchema/Userbase/Result/Infouds.pm

@@ -350,9 +350,6 @@ sub clean_metabase {
         dataset
         dataset_location
         ds_has_md
-        ga_contains_gd
-        ga_describes_ds
-        geographicalarea
         geometry_columns
         metadata
         numberitem

@@ -89,11 +89,6 @@ __PACKAGE__->has_many(
   { "foreign.ds_id" => "self.ds_id" },
 );
 __PACKAGE__->has_many(
-  "ga_describes_ds",
-  "Metamod::DBIxSchema::Metabase::Result::GaDescribesDs",
-  { "foreign.ds_id" => "self.ds_id" },
-);
-__PACKAGE__->has_many(
   "numberitems",
   "Metamod::DBIxSchema::Metabase::Result::Numberitem",
   { "foreign.ds_id" => "self.ds_id" },

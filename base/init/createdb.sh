@@ -105,7 +105,7 @@ GRANT SELECT ON WMSInfo TO "[==PG_WEB_USER==]";
 -- extension column to Dataset, uncoupled
 CREATE TABLE OAIInfo (
    -- soft REFERENCE to DataSet, should not be deleted with dataset
-   DS_id              INTEGER       UNIQUE NOT NULL, 
+   DS_id              INTEGER       UNIQUE NOT NULL,
    OAI_identifier     TEXT          UNIQUE
 );
 GRANT SELECT ON OAIInfo TO "[==PG_WEB_USER==]";
@@ -162,27 +162,6 @@ CREATE TABLE NumberItem (
    PRIMARY KEY (SC_id, NI_from, NI_to, DS_id)
 );
 GRANT SELECT ON NumberItem TO "[==PG_WEB_USER==]";
-
-CREATE TABLE GeographicalArea (
-   GA_id              SERIAL,
-   GA_name            VARCHAR(9999),
-   PRIMARY KEY (GA_id)
-);
-GRANT SELECT ON GeographicalArea TO "[==PG_WEB_USER==]";
-
-CREATE TABLE GA_Contains_GD (
-   GA_id              INTEGER       NOT NULL REFERENCES GeographicalArea ON DELETE CASCADE,
-   GD_id              VARCHAR(9999) NOT NULL,
-   PRIMARY KEY (GA_id, GD_id)
-);
-GRANT SELECT ON GA_Contains_GD TO "[==PG_WEB_USER==]";
-
-CREATE TABLE GA_Describes_DS (
-   GA_id              INTEGER       NOT NULL,
-   DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
-   PRIMARY KEY (GA_id, DS_id)
-);
-GRANT SELECT ON GA_Describes_DS TO "[==PG_WEB_USER==]";
 
 CREATE TABLE MetadataType (
    MT_name            VARCHAR(99),
