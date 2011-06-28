@@ -612,12 +612,12 @@ sub syserror {
             $errMsg .= "Stderr: $msg; ";
         }
         if ( $errmsg eq 'NORMAL TERMINATION' ) {
-            $logger->info( $errMsg . "\n" );
+            $logger->info( $errMsg );
         } else {
             if ( $type eq "SYSUSER" ) {
-                $logger->info( $errMsg . "\n" );
+                $logger->info( $errMsg );
             } else {
-                $logger->error( $errMsg . "\n" );
+                $logger->error( $errMsg );
             }
         }
     }
