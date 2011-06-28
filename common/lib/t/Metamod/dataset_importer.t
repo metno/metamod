@@ -18,6 +18,7 @@ BEGIN {
     $ENV{METAMOD_XSLT_DIR} = "$FindBin::Bin/../../../schema/";
 }
 
+use DatasetImporterFailer;
 use Metamod::DatasetImporter;
 use Metamod::DBIxSchema::Metabase;
 use Metamod::Subscription;
@@ -232,6 +233,82 @@ my $importer = Metamod::DatasetImporter->new();
     is( $oai_row3->{oai_identifier}, 'urn:dummy:OTHER_dataset_importer3', "Synchronised OAI identifier after re-import");
 
     BEGIN { $num_tests += 3 }
+
+}
+
+
+#
+# Test that a re-import failure does not cause changes in the number of rows.
+#
+{
+    my $fail_importer = DatasetImporterFailer->new();
+
+
+    my @affected_tables = qw(
+        BkDescribesDs
+        Dataset
+        DatasetLocation
+        DsHasMd
+        Metadata
+        Numberitem
+        Projectioninfo
+        Wmsinfo );
+    my @previous_counts = ();
+
+    foreach my $table (@affected_tables) {
+        my $count = $metabase->resultset($table)->count();
+        push @previous_counts, $count;
+    }
+
+    my $success = $fail_importer->write_to_database("$FindBin::Bin/../data/Metamod/dataset_importer1.xml");
+    is($success, undef, "Re-import fails for DatasetImporterFailer" );
+
+    foreach my $table (@affected_tables) {
+        my $now_count  = $metabase->resultset($table)->count();
+        my $prev_count = shift @previous_counts;
+
+        is( $now_count, $prev_count, "Failed re-import does not affect number of rows in database: $table" );
+    }
+
+    BEGIN { $num_tests += 9 }
+
+}
+
+#
+# Test that a new import failure does not cause changes in the number of rows.
+#
+{
+    my $fail_importer = DatasetImporterFailer->new();
+
+
+    my @affected_tables = qw(
+        BkDescribesDs
+        Dataset
+        DatasetLocation
+        DsHasMd
+        Metadata
+        Numberitem
+        Projectioninfo
+        Wmsinfo );
+    my @previous_counts = ();
+
+    foreach my $table (@affected_tables) {
+        my $count = $metabase->resultset($table)->count();
+        push @previous_counts, $count;
+    }
+
+    my $success = $fail_importer->write_to_database("$FindBin::Bin/../data/Metamod/dataset_importer4.xml");
+    is($success, undef, "New import fails for DatasetImporterFailer" );
+
+
+    foreach my $table (@affected_tables) {
+        my $now_count  = $metabase->resultset($table)->count();
+        my $prev_count = shift @previous_counts;
+
+        is( $now_count, $prev_count, "Failed new import does not affect number of rows in database: $table" );
+    }
+
+    BEGIN { $num_tests += 9 }
 
 }
 

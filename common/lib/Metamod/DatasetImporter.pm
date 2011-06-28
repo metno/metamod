@@ -300,6 +300,10 @@ sub write_to_database {
         $success = 0;
     };
 
+    if(!$success){
+        return;
+    }
+
     return $success;
 }
 
