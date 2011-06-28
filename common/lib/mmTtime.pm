@@ -17,10 +17,17 @@ sub ttime {
    }
    my $scaling = $config->get("TEST_IMPORT_SPEEDUP") || 1;
    if ($scaling <= 1) {
+      #printf STDERR "Real time = %s\n", scalar gmtime $realtime;
       return $realtime;
    } else {
       my $basistime = $config->get("TEST_IMPORT_BASETIME") || 0;
-      return $basistime + ($realtime - $basistime)*$scaling;
+      my $maxdiff = 2147483647 - $realtime;
+      my $diff = ($realtime - $basistime)*$scaling;
+      # basetime > 3 months old will cause integer overflow
+      die "TEST_IMPORT_BASETIME is too old!" if $diff > $maxdiff;
+      my $faketime = $basistime + $diff;
+      #printf STDERR "Speedup time = %s\n", scalar gmtime $faketime;
+      return $faketime;
    }
 }
 1;
