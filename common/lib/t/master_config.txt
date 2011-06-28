@@ -364,7 +364,7 @@ TEST_IMPORT_SPEEDUP = 100
 # the virtual date and time is the same as the real date and time. The
 # following number represents this point of time as number of seconds since
 # the epoch. (Use the show_time_now.pl utility to get a value for this number).
-TEST_IMPORT_BASETIME = 1213793125
+TEST_IMPORT_BASETIME = 1309263924
 
 # Set the following value to 1 for verbose output to files import_dataset.out
 # and upload_monitor.out in the webrun directory:
