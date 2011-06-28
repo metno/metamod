@@ -26,6 +26,7 @@ use warnings;
 use List::Util qw(max min);
 use Log::Log4perl;
 use Moose;
+use Try::Tiny;
 
 use Metamod::Dataset;
 use Metamod::DatasetTransformer::ToISO19115;
@@ -150,7 +151,24 @@ sub _build__basickeys {
 
 }
 
+=head2 $self->write_to_database($inputBaseFile)
 
+Write information about the database set to the index database.
+
+=over
+
+=item $inputBaseFile
+
+The file name for the metadata file. The filename can be both with and without
+the .xml and .xmd extension.
+
+=item return
+
+Returns 1 on success. Returns false on failure.
+
+=back
+
+=cut
 sub write_to_database {
     my $self = shift;
 
@@ -165,64 +183,24 @@ sub write_to_database {
     #
     my $ds = Metamod::Dataset->newFromFile($inputBaseFile);
     unless ($ds) {
-        die "cannot initialize dataset for $inputBaseFile";
+        $logger->error("cannot initialize dataset for $inputBaseFile");
+        return;
     }
-    my %info = $ds->getInfo;
 
-    #
-    #  Create hash mapping the correspondence between MetadataType name
-    #  and SearchCategory
-    #
-    my %searchcategories = (
-        variable              => 3,
-        area                  => 2,
-        activity_type         => 1,
-        institution           => 7,
-        datacollection_period => 8,
-        operational_status    => 10,
-    );
+    # we turn of auto commit since we want to either update all or not update at all.
+    my $previous_auto_commit = $dbh->{AutoCommit};
+    $dbh->{AutoCommit} = 0;
+    my $success = 0;
 
+    try {
 
-    {
-        my @metaarray = $self->_transform_metadata($ds);
+        my %info = $ds->getInfo;
+        my $dsid = $self->_get_dsid($ds);
+        $self->_remove_old_metadata($dsid);
 
-        my $sql_getIDByName_DS = $dbh->prepare_cached("SELECT DS_id FROM Dataset WHERE DS_name = ?");
-        $sql_getIDByName_DS->execute( $info{name} );
-        my $dsid;
-        while ( my @row = $sql_getIDByName_DS->fetchrow_array ) {
-            $dsid = $row[0];
-        }
-        if ( defined $dsid ) {
-            # Delete existing dataset and corresponding GeographicalArea (if found).
-            # This will cascade to BK_Describes_DS, GA_Describes_DS, GD_Ispartof_GA
-            # and also DS_Has_MD:
-            my $sql_delete_GA = $dbh->prepare_cached( "DELETE FROM GeographicalArea WHERE GA_id IN "
-                                             . "(SELECT GA_id FROM GA_Describes_DS AS g, DataSet AS d WHERE "
-                                             . "g.DS_id = d.DS_id AND (d.DS_id = ?))" );
-            $sql_delete_GA->execute( $dsid );
-            my $sql_delete_DS = $dbh->prepare_cached("DELETE FROM DataSet WHERE DS_id = ?");
-            $sql_delete_DS->execute( $dsid );
-        } else {
-            my $sql_getkey_DS = $dbh->prepare_cached("SELECT nextval('DataSet_DS_id_seq')");
-            $sql_getkey_DS->execute();
-            my @result = $sql_getkey_DS->fetchrow_array;
-            $dsid = $result[0];
-            $sql_getkey_DS->finish;
-        }
         my $dsStatus = ( $info{status} eq 'active' ) ? 1 : 0;
-        my $parentId = 0;
-        my $parentName = $ds->getParentName;
-        if ($parentName) {
-            my $sql_getIDByNameAndParent_DS = $dbh->prepare_cached("SELECT DS_id FROM Dataset WHERE DS_name = ? AND DS_parent = ?");
-            $sql_getIDByNameAndParent_DS->execute($parentName, 0);
-            my @result = $sql_getIDByNameAndParent_DS->fetchrow_array;
-            if (@result != 0) {
-                $parentId = $result[0];
-            } else {
-                die "couldn't find parent for $info{name}: $parentName";
-            }
-            $sql_getIDByNameAndParent_DS->finish;
-        }
+        my $parentId = $self->_get_parent_id($ds);
+
         my $sql_insert_DS =  $dbh->prepare_cached(
             "INSERT INTO DataSet (DS_id, DS_name, DS_parent, DS_status, DS_datestamp, DS_ownertag, DS_creationDate, DS_metadataFormat, DS_filePath)"
           . " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)" );
@@ -248,85 +226,7 @@ sub write_to_database {
         );
 
         if ($dsStatus) {
-            #  Prepare SQL statements for repeated use.
-            my $sql_getkey_MD = $dbh->prepare_cached("SELECT nextval('Metadata_MD_id_seq')");
-            my $sql_insert_MD = $dbh->prepare_cached("INSERT INTO Metadata (MD_id, MT_name, MD_content) VALUES (?, ?, ?)");
-            my $sql_insert_BKDS = $dbh->prepare_cached("INSERT INTO BK_Describes_DS (BK_id, DS_id) VALUES (?, ?)");
-            my $sql_selectCount_BKDS= $dbh->prepare_cached("SELECT COUNT(*) FROM BK_Describes_DS WHERE BK_id = ? AND DS_id = ?");
-            my $sql_insert_NI = $dbh->prepare_cached("INSERT INTO NumberItem (SC_id, NI_from, NI_to, DS_id) VALUES (?, ?, ?, ?)");
-            my $sql_selectCount_DSMD = $dbh->prepare_cached("SELECT COUNT(*) FROM DS_Has_MD WHERE DS_id = ? AND MD_id = ?");
-            my $sql_insert_DSMD = $dbh->prepare_cached("INSERT INTO DS_Has_MD (DS_id, MD_id) VALUES (?, ?)");
-
-            #
-            #  Insert metadata:
-            #  Metadata with metadata type name not in the database are ignored.
-            #
-            my %dbMetadata = %{ $self->_db_metadata() };
-            my %shared_metadatatypes = %{ $self->_shared_metadatatypes() };
-            my %rest_metadatatypes = %{ $self->_unshared_metadatatypes() };
-
-            foreach my $mref (@metaarray) {
-                my $mtname = $mref->[0];
-                my $mdcontent = $mref->[1];
-                my $mdid;
-                if ( exists( $shared_metadatatypes{$mtname} ) ) {
-                    my $mdkey = $mtname . ':' . $self->clean_content($mdcontent);
-                    $logger->debug("mdkey: $mdkey");
-                    if ( exists( $dbMetadata{$mdkey} ) ) {
-                        $mdid = $dbMetadata{$mdkey};
-                    } else {
-                        $sql_getkey_MD->execute();
-                        my @result = $sql_getkey_MD->fetchrow_array;
-                        $mdid = $result[0];
-                        $sql_getkey_MD->finish;
-                        $sql_insert_MD->execute( $mdid, $mtname, $mdcontent );
-                        $dbMetadata{$mdkey} = $mdid;
-                    }
-                    $sql_selectCount_DSMD->execute( $dsid, $mdid );
-                    my $count = $sql_selectCount_DSMD->fetchall_arrayref()->[0][0];
-                    if ( $count == 0 ) {
-                        $sql_insert_DSMD->execute( $dsid, $mdid );
-                    } else {
-                        # duplicate key happens all the times, in particular when converting formats
-                        $logger->debug("duplicate metadata: $mdkey");
-                    }
-                } elsif ( exists( $rest_metadatatypes{$mtname} ) ) {
-                    $sql_getkey_MD->execute();
-                    my @result = $sql_getkey_MD->fetchrow_array;
-                    $mdid = $result[0];
-                    $sql_getkey_MD->finish;
-                    $sql_insert_MD->execute( $mdid, $mtname, $mdcontent );
-                    $sql_insert_DSMD->execute( $dsid, $mdid );
-                }
-
-                #
-                #  Insert searchdata:
-                #
-                my %basickeys = %{ $self->_basickeys };
-                if ( exists( $searchcategories{$mtname} ) ) {
-                    my $skey = $searchcategories{$mtname} . ':' . $self->clean_content($mdcontent);
-                    $logger->debug("Insert searchdata. Try: '$skey'");
-                    if ( exists( $basickeys{$skey} ) ) {
-                        my $bkid = $basickeys{$skey};
-                        $sql_selectCount_BKDS->execute( $bkid, $dsid);
-                        my $count = $sql_selectCount_BKDS->fetchall_arrayref()->[0][0];
-                        if ( $count == 0 ) {
-                            $sql_insert_BKDS->execute( $bkid, $dsid );
-                        } else {
-                            # duplicate key happens all the times, in particular when converting formats
-                            $logger->debug("duplicate basic key: '$skey'");
-                        }
-                        $logger->debug(" -OK: $bkid,$dsid");
-                    } elsif ( $mtname eq 'datacollection_period' ) {
-                        my $scid = $searchcategories{$mtname};
-                        if ( $mdcontent =~ /(\d{4,4})-(\d{2,2})-(\d{2,2}) to (\d{4,4})-(\d{2,2})-(\d{2,2})/ ) {
-                            my $from = $1 . $2 . $3;
-                            my $to   = $4 . $5 . $6;
-                            $sql_insert_NI->execute( $scid, $from, $to, $dsid );
-                        }
-                    }
-                }
-            }
+            $self->_insert_metadata($ds, $dsid);
         }
 
         #
@@ -359,10 +259,6 @@ sub write_to_database {
         #
         #   Insert new projectionInformation
         #
-
-        my $sql_delete_ProjectionInfo = $dbh->prepare_cached("DELETE FROM ProjectionInfo WHERE DS_id = ?");
-
-        $sql_delete_ProjectionInfo->execute($dsid);
         my $projectionInfo = $ds->getProjectionInfo;
         if ($projectionInfo) {
             my $sql_insert_ProjectionInfo = $dbh->prepare_cached("INSERT INTO ProjectionInfo (DS_id, PI_content) VALUES (?, ?)");
@@ -372,8 +268,6 @@ sub write_to_database {
         #
         #   Insert new wmsInformation
         #
-        my $sql_delete_WMSInfo = $dbh->prepare_cached("DELETE FROM WMSInfo WHERE DS_id = ?");
-        $sql_delete_WMSInfo->execute($dsid);
         my $wmsInfo = $ds->getWMSInfo;
         if (exists($info{wmsxml})) {
             my $wmsxml = $info{wmsxml};
@@ -386,15 +280,267 @@ sub write_to_database {
            $logger->debug("No wmsxml");
         }
         $self->_updateExtraSearch($ds, $dsid, $inputBaseFile);
+
+
+    # TODO: This code should be moved somewhere else.
+    #    if( $config->get("USERBASE_NAME") && $ds->getParentName() && $activateSubscriptions ){
+    #        my $subscription = Metamod::Subscription->new();
+    #        my $num_subscribers = $subscription->activate_subscription_handlers($ds);
+    #    }
+
+        $dbh->commit;
+        $dbh->{AutoCommit} = $previous_auto_commit;
+        $success = 1;
+    } catch {
+
+        $logger->error("Failed to write information to database: $_");
+
+        $dbh->rollback();
+        $dbh->{AutoCommit} = $previous_auto_commit;
+        $success = 0;
+    };
+
+    return $success;
+}
+
+sub _insert_metadata {
+    my $self = shift;
+
+    my ($ds, $dsid) = @_;
+
+    my $dbh = $self->config->getDBH();
+    my $logger = $self->logger();
+
+    #
+    #  Create hash mapping the correspondence between MetadataType name
+    #  and SearchCategory
+    #
+    my %searchcategories = (
+        variable              => 3,
+        area                  => 2,
+        activity_type         => 1,
+        institution           => 7,
+        datacollection_period => 8,
+        operational_status    => 10,
+    );
+
+    #  Prepare SQL statements for repeated use.
+    my $sql_getkey_MD = $dbh->prepare_cached("SELECT nextval('Metadata_MD_id_seq')");
+    my $sql_insert_MD = $dbh->prepare_cached("INSERT INTO Metadata (MD_id, MT_name, MD_content) VALUES (?, ?, ?)");
+    my $sql_insert_BKDS = $dbh->prepare_cached("INSERT INTO BK_Describes_DS (BK_id, DS_id) VALUES (?, ?)");
+    my $sql_selectCount_BKDS= $dbh->prepare_cached("SELECT COUNT(*) FROM BK_Describes_DS WHERE BK_id = ? AND DS_id = ?");
+    my $sql_insert_NI = $dbh->prepare_cached("INSERT INTO NumberItem (SC_id, NI_from, NI_to, DS_id) VALUES (?, ?, ?, ?)");
+    my $sql_selectCount_DSMD = $dbh->prepare_cached("SELECT COUNT(*) FROM DS_Has_MD WHERE DS_id = ? AND MD_id = ?");
+    my $sql_insert_DSMD = $dbh->prepare_cached("INSERT INTO DS_Has_MD (DS_id, MD_id) VALUES (?, ?)");
+
+    #
+    #  Insert metadata:
+    #  Metadata with metadata type name not in the database are ignored.
+    #
+    my %dbMetadata = %{ $self->_db_metadata() };
+    my %shared_metadatatypes = %{ $self->_shared_metadatatypes() };
+    my %rest_metadatatypes = %{ $self->_unshared_metadatatypes() };
+
+    my @metaarray = $self->_transform_metadata($ds);
+    foreach my $mref (@metaarray) {
+        my $mtname = $mref->[0];
+        my $mdcontent = $mref->[1];
+        my $mdid;
+        if ( exists( $shared_metadatatypes{$mtname} ) ) {
+            my $mdkey = $mtname . ':' . $self->clean_content($mdcontent);
+            $logger->debug("mdkey: $mdkey");
+            if ( exists( $dbMetadata{$mdkey} ) ) {
+                $mdid = $dbMetadata{$mdkey};
+            } else {
+                $sql_getkey_MD->execute();
+                my @result = $sql_getkey_MD->fetchrow_array;
+                $mdid = $result[0];
+                $sql_getkey_MD->finish;
+                $sql_insert_MD->execute( $mdid, $mtname, $mdcontent );
+                $dbMetadata{$mdkey} = $mdid;
+            }
+            $sql_selectCount_DSMD->execute( $dsid, $mdid );
+            my $count = $sql_selectCount_DSMD->fetchall_arrayref()->[0][0];
+            if ( $count == 0 ) {
+                $sql_insert_DSMD->execute( $dsid, $mdid );
+            } else {
+                # duplicate key happens all the times, in particular when converting formats
+                $logger->debug("duplicate metadata: $mdkey");
+            }
+        } elsif ( exists( $rest_metadatatypes{$mtname} ) ) {
+            $sql_getkey_MD->execute();
+            my @result = $sql_getkey_MD->fetchrow_array;
+            $mdid = $result[0];
+            $sql_getkey_MD->finish;
+            $sql_insert_MD->execute( $mdid, $mtname, $mdcontent );
+            $sql_insert_DSMD->execute( $dsid, $mdid );
+        }
+
+        #
+        #  Insert searchdata:
+        #
+        my %basickeys = %{ $self->_basickeys };
+        if ( exists( $searchcategories{$mtname} ) ) {
+            my $skey = $searchcategories{$mtname} . ':' . $self->clean_content($mdcontent);
+            $logger->debug("Insert searchdata. Try: '$skey'");
+            if ( exists( $basickeys{$skey} ) ) {
+                my $bkid = $basickeys{$skey};
+                $sql_selectCount_BKDS->execute( $bkid, $dsid);
+                my $count = $sql_selectCount_BKDS->fetchall_arrayref()->[0][0];
+                if ( $count == 0 ) {
+                    $sql_insert_BKDS->execute( $bkid, $dsid );
+                } else {
+                    # duplicate key happens all the times, in particular when converting formats
+                    $logger->debug("duplicate basic key: '$skey'");
+                }
+                $logger->debug(" -OK: $bkid,$dsid");
+            } elsif ( $mtname eq 'datacollection_period' ) {
+                my $scid = $searchcategories{$mtname};
+                if ( $mdcontent =~ /(\d{4,4})-(\d{2,2})-(\d{2,2}) to (\d{4,4})-(\d{2,2})-(\d{2,2})/ ) {
+                    my $from = $1 . $2 . $3;
+                    my $to   = $4 . $5 . $6;
+                    $sql_insert_NI->execute( $scid, $from, $to, $dsid );
+                }
+            }
+        }
     }
 
-# TODO: This code should be moved somewhere else.
-#    if( $config->get("USERBASE_NAME") && $ds->getParentName() && $activateSubscriptions ){
-#        my $subscription = Metamod::Subscription->new();
-#        my $num_subscribers = $subscription->activate_subscription_handlers($ds);
-#    }
 
-    $dbh->commit;
+}
+
+=head2 $self->_remove_old_metadata($dsid)
+
+Remove metadata that is stored in the metabase and associated with a dsid.
+
+=over
+
+=item $dsid
+
+The C<dsid> of the dataste.
+
+=item return
+
+Always 1. Throws and exception on database error.
+
+=back
+
+=cut
+sub _remove_old_metadata {
+    my $self = shift;
+
+    my ($dsid) = @_;
+
+    my $dbh = $self->config()->getDBH();
+
+    # Delete existing dataset and corresponding GeographicalArea (if found).
+    # This will cascade to BK_Describes_DS, GA_Describes_DS, GD_Ispartof_GA
+    # and also DS_Has_MD:
+    my $sql_delete_GA = $dbh->prepare_cached( "DELETE FROM GeographicalArea WHERE GA_id IN "
+                                     . "(SELECT GA_id FROM GA_Describes_DS AS g, DataSet AS d WHERE "
+                                     . "g.DS_id = d.DS_id AND (d.DS_id = ?))" );
+    $sql_delete_GA->execute( $dsid );
+    my $sql_delete_DS = $dbh->prepare_cached("DELETE FROM DataSet WHERE DS_id = ?");
+    $sql_delete_DS->execute( $dsid );
+
+    my $sql_delete_ProjectionInfo = $dbh->prepare_cached("DELETE FROM ProjectionInfo WHERE DS_id = ?");
+    $sql_delete_ProjectionInfo->execute($dsid);
+
+    my $sql_delete_WMSInfo = $dbh->prepare_cached("DELETE FROM WMSInfo WHERE DS_id = ?");
+    $sql_delete_WMSInfo->execute($dsid);
+
+    return 1;
+
+}
+
+=head2 $self->_get_dsid($ds)
+
+Get the <dsid> for the dataset or a new C<dsid> in case of first time import.
+
+=over
+
+=item $ds
+
+A reference to the dataset object.
+
+=item return
+
+Returns either the current C<dsid> for the dataset or a new C<dsid> for new datasets.
+
+=back
+
+=cut
+sub _get_dsid {
+    my $self = shift;
+
+    my ($ds) = @_;
+
+    my $dbh = $self->config()->getDBH();
+
+    my %info = $ds->getInfo();
+
+    my $select_stmt = $dbh->prepare_cached("SELECT DS_id FROM Dataset WHERE DS_name = ?");
+    $select_stmt->execute( $info{name} );
+    my $dsid;
+    while ( my @row = $select_stmt->fetchrow_array ) {
+        $dsid = $row[0];
+    }
+
+    if ( !defined $dsid ) {
+
+        my $next_id_stmt = $dbh->prepare_cached("SELECT nextval('DataSet_DS_id_seq')");
+        $next_id_stmt->execute();
+        my @result = $next_id_stmt->fetchrow_array;
+        $dsid = $result[0];
+        $next_id_stmt->finish;
+    }
+
+    return $dsid;
+
+}
+
+
+=head2 $self->_get_parent_id($ds)
+
+Get the C<dsid> of the parent dataset if the dataset has a parent.
+
+=over
+
+=item $ds
+
+A dataset object
+
+=item return
+
+Returns the C<dsid> if the parent dataset if the dataset has a parent. Returns
+0 if the database does not have a parent.
+
+=back
+
+=cut
+sub _get_parent_id {
+    my $self = shift;
+
+    my ($ds) = @_;
+
+    my $dbh = $self->config()->getDBH();
+
+    my $parent_id = 0;
+    my $parent_name = $ds->getParentName;
+    if ($parent_name) {
+        my $stmt = $dbh->prepare_cached("SELECT DS_id FROM Dataset WHERE DS_name = ? AND DS_parent = ?");
+        $stmt->execute($parent_name, 0);
+        my @result = $stmt->fetchrow_array;
+        if (@result != 0) {
+            $parent_id = $result[0];
+        } else {
+            my %info = $ds->getInfo;
+            die "couldn't find parent for $info{name}: $parent_name";
+        }
+        $stmt->finish;
+    }
+
+    return $parent_id;
+
 }
 
 =head2 $self->_transform_metadata($ds)
