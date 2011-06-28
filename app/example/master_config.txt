@@ -396,8 +396,12 @@ OAI_HARVEST_VALIDATION_SCHEMA = [==TARGET_DIRECTORY==]/schema/OAI-PMH.xsd
 OAI_HARVEST_SOURCES =
  NP http://risapi.data.npolar.no/oai
  HI http://pegasus.nodc.no:8080/ipy_oai/oai.jsp
-HARVEST_HOUR = 1
 
+# use ordinary crontab syntax to determine times when harvester should run
+HARVEST_CRONTAB = 30 04 * * *
+# 30 04 * * * = run every night at 04:30
+# */10 * * * * = run every ten minutes
+# HARVEST_HOUR is no longer in use
 
 # ============ Metamod OAI_PMH configuration
 # The content-type the WWW-server delivers back. For debug-puposes,
