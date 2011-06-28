@@ -5,6 +5,7 @@ init/common.sh
 =init/import_searchdata.pl
 init/update2.2To2.3.sql
 init/update_to_Fulltext.sh
+init/upgradedb_28-29.sh
 init/sruSchema.sql
 userinit/createuserdb.sh
 userinit/run_createuserdb.sh
