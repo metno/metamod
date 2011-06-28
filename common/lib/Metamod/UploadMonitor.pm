@@ -40,7 +40,7 @@ use Moose;
 
 use base 'Exporter';
 our @EXPORT_OK = qw(
-    main_loop
+    init
     clean_up_problem_dir
     clean_up_repository
     ftp_process_hour
@@ -62,9 +62,13 @@ our @EXPORT_OK = qw(
     $work_expand
     $work_flat
     $work_start
+    $xml_directory
     $xml_history_directory
-    $sleeping_seconds
-    $SIG_TERM
+    $problem_dir_path
+    $logger
+    %dataset_institution
+    $file_in_error_counter
+    %ftp_events
 );
 
 use File::Copy;
@@ -103,138 +107,8 @@ use Metamod::UploadUtils qw(notify_web_system
     $local_url
     $shell_command_error
     @user_errors
-);
+); # DON'T PUT EXPORTS HERE!
 
-
-=head1 NAME
-
-Metamod::UploadMonitor
-
-=head1 DESCRIPTION
-
-Monitor file uploads from data providers. Start digest_nc.pl on
-uploaded files.
-
-=head1 USAGE
-
-Files are either uploaded to an FTP area, or interactively to an HTTP area
-using the web interface. The top level directory pathes for these two areas are
-given by the global variables $ftp_dir_path and $upload_dir_path.
-
-=head2 FTP uploads:
-
-Uploads to the FTP area are only done by data providers having an agreement
-with the data repository authority to do so. This agreement designates which
-datasets the data provider will upload data to. Typically, such agreements
-are made for operational data uploaded by automatic processes at the data
-provider site. The names of the datasets covered by such agreements are
-found in the text file [==WEBRUN_DIRECTORY==]/ftp_events described below.
-
-This script will search for files at any directory level beneath the
-$ftp_dir_path directory. Any file that have a basename matching glob pattern
-'<dataset_name>_*' (where <dataset_name> is the name of the dataset) will
-be treated as containing a possible addition to that dataset.
-
-=head2 HTTP uploads:
-
-The directory structure of the HTTP upload area mirrors the directory
-structure of the final data repository (the $opendap_directory defined
-below). Thus, any HTTP-uploaded file will end up in a directory where both
-the institution acronym and the dataset name are found in the directory
-path. Even so, all file names are required to match the '<dataset_name>_*'
-pattern (this requirement is enforced by the web interface).
-
-=head2 Overall operation:
-
-The script executes an infinite loop as long as it is not terminated. Termination
-might take some time due to clean-up work (finishing the loop).
-After each repetition of the loop body, the script waits for
-$sleeping_seconds seconds.
-
-The ftp_events file contains, for each of the datasets, the hours at which
-the FTP area should be checked for additions. The HTTP area will be checked at
-each repetition of the loop body.
-
-In order to avoid processing of incomplete files, the age of any file has
-to be above a threshold. This threshold is given in the ftp_events file for
-files uploaded with FTP, and may vary between datasets. For files uploaded
-with HTTP, this threshold is a configurable constant ($upload_age_threshold).
-
-Uploaded files are either individual netCDF files (or CDL files), or they are
-archive files (tar) containing several netCDF/CDL files. Both file types may
-be gzip compressed. The data provider may upload several files for the same
-dataset within a short period of time. The digest_nc.pl script will work best
-if it can, during one invocation, digest all the files uploaded during such
-a period. To achieve this, the script will not process a file if any other
-file are found for the same dataset that have not reached the age prescribed
-by the threshold.
-
-When a new set of files for a given dataset is found to be ready for processing
-(either from the FTP area or from the HTTP area), the file names are sent to
-the process_files subroutine.
-
-The process_files subroutine will copy the files to the $work_expand directory
-where any archive files are expanded. An archive file may contain a directory
-tree. All files in a directory tree (and all the other files in the $work_expand
-directory) are copied to another directory, $work_flat. This directory has a
-flat structure (no subdirectories). A name collision arising from files with same
-basename but from different parts of a directory tree, is considered an error.
-
-Any CDL file now found in the $work_flat directory is converted to netCDF. The
-set of uncompressed netCDF-files that now populate the $work_flat directory, is
-sent to the digest_nc.pl script for checking.
-
-=head1 ERROR HANDLING
-
-Various errors may arise during this file processing operation. The errors are
-divided into four different categories:
-
-1. Errors arising from external system environment. Such errors will usually not
-   occur. They will only arise if system resources are exhausted, or if anything
-   happens to the file system (like permission changes on important files and
-   directories). If any such error arise, the script will die and an abortion error
-   message will be recorded in the system error log.
-
-2. Internal system errors. These errors are mainly caused by failing shell commands
-   (file, tar, gunzip etc.). They may also arise when any inconsistency are found
-   that may indicate bugs in the script. The script will continue, but the
-   processing of the offending uploaded file will be discontinued. The file will
-   be moved to the F<$problem_dir_path> directory and an error message will be
-   recorded in the system error log. In addition, the user will be notified
-   about an internal system error that prohibited processing of the file.
-   These errors may be caused by uploaded files that are corrupted,
-   or not of the expected format. (Note to myself: In that case the error category
-   should be changed to category 3 below).
-
-3. User errors that makes furher prosessing of an uploaded file impossible. The
-   file will be moved to the $problem_dir_path directory and an error message will
-   be recorded in the system error log. In addition, the user will be notified
-   with an indication of the nature of the error.
-
-4. Other user errors. These are mainly caused by non-complience with the
-   requirements found in the F<conf_digest_nc.xml> file. All such errors are conveyed
-   to the user through the F<nc_usererrors.out> file. A summary of this file is
-   constructed in the form of a self-explaining HTML file (using the
-   print_usererrors.pl script).
-
-All uploaded files that were processed with no errors, or with only
-category 4 errors, are deleted after the expanded version of the files are
-copied to the data repository. The status of the files are recorded in the
-appropriate file in the u1 subdirectory of the $webrun_directory directory.
-
-In the F<$problem_dir_path> directory the files are renamed according to the following
-scheme: A 6 digit number, I<DDNNNN>, are constructed where I<DD> is the day number in
-the month and I<NNNN> is starting on 0001 each new day, and increments with 1 for
-each file copied to the directory. The new file name will be:
-
-   DDNNNN_<basename>
-
-where <basename> is the basename of the uploaded file name.
-
-Files older than a prescribed number of days will be deleted from the
-$problem_dir_path directory.
-
-=cut
 
 my $logger = Log::Log4perl->get_logger('metamod.upload.upload_monitor');
 
@@ -244,10 +118,6 @@ my $work_expand           = $work_directory . "/expand";
 my $work_flat             = $work_directory . "/flat";
 my $work_start            = $work_directory . "/start";
 my $xml_history_directory = $webrun_directory . '/XML/history';
-my $sleeping_seconds      = 60;
-if ( $config->get('TEST_IMPORT_SPEEDUP') and $config->get('TEST_IMPORT_SPEEDUP') > 1 ) {
-    $sleeping_seconds = 1;
-}
 my $problem_dir_path = $webrun_directory . "/upl/problemfiles";
 
 my $upload_age_threshold = $config->get('UPLOAD_AGE_THRESHOLD');
@@ -264,23 +134,19 @@ my %files_to_process = ();  # Hash containing, for each uploaded file to
                             # time of that file. This hash is re-
                             # initialized for each new batch of files
                             # to be processed for the same dataset.
+my %ftp_events = ();
 my $file_in_error_counter;
-
-our $SIG_TERM = 0;
-sub sigterm { ++$SIG_TERM; }
-$SIG{TERM} = \&sigterm;
 
 #
 # ----------------------------------------------------------------------------
 #
-sub main_loop {
-    my ($testrun) = @_;    # if test, always run, but only once
+sub init {
 
     #
     #  Make sure static directories exists:
     #
-    foreach my $directory ( $work_directory, $work_start, $work_expand, $work_flat, $uerr_directory, $xml_directory,
-        $xml_history_directory, $problem_dir_path ) {
+    foreach my $directory ( $work_directory, $work_start, $work_expand, $work_flat, $uerr_directory,
+        $xml_directory, $xml_history_directory, $problem_dir_path ) {
         mkpath($directory);
     }
 
@@ -291,45 +157,7 @@ sub main_loop {
         die "Could not cd to $work_directory: $!\n";
     }
 
-=head1 FTP events config file
-
-The FTP events config file regulates which datasets are uploaded through
-FTP, and how often this script will check for new files for these datasets.
-
-This is a text file which must contain lines of the following format:
-
-   dataset_name wait_minutes days_to_keep_files hour1 hour2 hour3 ...
-
-=over 4
-
-=item wait_minutes
-
-The minimum age of a new ftp file. If a file has less age
-than this value, the file is left for later processing.
-
-=item days_to_keep_files
-
-Number of days where the files are to remain
-unchanged on the repository. When this period
-expires, the files will be deleted and substituted
-with files containing only metadata. This is done
-in sub 'clean_up_repository'.
-If this number == 0, the files are kept indefinitely.
-
-=item hourN
-
-These numbers (0-23) represents the times during a day
-where checking for new files take place.
-
-=back
-
-For each hourN, a hash key is constructed as "dataset_name hourN" and the
-corresponding value is set to wait_minutes.
-
-=cut
-
     #  Initialize hash (%ftp_events) from text file
-    my %ftp_events = ();
     &read_ftp_events( \%ftp_events );
     if ( $logger->is_debug() ) {
         $logger->debug( "Dump of hash ftp_events:" . join( "\t", split "\n", Dumper( \%ftp_events ) ) );
@@ -341,46 +169,8 @@ corresponding value is set to wait_minutes.
     #  $webrun_directory/u1 at the beginning of each repetition of the loop.
     #
     %dataset_institution = ();
-
-    #
-    #  Loop which will continue until terminated SIG{TERM}.
-    #
-    #  For each new hour, the loop will check (in the ftp_process_hour
-    #  routine) if any FTP-processing are scheduled (looking in the %ftp_events hash).
-    #  Also, the loop will check for new files in the web upload area
-    #  (the web_process_uploaded routine).
-    #
-    #  After processing, the routine will wait until the system clock arrives at
-    #  a new fresh hour. Then the loop repeats, and new processing will eventually
-    #  be perfomed.
-    #
     &get_dataset_institution( \%dataset_institution );
-    my @ltime         = localtime( mmTtime::ttime() );
-    my $current_day   = $ltime[3];                       # 1-31
-    my $hour_finished = -1;
-    $file_in_error_counter = 1;
-    while ( ( !$SIG_TERM ) || $testrun ) {
-        @ltime = localtime( mmTtime::ttime() );
-        my $newday       = $ltime[3];                    # 1-31
-        my $current_hour = $ltime[2];                    # 0-23
-        if ( $current_day != $newday || ( $testrun && $testrun eq 'newday' ) ) {
-            &clean_up_problem_dir();
-            &clean_up_repository();
-            $file_in_error_counter = 1;
-            $hour_finished         = -1;
-            $current_day           = $newday;
-        }
-        if ( $current_hour > $hour_finished ) {
-            &get_dataset_institution( \%dataset_institution );
-            &ftp_process_hour( \%ftp_events, $current_hour );
-            &web_process_uploaded();
-            @ltime         = localtime( mmTtime::ttime() );
-            $hour_finished = $ltime[2];                       # 0-23
-        }
-        &testafile();
-        if ($testrun) { last; }
-        sleep($sleeping_seconds);
-    }
+
 }
 
 #
@@ -428,6 +218,8 @@ sub ftp_process_hour {
     #  if the newest file in the dataset have large enough age. If so, process
     #  the files in that dataset.
     #
+    $logger->info("Processing FTP upload area");
+
     my ( $eventsref, $current_hour ) = @_;
     $logger->debug("ftp_process_hour: Entered at current_hour: $current_hour\n");
     my $rex = " 0*$current_hour" . '$';
@@ -519,6 +311,8 @@ sub web_process_uploaded {
     #
     #  Check the WEB upload area.
     #
+
+    $logger->info("Processing web upload area");
     my %datasets    = ();
     my @files_found = findFiles($upload_dir_path);
     if ( scalar @files_found == 0 && length($shell_command_error) > 0 ) {
@@ -1626,6 +1420,168 @@ sub move_to_problemdir {
     }
 }
 
+=head1 NAME
+
+Metamod::UploadMonitor
+
+=head1 DESCRIPTION
+
+Monitor file uploads from data providers. Start digest_nc.pl on
+uploaded files.
+
+=head1 USAGE
+
+Files are either uploaded to an FTP area, or interactively to an HTTP area
+using the web interface. The top level directory pathes for these two areas are
+given by the global variables $ftp_dir_path and $upload_dir_path.
+
+=head2 FTP uploads:
+
+Uploads to the FTP area are only done by data providers having an agreement
+with the data repository authority to do so. This agreement designates which
+datasets the data provider will upload data to. Typically, such agreements
+are made for operational data uploaded by automatic processes at the data
+provider site. The names of the datasets covered by such agreements are
+found in the text file [==WEBRUN_DIRECTORY==]/ftp_events described below.
+
+This script will search for files at any directory level beneath the
+$ftp_dir_path directory. Any file that have a basename matching glob pattern
+'<dataset_name>_*' (where <dataset_name> is the name of the dataset) will
+be treated as containing a possible addition to that dataset.
+
+=head2 HTTP uploads:
+
+The directory structure of the HTTP upload area mirrors the directory
+structure of the final data repository (the $opendap_directory defined
+below). Thus, any HTTP-uploaded file will end up in a directory where both
+the institution acronym and the dataset name are found in the directory
+path. Even so, all file names are required to match the '<dataset_name>_*'
+pattern (this requirement is enforced by the web interface).
+
+=head2 Overall operation:
+
+The script executes an infinite loop as long as it is not terminated. Termination
+might take some time due to clean-up work (finishing the loop).
+After each repetition of the loop body, the script waits for
+$sleeping_seconds seconds.
+
+The ftp_events file contains, for each of the datasets, the hours at which
+the FTP area should be checked for additions. The HTTP area will be checked at
+each repetition of the loop body.
+
+In order to avoid processing of incomplete files, the age of any file has
+to be above a threshold. This threshold is given in the ftp_events file for
+files uploaded with FTP, and may vary between datasets. For files uploaded
+with HTTP, this threshold is a configurable constant ($upload_age_threshold).
+
+Uploaded files are either individual netCDF files (or CDL files), or they are
+archive files (tar) containing several netCDF/CDL files. Both file types may
+be gzip compressed. The data provider may upload several files for the same
+dataset within a short period of time. The digest_nc.pl script will work best
+if it can, during one invocation, digest all the files uploaded during such
+a period. To achieve this, the script will not process a file if any other
+file are found for the same dataset that have not reached the age prescribed
+by the threshold.
+
+When a new set of files for a given dataset is found to be ready for processing
+(either from the FTP area or from the HTTP area), the file names are sent to
+the process_files subroutine.
+
+The process_files subroutine will copy the files to the $work_expand directory
+where any archive files are expanded. An archive file may contain a directory
+tree. All files in a directory tree (and all the other files in the $work_expand
+directory) are copied to another directory, $work_flat. This directory has a
+flat structure (no subdirectories). A name collision arising from files with same
+basename but from different parts of a directory tree, is considered an error.
+
+Any CDL file now found in the $work_flat directory is converted to netCDF. The
+set of uncompressed netCDF-files that now populate the $work_flat directory, is
+sent to the digest_nc.pl script for checking.
+
+=head1 ERROR HANDLING
+
+Various errors may arise during this file processing operation. The errors are
+divided into four different categories:
+
+1. Errors arising from external system environment. Such errors will usually not
+   occur. They will only arise if system resources are exhausted, or if anything
+   happens to the file system (like permission changes on important files and
+   directories). If any such error arise, the script will die and an abortion error
+   message will be recorded in the system error log.
+
+2. Internal system errors. These errors are mainly caused by failing shell commands
+   (file, tar, gunzip etc.). They may also arise when any inconsistency are found
+   that may indicate bugs in the script. The script will continue, but the
+   processing of the offending uploaded file will be discontinued. The file will
+   be moved to the F<$problem_dir_path> directory and an error message will be
+   recorded in the system error log. In addition, the user will be notified
+   about an internal system error that prohibited processing of the file.
+   These errors may be caused by uploaded files that are corrupted,
+   or not of the expected format. (Note to myself: In that case the error category
+   should be changed to category 3 below).
+
+3. User errors that makes furher prosessing of an uploaded file impossible. The
+   file will be moved to the $problem_dir_path directory and an error message will
+   be recorded in the system error log. In addition, the user will be notified
+   with an indication of the nature of the error.
+
+4. Other user errors. These are mainly caused by non-complience with the
+   requirements found in the F<conf_digest_nc.xml> file. All such errors are conveyed
+   to the user through the F<nc_usererrors.out> file. A summary of this file is
+   constructed in the form of a self-explaining HTML file (using the
+   print_usererrors.pl script).
+
+All uploaded files that were processed with no errors, or with only
+category 4 errors, are deleted after the expanded version of the files are
+copied to the data repository. The status of the files are recorded in the
+appropriate file in the u1 subdirectory of the $webrun_directory directory.
+
+In the F<$problem_dir_path> directory the files are renamed according to the following
+scheme: A 6 digit number, I<DDNNNN>, are constructed where I<DD> is the day number in
+the month and I<NNNN> is starting on 0001 each new day, and increments with 1 for
+each file copied to the directory. The new file name will be:
+
+   DDNNNN_<basename>
+
+where <basename> is the basename of the uploaded file name.
+
+Files older than a prescribed number of days will be deleted from the
+$problem_dir_path directory.
+
+=head1 FTP events config file
+
+The FTP events config file regulates which datasets are uploaded through
+FTP, and how often this script will check for new files for these datasets.
+
+This is a text file which must contain lines of the following format:
+
+   dataset_name wait_minutes days_to_keep_files hour1 hour2 hour3 ...
+
+=over 4
+
+=item wait_minutes
+
+The minimum age of a new ftp file. If a file has less age
+than this value, the file is left for later processing.
+
+=item days_to_keep_files
+
+Number of days where the files are to remain
+unchanged on the repository. When this period
+expires, the files will be deleted and substituted
+with files containing only metadata. This is done
+in sub 'clean_up_repository'.
+If this number == 0, the files are kept indefinitely.
+
+=item hourN
+
+These numbers (0-23) represents the times during a day
+where checking for new files take place.
+
+=back
+
+For each hourN, a hash key is constructed as "dataset_name hourN" and the
+corresponding value is set to wait_minutes.
 
 =head1 LICENSE
 

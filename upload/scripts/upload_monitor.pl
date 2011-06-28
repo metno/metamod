@@ -50,7 +50,21 @@ sub getTargetDir {
 
 use lib ( '../../common/lib', getTargetDir('lib'), getTargetDir('scripts') );
 
-use Metamod::UploadMonitor qw(syserrorm main_loop);
+use Metamod::UploadMonitor qw(
+    init
+    syserrorm
+    get_dataset_institution
+    clean_up_problem_dir
+    clean_up_repository
+    ftp_process_hour
+    web_process_uploaded
+    testafile
+    %dataset_institution
+    %ftp_events
+    $file_in_error_counter
+    $config
+);
+
 
 =head1 NAME
 
@@ -69,6 +83,12 @@ See Metamod::UploadMonitor
 
 #  Action starts here:
 #  -------------------
+
+my $sleeping_seconds      = 60;
+if ( $config->get('TEST_IMPORT_SPEEDUP') and $config->get('TEST_IMPORT_SPEEDUP') > 1 ) {
+    $sleeping_seconds = 1;
+}
+
 eval {
     if ( $ARGV[0] && $ARGV[0] eq 'test' ) {
         print STDERR "Testrun: " . $ARGV[0] . "\n";
@@ -88,3 +108,58 @@ if ($@) {
     &syserrorm( "SYS", "NORMAL TERMINATION", "", "", "" );
 }
 
+our $SIG_TERM = 0;
+sub sigterm { ++$SIG_TERM; }
+$SIG{TERM} = \&sigterm;
+
+#
+# ----------------------------------------------------------------------------
+#
+sub main_loop {
+    my ($testrun) = @_;    # if test, always run, but only once
+    print STDERR "Starting main_loop...\n";
+
+    &init;
+
+    #
+    #  Loop which will continue until terminated SIG{TERM}.
+    #
+    #  For each new hour, the loop will check (in the ftp_process_hour
+    #  routine) if any FTP-processing are scheduled (looking in the %ftp_events hash).
+    #  Also, the loop will check for new files in the web upload area
+    #  (the web_process_uploaded routine).
+    #
+    #  After processing, the routine will wait until the system clock arrives at
+    #  a new fresh hour. Then the loop repeats, and new processing will eventually
+    #  be perfomed.
+    #
+
+    my @ltime         = localtime( mmTtime::ttime() );
+    my $current_day   = $ltime[3];                       # 1-31
+    my $hour_finished = -1;
+    $file_in_error_counter = 1;
+
+    while ( ( !$SIG_TERM ) || $testrun ) {
+        @ltime = localtime( mmTtime::ttime() );
+        my $newday       = $ltime[3];                    # 1-31
+        my $current_hour = $ltime[2];                    # 0-23
+        printf STDERR "...looping...%s > %s?\n", $current_hour, $hour_finished;
+        if ( $current_day != $newday || ( $testrun && $testrun eq 'newday' ) ) {
+            &clean_up_problem_dir();
+            &clean_up_repository();
+            $file_in_error_counter = 1;
+            $hour_finished         = -1;
+            $current_day           = $newday;
+        }
+        if ( $current_hour > $hour_finished ) {
+            &get_dataset_institution( \%dataset_institution );
+            &ftp_process_hour( \%ftp_events, $current_hour );
+            &web_process_uploaded();
+            @ltime         = localtime( mmTtime::ttime() );
+            $hour_finished = $ltime[2];                       # 0-23
+        }
+        &testafile();
+        if ($testrun) { last; }
+        sleep($sleeping_seconds);
+    }
+}
