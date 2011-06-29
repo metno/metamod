@@ -206,20 +206,19 @@ sub add_form_errors {
         $error_messages{$field} = { label => $validator->field_label($field), msg => 'Missing required input' };
     }
 
-    my %msgs = $result->msgs();
+    my $msgs = $result->msgs();
     my $invalid = $result->invalid();
     while( my ($field, $failed_constraints) = each %$invalid ){
 
-        #it can in theory be more than one constraint per field.
         my $msg = '';
-        foreach my $failed_constraint (@$failed_constraints){
 
-            if( exists $msgs{$failed_constraint} ){
-                $msg .= $msgs{$failed_constraint};
-            } else {
-                $msg .= $failed_constraint;
-            }
-
+        # If we just have the default message we use the constraint names instead
+        # since that can be 'hacked' to create a more detailed message
+        if( $msgs->{$field} eq 'Invalid' ){
+            # we ignore the possiblity of multiple constraints for now
+            $msg = $failed_constraints->[0];
+        } else {
+            $msg = $msgs->{$field};
         }
         $error_messages{$field} = { label => $validator->field_label($field), msg => $msg };
 
