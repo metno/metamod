@@ -224,14 +224,6 @@ CREATE TABLE DS_Has_MD (
 CREATE INDEX idx_ds_has_md_mdid ON ds_has_md(md_id);
 GRANT SELECT ON DS_Has_MD TO "[==PG_WEB_USER==]";
 
-CREATE TABLE Sessions (
-   sessionid          VARCHAR(9999)NOT NULL,
-   accesstime         VARCHAR(9999)NOT NULL,
-   sessionstate       VARCHAR(99999) NOT NULL,
-   PRIMARY KEY (sessionid)
-);
-GRANT ALL ON Sessions TO "[==PG_WEB_USER==]";
-
 CREATE TABLE Dataset_Location (DS_id INTEGER NOT NULL REFERENCES DataSet ON DELETE CASCADE) WITHOUT OIDS;
 GRANT ALL ON Dataset_Location TO "[==PG_WEB_USER==]";
 
