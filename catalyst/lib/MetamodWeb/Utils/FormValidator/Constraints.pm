@@ -124,6 +124,8 @@ sub boundingbox {
     my $validator = sub {
         my ($dfv, $value) = @_;
 
+        $dfv->name_this('boundingbox');
+
         my @values = split ',', $value;
 
         if( @values != 4 ){
