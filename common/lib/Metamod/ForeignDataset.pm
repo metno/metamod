@@ -143,9 +143,9 @@ sub writeToFile {
     my ($self, $fileBase) = @_;
 
     $self->_writeToFileHelper($fileBase);
-    $self->_writeToDatabase($fileBase);
+    my $success = $self->_writeToDatabase($fileBase);
 
-    return 1;
+    return $success;
 }
 
 =head2 $self->_writeToFileHelper($fileBase)
