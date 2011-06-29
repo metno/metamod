@@ -26,6 +26,7 @@ use namespace::autoclean;
 use warnings;
 
 use Data::FormValidator::Constraints qw( FV_max_length );
+use Data::FormValidator::Constraints::Dates qw(date_and_time);
 use DateTime;
 use File::Spec;
 use JSON;
@@ -95,11 +96,6 @@ sub quest_validator {
     my ($config_file) = @_;
 
     my $quest_config = $self->quest_config($config_file);
-
-    my %known_constraints = (
-        wms_info => \&MetamodWeb::Utils::FormValidator::Constraints::wms_info,
-    );
-
     my @required = ();
     my @optional = ();
     my %labels   = ();
@@ -110,6 +106,11 @@ sub quest_validator {
 
         # elements without names are not form input and can be ignored
         next if !$name;
+
+        # cannot have both a constraint and a max length since the one would override the other.
+        if( exists $element->{max_length} && exists $element->{constraint} ){
+            die "A questionnaire element are not allowed both a max_length and a constraint.";
+        }
 
         # existance is enough for marking required fields
         if ( exists $element->{mandatory} ) {
@@ -128,6 +129,10 @@ sub quest_validator {
             } elsif( $constraint eq 'projection_info') {
                 my $projection_schema = $self->config->get("TARGET_DIRECTORY") . '/schema/fimexProjections.xsd';
                 $constraint_func = MetamodWeb::Utils::FormValidator::Constraints::xml( $projection_schema )
+            } elsif( $constraint eq 'datetime' ) {
+                $constraint_func = date_and_time('YYYY-MM-DD hh:mm:ss');
+            } elsif( $constraint eq 'boundingbox' ) {
+                $constraint_func = MetamodWeb::Utils::FormValidator::Constraints::boundingbox();
             } else {
                 die "Unknown constraint '$constraint'";
             }
@@ -135,13 +140,13 @@ sub quest_validator {
             $constraints{$name} = $constraint_func;
         }
 
-        if( exists $element->{size} ){
+        if( exists $element->{max_length} ){
 
-            if( !($element->{size} =~ /^\d+$/ ) ){
+            if( !($element->{max_length} =~ /^\d+$/ ) ){
                 die "'size' is not a number for '$name'";
             }
 
-            $constraints{$name} = FV_max_length($element->{size});
+            $constraints{$name} = FV_max_length($element->{max_length});
         }
 
         $labels{$name} = $element->{label};
@@ -153,6 +158,13 @@ sub quest_validator {
         labels             => \%labels,
         constraint_methods => \%constraints,
         missing_optional_valid => 1,
+        msgs               => {
+            format => '%s',
+            constraints => {
+                date_and_time => 'Invalid date format',
+                boundingbox   => 'Invalid bounding box format',
+            }
+        },
     );
 
     return \%form_profile;
@@ -545,9 +557,10 @@ sub _save_metadata {
     $dataset->removeMetadata();
     $dataset->addMetadata($metadata);
     $dataset->setInfo(\%info);
-    $dataset->writeToFile($dataset_path);
 
-    return 1;
+    my $success = $dataset->writeToFile($dataset_path);
+
+    return $success;
 
 }
 
