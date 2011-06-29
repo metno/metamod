@@ -84,7 +84,7 @@ CREATE TABLE DataSet (
    DS_filePath        VARCHAR(1024),
    PRIMARY KEY (DS_id)
 );
-GRANT SELECT ON DataSet TO "[==PG_WEB_USER==]";
+GRANT SELECT, INSERT, UPDATE, DELETE ON DataSet TO "[==PG_WEB_USER==]";
 
 -- extension column to Dataset, uncoupled
 CREATE TABLE ProjectionInfo (
@@ -92,7 +92,7 @@ CREATE TABLE ProjectionInfo (
    PI_content         TEXT,
    UNIQUE (DS_id)
 );
-GRANT SELECT ON ProjectionInfo TO "[==PG_WEB_USER==]";
+GRANT SELECT, INSERT, UPDATE, DELETE ON ProjectionInfo TO "[==PG_WEB_USER==]";
 
 -- extension column to Dataset, uncoupled
 CREATE TABLE WMSInfo (
@@ -100,7 +100,7 @@ CREATE TABLE WMSInfo (
    WI_content         TEXT,
    UNIQUE (DS_id)
 );
-GRANT SELECT ON WMSInfo TO "[==PG_WEB_USER==]";
+GRANT SELECT, INSERT, UPDATE, DELETE ON WMSInfo TO "[==PG_WEB_USER==]";
 
 -- extension column to Dataset, uncoupled
 CREATE TABLE OAIInfo (
@@ -108,7 +108,7 @@ CREATE TABLE OAIInfo (
    DS_id              INTEGER       UNIQUE NOT NULL,
    OAI_identifier     TEXT          UNIQUE
 );
-GRANT SELECT ON OAIInfo TO "[==PG_WEB_USER==]";
+GRANT SELECT, INSERT, UPDATE, DELETE ON OAIInfo TO "[==PG_WEB_USER==]";
 
 
 CREATE TABLE SearchCategory (
@@ -152,7 +152,7 @@ CREATE TABLE BK_Describes_DS (
    DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
    PRIMARY KEY (BK_id, DS_id)
 );
-GRANT SELECT ON BK_Describes_DS TO "[==PG_WEB_USER==]";
+GRANT SELECT, INSERT, UPDATE, DELETE ON BK_Describes_DS TO "[==PG_WEB_USER==]";
 
 CREATE TABLE NumberItem (
    SC_id              INTEGER       NOT NULL REFERENCES SearchCategory ON DELETE CASCADE,
@@ -161,7 +161,7 @@ CREATE TABLE NumberItem (
    DS_id              INTEGER       NOT NULL REFERENCES DataSet ON DELETE CASCADE,
    PRIMARY KEY (SC_id, NI_from, NI_to, DS_id)
 );
-GRANT SELECT ON NumberItem TO "[==PG_WEB_USER==]";
+GRANT SELECT, INSERT, UPDATE, DELETE ON NumberItem TO "[==PG_WEB_USER==]";
 
 CREATE TABLE MetadataType (
    MT_name            VARCHAR(99),
@@ -178,7 +178,7 @@ CREATE TABLE Metadata (
    MD_content_vector  TSVECTOR, -- full-text vector
    PRIMARY KEY (MD_id)
 );
-GRANT SELECT ON Metadata TO "[==PG_WEB_USER==]";
+GRANT SELECT, INSERT, UPDATE, DELETE ON Metadata TO "[==PG_WEB_USER==]";
 
 -- create the full text index
 CREATE INDEX MD_content_vector_idx
@@ -222,7 +222,7 @@ CREATE TABLE DS_Has_MD (
 -- search on ds_has_md is most often executed query
 -- table may fit completely in memory, so consider 'set random_page_cost = 2 (or even 1.5)' see postgresql.conf
 CREATE INDEX idx_ds_has_md_mdid ON ds_has_md(md_id);
-GRANT SELECT ON DS_Has_MD TO "[==PG_WEB_USER==]";
+GRANT SELECT, INSERT, UPDATE, DELETE ON DS_Has_MD TO "[==PG_WEB_USER==]";
 
 CREATE TABLE Dataset_Location (DS_id INTEGER NOT NULL REFERENCES DataSet ON DELETE CASCADE) WITHOUT OIDS;
 GRANT ALL ON Dataset_Location TO "[==PG_WEB_USER==]";
