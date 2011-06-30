@@ -41,7 +41,8 @@ our $DEBUG = 0;
 use strict;
 use warnings;
 
-use Carp;
+use Carp qw(cluck croak);
+
 #use Data::Dumper;
 use File::Spec qw();
 use Cwd qw();
@@ -84,7 +85,8 @@ sub _getDefaultConfigFile {
     # allow the use of none standard location of the config file. This is functionality
     # is meant primarily for unit testing purposes
     if ( exists $ENV{ METAMOD_MASTER_CONFIG } ) {
-#        printf STDERR "Config file set in ENV to %s\n", $ENV{ METAMOD_MASTER_CONFIG };
+        # no, we can't use log4perl since haven't been initialized yet
+        #printf STDERR "Config file set in ENV to %s\n", $ENV{ METAMOD_MASTER_CONFIG };
         return $ENV{ METAMOD_MASTER_CONFIG };
     }
     my ($vol, $dir, undef) = File::Spec->splitpath(ABS_PATH());

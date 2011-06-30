@@ -53,7 +53,7 @@ if ($pid) {
 
 
 our $SIG_TERM = 0;
-sub sigterm {++$SIG_TERM;} # please explain why we're counting TERM signals
+sub sigterm {++$SIG_TERM;}
 $SIG{TERM} = \&sigterm;
 
 eval {
