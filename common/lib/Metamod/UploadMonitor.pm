@@ -38,39 +38,6 @@ use warnings;
 use Log::Log4perl;
 use Moose;
 
-use base 'Exporter';
-our @EXPORT_OK = qw(
-    init
-    clean_up_problem_dir
-    clean_up_repository
-    ftp_process_hour
-    web_process_uploaded
-    testafile
-    get_dataset_institution
-    read_ftp_events
-    syserrorm
-    %dataset_institution
-    %files_to_process
-    $file_in_error_counter
-    $logger
-    $config
-    $work_directory
-    $webrun_directory
-    $uerr_directory
-    $ftp_dir_path
-    $upload_dir_path
-    $work_expand
-    $work_flat
-    $work_start
-    $xml_directory
-    $xml_history_directory
-    $problem_dir_path
-    $logger
-    %dataset_institution
-    $file_in_error_counter
-    %ftp_events
-);
-
 use File::Copy;
 use File::Path;
 use File::Spec;
@@ -107,8 +74,40 @@ use Metamod::UploadUtils qw(notify_web_system
     $local_url
     $shell_command_error
     @user_errors
-); # DON'T PUT EXPORTS HERE!
+);
 
+use base 'Exporter';
+our @EXPORT_OK = qw(
+    init
+    clean_up_problem_dir
+    clean_up_repository
+    ftp_process_hour
+    web_process_uploaded
+    testafile
+    get_dataset_institution
+    read_ftp_events
+    syserrorm
+    %dataset_institution
+    %files_to_process
+    $file_in_error_counter
+    $logger
+    $config
+    $work_directory
+    $webrun_directory
+    $uerr_directory
+    $ftp_dir_path
+    $upload_dir_path
+    $work_expand
+    $work_flat
+    $work_start
+    $xml_directory
+    $xml_history_directory
+    $problem_dir_path
+    $logger
+    %dataset_institution
+    $file_in_error_counter
+    %ftp_events
+);
 
 my $logger = Log::Log4perl->get_logger('metamod.upload.upload_monitor');
 
@@ -135,7 +134,10 @@ my %files_to_process = ();  # Hash containing, for each uploaded file to
                             # initialized for each new batch of files
                             # to be processed for the same dataset.
 my %ftp_events = ();
-my $file_in_error_counter;
+my $file_in_error_counter;  # This is potentially a source of errors when
+                            # running as a library called from several scripts.
+                            # Worst-case scenario is files being overwritten
+                            # since FTP and web upload has separate counters.
 
 #
 # ----------------------------------------------------------------------------
@@ -170,6 +172,7 @@ sub init {
     #
     %dataset_institution = ();
     &get_dataset_institution( \%dataset_institution );
+    $file_in_error_counter = 1;
 
 }
 
@@ -309,12 +312,14 @@ sub ftp_process_hour {
 sub web_process_uploaded {
 
     #
-    #  Check the WEB upload area.
+    #  Check the web upload area.
     #
 
-    $logger->info("Processing web upload area");
+    my $inputfile = shift;
+    $logger->info( "Processing web upload " . ($inputfile || 'area') );
+    #printf STDERR  "                    - %s\n", join( "\n                    - ", findFiles($upload_dir_path) );
     my %datasets    = ();
-    my @files_found = findFiles($upload_dir_path);
+    my @files_found = ($inputfile) || findFiles($upload_dir_path);
     if ( scalar @files_found == 0 && length($shell_command_error) > 0 ) {
         &syserrorm( "SYS", "find_fails", "", "web_process_uploaded", "" );
     }
@@ -328,6 +333,7 @@ sub web_process_uploaded {
             push( @{ $datasets{$dataset_name} }, $filename );
         }
     }
+    #printf STDERR "Datasets: %s", Dumper \%datasets;
     foreach my $dataset_name ( keys %datasets ) {
         my $current_epoch_time = mmTtime::ttime();
         my $age_seconds        = 60 * $upload_age_threshold + 1;
@@ -342,15 +348,18 @@ sub web_process_uploaded {
                 # Get last modification time of file
                 # (seconds since the epoch)
                 #
-                my $modification_time = mmTtime::ttime( $file_stat[9] );
+                # skip time manipulation mumbo jumbo when we know for a fact we have a file to process
+                my $modification_time = $inputfile ? $file_stat[9] : mmTtime::ttime( $file_stat[9] );
                 if ( $current_epoch_time - $modification_time < $age_seconds ) {
                     $age_seconds = $current_epoch_time - $modification_time;
                 }
                 $files_to_process{$filename} = $modification_time;
             }
         }
+        #printf STDERR "Files: %s", Dumper \%files_to_process;
         my $filecount = scalar( keys %files_to_process );
-        if ( $filecount > 0 && $age_seconds > 60 * $upload_age_threshold ) {
+        # skip time manipulation mumbo jumbo when we know for a fact we have a file to process
+        if ( $inputfile or ( $filecount > 0 && $age_seconds > 60 * $upload_age_threshold ) ) {
             my $datestring = &get_date_and_time_string( $current_epoch_time - $age_seconds );
             &process_files( $dataset_name, 'WEB', $datestring );
         }
@@ -361,8 +370,11 @@ sub web_process_uploaded {
 # ----------------------------------------------------------------------------
 #
 sub testafile {
+    my $inputfile = shift;
+    $logger->debug( "Processing test upload " . ($inputfile || 'area') );
+
     my %datasets    = ();
-    my @files_found = findFiles( $config->get('WEBRUN_DIRECTORY') . '/upl/ftaf' );
+    my @files_found = ($inputfile) || findFiles( $config->get('WEBRUN_DIRECTORY') . '/upl/ftaf' );
     if ( scalar @files_found == 0 && length($shell_command_error) > 0 ) {
         &syserrorm( "SYS", "find_fails", "", "testafile", "" );
     }
@@ -379,10 +391,12 @@ sub testafile {
             push( @{ $datasets{$dataset_name} }, $filename );
         }
     }
+    #printf STDERR "Datasets: %s", Dumper \%datasets;
     foreach my $dataset_name ( keys %datasets ) {
         %files_to_process = ();
         foreach my $filename ( @{ $datasets{$dataset_name} } ) {
             if ( -r $filename ) {
+                print STDERR "Reading $filename ok\n";
                 my @file_stat = stat($filename);
                 if ( scalar @file_stat == 0 ) {
                     die "Could not stat $filename\n";
@@ -391,10 +405,14 @@ sub testafile {
                 # Get last modification time of file
                 # (seconds since the epoch)
                 #
-                my $modification_time = mmTtime::ttime( $file_stat[9] );
+                # skip time manipulation mumbo jumbo when we know for a fact we have a file to process
+                my $modification_time = $inputfile ? $file_stat[9] : mmTtime::ttime( $file_stat[9] );
                 $files_to_process{$filename} = $modification_time;
+            } else {
+                $logger->error("Unable to read file $filename");
             }
         }
+        #printf STDERR "Files: %s", Dumper \%files_to_process;
         my $filecount = scalar( keys %files_to_process );
         if ( $filecount > 0 ) {
             my $datestring = &get_date_and_time_string();

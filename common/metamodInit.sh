@@ -6,6 +6,7 @@ system_log="[==LOG4ALL_SYSTEM_LOG==]"
 export PERL5LIB="$PERL5LIB:[==CATALYST_LIB==]"
 
 upload_monitor_pid=$webrun_directory/upload_monitor.pid
+ftp_monitor_pid=$webrun_directory/ftp_monitor.pid
 import_dataset_pid=$webrun_directory/import_dataset.pid
 prepare_download_pid=$webrun_directory/prepare_download.pid
 harvester_pid=$webrun_directory/harvester.pid
@@ -71,6 +72,25 @@ start() {
          echo "upload_monitor already running"
       fi
    fi
+   if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" -a "[==EXTERNAL_REPOSITORY==]" != "true" -a -r $target_directory/scripts/ftp_monitor.pl ]; then
+      if ! running $ftp_monitor_pid; then
+         work_directory=$webrun_directory/upl/work
+         work_expand=$work_directory/expand
+         work_flat=$work_directory/flat
+         path_to_shell_error=$webrun_directory/upl/shell_command_error
+         rm -rf $work_expand
+         rm -rf $work_flat
+         rm -f $path_to_shell_error
+         # actually start the daemon
+         start_daemon -n 10 -p $ftp_monitor_pid $target_directory/scripts/ftp_monitor.pl $system_log $ftp_monitor_pid
+         if [ $? -ne 0 ]; then
+            echo "ftp_monitor failed: $?"
+            return $?;
+         fi
+      else
+         echo "ftp_monitor already running"
+      fi
+   fi
    if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/import_dataset.pl ]; then
       if ! running $import_dataset_pid; then
          path_to_import_updated=$webrun_directory/import_updated
@@ -126,6 +146,9 @@ stop() {
    if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" -a -r $target_directory/scripts/upload_monitor.pl ]; then
       killproc -p $upload_monitor_pid $target_directory/scripts/upload_monitor.pl SIGTERM
    fi
+   if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" -a -r $target_directory/scripts/ftp_monitor.pl ]; then
+      killproc -p $ftp_monitor_pid $target_directory/scripts/ftp_monitor.pl SIGTERM
+   fi
    if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/import_dataset.pl ]; then
       killproc -p $import_dataset_pid $target_directory/scripts/import_dataset.pl SIGTERM
    fi
@@ -151,7 +174,15 @@ status() {
       if running $upload_monitor_pid; then
          echo "upload_monitor running";
       else
-         echo "upload monitor not running";
+         echo "upload_monitor not running";
+         retval=1
+      fi
+   fi
+   if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" -a -r $target_directory/scripts/ftp_monitor.pl ]; then
+      if running $ftp_monitor_pid; then
+         echo "ftp_monitor running";
+      else
+         echo "ftp_monitor not running";
          retval=1
       fi
    fi
