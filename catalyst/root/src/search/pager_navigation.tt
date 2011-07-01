@@ -12,14 +12,14 @@ INPUT
 
     A Data::Page object for the current result set.
 
-    on_level_1
+    show_option_buttons
 
     A flag to indicate if you are on level 1 or not
 
 %]
 
 
-[% IF on_level_1 %]
+[% IF show_option_buttons %]
     <div style="width: 100%; text-align: right">
         <a href="[% c.uri_for('/search/options', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/options' ) %]')">Search options</a>
         <a href="[% c.uri_for('/search/two_way_table', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/two_way_table' ) %]')">Pivot table</a>

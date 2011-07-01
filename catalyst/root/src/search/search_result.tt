@@ -27,7 +27,7 @@ jQuery(document).ready( function () {
 
 [%ELSE %]
 
-    [% INCLUDE 'search/pager_navigation.tt' pager = datasets_pager, url_template = '/search/page/%s/result' on_level_1 = 1 %]
+    [% INCLUDE 'search/pager_navigation.tt' pager = datasets_pager, url_template = '/search/page/%s/result' show_option_buttons = 1 %]
 
     <table>
     <tr>
@@ -111,6 +111,9 @@ jQuery(document).ready( function () {
 
     [% END %]
     </table>
+
+    [% INCLUDE 'search/pager_navigation.tt' pager = datasets_pager, url_template = '/search/page/%s/result' %]
+
 [% END %]
 </div>
 
