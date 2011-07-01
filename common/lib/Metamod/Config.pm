@@ -41,7 +41,7 @@ our $DEBUG = 0;
 use strict;
 use warnings;
 
-use Carp qw(cluck croak);
+use Carp qw(cluck croak carp);
 
 #use Data::Dumper;
 use File::Spec qw();
