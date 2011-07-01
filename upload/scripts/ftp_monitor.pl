@@ -143,7 +143,7 @@ sub main_loop {
         @ltime = localtime( mmTtime::ttime() );
         my $newday       = $ltime[3];                    # 1-31
         my $current_hour = $ltime[2];                    # 0-23
-        printf STDERR "...looping...%s > %s?\n", $current_hour, $hour_finished;
+        #printf STDERR "...looping...%s > %s?\n", $current_hour, $hour_finished;
         if ( $current_day != $newday || ( $testrun && $testrun eq 'newday' ) ) {
             &clean_up_problem_dir(); # move to separate job - FIXME
             &clean_up_repository();  # move to separate job - FIXME
