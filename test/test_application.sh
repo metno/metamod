@@ -262,13 +262,9 @@ export PERL5LIB=/opt/metno-catalyst-dependencies-ver1/lib/perl5/
 cd $basedir/target
 ./prepare_runtime_env.sh
 #
-# E. A set of upload users is installed in the webrun/u1 directory:
+# E. Create directories for test data
 # =================================================================
 #
-cd $basedir/webrun
-rm -rf u1
-mkdir u1
-cp $basedir/source/test/u1input/* u1
 cd $basedir/data
 for dir in `cat $basedir/source/test/directories`; do
    mkdir -p $dir
