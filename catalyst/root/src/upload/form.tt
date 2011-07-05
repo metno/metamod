@@ -17,33 +17,26 @@
 [% ELSE %]
 
 
-[% IF data %]
-
-<p style="color: red">[% data %]</p>
-
-[% END %]
+    [% IF data %]
+    <p style="color: red">[% data %]</p>
+    [% END %]
 
 <form enctype="multipart/form-data" action="[% c.uri_for('/upload') %]" method="post">
+    <div id="upload-form">
+    Directory key: <input name="dirkey" value="" size="10" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    File name: <input name="data" type="file" />
+    <input class="selectbutton1" type="submit" name="BTN_upload" value="Upload" />
+    </div>
+</form>
 
-<div id="upload-form">
-Directory key: <input name="dirkey" value="" size="10" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-File name: <input name="data" type="file" />
-
-<input class="selectbutton1" type="submit" name="BTN_upload" value="Upload" />
-
-</div>
+<hr>
 
 <div id="upload-list">
 
+<h2 class="std">Previously processed files</h2>
+
 <table class="box" width="100%">
-<!--   <colgroup width="6%" />
-   <colgroup width="37%" />
-   <colgroup width="10%" />
-   <colgroup width="37%" />
-   <colgroup width="10%" />
--->   <tr>
-      <!--<th>Replace</th>-->
+    <tr>
       <th>File name</th>
       <th>Size</th>
       <th>Time</th>
@@ -51,11 +44,8 @@ File name: <input name="data" type="file" />
       <th>Show errors</th>
    </tr>
 
-<h3>Previously uploaded files</h3>
-
 [% FOREACH fi IN upload_ui_utils.user_files() %]
     <tr class="list_table">
-    <!--<td class="list_table"><input type="radio" name="selrec"/></td>-->
     <td class="list_table">[% fi.f_name %]</td>
     <td class="list_table">[% fi.f_size %]</td>
     <td class="list_table">[% fi.f_timestamp %]</td>
@@ -71,6 +61,9 @@ File name: <input name="data" type="file" />
 </table>
 </div>
 
+<form action="[% c.uri_for('/upload') %]" method="get" style="text-align: right">
+    <input type="submit" value="Refresh"/>
 </form>
+
 
 [% END %]

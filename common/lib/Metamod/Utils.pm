@@ -40,11 +40,11 @@ use File::Find qw();
 use POSIX qw();
 
 sub findFiles {
-   my ($dir, @funcs) = @_;
-   my @files;
+    my ($dir, @funcs) = @_;
+    my @files;
 
-   File::Find::find(sub {-f && _execFuncs($_, @funcs) && push @files, $File::Find::name;}, $dir);
-   return @files;
+    File::Find::find(sub {-f && _execFuncs($_, @funcs) && push @files, $File::Find::name;}, $dir);
+    return @files;
 }
 
 sub _execFuncs {

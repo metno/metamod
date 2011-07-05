@@ -30,6 +30,7 @@ etc/default/catalyst-myapp
 =schema/fimexProjections.xsd
 =schema/ncWmsSetup.xsd
 =schema/wmcSetup.xsd
+=lib/Metamod/DatasetImporter.pm
 =lib/Metamod/DatasetTransformer.pm
 =lib/Metamod/DatasetTransformer/MM2.pm
 =lib/Metamod/DatasetTransformer/OldDataset.pm
@@ -43,7 +44,6 @@ etc/default/catalyst-myapp
 =lib/Metamod/DBIxSchema/Metabase/ResultSet/Metadata.pm
 =lib/Metamod/DBIxSchema/Metabase/ResultSet/Dataset.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Numberitem.pm
-=lib/Metamod/DBIxSchema/Metabase/Result/GaContainsGd.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/HkRepresentsBk.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Metadatatype.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Sessions.pm
@@ -53,12 +53,10 @@ etc/default/catalyst-myapp
 =lib/Metamod/DBIxSchema/Metabase/Result/Hierarchicalkey.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Dataset.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Wmsinfo.pm
-=lib/Metamod/DBIxSchema/Metabase/Result/GaDescribesDs.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/DatasetLocation.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Searchcategory.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Projectioninfo.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/DsHasMd.pm
-=lib/Metamod/DBIxSchema/Metabase/Result/Geographicalarea.pm
 =lib/Metamod/DBIxSchema/Userbase/ResultSet/Dataset.pm
 =lib/Metamod/DBIxSchema/Userbase/ResultSet/Usertable.pm
 =lib/Metamod/DBIxSchema/Userbase/Result/Infouds.pm
@@ -80,13 +78,17 @@ etc/default/catalyst-myapp
 =lib/Metamod/LoggerConfigParser.pm
 =lib/Metamod/Queue.pm
 =lib/Metamod/Queue/Job/PrepareDownload.pm
+=lib/Metamod/Queue/Job/Upload.pm
 =lib/Metamod/Queue/Worker/PrepareDownload.pm
+=lib/Metamod/Queue/Worker/Upload.pm
 =lib/Metamod/Subscription.pm
 =lib/Metamod/SubscriptionHandler.pm
 =lib/Metamod/SubscriptionHandler/Email.pm
 =lib/Metamod/SubscriptionHandler/EmailToFile.pm
 =lib/Metamod/SubscriptionHandler/SMS.pm
 =lib/Metamod/SubscriptionUtils.pm
+=lib/Metamod/UploadMonitor.pm
+=lib/Metamod/UploadUtils.pm
 =lib/Metamod/WMS.pm
 =lib/Metamod/mmUserbase.pm
 =lib/Metamod/mmLogView.pm

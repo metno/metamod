@@ -41,7 +41,9 @@ our $DEBUG = 0;
 use strict;
 use warnings;
 
-use Carp;
+use Carp qw(cluck croak carp);
+
+#use Data::Dumper;
 use File::Spec qw();
 use Cwd qw();
 # read ABS_PATH early, in case somebody uses a chdir
@@ -50,7 +52,7 @@ BEGIN {
     die "cannot get abs_path from ".__FILE__ unless ABS_PATH;
 }
 
-our %_config; #_config{file} => $config
+our $_config; #_config{file} => $config
 
 # we only initialise the logger once during the entire run. Different configuration
 # files cannot have their own logger config.
@@ -67,15 +69,15 @@ sub new {
         die "Cannot read $fileFlag config-file: $file";
     }
     $file = _normalizeFile($file);
-    unless (exists $_config{$file}) {
+    unless (defined $_config) {
         my $config = {
             mtime => '0',
             filename => $file,
             vars => {}, # lazy loading on first get
         };
-        $_config{$file} = bless $config, $class;
+        $_config = bless $config, $class;
     }
-    return $_config{$file};
+    return $_config;
 }
 
 # get the file from METAMOD_MASTER_CONFIG or in (source|target)/master_config.txt
@@ -83,7 +85,8 @@ sub _getDefaultConfigFile {
     # allow the use of none standard location of the config file. This is functionality
     # is meant primarily for unit testing purposes
     if ( exists $ENV{ METAMOD_MASTER_CONFIG } ) {
-#        printf STDERR "Config file set in ENV to %s\n", $ENV{ METAMOD_MASTER_CONFIG };
+        # no, we can't use log4perl since haven't been initialized yet
+        #printf STDERR "Config file set in ENV to %s\n", $ENV{ METAMOD_MASTER_CONFIG };
         return $ENV{ METAMOD_MASTER_CONFIG };
     }
     my ($vol, $dir, undef) = File::Spec->splitpath(ABS_PATH());
@@ -110,6 +113,14 @@ sub get {
 
     $self->_checkFile();
     return $self->_substituteVariable($var);
+}
+
+sub has {
+    my ($self, $var) = @_;
+    return undef unless $var;
+
+    $self->_checkFile();
+    return exists $self->{vars}{$var};
 }
 
 # check for updates of config and reread
@@ -262,7 +273,7 @@ sub initLogger {
     }
 
     if( !( -r $log_config ) ){
-        die "Cannot read from '$log_config'";
+        croak "Cannot read from '$log_config'";
     }
 
     $ENV{ 'METAMOD_SYSTEM_LOG' } = $system_log;
@@ -406,6 +417,11 @@ if the same config file is opened several times.
 =item get("configVar")
 
 return the configuration variable configVar as currently set. This will reread the
+config-file each time it has been changed.
+
+=item has("configVar")
+
+return true if the configuration variable configVar is currently set. This will reread the
 config-file each time it has been changed.
 
 =item initLogger()

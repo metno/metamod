@@ -371,12 +371,23 @@ TEST_IMPORT_SPEEDUP = 100
 # the virtual date and time is the same as the real date and time. The
 # following number represents this point of time as number of seconds since
 # the epoch. (Use the show_time_now.pl utility to get a value for this number).
-TEST_IMPORT_BASETIME = 1213793125
+# *** WARNING *** THIS DATE MUST BE NO OLDER THAN 3 MONTHS OR YOU WILL GET AN INTEGER OVERFLOW!!!
+TEST_IMPORT_BASETIME = 1309258594
+
 
 # Set this value to a '#' to activate sending E-mail regarding errors in
 # uploaded files to actual users. It comments out setting the E-mail recipient
 # to [==OPERATOR_EMAIL==].
 TEST_EMAIL_RECIPIENT =
+
+# ============ Subscription configuration ==============
+#
+# Configuration of the METAMOD subscription services
+
+# The directory where SMS will look for new transfers to perform.
+SUBSCRIPTION_SMS_DIRECTORY =
+
+SUBSCRIPTION_ENABLED = ENABLED
 
 # ============ Authentication configuration ============
 #

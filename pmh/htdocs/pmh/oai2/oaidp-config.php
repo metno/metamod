@@ -406,7 +406,7 @@ function getRecords ($id = '', $from = '', $until = '', $set = '') {
          'area 13', 'Location Location_Type', '','', # required by GCMD
          'latitude_resolution 1', 'Data_Resolution Latitude_Resolution', '','',
          'longitude_resolution 1', 'Data_Resolution Longitude_Resolution', '','',
-         'project_name 3', '*Project Short_Name', '', 'Not Available', # required by GCMD (IPY projects)
+         'project_name 3', '*Project Short_Name', '', '', # required by GCMD (IPY projects)
          'project_name 4', 'Project Long_Name', '', '', # required by GCMD (IPY projects)
          'project_name 1', '*Project Short_Name', '', '',
          'project_name 2', 'Project Long_Name', '', '',

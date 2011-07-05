@@ -92,13 +92,13 @@ sub test {
         if ($nodeList->size() == 1) {
             $success++;
         } else {
-            $logger->debug("could not find /d:dataset/d:info/\@ownertag\n");
+            $logger->debug("could not find /d:dataset/d:info/\@ownertag");
         }
     }
     { # test MM2
         my $root = $self->{mm2Doc}->getDocumentElement();
         my $nodeList = $xpc->findnodes('/m:MM2', $root);
-        $logger->debug("found ".$nodeList->size()." elements of /m:MM2\n");
+        $logger->debug("found ".$nodeList->size()." elements of /m:MM2");
         if ($nodeList->size() == 1) {
             $success++;
         }
@@ -109,8 +109,8 @@ sub test {
 
 sub transform {
     my $self = shift;
-    croak("Cannot run transform if test fails\n") unless $self->test;
-    
+    croak("Cannot run transform if test fails") unless $self->test;
+
     return ($self->{xmdDoc}, $self->{mm2Doc});
 }
 
@@ -161,4 +161,3 @@ Heiko Klein, E<lt>H.Klein@met.noE<gt>
 L<XML::LibXML>, L<XML::LibXSLT>, L<Metamod::DatasetTransformer>
 
 =cut
-

@@ -35,10 +35,14 @@ use namespace::autoclean;
 use MetamodWeb::Utils::UI::Upload;
 use MetamodWeb::Utils::UploadUtils;
 use MetamodWeb::Utils::Exception qw(error_from_exception);
+use Metamod::Queue;
 use Data::Dumper;
 #use Devel::Peek;
 
 BEGIN { extends 'MetamodWeb::BaseController::Base' };
+
+my $queue = Metamod::Queue->new();
+
 
 sub auto :Private {
     my ( $self, $c ) = @_;
@@ -98,9 +102,22 @@ sub upload_POST  {
         }
 
         # OK to overwrite file
+
         $self->logger->info("Existing file '$file' uploaded");
         rename("$updir/${file}_", "$updir/$file") or die "Can't overwrite file '$file'";
         $c->stash( data => "File $file replaced." );
+
+        my $success = $queue->insert_job(
+            job_type => 'Metamod::Queue::Worker::Upload',
+            job_parameters => { file => "$updir/$file", type => 'INDEX' },
+        );
+
+        if( $success ){
+            $self->logger->debug("File $file replaced, will be processed shortly.");
+        } else {
+            $self->logger->error('Internal error: Could not add file to processing queue!');
+        }
+
         return;
     }
 
@@ -116,32 +133,50 @@ sub upload_POST  {
     mkdir "$updir/$institution/$dsname";
     $self->logger->info("Uploaded file '$filepath'.");
 
-    if ( ! $dsname ) { # not validated
+    if ( ! $dsname ) { # not validated (for some reason)
 
         $data .= "ERROR: Invalid filename!"; # or whatever
+        $self->logger->debug("ERROR: Invalid filename!");
+
+    } elsif (! $upload->size) { # empty file
+
+        $data = "ERROR: File size is zero bytes!";
+        $self->logger->debug("ERROR: File size is zero bytes!");
+
+    } elsif ( !( my $dataset = $c->model('Userbase::Dataset')->search( { ds_name => $dsname } )->first() ) ) { # missing dataset
+
+        $data .= "ERROR: No such dataset '$dsname' registered!";
+        $self->logger->debug("ERROR: No such dataset '$dsname' registered!");
+
+    } elsif ( ! $dataset->validate_dskey( $c->req->params->{dirkey} ) ) { # wrong key supplied
+
+        $data = "ERROR: Incorrect key supplied!";
+        $self->logger->debug("ERROR: Incorrect key supplied!");
 
     } elsif ( $c->model('Userbase::File')->search( { f_name => $upload->filename } )->first() ) { # file exists
+        # run this test last so can check dskey & filesize before writing
 
         $upload->copy_to("$updir/${filepath}_") or die "$!"; # temp file
         $data = "File already exists in database. Overwrite?";
         $c->stash( overwrite_file => $filepath );
 
-    } elsif (! $upload->size) { # empty file
-
-        $data = "ERROR: File size is zero bytes!";
-
-    } elsif ( !( my $dataset = $c->model('Userbase::Dataset')->search( { ds_name => $dsname } )->first() ) ) { # missing dataset
-
-        $data .= "ERROR: No such dataset '$dsname' registered!";
-
-    } elsif ( ! $dataset->validate_dskey( $c->req->params->{dirkey} ) ) { # wrong key supplied
-
-        $data = "ERROR: Incorrect key supplied!";
-
     } else {
 
         $self->logger->info("New file '$filepath' uploaded");
         $upload->copy_to("$updir/$filepath") or die $!;
+
+        my $success = $queue->insert_job(
+            job_type => 'Metamod::Queue::Worker::Upload',
+            job_parameters => { file => "$updir/$filepath", type => 'INDEX' },
+        );
+
+        if( $success ){
+            $data = "File uploaded, will be processed shortly.";
+            $self->logger->debug('File uploaded');
+        } else {
+            $data = "Internal error: Could not add file to processing queue!";
+            $self->logger->error('Internal error: Could not add file to processing queue!');
+        }
 
     }
 
@@ -190,6 +225,18 @@ sub test_POST  {
             open(my $etaf, '>', "$updir/etaf/$fn") or die $!;
             printf $etaf "%s %s\n", $c->user->u_email, $c->user->u_name;
             close $etaf;
+
+            my $success = $queue->insert_job(
+                job_type => 'Metamod::Queue::Worker::Upload',
+                job_parameters => { file => "$updir/ftaf/$fn", type => 'TEST' },
+            );
+
+            if( $success ){
+                $self->logger->debug("File $fn replaced, will be processed shortly.");
+            } else {
+                $self->logger->error('Internal error: Could not add file to processing queue!');
+            }
+
             $data = sprintf "File $fn (%s bytes) uploaded successfully. Test report will be sent on e-mail.", $upload->size;
         }
     } else {

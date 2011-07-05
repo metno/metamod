@@ -716,11 +716,19 @@ $projectNames = array(
    "IPY/Damocles/iAOOS" => "DAMOCLES",
    "Hamburg Arctic Ocean Buoy Drift Experiment DAMOCLES 2008-2009" => "DAMOCLES",
    "Hamburg Arctic Ocean Buoy Drift Experiment DAMOCLES 2007-2008" => "DAMOCLES",
-   "IPY/iAOOS/Damocles" => "DAMOCLES"
+   "IPY/iAOOS/Damocles" => "DAMOCLES",
+   "iAOOS-Norway" => "IAOOS",
+   "iAOOS-Norway/IPY-THORPEX" => "IAOOS",
+   "AtmoTroll" => "NOT_VALID",
+   "POLEWARD" => "NOT_VALID",
+   "IPY Operational Data Coordination" => "NOT_VALID"
 );
 
 $projectLongNames = array(
-   "DAMOCLES" => "Developing Arctic Modelling & Observing Capabilities for Long-term Env. Studies"
+   "DAMOCLES" => "Developing Arctic Modelling & Observing Capabilities for Long-term Env. Studies",
+   "POLARCAT" => "POLar study using Aircraft, Remote sensing data of Climate, Aerosols & Transport",
+   "IAOOS" => "Integrated Arctic Ocean Observing System",
+   "IPY-THORPEX" => "Improved numerical weather forecasting and climate simulations"
 );
 
 $ipyProjects = array(

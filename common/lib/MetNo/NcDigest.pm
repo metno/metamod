@@ -1545,6 +1545,7 @@ sub parse_file {
    };
    foreach my $varname (keys %foundvars) {
       my $vref = $foundvars{$varname};
+      if (!exists($vars_with_preset_type{$varname})) {
       if (substr($vref->{"type"},0,5) ne '%Data') {
          if (exists($vref->{"attributes"}->{"axis"})) {
             $vref->{"type"} =  '%Coordinate_' . $vref->{"attributes"}->{"axis"};
@@ -1555,10 +1556,12 @@ sub parse_file {
             }
          }
       }
+      }
       if ($vref->{"type"} eq "") {
          $vref->{"type"} = '%Data';
       }
       if ($vref->{"type"} eq '%Coordinate') {
+         if (!exists($vars_with_preset_type{$varname})) {
          if (exists($vref->{"stdname"})) {
             my $stdname = $vref->{"stdname"};
             if ($vref->{"dimcount"} == 1 && exists($axis_from_stdname->{$stdname})) {
@@ -1566,6 +1569,7 @@ sub parse_file {
             }
          }
       }
+   }
    }
    foreach my $varname (keys %foundvars) {
       if (!exists($vars_with_preset_type{$varname})) {

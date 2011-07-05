@@ -106,6 +106,57 @@ sub xml {
 
 }
 
+=head2 boundingbox()
+
+Create a validation function for validation a bounding box input field.
+
+=over
+
+=item return
+
+Returns a function that validates a value as a valid bounding box.
+
+=back
+
+=cut
+sub boundingbox {
+
+    my $validator = sub {
+        my ($dfv, $value) = @_;
+
+        $dfv->name_this('boundingbox');
+
+        my @values = split ',', $value;
+
+        if( @values != 4 ){
+            return;
+        }
+
+        my $east = shift @values;
+        if( abs($east) > 180 ){
+            return;
+        }
+
+        my $south = shift @values;
+        if( abs($south) > 90 ){
+            return;
+        }
+
+        my $west = shift @values;
+        if( abs($west) > 180 ){
+            return;
+        }
+
+        my $north = shift @values;
+        if( abs($north) > 90 ){
+            return;
+        }
+
+        return 1;
+    };
+
+    return $validator;
+}
 
 =head1 LICENSE
 

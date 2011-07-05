@@ -45,6 +45,8 @@ WEBRUN_DIRECTORY = [==BASE_DIRECTORY==]/webrun
 # delete the metadata database.
 PG_ADMIN_USER = admin
 
+PG_ADMIN_USER_PASSWORD =
+
 # PG_WEB_USER is a PostgreSQL user who may read/write data in the metadata
 # database.
 PG_WEB_USER = webuser
@@ -95,6 +97,11 @@ APP_FOOTER_HTML =
 
 # Comma-separated list of dataset tags accessible from this application:
 DATASET_TAGS = 'DAM', 'NP', 'HI', 'XXX', 'MM'
+
+# SRU/ISO23950-searchable datasets
+# if a database is shared among different projects
+# the tags of all projects will be searchable from each project
+SRU2JDBC_TAGS = [==DATASET_TAGS==]
 
 # ============ METAMODBASE configuration ==============
 # Path for logfile of php-messages (leave empty to log to webserver-errorlogfile)
@@ -357,7 +364,7 @@ TEST_IMPORT_SPEEDUP = 100
 # the virtual date and time is the same as the real date and time. The
 # following number represents this point of time as number of seconds since
 # the epoch. (Use the show_time_now.pl utility to get a value for this number).
-TEST_IMPORT_BASETIME = 1213793125
+TEST_IMPORT_BASETIME = 1309263924
 
 # Set the following value to 1 for verbose output to files import_dataset.out
 # and upload_monitor.out in the webrun directory:
@@ -371,3 +378,17 @@ TEST_EMAIL_RECIPIENT =
 LOG4PERL_CONFIG = logger_config.ini
 LOG4ALL_SYSTEM_LOG = system_log.log
 LOG4PERL_WATCH_TIME = 30
+
+# List the supported geographical search environments
+SRID_ID_COLUMNS = 93995 93031
+
+# define a bounding box (north east south west) where each SRID is valid
+SRID_NESW_BOUNDING_BOX_93995 = 90 180 30 -180
+SRID_NESW_BOUNDING_BOX_93031 = -30 180 -90 -180
+
+# Basic latitude longitude earth (4035 = WGS84)
+LONLAT_SRID = 4035
+
+PMH_REPOSITORY_IDENTIFIER =
+
+PMH_SYNCHRONIZE_ISO_IDENTIFIER =

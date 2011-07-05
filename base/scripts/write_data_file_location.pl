@@ -16,7 +16,7 @@ use Log::Log4perl qw(:easy);
 use Pod::Usage;
 
 use Metamod::Dataset;
-use MetamodWeb::Schema::Userbase;
+use Metamod::DBIxSchema::Userbase;
 
 =head1 NAME
 
@@ -53,7 +53,7 @@ my $external_repository = ($config->get('EXTERNAL_REPOSITORY') eq 'true') ? 1 : 
 if( $external_repository ){
     my $userbase_dsn = $config->getDSN_Userbase();
 
-    $userbase_model = MetamodWeb::Schema::Userbase->connect($userbase_dsn, 'admin');
+    $userbase_model = Metamod::DBIxSchema::Userbase->connect($userbase_dsn, 'admin');
     $userbase_model->storage()->ensure_connected();
 
 }

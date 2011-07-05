@@ -92,7 +92,7 @@ is($ds->getParentName, 'project/parent', "get defined parent");
 my @quadTree = (1, 11, 111, 112);
 ok(eq_array([], [$ds->setQuadtree(\@quadTree)]), "set quadtree");
 ok(eq_array(\@quadTree, [$ds->getQuadtree]), "get quadtree");
-ok($ds->writeToFile('test'), "writeToFile");
+ok($ds->_writeToFileHelper('test'), "_writeToFileHelper");
 ok(-f 'test.xml', "xml file exists");
 ok(-f 'test.xmd', "xmd file exists");
 
@@ -128,7 +128,7 @@ $ds->addMetadata(\%metadata);
 my %newMeta = $ds->getMetadata;
 ok(exists $newMeta{'abc'}, "write and get metadata, name");
 ok(eq_array($newMeta{'abc'}, \@metaVals), "write and get metadata, values");
-ok($ds->writeToFile('test'), "writeToFile with umlauts");
+ok($ds->_writeToFileHelper('test'), "_writeToFileHelper with umlauts");
 $ds = newFromFile Metamod::Dataset('test.xml');
 ok(ref $ds, "reading dataset with umlauts");
 %newMeta = $ds->getMetadata;

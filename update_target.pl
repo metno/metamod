@@ -345,7 +345,7 @@ system "$targetdir/scripts/gen_httpd_conf.pl", $targetdir;
 sub install_catalyst {
    # install the catalyst application
    my $cata_dir = "$sourcedir/catalyst";
-   my $cata_inst_dir = "$targetdir/";
+   my $cata_inst_dir = "$targetdir";
    my $catalyst_lib_dir = "$cata_inst_dir/lib";
 
    my @required_dirs = ("$cata_inst_dir/scripts", "$cata_inst_dir/lib", "$cata_inst_dir/root");

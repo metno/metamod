@@ -38,6 +38,7 @@ use warnings;
 use Encode;
 use Fcntl qw(:DEFAULT :flock); # import LOCK_* constants
 use POSIX qw();
+use Metamod::DatasetImporter;
 use Metamod::DatasetTransformer qw();
 use Metamod::DatasetRegion qw();
 use XML::LibXML::XPathContext qw();
@@ -62,10 +63,10 @@ my $nameReg = qr{^([^/]*)/([^/]*/)?([^/]*)$}; # project/[parent/]name where pare
 sub _decode {
 	my ($self, $string) = @_;
 	if (!Encode::is_utf8($string)) {
-		$logger->debug("String not properly encoded, assuming utf8: $string\n");
+		$logger->debug("String not properly encoded, assuming utf8: $string");
         eval {$string = Encode::decode('utf8', $string, Encode::FB_CROAK);};
         if ($@) {
-        	$logger->warn("Unable to properly decode string: $string\n");
+        	$logger->warn("Unable to properly decode string: $string");
         	$string = Encode::decode('utf8', $string);
         }
 	}
@@ -140,6 +141,35 @@ sub _initSelf {
 
 sub writeToFile {
     my ($self, $fileBase) = @_;
+
+    $self->_writeToFileHelper($fileBase);
+    my $success = $self->_writeToDatabase($fileBase);
+
+    return $success;
+}
+
+=head2 $self->_writeToFileHelper($fileBase)
+
+Writes the dataset information to .xml and .xmd files.
+
+B<IMPLEMTATION NOTE:> This has been separated as its own function to facilitate
+unit testing of writing to file without involving the database.
+
+=over
+
+=item $fileBase
+
+The base filename
+
+=item return
+
+Returns 1 on success. Throws and exception on failure.
+
+=back
+
+=cut
+sub _writeToFileHelper {
+    my ($self, $fileBase) = @_;
     $fileBase = Metamod::DatasetTransformer::getBasename($fileBase);
 
     my ($xmlF, $xmdF);
@@ -159,6 +189,32 @@ sub writeToFile {
     close $xmdF;
 
     return 1;
+
+}
+
+=head2 $self->_writeToDatabase($filename)
+
+Write the information in the dataset to the metabase database.
+
+=over
+
+=item $filename
+
+The filename for this dataset.
+
+=item return
+
+=back
+
+=cut
+sub _writeToDatabase {
+    my $self = shift;
+
+    my ($filename) = @_;
+
+    my $importer = Metamod::DatasetImporter->new();
+    $importer->write_to_database( $filename );
+
 }
 
 sub deleteDatasetFile {

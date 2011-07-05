@@ -21,13 +21,15 @@ use Test::Files;
 use Metamod::Config qw( :init_logger );
 use Metamod::Dataset;
 use Metamod::SubscriptionHandler::SMS;
-use Metamod::TestUtils qw( init_userdb_test empty_userdb );
+use Metamod::Test::Setup;
 
 my $num_tests;
 
 $ENV{METAMOD_SUBSCRIPTION_SMS_DIRECTORY} = $FindBin::Bin;
 
-init_userdb_test("$FindBin::Bin/sms_test_data.sql");
+my $test_setup = Metamod::Test::Setup->new( master_config_file => $ENV{METAMOD_MASTER_CONFIG } );
+$test_setup->mm_config->initLogger();
+$test_setup->populate_userbase("$FindBin::Bin/sms_test_data.sql");
 
 # tests for the _ds_file_name function.
 {
@@ -296,8 +298,4 @@ sub add_location {
     $userbase->dset_put( 'LOCATION', "$location" );
     $userbase->close();
 
-}
-
-END {
-    empty_userdb();
 }

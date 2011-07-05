@@ -25,7 +25,7 @@
         "type" : "text",
         "label" : "Dataset title",
         "length" : 70,
-        "size" : 100,
+        "max_length" : 100,
         "name" : "title"
     },
     {
@@ -41,7 +41,7 @@
         "label" : "URL describing/linking the data",
         "name" : "dataref",
         "length" : 70,
-        "size" : 250
+        "max_length" : 250
     },
     {
         "type" : "list",
@@ -61,7 +61,7 @@
         "label" : "Geogr. Bounding Box (East,South,West,North) (decimal degrees North/East)",
         "name" : "bounding_box",
         "length" : 24,
-        "size" : 24,
+        "constraint" : "boundingbox",
         "mandatory" : true
     },
     {
@@ -77,16 +77,16 @@
      "type" : "text",
      "label" : "Data collection period - start (in the form YYYY-MM-DD HH:MM UTC)",
      "name" : "datacollection_period_from",
-     "length" : 25,
-     "size" : 25
+     "constraint" : "datetime",
+     "length" : 25
     },
 
     {
         "type" : "text",
         "label" : "Data collection period - end (in the form YYYY-MM-DD HH:MM UTC)",
         "name" : "datacollection_period_to",
-        "length" : 25,
-        "size" : 25
+        "constraint" : "datetime",
+        "length" : 25
     },
 
     {
@@ -131,7 +131,7 @@
         "label" : "Metadata standard",
         "name" : "metadata_standard",
         "length" : 70,
-        "size" : 250
+        "max_length" : 250
     },
     {
         "type" : "textarea",
@@ -151,7 +151,7 @@
         "type" : "text",
         "label" : "PI Name",
         "length" : 70,
-        "size" : 100,
+        "max_length" : 100,
         "name" : "PI_name",
         "mandatory" : true
     },
@@ -159,7 +159,7 @@
         "type" : "text",
         "label" : "Institution",
         "length" : 70,
-        "size" : 100,
+        "max_length" : 100,
         "name" : "institution",
         "mandatory" : true
     },
@@ -167,7 +167,7 @@
         "type" : "text",
         "label" : "Email",
         "length" : 70,
-        "size" : 100,
+        "max_length" : 100,
         "name" : "contact",
         "mandatory" : true
     },
@@ -181,7 +181,7 @@
         "type" : "text",
         "label" : "Project",
         "length" : 70,
-        "size" : 100,
+        "max_length" : 100,
         "name" : "project_name"
     },
     {

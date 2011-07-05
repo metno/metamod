@@ -90,20 +90,20 @@ sub test {
         }
     }
     return 0 unless $self->{difDoc}; # $doc not initialized
-        
+
     my $xpc = XML::LibXML::XPathContext->new();
     $xpc->registerNs('dif', 'http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/');
     $xpc->registerNs('d', 'http://www.met.no/schema/metamod/dataset');
-    
+
     # test of content in xmlStr
     my $isDIF = 0;
     my $root = $self->{difDoc}->getDocumentElement();
     my $nodeList = $xpc->findnodes('/dif:DIF', $root);
-    $logger->debug("found ".$nodeList->size." nodes with /dif:DIF\n");
+    $logger->debug("found ".$nodeList->size." nodes with /dif:DIF");
     if ($nodeList->size() == 1) {
         $isDIF = 1;
     }
-    
+
     my $isXMD = 1;
     if ($self->{xmdStr}) {
         $isXMD = 0; # reset to 0, might fail
@@ -121,7 +121,7 @@ sub test {
             }
         }
         return 0 unless $self->{xmdDoc};
-        
+
         my $dsRoot = $self->{difDoc}->getDocumentElement();
         my $nList = $xpc->findnodes('/d:dataset/d:info/@ownertag', $root);
         if ($nodeList->size() == 1) {
@@ -135,15 +135,15 @@ sub test {
 
 sub transform {
     my $self = shift;
-    Carp::croak("Cannot run transform if test fails\n") unless $self->test;
-    
+    Carp::croak("Cannot run transform if test fails") unless $self->test;
+
     my $mm2Doc;
     {
-        my $styleDoc = $self->XMLParser->parse_file($self->{mm2Xslt});    
+        my $styleDoc = $self->XMLParser->parse_file($self->{mm2Xslt});
         my $stylesheet = $self->XSLTParser->parse_stylesheet($styleDoc);
         $mm2Doc = $stylesheet->transform($self->{difDoc});
     }
-    
+
     my $xmdDoc = $self->{xmdDoc};
     unless ($self->{xmdDoc}) { # no xmdStr and thus no xmdDoc, extract from dif
         my $styleDoc = $self->XMLParser->parse_file($self->{xmdXslt});
@@ -160,7 +160,7 @@ sub transform {
         @vals = map {s/\s*degree.*//ig;} @vals;
         $ds->addMetadata({$degName => \@vals});
     }
-    
+
     unless ($self->{xmdDoc}) { # no xmdStr and thus no xmdDoc, extracted from dif, postprocessing
         my %info = $ds->getInfo;
         $info{'name'} =~ s^_^/^g;
@@ -186,15 +186,15 @@ sub transform {
         unless ($info{'name'} =~ m^/^) {
             warn "mismatching datasetname from DIF Entry_ID, setting project UNKNOWN";
             $info{'name'} = 'UNKNOWN/'.$info{'name'};
-        } 
+        }
         $ds->setInfo(\%info);
-        
+
         # conversion to quadtreeuse and to datasetregion
         # TODO: remove one or the other
         require quadtreeuse;
         my %metadata = $ds->getMetadata;
         my $datasetRegion = $ds->getDatasetRegion();
-        my ($south, $north, $east, $west) = qw(southernmost_latitude northernmost_latitude 
+        my ($south, $north, $east, $west) = qw(southernmost_latitude northernmost_latitude
                                                easternmost_longitude westernmost_longitude);
         if (exists $metadata{bounding_box}) {
             my @bbs = @{ $metadata{bounding_box} };
@@ -218,13 +218,13 @@ sub transform {
                     } else {
                         $datasetRegion->addPolygon([[$eLon, $nLat], [$eLon, $sLat], [$wLon, $sLat], [$wLon, $nLat], [$eLon, $nLat]]);
                     }
-                    $logger->debug("adding polygon [[$eLon, $nLat], [$eLon, $sLat], [$wLon, $sLat], [$wLon, $nLat], [$eLon, $nLat]]\n");
+                    $logger->debug("adding polygon [[$eLon, $nLat], [$eLon, $sLat], [$wLon, $sLat], [$wLon, $nLat], [$eLon, $nLat]]");
                     # and now the quadtree
                     my $qtu = new quadtreeuse(90, 0, 3667387.2, 7, "+proj=stere +lat_0=90 +datum=WGS84");
                     if (defined $sLat && defined $nLat && defined $wLon && defined $eLon) {
                         if ($sLat <= -90) {
                             if ($nLat <= -89.9) {
-                                warn "cannot build northern polar-stereographic quadtree on southpole\n";
+                                warn "cannot build northern polar-stereographic quadtree on southpole";
                             } else {
                                 $sLat = 89.9;
                             }
@@ -236,7 +236,7 @@ sub transform {
                     }
                 }; if ($@) {
                     my %info = $ds->getInfo();
-                    warn "problems setting boundingBox for ".$info{name}.": $@\n";
+                    warn "problems setting boundingBox for ".$info{name}.": $@";
                 }
             }
             $ds->setDatasetRegion($datasetRegion);
@@ -247,7 +247,7 @@ sub transform {
             }
         }
     }
-    
+
     return ($ds->getXMD_DOC, $ds->getMETA_DOC);
 }
 
@@ -282,7 +282,7 @@ For inherited options see L<Metamod::DatasetTransformer>, only differences are m
 =item new($xmdStr, $xmlStr, %options)
 
 Initialize the transformation by the meta-metadata (optional) and the DIF document. Both arguments can
-be strings or XML::LibXML::Documents. 
+be strings or XML::LibXML::Documents.
 
 Options include:
 
@@ -309,4 +309,3 @@ Heiko Klein, E<lt>H.Klein@met.noE<gt>
 L<XML::LibXML>, L<XML::LibXSLT>, L<Metamod::DatasetTransformer>
 
 =cut
-

@@ -38,6 +38,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use strict;
 use warnings;
 use File::Spec;
+
 # small routine to get lib-directories relative to the installed file
 sub getTargetDir {
     my ($finalDir) = @_;
@@ -49,6 +50,7 @@ sub getTargetDir {
 
 use lib ('../../common/lib', getTargetDir('lib'));
 
+use Carp;
 use POSIX;
 use Getopt::Long;
 use DBI;
@@ -58,6 +60,9 @@ use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX SEEK_SET);
 use quadtreeuse;
 use mmTtime;
 use XML::LibXML;
+use POE qw(Component::Schedule);
+use POE::Component::Cron;
+use DateTime::Set;
 use Metamod::Dataset;
 use Metamod::ForeignDataset;
 use Metamod::DatasetTransformer::DIF;
@@ -120,11 +125,10 @@ if ($pid) {
     usage();
 }
 
-
-# please explain why we're counting TERM signals
-our $SIG_TERM = 0;
-sub sigterm {++$SIG_TERM;}
-$SIG{TERM} = \&sigterm;
+# this is probably no longer needed as POE itself should handle breaks correctly
+#our $SIG_TERM = 0;
+#sub sigterm {++$SIG_TERM;}
+#$SIG{TERM} = \&sigterm;
 
 my @arr_harvest_sources = split(/\n/,$harvest_sources);
 my %hash_harvest_sources = ();
@@ -136,81 +140,84 @@ foreach my $hsource (@arr_harvest_sources) {
     $hash_set_specifications{$ownertag} = $setspec;
 }
 
-eval {
-    &do_harvest();
-};
-if ($@) {
-    $log->error($@);
-}
+my $crontab = $config->get('HARVEST_CRONTAB') || '30 04 * * *'; # FIXME - move to defaults
 
+my $harvest = POE::Session->create(
+    inline_states => {
+        _start    => sub {
+                        $log->info("Harvester initialized with schedule $crontab");
+                    },
+        harvest   => \&do_harvest,
+        _stop     => sub {
+                        $log->info("Harvester session ", $_[SESSION]->ID, " has stopped.");
+                    },
+    }
+);
+
+
+my $sched =
+  POE::Component::Cron->from_cron( $crontab => $harvest->ID => 'harvest' );
+
+POE::Kernel->run();
+
+# END
 
 #-----------------------------------------------------------------------
 #
 sub do_harvest {
-    my $previous_day = -1;
-    while (! $SIG_TERM ) {
-        my @ltime = localtime(mmTtime::ttime());
-        my $newday = $ltime[3]; # 1-31
-        my $current_hour = $ltime[2];
-        if ($newday == $previous_day || $current_hour < $config->get('HARVEST_HOUR')) {
-            my $acc = $config->get('TEST_IMPORT_SPEEDUP');
-            if (defined($acc) && $acc > 1) {
-                sleep(1);
-            } else {
-                sleep(15*60);
-            }
-            next;
+
+    my ($kernel, $heap, $session) = @_[KERNEL, HEAP, SESSION];
+    $log->info("Harvest session " . $_[SESSION]->ID . " started at " . scalar(gmtime) . " UTC.");
+
+    my $dbh = $config->getDBH();
+
+    # foreach key,value pair in a hash
+    while (my ($ownertag,$url) = each(%hash_harvest_sources)) {
+
+        # Open file for reading (with shared lock)
+        $log->debug("harvesting $ownertag $url");
+
+        my $date_last_upd = getlaststatus($dbh, $applicationid, $url);
+
+        my $urlsent = $url . '?verb=ListRecords&metadataPrefix=dif';
+        if (defined($date_last_upd)) {
+            $urlsent .= '&from=' . substr( $date_last_upd, 0, 10 ); # use only date from timestamp
         }
-        $previous_day = $newday;
-
-        my $dbh = $config->getDBH();
-
-        # foreach key,value pair in a hash
-        while (my ($ownertag,$url) = each(%hash_harvest_sources)) {
-
-            # Open file for reading (with shared lock)
-            $log->debug("harvesting $ownertag $url");
-
-            my $date_last_upd = getlaststatus($dbh, $applicationid, $url);
-
-            my $urlsent = $url . '?verb=ListRecords&metadataPrefix=dif';
-            if (defined($date_last_upd)) {
-                $urlsent .= '&from=' . substr( $date_last_upd, 0, 10 ); # use only date from timestamp
-            }
-            if (exists($hash_set_specifications{$ownertag}) &&
-                 defined($hash_set_specifications{$ownertag})) {
-                $urlsent .= '&set=' . $hash_set_specifications{$ownertag};
-            }
-            my $content_from_get = eval { getContentFromUrl($urlsent); };
-            #next unless $content_from_get;
-            if ($@) {
-                $log->error("GET error: $@ for GET $urlsent");
-                next; # probably network or server error, let's wait and see
-            }
-
-            # Process DIF records:
-            eval {
-                my $resumptionToken = process_DIF_records($ownertag, $content_from_get);
-                while ($resumptionToken) {
-                    # continue reading records
-                    my $resumptionUrl = $url . '?verb=ListRecord&resumptionToken='. uri_escape($resumptionToken);
-                    my $content_from_get = getContentFromUrl($resumptionUrl);
-                    last unless $content_from_get;
-                    $resumptionToken = process_DIF_records($ownertag, $content_from_get);
-                }
-            };
-
-            if ($@) { # OAI-PMH reports an error
-                $log->error("DIF processing error: $@");
-            } else { # all ok, update status in db to current timestamp
-                eval { updatestatus($dbh, $applicationid, $url, $date_last_upd); };
-                $log->error("Could not update status in DB: $@") if ($@);
-            }
-
+        if (exists($hash_set_specifications{$ownertag}) &&
+             defined($hash_set_specifications{$ownertag})) {
+            $urlsent .= '&set=' . $hash_set_specifications{$ownertag};
         }
-        $dbh->disconnect;
-        sleep(10);
+        my $content_from_get = eval { getContentFromUrl($urlsent); };
+        #next unless $content_from_get;
+        if ($@) {
+            $log->error("GET error: $@ for GET $urlsent");
+            next; # probably network or server error, let's wait and see
+        }
+
+        # Process DIF records:
+        eval {
+            my $resumptionToken = process_DIF_records($ownertag, $content_from_get);
+            while ($resumptionToken) {
+                # continue reading records
+                my $resumptionUrl = $url . '?verb=ListRecord&resumptionToken='. uri_escape($resumptionToken);
+                my $content_from_get = getContentFromUrl($resumptionUrl);
+                last unless $content_from_get;
+                $resumptionToken = process_DIF_records($ownertag, $content_from_get);
+            }
+        };
+
+        if ($@) { # OAI-PMH reports an error
+            $log->error("DIF processing error: $@");
+        } else { # all ok, update status in db to current timestamp
+            eval { updatestatus($dbh, $applicationid, $url, $date_last_upd); };
+            $log->error("Could not update status in DB: $@") if ($@);
+        }
+
     }
+    $dbh->disconnect;
+
+    $log->info("Harvest session " . $_[SESSION]->ID . " finished at " . scalar(gmtime) . " UTC.");
+
 }
 
 #
@@ -253,7 +260,7 @@ sub process_DIF_records {
     my $oaiDoc;
     eval {
         $oaiDoc = $parser->parse_string($content_from_get);
-        $log->debug("Successfully parsed XML\n");
+        $log->debug("Successfully parsed XML");
         if ($harvest_schema) {
             # $log->debug("validating ...");
             $harvest_schema->validate($oaiDoc);
@@ -372,7 +379,7 @@ sub process_DIF_records {
 #
 sub getContentFromFile {
     my ($file) = @ARGV;
-    open my $f, $file or die "Cannot read $file: $!\n";
+    open my $f, $file or croak "Cannot read $file: $!";
     local $/ = undef;
     my $content = <$f>;
     close $f;
@@ -475,7 +482,7 @@ The list of web addresses to use is configurable and stored in the
 ownertag used in the METAMOD2 database. The corresponding value is the URL used
 in the GET request.
 
-At regular time intervals (24 hours), all URLs in the hash is sent a GET
+At specified time intervals (set in HARVEST_CRONTAB), all URLs in the hash is sent a GET
 request asking for all records from the corresponding source that are
 changed/new since the previous harvest on the same source.
 

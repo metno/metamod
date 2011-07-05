@@ -18,7 +18,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
-package Uploadutils;
+package Metamod::UploadUtils;
 use base qw(Exporter);
 use strict;
 use warnings;
@@ -612,12 +612,12 @@ sub syserror {
             $errMsg .= "Stderr: $msg; ";
         }
         if ( $errmsg eq 'NORMAL TERMINATION' ) {
-            $logger->info( $errMsg . "\n" );
+            $logger->info( $errMsg );
         } else {
             if ( $type eq "SYSUSER" ) {
-                $logger->info( $errMsg . "\n" );
+                $logger->info( $errMsg );
             } else {
-                $logger->error( $errMsg . "\n" );
+                $logger->error( $errMsg );
             }
         }
     }

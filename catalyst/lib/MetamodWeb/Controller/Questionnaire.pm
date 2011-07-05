@@ -131,7 +131,7 @@ sub questionnaire_POST : Private {
         my $msg = "Thank you. Your response has been save. Use '$response_key' if you want to edit your response later.";
         $self->add_info_msgs( $c, $msg );
     } else {
-        $self->add_error_msgs( $c, 'Failed to save the response on the error. Please contact the administrator.' );
+        $self->add_error_msgs( $c, 'Failed to save the response because of an error. Please contact the administrator.' );
     }
 
     return $c->res->redirect( $c->uri_for( '/editor', $config_id, { response_key => $response_key } ) );

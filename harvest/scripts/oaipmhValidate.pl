@@ -1,33 +1,33 @@
 #!/usr/bin/perl -w
 #
-#---------------------------------------------------------------------------- 
-#  METAMOD - Web portal for metadata search and upload 
-# 
-#  Copyright (C) 2009 met.no 
-# 
-#  Contact information: 
-#  Norwegian Meteorological Institute 
-#  Box 43 Blindern 
-#  0313 OSLO 
-#  NORWAY 
-#  email: heiko.klein@met.no 
-#   
-#  This file is part of METAMOD 
-# 
-#  METAMOD is free software; you can redistribute it and/or modify 
-#  it under the terms of the GNU General Public License as published by 
-#  the Free Software Foundation; either version 2 of the License, or 
-#  (at your option) any later version. 
-# 
-#  METAMOD is distributed in the hope that it will be useful, 
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-#  GNU General Public License for more details. 
-#   
-#  You should have received a copy of the GNU General Public License 
-#  along with METAMOD; if not, write to the Free Software 
-#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
-#---------------------------------------------------------------------------- 
+#----------------------------------------------------------------------------
+#  METAMOD - Web portal for metadata search and upload
+#
+#  Copyright (C) 2009 met.no
+#
+#  Contact information:
+#  Norwegian Meteorological Institute
+#  Box 43 Blindern
+#  0313 OSLO
+#  NORWAY
+#  email: heiko.klein@met.no
+#
+#  This file is part of METAMOD
+#
+#  METAMOD is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  METAMOD is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with METAMOD; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#----------------------------------------------------------------------------
 #
 
 use strict;
@@ -54,10 +54,10 @@ sub printUsage {
 usage: $prg -i inputURL [-m metadataSchema] [-o oaiPmhSchema] [-h] [-d]
  default: metadataSchema: $difSchemaURI
           oaiPmhSchema:   $oaiSchemaURI
-          
+
  -d debug
  -h this help
- 
+
 example: $prg -i '$harvestSource'
 
 EOT
@@ -107,7 +107,7 @@ while (defined (my $record = $records->shift)) {
     	print STDERR "$identifier has status $status, not analyzing\n" if $debug;
     	$recordNo--;
     } else {
-        my @difNodes = map {$_->nodeType == XML_ELEMENT_NODE ? $_ : ();} 
+        my @difNodes = map {$_->nodeType == XML_ELEMENT_NODE ? $_ : ();}
             $xpath->findnodes("oai:metadata", $record)->item(0)->childNodes;
         if (@difNodes != 1) {
         	print STDERR "found ".scalar @difNodes. " for $identifier in $harvestSource, should be exactly 1 active\n";
@@ -125,7 +125,7 @@ while (defined (my $record = $records->shift)) {
     }
 }
 if ($errors) {
-	die "found $errors validation errors in $recordNo records\n";
+	die "found $errors validation errors in $recordNo records";
 } else {
     print STDERR "sucessfully finished without errors, testing $recordNo records\n";
     exit(0);
@@ -136,7 +136,7 @@ sub getTargetDir {
     my ($finalDir) = @_;
     my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
     $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
-    $dir = File::Spec->catdir($dir, $finalDir); 
+    $dir = File::Spec->catdir($dir, $finalDir);
     return File::Spec->catpath($vol, $dir, "");
 }
 
@@ -153,4 +153,3 @@ sub fetchSource {
     }
     return $content;
 }
-

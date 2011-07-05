@@ -12,7 +12,10 @@
             id="[% element.name %]"
             value="[% quest_data.item( element.name ) | html %]"
             size="[% element.length %]"
-            maxlength="[% element.size %]"
+
+            [% IF element.max_length %]
+                maxlength="[% element.max_length %]"
+            [% END %]
             />
     </td>
 </tr>
