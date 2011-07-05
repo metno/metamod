@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 
 =begin licence
 
@@ -40,15 +40,30 @@ use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin/../../common/lib";
 use lib "$FindBin::Bin/../../lib";
 
-use MetamodWeb::Utils::GenCatalystConf;
+use Getopt::Long qw(:config pass_through);
+use Metamod::Config;
 
 $ENV{CATALYST_SCRIPT_GEN} = 40;
 
-if( !exists $ENV{METAMOD_MASTER_CONFIG } ){
-    $FindBin::Bin =~ qw!(.+)/(catalyst/script|bin)$! or die "Couldn't find master_config around here. Try setting ENV.";
-    $ENV{METAMOD_MASTER_CONFIG} = "$1/master_config.txt";
+my $config_file;
+GetOptions("config-dir=s", \$config_dir);
+
+if( !$config_dir && !exists $ENV{METAMOD_MASTER_CONFIG}){
+    print "You must supply either the config-dir parameter or set the METAMOD_MASTER_CONFIG environment variable\n";
+    exit 1;
 }
-die "Cannot open master config $ENV{METAMOD_MASTER_CONFIG}" unless -r $ENV{METAMOD_MASTER_CONFIG};
+
+
+if(!exists $ENV{METAMOD_MASTER_CONFIG} && $config_dir){
+    Metamod::Config->new(File::Spec->catfile($config_dir, 'master_config.txt'), {is_default => 1} );
+    #$ENV{METAMOD_MASTER_CONFIG} = File::Spec->catfile($config_dir, 'master_config.txt');
+}
+
+#if( !exists $ENV{METAMOD_MASTER_CONFIG } ){
+#    $FindBin::Bin =~ qw!(.+)/(catalyst/script|fscript)$! or die "Couldn't find master_config around here. Try setting ENV.";
+#    $ENV{METAMOD_MASTER_CONFIG} = "$1/master_config.txt";
+#}
+#die "Cannot open master config $ENV{METAMOD_MASTER_CONFIG}" unless -r $ENV{METAMOD_MASTER_CONFIG};
 
 use Catalyst::ScriptRunner;
 Catalyst::ScriptRunner->run('MetamodWeb', 'Server');
