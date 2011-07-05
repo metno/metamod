@@ -14,7 +14,7 @@ fi
 
 # Load the configuration dynamically
 SCRIPT_PATH="`dirname \"$0\"`"
-source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" $1)
+source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" "$1/master_config.txt")
 
 COMMON="$SCRIPT_PATH/../init/common.sh"
 

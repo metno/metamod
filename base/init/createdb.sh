@@ -2,7 +2,7 @@
 
 if [ $# != 1 ]
 then
-	echo "You must supply the master config file as a parameter"
+	echo "You must supply the config dir as a parameter"
 	exit 1
 fi
 
@@ -14,7 +14,7 @@ fi
 
 # Load the configuration dynamically
 SCRIPT_PATH="`dirname \"$0\"`"
-source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" $1)
+source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" "$1/master_config.txt")
 
 COMMON="$SCRIPT_PATH/common.sh"
 

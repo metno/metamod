@@ -41,16 +41,8 @@ use strict;
 use warnings;
 use File::Spec;
 use File::Basename;
-# small routine to get lib-directories relative to the installed file
-sub getTargetDir {
-    my ($finalDir) = @_;
-    my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
-    $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
-    $dir = File::Spec->catdir($dir, $finalDir);
-    return File::Spec->catpath($vol, $dir, "");
-}
 
-use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
+use lib ('../../common/lib' );
 use XML::Simple qw(:strict);
 use mmTtime;
 # use Data::Dumper;
@@ -70,8 +62,8 @@ if (scalar @ARGV != 1) {
 }
 
 
-my $master_config_file = shift @ARGV;
-my $config_directory = dirname($master_config_file);
+my $config_directory = shift @ARGV;
+my $master_config_file = File::Spec->catfile($config_directory, "master_config.txt");
 
 my $config = new Metamod::Config($master_config_file);
 my $searchdataxml = File::Spec->catfile($config_directory, 'staticdata', 'searchdata.xml');
