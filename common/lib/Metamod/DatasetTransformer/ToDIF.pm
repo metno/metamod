@@ -46,16 +46,16 @@ use Metamod::ForeignDataset;
 our @EXPORT_OK = qw(foreignDataset2Dif);
 our $_logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
 
-my $mm2ToDifXslt = $Metamod::DatasetTransformer::XSLT_DIR . 'mm2dif.xsl';
-my $isoToDifXslt = $Metamod::DatasetTransformer::XSLT_DIR . 'iso2dif.xslt';
-my $jifXslt = $Metamod::DatasetTransformer::XSLT_DIR . 'jif.xsl';
-
 my $mm2ToDifStyle;
 my $isoToDifStyle;
 my $jifStyle;
 my $_init = 0;
 sub _init {
     return if $_init++;
+
+    my $mm2ToDifXslt = Metamod::DatasetTransformer::xslt_dir() . 'mm2dif.xsl';
+    my $isoToDifXslt = Metamod::DatasetTransformer::xslt_dir() . 'iso2dif.xslt';
+    my $jifXslt = Metamod::DatasetTransformer::xslt_dir() . 'jif.xsl';
 
     my $styleDoc = Metamod::DatasetTransformer->XMLParser->parse_file($mm2ToDifXslt);
     $mm2ToDifStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet($styleDoc);

@@ -40,9 +40,6 @@ use 5.6.0;
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 my $logger = Log::Log4perl::get_logger('metamod::common::DatasetTransformer::OldDataset');
 
-our $XSLT_FILE_MM2 = $Metamod::DatasetTransformer::XSLT_DIR.'oldDataset2MM2.xslt';
-our $XSLT_FILE_XMD =  $Metamod::DatasetTransformer::XSLT_DIR.'oldDataset2Dataset.xslt';
-
 sub originalFormat {
     return "OldDataset";
 }
@@ -51,6 +48,10 @@ sub new {
     if (@_ < 3 || (scalar @_ % 2 != 1)) {
         croak ("new " . __PACKAGE__ . " needs argument (package, file), got: @_\n");
     }
+
+    my $XSLT_FILE_MM2 = Metamod::DatasetTransformer::xslt_dir().'oldDataset2MM2.xslt';
+    my $XSLT_FILE_XMD = Metamod::DatasetTransformer::xslt_dir().'oldDataset2Dataset.xslt';
+
     my ($class, $xmdStr, $xmlStr, %options) = @_;
     my $self = {xmdStr => $xmdStr,
                 xmlStr => $xmlStr,

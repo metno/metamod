@@ -41,17 +41,16 @@ use Log::Log4perl;
 our @EXPORT_OK = qw(foreignDataset2iso19115);
 our $_logger = Log::Log4perl->get_logger('metamod::common::Metamod::DatasetTransformer::ToISO19115');
 
-my $difToIsoXslt = $Metamod::DatasetTransformer::XSLT_DIR . 'dif2iso.xslt';
-
 my $difToIsoStyle;
 my $_init = 0;
 sub _init {
     return if $_init++;
-    
+
+    my $difToIsoXslt = Metamod::DatasetTransformer::xslt_dir() . 'dif2iso.xslt';
     my $styleDoc = Metamod::DatasetTransformer->XMLParser->parse_file($difToIsoXslt);
     $difToIsoStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet($styleDoc);
     if (!$difToIsoStyle) {
-        $_logger->logcroak("cannot parse stylesheet $difToIsoXslt");   
+        $_logger->logcroak("cannot parse stylesheet $difToIsoXslt");
     }
 }
 
@@ -70,7 +69,7 @@ sub foreignDataset2iso19115 {
         return $foreignDataset;
     } elsif (UNIVERSAL::isa($transformer,'Metamod::DatasetTransformer::DIF')) {
         $_logger->debug("foreignDataset is DIF, only one transformation need");
-        $difFds = $foreignDataset; 
+        $difFds = $foreignDataset;
     } elsif (UNIVERSAL::isa($transformer,'Metamod::DatasetTransformer')) {
         $_logger->debug("foreignDataset is does map to internal, converting to internal->DIF->ISO");
         my ($xmdDoc, $xmlDoc) = $transformer->transform();
@@ -87,7 +86,7 @@ sub foreignDataset2iso19115 {
         if exists $options->{REPOSITORY_IDENTIFIER};
     my $isoDoc = $difToIsoStyle->transform($difFds->getMETA_DOC(), XML::LibXSLT::xpath_to_string(%params));
     return Metamod::ForeignDataset->newFromDoc($isoDoc, $difFds->getXMD_DOC());
-    
+
 }
 
 1;
