@@ -400,7 +400,7 @@ sub level2_datasets {
                                                        max_files => { default => 100, },
                                                        max_age => { default => 90 } } );
 
-    my $config         = Metamod::Config->new();
+    my $config         = Metamod::Config->instance();
     my $dbh            = $config->getDBH();
     my $days           = $parameters{max_age} + 0; # get into numeric presentation
     my ($cut_off_date) = $dbh->selectrow_array("SELECT now() - interval '$days days'");
@@ -471,7 +471,7 @@ sub dataset_location_search {
 
     my ( $srid, $x1, $y1, $x2, $y2 ) = @_;
 
-    my $config = Metamod::Config->new();
+    my $config = Metamod::Config->instance();
 
     my $scale_factor_x = $config->get("SRID_MAP_SCALE_FACTOR_X_$srid");
     my $scale_factor_y = $config->get("SRID_MAP_SCALE_FACTOR_Y_$srid");

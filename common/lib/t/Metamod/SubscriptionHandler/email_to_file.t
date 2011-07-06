@@ -7,25 +7,18 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 use lib "$FindBin::Bin/../../..";
 
-# must override the master config file to use here before use import modules that use the config file.
-BEGIN {
-     my $config_file = "$FindBin::Bin/../../master_config.txt";
-     $ENV{ METAMOD_MASTER_CONFIG } = $config_file unless exists $ENV{METAMOD_MASTER_CONFIG };
-     $ENV{ METAMOD_LOG4PERL_CONFIG } = "$FindBin::Bin/../../log4perl_config.ini";
-}
-
-
 use Mail::Mailer;
 use Test::More;
 use Test::Files;
 
-use Metamod::Config qw( :init_logger );
+use Metamod::Config;
 use Metamod::Dataset;
 use Metamod::SubscriptionHandler::EmailToFile;
 
 my $num_tests = 0;
 
-my $config = Metamod::Config->new();
+my $config = Metamod::Config->new("$FindBin::Bin/../../master_config.txt");
+$config->initLogger();
 my $from_address = $config->get('FROM_ADDRESS');
 
 # We must set this so Mail::Util::mailaddress() gives a consistent address;

@@ -49,7 +49,7 @@ FIXME
 
 =cut
 
-has 'config' => ( is => 'ro', default => sub { Metamod::Config->new() } );
+has 'config' => ( is => 'ro', default => sub { Metamod::Config->instance() } );
 
 has 'logger' => ( is => 'ro', default => sub { Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__); } );
 

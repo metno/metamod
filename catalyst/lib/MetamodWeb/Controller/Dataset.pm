@@ -175,7 +175,7 @@ sub rss :Chained("ds_id") :PathPart("rss") : Args(0) {
 
     my $ds_name          = $ds->unqualified_ds_name();
 
-    my $config = Metamod::Config->new();
+    my $config = Metamod::Config->instance();
     my $application_name = $mm_config->get('APPLICATION_NAME');
     my $base_url = $mm_config->get('BASE_PART_OF_EXTERNAL_URL');
     my $local_url = $mm_config->get('LOCAL_URL');

@@ -30,7 +30,7 @@ sub new {
     my $class = shift;
 
     my $self = bless {}, $class;
-    $self->{_config} = Metamod::Config->new();
+    $self->{_config} = Metamod::Config->instance();
     $self->{_logger} = get_logger('metamod.subscription');
 
     return $self;

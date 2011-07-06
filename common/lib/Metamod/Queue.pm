@@ -49,7 +49,7 @@ use Params::Validate qw(:all);
 #
 # The current METAMOD configuration object
 #
-has 'mm_config' => ( is => 'ro', isa => 'Metamod::Config', default => sub { return Metamod::Config->new() } );
+has 'mm_config' => ( is => 'ro', isa => 'Metamod::Config', default => sub { return Metamod::Config->instance() } );
 
 #
 # The TheSchwartz client that is used to insert jobs into the queue

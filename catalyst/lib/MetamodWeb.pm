@@ -66,7 +66,7 @@ $VERSION = eval $VERSION;
 # with an external configuration file acting as an override for
 # local deployment.
 
-my $mm_config = Metamod::Config->new();
+my $mm_config = Metamod::Config->instance();
 $mm_config->initLogger();
 
 my $custdir = path_to_custom();

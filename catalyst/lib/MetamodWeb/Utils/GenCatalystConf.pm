@@ -57,7 +57,7 @@ Returns the Catalyst configuration as a JSON string.
 
 sub catalyst_conf {
 
-    my $conf = Metamod::Config->new();
+    my $conf = Metamod::Config->instance();
 
     my %config = (
         "name"            => 'MetamodWeb',

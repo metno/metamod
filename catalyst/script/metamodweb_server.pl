@@ -54,10 +54,7 @@ if( !$config_dir && !exists $ENV{METAMOD_MASTER_CONFIG}){
 }
 
 
-if(!exists $ENV{METAMOD_MASTER_CONFIG} && $config_dir){
-    Metamod::Config->new(File::Spec->catfile($config_dir, 'master_config.txt'), {is_default => 1} );
-    #$ENV{METAMOD_MASTER_CONFIG} = File::Spec->catfile($config_dir, 'master_config.txt');
-}
+Metamod::Config->new($config_dir);
 
 #if( !exists $ENV{METAMOD_MASTER_CONFIG } ){
 #    $FindBin::Bin =~ qw!(.+)/(catalyst/script|fscript)$! or die "Couldn't find master_config around here. Try setting ENV.";

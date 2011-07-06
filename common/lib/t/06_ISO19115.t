@@ -9,14 +9,15 @@ use Test::More tests => 8;
 use Data::Dumper;
 
 BEGIN{
-    $ENV{METAMOD_MASTER_CONFIG} = "$FindBin::Bin/master_config.txt";
-    $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/log4perl_config.ini";
     $ENV{METAMOD_SOURCE_DIRECTORY} = "$FindBin::Bin/../../..";
 }
 
-use Metamod::Config qw(:init_logger);
+use Metamod::Config;
 
-BEGIN {use_ok('Metamod::DatasetTransformer::ISO19115')};
+my $config = Metamod::Config->new("$FindBin::Bin/master_config.txt");
+$config->initLogger();
+
+use_ok('Metamod::DatasetTransformer::ISO19115');
 
 my $DataDir = $FindBin::Bin.'/data/XML/';
 my ($xmdStr, $xmlStr) = Metamod::DatasetTransformer::getFileContent($DataDir."exampleISO19115");

@@ -30,15 +30,6 @@ BEGIN {
 
 }
 
-#Teste med søk
-# - Resultater på bare en side
-# - Resultater over flere sider. Ha første side
-# - Resultater over flere sider. Ikke ha første side.
-# - Et søke kriterium
-# - Flere søke kriterium innen samme kategori
-# - Flere kategorier.
-# - Test alle kategorier
-
 test_metadata_search( {}, 1, [qw( TEST/dataset1 TEST/dataset2 TEST/dataset3 )], 'No search criteria. First page' );
 
 test_metadata_search( {}, 2, [qw( TEST/dataset4 )], 'No search criteria. Second page' );

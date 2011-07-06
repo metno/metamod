@@ -52,8 +52,6 @@ our @EXPORT = qw(logger param abandon getXML getSetup outputXML defaultWMC);
 
 my $q = CGI->new;
 my $parser = XML::LibXML->new;
-my $config = Metamod::Config->new();
-$config->initLogger();
 my $logger = get_logger('metamod.search');
 
 #sub new {

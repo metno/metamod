@@ -8,7 +8,7 @@ use Metamod::Config;
 #  Method: ttime
 #
 sub ttime {
-   my $config = new Metamod::Config();
+   my $config = Metamod::Config->instance();
    my $realtime;
    if (scalar @_ == 0) {
       $realtime = time;

@@ -37,7 +37,7 @@ MetamodWeb::Utils::UI::Base - Base class for the UI utility classes
 
 =cut
 
-has 'config' => ( is => 'ro', default => sub { Metamod::Config->new() } );
+has 'config' => ( is => 'ro', default => sub { Metamod::Config->instance() } );
 has 'c' => (
     is       => 'ro',
     required => 1,

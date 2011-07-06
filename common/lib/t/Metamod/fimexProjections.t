@@ -7,9 +7,12 @@ use lib "$FindBin::Bin/../..";
 
 use Test::More tests => 9;
 use Data::Dumper;
+use Metamod::Config;
 
+my $config = Metamod::Config->new("$FindBin::Bin/../master_config.txt");
+$config->initLogger();
 
-BEGIN {use_ok('Metamod::FimexProjections');};
+use_ok('Metamod::FimexProjections');
 
 # setting target dir so that common is below
 $ENV{METAMOD_TARGET_DIRECTORY} = "$FindBin::Bin/../../..";

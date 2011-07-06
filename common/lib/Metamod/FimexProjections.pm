@@ -76,7 +76,7 @@ my $logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
 
 =cut
 sub getFimexProjectionsSchemaPath {
-    my $config = Metamod::Config->new();
+    my $config = Metamod::Config->instance();
     return $config->get('TARGET_DIRECTORY') . "/schema/fimexProjections.xsd";
 }
 

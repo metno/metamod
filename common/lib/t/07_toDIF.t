@@ -7,12 +7,14 @@ use lib "$FindBin::Bin/../";
 
 use Test::More tests => 12;
 use Data::Dumper;
+use Metamod::Config;
 
-BEGIN {$ENV{METAMOD_XSLT_DIR} = "$FindBin::Bin/../../schema/";}
+$ENV{METAMOD_XSLT_DIR} = "$FindBin::Bin/../../schema/";
 
-BEGIN {use_ok('Metamod::DatasetTransformer::ToDIF', "foreignDataset2Dif")};
+my $config = Metamod::Config->new("$FindBin::Bin/master_config.txt");
+$config->initLogger();
 
-Log::Log4perl::init( "$FindBin::Bin/log4perl_config.ini" );
+use_ok('Metamod::DatasetTransformer::ToDIF', "foreignDataset2Dif");
 
 my $DataDir = $FindBin::Bin.'/data/XML/';
 my $fds = Metamod::ForeignDataset->newFromFileAutocomplete($DataDir."exampleDIF");

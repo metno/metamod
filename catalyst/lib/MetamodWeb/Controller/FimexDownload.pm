@@ -47,7 +47,7 @@ BEGIN {extends 'MetamodWeb::BaseController::Base'; }
 sub fimexDownload :Path('/search/fimexdownload') :Args(0) {
     my ( $self, $c ) = @_;
 
-    my $config = Metamod::Config->new();
+    my $config = Metamod::Config->instance();
 
 
     my $dsName = $c->req->params->{ dataset_name } || 0;

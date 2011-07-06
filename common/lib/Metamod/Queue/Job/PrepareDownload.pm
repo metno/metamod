@@ -105,7 +105,7 @@ sub prepare_download {
         $zip->addFile( $location, $filename );
     }
 
-    my $config          = Metamod::Config->new();
+    my $config          = Metamod::Config->instance();
     my $download_area   = $config->get('WEBRUN_DIRECTORY') . "/download";
 
     if( !(-d $download_area) ){

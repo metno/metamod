@@ -136,7 +136,8 @@ sub run_import_dataset {
 
     my $import_script = $self->import_dataset_path;
     my $dataset_dir   = $self->dataset_dir;
-    my $output        = `$import_script $dataset_dir`;
+    my $config_file    = $self->master_config_file;
+    my $output        = `$import_script $config_file $dataset_dir`;
 
     print $output;
 

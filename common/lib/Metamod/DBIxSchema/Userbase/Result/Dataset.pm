@@ -117,7 +117,7 @@ sub set_info_ds {
     my $rs = $self->infods;
 
     #die "Bad key" if length($$para{dskey}) > 10;
-    my $config = Metamod::Config->new();
+    my $config = Metamod::Config->instance();
     my @infos = $config->get('EXTERNAL_REPOSITORY') eq 'true' ? qw(DSKEY CATALOG LOCATION) : qw(DSKEY);
 
     foreach ( @infos ) { # FIXME - define keys elsewhere

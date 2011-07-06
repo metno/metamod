@@ -3,18 +3,19 @@
 use strict;
 use warnings;
 
-use Data::Dumper;
 use FindBin;
-
 use lib "$FindBin::Bin/../../";
 
-BEGIN {
-    $ENV{METAMOD_MASTER_CONFIG} = "$FindBin::Bin/../master_config.txt";
-    $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/../log4perl_config.ini";
-    $ENV{METAMOD_SOURCE_DIRECTORY} = "$FindBin::Bin/../../../..";
-}
+use Data::Dumper;
+use Metamod::Config;
+use Test::PerformanceRegression;
+use Metamod::ForeignDataset;
+use Metamod::DatasetTransformer;
 
-use Metamod::Config qw(:init_logger);
+$ENV{METAMOD_SOURCE_DIRECTORY} = "$FindBin::Bin/../../../..";
+
+my $config = Metamod::Config->new("$FindBin::Bin/../master_config.txt");
+$config->initLogger();
 
 my $num_tests = 0;
 use Test::More;
@@ -23,10 +24,8 @@ BEGIN {
     plan skip_all => 'unset NO_PERF_TESTS to run performance tests' if $ENV{NO_PERF_TESTS};
 }
 
-use Metamod::ForeignDataset;
-use Metamod::DatasetTransformer;
 
-use Test::PerformanceRegression;
+
 
 my $perf = Test::PerformanceRegression->new();
 my $data_dir = "$FindBin::Bin/../data/performance";

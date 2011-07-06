@@ -9,11 +9,7 @@ use lib "$FindBin::Bin/../..";
 
 use Test::More;
 
-# must override the master config file to use here before use import modules that use the config file.
 BEGIN {
-    my $config_file = "$FindBin::Bin/../master_config.txt";
-    $ENV{METAMOD_MASTER_CONFIG} = $config_file unless exists $ENV{METAMOD_MASTER_CONFIG};
-    $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/../log4perl_config.ini";
     $ENV{METAMOD_SOURCE_DIRECTORY} = "$FindBin::Bin/../../../..";
 }
 
@@ -24,7 +20,7 @@ use Metamod::Test::Setup;
 
 my $num_tests = 0;
 
-my $test_setup = Metamod::Test::Setup->new( master_config_file => $ENV{METAMOD_MASTER_CONFIG } );
+my $test_setup = Metamod::Test::Setup->new( master_config_file => "$FindBin::Bin/../master_config.txt" );
 $test_setup->mm_config->initLogger();
 $test_setup->populate_userbase("$FindBin::Bin/subscription_test_data.sql");
 
