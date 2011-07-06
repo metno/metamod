@@ -311,21 +311,12 @@ sub initLogger {
 
 }
 
-sub staticInitLogger {
-    my ($filename) = @_;
-
-    my $config = __PACKAGE__->new($filename);
-
-    return $config->initLogger();
-
-}
-
 sub import {
     my $package = shift;
 
     foreach my $parameter ( @_ ){
         if( $parameter =~ /:init_logger/ ){
-            staticInitLogger();
+            die "Static initialisation of logger no longer supported since it was a really stupid idea!";
         }
     }
 }
