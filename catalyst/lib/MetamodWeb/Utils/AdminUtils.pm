@@ -41,9 +41,6 @@ use XML::LibXML;
 use Data::FormValidator::Constraints qw( FV_max_length );
 use MetamodWeb::Utils::FormValidator;
 
-#has 'config' => ( is => 'ro', default => sub { Metamod::Config->new() } );
-
-
 =head2 list_files($dir, $path, $maxfiles)
 
 Counts and lists the files belonging to a dataset. B<NB:> Does not (yet) support
