@@ -44,6 +44,7 @@ use warnings;
 use Carp qw(cluck croak carp confess);
 
 #use Data::Dumper;
+use File::Basename;
 use File::Spec qw();
 use Cwd qw();
 # read ABS_PATH early, in case somebody uses a chdir
@@ -288,7 +289,15 @@ sub initLogger {
 
     return if( $_logger_initialised );
 
-    my $log_config = $self->get( 'LOG4PERL_CONFIG' );
+    my $config_file = $self->{filename};
+    my $config_dir = dirname($config_file);
+
+    my $log_config = File::Spec->catfile($config_dir,'log4perl_config.ini');
+
+    if(exists $ENV{METAMOD_LOG4PERL_CONFIG} && $ENV{METAMOD_LOG4PERL_CONFIG}){
+        $log_config = $ENV{METAMOD_LOG4PERL_CONFIG};
+    }
+
     my $system_log = $self->get( 'LOG4ALL_SYSTEM_LOG' );
     my $reinit_period = $self->get( 'LOG4PERL_WATCH_TIME' ) || 10;
 
