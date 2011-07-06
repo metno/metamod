@@ -13,7 +13,6 @@ BEGIN {
     $ENV{METAMOD_SOURCE_DIRECTORY} = "$FindBin::Bin/../../../..";
 }
 
-#use Metamod::Config qw( :init_logger );
 use Metamod::Dataset;
 use Metamod::Subscription;
 use Metamod::Test::Setup;
