@@ -1,7 +1,6 @@
 prepare_runtime_env.sh
 metamodInit.sh
 install_jobs.sh
-logger_config.ini
 etc/init.d/metamod-catalyst
 etc/default/catalyst-myapp
 =htdocs/funcs/mmConfig.inc
