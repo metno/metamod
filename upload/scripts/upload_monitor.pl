@@ -48,16 +48,14 @@ sub getTargetDir {
     return File::Spec->catpath( $vol, $dir, "" );
 }
 
-use lib ( '../../common/lib', getTargetDir('lib'), getTargetDir('scripts') );
+use FindBin;
+use lib ( "$FindBin::Bin/../../common/lib", getTargetDir('lib'), getTargetDir('scripts') );
 
 
 use TheSchwartz;
 use Metamod::Utils;
 use Metamod::Queue::Worker::Upload;
-use Metamod::UploadMonitor qw(
-    syserrorm
-    $config
-);
+use Metamod::Config;
 
 
 =head1 NAME
@@ -75,6 +73,7 @@ See Metamod::UploadMonitor (rewrite - FIXME)
 
 =cut
 
+my $config = Metamod::Config->new();
 
 # setup queue
 my $queue_worker = TheSchwartz->new(
