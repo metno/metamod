@@ -73,15 +73,13 @@ sub add_user_error {
 
 }
 
-sub web_process_uploaded {
+
+sub process_upload {
     my $self = shift;
 
-    #
-    #  Check the web upload area.
-    #
+    my ($inputfile, $upload_type) = @_;
 
     my $upload_age_threshold = $self->config->get('UPLOAD_AGE_THRESHOLD');
-    my $inputfile = shift;
     $self->logger->info( "Processing web upload " . $inputfile );
 
     my %datasets    = ();
@@ -98,9 +96,10 @@ sub web_process_uploaded {
     my $age_seconds        = 60 * $upload_age_threshold + 1;
 
     my $datestring = $self->get_date_and_time_string( $current_epoch_time - $age_seconds );
-    $self->process_files( $inputfile, $dataset_name, 'WEB', $datestring );
+    $self->process_files( $inputfile, $dataset_name, $upload_type, $datestring );
 
 }
+
 #
 # ----------------------------------------------------------------------------
 #
@@ -547,9 +546,19 @@ sub process_files {
     #
     #  Run the digest_nc.pl script and process user errors if found:
     #
+
+    # We try to determine the path to the relevant etc/ directory
+    # regardless of running from source or from target.
     my $target_directory = $self->config->get('TARGET_DIRECTORY');
-    my $path_to_etc       = $target_directory . '/upload/etc';
-    my $path_to_digest_nc = $target_directory . '/scripts/digest_nc.pl';
+    my $source_directory = $self->config->get('SOURCE_DIRECTORY');
+    my $path_to_etc;
+    if( -d $target_directory . '/etc' ){
+        $path_to_etc = $target_directory . '/etc';
+    } elsif( -d $source_directory . '/upload/etc' ){
+        $path_to_etc = $source_directory . '/upload/etc'
+    } else {
+        die 'Could not determine etc directroy';
+    }
 
     #
     #  Run the digest_nc.pl script:
@@ -618,10 +627,7 @@ sub process_files {
                     }
                 }
                 my $xmlFilePath = File::Spec->catfile( $xmlFileDir, $pureFile . '.xml' );
-                my $digestCommand =
-                    "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlFilePath isChild";
                 MetNo::NcDigest::digest( $path_to_etc, 'digest_input', $upload_ownertag, $xmlFilePath, 'isChild');
-                $self->logger->debug("RUN:    $digestCommand\n");
                 #$self->shcommand_scalar($digestCommand);
                 #if ( length($self->shell_command_error) > 0 ) {
                 #    $self->logger->error("digest_nc_file_fails $filepath");
