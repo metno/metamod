@@ -76,6 +76,7 @@ etc/default/catalyst-myapp
 =lib/Metamod/Config.pm
 =lib/Metamod/FimexProjections.pm
 =lib/Metamod/LoggerConfigParser.pm
+=lib/Metamod/PrintUsererrors.pm
 =lib/Metamod/Queue.pm
 =lib/Metamod/Queue/Job/PrepareDownload.pm
 =lib/Metamod/Queue/Job/Upload.pm
