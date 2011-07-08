@@ -26,32 +26,7 @@ use File::Spec;
 use Params::Validate qw(:all);
 use Log::Log4perl qw(get_logger);
 
-# small routine to get lib-directories relative to the installed file
-sub getTargetDir {
-    my ($finalDir) = @_;
-    my ( $vol, $dir, $file ) = File::Spec->splitpath(__FILE__);
-    $dir = $dir ? File::Spec->catdir( $dir, ".." ) : File::Spec->updir();
-    $dir = File::Spec->catdir( $dir, $finalDir );
-    return File::Spec->catpath( $vol, $dir, "" );
-}
-
-use lib ( '../../common/lib', getTargetDir('lib'), getTargetDir('scripts') );
-
-use Metamod::UploadMonitor qw(
-    init
-    syserrorm
-    get_dataset_institution
-    clean_up_problem_dir
-    clean_up_repository
-    ftp_process_hour
-    web_process_uploaded
-    testafile
-    %dataset_institution
-    %ftp_events
-    $file_in_error_counter
-    $config
-);
-
+use Metamod::UploadHelper;
 
 use Moose;
 use namespace::autoclean;
@@ -73,12 +48,6 @@ requirements change.
 =head1 FUNCTIONS/METHODS
 
 =cut
-
-sub BUILD {
-    my $self = shift;
-
-    &init; # setup UploadMonitor
-}
 
 =head2 process_file
 
@@ -105,6 +74,8 @@ A text string in a format that is more readable than mere byte size.
 sub process_file {
     my $self = shift;
 
+    my $upload_helper = Metamod::UploadHelper->new();
+
     my ( $jobid, $file, $type ) =
         validate_pos( @_, 1, 1, 1 );
 
@@ -112,12 +83,10 @@ sub process_file {
 
     $logger->debug("Processing file $file...");
 
-    &get_dataset_institution( \%dataset_institution );
-
     if ($type eq 'INDEX') {
-        web_process_uploaded($file);
+        $upload_helper->process_upload($file,'WEB');
     } elsif ($type eq 'TEST') {
-        testafile($file);
+        $upload_helper->process_upload($file,'TAF');
     } else {
         $logger->error('Unknown job type');
     }
