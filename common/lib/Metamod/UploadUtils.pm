@@ -24,7 +24,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 use mmTtime;
-use Metamod::Config qw(:init_logger);
+use Metamod::Config;
 use Log::Log4perl;
 use Metamod::mmUserbase;
 
