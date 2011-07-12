@@ -249,6 +249,8 @@ OPENDAP_DIRECTORY = [==WEBRUN_DIRECTORY==]/data
 # gives access to the data repository by HTTP download.
 OPENDAP_URL = http://[==SERVER==]:8081/thredds/catalog/data
 
+THREDDS_DATASET_PREFIX =
+
 # Ownertag for uploaded datasets:
 UPLOAD_OWNERTAG = MM
 
