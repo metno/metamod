@@ -70,7 +70,6 @@ my $mm_config = Metamod::Config->new();
 $mm_config->initLogger();
 
 my $custdir = path_to_custom();
-
 my %default_config = (
     disable_component_resolution_regex_fallback => 1,
 
@@ -138,7 +137,7 @@ be different between development and deployment.
 
 sub path_to_metamod_root {
 
-    if( $FindBin::Bin =~ qw!(.+)/(catalyst/script|bin|catalyst/t.*)$! ){
+    if( $FindBin::Bin =~ qw!(.+)/(catalyst/script|scripts|catalyst/t.*)$! ){
         return $1;
     } else {
         get_logger('MetamodWeb')->error("Could not determine the absolute path from $FindBin::Bin to the METAMOD root directory.");
