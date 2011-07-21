@@ -109,7 +109,7 @@ sub upload_POST  {
 
         my $success = $queue->insert_job(
             job_type => 'Metamod::Queue::Worker::Upload',
-            job_parameters => { file => "$updir/$file", type => 'INDEX' },
+            job_parameters => { file => "$updir/$file", type => 'WEB' },
         );
 
         if( $success ){
@@ -168,6 +168,7 @@ sub upload_POST  {
         my $success = $queue->insert_job(
             job_type => 'Metamod::Queue::Worker::Upload',
             job_parameters => { file => "$updir/$filepath", type => 'INDEX' },
+            priority => 10,
         );
 
         if( $success ){
@@ -228,7 +229,7 @@ sub test_POST  {
 
             my $success = $queue->insert_job(
                 job_type => 'Metamod::Queue::Worker::Upload',
-                job_parameters => { file => "$updir/ftaf/$fn", type => 'TEST' },
+                job_parameters => { file => "$updir/ftaf/$fn", type => 'TAF' },
             );
 
             if( $success ){

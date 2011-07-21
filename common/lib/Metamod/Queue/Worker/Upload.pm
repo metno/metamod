@@ -84,11 +84,11 @@ sub work {
 
 }
 
-# keep the exit status for one week
-sub keep_exit_status_for { 60 * 60 * 24 * 7 }
-
-# grap the job for one hour
-sub grab_for             { 60 * 60 * 1 }
+## keep the exit status for one week
+#sub keep_exit_status_for { 60 * 60 * 24 * 7 }
+#
+## grap the job for one hour
+#sub grab_for             { 60 * 60 * 1 }
 
 =head1 LICENSE
 

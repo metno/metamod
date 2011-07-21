@@ -31,6 +31,9 @@ package Metamod::DatasetTransformer;
 use 5.6.0;
 use strict;
 use warnings;
+use Data::Dumper;
+use Cwd;
+use Carp;
 use Fcntl ':flock'; # import LOCK_* constants
 use File::Spec;
 use XML::LibXML;
@@ -49,12 +52,12 @@ use constant XSLTParser => new XML::LibXSLT();
 
 our $XSLT_DIR;
 if ($ENV{METAMOD_XSLT_DIR}) {
-    $XSLT_DIR = $ENV{METAMOD_XSLT_DIR}    
+    $XSLT_DIR = $ENV{METAMOD_XSLT_DIR}
 } else {
     my $config = Metamod::Config->new();
-    $XSLT_DIR = $config->get("SOURCE_DIRECTORY") . '/common/schema/';   
+    $XSLT_DIR = $config->get("SOURCE_DIRECTORY") . '/common/schema/';
 }
- 
+
 
 sub new {
     die "'new' not implemented yet in $_[0]: new(\$dataStr)\n";
@@ -64,7 +67,7 @@ sub getBasename {
     my ($self, $file) = @_;
     unless (UNIVERSAL::isa($self, __PACKAGE__)) {
         # called as function, not method
-        $file = $self; 
+        $file = $self;
     }
     if ($file) {
         $file =~ s/\.xm[dl]$//;
@@ -112,14 +115,16 @@ sub getPlugins {
     my $fullClassPath = $INC{$classPath};
     my $basePluginPath = $fullClassPath;
     $basePluginPath =~ s/\.pm$//;
+    #$logger->debug(" *** \$classPath=$classPath \$basePluginPath=$basePluginPath");
+    #print STDERR Dumper \@INC;
     my $d;
-    opendir $d, $basePluginPath or die "cannot read DatasetTransformer dir at $basePluginPath\n";
+    opendir $d, $basePluginPath or die "cannot read DatasetTransformer dir at $basePluginPath\nCurrent dir is ". cwd(); # this will most probably fail
     my @files = grep {/\.pm$/ && -f File::Spec->catfile($basePluginPath,$_)} readdir $d;
     closedir $d;
-    
+
     my @plugins;
     foreach my $file (@files) {
-        next if substr($file, 0, 2) eq 'To'; # Ignore modules To other formats 
+        next if substr($file, 0, 2) eq 'To'; # Ignore modules To other formats
         my $plugin = __PACKAGE__ . "::$file";
         $plugin =~ s/\.pm$//;
         eval "require $plugin";
@@ -180,7 +185,7 @@ Metamod::DatasetTransformer - interface to transform datasets to internal MM2 pr
   if ($implX->test) {
       my ($dsDoc, $mm2Doc) = $implX->transform;
   }
-  
+
   # or
   my $implX = Metamod::DatasetTransfomer::autodetect("filename");
   ...
@@ -196,7 +201,7 @@ to the internally used MM2 format.
 
 =item $XSLT_DIR
 
-Default directory of XSLT files. Uses ENV{METAMOD_XSLT_DIR} or 
+Default directory of XSLT files. Uses ENV{METAMOD_XSLT_DIR} or
 $config->get("SOURCE_DIRECTORY") . '/common/schema/'. The ENV part
 is mainly thought for testing independently of config.
 
@@ -284,4 +289,3 @@ Heiko Klein, E<lt>H.Klein@met.noE<gt>
 L<XML::LibXML>
 
 =cut
-

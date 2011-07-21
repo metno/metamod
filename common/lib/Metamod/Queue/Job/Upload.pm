@@ -63,7 +63,7 @@ Do upload processing for the file indicated
 
 =item type
 
-Must be either 'INDEX' or 'TEST'
+Must be either 'FTP', 'WEB' or 'TAF' (test-a-file)
 
 A text string in a format that is more readable than mere byte size.
 
@@ -75,22 +75,12 @@ sub process_file {
     my $self = shift;
 
     my $upload_helper = Metamod::UploadHelper->new();
-
     my ( $jobid, $file, $type ) =
         validate_pos( @_, 1, 1, 1 );
-
     my $logger = get_logger('job');
 
-    $logger->debug("Processing file $file...");
-
-    if ($type eq 'INDEX') {
-        $upload_helper->process_upload($file,'WEB');
-    } elsif ($type eq 'TEST') {
-        $upload_helper->process_upload($file,'TAF');
-    } else {
-        $logger->error('Unknown job type');
-    }
-
+    $logger->debug("Processing file $file ($type)");
+    $upload_helper->process_upload($file, $type);
     $logger->debug('Job done');
     return 1;
 

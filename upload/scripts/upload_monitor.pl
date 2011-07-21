@@ -91,7 +91,7 @@ eval {
 
         print STDERR "Testrun: " . $ARGV[0] . "\n";
         $queue_worker->can_do('Metamod::Queue::Worker::Upload');
-        $queue_worker->work_until_done();
+        $queue_worker->work_until_done(); # built-in TheSchwartz method, exiting when job queue is empty
 
     } elsif(0 == @ARGV) {
 

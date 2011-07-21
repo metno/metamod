@@ -23,6 +23,19 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use strict;
 use warnings;
 
+=head1 NAME
+
+Metamod::UploadHelper - Helper module for processing file uploads
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 FUNCTIONS/METHODS
+
+=cut
+
+use Cwd;
 use Data::Dump qw(dump);
 use Data::Dumper;
 use File::Copy;
@@ -36,48 +49,211 @@ use Metamod::mmUserbase;
 use Metamod::PrintUsererrors;
 use Metamod::Utils qw(getFiletype findFiles remove_cr_from_file);
 use MetNo::NcDigest;
-use mmTtime;
 
-has 'config' => ( is => 'ro', default => sub { Metamod::Config->new() } );
+has 'config'                => ( is => 'ro', default => sub { Metamod::Config->new() } );
+has 'logger'                => ( is => 'ro', default => sub { get_logger(__PACKAGE__) } ); # set to ro later
+has 'shell_command_error'   => ( is => 'rw', default => '' );
+has 'file_in_error_counter' => ( is => 'rw', default => 1 );
+# This is potentially a source of errors when running as a library called from several scripts.
+# Worst-case scenario is files being overwritten since FTP and web upload has separate counters
+# (even worse if initing UploadHelper more than once in a script).
 
-has 'logger' => ( is => 'ro', default => sub { get_logger(__PACKAGE__) } );
+has 'user_errors'           => ( is => 'rw', default => sub { [] } );
+has 'days_to_keep_errfiles' => ( is => 'rw', default => 14 );
+has 'all_ftp_datasets'      => ( is => 'rw', default => sub { {} } );
+# Initialized in sub read_ftp_events. For each dataset found in the ftp_events file, this hash contains the
+# number of days to keep the files in the repository. If this number == 0, the files are kept indefinitely.
 
-has 'shell_command_error' => ( is => 'rw', default => '' );
+has 'ftp_events'            => ( is => 'rw', default => sub { {} } );
 
-has 'file_in_error_counter' => ( is => 'rw' );
 
-has 'user_errors' => ( is => 'rw', default => sub { [] } );
 
-=head1 NAME
-
-Metamod::UploadHelper - Helper module for processing file uploads
-
-=head1 SYNOPSIS
-
-=head1 DESCRIPTION
-
-=head1 FUNCTIONS/METHODS
-
-=cut
-
-sub add_user_error {
+sub BUILD { # ye olde init "constructor"
     my $self = shift;
 
-    my ($error) = @_;
+    ## Make sure static directories exists
+    #foreach my $directory ( $work_directory, $work_start, $work_expand, $work_flat, $uerr_directory,
+    #    $xml_directory, $xml_history_directory, $problem_dir_path ) {
+    #    mkpath($directory);
+    #}
+    #
+    ##  Change to work directory
+    #unless ( chdir $work_directory ) {
+    #    die "Could not cd to $work_directory: $!\n";
+    #}
 
-    my $user_errors = $self->user_errors();
+    #  Initialize hash (ftp_events) from text file
+    $self->read_ftp_events();
+    #$self->logger( $self->config->initLogger && get_logger(__PACKAGE__) ); # remove when ØT has fixed up Config.pm
+    # $self->logger->debug( "Dump of hash ftp_events:" . join( "\t", split "\n", Dumper( $self->ftp_events() ) ) ); # Data::Dumper works poorly in log4perl
+    #print STDERR "Dump of hash ftp_events:\n" . Dumper( $self->ftp_events() );
 
-    push @{ $user_errors }, $error;
-
-    $self->user_errors($user_errors);
+    #  Initialize hash that contain the institution code for each dataset.
+    #  The hash will be filled with updated info from the directory
+    #  $webrun_directory/u1 at the beginning of each repetition of the loop.
+    $self->get_dataset_institution();
 
 }
 
 
-sub process_upload {
-    my $self = shift;
+=head2 read_ftp_events
 
-    my ($inputfile, $upload_type) = @_;
+Load the content of the ftp_events file into a hash.
+
+=cut
+
+sub read_ftp_events {
+    my $self = shift;
+    my $webrun_directory      = $self->config->get('WEBRUN_DIRECTORY');
+    my $eventsref = $self->ftp_events;
+    my $eventsfile = $webrun_directory . '/ftp_events';
+    if ( -r $eventsfile ) {
+        open( EVENTS, $eventsfile );
+        while (<EVENTS>) {
+            chomp($_);
+            my $line = $_;
+            $line =~ s/^\s+//;
+            my @tokens = split( /\s+/, $line );
+            if ( scalar @tokens >= 4 ) {
+                my $dataset_name       = $tokens[0];
+                my $wait_minutes       = $tokens[1];
+                my $days_to_keep_files = $tokens[2];
+                $self->all_ftp_datasets->{$dataset_name} = $days_to_keep_files;
+                for ( my $ix = 3 ; $ix < scalar @tokens ; $ix++ ) {
+                    my $hour     = $tokens[$ix];
+                    my $eventkey = "$dataset_name $hour";
+                    $eventsref->{$eventkey} = $wait_minutes;
+                }
+            }
+        }
+        close(EVENTS);
+    }
+}
+
+=head2 ftp_process_hour
+
+Check the FTP upload area.
+
+For all datasets scheduled to be processed at the current hour, check if the
+newest file in the dataset have large enough age. If so, process the files in
+that dataset.
+
+=cut
+
+sub ftp_process_hour {
+
+    my $self = shift;
+    my @ltime = localtime( time() );
+    my $current_hour = $ltime[2];                    # 0-23
+    my $eventsref = $self->ftp_events;
+
+die unless $self->config;
+    my $ftp_dir_path = $self->config->get('UPLOAD_FTP_DIRECTORY');
+    my $logger = $self->logger or die "Missing logger object";
+    $logger->info("Processing FTP upload area");
+    $logger->debug("ftp_process_hour: Entered at current_hour: $current_hour\n");
+
+    # Hash containing, for each uploaded file to be processed (full path), the
+    # modification time of that file. This hash is re- initialized for each new
+    # batch of files to be processed for the same dataset.
+    my %files_to_process = ();
+
+    # search the events table for scheduled datasets and iterate
+    my $rex = " 0*$current_hour" . '$';
+    my @matches = grep( /$rex/, keys %$eventsref );
+    foreach my $eventkey (@matches) {
+        my ( $dataset_name, $hour ) = split( /\s+/, $eventkey );
+        my $wait_minutes = $eventsref->{$eventkey};
+        $logger->debug(" [ftp_process_hour] Dataset=$dataset_name, hour=$hour, wait_minutes=$wait_minutes\n");
+        my @files_found = findFiles( $ftp_dir_path, eval 'sub {$_[0] =~ /^\Q$dataset_name\E_/o;}' );
+        if ( scalar @files_found == 0 && length($self->shell_command_error) > 0 ) {
+            &syserrorm( "SYS", "find_fails", "", "ftp_process_hour", "" );
+            next;
+        }
+        my $current_epoch_time = time();
+        my $age_seconds        = 60 * 60 * 24;
+        %files_to_process = ();
+        foreach my $filename (@files_found) {
+            if ( -r $filename ) {
+                my @file_stat = stat($filename);
+                if ( scalar @file_stat == 0 ) {
+                    die "Could not stat new file $filename\n"; # should never occur since -r is implemented via stat()
+                }
+
+                # Get last modification time of file (seconds since the epoch)
+                my $modification_time = $file_stat[9];
+                if ( $current_epoch_time - $modification_time < $age_seconds ) {
+                    $age_seconds = $current_epoch_time - $modification_time;
+                }
+                $files_to_process{$filename} = $modification_time;
+                $logger->debug(" [ftp_process_hour] File $filename (" . localtime($modification_time) . ") scheduled\n");
+            }
+        }
+        my $filecount = scalar( keys %files_to_process );
+        if ( $filecount > 0 ) {
+            $logger->debug("ftp_process_hour: $filecount files from $dataset_name with age $age_seconds\n");
+        }
+        if ( $filecount > 0 && $age_seconds > 60 * $wait_minutes ) {
+            my $datestring = &get_date_and_time_string( $current_epoch_time - $age_seconds );
+            $self->process_files( \%files_to_process, $dataset_name, 'FTP', $datestring );
+        }
+    }
+
+    #print STDERR "Dump av hash all_ftp_datasets:\n";
+    #print STDERR Dumper($self->all_ftp_datasets);
+
+    #  Move any file in the ftp upload area not belonging to a dataset to the
+    #  $problem_dir_path directory (the actual moving is done in the syserror
+    #  routine). Only move files older than 5 hours. Newer files may be temporary
+    #  files waiting to be renamed by the uploading software:
+    #
+    my @all_files_found = findFiles($ftp_dir_path);
+    if ( scalar @all_files_found == 0 && length($self->shell_command_error) > 0 ) {
+        &syserrorm( "SYS", "find_fails_2", "", "ftp_process_hour", "" );
+    } else {
+        foreach my $filename (@all_files_found) {
+            my $dataset_name;
+            if ( $filename =~ /([^\/_]+)_[^\/]*$/ ) {
+                $dataset_name = $1;    # First matching ()-expression
+            }
+            if (  !defined($dataset_name)
+                || scalar grep( $dataset_name eq $_, keys %{ $self->all_ftp_datasets } ) == 0 ) {
+                my @file_stat = stat($filename);
+                if ( scalar @file_stat == 0 ) {
+
+                    # egils: Should not die, because uploaded files may have temporary names while uploading:
+                    #die "Could not stat $filename\n";
+                    &syserrorm( "SYS", "Could not stat problem file $filename", "", "ftp_process_hour", "" );
+                } else {
+
+                    # Get last modification time of file (seconds since the epoch)
+                    my $current_epoch_time = time();
+                    my $modification_time  = $file_stat[9];
+                    if ( $current_epoch_time - $modification_time > 60 * 60 * 5 ) {
+                        &syserrorm( "SYS", "file_with_no_dataset", $filename, "ftp_process_hour", "" );
+                    }
+                }
+            }
+        }
+    }
+}
+
+sub add_user_error {
+    my ($self, $error) = @_;
+
+    my $user_errors = $self->user_errors();
+    push @{ $user_errors }, $error;
+    $self->user_errors($user_errors);
+}
+
+=head2 process_upload
+
+
+
+=cut
+
+sub process_upload {
+    my ($self, $inputfile, $upload_type) = @_;
 
     my $upload_age_threshold = $self->config->get('UPLOAD_AGE_THRESHOLD');
     $self->logger->info( "Processing web upload " . $inputfile );
@@ -92,7 +268,7 @@ sub process_upload {
         push( @{ $datasets{$dataset_name} }, $inputfile );
     }
 
-    my $current_epoch_time = mmTtime::ttime();
+    my $current_epoch_time = time();
     my $age_seconds        = 60 * $upload_age_threshold + 1;
 
     my $datestring = $self->get_date_and_time_string( $current_epoch_time - $age_seconds );
@@ -100,34 +276,34 @@ sub process_upload {
 
 }
 
-#
-# ----------------------------------------------------------------------------
-#
-sub process_files {
-    my $self = shift;
 
-    #
-    #  Process uploaded files for one dataset from either the FTP or web area.
-    #  Names of the uploaded files are found in the global %files_to_process hash.
-    #
-    #  This routine may also be used to test a file against the repository requirements.
-    #  Then, a dataset for the file need not exist.
-    #
-    #  Uploaded files are either single files or archives (tar). Archives are expanded
-    #  and one archive file will produce many expanded files. Both single files
-    #  and archives can be compressed (gzip). All such files are uncompressed.
-    #  The uncompressed expanded files are either netCDF (*.nc) or CDL (*.cdl).
-    #  CDL files are converted to netCDF.
-    #
-    #  Arguments:
-    #
-    #  $dataset_name     - Name of the dataset
-    #  $ftp_or_web       - ='FTP' if the files are uploaded through FTP,
-    #                      ='WEB' if files are uploaded through the web application.
-    #                      ='TAF' if the file is uploaded just for testing.
-    #  $datestring       - Date/time of the last uploaded file as "YYYY-MM-DD HH:MM"
-    #
-    my ( $input_file, $dataset_name, $ftp_or_web, $datestring ) = @_;
+=head2 process_files
+
+Process uploaded files for one dataset from either the FTP or web area.
+Names of the uploaded files are found in the global %files_to_process hash.
+
+This routine may also be used to test a file against the repository requirements.
+Then, a dataset for the file need not exist.
+
+Uploaded files are either single files or archives (tar). Archives are expanded
+and one archive file will produce many expanded files. Both single files
+and archives can be compressed (gzip). All such files are uncompressed.
+The uncompressed expanded files are either netCDF (*.nc) or CDL (*.cdl).
+CDL files are converted to netCDF.
+
+=head3 Arguments
+
+    $dataset_name     - Name of the dataset
+    $ftp_or_web       - ='FTP' if the files are uploaded through FTP,
+                        ='WEB' if files are uploaded through the web application.
+                        ='TAF' if the file is uploaded just for testing.
+    $datestring       - Date/time of the last uploaded file as "YYYY-MM-DD HH:MM"
+
+=cut
+
+sub process_files {
+
+    my ( $self, $input_files, $dataset_name, $ftp_or_web, $datestring ) = @_;
 
     my $webrun_directory      = $self->config->get('WEBRUN_DIRECTORY');
     my $work_directory        = $webrun_directory . "/upl/work";
@@ -135,9 +311,11 @@ sub process_files {
     my $work_flat             = $work_directory . "/flat";
     my $work_start            = $work_directory . "/start";
     my $xml_history_directory = $webrun_directory . '/XML/history';
-    my $problem_dir_path = $webrun_directory . "/upl/problemfiles";
+    my $problem_dir_path      = $webrun_directory . "/upl/problemfiles";
+    my $starting_dir          = getcwd();
 
-    my %files_to_process = ( $input_file => 1 );
+    # called with multiple files (ftp) or single (web)?
+    my %files_to_process = ref $input_files ? %$input_files : ( $input_files => 1 );
 
     my %dataset_institution = %{ $self->get_dataset_institution() };
 
@@ -543,6 +721,9 @@ sub process_files {
     }
     close(DIGEST);
 
+    # change back to script dir or else lib path searching will fail
+    #chdir $starting_dir or die "Could not cd to script dir '$starting_dir': $!"; # not working... FIXME
+
     #
     #  Run the digest_nc.pl script and process user errors if found:
     #
@@ -564,7 +745,7 @@ sub process_files {
     #  Run the digest_nc.pl script:
     #
     my $upload_ownertag = $self->config->get('UPLOAD_OWNERTAG');
-    MetNo::NcDigest::digest($path_to_etc, 'digest_input', $upload_ownertag, $xmlpath );
+    MetNo::NcDigest::digest($path_to_etc, "$work_directory/digest_input", $upload_ownertag, $xmlpath );
 
     #my $command = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlpath";
     #$self->logger->debug("RUN:    $command\n");
@@ -574,8 +755,8 @@ sub process_files {
     #    print DIGOUTPUT $result . "\n";
     #    close(DIGOUTPUT);
     #}
-    my $usererrors_path = "nc_usererrors.out";
-    open( USERERRORS, ">>$usererrors_path" );
+    my $usererrors_path = "$work_directory/nc_usererrors.out";
+    open( USERERRORS, ">>$usererrors_path" ) or die "Cannot open $usererrors_path for output!";
     my @user_errors = @{ $self->user_errors() };
     foreach my $line (@user_errors) {
         print USERERRORS $line;
@@ -611,7 +792,7 @@ sub process_files {
                     . "catalog.html?dataset="
                     . $self->config->get('THREDDS_DATASET_PREFIX') || ''
                     . join( '/', $dataset_institution{$dataset_name}->{'institution'}, $dataset_name, $basename );
-                open( my $digest, ">digest_input" );
+                open( my $digest, ">$work_directory/digest_input" );
                 print $digest $fileURL,  "\n";
                 print $digest $filepath . " ";
                 print $digest $destination_path . "\n";
@@ -627,7 +808,7 @@ sub process_files {
                     }
                 }
                 my $xmlFilePath = File::Spec->catfile( $xmlFileDir, $pureFile . '.xml' );
-                MetNo::NcDigest::digest( $path_to_etc, 'digest_input', $upload_ownertag, $xmlFilePath, 'isChild');
+                MetNo::NcDigest::digest( $path_to_etc, "$work_directory/digest_input", $upload_ownertag, $xmlFilePath, 'isChild');
                 #$self->shcommand_scalar($digestCommand);
                 #if ( length($self->shell_command_error) > 0 ) {
                 #    $self->logger->error("digest_nc_file_fails $filepath");
@@ -693,7 +874,7 @@ sub process_files {
             my $name_html_errfile   = $dataset_name . '_' . $timecode . '.html';
             my $path_to_errors_html = File::Spec->catfile( $uerr_directory, $name_html_errfile );
             my $errorinfo_path      = "errorinfo";
-            open( ERRORINFO, ">$errorinfo_path" );
+            open( ERRORINFO, ">$work_directory/$errorinfo_path" );
             print ERRORINFO $path_to_errors_html . "\n";
             print ERRORINFO $bnames_string . "\n";
             print ERRORINFO $datestring . "\n";
@@ -800,7 +981,7 @@ sub get_date_and_time_string {
     if ( scalar @_ > 0 ) {
         @ta = localtime( $_[0] );
     } else {
-        @ta = localtime( mmTtime::ttime() );
+        @ta = localtime( time() );
     }
     my $year       = 1900 + $ta[5];
     my $mon        = $ta[4] + 1;                                                               # 1-12
@@ -812,28 +993,30 @@ sub get_date_and_time_string {
 }
 
 
+=head2 get_dataset_institution
+
+Initialize hash connecting each dataset to a reference to a hash with the following
+elements:
+
+->{'institution'} Name of institution as found in an <heading> element within the webrun/u1
+      file for the user that owns the dataset.
+->{'email'} The owners E-mail address.
+->{'name'} The owners name.
+->{'key'} The directory key.
+
+If found, extra elements are included:
+
+->{'location'} Location
+->{'catalog'} Catalog
+->{'wmsurl'} URL to WMS
+
+The last elements are taken from the line:
+<dir ... location="..." catalog="..." wmsurl="..."/>)
+
+=cut
+
 sub get_dataset_institution {
     my $self = shift;
-
-    #
-    # Initialize hash connecting each dataset to a reference to a hash with the following
-    # elements:
-    #
-    # ->{'institution'} Name of institution as found in an <heading> element within the webrun/u1
-    #       file for the user that owns the dataset.
-    # ->{'email'} The owners E-mail address.
-    # ->{'name'} The owners name.
-    # ->{'key'} The directory key.
-    #
-    # If found, extra elements are included:
-    #
-    # ->{'location'} Location
-    # ->{'catalog'} Catalog
-    # ->{'wmsurl'} URL to WMS
-    #
-    # The last elements are taken from the line:
-    # <dir ... location="..." catalog="..." wmsurl="..."/>)
-    #
 
     my $dataset_institution = {};
 
@@ -1052,8 +1235,8 @@ sub move_to_problemdir {
         if ( scalar @file_stat == 0 ) {
             die "In move_to_problemdir: Could not stat $uploadname\n";
         }
-        my $modification_time = mmTtime::ttime( $file_stat[9] );
-        my @ltime             = localtime( mmTtime::ttime() );
+        my $modification_time = $file_stat[9];
+        my @ltime             = localtime( time() );
         my $current_day       = $ltime[3];                         # 1-31
 
         my $destname = sprintf( '%02d%04d', $current_day, $self->file_in_error_counter) . "_" . $baseupldname;
@@ -1215,7 +1398,7 @@ sub notify_web_system {
         my $basename = $uploaded_basenames[$i1];
         my @filestat = stat($fname);
         if ( scalar @filestat == 0 ) {
-            $self->logger->error("Could not stat $fname");
+            $self->logger->error("Could not stat uploaded file $fname");
             $file_sizes{$basename} = 0;
         } else {
             $file_sizes{$basename} = $filestat[7];
@@ -1523,6 +1706,120 @@ sub clearXmlFile {
     }
 }
 
+=head2 clean_up_problem_dir
+
+Delete problem files older than 14 days (or whatever)
+
+=cut
+
+sub clean_up_problem_dir {
+    my $self = shift;
+    my $webrun_directory = $self->config->get('WEBRUN_DIRECTORY');
+    my $problem_dir_path = $webrun_directory . "/upl/problemfiles";
+
+    my @files_found = findFiles( $problem_dir_path, sub { $_[0] =~ /^\d/; } );
+    if ( scalar @files_found == 0 && length($self->shell_command_error) > 0 ) {
+        &syserrorm( "SYS", "find_fails", "", "clean_up_problem_dir", "" );
+    }
+
+    # Find current time (epoch) as number of seconds since the epoch (1970)
+    my $current_epoch_time = time(); # no more relativistic time machine wizardry
+    my $age_seconds        = 60 * 60 * 24 * $self->days_to_keep_errfiles;
+    foreach my $filename (@files_found) {
+        if ( -r $filename ) {
+            my @file_stat = stat($filename);
+            if ( scalar @file_stat == 0 ) {
+                &syserrorm( "SYS", "Could not stat old problem file $filename", "", "clean_up_problem_dir", "" );
+            }
+
+            # Get last modification time of file (seconds since the epoch)
+            my $modification_time = $file_stat[9];
+            if ( $current_epoch_time - $modification_time > $age_seconds ) {
+                if ( unlink($filename) == 0 ) {
+                    &syserrorm( "SYS", "Unlink file $filename did not succeed", "", "clean_up_problem_dir", "" );
+                }
+            }
+        }
+    }
+}
+
+=head2 clean_up_repository
+
+Delete files
+
+=cut
+
+sub clean_up_repository {
+    my $self = shift;
+    my $current_epoch_time = time();
+    my $logger = $self->logger;
+    my %dataset_institution = %{ $self->get_dataset_institution() };
+    my $opendap_directory = $self->config->get('OPENDAP_DIRECTORY');
+
+    foreach my $dataset ( keys %{ $self->all_ftp_datasets } ) {
+        my $days_to_keep_files = $self->all_ftp_datasets->{$dataset};
+        if ( $days_to_keep_files > 0 ) {
+            if ( !defined( $dataset_institution{$dataset} ) ) {
+                &syserrorm( "SYS", "$dataset not in any userfiler", "", "clean_up_repository", "" );
+                next;
+            }
+            my $directory = $opendap_directory . "/" . $dataset_institution{$dataset}->{'institution'} . "/" . $dataset;
+            my @files     = glob( $directory . "/" . $dataset . "_*" );
+            $logger->debug("clean_up_repository directory: $directory\n");
+            foreach my $fname (@files) {
+                my @file_stat = stat($fname);
+                if ( scalar @file_stat == 0 ) {
+                    &syserrorm( "SYS", "Could not stat old repo file $fname", "", "clean_up_repository", "" );
+                    next;
+                }
+
+                # Get last modification time of file (seconds since the epoch)
+                my $modification_time = $file_stat[9];
+                if ( $current_epoch_time - $modification_time > 60 * 60 * 24 * $days_to_keep_files ) {
+                    $logger->debug("$fname\n");
+                    my @cdlcontent = &shcommand_array("ncdump -h $fname");
+                    if ( length($self->shell_command_error) > 0 ) {
+                        &syserrormm( "SYS", "Could not ncdump -h $fname", "", "clean_up_repository", "" );
+                        next;
+                    }
+                    my $lnum = 0;
+                    my $lmax = scalar @cdlcontent;
+                    $logger->debug("Line count of CDL file (lmax) = $lmax\n");
+                    while ( $lnum < $lmax ) {
+                        if ( $cdlcontent[$lnum] eq 'dimensions:' ) {
+                            last;
+                        }
+                        $lnum++;
+                    }
+                    $logger->debug("'dimensions:' found at line = $lnum\n");
+                    $lnum++;
+                    while ( $lnum < $lmax ) {
+                        if ( $cdlcontent[$lnum] eq 'variables:' ) {
+                            last;
+                        }
+                        $cdlcontent[$lnum] =~ s/=\s*\d+\s*;$/= 1 ;/;
+                        $lnum++;
+                    }
+                    $logger->debug("'variables:' found at line = $lnum\n");
+                    if ( $lnum >= $lmax ) {
+                        &syserrorm( "SYS", "Error while changing CDL content from $fname",
+                            "", "clean_up_repository", "" );
+                        next;
+                    }
+                    open( CDLFILE, ">tmp_file.cdl" );
+                    print CDLFILE join( "\n", @cdlcontent );
+                    close(CDLFILE);
+                    &shcommand_scalar("ncgen tmp_file.cdl -o $fname");
+                    if ( length($self->shell_command_error) > 0 ) {
+                        &syserrorm( "SYS", "Could not ncgen tmp_file.cdl -o $fname", "", "clean_up_repository", "" );
+                        next;
+                    }
+                }
+            }
+        }
+    }
+}
+
 sub syserrorm {
     my $self = shift;
 
@@ -1532,9 +1829,7 @@ sub syserrorm {
     if ( $type eq "SYS" || $type eq "SYSUSER" ) {
         if ( $uploadname ne "" ) {
 
-            #
-            #        Move upload file to problem file directory:
-            #
+            # Move upload file to problem file directory
             $self->move_to_problemdir($uploadname);
         }
     }

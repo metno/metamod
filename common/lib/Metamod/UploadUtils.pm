@@ -28,6 +28,18 @@ use Metamod::Config;
 use Log::Log4perl;
 use Metamod::mmUserbase;
 
+=head1 NAME
+
+Metamod::UploadUtils - DEPRECATED
+
+=head1 DESCRIPTION
+
+Various functions for dealing with uploaded files.
+
+Only used by upload_indexer; other upload modules now use Metamod::UploadHelper.
+
+=cut
+
 my $logger = Log::Log4perl->get_logger('metamod.upload.Uploadutils');
 
 our $VERSION = 0.1;

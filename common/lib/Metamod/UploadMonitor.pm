@@ -1440,7 +1440,7 @@ sub move_to_problemdir {
 
 =head1 NAME
 
-Metamod::UploadMonitor
+Metamod::UploadMonitor - OBSOLETED
 
 =head1 DESCRIPTION
 

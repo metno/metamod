@@ -268,6 +268,10 @@ UPLOAD_DIRECTORY = Substituted by test_application.sh
 # Directory path for files uploaded by FTP:
 UPLOAD_FTP_DIRECTORY = Substituted by test_application.sh
 
+# Schedule for FTP upload monitor
+FTP_CRONTAB     = */5 * * * *
+CLEANUP_CRONTAB = 30  * * * *
+
 # Required minimum file age (number of minutes) for initiating processing
 # of files uploaded through the WEB interface. Files less than this age will
 # postpone processing (in the upload_monitor.pl script) of all files with

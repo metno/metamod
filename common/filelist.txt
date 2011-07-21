@@ -89,7 +89,6 @@ etc/default/catalyst-myapp
 =lib/Metamod/SubscriptionHandler/SMS.pm
 =lib/Metamod/SubscriptionUtils.pm
 =lib/Metamod/UploadHelper.pm
-=lib/Metamod/UploadMonitor.pm
 =lib/Metamod/UploadUtils.pm
 =lib/Metamod/WMS.pm
 =lib/Metamod/mmUserbase.pm

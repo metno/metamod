@@ -175,6 +175,7 @@ Returns 1 on success. Returns false on failure.
 =back
 
 =cut
+
 sub write_to_database {
     my $self = shift;
 

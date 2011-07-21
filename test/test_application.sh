@@ -257,6 +257,7 @@ mkdir -p webupload/TUN/ice
 # =======================================================
 #
 cd $basedir/source
+# this should be configurable - not everybody uses our debian pkg... FIXME
 export PERL5LIB=/opt/metno-catalyst-dependencies-ver1/lib/perl5/
 ./update_target.pl test/applic
 cd $basedir/target
