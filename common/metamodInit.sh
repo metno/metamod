@@ -7,7 +7,7 @@ export PERL5LIB="$PERL5LIB:[==CATALYST_LIB==]"
 
 upload_monitor_pid=$webrun_directory/upload_monitor.pid
 ftp_monitor_pid=$webrun_directory/ftp_monitor.pid
-import_dataset_pid=$webrun_directory/import_dataset.pid
+#import_dataset_pid=$webrun_directory/import_dataset.pid
 prepare_download_pid=$webrun_directory/prepare_download.pid
 harvester_pid=$webrun_directory/harvester.pid
 create_thredds_catalogs_pid=$webrun_directory/create_thredds_catalogs.pid
@@ -91,22 +91,22 @@ start() {
          echo "ftp_monitor already running"
       fi
    fi
-   if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/import_dataset.pl ]; then
-      if ! running $import_dataset_pid; then
-         path_to_import_updated=$webrun_directory/import_updated
-         if [ ! -f $path_to_import_updated ]; then
-            # create/touch path to set timestamp
-            >$path_to_import_updated
-         fi
-         start_daemon -n 10 -p $import_dataset_pid $target_directory/scripts/import_dataset.pl $system_log $import_dataset_pid
-         if [ $? -ne 0 ]; then
-            echo "import_dataset failed: $?"
-            return $?;
-         fi
-      else
-         echo "import_dataset already running"
-      fi
-   fi
+   #if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/import_dataset.pl ]; then
+   #   if ! running $import_dataset_pid; then
+   #      path_to_import_updated=$webrun_directory/import_updated
+   #      if [ ! -f $path_to_import_updated ]; then
+   #         # create/touch path to set timestamp
+   #         >$path_to_import_updated
+   #      fi
+   #      start_daemon -n 10 -p $import_dataset_pid $target_directory/scripts/import_dataset.pl $system_log $import_dataset_pid
+   #      if [ $? -ne 0 ]; then
+   #         echo "import_dataset failed: $?"
+   #         return $?;
+   #      fi
+   #   else
+   #      echo "import_dataset already running"
+   #   fi
+   #fi
    if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/prepare_download.pl ]; then
       if ! running $prepare_download_pid; then
          start_daemon -n 10 -p $prepare_download_pid $target_directory/scripts/prepare_download.pl -log $system_log -pid $prepare_download_pid $target_directory/master_config.txt
@@ -149,9 +149,9 @@ stop() {
    if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" -a -r $target_directory/scripts/ftp_monitor.pl ]; then
       killproc -p $ftp_monitor_pid $target_directory/scripts/ftp_monitor.pl SIGTERM
    fi
-   if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/import_dataset.pl ]; then
-      killproc -p $import_dataset_pid $target_directory/scripts/import_dataset.pl SIGTERM
-   fi
+   #if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/import_dataset.pl ]; then
+   #   killproc -p $import_dataset_pid $target_directory/scripts/import_dataset.pl SIGTERM
+   #fi
    if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/prepare_download.pl ]; then
       killproc -p $prepare_download_pid $target_directory/scripts/prepare_download.pl SIGTERM
    fi
@@ -186,14 +186,14 @@ status() {
          retval=1
       fi
    fi
-   if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/import_dataset.pl ]; then
-      if running $import_dataset_pid; then
-         echo "import_dataset running"
-      else
-         echo "import_dataset not running"
-         retval=2
-      fi
-   fi
+   #if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/import_dataset.pl ]; then
+   #   if running $import_dataset_pid; then
+   #      echo "import_dataset running"
+   #   else
+   #      echo "import_dataset not running"
+   #      retval=2
+   #   fi
+   #fi
    if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/prepare_download.pl ]; then
       if running $prepare_download_pid; then
          echo "prepare_download running"
