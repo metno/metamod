@@ -76,6 +76,7 @@ sub new {
             vars => {}, # lazy loading on first get
         };
         $_config = bless $config, $class;
+        $_config->initLogger; # staticInitLogger ?
     }
     return $_config;
 }
