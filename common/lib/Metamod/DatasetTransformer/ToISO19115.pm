@@ -35,6 +35,7 @@ use strict;
 use warnings;
 use Metamod::ForeignDataset;
 use Metamod::DatasetTransformer;
+use Metamod::DatasetTransformer::ToDIF;
 use Carp qw(croak);
 use Log::Log4perl;
 
@@ -47,11 +48,11 @@ my $difToIsoStyle;
 my $_init = 0;
 sub _init {
     return if $_init++;
-    
+
     my $styleDoc = Metamod::DatasetTransformer->XMLParser->parse_file($difToIsoXslt);
     $difToIsoStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet($styleDoc);
     if (!$difToIsoStyle) {
-        $_logger->logcroak("cannot parse stylesheet $difToIsoXslt");   
+        $_logger->logcroak("cannot parse stylesheet $difToIsoXslt");
     }
 }
 
@@ -70,12 +71,12 @@ sub foreignDataset2iso19115 {
         return $foreignDataset;
     } elsif (UNIVERSAL::isa($transformer,'Metamod::DatasetTransformer::DIF')) {
         $_logger->debug("foreignDataset is DIF, only one transformation need");
-        $difFds = $foreignDataset; 
+        $difFds = $foreignDataset;
     } elsif (UNIVERSAL::isa($transformer,'Metamod::DatasetTransformer')) {
         $_logger->debug("foreignDataset is does map to internal, converting to internal->DIF->ISO");
         my ($xmdDoc, $xmlDoc) = $transformer->transform();
         # transform to dif
-        require Metamod::DatasetTransformer::ToDIF;
+        # require Metamod::DatasetTransformer::ToDIF; # must 'use' instead since INC not working after chdir
         $difFds = Metamod::DatasetTransformer::ToDIF::foreignDataset2Dif($foreignDataset);
     } else {
         my %info = $foreignDataset->getInfo();
@@ -87,7 +88,7 @@ sub foreignDataset2iso19115 {
         if exists $options->{REPOSITORY_IDENTIFIER};
     my $isoDoc = $difToIsoStyle->transform($difFds->getMETA_DOC(), XML::LibXSLT::xpath_to_string(%params));
     return Metamod::ForeignDataset->newFromDoc($isoDoc, $difFds->getXMD_DOC());
-    
+
 }
 
 1;

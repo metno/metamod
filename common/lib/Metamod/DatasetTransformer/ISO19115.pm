@@ -39,11 +39,10 @@ use Metamod::Config;
 use Log::Log4perl;
 use 5.6.0;
 
-our $XSLT_ISO_DIF = $Metamod::DatasetTransformer::XSLT_DIR . 'iso2dif.xslt';
 my $logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
 
 sub originalFormat {
-    return "ISO19115"; 
+    return "ISO19115";
 }
 
 sub new {
@@ -51,6 +50,7 @@ sub new {
         croak ("new " . __PACKAGE__ . " needs argument (package, file), got: @_");
     }
     my ($class, $xmdStr, $xmlStr, %options) = @_;
+    my $XSLT_ISO_DIF = $Metamod::DatasetTransformer::XSLT_DIR . 'iso2dif.xslt'; # doesn't work compile time
     my $self = {xmdStr => $xmdStr,
                 xmlStr => $xmlStr,
                 isoDoc => undef, # init by test
@@ -61,7 +61,7 @@ sub new {
     # options to be forwarded to DIF2MM2 conversion
     $self->{xmdXslt} = $options{xmdXslt} if exists $options{xmdXslt};
     $self->{mm2Xslt} = $options{mm2Xslt} if exists $options{mm2Xslt};
-    
+
     return bless $self, $class;
 }
 
@@ -72,7 +72,7 @@ sub test {
         $logger->debug("no data");
         return 0; # no data
     }
-    
+
     unless ($self->{isoDoc}) {
         eval {
             $self->{isoDoc} = $self->XMLParser->parse_string($self->{xmlStr});
@@ -82,11 +82,11 @@ sub test {
         }
     }
     return 0 unless $self->{isoDoc}; # $doc not initialized
-        
+
     my $xpc = XML::LibXML::XPathContext->new();
     $xpc->registerNs('gmd', 'http://www.isotc211.org/2005/gmd');
     $xpc->registerNs('d', 'http://www.met.no/schema/metamod/dataset');
-    
+
     # test of content in xmlStr
     my $isISO = 0;
     my $root = $self->{isoDoc}->getDocumentElement();
@@ -95,7 +95,7 @@ sub test {
     if ($nodeList->size() == 1) {
         $isISO = 1;
     }
-    
+
     my $isXMD = 1;
     if ($self->{xmdStr}) {
         $isXMD = 0; # reset to 0, might fail
@@ -109,7 +109,7 @@ sub test {
             }
         }
         return 0 unless $self->{xmdDoc};
-        
+
         my $dsRoot = $self->{isoDoc}->getDocumentElement();
         my $nList = $xpc->findnodes('/d:dataset/d:info/@ownertag', $root);
         if ($nodeList->size() == 1) {
@@ -134,12 +134,12 @@ sub test {
         require Metamod::DatasetTransformer::DIF;
         my $difDT = new Metamod::DatasetTransformer::DIF($self->{xmdDoc}, $difDoc, %options);
         $self->{difTransformer} = $difDT;
-        
+
         my $difTestResult = $difDT->test;
-        $logger->debug("dif-conversionn result: $difTestResult"); 
-        return $difTestResult; 
+        $logger->debug("dif-conversionn result: $difTestResult");
+        return $difTestResult;
     } else {
-        $logger->debug("isDataset, isISO: $isXMD, $isISO"); 
+        $logger->debug("isDataset, isISO: $isXMD, $isISO");
         return 0;
     }
 }
@@ -147,7 +147,7 @@ sub test {
 sub transform {
     my $self = shift;
     $logger->logcroak("Cannot run transform if test fails") unless $self->test;
-    
+
     # convert from dif to mm2
     my ($xmdDoc, $mm2Doc) = $self->{difTransformer}->transform;
 
@@ -199,17 +199,17 @@ Overwrite the default xslt transformation to convert from ISO19115 to DIF.
 
 =item xmdXslt => 'filename.xslt'
 
-Overwrite the default xslt transformation to convert to the DIF to xmd. This option is forwarded to the 
+Overwrite the default xslt transformation to convert to the DIF to xmd. This option is forwarded to the
 Metamod::DatasetTransformer::DIF.
 
 =item mm2Xslt => 'filename.xslt'
 
-Overwrite the default xslt transformation to convert to the DIF to MM2. This option is forwarded to the 
+Overwrite the default xslt transformation to convert to the DIF to MM2. This option is forwarded to the
 Metamod::DatasetTransformer::DIF.
 
 =back
 Return: object
-Dies on 
+Dies on
 
 =back
 

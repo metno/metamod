@@ -47,8 +47,6 @@ use 5.6.0;
 
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 my $config = Metamod::Config->new();
-our $XSLT_FILE_MM2 = $Metamod::DatasetTransformer::XSLT_DIR.'dif2MM2.xslt';
-our $XSLT_FILE_XMD  = $Metamod::DatasetTransformer::XSLT_DIR.'dif2dataset.xslt';
 my $logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
 
 sub originalFormat {
@@ -60,6 +58,8 @@ sub new {
         croak ("new " . __PACKAGE__ . " needs argument (package, file), got: @_\n");
     }
     my ($class, $xmdStr, $xmlStr, %options) = @_;
+    my $XSLT_FILE_MM2 = $Metamod::DatasetTransformer::XSLT_DIR.'dif2MM2.xslt'; # doesn't work compile time
+    my $XSLT_FILE_XMD = $Metamod::DatasetTransformer::XSLT_DIR.'dif2dataset.xslt';
     my $self = {xmdStr => $xmdStr,
                 xmlStr => $xmlStr,
                 difDoc => undef, # init by test

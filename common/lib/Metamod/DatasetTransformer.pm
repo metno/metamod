@@ -46,6 +46,8 @@ our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", 
 
 my $logger = Log::Log4perl::get_logger('metamod::common::Metamod::DatasetTransformer');
 
+my @plugins;
+
 # single parser
 use constant XMLParser => new XML::LibXML();
 use constant XSLTParser => new XML::LibXSLT();
@@ -109,6 +111,7 @@ sub getFileContent {
 }
 
 sub getPlugins {
+    return @plugins if @plugins;
     my $classPath = __PACKAGE__;
     $classPath = File::Spec->catfile(split '::', $classPath);
     $classPath .= '.pm';
@@ -122,7 +125,6 @@ sub getPlugins {
     my @files = grep {/\.pm$/ && -f File::Spec->catfile($basePluginPath,$_)} readdir $d;
     closedir $d;
 
-    my @plugins;
     foreach my $file (@files) {
         next if substr($file, 0, 2) eq 'To'; # Ignore modules To other formats
         my $plugin = __PACKAGE__ . "::$file";
@@ -135,6 +137,10 @@ sub getPlugins {
         push @plugins, $plugin;
     }
     return @plugins;
+}
+
+BEGIN {
+    @plugins = getPlugins();
 }
 
 # difficult to unit-test, since options for $plugin->new are unknown (xslt files)

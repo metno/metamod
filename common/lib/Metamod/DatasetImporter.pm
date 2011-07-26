@@ -899,7 +899,7 @@ sub _isoDoc2SruDb {
 INSERT INTO sru.products ( $paramNames ) VALUES ( $placeholder )
 SQL
     $sth->execute(@values);
-    $self->logger->debug("Inserted sru-searchdata\n");
+    $self->logger->debug("Inserted sru-searchdata");
 }
 
 
@@ -923,7 +923,7 @@ sub _get_contact_id {
 
     # TODO: get author from other places if other code-list is used
 
-    $self->logger->debug("found contact-(author,organization)=($author,$organization) in sru/iso19115") if $self->logger->is_debug();
+    $self->logger->debug("found contact-(author,organization)=($author,$organization||'-') in sru/iso19115") if $self->logger->is_debug();
 
     # search for existing author/organization
     ($author, $organization) =  map {defined $_ ? uc($_) : undef} ($author, $organization);
