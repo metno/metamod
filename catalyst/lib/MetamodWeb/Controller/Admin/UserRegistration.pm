@@ -64,8 +64,18 @@ sub confirm_user_POST {
     my ( $self, $c, $u_id ) = @_;
 
     my $userbase_user = $c->stash->{userbase_user};
-    my $random_pass = $userbase_user->reset_password();
 
+    my $action = $c->request->params->{action};
+
+    if ($action eq 'Reject') {
+        $userbase_user->delete;
+        $self->add_info_msgs( $c, 'User has been rejected' );
+        return $c->res->redirect( $c->uri_for('/admin/useradmin') );
+    } elsif ($action ne 'Approve') {
+        die "'action' must be either 'Approve' or 'Reject'";
+    }
+
+    my $random_pass = $userbase_user->reset_password();
 
     my $mm_config        = $c->stash->{mm_config};
     my $operator_email   = $mm_config->get('OPERATOR_EMAIL');
@@ -73,7 +83,6 @@ sub confirm_user_POST {
     my $signature        = $mm_config->get('EMAIL_SIGNATURE') || '';
     my $name             = $userbase_user->u_name();
     my $username         = $userbase_user->u_loginname();
-
     my $email_body = <<"END_BODY";
 Dear $name,
 
