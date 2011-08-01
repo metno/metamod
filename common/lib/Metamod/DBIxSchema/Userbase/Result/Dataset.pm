@@ -36,7 +36,8 @@ __PACKAGE__->set_primary_key("ds_id");
 __PACKAGE__->add_unique_constraint( "dataset_a_id_key", [ "a_id", "ds_name" ] );
 __PACKAGE__->add_unique_constraint( "dataset_pkey", ["ds_id"] );
 __PACKAGE__->belongs_to( "u_id", "Metamod::DBIxSchema::Userbase::Result::Usertable", { u_id => "u_id" }, );
-__PACKAGE__->has_many( "files",  "Metamod::DBIxSchema::Userbase::Result::File",   { "foreign.ds_id" => "self.ds_id" }, );
+# File table is not linked to Dataset and does not contain ds_id
+#__PACKAGE__->has_many( "files",  "Metamod::DBIxSchema::Userbase::Result::File",   { "foreign.ds_id" => "self.ds_id" }, );
 __PACKAGE__->has_many( "infods", "Metamod::DBIxSchema::Userbase::Result::Infods", { "foreign.ds_id" => "self.ds_id" }, );
 __PACKAGE__->has_many(
     "infouds",
