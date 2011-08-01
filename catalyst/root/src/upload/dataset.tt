@@ -8,7 +8,12 @@
 
 [% INCLUDE user_msgs.tt formvalid = "foo" %]
 
-<table>
+<style type="text/css">
+    table.airy tr td { padding: 2px 5px 2px 2px; }
+    table.airy { border: solid 2px #cccccc; padding: 5px 5px 5px 5px }
+</style>
+
+<table class="airy">
 
     <tr>
         <td><label for="ds_name">Dataset name:</label></td>
@@ -27,26 +32,42 @@
     </tr>
 
     [% IF mm_config.get('EXTERNAL_REPOSITORY') == "true" # used for osisaf et al %]
-    <tr>
-        <td><label for="location">Dataset location:</label></td>
-        <td><input id="location" name="location" value="[% dataset.location %]" size="60"> (absolute directory path)</td>
-    </tr>
+        <tr>
+            <td><label for="location">Dataset location:</label></td>
+            <td><input id="location" name="location" value="[% dataset.location %]" size="60"> (absolute directory path)</td>
+        </tr>
+
+        <tr>
+            <td><label for="catalog">Dataset catalog:</label></td>
+            <td><input id="catalog" name="catalog" value="[% dataset.catalog %]" size="60"> (THREDDS URL)</td>
+        </tr>
+    [% END %]
 
     <tr>
-        <td><label for="catalog">Dataset catalog:</label></td>
-        <td><input id="catalog" name="catalog" value="[% dataset.catalog %]" size="60"> (THREDDS URL)</td>
+        <td>
+            [% IF ds_id %]
+                <input type="submit" value="Update">
+            [% ELSE %]
+                <input type="submit" value="Create">
+            [% END %]
+        </td>
     </tr>
-    [% END %]
 
 </table>
 
-[% IF ds_id %]
-    <input type="submit" value="Update">
-[% ELSE %]
-    <input type="submit" value="Create">
-[% END %]
-
 </form>
+
+
+[% IF ds_id %]
+<br/>
+<form name="dataset" action="[% root %]/[% ds_id %]" method="POST" class="datasetedit">
+<table class="airy">
+    <tr><td>[% files %] files uploaded in dataset.</td></tr>
+    <tr><td>Delete dataset? <input type="checkbox" name="delete" value="1"/> Yup</td></tr>
+    <tr><td><input type="submit" value="Delete"/></td></tr>
+</table>
+</form>
+[% END %]
 
 <h1 class="std">Dataset directories you own</h1>
 
@@ -70,8 +91,7 @@
     [% IF ds_id %]
         <tr class="list_table">
             <td class="list_table">New dataset</td>
-            <td class="list_table"><div class="btns"><a class="btn2" style="width:120px" href="[% root %]"><span>Create</span></a></div></td>
-            <td class="list_table">&nbsp;</td>
+            <td class="list_table" colspan="3"><div class="btns"><a class="btn2" style="width:120px" href="[% root %]"><span>Create</span></a></div></td>
         </tr>
     [% END %]
 </table>

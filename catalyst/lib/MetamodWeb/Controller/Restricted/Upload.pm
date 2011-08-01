@@ -331,7 +331,10 @@ sub dataset_x_GET { # show editor for a dataset
         # a normal dataset lookup
         $dataset = $c->model('Userbase')->resultset('Dataset')->get_ds($ds_id);
         $c->detach( 'Root', 'default' ) unless $dataset; # not found
-        $c->stash( dataset => $dataset );
+        my $files = $c->model('Userbase')->resultset('File')->count({
+            f_name => { 'like', $$dataset{ds_name} ."%"}
+        });
+        $c->stash( dataset => $dataset, files => $files );
     }
 
     $c->stash( template => 'upload/dataset.tt' );
@@ -355,14 +358,35 @@ sub dataset_x_POST  { # update existing dataset
     my $dataset = $rs->find( $ds_id );
     $c->detach( 'Root', 'default' ) unless $dataset; # not found
 
-    eval { $dataset->set_info_ds($para); };
-    if ($@) {
-        # update record failed
-        $self->add_error_msgs( $c, error_from_exception($@) );
-        $c->response->redirect( $c->uri_for($path, $ds_id, $para) );
-    } else {
-        # success - now go back and read dataset from db
-        $c->response->redirect( $c->uri_for($path, $ds_id) );
+    if (exists $$para{delete}) {
+
+        print STDERR "*** deleting dataset $ds_id...\n";
+
+        eval { $dataset->delete; };
+        if ($@) {
+            # delete record failed
+            print STDERR "*** delete went wrong :( \n";
+            $self->add_error_msgs( $c, error_from_exception($@) );
+            $c->response->redirect( $c->uri_for($path) );
+        } else {
+            print STDERR "*** done deleting\n";
+            # success - now go back to dataset list
+            $self->add_error_msgs( $c, 'Dataset deleted' );
+            $c->response->redirect( $c->uri_for($path) );
+        }
+
+    } else { # normal update
+
+        eval { $dataset->set_info_ds($para); };
+        if ($@) {
+            # update record failed
+            $self->add_error_msgs( $c, error_from_exception($@) );
+            $c->response->redirect( $c->uri_for($path, $ds_id, $para) );
+        } else {
+            # success - now go back and read dataset from db
+            $c->response->redirect( $c->uri_for($path, $ds_id) );
+        }
+
     }
 
 }
