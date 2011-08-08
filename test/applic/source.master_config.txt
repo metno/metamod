@@ -53,6 +53,14 @@ LOG4PERL_WATCH_TIME = 30
 LOG4PHP_CONFIG = [==TARGET_DIRECTORY==]/log4php_config.ini
 LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
 
+# Mail address for person/group responsible for daily operation of the file
+# repository. Used for automatically sent notifications when manual action is
+# needed:
+OPERATOR_EMAIL = Substituted by test_application.sh
+
+# Specify here if you want to use external SMTP relay instead of localhost MTA
+SMTP_RELAY = smtp.met.no
+
 # ============== Catalyst configuration =================
 ## File path for generated Catalyst config
 ##CATALYST_SITE_CONFIG = [==TARGET_DIRECTORY==]/metamodweb.json
@@ -321,11 +329,6 @@ EMAIL_BODY_WHEN_UPLOAD_ERROR =
 # Subject field in E-mails sent to a dataset owner when errors are found
 # in an uploaded file:
 EMAIL_SUBJECT_WHEN_UPLOAD_ERROR = METAMOD file upload error
-
-# Mail address for person/group responsible for daily operation of the file
-# repository. Used for automatically sent notifications when manual action is
-# needed:
-OPERATOR_EMAIL = Substituted by test_application.sh
 
 # Mail address used in the "from" field on automatically sent E-mails to
 # users:

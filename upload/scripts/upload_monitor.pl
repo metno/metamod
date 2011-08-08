@@ -56,7 +56,7 @@ use TheSchwartz;
 use Metamod::Utils;
 use Metamod::Queue::Worker::Upload;
 use Metamod::Config;
-
+use Metamod::UploadHelper;
 
 =head1 NAME
 
@@ -69,11 +69,12 @@ Start digest_nc.pl on uploaded files.
 
 =head1 USAGE
 
-See Metamod::UploadMonitor (rewrite - FIXME)
+See Metamod::UploadHelper
 
 =cut
 
 my $config = Metamod::Config->new();
+my $upload_helper = Metamod::UploadHelper->new();
 
 # setup queue
 my $queue_worker = TheSchwartz->new(
@@ -103,7 +104,7 @@ eval {
 
         my ($logFile, $pidFile) = @ARGV;
         Metamod::Utils::daemonize($logFile, $pidFile);
-        $SIG{TERM} = \&sigterm;
+        #$SIG{TERM} = \&sigterm;
         $queue_worker->can_do('Metamod::Queue::Worker::Upload');
         $queue_worker->work();
 
@@ -111,14 +112,14 @@ eval {
 };
 
 if ($@) {
-    &syserrorm( "SYS", "ABORTED: " . $@, "", "", "" );
+    $upload_helper->syserrorm( "SYS", "ABORTED: " . $@, "", "", "" );
 } else {
-    &syserrorm( "SYS", "NORMAL TERMINATION", "", "", "" );
+    $upload_helper->syserrorm( "SYS", "NORMAL TERMINATION", "", "", "" );
 }
 
 # not sure if this is still necessary...
-our $SIG_TERM = 0;
-sub sigterm { ++$SIG_TERM; }
-$SIG{TERM} = \&sigterm;
+#our $SIG_TERM = 0;
+#sub sigterm { ++$SIG_TERM; }
+#$SIG{TERM} = \&sigterm;
 
 # END

@@ -27,9 +27,15 @@ use warnings;
 
 Metamod::UploadHelper - Helper module for processing file uploads
 
-=head1 SYNOPSIS
-
 =head1 DESCRIPTION
+
+Monitor file uploads from data providers. Start digest_nc() on uploaded files.
+
+=head1 USAGE
+
+Files are either uploaded to an FTP area, or interactively to an HTTP area
+using the web interface. The top level directory pathes for these two areas are
+given by FIXME [was: the global variables $ftp_dir_path and $upload_dir_path].
 
 =head1 FUNCTIONS/METHODS
 
@@ -41,7 +47,7 @@ use Data::Dumper;
 use File::Copy;
 use File::Path;
 use Log::Log4perl qw( get_logger );
-use Mail::Mailer;
+use Metamod::Email;
 use Moose;
 
 use Metamod::Config;
@@ -338,9 +344,7 @@ sub process_files {
         return;
     }
 
-    #
     #  Clean up the work_start, work_flat and work_expand directories:
-    #
     foreach my $dir ( $work_start, $work_expand, $work_flat ) {
         rmtree($dir);
         if ( -d $dir ) {
@@ -349,7 +353,6 @@ sub process_files {
         mkpath($dir) or die "Failed to create $dir: $!";    # create a fresh directory
     }
 
-    #
     my $taf_basename;    # Used if uploaded file is only for testing
     foreach my $uploadname ( keys %files_to_process ) {
         $errors = 0;
@@ -360,26 +363,19 @@ sub process_files {
             $extension = $1;    # First matching ()-expression
         }
 
-        #
-        #     Copy uploaded file to the work_start directory
-        #
+        # Copy uploaded file to the work_start directory
         my $newpath = File::Spec->catfile( $work_start, $baseupldname );
         if ( copy( $uploadname, $newpath ) == 0 ) {
             die "Copy to workdir did not succeed. Uploaded file: $uploadname, $newpath Error code: $!\n";
         }
 
-        #
-        #     Get type of file and act accordingly:
-        #
+        # Get type of file and act accordingly:
         my $filetype = getFiletype($newpath);
         $self->logger->debug("Processing $newpath Filtype: $filetype\n");
 
-        #
         if ( $filetype =~ /^gzip/ ) {    # gzip or gzip-compressed
 
-            #
-            #           Uncompress file:
-            #
+            # Uncompress file:
             my $result = $self->shcommand_scalar("gunzip $newpath");
             if ( !defined($result) ) {
                 $self->syserrorm( "SYSUSER", "gunzip_problem_with_uploaded_file", $uploadname, "process_files", "" );
@@ -388,9 +384,7 @@ sub process_files {
             }
             if ( defined($extension) && ( $extension eq "gz" || $extension eq "GZ" ) ) {
 
-                #
-                #              Strip ".gz" extension from $baseupldname
-                #
+                # Strip ".gz" extension from $baseupldname
                 $baseupldname = substr( $baseupldname, 0, length($baseupldname) - 3 );
                 undef $extension;
                 if ( $baseupldname =~ /\.([^.]+)$/ ) {
@@ -398,9 +392,7 @@ sub process_files {
                 }
             } elsif ( defined($extension) && ( $extension eq "tgz" || $extension eq "TGZ" ) ) {
 
-                #
-                #              Substitute "tgz" extension with "tar"
-                #
+                # Substitute "tgz" extension with "tar"
                 $baseupldname = substr( $baseupldname, 0, length($baseupldname) - 3 ) . 'tar';
                 $extension = 'tar';
             } else {
@@ -420,9 +412,7 @@ sub process_files {
                 next;
             }
 
-            #
-            #        Get all component file names in the tar file:
-            #
+            # Get all component file names in the tar file:
             my @tarcomponents = $self->shcommand_array("tar tf $newpath");
             if ( length($self->shell_command_error) > 0 ) {
                 $self->syserrorm( "SYSUSER", "unable_to_unpack_tar_archive", $uploadname, "process_files", "" );
@@ -436,9 +426,7 @@ sub process_files {
             my %basenames    = ();
             my $errcondition = "";
 
-            #
-            #        Check the component file names:
-            #
+            # Check the component file names:
             foreach my $component (@tarcomponents) {
                 if ( substr( $component, 0, 1 ) eq "/" ) {
                     $self->syserrorm( "USER", "uploaded_tarfile_with_abs_pathes",
@@ -466,9 +454,7 @@ sub process_files {
             }
             if ( $errors == 0 ) {
 
-                #
-                #           Expand the tar file onto the $work_expand directory
-                #
+                # Expand the tar file onto the $work_expand directory
                 unless ( chdir $work_expand ) {
                     die "Could not cd to $work_expand: $!\n";
                 }
@@ -478,11 +464,9 @@ sub process_files {
                     next;
                 }
 
-                #
-                #           Move all expanded files to the $work_flat directory, which
-                #           will not contain any subdirectories. Check that no duplicate
-                #           file names arise.
-                #
+                # Move all expanded files to the $work_flat directory, which
+                # will not contain any subdirectories. Check that no duplicate
+                # file names arise.
                 foreach my $component (@tarcomponents) {
                     my $bname = $component;
                     if ( $component =~ /\/([^\/]+)$/ ) {
@@ -510,9 +494,7 @@ sub process_files {
             }
         } else {
 
-            #
-            #        Move file directly to $work_flat:
-            #
+            # Move file directly to $work_flat:
             if ( -e File::Spec->catfile( $work_flat, $baseupldname ) ) {
                 $self->syserrorm( "SYSUSER", "uploaded_file_already_encountered", $uploadname, "process_files", "" );
                 next;
@@ -529,7 +511,7 @@ sub process_files {
 
     #   print "Original upload names of expanden files:\n";
     #   print Dumper(\%orignames);
-    #
+
     #  All files are now unpacked/expanded and moved to the $work_flat directory:
     #
     unless ( chdir $work_flat ) {
@@ -543,9 +525,7 @@ sub process_files {
         $self->logger->debug( $msg . "\n" );
     }
 
-    #
     #  Convert CDL files to netCDF and then check that all files are netCDF:
-    #
     $errors = 0;
     my %not_accepted = ();
     foreach my $expfile (@expanded_files) {
@@ -643,12 +623,10 @@ sub process_files {
         die "Could not cd to $work_directory: $!\n";
     }
 
-    #
     #  Decide if this batch of netCDF files are all new files, or if some of them has been
     #  uploaded before. If any re-uploads, find the XML-file representing most of the existing
     #  files in the repository that are not affected by re-uploads. Base the digest_nc.pl run
     #  on this XML file.
-    #
     my @uploaded_files = findFiles( $work_flat, eval 'sub {$_[0] =~ /^\Q$dataset_name\E_/o;}' );
 
     #   print "Uploaded files:\n";
@@ -943,15 +921,14 @@ sub process_files {
                 $mailbody .= "\n";
                 $mailbody .= $self->config->get('EMAIL_SIGNATURE');
                 my $sender  = $self->config->get('FROM_ADDRESS');
-                my $mailer  = Mail::Mailer->new;
-                my %headers = (
-                    To      => $recipient,
-                    Subject => $subject,
-                    From    => $sender,
+
+                Metamod::Email::send_simple_email(
+                    to => [ $recipient ],
+                    from => $sender,
+                    subject => $subject,
+                    body => $mailbody,
                 );
-                #$mailer->open( \%headers );
-                #print $mailer $mailbody;
-                #$mailer->close;
+
             }
         }
         foreach my $uploadname ( keys %files_to_process ) {
@@ -1870,6 +1847,155 @@ sub syserror {
     }
     $self->shell_command_error("");
 }
+
+=head1 DETAILED OPERATION
+
+=head2 FTP uploads:
+
+Uploads to the FTP area are only done by data providers having an agreement
+with the data repository authority to do so. This agreement designates which
+datasets the data provider will upload data to. Typically, such agreements
+are made for operational data uploaded by automatic processes at the data
+provider site. The names of the datasets covered by such agreements are
+found in the text file [==WEBRUN_DIRECTORY==]/ftp_events described below.
+
+The script ftp_monitor.pl will search for files at any directory level beneath the
+$ftp_dir_path directory. Any file that have a basename matching glob pattern
+'<dataset_name>_*' (where <dataset_name> is the name of the dataset) will
+be treated as containing a possible addition to that dataset.
+
+=head2 HTTP uploads:
+
+Files uploaded via the web interface are processed with the upload_monitor.pl script.
+Normally running as a daemon, this starts a worker which waits for events in
+the job queue.
+
+The directory structure of the HTTP upload area mirrors the directory
+structure of the final data repository (the $opendap_directory defined
+below). Thus, any HTTP-uploaded file will end up in a directory where both
+the institution acronym and the dataset name are found in the directory
+path. Even so, all file names are required to match the '<dataset_name>_*'
+pattern (this requirement is enforced by the web interface).
+
+=head2 Overall operation:
+
+The ftp_events file contains, for each of the datasets, the hours at which
+the FTP area should be checked for additions. The HTTP area will not be checked
+– now all uploads must register a job in the queue system.
+
+In order to avoid processing of incomplete files, the age of any file has
+to be above a threshold. This threshold is given in the ftp_events file for
+files uploaded with FTP, and may vary between datasets. For files uploaded
+with HTTP, this threshold is a configurable constant ($upload_age_threshold).
+
+Uploaded files are either individual netCDF files (or CDL files), or they are
+archive files (tar) containing several netCDF/CDL files. Both file types may
+be gzip compressed. The data provider may upload several files for the same
+dataset within a short period of time. The digest_nc.pl script will work best
+if it can, during one invocation, digest all the files uploaded during such
+a period. To achieve this, the script will not process a file if any other
+file are found for the same dataset that have not reached the age prescribed
+by the threshold.
+
+When a new set of files for a given dataset is found to be ready for processing
+(either from the FTP area or from the HTTP area), the file names are sent to
+the process_files subroutine.
+
+The process_files subroutine will copy the files to the $work_expand directory
+where any archive files are expanded. An archive file may contain a directory
+tree. All files in a directory tree (and all the other files in the $work_expand
+directory) are copied to another directory, $work_flat. This directory has a
+flat structure (no subdirectories). A name collision arising from files with same
+basename but from different parts of a directory tree, is considered an error.
+
+Any CDL file now found in the $work_flat directory is converted to netCDF. The
+set of uncompressed netCDF-files that now populate the $work_flat directory, is
+sent to the digest_nc.pl script for checking.
+
+=head1 ERROR HANDLING
+
+Various errors may arise during this file processing operation. The errors are
+divided into four different categories:
+
+1. Errors arising from external system environment. Such errors will usually not
+   occur. They will only arise if system resources are exhausted, or if anything
+   happens to the file system (like permission changes on important files and
+   directories). If any such error arise, the script will die and an abortion error
+   message will be recorded in the system error log.
+
+2. Internal system errors. These errors are mainly caused by failing shell commands
+   (file, tar, gunzip etc.). They may also arise when any inconsistency are found
+   that may indicate bugs in the script. The script will continue, but the
+   processing of the offending uploaded file will be discontinued. The file will
+   be moved to the F<$problem_dir_path> directory and an error message will be
+   recorded in the system error log. In addition, the user will be notified
+   about an internal system error that prohibited processing of the file.
+   These errors may be caused by uploaded files that are corrupted,
+   or not of the expected format. (Note to myself: In that case the error category
+   should be changed to category 3 below).
+
+3. User errors that makes furher prosessing of an uploaded file impossible. The
+   file will be moved to the $problem_dir_path directory and an error message will
+   be recorded in the system error log. In addition, the user will be notified
+   with an indication of the nature of the error.
+
+4. Other user errors. These are mainly caused by non-complience with the
+   requirements found in the F<conf_digest_nc.xml> file. All such errors are conveyed
+   to the user through the F<nc_usererrors.out> file. A summary of this file is
+   constructed in the form of a self-explaining HTML file (using the
+   print_usererrors.pl script).
+
+All uploaded files that were processed with no errors, or with only
+category 4 errors, are deleted after the expanded version of the files are
+copied to the data repository. The status of the files are recorded in the
+appropriate file in the u1 subdirectory of the $webrun_directory directory.
+
+In the F<$problem_dir_path> directory the files are renamed according to the following
+scheme: A 6 digit number, I<DDNNNN>, are constructed where I<DD> is the day number in
+the month and I<NNNN> is starting on 0001 each new day, and increments with 1 for
+each file copied to the directory. The new file name will be:
+
+   DDNNNN_<basename>
+
+where <basename> is the basename of the uploaded file name.
+
+Files older than a prescribed number of days will be deleted from the
+$problem_dir_path directory.
+
+=head1 FTP events config file
+
+The FTP events config file regulates which datasets are uploaded through
+FTP, and how often this script will check for new files for these datasets.
+
+This is a text file which must contain lines of the following format:
+
+   dataset_name wait_minutes days_to_keep_files hour1 hour2 hour3 ...
+
+=over 4
+
+=item wait_minutes
+
+The minimum age of a new ftp file. If a file has less age
+than this value, the file is left for later processing.
+
+=item days_to_keep_files
+
+Number of days where the files are to remain
+unchanged on the repository. When this period
+expires, the files will be deleted and substituted
+with files containing only metadata. This is done
+in sub 'clean_up_repository'.
+If this number == 0, the files are kept indefinitely.
+
+=item hourN
+
+These numbers (0-23) represents the times during a day
+where checking for new files take place.
+
+=back
+
+For each hourN, a hash key is constructed as "dataset_name hourN" and the
+corresponding value is set to wait_minutes.
 
 =head1 LICENSE
 

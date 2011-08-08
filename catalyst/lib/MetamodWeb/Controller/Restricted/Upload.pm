@@ -360,17 +360,14 @@ sub dataset_x_POST  { # update existing dataset
 
     if (exists $$para{delete}) {
 
-        print STDERR "*** deleting dataset $ds_id...\n";
-
         eval { $dataset->delete; };
         if ($@) {
             # delete record failed
-            print STDERR "*** delete went wrong :( \n";
             $self->add_error_msgs( $c, error_from_exception($@) );
             $c->response->redirect( $c->uri_for($path) );
         } else {
-            print STDERR "*** done deleting\n";
             # success - now go back to dataset list
+            $self->logger->debug("Deleted dataset $ds_id");
             $self->add_error_msgs( $c, 'Dataset deleted' );
             $c->response->redirect( $c->uri_for($path) );
         }

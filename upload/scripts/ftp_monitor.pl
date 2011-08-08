@@ -70,7 +70,7 @@ uploaded files.
 
 =head1 USAGE
 
-See Metamod::UploadMonitor (rewrite - FIXME)
+See Metamod::UploadHelper
 
 =cut
 
