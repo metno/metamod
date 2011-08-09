@@ -228,6 +228,7 @@ sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 /^OPENDAP_DIRECTORY *=/s|=.*$|= '$basedir/[==OPENDAP_BASEDIR==]'|
 /^OPENDAP_URL *=/s|=.*$|= '$opendapurl'|
 /^OPERATOR_EMAIL *=/s|=.*$|= '$operatoremail'|
+/^OPERATOR_INSTITUTION *=/s|=.*$|= EXAMPLE|
 /^DATASET_TAGS *=/s|=.*$|= '"'$idstring','$oaiharvesttag'"'|
 /^UPLOAD_OWNERTAG *=/s|=.*$|= '$idstring'|
 /^TEST_IMPORT_BASETIME *=/s|=.*$|= '$importbasetime'|' source.master_config.txt >master_config.txt
@@ -247,10 +248,8 @@ rm -rf webupload/*
 rm -rf ftpupload/*
 rm -rf data/*
 
-# and add some needed projects
-mkdir -p webupload/TUN/osisaf
-mkdir -p webupload/TUN/ice
-
+# Add institution directory in the web upload area
+mkdir -p webupload/EXAMPLE
 
 #
 # D. The software is installed into the target directory:
@@ -268,7 +267,7 @@ cd $basedir/target
 #
 cd $basedir/data
 for dir in `cat $basedir/source/test/directories`; do
-   mkdir -p $dir
+   mkdir -p EXAMPLE/$dir
 done
 #
 # F. The databases (metadatabase and user database) is initialized and filled with static data.
@@ -284,8 +283,7 @@ cd $basedir/target/init
 ./create_and_load_all.sh
 cd $basedir/target/userinit
 ./run_createuserdb.sh
-cd $basedir/target/scripts
-./load_userbase.pl
+$basedir/target/scripts/userbase_add_datasets.pl $operatoremail <$basedir/source/test/directories
 #
 # G. The services defined for the application is started.
 # =======================================================
@@ -309,7 +307,21 @@ rm -rf t_dir
 mkdir t_dir
 chown $WEBUSER t_dir
 cd $basedir/source/test/ncinput
-for fil in `cat $filestoupload`; do su $WEBUSER -c "cp $fil $basedir/t_dir"; su $WEBUSER -c "mv $basedir/t_dir/* $basedir/ftpupload"; sleep 10; done
+switch=0
+for fil in `cat $filestoupload`; do
+   su $WEBUSER -c "cp $fil $basedir/t_dir"
+   if [ $switch -eq 0 ]; then
+      su $WEBUSER -c "mv $basedir/t_dir/* $basedir/ftpupload"
+      switch=1
+   else
+      dataset=`basename $fil | sed 's/_.*$//'`
+      su $WEBUSER -c "mkdir -p $basedir/webupload/EXAMPLE/$dataset"
+      su $WEBUSER -c "mv $basedir/t_dir/* $basedir/webupload/EXAMPLE/$dataset"
+      $basedir/target/scripts/add_file_to_queue.pl $basedir/webupload/EXAMPLE/$dataset/$fil
+      switch=0
+   fi
+   sleep 10
+done
 #
 # I. After sleeping some time the services is stopped.
 # ====================================================

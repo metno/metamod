@@ -161,9 +161,9 @@ CREATE INDEX exitstatus_deleteafter ON exitstatus (delete_after);
 
 GRANT ALL PRIVILEGES ON exitstatus TO "[==PG_WEB_USER==]";
 
-INSERT INTO UserTable (u_id, a_id, u_name, u_email, u_loginname, u_password)
+INSERT INTO UserTable (u_id, a_id, u_name, u_email, u_loginname, u_password, u_institution)
     VALUES (1, '[==APPLICATION_ID==]', 'Admin', '[==OPERATOR_EMAIL==]', '[==OPERATOR_EMAIL==]',
-    encode(digest('admin123', 'sha1'), 'hex'));
+    encode(digest('admin123', 'sha1'), 'hex'), '[==OPERATOR_INSTITUTION==]');
 INSERT INTO UserRole VALUES (1, 'admin');
 
 \q

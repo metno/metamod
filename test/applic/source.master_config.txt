@@ -55,8 +55,12 @@ LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
 
 # Mail address for person/group responsible for daily operation of the file
 # repository. Used for automatically sent notifications when manual action is
-# needed:
+# needed. Also used as login name for the Admin user added to the user
+# database while this database is initialized:
 OPERATOR_EMAIL = Substituted by test_application.sh
+
+# Institution set up for the Admin user during user database initialization:
+OPERATOR_INSTITUTION = Substituted by test_application.sh
 
 # Specify here if you want to use external SMTP relay instead of localhost MTA
 SMTP_RELAY = smtp.met.no

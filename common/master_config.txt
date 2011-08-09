@@ -279,8 +279,12 @@ EMAIL_SUBJECT_WHEN_UPLOAD_ERROR = METAMOD file upload error
 
 # Mail address for person/group responsible for daily operation of the file
 # repository. Used for automatically sent notifications when manual action is
-# needed:
+# needed. Also used as login name for the Admin user added to the user
+# database while this database is initialized:
 OPERATOR_EMAIL = someuser@somedomain.com
+
+# Institution set up for the Admin user during user database initialization:
+OPERATOR_INSTITUTION = someinstitution
 
 # Mail address used in the "from" field on automatically sent E-mails to
 # users:
