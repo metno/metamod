@@ -289,6 +289,14 @@ done
 #
 cp -r $basedir/source/test/xmlinput/* $basedir/webrun/XML/$idstring/
 find $basedir/webrun/XML/$idstring -name '*.xmd' | xargs perl -pi -e "s/name=\"DAMOC/name=\"$idstring/g; s/ownertag=\"DAM/ownertag=\"$idstring/"
+#
+# Hack to remove webuser connections to the databases. Othervise postgres rejects to reinitialize the databases (UGLY):
+ps -ef | grep 'postgres: webuser' | grep -v grep | sed 's/^postgres *//' | sed 's/^\([0-9]*\)[^0-9].*/\1/' >pids_to_remove
+for pid in `cat pids_to_remove`; do
+   kill -9 $pid
+done
+rm pids_to_remove
+#
 cd $basedir/target/init
 ./create_and_load_all.sh
 cd $basedir/target/userinit
