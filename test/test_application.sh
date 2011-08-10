@@ -251,6 +251,16 @@ rm -rf data/*
 # Add institution directory in the web upload area
 mkdir -p webupload/EXAMPLE
 
+# Write a log4perl_config.ini file to the target directory to avoid bug #122:
+cat >target/log4perl_config.ini <<'EOF'
+log4perl.rootLogger=INFO, SYSTEM_LOG
+log4perl.appender.SYSTEM_LOG=Log::Log4perl::Appender::File
+log4perl.appender.SYSTEM_LOG.filename = ${METAMOD_SYSTEM_LOG}
+log4perl.appender.SYSTEM_LOG.layout=Log::Log4perl::Layout::PatternLayout
+log4perl.appender.SYSTEM_LOG.layout.ConversionPattern=%d{ISO8601} [%p] %c in %F on line: %L msg: %m%n
+log4perl.appender.SYSTEM_LOG.syswrite=1
+EOF
+
 #
 # D. The software is installed into the target directory:
 # =======================================================
