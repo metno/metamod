@@ -325,9 +325,10 @@ for fil in `cat $filestoupload`; do
       switch=1
    else
       dataset=`basename $fil | sed 's/_.*$//'`
+      filename=`basename $fil`
       su $WEBUSER -c "mkdir -p $basedir/webupload/EXAMPLE/$dataset"
       su $WEBUSER -c "mv $basedir/t_dir/* $basedir/webupload/EXAMPLE/$dataset"
-      $basedir/target/scripts/add_file_to_queue.pl $basedir/webupload/EXAMPLE/$dataset/$fil
+      $basedir/target/scripts/add_file_to_queue.pl $basedir/webupload/EXAMPLE/$dataset/$filename
       switch=0
    fi
    sleep 10
