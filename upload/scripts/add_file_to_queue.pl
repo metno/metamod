@@ -47,7 +47,7 @@ sub getTargetDir {
     $dir = File::Spec->catdir( $dir, $finalDir );
     return File::Spec->catpath( $vol, $dir, "" );
 }
-use lib ( getTargetDir('lib'), getTargetDir('scripts', '../../common/lib') );
+use lib ( getTargetDir('lib'), getTargetDir('scripts'), '../../common/lib' );
 use TheSchwartz;
 use Metamod::Queue;
 
