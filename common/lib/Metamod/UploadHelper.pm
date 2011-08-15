@@ -252,6 +252,12 @@ sub add_user_error {
     $self->user_errors($user_errors);
 }
 
+sub reset_user_errors {
+    my $self = shift;
+
+    $self->user_errors([]);
+}
+
 =head2 process_upload
 
 
@@ -319,6 +325,9 @@ sub process_files {
     my $xml_history_directory = $webrun_directory . '/XML/history';
     my $problem_dir_path      = $webrun_directory . "/upl/problemfiles";
     my $starting_dir          = getcwd();
+
+    # need to reset the user error messages for each upload.
+    $self->reset_user_errors();
 
     # called with multiple files (ftp) or single (web)?
     my %files_to_process = ref $input_files ? %$input_files : ( $input_files => 1 );
