@@ -42,8 +42,15 @@ WEBRUN_DIRECTORY = [==BASE_DIRECTORY==]/webrun
 
 # Mail address for person/group responsible for daily operation of the file
 # repository. Used for automatically sent notifications when manual action is
-# needed:
+# needed. Also used as login name for the Admin user added to the user
+# database while this database is initialized:
 OPERATOR_EMAIL = someuser@somedomain.com
+
+# Institution set up for the Admin user during user database initialization:
+OPERATOR_INSTITUTION = someinstitution
+
+# Specify here if you want to use external SMTP relay instead of localhost MTA
+SMTP_RELAY = smtp.example.com
 
 # ============== Logging configuration ==================
 LOG4PERL_CONFIG = [==TARGET_DIRECTORY==]/log4perl_config.ini
@@ -284,6 +291,10 @@ UPLOAD_DIRECTORY = [==WEBRUN_DIRECTORY==]/webupload
 
 # Directory path for files uploaded by FTP:
 UPLOAD_FTP_DIRECTORY = [==WEBRUN_DIRECTORY==]/ftpupload
+
+# Schedule for FTP upload monitor
+FTP_CRONTAB     = 30 04 * * *
+CLEANUP_CRONTAB = 15 00 * * *
 
 # Required minimum file age (number of minutes) for initiating processing
 # of files uploaded through the WEB interface. Files less than this age will

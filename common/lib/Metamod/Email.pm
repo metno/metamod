@@ -91,7 +91,12 @@ sub send_simple_email {
 
     my ( $bcc, $body, $cc, $from, $subject, $to ) = @params{qw(bcc body cc from subject to)};
 
-    my $mailer = Mail::Mailer->new();
+    my $config = Metamod::Config->new();
+    my $logger = Log::Log4perl->get_logger('metamod.email');
+    my $smtp = $config->has('SMTP_RELAY') ? $config->get('SMTP_RELAY') : undef;
+    $logger->debug("Using SMTP server <$smtp>");
+    #my $mailer = Mail::Mailer->new();
+    my $mailer = $smtp ? Mail::Mailer->new('smtp', Server => $smtp) : Mail::Mailer->new();
 
     my %mail_headers = ();
     $mail_headers{From}    = $from;
@@ -100,11 +105,11 @@ sub send_simple_email {
     $mail_headers{Bcc}     = $bcc if 0 != @$bcc;
     $mail_headers{Subject} = $subject;
 
+    $logger->debug("Message from $from to " . join(',', @$to) . " regarding \"$subject\":\n$body");
+
     $mailer->open(\%mail_headers);
     print $mailer $body;
-
-    my $success = close $mailer;
-
+    my $success = $mailer->close; # avoid dreaded Can't locate object method "CLOSE"... when using smtp
     if( !$success ){
         die "Could not send the email: $!";
     }

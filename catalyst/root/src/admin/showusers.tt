@@ -17,6 +17,10 @@
             [% END %])
         </i>
     </td>
+    <td>
+        <form action="[% c.uri_for('/admin/useradmin/delete', u.u_id) %]" method="post">
+            <input type="submit" value="Delete user"/>
+        </form>
 </tr>
 
 [% END %]

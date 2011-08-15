@@ -169,8 +169,8 @@ sub register : Path('register') :Args(0) {
 
     $self->send_operator_email($c, $new_user);
 
-    $self->add_info_msgs($c, 'New user has been request. A receipt has been sent to your email');
-    $c->res->redirect($c->uri_for('/login', $c->req->params ));
+    $self->add_info_msgs($c, 'New user has been requested. A receipt has been sent to your email');
+    $c->res->redirect($c->uri_for('/login' ));
 
 }
 
@@ -198,9 +198,11 @@ sub validate_new_user : Private {
             telephone => 'Telephone',
             realname => 'Name',
         },
-        msgs => sub {
-            email => 'Invalid email address',
-            username_constraint => "Invalid username. Only user letters, '_' and numbers, or same as email",
+        msgs => {
+            constraints => {
+                email => 'Invalid email address',
+                username_constraint => "Invalid username. Only user letters, '_' and numbers, or same as email",
+            }
         }
     );
     my $validator = MetamodWeb::Utils::FormValidator->new( validation_profile => \%form_profile );
@@ -250,15 +252,15 @@ sub send_operator_email {
     my ($self, $c, $new_user) = @_;
 
     my $mm_config = $c->stash->{mm_config};
-    my $local_url = $mm_config->get('LOCAL_URL');
+    my $local_url = $mm_config->get('BASE_PART_OF_EXTERNAL_URL') . $mm_config->get('LOCAL_URL');
 
     # Normally uri_for will return relative URI's when Plugin::SmartURI is loaded,
     # so we must explicitly ask for the absolute URI.
-    my $approve_url = $c->uri_for( $local_url, 'admin/confirm_user', $new_user->u_id())->absolute();
+    my $approve_url = "$local_url/admin/confirm_user/" . $new_user->u_id(); # can't use uri_for in email
 
     my $email_body = <<"END_BODY";
 A new user has been registred. Please check the information
-and approve the user if the information is ok.
+and approve the user if the information is ok, or reject if not.
 
 $approve_url
 END_BODY
@@ -268,7 +270,7 @@ END_BODY
 
     Metamod::Email::send_simple_email(
         to => [ $operator_email ],
-        from => 'dummy@example.com',
+        from => 'metamod@' . $mm_config->get('SERVER'),
         subject => "$application_name new user registred",
         body => $email_body,
     );
@@ -383,11 +385,11 @@ sub send_role_request {
     my ( $c, $role ) = @_;
 
     my $mm_config = $c->stash->{mm_config};
-    my $local_url = $mm_config->get('LOCAL_URL');
+    my $local_url = $mm_config->get('BASE_PART_OF_EXTERNAL_URL') . $mm_config->get('LOCAL_URL');
 
     # Normally uri_for will return relative URI's when Plugin::SmartURI is loaded,
     # so we must explicitly ask for the absolute URI.
-    my $approve_url = $c->uri_for( $local_url, 'admin/confirm_role', $role, $c->user()->u_loginname() )->absolute();
+    my $approve_url = "$local_url/admin/confirm_role/$role/" . $c->user()->u_loginname(); # can't use uri_for in email
 
     my $email_body = <<"END_BODY";
 A user has requested a new role. Please check the information

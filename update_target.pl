@@ -332,7 +332,7 @@ my $appuser = &substituteval($conf{'APPLICATION_USER'}) if exists $conf{APPLICAT
 my $webrun = &substituteval($conf{'WEBRUN_DIRECTORY'}) if exists $conf{WEBRUN_DIRECTORY};
 if ($appuser) {
    my $owner = getpwuid( (stat($webrun))[4] );
-   print STDERR "webrun dir '$webrun' is owned by user '$owner'\n";
+#   print STDERR "webrun dir '$webrun' is owned by user '$owner'\n";
    warn "Webrun directory ($webrun) should be owned by user $appuser (not $owner)" unless $owner eq $appuser;
 }
 

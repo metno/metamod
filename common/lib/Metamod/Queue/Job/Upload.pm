@@ -26,32 +26,7 @@ use File::Spec;
 use Params::Validate qw(:all);
 use Log::Log4perl qw(get_logger);
 
-# small routine to get lib-directories relative to the installed file
-sub getTargetDir {
-    my ($finalDir) = @_;
-    my ( $vol, $dir, $file ) = File::Spec->splitpath(__FILE__);
-    $dir = $dir ? File::Spec->catdir( $dir, ".." ) : File::Spec->updir();
-    $dir = File::Spec->catdir( $dir, $finalDir );
-    return File::Spec->catpath( $vol, $dir, "" );
-}
-
-use lib ( '../../common/lib', getTargetDir('lib'), getTargetDir('scripts') );
-
-use Metamod::UploadMonitor qw(
-    init
-    syserrorm
-    get_dataset_institution
-    clean_up_problem_dir
-    clean_up_repository
-    ftp_process_hour
-    web_process_uploaded
-    testafile
-    %dataset_institution
-    %ftp_events
-    $file_in_error_counter
-    $config
-);
-
+use Metamod::UploadHelper;
 
 use Moose;
 use namespace::autoclean;
@@ -74,12 +49,6 @@ requirements change.
 
 =cut
 
-sub BUILD {
-    my $self = shift;
-
-    &init; # setup UploadMonitor
-}
-
 =head2 process_file
 
 Do upload processing for the file indicated
@@ -94,7 +63,7 @@ Do upload processing for the file indicated
 
 =item type
 
-Must be either 'INDEX' or 'TEST'
+Must be either 'FTP', 'WEB' or 'TAF' (test-a-file)
 
 A text string in a format that is more readable than mere byte size.
 
@@ -105,23 +74,13 @@ A text string in a format that is more readable than mere byte size.
 sub process_file {
     my $self = shift;
 
+    my $upload_helper = Metamod::UploadHelper->new();
     my ( $jobid, $file, $type ) =
         validate_pos( @_, 1, 1, 1 );
-
     my $logger = get_logger('job');
 
-    $logger->debug("Processing file $file...");
-
-    &get_dataset_institution( \%dataset_institution );
-
-    if ($type eq 'INDEX') {
-        web_process_uploaded($file);
-    } elsif ($type eq 'TEST') {
-        testafile($file);
-    } else {
-        $logger->error('Unknown job type');
-    }
-
+    $logger->debug("Processing file $file ($type)");
+    $upload_helper->process_upload($file, $type);
     $logger->debug('Job done');
     return 1;
 

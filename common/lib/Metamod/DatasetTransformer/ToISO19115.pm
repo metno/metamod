@@ -35,6 +35,7 @@ use strict;
 use warnings;
 use Metamod::ForeignDataset;
 use Metamod::DatasetTransformer;
+use Metamod::DatasetTransformer::ToDIF;
 use Carp qw(croak);
 use Log::Log4perl;
 
@@ -74,7 +75,7 @@ sub foreignDataset2iso19115 {
         $_logger->debug("foreignDataset is does map to internal, converting to internal->DIF->ISO");
         my ($xmdDoc, $xmlDoc) = $transformer->transform();
         # transform to dif
-        require Metamod::DatasetTransformer::ToDIF;
+        # require Metamod::DatasetTransformer::ToDIF; # must 'use' instead since INC not working after chdir
         $difFds = Metamod::DatasetTransformer::ToDIF::foreignDataset2Dif($foreignDataset);
     } else {
         my %info = $foreignDataset->getInfo();

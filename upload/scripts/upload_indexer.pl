@@ -78,7 +78,7 @@ use Metamod::UploadUtils qw(notify_web_system
     $target_directory
     $local_url
     $shell_command_error
-    @user_errors);
+    @user_errors); # FIXME - rewrite to use Metamod::UploadHelper
 
 $| = 1;
 

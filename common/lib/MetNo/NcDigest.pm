@@ -7,6 +7,8 @@ use base 'Exporter';
 
 our @EXPORT_OK = qw( digest );
 
+use Carp;
+use Cwd;
 use File::Spec;
 use XML::Simple qw(:strict);
 use Metamod::Dataset;
@@ -166,7 +168,7 @@ sub digest {
     }
 
     my $usererrors_path = "nc_usererrors.out";
-    open (my $USERERRORS,'>', $usererrors_path);
+    open (my $USERERRORS,'>', $usererrors_path) or confess "Cannot open usererrors log in " . getcwd();
     foreach my $line (@user_errors) {
         print $USERERRORS $line;
     }

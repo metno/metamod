@@ -75,6 +75,7 @@ etc/default/catalyst-myapp
 =lib/Metamod/Config.pm
 =lib/Metamod/FimexProjections.pm
 =lib/Metamod/LoggerConfigParser.pm
+=lib/Metamod/PrintUsererrors.pm
 =lib/Metamod/Queue.pm
 =lib/Metamod/Queue/Job/PrepareDownload.pm
 =lib/Metamod/Queue/Job/Upload.pm
@@ -86,7 +87,7 @@ etc/default/catalyst-myapp
 =lib/Metamod/SubscriptionHandler/EmailToFile.pm
 =lib/Metamod/SubscriptionHandler/SMS.pm
 =lib/Metamod/SubscriptionUtils.pm
-=lib/Metamod/UploadMonitor.pm
+=lib/Metamod/UploadHelper.pm
 =lib/Metamod/UploadUtils.pm
 =lib/Metamod/WMS.pm
 =lib/Metamod/mmUserbase.pm

@@ -31,6 +31,9 @@ package Metamod::DatasetTransformer;
 use 5.6.0;
 use strict;
 use warnings;
+use Data::Dumper;
+use Cwd;
+use Carp;
 use Fcntl ':flock'; # import LOCK_* constants
 use File::Spec;
 use XML::LibXML;
@@ -42,6 +45,8 @@ use Log::Log4perl;
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 
 my $logger = Log::Log4perl::get_logger('metamod::common::Metamod::DatasetTransformer');
+
+my @plugins;
 
 # single parser
 use constant XMLParser => new XML::LibXML();
@@ -56,6 +61,7 @@ sub xslt_dir {
         return $config->get("SOURCE_DIRECTORY") . '/common/schema/';
     }
 }
+
 
 sub new {
     die "'new' not implemented yet in $_[0]: new(\$dataStr)\n";
@@ -107,14 +113,17 @@ sub getFileContent {
 }
 
 sub getPlugins {
+    return @plugins if @plugins;
     my $classPath = __PACKAGE__;
     $classPath = File::Spec->catfile(split '::', $classPath);
     $classPath .= '.pm';
     my $fullClassPath = $INC{$classPath};
     my $basePluginPath = $fullClassPath;
     $basePluginPath =~ s/\.pm$//;
+    #$logger->debug(" *** \$classPath=$classPath \$basePluginPath=$basePluginPath");
+    #print STDERR Dumper \@INC;
     my $d;
-    opendir $d, $basePluginPath or die "cannot read DatasetTransformer dir at $basePluginPath\n";
+    opendir $d, $basePluginPath or die "cannot read DatasetTransformer dir at $basePluginPath\nCurrent dir is ". cwd(); # this will most probably fail
     my @files = grep {/\.pm$/ && -f File::Spec->catfile($basePluginPath,$_)} readdir $d;
     closedir $d;
 
@@ -131,6 +140,10 @@ sub getPlugins {
         push @plugins, $plugin;
     }
     return @plugins;
+}
+
+BEGIN {
+    @plugins = getPlugins();
 }
 
 # difficult to unit-test, since options for $plugin->new are unknown (xslt files)
@@ -285,4 +298,3 @@ Heiko Klein, E<lt>H.Klein@met.noE<gt>
 L<XML::LibXML>
 
 =cut
-

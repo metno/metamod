@@ -82,6 +82,7 @@ sub new {
 
     if ((! -f $config_file) and (! -r $config_file)) {
         die "Cannot read config-file: $config_file";
+        $_config->initLogger; # staticInitLogger ?
     }
 
     $config_file = _normalizeFile($config_file);

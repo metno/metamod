@@ -28,7 +28,12 @@ email that a new file has become available.
 
 See documentation in base class.
 
+=head1 TODO
+
+Rewrite to use Metamod::Email::send_simple_email() - FIXME
+
 =cut
+
 sub push_to_subscribers {
     my $self = shift;
 

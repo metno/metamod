@@ -53,6 +53,18 @@ LOG4PERL_WATCH_TIME = 30
 LOG4PHP_CONFIG = [==TARGET_DIRECTORY==]/log4php_config.ini
 LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
 
+# Mail address for person/group responsible for daily operation of the file
+# repository. Used for automatically sent notifications when manual action is
+# needed. Also used as login name for the Admin user added to the user
+# database while this database is initialized:
+OPERATOR_EMAIL = Substituted by test_application.sh
+
+# Institution set up for the Admin user during user database initialization:
+OPERATOR_INSTITUTION = Substituted by test_application.sh
+
+# Specify here if you want to use external SMTP relay instead of localhost MTA
+SMTP_RELAY = smtp.met.no
+
 # ============== Catalyst configuration =================
 ## File path for generated Catalyst config
 ##CATALYST_SITE_CONFIG = [==TARGET_DIRECTORY==]/metamodweb.json
@@ -268,6 +280,10 @@ UPLOAD_DIRECTORY = Substituted by test_application.sh
 # Directory path for files uploaded by FTP:
 UPLOAD_FTP_DIRECTORY = Substituted by test_application.sh
 
+# Schedule for FTP upload monitor
+FTP_CRONTAB     = */5 * * * *
+CLEANUP_CRONTAB = 30  * * * *
+
 # Required minimum file age (number of minutes) for initiating processing
 # of files uploaded through the WEB interface. Files less than this age will
 # postpone processing (in the upload_monitor.pl script) of all files with
@@ -318,11 +334,6 @@ EMAIL_BODY_WHEN_UPLOAD_ERROR =
 # in an uploaded file:
 EMAIL_SUBJECT_WHEN_UPLOAD_ERROR = METAMOD file upload error
 
-# Mail address for person/group responsible for daily operation of the file
-# repository. Used for automatically sent notifications when manual action is
-# needed:
-OPERATOR_EMAIL = Substituted by test_application.sh
-
 # Mail address used in the "from" field on automatically sent E-mails to
 # users:
 FROM_ADDRESS = [==OPERATOR_EMAIL==]
@@ -338,13 +349,13 @@ EMAIL_SIGNATURE =
 # METAMOD 2.x software. The initial content will only be used if no ftp_events
 # file already exists.
 FTP_EVENTS_INITIAL_CONTENT =
- oce        100 0 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
- msm        100 0 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
- eol        100 0 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
- met        100 0 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
- test1      100 0 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
- test2      100 0 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
- osisaf     100 0 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+ oce        1 0 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+ msm        1 0 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+ eol        1 0 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+ met        1 0 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+ test1      1 0 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+ test2      1 0 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+ osisaf     1 0 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
 
 # Institutions available in the new user registration form:
 INSTITUTION_LIST =

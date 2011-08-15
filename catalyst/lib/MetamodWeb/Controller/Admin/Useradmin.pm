@@ -60,13 +60,36 @@ Use for listing users
 =cut
 
 sub useradmin :Path('/admin/useradmin') :Args(0) {
-    # if no args, show list of files in xml dir
+    # if no args, show list of registered users
     my ( $self, $c ) = @_;
 
     $c->stash(
         template => 'admin/showusers.tt',
         users => [ $c->model('Userbase::Usertable')->all ],
     );
+
+}
+
+=head2 /admin/useradmin/delete
+
+Use for deleting users
+
+=cut
+
+sub deleteuser :Path('/admin/useradmin/delete') :Args(1) { # delete user
+
+    my ( $self, $c ) = @_;
+
+    if ( $c->req->method() eq 'POST' ) {
+        try {
+            my $user = $c->model('Userbase::Usertable')->find( $c->req->args->[0] );
+            $user->delete if defined $user;
+        } catch {
+            $c->stash( error => $_ );
+        }
+    } # ignore GET requests
+
+    $c->res->redirect( $c->uri_for('/admin/useradmin') );
 
 }
 

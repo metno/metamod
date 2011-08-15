@@ -1,0 +1,702 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<digest_nc>
+   <!-- The file_structures element contains a sequence of structure elements -->
+   <file_structures>
+      <!-- Any number of specific structure elements are allowed. These are designed to
+           give special rules for specific datasets or classes of datasets. Each specific
+           structure element has a regex attribute that contains a regular expression
+           (perl style). This regular expression is matched against the path to the XML file
+           for the dataset (this path will contain the dataset name). This path is found
+           from the file name of the files to be imported. Files
+           that matches is treated according to the rules in the matching specific structure
+           element, in addition to the default rules (see below). Specific rules overrides
+           the default rules if they can not simultaneously be satisfied. -->
+      <structure name="icedrift" regex="/icedriftC[^/]*$">
+         <set switch="%IS_INSITU" />
+         <set_global_attribute_value name="gcmd_keywords">
+            Cryosphere > Sea Ice > Sea Ice Motion
+            Oceans > Sea Ice > Sea Ice Motion
+         </set_global_attribute_value>
+         <variables_of_type name="%Data_latitude">
+            latitude_reference
+         </variables_of_type>
+         <variables_of_type name="%Data_longitude">
+            longitude_reference
+         </variables_of_type>
+      </structure>
+      <!-- The default structure element gives rules that are applied for all files,
+           unless overridden by specific rules (see above). -->
+      <structure name="default">
+         <!-- Global swiches are initialized for each new file to a value of FALSE. They must
+              be declared in the default structure, but can be set (to TRUE) in a specific
+              structure element. They may also be set by the digest_nc.pl program. -->
+         <global switches="%IS_GRIDDED %IS_INSITU" />
+         <!-- Global lists are initialized for each new file to an empty list. The digest_nc.pl
+              program will add to the lists according to what it finds in the netCDF file, and
+              according to the rules given in this file. -->
+         <global lists="%VERTICAL %CASE %LEGALVARNAME" />
+         <!-- Variables encountered in the netCDF files are classified into various types.
+              The variables_of_type elements are used to force such classification according
+              to the variable name. -->
+         <variables_of_type name="%Coordinate">
+            latitude
+            longitude
+         </variables_of_type>
+         <!-- The investigate_data_dimensions element will investigate the dimension strings
+              for each variable (as shown in a CDL file). If the dimension string matches
+              the regular expression (found in attribute rex), then two things might happen:
+              1. If the regular expression contains a subexpression within parantheses, and
+              the element has an addmatches attribute, then the string that matches the
+              subexpression is added to the list given by the addmatches attribute.
+              2. If the element has an extendtype attribute, then the value of this attribute
+              is appended to the type name already allocated to the variable. -->
+         <investigate_data_dimensions>
+            <dim rex="^time,([^,]+),latitude,longitude$" addmatches="%VERTICAL" extendtype="_latlon" />
+            <dim rex="^time,([^,]+),Yc,Xc$" addmatches="%VERTICAL" extendtype="_ycxc" />
+            <dim rex="^time,latitude,longitude$" extendtype="_latlon" />
+            <dim rex="^time,Yc,Xc$" extendtype="_ycxc" />
+            <dim rex="^time$" extendtype="_time" />
+            <dim rex="^([^,]+),time$" addmatches="%CASE" extendtype="_casetime" />
+            <dim rex="^time,([^,]+)$" addmatches="%VERTICAL" extendtype="_timevertical" />
+            <dim rex="^([^,]+)$" addmatches="%CASE" extendtype="_case" />
+         </investigate_data_dimensions>
+         <!-- The attribute_aliases elements are used to set up aliases for netCDF attribute
+              names. If any of these aliases are used in the netCDF files, they are
+              translated to the standardized attribute name. If an errmsg attribute is
+              found in the element where one of the aliases matches an attribute value in the
+              netCDF file, the data provider will recieve an error message according to the
+              value of the errmsg attribute. -->
+         <attribute_aliases name="institution" errmsg="not_standard_attribute_name">
+             Institution
+             INSTITUTION
+         </attribute_aliases>
+         <attribute_aliases name="title" errmsg="not_standard_attribute_name">
+             Title
+             TITLE
+         </attribute_aliases>
+         <attribute_aliases name="abstract" errmsg="not_standard_attribute_name">
+             Abstract
+             ABSTRACT
+         </attribute_aliases>
+         <attribute_aliases name="topiccategory" errmsg="not_standard_attribute_name">
+             Topiccategory
+             TopicCategory
+             topicCategory
+             TOPICCATEGORY
+         </attribute_aliases>
+         <attribute_aliases name="keywords" errmsg="not_standard_attribute_name">
+             Keywords
+             KEYWORDS
+             keyword
+             Keyword
+             KEYWORD
+         </attribute_aliases>
+         <attribute_aliases name="gcmd_keywords" errmsg="not_standard_attribute_name">
+             Gcmd_keywords
+             GCMD_keywords
+             GCMD_KEYWORDS
+             gcmd_keyword
+             Gcmd_keyword
+             GCMD_keyword
+             GCMD_KEYWORD
+         </attribute_aliases>
+         <attribute_aliases name="activity_type" errmsg="not_standard_attribute_name">
+             Activity_type
+             ACTIVITY_TYPE
+         </attribute_aliases>
+         <attribute_aliases name="product_name" errmsg="not_standard_attribute_name">
+             Product_name
+             PRODUCT_NAME
+         </attribute_aliases>
+         <attribute_aliases name="area" errmsg="not_standard_attribute_name">
+             Area
+             AREA
+         </attribute_aliases>
+         <attribute_aliases name="southernmost_latitude" errmsg="not_standard_attribute_name">
+             Southernmost_latitude
+             SOUTHERNMOST_LATITUDE
+         </attribute_aliases>
+         <attribute_aliases name="northernmost_latitude" errmsg="not_standard_attribute_name">
+             Northernmost_latitude
+             NORTHERNMOST_LATITUDE
+         </attribute_aliases>
+         <attribute_aliases name="westernmost_longitude" errmsg="not_standard_attribute_name">
+             Westernmost_longitude
+             WESTERNMOST_LONGITUDE
+         </attribute_aliases>
+         <attribute_aliases name="easternmost_longitude" errmsg="not_standard_attribute_name">
+             Easternmost_longitude
+             EASTERNMOST_LONGITUDE
+         </attribute_aliases>
+         <attribute_aliases name="start_date" errmsg="not_standard_attribute_name">
+             Start_date
+             START_DATE
+         </attribute_aliases>
+         <attribute_aliases name="stop_date" errmsg="not_standard_attribute_name">
+             Stop_date
+             STOP_DATE
+         </attribute_aliases>
+         <attribute_aliases name="PI_name" errmsg="not_standard_attribute_name">
+             pi_name
+             Pi_name
+             PI_NAME
+         </attribute_aliases>
+         <attribute_aliases name="contact" errmsg="not_standard_attribute_name">
+             Contact
+             CONTACT
+         </attribute_aliases>
+         <attribute_aliases name="distribution_statement" errmsg="not_standard_attribute_name">
+             Distribution_statement
+             DISTRIBUTION_STATEMENT
+         </attribute_aliases>
+         <attribute_aliases name="project_name" errmsg="not_standard_attribute_name">
+             Project_name
+             PROJECT_NAME
+         </attribute_aliases>
+         <!-- The global_attributes element gives rules for global attributes in a netCDF file.
+              Each attribute has a separate att element. Note that netCDF files may have
+              global attribues that have no corresponding att element. For such global
+              attributes there are no restrictions. Within each att element, rule elements
+              may be found:
+              The 'mandatory' element says that the attribute is mandatory. It can be made
+              conditional if the 'only_if' attribute is applied within the element.
+              The 'aggregate' element tells how the netCDF attribute should be aggregated
+              to one value if the same attribute is found in several files within the same
+              dataset.
+              The 'breaklines' element is used to break up an attribute value that is a long
+              text string without newlines. The 'value' attribute represents the max line
+              length that is enforced.
+              The 'multivalue' element is used to split a netCDF attribute value into several
+              values that each is used as a separate entity within the metadata database.
+              The 'seperator' attribute within this element is a regular expression that
+              tells how the values are separated.
+              The 'convert' element is used to convert values to a standardised form.
+              The 'vocabulary' element gives a vocabulary that the netCDF attribute values
+              must adhere to. -->
+         <global_attributes>
+            <att name="title">
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" errmsg="globatt_different_values" />
+            </att>
+            <att name="abstract">
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" errmsg="globatt_different_values" />
+               <breaklines value="80" />
+            </att>
+            <att name="topiccategory">
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <multivalue separator="\s*,\s*" />
+               <aggregate rule="take_union" />
+               <convert dummy="dummy">
+                  Biota :TO: biota
+                  ClimatologyMeteorologyAtmosphere :TO: climatologyMeteorologyAtmosphere
+                  Environment :TO: environment
+                  Geoscientificinformation :TO: geoscientificinformation
+                  ImageryBaseMapsEarthCover :TO: imageryBaseMapsEarthCover
+                  InlandWaters :TO: inlandWaters
+                  Oceans :TO: oceans
+                  Society :TO: society
+               </convert>
+               <vocabulary on_error="notuse" errmsg="illegal_global_att_val">
+                  farming
+                  biota
+                  boundaries
+                  climatologyMeteorologyAtmosphere
+                  economy
+                  elevation
+                  environment
+                  geoscientificinformation
+                  health
+                  imageryBaseMapsEarthCover
+                  intelligenceMilitary
+                  inlandWaters
+                  location
+                  oceans
+                  planningCadastre
+                  society
+                  structure
+                  transportation
+                  utilitiesCommunication
+               </vocabulary>
+            </att>
+            <att name="keywords">
+               <multivalue separator="\s*,\s*" />
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="take_union" />
+            </att>
+            <att name="activity_type">
+               <multivalue separator="\s*,\s*" />
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="take_union" />
+               <vocabulary on_error="use" errmsg="illegal_global_att_val">
+                  Moored instrument
+                  Cruise
+                  Aircraft
+                  Model run
+                  Land station
+                  Ice station
+                  Submersible
+                  Float
+                  Space borne instrument
+                  Other
+               </vocabulary>
+            </att>
+            <att name="Conventions">
+               <multivalue separator="\s*,\s*" />
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" errmsg="globatt_different_values" />
+               <vocabulary on_error="use" errmsg="illegal_global_att_val">
+                  CF-1.0
+                  CF-1.1
+                  CF-1.2
+                  CF-1.3
+                  CF-1.4
+               </vocabulary>
+            </att>
+            <att name="product_name">
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" errmsg="globatt_different_values" />
+            </att>
+            <att name="product_version">
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" />
+            </att>
+            <att name="software_version">
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" />
+            </att>
+            <att name="references">
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" />
+            </att>
+            <att name="history">
+               <multivalue separator="\s*\n\s*" />
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" />
+               <vocabulary on_error="use" errmsg="illegal_global_att_val" escapes="%ISODATE %ANYSTRING %hh %mm %ss">
+                  %ISODATE creation%ANYSTRING
+                  %ISODATE publication%ANYSTRING
+                  %ISODATE revision%ANYSTRING
+                  %ISODATE %hh:%mm UTC creation%ANYSTRING
+                  %ISODATE %hh:%mm UTC publication%ANYSTRING
+                  %ISODATE %hh:%mm UTC revision%ANYSTRING
+                  %ISODATE %hh:%mm:%ss UTC creation%ANYSTRING
+                  %ISODATE %hh:%mm:%ss UTC publication%ANYSTRING
+                  %ISODATE %hh:%mm:%ss UTC revision%ANYSTRING
+                  %ISODATE %hh:%mm creation%ANYSTRING
+                  %ISODATE %hh:%mm publication%ANYSTRING
+                  %ISODATE %hh:%mm revision%ANYSTRING
+                  %ISODATE %hh:%mm:%ss creation%ANYSTRING
+                  %ISODATE %hh:%mm:%ss publication%ANYSTRING
+                  %ISODATE %hh:%mm:%ss revision%ANYSTRING
+                  %ISODATE %hh:%mmZ creation%ANYSTRING
+                  %ISODATE %hh:%mmZ publication%ANYSTRING
+                  %ISODATE %hh:%mmZ revision%ANYSTRING
+                  %ISODATE %hh:%mm:%ssZ creation%ANYSTRING
+                  %ISODATE %hh:%mm:%ssZ publication%ANYSTRING
+                  %ISODATE %hh:%mm:%ssZ revision%ANYSTRING
+               </vocabulary>
+            </att>
+            <att name="area">
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <multivalue separator="\s*,\s*" />
+               <aggregate rule="take_union" />
+               <vocabulary on_error="use" errmsg="illegal_global_att_val">
+                  Arctic Ocean
+                  Barents Sea
+                  Beufort Sea
+                  Chukchi Sea
+                  Denmark Strait Sea
+                  East Siberian Sea
+                  Fram Strait
+                  Greenland Sea
+                  Iceland Sea
+                  Kara Sea
+                  Laptev Sea
+                  Nordic Seas
+                  Northern Hemisphere
+                  White Sea
+               </vocabulary>
+            </att>
+            <att name="grid_projection">
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" />
+               <vocabulary on_error="use" errmsg="illegal_global_att_val">
+                  lat-lon
+                  albers_conical_equal_area
+                  azimuthal_equidistant
+                  lambert_azimuthal_equal_area
+                  lambert_conformal_conic
+                  polar_stereographic
+                  rotated_latitude_longitude
+                  stereographic
+                  transverse_mercator
+               </vocabulary>
+            </att>
+            <att name="southernmost_latitude">
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="take_lowest" />
+               <vocabulary on_error="notuse" errmsg="illegal_global_att_val" escapes="%LATITUDE">
+                  %LATITUDE
+               </vocabulary>
+            </att>
+            <att name="northernmost_latitude">
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="take_highest" />
+               <vocabulary on_error="notuse" errmsg="illegal_global_att_val" escapes="%LATITUDE">
+                  %LATITUDE
+               </vocabulary>
+            </att>
+            <att name="latitude_resolution">
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" />
+            </att>
+            <att name="westernmost_longitude">
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="take_lowest" />
+               <vocabulary on_error="notuse" errmsg="illegal_global_att_val" escapes="%LONGITUDE">
+                  %LONGITUDE
+               </vocabulary>
+            </att>
+            <att name="easternmost_longitude">
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="take_highest" />
+               <vocabulary on_error="notuse" errmsg="illegal_global_att_val" escapes="%LONGITUDE">
+                  %LONGITUDE
+               </vocabulary>
+            </att>
+            <att name="longitude_resolution">
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" />
+            </att>
+            <att name="minimum_altitude">
+               <aggregate rule="take_lowest" />
+            </att>
+            <att name="maximum_altitude">
+               <aggregate rule="take_highest" />
+            </att>
+            <att name="start_date">
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="take_lowest_date" />
+               <vocabulary on_error="notuse" errmsg="illegal_global_att_val" escapes="%ISODATE %hh %mm %ss">
+                  %ISODATE %hh:%mm:%ss UTC
+                  %ISODATE %hh:%mm UTC
+                  %ISODATE %hh:%mm:%ss
+                  %ISODATE %hh:%mm
+                  %ISODATE %hh:%mm:%ssZ
+                  %ISODATE %hh:%mmZ
+                  %ISODATE
+               </vocabulary>
+            </att>
+            <att name="stop_date">
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="take_highest_date" />
+               <vocabulary on_error="notuse" errmsg="illegal_global_att_val" escapes="%ISODATE %hh %mm %ss">
+                  %ISODATE %hh:%mm:%ss UTC
+                  %ISODATE %hh:%mm UTC
+                  %ISODATE %hh:%mm:%ss
+                  %ISODATE %hh:%mm
+                  %ISODATE %hh:%mm:%ssZ
+                  %ISODATE %hh:%mmZ
+                  %ISODATE
+               </vocabulary>
+            </att>
+            <att name="field_type">
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" />
+               <vocabulary on_error="use" errmsg="illegal_global_att_val" escapes="%i">
+                  hourly
+                  daily
+                  weekly
+                  monthly
+                  yearly
+                  %i-hourly
+                  %i-daily
+                  %i-weekly
+                  %i-monthly
+                  %i-yearly
+                  monthly climatology
+               </vocabulary>
+            </att>
+            <att name="institution">
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" errmsg="globatt_different_values" />
+            </att>
+            <att name="Platform_name">
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" />
+            </att>
+            <att name="PI_name">
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" errmsg="globatt_different_values" />
+            </att>
+            <att name="contact">
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" />
+               <vocabulary on_error="notuse" errmsg="illegal_global_att_val" escapes="%EMAIL">
+                  %EMAIL
+               </vocabulary>
+            </att>
+            <att name="distribution_statement">
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" errmsg="globatt_different_values" />
+               <vocabulary on_error="use" errmsg="illegal_global_att_val">
+                  Free
+                  Restricted
+               </vocabulary>
+            </att>
+            <att name="operational_status">
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" />
+            </att>
+            <att name="quality_index">
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" />
+               <vocabulary on_error="notuse" errmsg="illegal_global_att_val">
+                  0
+                  1
+                  2
+                  3
+               </vocabulary>
+            </att>
+            <att name="project_name">
+               <mandatory on_error="cry_but_continue" errmsg="missing_global_att" />
+               <aggregate rule="all_should_be_equal_IFNOT_take_last" errmsg="globatt_different_values" />
+            </att>
+            <att name="gcmd_keywords">
+               <multivalue separator="\s*\n\s*" />
+               <aggregate rule="take_union" />
+            </att>
+         </global_attributes>
+         <!-- The 'variable' elements give rules for variables within the netCDF file.
+              Each netCDF variable may have a separate 'variable' element. Note that netCDF
+              files may have variables that have no corresponding 'variable' element. For
+              such variables there are no restrictions.
+              Each 'variable' element is identified with a 'name' attribute. The value of
+              this attribute is usually the name of the netCDF variable, but it may
+              alternatively be the name of a variable type. Variable type names are
+              distinguished from variable names by starting with a '%' character.
+              A 'variable' element identified by a variable type contains rules that
+              all variables of this type must obey.
+              The 'variable' elements may contain the following elements:
+              - A 'mandatory' element. See description of the 'mandatory' element for global
+              attributes.
+              - A 'dimensions' element listing the allowed dimension strings for the variable.
+              - One or more 'att' elements giving rules for the variable attributes. See
+              description of the 'att' elements for global attributes. -->
+         <variable name="time">
+            <mandatory on_error="cry_but_continue" errmsg="missing_mandatory_var" />
+            <dimensions on_error="use" errmsg="illegal_dimensions" escapes="%NONE %CASE">
+               time
+               %CASE
+               %NONE
+            </dimensions>
+            <att name="standard_name">
+               <mandatory on_error="cry_but_continue" errmsg="missing_att" />
+               <vocabulary on_error="use_first_in_vocabulary" errmsg="illegal_att_val">
+                  time
+               </vocabulary>
+            </att>
+            <att name="units">
+               <mandatory on_error="cry_but_continue" errmsg="missing_att" />
+               <vocabulary on_error="use" errmsg="illegal_att_val" escapes="%TIMEUNIT">
+                  %TIMEUNIT
+               </vocabulary>
+            </att>
+            <att name="axis">
+               <mandatory on_error="cry_but_continue" errmsg="missing_att" />
+               <vocabulary on_error="use" errmsg="illegal_att_val">
+                  T
+               </vocabulary>
+            </att>
+         </variable>
+         <variable name="Xc">
+            <mandatory only_if="%Data_grid_ycxc" on_error="cry_but_continue" errmsg="missing_mandatory_var" />
+            <dimensions on_error="use" errmsg="illegal_dimensions">
+               Xc
+            </dimensions>
+            <att name="axis">
+               <mandatory on_error="cry_but_continue" errmsg="missing_att" />
+               <vocabulary on_error="use" errmsg="illegal_att_val">
+                  X
+               </vocabulary>
+            </att>
+         </variable>
+         <variable name="Yc">
+            <mandatory only_if="%Data_grid_ycxc" on_error="cry_but_continue" errmsg="missing_mandatory_var" />
+            <dimensions on_error="use" errmsg="illegal_dimensions">
+               Yc
+            </dimensions>
+            <att name="axis">
+               <mandatory on_error="cry_but_continue" errmsg="missing_att" />
+               <vocabulary on_error="use" errmsg="illegal_att_val">
+                  Y
+               </vocabulary>
+            </att>
+         </variable>
+         <variable name="latitude">
+            <mandatory on_error="cry_but_continue" errmsg="missing_mandatory_var" />
+            <dimensions on_error="use" errmsg="illegal_dimensions" escapes="%NONE %CASE">
+               latitude
+               Yc,Xc
+               %CASE
+               time
+               %NONE
+            </dimensions>
+            <att name="standard_name">
+               <mandatory on_error="cry_but_continue" errmsg="missing_att" />
+               <vocabulary on_error="use" errmsg="illegal_att_val">
+                  latitude
+               </vocabulary>
+            </att>
+            <att name="units">
+               <mandatory on_error="cry_but_continue" errmsg="missing_att" />
+               <vocabulary on_error="use" errmsg="illegal_att_val">
+                  degree_north
+                  degrees_north
+               </vocabulary>
+            </att>
+            <att name="axis">
+               <mandatory only_if="DIMNAME_IS_VARNAME" on_error="cry_but_continue" errmsg="missing_att" />
+               <vocabulary on_error="use" errmsg="illegal_att_val">
+                  Y
+               </vocabulary>
+            </att>
+         </variable>
+         <variable name="longitude">
+            <mandatory on_error="cry_but_continue" errmsg="missing_mandatory_var" />
+            <dimensions on_error="use" errmsg="illegal_dimensions" escapes="%NONE %CASE">
+               longitude
+               Yc,Xc
+               %CASE
+               time
+               %NONE
+            </dimensions>
+            <att name="standard_name">
+               <mandatory on_error="cry_but_continue" errmsg="missing_att" />
+               <vocabulary on_error="use" errmsg="illegal_att_val">
+                  longitude
+               </vocabulary>
+            </att>
+            <att name="units">
+               <mandatory on_error="cry_but_continue" errmsg="missing_att" />
+               <vocabulary on_error="use" errmsg="illegal_att_val">
+                  degree_east
+                  degrees_east
+               </vocabulary>
+            </att>
+            <att name="axis">
+               <mandatory only_if="DIMNAME_IS_VARNAME" on_error="cry_but_continue" errmsg="missing_att" />
+               <vocabulary on_error="use" errmsg="illegal_att_val">
+                  X
+               </vocabulary>
+            </att>
+         </variable>
+         <variable name="%Coordinate_Z" if_in_list="%VERTICAL" comment="Vertical coordinate variable">
+            <dimensions escapes="%SINGLEWORD">
+               %SINGLEWORD
+            </dimensions>
+         </variable>
+         <variable name="%Data_grid_latlon" comment="Main gridded variable based on latlon grid">
+            <dimensions escapes="%VERTICAL">
+               time,%VERTICAL,latitude,longitude
+               time,latitude,longitude
+            </dimensions>
+            <att name="standard_name">
+               <vocabulary on_error="use" errmsg="illegal_att_val" escapes="%CF_STANDARD_NAME">
+                  %CF_STANDARD_NAME
+               </vocabulary>
+            </att>
+            <att name="units">
+               <mandatory on_error="cry_but_continue" errmsg="missing_att" />
+               <vocabulary on_error="use" errmsg="illegal_att_val" escapes="%UDUNIT">
+                  %UDUNIT
+               </vocabulary>
+            </att>
+            <att name="coordinates">
+               <multivalue separator="\s+" />
+               <vocabulary on_error="use" escapes="%LEGALVARNAME" errmsg="coordinate_not_found">
+                  %LEGALVARNAME
+               </vocabulary>
+            </att>
+         </variable>
+         <variable name="%Data_grid_ycxc" comment="Main gridded variable based on YcXc grid">
+            <dimensions escapes="%VERTICAL">
+               time,%VERTICAL,Yc,Xc
+               time,Yc,Xc
+            </dimensions>
+            <att name="standard_name">
+               <vocabulary on_error="use" errmsg="illegal_att_val" escapes="%CF_STANDARD_NAME">
+                  %CF_STANDARD_NAME
+               </vocabulary>
+            </att>
+            <att name="units">
+               <mandatory on_error="cry_but_continue" errmsg="missing_att" />
+               <vocabulary on_error="use" errmsg="illegal_att_val" escapes="%UDUNIT">
+                  %UDUNIT
+               </vocabulary>
+            </att>
+            <att name="coordinates">
+               <multivalue separator="\s+" />
+               <mandatory on_error="cry_but_continue" errmsg="missing_att" />
+               <vocabulary on_error="use" escapes="%LEGALVARNAME" errmsg="illegal_coordinate_att_val">
+                  latitude %MANDATORY
+                  longitude %MANDATORY
+                  %LEGALVARNAME
+               </vocabulary>
+            </att>
+         </variable>
+         <variable name="%Data_time" comment="Insitu timeseries variable">
+            <dimensions on_error="use" errmsg="illegal_dimensions">
+               time
+            </dimensions>
+            <att name="standard_name">
+               <vocabulary on_error="use" errmsg="illegal_att_val" escapes="%CF_STANDARD_NAME">
+                  %CF_STANDARD_NAME
+               </vocabulary>
+            </att>
+            <att name="units">
+               <mandatory on_error="cry_but_continue" errmsg="missing_att" />
+               <vocabulary on_error="use" errmsg="illegal_att_val" escapes="%UDUNIT">
+                  %UDUNIT
+               </vocabulary>
+            </att>
+         </variable>
+         <variable name="%Data_casetime" comment="Insitu timeseries variable for several cases">
+            <dimensions on_error="use" errmsg="illegal_dimensions" escapes="%CASE">
+               %CASE,time
+            </dimensions>
+            <att name="standard_name">
+               <vocabulary on_error="use" errmsg="illegal_att_val" escapes="%CF_STANDARD_NAME">
+                  %CF_STANDARD_NAME
+               </vocabulary>
+            </att>
+            <att name="units">
+               <vocabulary on_error="use" errmsg="illegal_att_val" escapes="%UDUNIT">
+                  %UDUNIT
+               </vocabulary>
+            </att>
+         </variable>
+         <variable name="%Data_timevertical" comment="Insitu timeseries variable for several vertical levels">
+            <dimensions on_error="use" errmsg="illegal_dimensions" escapes="%VERTICAL">
+               time,%VERTICAL
+            </dimensions>
+            <att name="standard_name">
+               <vocabulary on_error="use" errmsg="illegal_att_val" escapes="%CF_STANDARD_NAME">
+                  %CF_STANDARD_NAME
+               </vocabulary>
+            </att>
+            <att name="units">
+               <vocabulary on_error="use" errmsg="illegal_att_val" escapes="%UDUNIT">
+                  %UDUNIT
+               </vocabulary>
+            </att>
+         </variable>
+         <variable name="%Data_case" comment="Insitu variable for several cases">
+            <dimensions on_error="use" errmsg="illegal_dimensions" escapes="%CASE">
+               %CASE
+            </dimensions>
+            <att name="standard_name">
+               <vocabulary on_error="use" errmsg="illegal_att_val" escapes="%CF_STANDARD_NAME">
+                  %CF_STANDARD_NAME
+               </vocabulary>
+            </att>
+            <att name="units">
+               <vocabulary on_error="use" errmsg="illegal_att_val" escapes="%UDUNIT">
+                  %UDUNIT
+               </vocabulary>
+            </att>
+         </variable>
+      </structure>
+   </file_structures>
+</digest_nc>

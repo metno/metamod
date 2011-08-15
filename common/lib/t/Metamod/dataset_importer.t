@@ -10,12 +10,14 @@ use lib "$FindBin::Bin";
 
 use Test::More;
 
-my $config_file = "$FindBin::Bin/../master_config.txt";
-$ENV{METAMOD_MASTER_CONFIG}   = $config_file;
-$ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/../log4perl_config.ini";
+my $config_file;
 
 # We need to set this for SRU insert to work
 BEGIN {
+
+    $config_file = "$FindBin::Bin/../master_config.txt";
+    $ENV{METAMOD_MASTER_CONFIG}   = $config_file;
+    $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/../log4perl_config.ini";
     $ENV{METAMOD_XSLT_DIR} = "$FindBin::Bin/../../../schema/";
 }
 

@@ -7,5 +7,7 @@
 =scripts/show_time_now.pl
 =scripts/createChildDatasets.pl
 =scripts/load_userbase.pl
+=scripts/userbase_add_datasets.pl
+=scripts/add_file_to_queue.pl
 =etc/standard_name.txt
 =etc/conf_digest_nc.xsd

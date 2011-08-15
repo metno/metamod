@@ -47,7 +47,8 @@
 [% IF !userbase_user.u_password %]
 
     <form name="confirm" method="POST" action="[% c.uri_for('/admin/confirm_user', userbase_user.u_id ) %]">
-    <input type="submit" value="Approve" />
+        <input type="submit" name="action" value="Approve" />
+        <input type="submit" name="action" value="Reject" />
     </form>
 
 [% ELSE %]
