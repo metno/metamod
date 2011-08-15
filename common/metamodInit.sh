@@ -1,16 +1,38 @@
-#!/bin/sh
-webrun_directory="[==WEBRUN_DIRECTORY==]"
-target_directory="[==TARGET_DIRECTORY==]"
-system_log="[==LOG4ALL_SYSTEM_LOG==]"
+#!/bin/bash
 
-export PERL5LIB="$PERL5LIB:[==CATALYST_LIB==]"
+if [ $# != 2 ]
+then
+    echo "You must supply the config dir as a parameter"
+    exit 1
+fi
+
+if [ ! -r $2 ]
+then
+    echo "Cannot read the file "$2
+    exit 1
+fi
+
+# Load the configuration dynamically
+SCRIPT_PATH="`dirname \"$0\"`"
+source <(perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" "$2/master_config.txt")
+
+webrun_directory="$WEBRUN_DIRECTORY"
+target_directory="$TARGET_DIRECTORY"
+system_log="$LOG4ALL_SYSTEM_LOG"
+
+COMMON_LIB=$SCRIPT_PATH/lib
+export PERL5LIB="$PERL5LIB:$CATALYST_LIB:$COMMON_LIB"
 
 upload_monitor_pid=$webrun_directory/upload_monitor.pid
+upload_monitor_script=$SCRIPT_PATH/../upload/scripts/upload_monitor.pl
 ftp_monitor_pid=$webrun_directory/ftp_monitor.pid
-import_dataset_pid=$webrun_directory/import_dataset.pid
+ftp_monitor_script=$SCRIPT_PATH/../upload/scripts/ftp_monitor.pl
 prepare_download_pid=$webrun_directory/prepare_download.pid
+prepare_download_script=$SCRIPT_PATH/scripts/prepare_download.pl
 harvester_pid=$webrun_directory/harvester.pid
+harvester_script=$SCRIPT_PATH/../harvest/scripts/harvester.pl
 create_thredds_catalogs_pid=$webrun_directory/create_thredds_catalogs.pid
+create_thredds_catalogs_script=$SCRIPT_PATH/../thredds/scripts/create_thredds_catalogs.pl
 
 
 . /lib/lsb/init-functions
@@ -43,17 +65,17 @@ running() {
 }
 
 start() {
-   if [ ! -f [==PHPLOGFILE==] ]; then
+   if [ ! -f $PHPLOGFILE ]; then
       # create world writeable logfile (i.e. by nobody)
-      > [==PHPLOGFILE==]
-      chmod 666 [==PHPLOGFILE==]
+      > $PHPLOGFILE
+      chmod 666 $PHPLOGFILE
    fi
-   if [ ! -f [==WEBRUN_DIRECTORY==]/userlog ]; then
+   if [ ! -f $WEBRUN_DIRECTORY/userlog ]; then
       # create world writeable logfile
-      > [==WEBRUN_DIRECTORY==]/userlog
-      chmod 666 [==WEBRUN_DIRECTORY==]/userlog
+      > $WEBRUN_DIRECTORY/userlog
+      chmod 666 $WEBRUN_DIRECTORY/userlog
    fi
-   if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" -a "[==EXTERNAL_REPOSITORY==]" != "true" -a -r $target_directory/scripts/upload_monitor.pl ]; then
+   if [ "$METAMODUPLOAD_DIRECTORY" != "" -a "$EXTERNAL_REPOSITORY" != "true" -a -r $upload_monitor_script ]; then
       if ! running $upload_monitor_pid; then
          work_directory=$webrun_directory/upl/work
          work_expand=$work_directory/expand
@@ -63,7 +85,7 @@ start() {
          rm -rf $work_flat
          rm -f $path_to_shell_error
          # actually start the daemon
-         start_daemon -n 10 -p $upload_monitor_pid $target_directory/scripts/upload_monitor.pl $system_log $upload_monitor_pid
+         start_daemon -n 10 -p $upload_monitor_pid $upload_monitor_script $system_log $upload_monitor_pid
          if [ $? -ne 0 ]; then
             echo "upload_monitor failed: $?"
             return $?;
@@ -72,7 +94,7 @@ start() {
          echo "upload_monitor already running"
       fi
    fi
-   if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" -a "[==EXTERNAL_REPOSITORY==]" != "true" -a -r $target_directory/scripts/ftp_monitor.pl ]; then
+   if [ "$METAMODUPLOAD_DIRECTORY" != "" -a "$EXTERNAL_REPOSITORY" != "true" -a -r $ftp_monitor_script ]; then
       if ! running $ftp_monitor_pid; then
          work_directory=$webrun_directory/upl/work
          work_expand=$work_directory/expand
@@ -82,7 +104,7 @@ start() {
          rm -rf $work_flat
          rm -f $path_to_shell_error
          # actually start the daemon
-         start_daemon -n 10 -p $ftp_monitor_pid $target_directory/scripts/ftp_monitor.pl $system_log $ftp_monitor_pid
+         start_daemon -n 10 -p $ftp_monitor_pid $ftp_monitor_script $system_log $ftp_monitor_pid
          if [ $? -ne 0 ]; then
             echo "ftp_monitor failed: $?"
             return $?;
@@ -91,25 +113,9 @@ start() {
          echo "ftp_monitor already running"
       fi
    fi
-   if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/import_dataset.pl ]; then
-      if ! running $import_dataset_pid; then
-         path_to_import_updated=$webrun_directory/import_updated
-         if [ ! -f $path_to_import_updated ]; then
-            # create/touch path to set timestamp
-            >$path_to_import_updated
-         fi
-         start_daemon -n 10 -p $import_dataset_pid $target_directory/scripts/import_dataset.pl $system_log $import_dataset_pid
-         if [ $? -ne 0 ]; then
-            echo "import_dataset failed: $?"
-            return $?;
-         fi
-      else
-         echo "import_dataset already running"
-      fi
-   fi
-   if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/prepare_download.pl ]; then
+   if [ "$METAMODBASE_DIRECTORY" != "" -a -r $prepare_download_script ]; then
       if ! running $prepare_download_pid; then
-         start_daemon -n 10 -p $prepare_download_pid $target_directory/scripts/prepare_download.pl -log $system_log -pid $prepare_download_pid $target_directory/master_config.txt
+         start_daemon -n 10 -p $prepare_download_pid $prepare_download_script -log $system_log -pid $prepare_download_pid $2/master_config.txt
          if [ $? -ne 0 ]; then
             echo "prepare_download failed: $?"
             return $?;
@@ -118,9 +124,9 @@ start() {
          echo "prepare_download already running"
       fi
    fi
-   if [ "[==METAMODHARVEST_DIRECTORY==]" != "" -a -r $target_directory/scripts/harvester.pl ]; then
+   if [ "$METAMODHARVEST_DIRECTORY" != "" -a -r $harvester_script ]; then
       if ! running $harvester_pid; then
-         start_daemon -n 10 -p $harvester_pid $target_directory/scripts/harvester.pl -log $system_log -pid $harvester_pid
+         start_daemon -n 10 -p $harvester_pid $harvester_script -log $system_log -pid $harvester_pid
          if [ $? -ne 0 ]; then
             echo "harvester failed: $?"
             return $?;
@@ -129,9 +135,9 @@ start() {
          echo "harvester already running"
       fi
    fi
-   if [ "[==METAMODTHREDDS_DIRECTORY==]" != "" -a -r $target_directory/scripts/create_thredds_catalogs.pl ]; then
+   if [ "$METAMODTHREDDS_DIRECTORY" != "" -a -r $create_thredds_catalogs_script ]; then
       if ! running $create_thredds_catalogs_pid; then
-         start_daemon -n 10 -p $create_thredds_catalogs_pid $target_directory/scripts/create_thredds_catalogs.pl $system_log $create_thredds_catalogs_pid
+         start_daemon -n 10 -p $create_thredds_catalogs_pid $create_thredds_catalogs_script $system_log $create_thredds_catalogs_pid
          if [ $? -ne 0 ]; then
             echo "create_thredds_catalogs failed: $?"
             return $?;
@@ -143,23 +149,20 @@ start() {
 }
 
 stop() {
-   if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" -a -r $target_directory/scripts/upload_monitor.pl ]; then
-      killproc -p $upload_monitor_pid $target_directory/scripts/upload_monitor.pl SIGTERM
+   if [ "$METAMODUPLOAD_DIRECTORY" != "" -a -r $upload_monitor_script ]; then
+      killproc -p $upload_monitor_pid $upload_monitor_script SIGTERM
    fi
-   if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" -a -r $target_directory/scripts/ftp_monitor.pl ]; then
-      killproc -p $ftp_monitor_pid $target_directory/scripts/ftp_monitor.pl SIGTERM
+   if [ "$METAMODUPLOAD_DIRECTORY" != "" -a -r $ftp_monitor_script ]; then
+      killproc -p $ftp_monitor_pid $ftp_monitor_script SIGTERM
    fi
-   if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/import_dataset.pl ]; then
-      killproc -p $import_dataset_pid $target_directory/scripts/import_dataset.pl SIGTERM
+   if [ "$METAMODBASE_DIRECTORY" != "" -a -r $prepare_download_script ]; then
+      killproc -p $prepare_download_pid $prepare_download_script SIGTERM
    fi
-   if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/prepare_download.pl ]; then
-      killproc -p $prepare_download_pid $target_directory/scripts/prepare_download.pl SIGTERM
+   if [ "$METAMODHARVEST_DIRECTORY" != "" -a -r $harvester_script ]; then
+      killproc -p $harvester_pid $harvester_script SIGTERM
    fi
-   if [ "[==METAMODHARVEST_DIRECTORY==]" != "" -a -r $target_directory/scripts/harvester.pl ]; then
-      killproc -p $harvester_pid $target_directory/scripts/harvester.pl SIGTERM
-   fi
-   if [ "[==METAMODTHREDDS_DIRECTORY==]" != "" -a -r $target_directory/scripts/create_thredds_catalogs.pl ]; then
-      killproc -p $create_thredds_catalogs_pid $target_directory/scripts/create_thredds_catalogs.pl SIGTERM
+   if [ "$METAMODTHREDDS_DIRECTORY" != "" -a -r $create_thredds_catalogs_script ]; then
+      killproc -p $create_thredds_catalogs_pid $create_thredds_catalogs_script SIGTERM
    fi
 }
 
@@ -170,7 +173,7 @@ restart() {
 
 status() {
    retval=0
-   if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" -a -r $target_directory/scripts/upload_monitor.pl ]; then
+   if [ "$METAMODUPLOAD_DIRECTORY" != "" -a -r $upload_monitor_script ]; then
       if running $upload_monitor_pid; then
          echo "upload_monitor running";
       else
@@ -178,7 +181,7 @@ status() {
          retval=1
       fi
    fi
-   if [ "[==METAMODUPLOAD_DIRECTORY==]" != "" -a -r $target_directory/scripts/ftp_monitor.pl ]; then
+   if [ "$METAMODUPLOAD_DIRECTORY" != "" -a -r $ftp_monitor_script ]; then
       if running $ftp_monitor_pid; then
          echo "ftp_monitor running";
       else
@@ -186,15 +189,7 @@ status() {
          retval=1
       fi
    fi
-   if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/import_dataset.pl ]; then
-      if running $import_dataset_pid; then
-         echo "import_dataset running"
-      else
-         echo "import_dataset not running"
-         retval=2
-      fi
-   fi
-   if [ "[==METAMODBASE_DIRECTORY==]" != "" -a -r $target_directory/scripts/prepare_download.pl ]; then
+   if [ "$METAMODBASE_DIRECTORY" != "" -a -r $prepare_download_script ]; then
       if running $prepare_download_pid; then
          echo "prepare_download running"
       else
@@ -202,7 +197,7 @@ status() {
          retval=2
       fi
    fi
-   if [ "[==METAMODHARVEST_DIRECTORY==]" != "" -a -r $target_directory/scripts/harvester.pl ]; then
+   if [ "$METAMODHARVEST_DIRECTORY" != "" -a -r $harvester_script ]; then
       if running $harvester_pid; then
          echo "harvester running"
       else
@@ -210,7 +205,7 @@ status() {
          retval=3
       fi
    fi
-   if [ "[==METAMODTHREDDS_DIRECTORY==]" != "" -a -r $target_directory/scripts/create_thredds_catalogs.pl ]; then
+   if [ "$METAMODTHREDDS_DIRECTORY" != "" -a -r $create_thredds_catalogs_script ]; then
       if running $create_thredds_catalogs_pid; then
          echo "create_thredds_catalogs running"
       else
@@ -240,7 +235,7 @@ case "$1" in
         status $VERSION
         ;;
     *)
-        echo "Usage: $0 {start|stop|restart|reload|force-reload|status}"
+        echo "Usage: $0 {start|stop|restart|reload|force-reload|status} <path to config>"
         exit 1
         ;;
 esac
