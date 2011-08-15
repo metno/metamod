@@ -39,16 +39,7 @@ use strict;
 use warnings;
 use File::Spec;
 
-# small routine to get lib-directories relative to the installed file
-sub getTargetDir {
-    my ($finalDir) = @_;
-    my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
-    $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
-    $dir = File::Spec->catdir($dir, $finalDir);
-    return File::Spec->catpath($vol, $dir, "");
-}
-
-use lib ('../../common/lib', getTargetDir('lib'));
+use lib ('$FindBin::Bin/../../common/lib');
 
 use Carp;
 use POSIX;
@@ -67,11 +58,29 @@ use Metamod::Dataset;
 use Metamod::ForeignDataset;
 use Metamod::DatasetTransformer::DIF;
 use Metamod::Utils qw();
-use Metamod::Config qw(:init_logger);
-my $config = Metamod::Config->new();
+use Metamod::Config;
 use Log::Log4perl qw( get_logger );
-my $log = get_logger('metamod.harvester');
 # use encoding 'utf8';
+
+# Parse cmd line params
+#
+my ($pid, $errlog, $ownertag);
+GetOptions ('pid|p=s' => \$pid,     # name of pid file - if given, run as daemon
+            'log|l=s' => \$errlog,  # optional, redirect STDERR and STDOUT here
+            'owner=s' => \$ownertag, # archive files under this owner
+);
+
+
+if( @ARGV != 1 ){
+    print "You must supply the config file as a parameter\n";
+    exit 1;
+}
+my $config_file_or_dir = shift @ARGV;
+
+my $config = Metamod::Config->new($config_file_or_dir);
+$config->initLogger();
+my $log = get_logger('metamod.harvester');
+
 
 my $xmldirectory = $config->get('WEBRUN_DIRECTORY').'/XML/'.$config->get('APPLICATION_ID').'/';
 my $applicationid = $config->get('APPLICATION_ID');
@@ -88,14 +97,6 @@ my $harvest_schema;
     $harvest_schema = XML::LibXML::Schema->new( location => $harvest_validation_schema )
         if $harvest_validation_schema;
 }
-
-# Parse cmd line params
-#
-my ($pid, $errlog, $ownertag);
-GetOptions ('pid|p=s' => \$pid,     # name of pid file - if given, run as daemon
-            'log|l=s' => \$errlog,  # optional, redirect STDERR and STDOUT here
-            'owner=s' => \$ownertag, # archive files under this owner
-);
 
 #
 if ($pid) {
