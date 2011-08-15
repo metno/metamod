@@ -318,7 +318,7 @@ sub process_files {
     my ( $self, $input_files, $dataset_name, $ftp_or_web, $datestring ) = @_;
 
     my $webrun_directory      = $self->config->get('WEBRUN_DIRECTORY');
-    my $work_directory        = $webrun_directory . "/upl/work";
+    my $work_directory        = $webrun_directory . "/upl/work" . $$;
     my $work_expand           = $work_directory . "/expand";
     my $work_flat             = $work_directory . "/flat";
     my $work_start            = $work_directory . "/start";
@@ -326,8 +326,18 @@ sub process_files {
     my $problem_dir_path      = $webrun_directory . "/upl/problemfiles";
     my $starting_dir          = getcwd();
 
+    #  Create the necessary directories
+    foreach my $dir ( $work_start, $work_expand, $work_flat ) {
+        mkpath($dir) or die "Failed to create $dir: $!";    # create a fresh directory
+    }
+
     # need to reset the user error messages for each upload.
     $self->reset_user_errors();
+
+    # also need to empty the error file
+    my $usererrors_path = "$work_directory/nc_usererrors.out";
+    open my $USER_ERRORS, '>', $usererrors_path or die $!;
+    close $USER_ERRORS;
 
     # called with multiple files (ftp) or single (web)?
     my %files_to_process = ref $input_files ? %$input_files : ( $input_files => 1 );
@@ -353,14 +363,6 @@ sub process_files {
         return;
     }
 
-    #  Clean up the work_start, work_flat and work_expand directories:
-    foreach my $dir ( $work_start, $work_expand, $work_flat ) {
-        rmtree($dir);
-        if ( -d $dir ) {
-            die "Unable to clean up $dir: " . $self->shell_command_error;
-        }
-        mkpath($dir) or die "Failed to create $dir: $!";    # create a fresh directory
-    }
 
     my $taf_basename;    # Used if uploaded file is only for testing
     foreach my $uploadname ( keys %files_to_process ) {
@@ -742,7 +744,6 @@ sub process_files {
     #    print DIGOUTPUT $result . "\n";
     #    close(DIGOUTPUT);
     #}
-    my $usererrors_path = "$work_directory/nc_usererrors.out";
     open( USERERRORS, ">>$usererrors_path" ) or die "Cannot open $usererrors_path for output!";
     my @user_errors = @{ $self->user_errors() };
     foreach my $line (@user_errors) {
@@ -955,6 +956,14 @@ sub process_files {
         }
         if ( $ftp_or_web ne 'TAF' ) {
             $self->update_XML_history( $dataset_name, \@uploaded_basenames, \@existing_basenames );
+        }
+    }
+
+    #  Clean up the work_start, work_flat and work_expand directories:
+    foreach my $dir ( $work_start, $work_expand, $work_flat ) {
+        rmtree($dir);
+        if ( -d $dir ) {
+            die "Unable to clean up $dir: " . $self->shell_command_error;
         }
     }
 }
