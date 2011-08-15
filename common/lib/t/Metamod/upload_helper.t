@@ -125,7 +125,7 @@ my $upload_helper = Metamod::UploadHelper->new();
     file_exists_ok(File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_pl_2008-05-29_00.xml'), "$testname: Level 2 metadata created");
 
     row_ok( sql => q{SELECT * FROM file WHERE u_id = 1 AND f_name = 'hirlam12_upload2.tar'},
-            tests => [ f_size => 10240, f_errurl => q{} ],
+            tests => [ f_size => 10240, f_errurl => qr[/example/htdocs/upl/uerr/.*] ],
             label => "$testname: Uploaded file inserted into userbase",
     );
 
@@ -146,7 +146,7 @@ my $upload_helper = Metamod::UploadHelper->new();
     file_not_exists_ok(File::Spec->catfile($metadata_dir, 'hirlam12', 'wrong_name.xml'), "$testname: No metadata for file with wrong name");
 
     row_ok( sql => q{SELECT * FROM file WHERE u_id = 1 AND f_name = 'hirlam12_invalid_component.tar.gz'},
-            tests => [ f_size => 0, f_errurl => q{} ],
+            tests => [ f_size => 0, f_errurl => qr[/example/htdocs/upl/uerr/.*] ],
             label => "$testname: Uploaded file inserted into userbase",
     );
 
@@ -163,7 +163,7 @@ my $upload_helper = Metamod::UploadHelper->new();
     file_exists_ok(File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_valid_cdl.xml'), "$testname: Metadata for valid CDL generated");
 
     row_ok( sql => q{SELECT * FROM file WHERE u_id = 1 AND f_name = 'hirlam12_valid_cdl.tar.gz'},
-            tests => [ f_size => 4716, f_errurl => q{} ],
+            tests => [ f_size => 4716, f_errurl => qr[/example/htdocs/upl/uerr/.*] ],
             label => "$testname: Valid file upload inserted into userbase",
     );
 
@@ -174,7 +174,7 @@ my $upload_helper = Metamod::UploadHelper->new();
     file_not_exists_ok(File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_invalid_cdl.xml'), "$testname: Metadata for invalid CDL not generated");
 
     row_ok( sql => q{SELECT * FROM file WHERE u_id = 1 AND f_name = 'hirlam12_invalid_cdl.tar.gz'},
-            tests => [ f_size => 0, f_errurl => q{} ],
+            tests => [ f_size => 0, f_errurl => qr[/example/htdocs/upl/uerr/.*] ],
             label => "$testname: Invalid file upload inserted into userbase",
     );
 
