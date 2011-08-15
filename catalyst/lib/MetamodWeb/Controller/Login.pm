@@ -198,9 +198,11 @@ sub validate_new_user : Private {
             telephone => 'Telephone',
             realname => 'Name',
         },
-        msgs => sub {
-            email => 'Invalid email address',
-            username_constraint => "Invalid username. Only user letters, '_' and numbers, or same as email",
+        msgs => {
+            constraints => {
+                email => 'Invalid email address',
+                username_constraint => "Invalid username. Only user letters, '_' and numbers, or same as email",
+            }
         }
     );
     my $validator = MetamodWeb::Utils::FormValidator->new( validation_profile => \%form_profile );
