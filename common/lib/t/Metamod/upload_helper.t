@@ -17,6 +17,7 @@ use Test::Files;
 
 BEGIN {
     $ENV{METAMOD_MASTER_CONFIG} = "$FindBin::Bin/../master_config.txt";
+    $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/../log4perl_config.ini";
 }
 
 use Metamod::Config;
