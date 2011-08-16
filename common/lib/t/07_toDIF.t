@@ -11,6 +11,7 @@ use Data::Dumper;
 BEGIN {
     $ENV{METAMOD_XSLT_DIR} = "$FindBin::Bin/../../schema/";
     $ENV{METAMOD_MASTER_CONFIG} = "$FindBin::Bin/master_config.txt";
+    $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/log4perl_config.ini";
 }
 
 BEGIN {use_ok('Metamod::DatasetTransformer::ToDIF', "foreignDataset2Dif")};

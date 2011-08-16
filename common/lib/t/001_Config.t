@@ -40,6 +40,8 @@ use Test::More tests => 12;
 
 BEGIN {use_ok('Metamod::Config');}
 
+$ENV{METAMOD_LOG4PERL_CONFIG} = $FindBin::Bin . '/log4perl_config.ini';
+
 my $confFile = $FindBin::Bin.'/master_config.txt';
 my $config = new Metamod::Config($confFile);
 isa_ok($config, 'Metamod::Config');
