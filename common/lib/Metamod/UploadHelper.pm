@@ -336,8 +336,9 @@ sub process_files {
 
     # also need to empty the error file
     my $usererrors_path = "$work_directory/nc_usererrors.out";
-    open my $USER_ERRORS, '>', $usererrors_path or die $!;
-    close $USER_ERRORS;
+    if( -f $usererrors_path ){
+        unlink $usererrors_path or die $!;
+    }
 
     # called with multiple files (ftp) or single (web)?
     my %files_to_process = ref $input_files ? %$input_files : ( $input_files => 1 );
@@ -736,14 +737,14 @@ sub process_files {
     my $upload_ownertag = $self->config->get('UPLOAD_OWNERTAG');
     MetNo::NcDigest::digest($path_to_etc, "$work_directory/digest_input", $upload_ownertag, $xmlpath );
 
-    #my $command = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlpath";
-    #$self->logger->debug("RUN:    $command\n");
-    #my $result = $self->shcommand_scalar($command);
-    #if ( defined($result) ) {
-    #    open( DIGOUTPUT, ">digest_out" );
-    #    print DIGOUTPUT $result . "\n";
-    #    close(DIGOUTPUT);
-    #}
+#    my $command = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlpath";
+#    $self->logger->debug("RUN:    $command\n");
+#    my $result = $self->shcommand_scalar($command);
+#    if ( defined($result) ) {
+#        open( DIGOUTPUT, ">digest_out" );
+#        print DIGOUTPUT $result . "\n";
+#        close(DIGOUTPUT);
+#    }
     open( USERERRORS, ">>$usererrors_path" ) or die "Cannot open $usererrors_path for output!";
     my @user_errors = @{ $self->user_errors() };
     foreach my $line (@user_errors) {
@@ -858,9 +859,9 @@ sub process_files {
             $mailbody = $self->config->get('EMAIL_BODY_WHEN_UPLOAD_ERROR');
             my @bnames = $self->get_basenames( \@originally_uploaded );
             my $bnames_string = join( ", ", @bnames );
-            my $timecode = substr( $datestring, 8, 2 ) . substr( $datestring, 11, 2 ) . substr( $datestring, 14, 2 );
-            my $name_html_errfile   = $dataset_name . '_' . $timecode . '.html';
+            my $name_html_errfile   = $self->html_error_file($dataset_name, $uerr_directory, $datestring);
             my $path_to_errors_html = File::Spec->catfile( $uerr_directory, $name_html_errfile );
+
             my $errorinfo_path      = "errorinfo";
             open( ERRORINFO, ">$work_directory/$errorinfo_path" );
             print ERRORINFO $path_to_errors_html . "\n";
@@ -1864,6 +1865,24 @@ sub syserror {
         $self->add_user_error("$errmsg\nUploadfile: $baseupldname\n$what\n\n" );
     }
     $self->shell_command_error("");
+}
+
+sub html_error_file {
+    my $self = shift;
+
+    my ($dataset_name, $uerr_directory, $datestring) = @_;
+
+    my $timecode = substr( $datestring, 8, 2 ) . substr( $datestring, 11, 2 ) . substr( $datestring, 14, 2 );
+    my $name_html_errfile   = $dataset_name . '_' . $timecode . '.html';
+
+    # need to check if file exists to avoid overwriting existing files.
+    my $file_counter = 1;
+    while( -f File::Spec->catfile( $uerr_directory, $name_html_errfile ) ){
+        $name_html_errfile   = $dataset_name . '_' . $timecode . '_' . $file_counter . '.html';
+        $file_counter++;
+    }
+
+    return $name_html_errfile;
 }
 
 =head1 DETAILED OPERATION
