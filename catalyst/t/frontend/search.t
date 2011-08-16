@@ -15,6 +15,8 @@ my $dataset1id;
 
 BEGIN {
 
+    $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/../log4perl_config.ini";
+
     $helper = MetamodWeb::Test::Helper->new( dataset_dir => "$FindBin::Bin/datasets", );
     $helper->setup_environment();
 
