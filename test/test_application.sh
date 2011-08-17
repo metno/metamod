@@ -370,7 +370,7 @@ grep '\[INFO\]\|\[WARN\]\|\[ERROR\]' webrun/metamod.log > webrun/metamod.log_iwe
 #
 # Extract errors and warnings to a file easily accessible through the web:
 errorwarnlog=errorwarnlog_$idstring
-grep '\[WARN\]\|\[ERROR\]' webrun/metamod.log > ~/$errorwarnlog
+grep '\[WARN\]\|\[ERROR\]' webrun/metamod.log > ~/htdocs/$errorwarnlog
 #
 # compare logs
 logfiles='metamod.log_iwe'
