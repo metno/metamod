@@ -27,13 +27,23 @@
 #                               - The local files for the application,
 #                                 including the master_config.txt file.
 #
-#                        source/test/u1input
-#                               - A set of user files that are copied to
-#                                 webrun/u1.
-#
 #                        source/test/ncinput
 #                               - Directory containing netCDF and CDL
 #                                 files for simulated uploading.
+#                                 The directory also contains the 'files'
+#                                 file that is a list of file names
+#                                 (separated by newlines) of files to be
+#                                 uploaded. The files in this list may be
+#                                 found in other directories; in that
+#                                 case the file name must represent a
+#                                 relative path to the file.
+#
+#                        source/text/xmlinput
+#                               - Directory containing XML files that will
+#                                 be copied to the XML repository. (After
+#                                 copying, these files are edited so they
+#                                 will contain correct identification 
+#                                 metadata). 
 #
 #                     target    - The target directory for the installed
 #                                 application.
@@ -71,18 +81,16 @@
 #
 # D. The software is installed into the target directory.
 #
-# E. A set of upload users is installed in the webrun/u1 directory.
-#    A corresponding directory structure is created for the webupload
-#    and data directories.
+# E. Create directories for test data
 #
-# F. The databases (metadatabase and user database) is initialized and
-#    filled with static data. The user database is loaded with user info
-#    from the webrun/u1 files.
+# F. The XML repository and databases (metadatabase and user database) is
+#    initialized and filled with data.
 #
 # G. The services defined for the application is started.
 #
 # H. Uploads to the system is simulated by copying files to the ftp- and
-#    web-upload areas. Input files are taken from the ncinput directory.
+#    web-upload areas. Input files are taken from the list of files found in
+#    the file having abs. path $filestoupload.
 #
 # I. After sleeping some time (to let the import script finish its tasks),
 #    the services is stopped.
@@ -120,6 +128,8 @@ if [ $# -eq 2 -a $1 = '-i' ]; then
    read apacheport
    echo -n "URL of OPeNDAP server (any URL will do): "
    read opendapurl
+   echo -n "Domain name required for admin user (e.g somedomain.com): "
+   read admindomain
    echo -n "Operator E-mail address: "
    read operatoremail
    echo "Comma-separated list of E-mail addresses for recievers"
@@ -136,6 +146,7 @@ sourceurl = $sourceurl
 idstring = $idstring
 apacheport = $apacheport
 opendapurl = $opendapurl
+admindomain = $admindomain
 operatoremail = $operatoremail
 developeremail = $developeremail
 oaiharvest = $oaiharvesttag $oaiharvestsource $oaiharvestset
@@ -159,6 +170,7 @@ elif [ $# -eq 1 -a -d $1 -a -d $1/source -a -r $1/testrc ]; then
    read dummy1 dummy2 idstring
    read dummy1 dummy2 apacheport
    read dummy1 dummy2 opendapurl
+   read dummy1 dummy2 admindomain
    read dummy1 dummy2 operatoremail
    read dummy1 dummy2 developeremail
    read dummy1 dummy2 oaiharvesttag oaiharvestsource oaiharvestset
@@ -207,8 +219,6 @@ else
    appendport=''
    pmhport=''
 fi
-admindomain=`expr $servername : ".*\.\([^.]*\.[^.]*\)"`
-datasettags=`expr $servername : ".*\.\([^.]*\.[^.]*\)"`
 basedirbasename=`basename $basedir`
 sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 /^TARGET_DIRECTORY *=/s|=.*$|= '$basedir/target'|
@@ -280,8 +290,8 @@ for dir in `cat $basedir/source/test/directories`; do
    mkdir -p EXAMPLE/$dir
 done
 #
-# F. The databases (metadatabase and user database) is initialized and filled with static data.
-# =============================================================================================
+# F. The XML repository and databases (metadatabase and user database) is initialized and filled with data.
+# =========================================================================================================
 #
 # disable tomcat (SRU2jdbc) connection to database
 # this is a hack, TODO: make configurable
@@ -354,12 +364,16 @@ sleep 100
 # ==================
 #
 cd $basedir
-# split INFO and WARN/ERROR log
-grep '\[INFO\]' webrun/metamod.log > webrun/metamod.log_info
-grep -v '\[INFO\]' webrun/metamod.log | grep -v '\[DEBUG\]' > webrun/metamod.log_warnerror
 #
-# compare info logs
-logfiles='metamod.log_info'
+# Remove debug messages and similar output from the log file that is used in reports:
+grep '\[INFO\]\|\[WARN\]\|\[ERROR\]' webrun/metamod.log > webrun/metamod.log_iwe
+#
+# Extract errors and warnings to a file easily accessible through the web:
+errorwarnlog=errorwarnlog_$idstring
+grep '\[WARN\]\|\[ERROR\]' webrun/metamod.log > ~/$errorwarnlog
+#
+# compare logs
+logfiles='metamod.log_iwe'
 if [ -z "`ls compare`" ]; then
    for fil in $logfiles; do
       if [ -r webrun/$fil ]; then
@@ -371,9 +385,8 @@ if [ -z "`ls compare`" ]; then
    done
 else
    echo "`whoami`@`uname -n`:`pwd`" >t_result
-   echo "========== metamod.log warnings:" >>t_result
+   echo "See the METAMOD log (errors and warnings) at: http:/`uname -n`/$errorwarnlog"
    count=2
-   cat webrun/metamod.log_warnerror >> t_result
    for fil in $logfiles; do
       if [ -r webrun/$fil ]; then
          # remove line-number and time/date
