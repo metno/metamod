@@ -385,7 +385,7 @@ if [ -z "`ls compare`" ]; then
    done
 else
    echo "`whoami`@`uname -n`:`pwd`" >t_result
-   echo "See the METAMOD log (errors and warnings) at: http:/`uname -n`/$errorwarnlog"
+   echo "See the METAMOD log (errors and warnings) at: http:/`uname -n`/$errorwarnlog" >>t_result
    count=2
    for fil in $logfiles; do
       if [ -r webrun/$fil ]; then
