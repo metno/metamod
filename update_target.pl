@@ -461,7 +461,7 @@ sub substituteval {
 
 =head2 dircopy($src, $dest)
 
-Directory copy implemented via Unix 'cp' command.
+Directory copy implemented via Unix 'rsync' command.
 
 IMPLEMENTATION NOTE: This could be implemented in a more portal fashion with
 C<File::Copy::Recursive>, but we don't want any none core dependencies in
@@ -471,8 +471,7 @@ update_target.pl.
 sub dircopy {
     my ($src, $dest) = @_;
 
-use Carp;
-    my $output = qx/cp -ru $src $dest/;
+    my $output = qx/rsync -aC $src $dest/;
     print "$output\n" if $output;
 
 }
