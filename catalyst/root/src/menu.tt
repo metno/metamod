@@ -12,9 +12,11 @@
 [% INCLUDE "${section}/menu.tt" %]
 [% END %]
 
-<div class="menu-item"><a href="[% c.uri_for( '/upload' )%]">File upload</a></div>
-[% IF section == 'upload' %]
-[% INCLUDE "${section}/menu.tt" %]
+[% IF c.check_user_roles('upload') %]
+    <div class="menu-item"><a href="[% c.uri_for( '/upload' )%]">File upload</a></div>
+    [% IF section == 'upload' %]
+    [% INCLUDE "${section}/menu.tt" %]
+    [% END %]
 [% END %]
 
 <div class="menu-item"><a href="[% c.uri_for( '/subscription' )%]">Subscription</a></div>
@@ -28,16 +30,18 @@
 
 
 [% IF c.user_exists %]
-<div class="menu-item"><a href="[% c.uri_for( '/userprofile' )%]">User profile</a></div>
-[% IF section == 'userprofile' %]
-[% INCLUDE "${section}/menu.tt" %]
-[% END %]
 
-
-<div class="menu-item"><a href="[% c.uri_for( '/logout', redirect_params )%]">Logout</a></div>
+    <div class="menu-item"><a href="[% c.uri_for( '/userprofile' )%]">User profile</a></div>
+    [% IF section == 'userprofile' %]
+    [% INCLUDE "${section}/menu.tt" %]
+    [% END %]
+    <div class="menu-item"><a href="[% c.uri_for( '/logout', redirect_params )%]">Logout</a></div>
+    <p>&nbsp;[% c.user.u_name %] ([% c.user.u_loginname %])</p>
 
 [% ELSE %]
-<div class="menu-item"><a href="[% c.uri_for( '/login', redirect_params )%]">Login</a></div>
+
+    <div class="menu-item"><a href="[% c.uri_for( '/login', redirect_params )%]">Login</a></div>
+
 [% END %]
 
 
