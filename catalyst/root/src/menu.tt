@@ -6,6 +6,10 @@
     </div>
 [% END %]
 
+[% IF c.check_user_roles('admin') %]
+    <div class="menu-item"><a href="[% c.uri_for( '/admin' )%]">Admin</a></div>
+[% END %]
+
 <!-- standard level 1 menu items -->
 <div class="menu-item"><a href="[% c.uri_for( '/search' )%]">Metadata search</a></div>
 [% IF section == 'search' %]
@@ -30,18 +34,14 @@
 
 
 [% IF c.user_exists %]
-
     <div class="menu-item"><a href="[% c.uri_for( '/userprofile' )%]">User profile</a></div>
     [% IF section == 'userprofile' %]
     [% INCLUDE "${section}/menu.tt" %]
     [% END %]
     <div class="menu-item"><a href="[% c.uri_for( '/logout', redirect_params )%]">Logout</a></div>
     <p>&nbsp;[% c.user.u_name %] ([% c.user.u_loginname %])</p>
-
 [% ELSE %]
-
     <div class="menu-item"><a href="[% c.uri_for( '/login', redirect_params )%]">Login</a></div>
-
 [% END %]
 
 
