@@ -43,7 +43,7 @@ BEGIN {use_ok('Metamod::Config');}
 
 dies_ok { my $config = Metamod::Config()->new(); } 'Dies on missing parameter';
 
-dies_ok { my $config = Metamod::Config('xyz')->new(); } 'Dies on unknown file';
+dies_ok { my $config = Metamod::Config()->new('xyz'); } 'Dies on unknown file';
 
 my $confFile = $FindBin::Bin.'/master_config.txt';
 my $config = Metamod::Config->new($confFile);
@@ -61,4 +61,6 @@ is($config, $config2, "config-singleton on same file");
 
 $config2 = Metamod::Config->instance();
 isa_ok($config2, 'Metamod::Config');
+
 ok($config2->get('TARGET_DIRECTORY'), 'get TARGET_DIRECTORY of default');
+

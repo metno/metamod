@@ -1,69 +1,72 @@
+[% IF NOT external_repository  %]
+
 <h2 class="std">Upload file</h2>
 
 [% IF overwrite_file %]
 
-<p style="color: red">[% data %]</p>
+    <p style="color: red">[% data %]</p>
 
-<form action="[% c.uri_for('/upload') %]" method="post">
+    <form action="[% c.uri_for('/upload') %]" method="post">
 
-    <label>Overwrite file?
-        <input type="hidden" name="filename" value="[% overwrite_file %]" />
-        <input type="submit" name="BTN_overwrite" value="Cancel" />
-        <input type="submit" name="BTN_overwrite" value="OK" />
-    </label>
+        <label>Overwrite file?
+            <input type="hidden" name="filename" value="[% overwrite_file %]" />
+            <input type="submit" name="BTN_overwrite" value="Cancel" />
+            <input type="submit" name="BTN_overwrite" value="OK" />
+        </label>
 
-</form>
+    </form>
 
 [% ELSE %]
 
 
     [% IF data %]
-    <p style="color: red">[% data %]</p>
+        <p style="color: red">[% data %]</p>
     [% END %]
 
-<form enctype="multipart/form-data" action="[% c.uri_for('/upload') %]" method="post">
-    <div id="upload-form">
-    Directory key: <input name="dirkey" value="" size="10" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    File name: <input name="data" type="file" />
-    <input class="selectbutton1" type="submit" name="BTN_upload" value="Upload" />
+    <form enctype="multipart/form-data" action="[% c.uri_for('/upload') %]" method="post">
+        <div id="upload-form">
+        Directory key: <input name="dirkey" value="" size="10" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        File name: <input name="data" type="file" />
+        <input class="selectbutton1" type="submit" name="BTN_upload" value="Upload" />
+        </div>
+    </form>
+
+    <hr>
+
+    <div id="upload-list">
+
+    <h2 class="std">Previously processed files</h2>
+
+    <table class="box" width="100%">
+        <tr>
+          <th>File name</th>
+          <th>Size</th>
+          <th>Time</th>
+          <th>Status</th>
+          <th>Show errors</th>
+       </tr>
+
+    [% FOREACH fi IN upload_ui_utils.user_files() %]
+        <tr class="list_table">
+        <td class="list_table">[% fi.f_name %]</td>
+        <td class="list_table">[% fi.f_size %]</td>
+        <td class="list_table">[% fi.f_timestamp %]</td>
+        <td class="list_table">[% fi.f_status %]</td>
+        <td class="list_table">
+            [% IF fi.f_errurl %]
+                <a href="[% mm_config.get('BASE_PART_OF_EXTERNAL_URL') %][% fi.f_errurl %]">Error</a>
+            [% END %]
+        </td>
+        </tr>
+    [% END %]
+
+    </table>
     </div>
-</form>
 
-<hr>
+    <form action="[% c.uri_for('/upload') %]" method="get" style="text-align: right">
+        <input type="submit" value="Refresh"/>
+    </form>
 
-<div id="upload-list">
-
-<h2 class="std">Previously processed files</h2>
-
-<table class="box" width="100%">
-    <tr>
-      <th>File name</th>
-      <th>Size</th>
-      <th>Time</th>
-      <th>Status</th>
-      <th>Show errors</th>
-   </tr>
-
-[% FOREACH fi IN upload_ui_utils.user_files() %]
-    <tr class="list_table">
-    <td class="list_table">[% fi.f_name %]</td>
-    <td class="list_table">[% fi.f_size %]</td>
-    <td class="list_table">[% fi.f_timestamp %]</td>
-    <td class="list_table">[% fi.f_status %]</td>
-    <td class="list_table">
-        [% IF fi.f_errurl %]
-            <a href="[% mm_config.get('BASE_PART_OF_EXTERNAL_URL') %][% fi.f_errurl %]">Error</a>
-        [% END %]
-    </td>
-    </tr>
 [% END %]
-
-</table>
-</div>
-
-<form action="[% c.uri_for('/upload') %]" method="get" style="text-align: right">
-    <input type="submit" value="Refresh"/>
-</form>
-
 
 [% END %]

@@ -50,16 +50,16 @@ sub auto :Private {
     return 0 unless $self->chk_logged_in($c);
 
     if( !$c->check_user_roles("upload") ){
-
         # detach() does not work correctly in auto()
         $c->forward("Root", "unauthorized", ['upload']);
         return 0;
     }
 
-
     my $upload_ui_utils = MetamodWeb::Utils::UI::Upload->new( c => $c );
     $c->stash( upload_ui_utils => $upload_ui_utils );
     $c->stash( section => 'upload' );
+    my $xrep = $c->stash->{mm_config}->get('EXTERNAL_REPOSITORY') || 0;
+    $c->stash( external_repository => $xrep eq 'false' ? 0 : $xrep ? 1 : 0 ); # store as bool for easy eval
 }
 
 =head2 /upload
@@ -83,6 +83,8 @@ sub upload_GET {
 
 sub upload_POST  {
     my ( $self, $c ) = @_;
+
+    $c->detach('Root', 'default' ) if $c->stash->{external_repository}; # don't accept any uploads
 
     my $institution = $c->user->u_institution;
     my $updir = $c->stash->{mm_config}->get('UPLOAD_DIRECTORY');

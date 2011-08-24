@@ -91,7 +91,7 @@ sub send_simple_email {
 
     my ( $bcc, $body, $cc, $from, $subject, $to ) = @params{qw(bcc body cc from subject to)};
 
-    my $config = Metamod::Config->new();
+    my $config = Metamod::Config->instance();
     my $logger = Log::Log4perl->get_logger('metamod.email');
     my $smtp = $config->has('SMTP_RELAY') ? $config->get('SMTP_RELAY') : undef;
     $logger->debug("Using SMTP server <$smtp>");

@@ -166,7 +166,7 @@ sub ftp_monitor {
     #$upload_helper->get_dataset_institution(); # now run automatically by process_files
     $upload_helper->ftp_process_hour();
 
-    $logger->info("FTP Monitor session " . $_[SESSION]->ID . " finished at " . scalar(gmtime) . " UTC.");
+    $logger->info("FTP Monitor session " . $_[SESSION]->ID . " finished.");
 
 }
 
@@ -178,7 +178,7 @@ sub cleanup_dirs {
     $upload_helper->clean_up_problem_dir();
     $upload_helper->clean_up_repository();
 
-    $logger->info("Upload cleanup session " . $_[SESSION]->ID . " finished at " . scalar(gmtime) . " UTC.");
+    $logger->info("Upload cleanup session " . $_[SESSION]->ID . " finished.");
 
 }
 

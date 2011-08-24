@@ -1,0 +1,167 @@
+=head1 Metadata extration
+
+METAMOD supports extracting metadata from netCDF files. The metadata extraction
+is triggered in three different ways.
+
+=over
+
+=item *
+
+A user uploads a data file or tar archive via the web interface.
+
+=item *
+
+Data files are upload via a FTP to a folder that is monitored by METAMOD.
+
+=item *
+
+Data files are placed in a folder available to METAMOD and then a HTTP request
+is sent to METAMOD to trigger the metadata extraction.
+
+=back
+
+Which method is used for triggering uploads are decided by the
+C<EXTERNAL_REPOSITORY> configuration variables.
+
+If C<EXTERNAL_REPOSTORY> is set to C<false> the two first methods can be used.
+In this case METAMOD is also responsible for moving the data files to the data
+repository in addition to extracting the metadata.
+
+If C<EXTERNAL_REPOSITORY> is set to C<true> the second method is used. In this
+case METAMOD will B<not> move the  data files to the data repository. The data
+repository is then some other system responsibility.
+
+=head2 Upload via web interface
+
+When a user uploads a new data file to the system using the web interface the following steps
+are executed.
+
+=over
+
+=item *
+
+The web application performs some validation of the file and the name of the
+dataset and if all validations are ok it stores the file in the directory
+specified in the configuration variable C<UPLOAD_DIRECTORY>.
+
+The web application also inserts an "Upload" job into the queue to tell the
+backend system that a new file is available.
+
+At this point the web application sends a reply back to the client.
+
+=item *
+
+Now that there is a now job in the queue a B<worker process> will start to
+execute the job as soon as a worker process is available.
+
+For the Upload job, C<Metamod::Queue::Worker::Upload> and
+C<Metamod::Queue::Job::Upload> is used to perform the job. The reason for
+having two modules for doing this work is that Worker module is specific the
+queue system used, while the Job module is independent of the actual queue
+system. This makes it easier to switch from one queue system to another at a
+later date.
+
+=item *
+
+When C<Metamod::Queue::Job::Upload> has started to execute the job it will
+leave the heavy lifting to C<Metamod::UploadHelper>. UploadHelper will do the
+following:
+
+=over
+
+=item *
+
+Create a directory structure where it can put temporary files while it is working.
+
+=item *
+
+If the upload file is a gz, tar.gz or tar file it will extract the contents of
+archive and then continue to work on the contents of the archive.
+
+=item *
+
+If any of the uploaded files are CDL files it will try to convert the files to
+netCDF files.
+
+=item *
+
+When all the files are ready for processing it will use C<MetNo::DigestNc> to
+extract the metadata from the netCDF files. This processing in done twice. Once
+for all the uploaded at the same time to extract the level 1 metadata for the
+dataset. Then DigestNc is used again for each file to extract the level 2
+metadata for that file.
+
+DigestNc use C<Metamod::Dataset> for reading and writing metadata so all data
+is stored both in the XML metadata repository and the index database.
+
+=item *
+
+After the metadata has been extracted the data files are moved to the data
+repository.
+
+=item *
+
+Depending on how the processing of the files went the UploadHelper will notify
+the user on the result of the upload via email and also write the result of the
+upload to the User database.
+
+In case of any error in the processing of the file the UploadHelper will
+generate a HTML file with a description of all the errors.
+
+=back
+
+=back
+
+=head2 Upload via FTP
+
+Upload via FTP is very similar to upload via web except for the first steps
+that triggers the metadata extraction.
+
+Instead of using the queue system the FTP upload is triggered by the script
+upload/scripts/ftp_monitor.pl. This script supports several different modes but
+the most relevant here is the daemon mode where it is running like a CRON-like
+job.
+
+When running as a CRON-like job the script will wake up at regular intervals
+and start looking for files in the C<FTP_UPLOAD_DIRECTORY>.
+
+When looking for files in the ftp upload directory it will not process all
+files that it finds. What files to process is specificed in the C<ftp_events>
+file in the C<WEBRUN_DIRECTORY>.
+
+When a file is found in the FTP directory the metadata extraction continous in
+the same way for web uploads using the C<Metamod::UploadHelper>.
+
+=head2 Metadata extraction from external repository
+
+Metadata extraction when data is stored in a external repository works
+differently than the two other methods.
+
+In this case the process is as follows:
+
+=over
+
+=item *
+
+A process external to METAMOD places one or more data files in a directory that
+is available from the METAMOD instance.
+
+=item *
+
+The external process notifies METAMOD that new files are ready for metadata
+extraction by sending a HTTP GET message to /upload/newfiles with the correct parameters.
+
+=item *
+
+The METAMOD web application will receive the HTTP request and then start the
+script C<upload/script/upload_index.pl>.
+
+=item *
+
+The upload_index.pl script will then follow the same steps as UploadHelper for
+extracting the metadata. The only difference is that it will B<not> move the
+data files into a data repository.
+
+=back
+
+=cut

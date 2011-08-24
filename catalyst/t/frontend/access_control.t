@@ -13,6 +13,7 @@ use MetamodWeb::Test::Helper;
 my $helper;
 
 BEGIN {
+    $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/../log4perl_config.ini";
 
     $helper = MetamodWeb::Test::Helper->new();
     $helper->setup_environment();

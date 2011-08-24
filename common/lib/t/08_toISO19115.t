@@ -9,6 +9,7 @@ use Test::More tests => 12;
 use Data::Dumper;
 use Metamod::Config;
 
+
 $ENV{METAMOD_XSLT_DIR} = "$FindBin::Bin/../../schema/";
 
 my $config = Metamod::Config->new("$FindBin::Bin/master_config.txt");

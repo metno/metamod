@@ -45,7 +45,6 @@ etc/default/catalyst-myapp
 =lib/Metamod/DBIxSchema/Metabase/Result/Numberitem.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/HkRepresentsBk.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Metadatatype.pm
-=lib/Metamod/DBIxSchema/Metabase/Result/Sessions.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Basickey.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/BkDescribesDs.pm
 =lib/Metamod/DBIxSchema/Metabase/Result/Metadata.pm
@@ -93,8 +92,6 @@ etc/default/catalyst-myapp
 =lib/Metamod/mmUserbase.pm
 =lib/Metamod/mmLogView.pm
 =lib/Metamod/DbTableinfo.pm
-=lib/Metamod/test/mmUserbase_test.pl
-=lib/Metamod/test/mmUserbase_test.sh
 =lib/MetNo/Fimex.pm
 =lib/MetNo/NcFind.pm
 =lib/MetNo/NcDigest.pm

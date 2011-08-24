@@ -140,6 +140,39 @@ $parse_actions{ dimensions } = $parse_actions{"vocabulary"};
 sub digest {
     my ( $etcdirectory, $pathfilename, $ownertag, $xml_metadata_path, $is_child ) = @_;
 
+    # Reset global variables before starting digest.
+    @user_errors = ();
+    $current_struct = "UNINITIALIZED";
+
+    %globlists = ();
+    %globswitches = ();
+    %attributes = ();
+    %presetattributes = ();
+    %structures = ();
+    %vocabularies = ();
+    %dimensions = ();
+    %variables = ();
+    %variabletypes = ();
+    %attribute_aliases = ();
+    %conversions = ();
+    %investigatedims = ();
+
+    %LSH_globswitches = ();
+    %LSH_globlists = ();
+
+    %RH_attributes = ();
+    %RH_presetattributes = ();
+    %RH_vocabularies = ();
+    %RH_dimensions = ();
+    %RH_variables = ();
+    %RH_variabletypes = ();
+    %RH_attribute_aliases = ();
+    %RH_conversions = ();
+
+    $RH_investigatedims = undef;
+
+    %standard_names = ();
+
     eval {
 
         init_escapes($etcdirectory);

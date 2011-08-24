@@ -39,11 +39,14 @@ use Metamod::Config;
 use Log::Log4perl;
 use 5.6.0;
 
-our $XSLT_ISO_DIF = Metamod::DatasetTransformer::xslt_dir() . 'iso2dif.xslt';
 my $logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
 
 sub originalFormat {
     return "ISO19115";
+}
+
+sub xslt_iso_dif {
+    return Metamod::DatasetTransformer::xslt_dir() . 'iso2dif.xslt';
 }
 
 sub new {
@@ -55,7 +58,7 @@ sub new {
                 xmlStr => $xmlStr,
                 isoDoc => undef, # init by test
                 xmdDoc => undef,
-                iso2difXslt => $options{iso2difXslt} || $XSLT_ISO_DIF,
+                iso2difXslt => $options{iso2difXslt} || xslt_iso_dif(),
                 difTransformer => undef,
                };
     # options to be forwarded to DIF2MM2 conversion

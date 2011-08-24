@@ -41,6 +41,7 @@ use POSIX qw();
 use Metamod::DatasetImporter;
 use Metamod::DatasetTransformer qw();
 use Metamod::DatasetRegion qw();
+use Metamod::Subscription;
 use XML::LibXML::XPathContext qw();
 use Log::Log4perl;
 use UNIVERSAL qw();
@@ -145,6 +146,16 @@ sub writeToFile {
     $self->_writeToFileHelper($fileBase);
     my $success = $self->_writeToDatabase($fileBase);
 
+    if( $success ){
+
+        # We need a Metamod::Dataset version of the current dataset to get access to
+        # the metadata.
+        my $self_as_ds = Metamod::Dataset->newFromFile($fileBase);
+
+        my $subscription = Metamod::Subscription->new();
+        my $num_subscribers = $subscription->activate_subscription_handlers($self_as_ds);
+    }
+
     return $success;
 }
 
@@ -213,7 +224,7 @@ sub _writeToDatabase {
     my ($filename) = @_;
 
     my $importer = Metamod::DatasetImporter->new();
-    $importer->write_to_database( $filename );
+    return $importer->write_to_database( $filename );
 
 }
 

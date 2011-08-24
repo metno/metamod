@@ -43,7 +43,6 @@ use FindBin qw($Bin);
 use Cwd;
 
 use lib "$Bin/common/lib";
-use Metamod::LoggerConfigParser;
 
 #
 #  Check command line arguments (FIXME: rewrite using Getopt::Long)
@@ -319,10 +318,6 @@ foreach my $filelistpath (@flistpathes) {
 }
 
 
-my $logger_config = File::Spec->catfile( $targetdir, 'logger_config.ini' );
-my $lcp = Metamod::LoggerConfigParser->new( { verbose => 1 } );
-$lcp->create_and_write_configs($configfile,$logger_config);
-
 if ($missing_variables > 0) {
    print "NOTE: All [==...==] constructs found that were not defined in the configuration file\n" .
                 "      were substituted with empty values\n";
@@ -466,7 +461,7 @@ sub substituteval {
 
 =head2 dircopy($src, $dest)
 
-Directory copy implemented via Unix 'cp' command.
+Directory copy implemented via Unix 'rsync' command.
 
 IMPLEMENTATION NOTE: This could be implemented in a more portal fashion with
 C<File::Copy::Recursive>, but we don't want any none core dependencies in
@@ -476,8 +471,7 @@ update_target.pl.
 sub dircopy {
     my ($src, $dest) = @_;
 
-use Carp;
-    my $output = qx/cp -ru $src $dest/;
+    my $output = qx/rsync -aC $src $dest/;
     print "$output\n" if $output;
 
 }
