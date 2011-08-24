@@ -45,6 +45,8 @@ use Metamod::Config;
 
 use Moose;
 use Params::Validate qw(:all);
+use TheSchwartz;
+use TheSchwartz::Job;
 
 #
 # The current METAMOD configuration object
@@ -91,6 +93,10 @@ A string with the type of job that should be performed. This is used to determin
 
 A hash reference of job parameters. These parameters can be any thing as required by the job type.
 
+=item priority
+
+The priority of the job.
+
 =item return
 
 Returns 1 if the job was inserted successfully. False otherwise.
@@ -101,10 +107,15 @@ Returns 1 if the job was inserted successfully. False otherwise.
 sub insert_job {
     my $self = shift;
 
-    my %params = validate( @_, { job_type => { type => SCALAR }, job_parameters => { type => HASHREF } } );
+    my %params = validate( @_, { job_type => { type => SCALAR }, job_parameters => { type => HASHREF }, priority => { optional => 1 } } );
 
-    my ($job_parameters, $job_type) = @params{qw(job_parameters job_type)};
+    my ($job_parameters, $job_type, $priority) = @params{qw(job_parameters job_type priority)};
 
+    my $job = TheSchwartz::Job->new(
+        funcname => $job_type,
+        arg => $job_parameters,
+        priority => $priority,
+    );
     my $status = $self->job_client->insert( $job_type, $job_parameters );
 
     return if !defined $status;
