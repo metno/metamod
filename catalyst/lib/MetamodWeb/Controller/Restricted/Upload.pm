@@ -112,6 +112,7 @@ sub upload_POST  {
         my $success = $queue->insert_job(
             job_type => 'Metamod::Queue::Worker::Upload',
             job_parameters => { file => "$updir/$file", type => 'WEB' },
+            priority => 10,
         );
 
         if( $success ){
