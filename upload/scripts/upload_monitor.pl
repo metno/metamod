@@ -39,20 +39,13 @@ use strict;
 use warnings;
 use File::Spec;
 
-# small routine to get lib-directories relative to the installed file
-sub getTargetDir {
-    my ($finalDir) = @_;
-    my ( $vol, $dir, $file ) = File::Spec->splitpath(__FILE__);
-    $dir = $dir ? File::Spec->catdir( $dir, ".." ) : File::Spec->updir();
-    $dir = File::Spec->catdir( $dir, $finalDir );
-    return File::Spec->catpath( $vol, $dir, "" );
-}
-
 use FindBin;
-use lib ( "$FindBin::Bin/../../common/lib", getTargetDir('lib'), getTargetDir('scripts') );
+use lib ( "$FindBin::Bin/../../common/lib", );
 
-
+use Getopt::Long;
+use Pod::Usage;
 use TheSchwartz;
+
 use Metamod::Utils;
 use Metamod::Queue::Worker::Upload;
 use Metamod::Config;
@@ -69,11 +62,48 @@ Start digest_nc.pl on uploaded files.
 
 =head1 USAGE
 
-See Metamod::UploadHelper
+upload_monitor.pl [option] <config file or directory>
+
+=over
+
+=item --daemon
+
+Run the script in deamon mode. Also requires --logfile and --pidfile
+
+=item --logfile
+
+Path to the log file to use when running in daemon mode.
+
+=item --pidfile
+
+Path to the pid file to use when running in daemon mode.
+
+=item --test
+
+Run the script in test mode.
+
+=back
 
 =cut
 
-my $config = Metamod::Config->new();
+my $test;
+my $daemon;
+my $logfile;
+my $pidfile;
+
+GetOptions("daemon" => \$daemon, 'test' => \$test, 'logfile=s' => \$logfile, 'pidfile=s' => \$pidfile) or pod2usage();
+
+my $config_file_or_dir = shift @ARGV;
+
+if( !$config_file_or_dir ){
+    pod2usage("Missing config file or directory");
+}
+
+if( $daemon && (!$logfile || !$pidfile)){
+    pod2usage("You must specify both --logfile and --pidfile when running in daemon mode");
+}
+
+my $config = Metamod::Config->new($config_file_or_dir);
 my $upload_helper = Metamod::UploadHelper->new();
 
 # setup queue
@@ -88,26 +118,23 @@ my $queue_worker = TheSchwartz->new(
 );
 
 eval {
-    if ( $ARGV[0] && $ARGV[0] eq 'test' ) {
+    if ($test) {
 
         print STDERR "Testrun: " . $ARGV[0] . "\n";
         $queue_worker->can_do('Metamod::Queue::Worker::Upload');
         $queue_worker->work_until_done(); # built-in TheSchwartz method, exiting when job queue is empty
 
-    } elsif(0 == @ARGV) {
+    } elsif($daemon) {
 
-        print STDERR "Not running as daemon. Stop me with Ctrl + C\n";
+        Metamod::Utils::daemonize($logfile, $pidfile);
         $queue_worker->can_do('Metamod::Queue::Worker::Upload');
         $queue_worker->work();
 
     } else {
 
-        my ($logFile, $pidFile) = @ARGV;
-        Metamod::Utils::daemonize($logFile, $pidFile);
-        #$SIG{TERM} = \&sigterm;
+        print STDERR "Not running as daemon. Stop me with Ctrl + C\n";
         $queue_worker->can_do('Metamod::Queue::Worker::Upload');
         $queue_worker->work();
-
     }
 };
 
