@@ -331,6 +331,28 @@ sub import {
     }
 }
 
+=head2 $self->config_dir()
+
+Get the directory that the master config file is located in. Can be used to get
+paths relative to the config file.
+
+=over
+
+=item return
+
+The path to the directory containing the configuration file.
+
+=back
+
+=cut
+sub config_dir {
+    my $self = shift;
+
+    my ($dummy, $config_dir, $dummy2) = fileparse($self->{filename});
+    return $config_dir;
+
+}
+
 =head2 $self->getVarNames()
 
 =over
