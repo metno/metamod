@@ -62,16 +62,16 @@ my $logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
 my $nameReg = qr{^([^/]*)/([^/]*/)?([^/]*)$}; # project/[parent/]name where parent is optional
 
 sub _decode {
-	my ($self, $string) = @_;
-	if (!Encode::is_utf8($string)) {
-		$logger->debug("String not properly encoded, assuming utf8: $string");
+    my ($self, $string) = @_;
+    if (!Encode::is_utf8($string)) {
+        $logger->debug("String not properly encoded, assuming utf8: $string");
         eval {$string = Encode::decode('utf8', $string, Encode::FB_CROAK);};
         if ($@) {
-        	$logger->warn("Unable to properly decode string: $string");
-        	$string = Encode::decode('utf8', $string);
+            $logger->warn("Unable to properly decode string: $string");
+            $string = Encode::decode('utf8', $string);
         }
-	}
-	return $string;
+    }
+    return $string;
 }
 
 sub newFromDoc {
@@ -146,8 +146,8 @@ sub writeToFile {
     $self->_writeToFileHelper($fileBase);
     my $success = $self->_writeToDatabase($fileBase);
 
-    if( $success ){
-
+    my $is_level_2 = (defined $self->getParentName()) ? 1 : undef;
+    if( $success && $is_level_2 ){
         # We need a Metamod::Dataset version of the current dataset to get access to
         # the metadata.
         my $self_as_ds = Metamod::Dataset->newFromFile($fileBase);
@@ -229,8 +229,8 @@ sub _writeToDatabase {
 }
 
 sub deleteDatasetFile {
-	 my ($self, $fileBase) = @_;
-	 $fileBase = Metamod::DatasetTransformer::getBasename($fileBase);
+     my ($self, $fileBase) = @_;
+     $fileBase = Metamod::DatasetTransformer::getBasename($fileBase);
     my ($xmlF, $xmdF);
     # use sysopen, flock, truncate instead of open ">file" (see perlopentut)
     sysopen($xmdF, "$fileBase.xmd", O_WRONLY | O_CREAT) or die "cannot write $fileBase.xmd: $!\n";
@@ -295,9 +295,9 @@ sub replaceInfo {
     my %oldInfo = $self->getInfo;
     my %newInfo = %$infoRef;
     unless ($newInfo{name} and $newInfo{name} =~ /$nameReg/) {
-    	my $infoName = $newInfo{name} || 'undef';
+        my $infoName = $newInfo{name} || 'undef';
         if ($infoName ne 'TESTFILE') {
-    	   Carp::croak("Cannot set name to $infoName, need project/[parent/]filename");
+           Carp::croak("Cannot set name to $infoName, need project/[parent/]filename");
         }
     }
     my $infoNode = $self->{xpath}->findnodes('/d:dataset/d:info', $self->{docXMD})->item(0);
@@ -311,18 +311,18 @@ sub replaceInfo {
 }
 
 sub getParentName {
-	my ($self) = @_;
-	my %info = $self->getInfo;
-	if ($info{name} =~ /$nameReg/) {
-		if ($2) {
-			my $parent = substr $2, 0, length($2)-1; # remove trailing slash
-			return join('/', $1, $parent);
-		} else {
-			return undef;
-		}
-	} else {
-		Carp::croak("Cannot parse name to $info{name}, need project/[parent/]filename");
-	}
+    my ($self) = @_;
+    my %info = $self->getInfo;
+    if ($info{name} =~ /$nameReg/) {
+        if ($2) {
+            my $parent = substr $2, 0, length($2)-1; # remove trailing slash
+            return join('/', $1, $parent);
+        } else {
+            return undef;
+        }
+    } else {
+        Carp::croak("Cannot parse name to $info{name}, need project/[parent/]filename");
+    }
 }
 
 sub originalFormat {
@@ -399,17 +399,17 @@ sub setWMSInfo {
     my ($self, $content) = @_;
     my $oldContent = $self->getWMSInfo;
     foreach my $node ($self->{xpath}->findnodes('/d:dataset/d:wmsInfo', $self->{docXMD})) {
-	# remove old value
-	$node->parentNode->removeChild($node);
+    # remove old value
+    $node->parentNode->removeChild($node);
     }
     if ($content) {
-	# create node with new content
-	my $el = $self->{docXMD}->createElementNS($self->NAMESPACE_DS, 'wmsInfo');
-	my $parser = Metamod::DatasetTransformer->XMLParser;
-	my $contentDoc = $parser->parse_string($content);
-	$el->appendChild($contentDoc->documentElement);
+    # create node with new content
+    my $el = $self->{docXMD}->createElementNS($self->NAMESPACE_DS, 'wmsInfo');
+    my $parser = Metamod::DatasetTransformer->XMLParser;
+    my $contentDoc = $parser->parse_string($content);
+    $el->appendChild($contentDoc->documentElement);
 
-	# add content to doc, before optional projectionInfo
+    # add content to doc, before optional projectionInfo
         $self->{docXMD}->documentElement->insertAfter($el, $self->_getLastNodeBefore('d:wmsInfo'));
     }
     return $oldContent;
@@ -479,7 +479,7 @@ sub setDatasetRegion {
 =begin deprecated
 sub isXMLCharacter {
     # see http://www.w3.org/TR/REC-xml/#dt-character
-    # Char	   ::=   	#x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+    # Char       ::=       #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
     my $ic = ord($_[0]);
     my $retVal = 0;
     if ($ic == 0x9 || $ic == 0xA || $ic == 0xD) {
