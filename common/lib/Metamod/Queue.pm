@@ -101,7 +101,11 @@ Returns 1 if the job was inserted successfully. False otherwise.
 sub insert_job {
     my $self = shift;
 
-    my %params = validate( @_, { job_type => { type => SCALAR }, job_parameters => { type => HASHREF }, priority => { optional => 1 } } );
+    my %params = validate( @_, {
+        job_type => { type => SCALAR },
+        job_parameters => { type => HASHREF },
+        #priority => { optional => 1 }
+    } );
 
     my ($job_parameters, $job_type) = @params{qw(job_parameters job_type)};
 
