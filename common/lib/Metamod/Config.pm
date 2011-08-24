@@ -321,16 +321,6 @@ sub initLogger {
 
 }
 
-sub import {
-    my $package = shift;
-
-    foreach my $parameter ( @_ ){
-        if( $parameter =~ /:init_logger/ ){
-            die "Static initialisation of logger no longer supported since it was a really stupid idea!";
-        }
-    }
-}
-
 =head2 $self->config_dir()
 
 Get the directory that the master config file is located in. Can be used to get
