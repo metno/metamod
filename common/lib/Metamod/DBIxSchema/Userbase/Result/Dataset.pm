@@ -197,9 +197,8 @@ sub validate_dskey {
     my $key = shift;
 
     my $dskey = $self->dataset_key();
-    printf STDERR " '%s' = '%s'? %d\n", $key, $dskey, ($key eq $dskey);
-    return 1 unless $dskey; # blank key = access all areas
-    return !$dskey || ($key eq $dskey);
+    return 1 unless defined($dskey); # blank key = access all areas
+    return ($key eq $dskey);
 }
 
 1;
