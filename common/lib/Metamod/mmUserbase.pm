@@ -183,10 +183,9 @@ use constant FALSE => 0;
     #     Method: _pg_escape_string
     #
     sub _pg_escape_string {
-        my $self   = shift;
+        my ($self, $string) = @_;
         my $ident  = ident($self);
-        my $string = shift or return;
-        $string =~ s/\'/\'\'/mg;
+        $string =~ s/\'/\'\'/mg if $string;
         return $string;
     }
 
