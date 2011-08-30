@@ -379,7 +379,7 @@ TEST_IMPORT_PROGRESS_REPORT = 1
 # Set this value to a '#' to activate sending E-mail regarding errors in
 # uploaded files to actual users. It comments out setting the E-mail recipient
 # to [==OPERATOR_EMAIL==].
-TEST_EMAIL_RECIPIENT =
+TEST_EMAIL_RECIPIENT = 0
 
 LOG4PERL_CONFIG = log4perl_config.ini
 LOG4ALL_SYSTEM_LOG = system_log.log
