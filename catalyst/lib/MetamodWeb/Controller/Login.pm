@@ -167,7 +167,7 @@ sub register : Path('register') :Args(0) {
 
     $self->send_user_receipt($c, $user_values);
 
-    $self->send_operator_email($c, $new_user);
+    $self->send_operator_email($c, $new_user, $user_values);
 
     $self->add_info_msgs($c, 'New user has been requested. A receipt has been sent to your email');
     $c->res->redirect($c->uri_for('/login' ));
@@ -188,11 +188,18 @@ sub validate_new_user : Private {
                 $dfv->set_current_constraint_name('username_constraint');
                 return $val =~ /^(\w{3,20})|$email$/;
             },
+            access_rights => sub {
+                my ($dfv, $priv) = @_;
+                my $inst = $dfv->get_filtered_data->{institution_name};
+                my $illegal = ($priv ne 'subscription' and $inst eq 'other');
+                return !$illegal;
+            }
+
         },
-        labels => {
+        labels => { # shouldn't these be equal to labels in template? FIXME
             register_username => 'Username',
             email => 'Email',
-            access_right => 'Access rights',
+            access_rights => 'Access rights',
             institution => 'Institution name',
             institution_other => 'Institution name (other)',
             telephone => 'Telephone',
@@ -202,8 +209,10 @@ sub validate_new_user : Private {
             constraints => {
                 email => 'Invalid email address',
                 username_constraint => "Invalid username. Only user letters, '_' and numbers, or same as email",
+                access_rights => 'Only subscription privileges allowed for other institutions',
             }
-        }
+        },
+        debug => 1,
     );
     my $validator = MetamodWeb::Utils::FormValidator->new( validation_profile => \%form_profile );
     my $result = $validator->validate($c->req->params);
@@ -226,11 +235,11 @@ Dear $user_info->{u_name},
 
 we have received your request for a new user with the following information.
 
-Name: $user_info->{u_name}
-Email: $user_info->{u_email}
-Username: $user_info->{u_loginname}
+Name:        $user_info->{u_name}
+Email:       $user_info->{u_email}
+Username:    $user_info->{u_loginname}
 Institution: $user_info->{u_institution}
-Telephone: $user_info->{u_telephone}
+Telephone:   $user_info->{u_telephone}
 
 You will receive an email with your password as soon as your request has been manually reviewed.
 
@@ -249,7 +258,7 @@ END_BODY
 }
 
 sub send_operator_email {
-    my ($self, $c, $new_user) = @_;
+    my ($self, $c, $new_user, $user_info) = @_;
 
     my $mm_config = $c->stash->{mm_config};
     my $local_url = $mm_config->get('BASE_PART_OF_EXTERNAL_URL') . $mm_config->get('LOCAL_URL');
@@ -259,8 +268,14 @@ sub send_operator_email {
     my $approve_url = "$local_url/admin/confirm_user/" . $new_user->u_id(); # can't use uri_for in email
 
     my $email_body = <<"END_BODY";
-A new user has been registred. Please check the information
+A new user has been registered. Please check the information
 and approve the user if the information is ok, or reject if not.
+
+Name:        $user_info->{u_name}
+Email:       $user_info->{u_email}
+Username:    $user_info->{u_loginname}
+Institution: $user_info->{u_institution}
+Telephone:   $user_info->{u_telephone}
 
 $approve_url
 END_BODY
