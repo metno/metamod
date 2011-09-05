@@ -191,8 +191,9 @@ sub validate_new_user : Private {
             access_rights => sub {
                 my ($dfv, $priv) = @_;
                 my $inst = $dfv->get_filtered_data->{institution_name};
-                my $illegal = ($priv ne 'subscription' and $inst eq 'other');
-                return !$illegal;
+                $dfv->set_current_constraint_name('access_rights');
+                my $illegal = ($priv ne 'subscription') && ($inst eq 'other');
+                return not $illegal;
             }
 
         },
