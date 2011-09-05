@@ -77,7 +77,7 @@ has 'ftp_events'            => ( is => 'rw', default => sub { {} } );
 sub BUILD { # ye olde init "constructor"
     my $self = shift;
 
-    ## Make sure static directories exists
+    ## Make sure static directories exists - FIXME
     #foreach my $directory ( $work_directory, $work_start, $work_expand, $work_flat, $uerr_directory,
     #    $xml_directory, $xml_history_directory, $problem_dir_path ) {
     #    mkpath($directory);
@@ -90,7 +90,6 @@ sub BUILD { # ye olde init "constructor"
 
     #  Initialize hash (ftp_events) from text file
     $self->read_ftp_events();
-    #$self->logger( $self->config->initLogger && get_logger(__PACKAGE__) ); # remove when ØT has fixed up Config.pm
     # $self->logger->debug( "Dump of hash ftp_events:" . join( "\t", split "\n", Dumper( $self->ftp_events() ) ) ); # Data::Dumper works poorly in log4perl
     #print STDERR "Dump of hash ftp_events:\n" . Dumper( $self->ftp_events() );
 
@@ -1042,12 +1041,13 @@ sub get_dataset_institution {
                     # Get user property
                     my $val = $userbase->user_get( $properties[$i1] );
                     if ( !$val ) {
-                        #$self->logger->warn( $userbase->get_exception() . "\n" );
-                        # $ok_to_now = 0;  # not a fatal error - u_institution is not required
+                        $self->logger->warn( $userbase->get_exception() . "\n" );
+                        $ok_to_now = 0;  # not a fatal error - u_institution is not required
                         @user_values = (); # empty the fields list
-                        last;              # we're ignoring this user
+                        #last;              # we're ignoring this user
                     } else {
                         push( @user_values, $val );
+                        $self->logger->debug( "User: " . join('|', @user_values) );
                     }
                 }
             }
@@ -1065,9 +1065,7 @@ sub get_dataset_institution {
                         for ( my $i2 = 0 ; $i2 < 4 ; $i2++ ) {
                             if ($ok_to_now) {
 
-                                #
-                                #                  Get content field in current dataset
-                                #
+                                # Get content field in current dataset
                                 my $val2 = $userbase->dset_get( $properties2[$i2] );
                                 if ( ( !$val2 ) and $userbase->exception_is_error() ) {
                                     $self->logger->error( $userbase->get_exception() . " (*ACTUALLY*, $properties2[$i2] is not set)" );
