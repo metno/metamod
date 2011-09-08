@@ -32,6 +32,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
+use Cwd;
 use FindBin;
 use lib "$FindBin::Bin/../";
 
@@ -56,6 +57,10 @@ ok(index($config->get("SOURCE_DIRECTORY"), $config->get("BASE_DIRECTORY")) == 0,
 
 is($config->getDSN(), "dbi:Pg:dbname=metamod_unittest;host=localhost;password=admin", "getDSN");
 
+is($config->get('INSTALLATION_DIR'), Cwd::abs_path("$FindBin::Bin/../../../"), 'Installation dir figured out correctly.');
+
+is($config->get('CONFIG_DIR'), "$FindBin::Bin", 'Config directory figured out correctly.');
+
 my $config2 = Metamod::Config->new($FindBin::Bin.'/../t/master_config.txt');
 is($config, $config2, "config-singleton on same file");
 
@@ -63,4 +68,3 @@ $config2 = Metamod::Config->instance();
 isa_ok($config2, 'Metamod::Config');
 
 ok($config2->get('TARGET_DIRECTORY'), 'get TARGET_DIRECTORY of default');
-

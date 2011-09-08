@@ -45,6 +45,7 @@ use Carp qw(cluck croak carp confess);
 
 #use Data::Dumper;
 use File::Basename;
+use FindBin;
 use File::Spec qw();
 use Cwd qw();
 # read ABS_PATH early, in case somebody uses a chdir
@@ -218,6 +219,13 @@ sub _getVar {
     if (exists $ENV{"METAMOD_".$var}) {
         return $ENV{"METAMOD_".$var};
     }
+
+    if( $var eq 'CONFIG_DIR' ){
+        return $self->config_dir();
+    } elsif( $var eq 'INSTALLATION_DIR') {
+        return $self->installation_dir();
+    }
+
     if (!exists $self->{vars}{$var}) {
         if ($_logger_initialised) {
             Log::Log4perl::get_logger('metamod::common::Metamod::Config')->logcarp("missing config variable in master_config.txt: $var");
@@ -339,8 +347,42 @@ sub config_dir {
     my $self = shift;
 
     my ($dummy, $config_dir, $dummy2) = fileparse($self->{filename});
-    return $config_dir;
+    return Cwd::abs_path($config_dir);
 
+}
+
+=head2 $self->installation_dir()
+
+Get the absolute path to the directory where the METAMOD application is installed.
+
+=over
+
+=item return
+
+Returns the absolute path to the directory where METAMOD is installed. Throws an exception if
+the location cannot be determined.
+
+=back
+
+=cut
+sub installation_dir {
+    my $self = shift;
+
+    my $tries_counter = 0;
+    my $curr_dir = $FindBin::Bin;
+
+    while( !(-d File::Spec->catdir( $curr_dir, 'common'))){
+
+        # try one level up
+        $curr_dir = File::Spec->catdir($curr_dir, '..');
+        $tries_counter++;
+
+        if( $tries_counter > 10 ){
+            die 'Could not determine installation dir';
+        }
+    }
+
+    return Cwd::abs_path($curr_dir);
 }
 
 =head2 $self->getVarNames()
@@ -359,8 +401,12 @@ sub getVarNames {
     my $self = shift;
 
     $self->_checkFile();
-    return keys %{ $self->{vars} };
+    my @var_names = keys %{ $self->{vars} };
 
+    push @var_names, 'CONFIG_DIR';
+    push @var_names, 'INSTALLATION_DIR';
+
+    return @var_names;
 }
 
 =head2 $self->getDSFilePath($ds_name)
