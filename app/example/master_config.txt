@@ -504,8 +504,8 @@ SUBSCRIPTION_ENABLED = ENABLED
 AUTH_TYPE = DB
 
 # LDAP server used for authentication + base DN
-LDAP_SERVER = ldaps://ldap.example.com
-LDAP_BASE_DN = ou=user,ou=internal,dc=example,dc=com
+#LDAP_SERVER = ldaps://ldap.example.com
+#LDAP_BASE_DN = ou=user,ou=internal,dc=example,dc=com
 
 # ============== Distribution configuration =================
 
