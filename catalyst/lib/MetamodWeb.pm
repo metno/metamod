@@ -66,7 +66,7 @@ $VERSION = eval $VERSION;
 # with an external configuration file acting as an override for
 # local deployment.
 
-my $mm_config = Metamod::Config->new();
+my $mm_config = Metamod::Config->instance();
 $mm_config->initLogger();
 
 my $custdir = path_to_custom();
@@ -155,12 +155,7 @@ Determine the absolute path to the custom directory under Metamod root (see over
 
 sub path_to_custom {
 
-    if ( my $root = path_to_metamod_root() ) {
-        return "$root/custom";
-    }
-
-    get_logger('MetamodWeb')->error("$@ Custom styles will probably not work");
-    return;
+    return File::Spec->catdir($mm_config->config_dir, 'custom');
 
 }
 

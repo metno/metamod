@@ -25,7 +25,6 @@ GetOptions ('pid|p=s' => \$pid,     # name of pid file - if given, run as daemon
 
 # init config + logger
 my $master_config = shift @ARGV or usage();
-$ENV{METAMOD_MASTER_CONFIG} = $master_config;
 my $mm_config    = Metamod::Config->new($master_config);
 my $log = get_logger('metamod.basket');
 

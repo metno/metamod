@@ -7,18 +7,11 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 use lib "$FindBin::Bin/../../..";
 
-# must override the master config file to use here before use import modules that use the config file.
-BEGIN {
-    my $config_file = "$FindBin::Bin/../../master_config.txt";
-    $ENV{METAMOD_MASTER_CONFIG} = $config_file unless exists $ENV{METAMOD_MASTER_CONFIG};
-    $ENV{ METAMOD_LOG4PERL_CONFIG } = "$FindBin::Bin/../../log4perl_config.ini";
-}
-
 use Cwd qw( abs_path );
 use Test::More;
 use Test::Files;
 
-use Metamod::Config qw( :init_logger );
+use Metamod::Config;
 use Metamod::Dataset;
 use Metamod::SubscriptionHandler::SMS;
 use Metamod::Test::Setup;
@@ -27,7 +20,7 @@ my $num_tests;
 
 $ENV{METAMOD_SUBSCRIPTION_SMS_DIRECTORY} = $FindBin::Bin;
 
-my $test_setup = Metamod::Test::Setup->new( master_config_file => $ENV{METAMOD_MASTER_CONFIG } );
+my $test_setup = Metamod::Test::Setup->new( master_config_file => "$FindBin::Bin/../../master_config.txt" );
 $test_setup->mm_config->initLogger();
 $test_setup->populate_userbase("$FindBin::Bin/sms_test_data.sql");
 

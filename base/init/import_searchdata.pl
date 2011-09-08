@@ -40,16 +40,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use strict;
 use warnings;
 use File::Spec;
-# small routine to get lib-directories relative to the installed file
-sub getTargetDir {
-    my ($finalDir) = @_;
-    my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
-    $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
-    $dir = File::Spec->catdir($dir, $finalDir);
-    return File::Spec->catpath($vol, $dir, "");
-}
+use File::Basename;
 
-use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
+use lib ('../../common/lib' );
 use XML::Simple qw(:strict);
 use mmTtime;
 # use Data::Dumper;
@@ -63,11 +56,18 @@ use vars qw($dbh @logarr %searchdata @ancestors
             );
 
 
-my $config = new Metamod::Config();
+
 if (scalar @ARGV != 1) {
-   die "\nUsage:\n\n     $0 name_of_xml_file\n\n";
+   die "\nUsage:\n\n     $0 <path to config directory>\n\n";
 }
-my $searchdataxml = $ARGV[0];
+
+
+my $config_directory = shift @ARGV;
+my $master_config_file = File::Spec->catfile($config_directory, "master_config.txt");
+
+my $config = new Metamod::Config($master_config_file);
+my $searchdataxml = File::Spec->catfile($config_directory, 'staticdata', 'searchdata.xml');
+
 #
 #  Connect to PostgreSQL database:
 #

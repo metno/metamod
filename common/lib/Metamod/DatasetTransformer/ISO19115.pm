@@ -45,17 +45,20 @@ sub originalFormat {
     return "ISO19115";
 }
 
+sub xslt_iso_dif {
+    return Metamod::DatasetTransformer::xslt_dir() . 'iso2dif.xslt';
+}
+
 sub new {
     if (@_ < 3 || (scalar @_ % 2 != 1)) {
         croak ("new " . __PACKAGE__ . " needs argument (package, file), got: @_");
     }
     my ($class, $xmdStr, $xmlStr, %options) = @_;
-    my $XSLT_ISO_DIF = $Metamod::DatasetTransformer::XSLT_DIR . 'iso2dif.xslt'; # doesn't work compile time
     my $self = {xmdStr => $xmdStr,
                 xmlStr => $xmlStr,
                 isoDoc => undef, # init by test
                 xmdDoc => undef,
-                iso2difXslt => $options{iso2difXslt} || $XSLT_ISO_DIF,
+                iso2difXslt => $options{iso2difXslt} || xslt_iso_dif(),
                 difTransformer => undef,
                };
     # options to be forwarded to DIF2MM2 conversion

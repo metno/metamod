@@ -823,9 +823,9 @@ sub parse_all {
 #  in the first line), then construct a wmsxml element form this based on the
 #  WMS_XML value in master config:
 #
-   my $masterconfig = Metamod::Config->new();
+   my $config = Metamod::Config->instance();
    if (defined($wmsurl)) {
-      my $wmsxml = $masterconfig->get("WMS_XML");
+      my $wmsxml = $config->get("WMS_XML");
       if ($wmsxml =~ / url=""/) {
          my $wmsfirst = $`; # String before match
          my $wmslast = $'; # String after match

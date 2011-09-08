@@ -7,14 +7,15 @@ use lib "$FindBin::Bin/../";
 
 use Test::More tests => 12;
 use Data::Dumper;
+use Metamod::Config;
 
-BEGIN {
-    $ENV{METAMOD_XSLT_DIR} = "$FindBin::Bin/../../schema/";
-    $ENV{METAMOD_MASTER_CONFIG} = "$FindBin::Bin/master_config.txt";
-    $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/log4perl_config.ini";
-}
 
-BEGIN {use_ok('Metamod::DatasetTransformer::ToISO19115', "foreignDataset2iso19115")};
+$ENV{METAMOD_XSLT_DIR} = "$FindBin::Bin/../../schema/";
+
+my $config = Metamod::Config->new("$FindBin::Bin/master_config.txt");
+$config->initLogger();
+
+use_ok('Metamod::DatasetTransformer::ToISO19115', "foreignDataset2iso19115");
 
 # iso -> iso
 my $DataDir = $FindBin::Bin.'/data/XML/';

@@ -33,10 +33,14 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../";
 
+use Metamod::Config;
+
 use Test::More tests => 2;
 
-BEGIN {use_ok('Metamod::DatasetTransformer');}
-Log::Log4perl::init( "$FindBin::Bin/log4perl_config.ini" );
+my $config = Metamod::Config->new("$FindBin::Bin/master_config.txt");
+$config->initLogger();
+
+use_ok('Metamod::DatasetTransformer');
 
 my @plugins = Metamod::DatasetTransformer::getPlugins();
 ok ((@plugins > 0), "plugins found");

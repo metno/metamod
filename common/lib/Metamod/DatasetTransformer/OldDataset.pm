@@ -48,9 +48,11 @@ sub new {
     if (@_ < 3 || (scalar @_ % 2 != 1)) {
         croak ("new " . __PACKAGE__ . " needs argument (package, file), got: @_\n");
     }
+
+    my $XSLT_FILE_MM2 = Metamod::DatasetTransformer::xslt_dir().'oldDataset2MM2.xslt';
+    my $XSLT_FILE_XMD = Metamod::DatasetTransformer::xslt_dir().'oldDataset2Dataset.xslt';
+
     my ($class, $xmdStr, $xmlStr, %options) = @_;
-    my $XSLT_FILE_MM2 = $Metamod::DatasetTransformer::XSLT_DIR.'oldDataset2MM2.xslt'; # doesn't work compile time
-    my $XSLT_FILE_XMD =  $Metamod::DatasetTransformer::XSLT_DIR.'oldDataset2Dataset.xslt';
     my $self = {xmdStr => $xmdStr,
                 xmlStr => $xmlStr,
                 oldDoc => undef, # init by test

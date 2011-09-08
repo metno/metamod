@@ -42,13 +42,12 @@ use Log::Log4perl;
 our @EXPORT_OK = qw(foreignDataset2iso19115);
 our $_logger = Log::Log4perl->get_logger('metamod::common::Metamod::DatasetTransformer::ToISO19115');
 
-my $difToIsoXslt = $Metamod::DatasetTransformer::XSLT_DIR . 'dif2iso.xslt';
-
 my $difToIsoStyle;
 my $_init = 0;
 sub _init {
     return if $_init++;
 
+    my $difToIsoXslt = Metamod::DatasetTransformer::xslt_dir() . 'dif2iso.xslt';
     my $styleDoc = Metamod::DatasetTransformer->XMLParser->parse_file($difToIsoXslt);
     $difToIsoStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet($styleDoc);
     if (!$difToIsoStyle) {

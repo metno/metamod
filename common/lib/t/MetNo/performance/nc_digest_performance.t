@@ -8,24 +8,20 @@ use FindBin;
 
 use lib "$FindBin::Bin/../../../";
 
-BEGIN {
-    $ENV{METAMOD_MASTER_CONFIG} = "$FindBin::Bin/../../master_config.txt" unless exists $ENV{METAMOD_MASTER_CONFIG};
-    $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/../../log4perl_config.ini";
-}
-
-use Metamod::Config qw(:init_logger);
+use Metamod::Config;
+use MetNo::NcDigest qw( digest );
 
 my $num_tests = 0;
 use Test::More;
 use Test::Files;
+use Test::PerformanceRegression;
 
 BEGIN {
     plan skip_all => 'unset NO_PERF_TESTS to run performance tests' if $ENV{NO_PERF_TESTS};
 }
 
-use MetNo::NcDigest qw( digest );
-
-use Test::PerformanceRegression;
+my $config = Metamod::Config->new("$FindBin::Bin/../../master_config.txt");
+$config->initLogger();
 
 my $out_dir = "$FindBin::Bin/xml_output/xml_output";
 my $baseline_dir = "$FindBin::Bin/../../data/MetNo"; # dir with the correct xml files

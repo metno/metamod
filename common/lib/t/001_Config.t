@@ -37,39 +37,30 @@ use lib "$FindBin::Bin/../";
 
 
 use Test::More tests => 12;
+use Test::Exception;
 
 BEGIN {use_ok('Metamod::Config');}
 
-$ENV{METAMOD_LOG4PERL_CONFIG} = $FindBin::Bin . '/log4perl_config.ini';
+dies_ok { my $config = Metamod::Config()->new(); } 'Dies on missing parameter';
+
+dies_ok { my $config = Metamod::Config()->new('xyz'); } 'Dies on unknown file';
 
 my $confFile = $FindBin::Bin.'/master_config.txt';
-my $config = new Metamod::Config($confFile);
+my $config = Metamod::Config->new($confFile);
 isa_ok($config, 'Metamod::Config');
 can_ok($config, 'get');
 ok($config->get('TARGET_DIRECTORY'), 'get TARGET_DIRECTORY');
-#print STDERR Dumper($config->{vars});
+
 ok(!$config->get('NOT_THERE'), 'getting false value on NOT_THERE');
 ok(index($config->get("SOURCE_DIRECTORY"), $config->get("BASE_DIRECTORY")) == 0, "get sustitutes variables");
 
 is($config->getDSN(), "dbi:Pg:dbname=metamod_unittest;host=localhost;password=admin", "getDSN");
 
-my $config2 = new Metamod::Config($FindBin::Bin.'/../t/master_config.txt');
+my $config2 = Metamod::Config->new($FindBin::Bin.'/../t/master_config.txt');
 is($config, $config2, "config-singleton on same file");
 
-eval {
-	$config2 = new Metamod::Config('xyz');
-};
-ok($@, 'config dies on missing file');
-
-$config2 = new Metamod::Config();
+$config2 = Metamod::Config->instance();
 isa_ok($config2, 'Metamod::Config');
+
 ok($config2->get('TARGET_DIRECTORY'), 'get TARGET_DIRECTORY of default');
 
-my $cwd = Cwd::getcwd();
-chdir "/tmp";
-my $config3;
-eval {
-    $config3 = new Metamod::Config();
-};
-isa_ok($config3, 'Metamod::Config');
-chdir $cwd;

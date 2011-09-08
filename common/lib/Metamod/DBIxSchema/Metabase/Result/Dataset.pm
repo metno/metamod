@@ -236,7 +236,7 @@ Returns a Metamod::FimexProjections object (never null)
 
 sub fimex_projections {
     my ($self) = @_;
-    my $config = Metamod::Config->new();
+    my $config = Metamod::Config->instance();
     return new Metamod::FimexProjections() unless $config->get('FIMEX_PROGRAM');
 
     my $projinfo_row = $self->projectioninfos()->first();
@@ -336,7 +336,7 @@ sub wmsthumb {
     my ($size) = @_;
 
     try {
-        my $config = Metamod::Config->new();
+        my $config = Metamod::Config->instance();
 
         my $setup = $self->wmsinfo or die "Error: Missing wmsSetup for dataset " . $self->ds_name;
 
@@ -466,7 +466,7 @@ sub file_location {
 
     my $metadata = $self->metadata( ['dataref'] );
 
-    my $config = Metamod::Config->new();
+    my $config = Metamod::Config->instance();
     my $opendap_basedir = $config->get('OPENDAP_BASEDIR') || '';
     my $thredds_dataset_prefix = $config->get('THREDDS_DATASET_PREFIX') || '';
 

@@ -40,7 +40,7 @@ use MetamodWeb::Utils::FormValidator::Constraints;
 #
 # A Metamod::Config object containing the configuration for the application
 #
-has 'config' => ( is => 'ro', isa => 'Metamod::Config', default => sub { Metamod::Config->new() } );
+has 'config' => ( is => 'ro', isa => 'Metamod::Config', default => sub { Metamod::Config->instance() } );
 
 #
 # A Catalyst context object.

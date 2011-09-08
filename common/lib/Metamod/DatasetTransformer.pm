@@ -52,12 +52,14 @@ my @plugins;
 use constant XMLParser => new XML::LibXML();
 use constant XSLTParser => new XML::LibXSLT();
 
-our $XSLT_DIR;
-if ($ENV{METAMOD_XSLT_DIR}) {
-    $XSLT_DIR = $ENV{METAMOD_XSLT_DIR}
-} else {
-    my $config = Metamod::Config->new();
-    $XSLT_DIR = $config->get("SOURCE_DIRECTORY") . '/common/schema/';
+sub xslt_dir {
+
+    if ($ENV{METAMOD_XSLT_DIR}) {
+        return $ENV{METAMOD_XSLT_DIR}
+    } else {
+        my $config = Metamod::Config->instance();
+        return $config->get("SOURCE_DIRECTORY") . '/common/schema/';
+    }
 }
 
 
@@ -125,6 +127,7 @@ sub getPlugins {
     my @files = grep {/\.pm$/ && -f File::Spec->catfile($basePluginPath,$_)} readdir $d;
     closedir $d;
 
+    my @plugins;
     foreach my $file (@files) {
         next if substr($file, 0, 2) eq 'To'; # Ignore modules To other formats
         my $plugin = __PACKAGE__ . "::$file";

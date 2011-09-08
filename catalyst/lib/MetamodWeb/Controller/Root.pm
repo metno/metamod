@@ -113,7 +113,7 @@ For instance creating objects that are relevant for all requests.
 sub auto :Private {
     my ( $self, $c ) = @_;
 
-    my $mm_config = Metamod::Config->new();
+    my $mm_config = Metamod::Config->instance();
 
     $c->stash( mm_config => $mm_config );
 

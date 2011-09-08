@@ -4,7 +4,7 @@
 
 DROP SCHEMA IF EXISTS sru CASCADE;
 CREATE SCHEMA sru;
-GRANT USAGE ON SCHEMA sru TO "[==PG_WEB_USER==]";
+GRANT USAGE ON SCHEMA sru TO :PG_WEB_USER;
 
 -- contacts
 CREATE TABLE sru.meta_contact (
@@ -14,7 +14,7 @@ CREATE TABLE sru.meta_contact (
     UNIQUE(author, organization),
     PRIMARY KEY(id_contact)
 );
-GRANT SELECT ON sru.meta_contact TO "[==PG_WEB_USER==]";
+GRANT SELECT ON sru.meta_contact TO :PG_WEB_USER;
 
 -- main table
 CREATE TABLE sru.products (
@@ -42,7 +42,7 @@ CREATE TABLE sru.products (
 
     PRIMARY KEY(id_product)
 );
-GRANT SELECT ON sru.products TO "[==PG_WEB_USER==]";
+GRANT SELECT ON sru.products TO :PG_WEB_USER;
 
 -- create the full text index
 CREATE INDEX products_metatext_vector_idx ON sru.products USING gist(metatext_vector);

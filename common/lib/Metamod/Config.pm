@@ -41,9 +41,10 @@ our $DEBUG = 0;
 use strict;
 use warnings;
 
-use Carp qw(cluck croak carp);
+use Carp qw(cluck croak carp confess);
 
 #use Data::Dumper;
+use File::Basename;
 use File::Spec qw();
 use Cwd qw();
 # read ABS_PATH early, in case somebody uses a chdir
@@ -59,48 +60,72 @@ our $_config; #_config{file} => $config
 our $_logger_initialised;
 
 sub new {
-    my ($class, $file) = @_;
-    my $fileFlag = "";
-    unless ($file) {
-        $file = _getDefaultConfigFile();
-        $fileFlag = "default";
+    my ($class, $file_or_dir) = @_;
+
+    confess "You must supply the path to the configuration directory or the master_config.txt file" if !$file_or_dir;
+
+    # we already have an object so use that instead.
+    return $_config if defined $_config;
+
+    my $config_file;
+    if( -d $file_or_dir ){
+        $config_file = File::Spec->catfile($file_or_dir, 'master_config.txt');
+    } else {
+        $config_file = $file_or_dir;
     }
-    if ((! -f $file) and (! -r _)) {
-        die "Cannot read $fileFlag config-file: $file";
+
+    # If the path to the master config is set in the enviroment that overrides
+    # any parameters sent to the constructor.
+    if( exists $ENV{METAMOD_MASTER_CONFIG} && $ENV{METAMOD_MASTER_CONFIG} ){
+        $config_file = $ENV{METAMOD_MASTER_CONFIG};
     }
-    $file = _normalizeFile($file);
-    unless (defined $_config) {
-        my $config = {
-            mtime => '0',
-            filename => $file,
-            vars => {}, # lazy loading on first get
-        };
-        $_config = bless $config, $class;
+
+    if ((! -f $config_file) and (! -r $config_file)) {
+        die "Cannot read config-file: $config_file";
         $_config->initLogger; # staticInitLogger ?
     }
+
+    $config_file = _normalizeFile($config_file);
+
+    my $config = {
+        mtime => '0',
+        filename => $config_file,
+        vars => {}, # lazy loading on first get
+    };
+    $_config = bless $config, $class;
+
     return $_config;
 }
 
-# get the file from METAMOD_MASTER_CONFIG or in (source|target)/master_config.txt
-sub _getDefaultConfigFile {
-    # allow the use of none standard location of the config file. This is functionality
-    # is meant primarily for unit testing purposes
-    if ( exists $ENV{ METAMOD_MASTER_CONFIG } ) {
-        # no, we can't use log4perl since haven't been initialized yet
-        #printf STDERR "Config file set in ENV to %s\n", $ENV{ METAMOD_MASTER_CONFIG };
-        return $ENV{ METAMOD_MASTER_CONFIG };
-    }
-    my ($vol, $dir, undef) = File::Spec->splitpath(ABS_PATH());
-    my @dirs = File::Spec->splitdir($dir);
-    pop @dirs; # remove last /
-    print STDERR "dir of Metamod: ".scalar @dirs." ". File::Spec->catdir(@dirs). " $dir\n" if $DEBUG;
-    # go up to dirs
-    pop @dirs;
-    print STDERR "dir of intermediate: ".scalar @dirs." ". File::Spec->catdir(@dirs)."\n" if $DEBUG;
-    pop @dirs;
-    print STDERR "dir of master_config: ".scalar @dirs." ". File::Spec->catdir(@dirs)."\n" if $DEBUG;
-    return File::Spec->catpath($vol, File::Spec->catdir(@dirs), 'master_config.txt');
+sub instance {
+    my $class = shift;
+
+    confess "You must call new() once before you can call instance()" if !defined $_config;
+
+    return $_config;
+
 }
+
+## get the file from METAMOD_MASTER_CONFIG or in (source|target)/master_config.txt
+#sub _getDefaultConfigFile {
+#    # allow the use of none standard location of the config file. This is functionality
+#    # is meant primarily for unit testing purposes
+#    if ( exists $ENV{ METAMOD_MASTER_CONFIG } ) {
+#        # no, we can't use log4perl since haven't been initialized yet
+#        #printf STDERR "Config file set in ENV to %s\n", $ENV{ METAMOD_MASTER_CONFIG };
+#        return $ENV{ METAMOD_MASTER_CONFIG };
+#    }
+#    my ($vol, $dir, undef) = File::Spec->splitpath(ABS_PATH());
+#    my @dirs = File::Spec->splitdir($dir);
+#    pop @dirs; # remove last /
+#    print STDERR "dir of Metamod: ".scalar @dirs." ". File::Spec->catdir(@dirs). " $dir\n" if $DEBUG;
+#    # go up to dirs
+#    pop @dirs;
+#    print STDERR "dir of intermediate: ".scalar @dirs." ". File::Spec->catdir(@dirs)."\n" if $DEBUG;
+#    pop @dirs;
+#    print STDERR "dir of master_config: ".scalar @dirs." ". File::Spec->catdir(@dirs)."\n" if $DEBUG;
+#    return File::Spec->catpath($vol, File::Spec->catdir(@dirs), 'master_config.txt');
+#}
 
 # normalize the filename
 sub _normalizeFile {
@@ -265,7 +290,15 @@ sub initLogger {
 
     return if( $_logger_initialised );
 
-    my $log_config = $self->get( 'LOG4PERL_CONFIG' );
+    my $config_file = $self->{filename};
+    my $config_dir = dirname($config_file);
+
+    my $log_config = File::Spec->catfile($config_dir,'log4perl_config.ini');
+
+    if(exists $ENV{METAMOD_LOG4PERL_CONFIG} && $ENV{METAMOD_LOG4PERL_CONFIG}){
+        $log_config = $ENV{METAMOD_LOG4PERL_CONFIG};
+    }
+
     my $system_log = $self->get( 'LOG4ALL_SYSTEM_LOG' );
     my $reinit_period = $self->get( 'LOG4PERL_WATCH_TIME' ) || 10;
 
@@ -288,23 +321,26 @@ sub initLogger {
 
 }
 
-sub staticInitLogger {
-    my ($filename) = @_;
+=head2 $self->config_dir()
 
-    my $config = __PACKAGE__->new($filename);
+Get the directory that the master config file is located in. Can be used to get
+paths relative to the config file.
 
-    return $config->initLogger();
+=over
 
-}
+=item return
 
-sub import {
-    my $package = shift;
+The path to the directory containing the configuration file.
 
-    foreach my $parameter ( @_ ){
-        if( $parameter =~ /:init_logger/ ){
-            staticInitLogger();
-        }
-    }
+=back
+
+=cut
+sub config_dir {
+    my $self = shift;
+
+    my ($dummy, $config_dir, $dummy2) = fileparse($self->{filename});
+    return $config_dir;
+
 }
 
 =head2 $self->getVarNames()

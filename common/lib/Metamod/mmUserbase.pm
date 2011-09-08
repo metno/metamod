@@ -155,7 +155,7 @@ use constant FALSE => 0;
         #
         #        Set attribute values
         #
-        my $config = new Metamod::Config();
+        my $config = Metamod::Config->instance();
         my $dbname = $config->get("USERBASE_NAME") or die "Missing USERBASE_NAME in master_config";
         my $user   = $config->get("PG_ADMIN_USER") or die "Missing PG_ADMIN_USER in master_config";
         $dbh{$ident} =
@@ -2129,7 +2129,7 @@ Return value: TRUE on success, FALSE on error.
 
 =head1 AUTHOR
 
-Egil Støren <egil.storen@met.no>
+Egil Stï¿½ren <egil.storen@met.no>
 
 =cut
 

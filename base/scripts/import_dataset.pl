@@ -36,27 +36,14 @@ use strict;
 use warnings;
 use File::Spec;
 use File::Find qw();
-# small routine to get lib-directories relative to the installed file
-sub getTargetDir {
-    my ($finalDir) = @_;
-    my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
-    $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
-    $dir = File::Spec->catdir($dir, $finalDir);
-    return File::Spec->catpath($vol, $dir, "");
-}
 
 use FindBin;
-use lib ("$FindBin::Bin/../../common/lib", getTargetDir('lib'), getTargetDir('scripts'), '.');
+use lib ("$FindBin::Bin/../../common/lib", '.');
 
 use Metamod::DatasetImporter;
 use Metamod::Config;
 use Log::Log4perl qw();
-use Metamod::Utils qw();
 use Data::Dumper;
-
-my $config = new Metamod::Config();
-$config->initLogger();
-my $logger = Log::Log4perl->get_logger('metamod.base.import_dataset');
 
 #
 #  Import datasets from XML files into the database.
@@ -68,15 +55,21 @@ my $logger = Log::Log4perl->get_logger('metamod.base.import_dataset');
 #
 #  Check number of command line arguments
 #
-if ( scalar @ARGV != 1 ) {
+if ( scalar @ARGV != 2 ) {
     die "\nUsage:\n\n"
-      . "   Import single XML file:     $0 filename\n"
-      . "   Import a directory:         $0 directory\n"
+      . "   Import single XML file:     $0 path-to-config filename\n"
+      . "   Import a directory:         $0 path-to-config directory\n"
 }
+
+my $config_dir = shift @ARGV;
+
+my $config = Metamod::Config->new($config_dir);
+$config->initLogger();
+my $logger = Log::Log4perl->get_logger('metamod.base.import_dataset');
+
+
 my $inputfile;
 my $inputDir;
-
-
 if ( -f $ARGV[0] ) {
     $inputfile = $ARGV[0];
 }

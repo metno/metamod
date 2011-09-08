@@ -29,18 +29,19 @@ files.
 
 =head1 SYNOPSIS
 
-gen_test_data_files.pl [metadata directory] [data directory]
+gen_test_data_files.pl [config file or dir] [metadata directory] [data directory]
 
 =cut
 
 Log::Log4perl->easy_init($INFO);
 my $logger = get_logger();
 
-if( @ARGV != 2 ){
+if( @ARGV != 3 ){
     pod2usage(1);
 }
 
-my $config = Metamod::Config->new();
+my $config_file_or_dir = shift @ARGV;
+my $config = Metamod::Config->new($config_file_or_dir);
 
 my $metadata_dir = abs_path( shift @ARGV );
 my $data_dir = shift @ARGV;

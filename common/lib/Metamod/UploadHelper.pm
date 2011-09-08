@@ -56,7 +56,7 @@ use Metamod::PrintUsererrors;
 use Metamod::Utils qw(getFiletype findFiles remove_cr_from_file);
 use MetNo::NcDigest;
 
-has 'config'                => ( is => 'ro', default => sub { Metamod::Config->new() } );
+has 'config'                => ( is => 'ro', default => sub { Metamod::Config->instance() } );
 has 'logger'                => ( is => 'ro', default => sub { get_logger(__PACKAGE__) } ); # set to ro later
 has 'shell_command_error'   => ( is => 'rw', default => '' );
 has 'file_in_error_counter' => ( is => 'rw', default => 1 );
@@ -717,18 +717,7 @@ sub process_files {
     #  Run the digest_nc.pl script and process user errors if found:
     #
 
-    # We try to determine the path to the relevant etc/ directory
-    # regardless of running from source or from target.
-    my $target_directory = $self->config->get('TARGET_DIRECTORY');
-    my $source_directory = $self->config->get('SOURCE_DIRECTORY');
-    my $path_to_etc;
-    if( -d $target_directory . '/etc' ){
-        $path_to_etc = $target_directory . '/etc';
-    } elsif( -d $source_directory . '/upload/etc' ){
-        $path_to_etc = $source_directory . '/upload/etc'
-    } else {
-        die 'Could not determine etc directroy';
-    }
+    my $path_to_etc = File::Spec->catdir( $self->config->config_dir(), 'etc' );
 
     #
     #  Run the digest_nc.pl script:
@@ -868,7 +857,6 @@ sub process_files {
             print ERRORINFO $datestring . "\n";
             close(ERRORINFO);
             $url_to_errors_html = $local_url . '/upl/uerr/' . $name_html_errfile;
-            my $path_to_print_usererrors = $target_directory . '/scripts/print_usererrors.pl';
             my $path_to_usererrors_conf  = $path_to_etc . '/usererrors.conf';
 
             #

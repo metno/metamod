@@ -1,6 +1,22 @@
-#!/bin/sh
+#!/bin/bash
 
-COMMON="[==TARGET_DIRECTORY==]/init/common.sh"
+if [ $# != 1 ]
+then
+    echo "You must supply the master config file as a parameter"
+    exit 1
+fi
+
+if [ ! -r $1 ]
+then
+    echo "Cannot read the file "$1
+    exit 1
+fi
+
+# Load the configuration dynamically
+SCRIPT_PATH="`dirname \"$0\"`"
+source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" "$1/master_config.txt")
+
+COMMON="$SCRIPT_PATH/../init/common.sh"
 
 if [ -e  $COMMON ]
 then
@@ -10,17 +26,16 @@ else
     exit 1
 fi
 
-USERBASE_NAME=[==USERBASE_NAME==];
 check "USERBASE_NAME"
-PG_CRYPTO=[==PG_CONTRIB==]/pgcrypto.sql
+PG_CRYPTO=$PG_CONTRIB"/pgcrypto.sql"
 check "PG_CRYPTO" 1
 
-$DROPDB -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] $USERBASE_NAME
-$CREATEDB -E UTF-8 -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] $USERBASE_NAME
+$DROPDB -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $USERBASE_NAME
+$CREATEDB -E UTF-8 -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $USERBASE_NAME
 echo "----------------- Database $USERBASE_NAME created ------------------"
-$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $USERBASE_NAME < $PG_CRYPTO
+$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $USERBASE_NAME < $PG_CRYPTO
 
-$PSQL -a -U [==PG_ADMIN_USER==] [==PG_CONNECTSTRING_SHELL==] -d $USERBASE_NAME <<'EOF'
+$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $USERBASE_NAME <<EOF
 
 CREATE TABLE UserTable (
    u_id               SERIAL,
@@ -35,8 +50,8 @@ CREATE TABLE UserTable (
    UNIQUE (a_id, u_loginname),
    PRIMARY KEY (u_id)
 );
-GRANT ALL PRIVILEGES ON UserTable TO "[==PG_WEB_USER==]";
-GRANT ALL PRIVILEGES ON UserTable_u_id_seq TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON UserTable TO "$PG_WEB_USER";
+GRANT ALL PRIVILEGES ON UserTable_u_id_seq TO "$PG_WEB_USER";
 
 CREATE TABLE DataSet (
    ds_id              SERIAL,
@@ -46,8 +61,8 @@ CREATE TABLE DataSet (
    UNIQUE (a_id, ds_name),
    PRIMARY KEY (ds_id)
 );
-GRANT ALL PRIVILEGES ON DataSet TO "[==PG_WEB_USER==]";
-GRANT ALL PRIVILEGES ON DataSet_ds_id_seq TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON DataSet TO "$PG_WEB_USER";
+GRANT ALL PRIVILEGES ON DataSet_ds_id_seq TO "$PG_WEB_USER";
 
 CREATE TABLE InfoDS (
    i_id               SERIAL,
@@ -56,8 +71,8 @@ CREATE TABLE InfoDS (
    i_content          TEXT NOT NULL,
    PRIMARY KEY (ds_id, i_type)
 );
-GRANT ALL PRIVILEGES ON InfoDS TO "[==PG_WEB_USER==]";
-GRANT ALL PRIVILEGES ON InfoDS_i_id_seq TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON InfoDS TO "$PG_WEB_USER";
+GRANT ALL PRIVILEGES ON InfoDS_i_id_seq TO "$PG_WEB_USER";
 
 CREATE TABLE InfoUDS (
    i_id               SERIAL,
@@ -67,8 +82,8 @@ CREATE TABLE InfoUDS (
    i_content          TEXT NOT NULL,
    PRIMARY KEY (i_id)
 );
-GRANT ALL PRIVILEGES ON InfoUDS TO "[==PG_WEB_USER==]";
-GRANT ALL PRIVILEGES ON InfoUDS_i_id_seq TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON InfoUDS TO "$PG_WEB_USER";
+GRANT ALL PRIVILEGES ON InfoUDS_i_id_seq TO "$PG_WEB_USER";
 
 CREATE TABLE InfoU (
    i_id               SERIAL,
@@ -77,8 +92,8 @@ CREATE TABLE InfoU (
    i_content          TEXT NOT NULL,
    PRIMARY KEY (i_id)
 );
-GRANT ALL PRIVILEGES ON InfoU TO "[==PG_WEB_USER==]";
-GRANT ALL PRIVILEGES ON InfoU_i_id_seq TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON InfoU TO "$PG_WEB_USER";
+GRANT ALL PRIVILEGES ON InfoU_i_id_seq TO "$PG_WEB_USER";
 
 CREATE TABLE File (
    u_id               INTEGER       NOT NULL REFERENCES UserTable ON DELETE CASCADE,
@@ -89,14 +104,14 @@ CREATE TABLE File (
    f_errurl           VARCHAR(9999),
    PRIMARY KEY (u_id, f_name)
 );
-GRANT ALL PRIVILEGES ON File TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON File TO "$PG_WEB_USER";
 
 CREATE TABLE UserRole (
    u_id               INTEGER NOT NULL REFERENCES UserTable ON DELETE CASCADE,
    role               VARCHAR(15) NOT NULL,
    PRIMARY KEY (u_id, role)
 );
-GRANT ALL PRIVILEGES ON UserRole TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON UserRole TO "$PG_WEB_USER";
 
 CREATE TABLE funcmap (
         funcid SERIAL PRIMARY KEY,
@@ -104,8 +119,8 @@ CREATE TABLE funcmap (
         UNIQUE(funcname)
 );
 
-GRANT ALL PRIVILEGES ON funcmap TO "[==PG_WEB_USER==]";
-GRANT ALL PRIVILEGES ON funcmap_funcid_seq TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON funcmap TO "$PG_WEB_USER";
+GRANT ALL PRIVILEGES ON funcmap_funcid_seq TO "$PG_WEB_USER";
 
 CREATE TABLE job (
         jobid           SERIAL PRIMARY KEY,
@@ -123,8 +138,8 @@ CREATE UNIQUE INDEX job_funcid_uniqkey ON job (funcid, uniqkey);
 CREATE INDEX job_funcid_runafter ON job (funcid, run_after);
 CREATE INDEX job_funcid_coalesce ON job (funcid, coalesce);
 
-GRANT ALL PRIVILEGES ON job TO "[==PG_WEB_USER==]";
-GRANT ALL PRIVILEGES ON job_jobid_seq TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON job TO "$PG_WEB_USER";
+GRANT ALL PRIVILEGES ON job_jobid_seq TO "$PG_WEB_USER";
 
 CREATE TABLE note (
         jobid           BIGINT NOT NULL,
@@ -133,7 +148,7 @@ CREATE TABLE note (
         value           BYTEA
 );
 
-GRANT ALL PRIVILEGES ON note TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON note TO "$PG_WEB_USER";
 
 CREATE TABLE error (
         error_time      INTEGER NOT NULL,
@@ -142,7 +157,7 @@ CREATE TABLE error (
         funcid          INT NOT NULL DEFAULT 0
 );
 
-GRANT ALL PRIVILEGES ON error TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON error TO "$PG_WEB_USER";
 
 CREATE INDEX error_funcid_errortime ON error (funcid, error_time);
 CREATE INDEX error_time ON error (error_time);
@@ -159,14 +174,14 @@ CREATE TABLE exitstatus (
 CREATE INDEX exitstatus_funcid ON exitstatus (funcid);
 CREATE INDEX exitstatus_deleteafter ON exitstatus (delete_after);
 
-GRANT ALL PRIVILEGES ON exitstatus TO "[==PG_WEB_USER==]";
+GRANT ALL PRIVILEGES ON exitstatus TO "$PG_WEB_USER";
 
 INSERT INTO UserTable (u_id, a_id, u_name, u_email, u_loginname, u_password, u_institution)
-    VALUES (1, '[==APPLICATION_ID==]', 'Admin', '[==OPERATOR_EMAIL==]', '[==OPERATOR_EMAIL==]',
+    VALUES (1, '$APPLICATION_ID', 'Admin', '$OPERATOR_EMAIL$', '$OPERATOR_EMAIL',
     encode(digest('admin123', 'sha1'), 'hex'), '[==OPERATOR_INSTITUTION==]');
 INSERT INTO UserRole VALUES (1, 'admin');
 
 \q
 EOF
 
-echo "Password for admin user '[==OPERATOR_EMAIL==]' set to 'admin123'. Please login and change asap."
+echo "Password for admin user '$OPERATOR_EMAIL' set to 'admin123'. Please login and change asap."

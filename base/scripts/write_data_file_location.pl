@@ -26,7 +26,7 @@ write_data_file_location.pl Parse metadata dataref to determine the data_file_lo
 
 =head1 SYNOPSIS
 
-write_data_file_location.pl [options] [dirname]
+write_data_file_location.pl [options] [path to config file or dir] [dirname]
 
   Options:
     --overwrite Should data_file_location be overwritten if it already exists for a dataset
@@ -40,12 +40,14 @@ my $overwrite = '';
 
 GetOptions( 'overwrite' => \$overwrite ) or pod2usage(1);
 
-if( @ARGV != 1 ){
+if( @ARGV != 2 ){
     pod2usage(1);
 }
 
+my $config_file_or_dir = shift @ARGV;
 my $dirname = shift @ARGV;
-my $config = Metamod::Config->new();
+my $config = Metamod::Config->new($config_file_or_dir);
+$config->initLogger();
 
 
 my $userbase_model;

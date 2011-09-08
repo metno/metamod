@@ -44,6 +44,8 @@ APPLICATION_ID = metamod-dev
 # delete the metadata database.
 PG_ADMIN_USER = admin
 
+PG_ADMIN_USER_PASSWORD =
+
 # PG_WEB_USER is a PostgreSQL user who may read/write data in the metadata
 # database.
 PG_WEB_USER = admin

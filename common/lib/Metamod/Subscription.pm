@@ -45,7 +45,7 @@ sub new {
     my $parser = XML::LibXML->new();
     $self->{_parser} = $parser;
 
-    my $config        = Metamod::Config->new();
+    my $config        = Metamod::Config->instance();
     my $schema_file   = $config->get("SOURCE_DIRECTORY") . '/common/schema/subscription.xsd';
     my $xsd_validator = XML::LibXML::Schema->new( location => $schema_file );
     $self->{_xsd_validator} = $xsd_validator;
