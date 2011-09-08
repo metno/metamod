@@ -165,7 +165,10 @@ sub register : Path('register') :Args(0) {
 
     my $new_user = $c->model('Userbase::Usertable')->new_user($user_values, \@roles);
 
-    $self->send_user_receipt($c, $user_values);
+    # This feature has been temporary removed since we have problems with junk regirations.
+    # This might be turned on if we figure out a better way to prevent the junk registrations
+    # See bug 129
+    #$self->send_user_receipt($c, $user_values);
 
     $self->send_operator_email($c, $new_user, $user_values);
 
