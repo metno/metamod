@@ -1,17 +1,16 @@
-METAMOD 2.x
-==========
+METAMOD 2
+=========
 
 INTRODUCTION
 ------------
 
-This directory is the top directory for METAMOD 2.x. It is based on the METAMOD
-project developed for NoSerC. Major changes and new features were added
-while this software was adapted for the DAMOCLES project. The current version 
-(named METAMOD 2.x) is a modularisation of the DAMOCLES version.
+This directory is the top directory for METAMOD 2. METAMOD is a metadata
+catalogue developed by the Norwegian Metrological Institute. METAMOD can
+harvest metadata from several different sources and offers a web-based
+search interface to the metadata catalogue.
 
-METAMOD 2.x comprises PHP, HTML and CSS files (for web applications) as well as
-Perl (and some Bourne shell) scripts for other tasks. It is archived under
-SVN on https://svn.met.no/.
+METAMOD is mostly written in Perl with some PHP and shell scripting as
+well.
 
 MODULES
 -------
@@ -31,14 +30,14 @@ METAMODUPLOAD   Web-based data upload application. Includes programs for
                 module are contained in subdirectory: upload.
 
 METAMODQUEST    Web-based questionnaire for entering metadata into the
-                datatbase. All software for this module are contained in 
+                datatbase. All software for this module are contained in
                 subdirectory: quest.
 
 METAMODPMH      OAI-PMH server for metadata harvesting
 
 METAMODHARVEST  OAI-PMH client for metadata harvesting
 
-METAMODTHREDDS  Automatic generation and maintenance of a thredds catalog XML 
+METAMODTHREDDS  Automatic generation and maintenance of a thredds catalog XML
                 file that makes new datasets visible through a thredds server.
                 Note that use of a thredds server as an interface to the data
                 repository is not dependent on this module, but if thredds is
@@ -77,7 +76,7 @@ of the METAMOD 2.x distribution:
   XML::Simple, XML::LibXML, XML::LibXSLT, DBI, DBD::Pg
   Geo::Proj4, Mail::Mailer, PDL, PDL::Char, PDL::NetCDF,
   LWP* (libwww-perl), URI::Escape, XML-RSS-LibXML, Config::Tiny
-  
+
 METAMOD 2.x has been developed and tested using Ubuntu Linux 8.04, but
 should work on most operating systems supporting the mentioned libraries.
 
@@ -85,13 +84,13 @@ should work on most operating systems supporting the mentioned libraries.
 SYSTEM OVERVIEW
 ---------------
 
-For each module there is a more detailed README file describing the 
+For each module there is a more detailed README file describing the
 operations of that module. This paragraph gives a summary of the operations
 of a full application comprising all modules.
 
 An application must be configured and installed as described later in this
 README-file. After installation, if the application is a fresh one (where
-no database for the application already exists), a new database must be 
+no database for the application already exists), a new database must be
 initialized and filled with static data. Also, if not already done for the
 PostgreSQL installation, two database users must be defined. The default names
 of these users are 'admin' and 'webuser', but these names are configurable.
@@ -101,9 +100,9 @@ prior to creating the database.
 Initializing the database and loading the static data are done by running the
 init/create_and_load_all.sh script as described in base/README. The static
 data loaded into the database are found in an XML file: staticdata/searchdata.xml
-and defines the search categories by which it is possible to search the database. 
+and defines the search categories by which it is possible to search the database.
 This file must be found in the application directory of the application owning
-the database. All applications using this database will be confined to the 
+the database. All applications using this database will be confined to the
 search categories defined by this file. The example application included in
 the source tree has one version of this file that is based on the
 application installed for the DAMOCLES project.
@@ -122,23 +121,23 @@ After initialization, loading of static data and setting up the runtime
 environment, the web interfaces for the METAMODSEARCH, METAMODUPLOAD and
 METAMODQUEST modules should be up and running.
 
-To fill the database with metadata, any of the METAMODUPLOAD, METAMODQUEST 
+To fill the database with metadata, any of the METAMODUPLOAD, METAMODQUEST
 and/or METAMODHARVEST modules must be applied. These modules produce XML files
 with metadata describing datasets (see base/README_XML).
 
-Datasets are organized hierarchically in two levels. The top level contains 
+Datasets are organized hierarchically in two levels. The top level contains
 directory datasets. Each directory dataset may own one or more file datasets
-at the second (bottom) level. File datasets will correspond to physical files 
+at the second (bottom) level. File datasets will correspond to physical files
 found in a local or external data repository. Directory datasets may correspond
 to directories in the data repositories where these files reside. The database
-will also contain independent datasets that own no file dataset on the second 
+will also contain independent datasets that own no file dataset on the second
 level. These datasets belong to the top level, and are considered directory
 datasets even if they correspond to no physical directory.
 
 The metadata comprising a dataset are found both in the database and in a set
 of XML files in the local file system. Two XML files exist for each
-dataset. With the METAMODQUEST routine, all the content of the two XML files has 
-to be manually entered into an HTML form. The METAMODUPLOAD routine creates the 
+dataset. With the METAMODQUEST routine, all the content of the two XML files has
+to be manually entered into an HTML form. The METAMODUPLOAD routine creates the
 XML files based on netCDF files uploaded to a data repository. Uploads may either
 be done interactively through the METAMODUPLOAD web interface, or by FTP
 (usually from a script run by the data provider). Each netCDF file will
@@ -158,7 +157,7 @@ other script, import_dataset.pl, belongs to the METAMODBASE module. This
 script monitors a number of directories to see if XML files are created or
 updated, and loads the XML files into the database. Both scripts are running
 in the background. They wake up at regular intervals to see if any work
-are pending. These perl scripts have to be manually started by the 
+are pending. These perl scripts have to be manually started by the
 'metamodInit.sh start' shell script. They will run until another shell script,
 'metamodInit.sh stop', stops the scripts in an orderly fashion.
 
@@ -194,11 +193,11 @@ Each METAMOD application must be configured in a separate directory tree.
 This application directory tree will generally be independent of the METAMOD
 source tree (where this README file resides at the top level). But an example
 of a METAMOD application directory (app/example) is included in the source
-tree as a template for real application directories. 
+tree as a template for real application directories.
 
 In each application directory there must be a configuration file called
 'master_config.txt', and a 'filelist.txt' file containing a list of files that
-are specific for the application (image files, style sheets etc.). An 
+are specific for the application (image files, style sheets etc.). An
 application directory has the same structure as any of the module directories,
 and contains a htdocs subdirectory divided into sch, upl etc. as needed.
 Any file found in the application directory (and included in the 'filelist.txt'
@@ -212,7 +211,7 @@ CONFIGURATION
 
 PHP CONFIGURATION
 -----------------
-The following values should be configured in the php.ini file 
+The following values should be configured in the php.ini file
 
 track_errors = On
 upload_max_filesize = 100M
@@ -223,7 +222,7 @@ METAMOD CONFIGURATION
 
 The source files within the METAMOD 2.x directories contain a variety of file
 types (PHP, Perl, XML, HTML/XHTML, CSS and shell-script files, some of
-them with embedded SQL). The source files are not intended to be used 
+them with embedded SQL). The source files are not intended to be used
 directly, but must be copied to a target directory tree before the application
 can run. Some of the files will be modified (see below) before ending up in the
 target directory. The reason for this is to apply a unified configuration method
@@ -237,7 +236,7 @@ This file contains lines as follows:
 
 VARNAME = VALUE
 
-'VARNAME' must be all uppercase letters [A-Z], underscore or digits. Any number 
+'VARNAME' must be all uppercase letters [A-Z], underscore or digits. Any number
 of white space characters may separate 'VARNAME' and '=', and also '=' and
 'VALUE'. 'VALUE' starts with the first non-whitespace character and ends with
 the last non-whitespace character on the line. Additional lines may be
@@ -249,7 +248,7 @@ VALUEs may be empty, which sometimes indicate that some aspect of the software
 is turned off. An empty value is indicated by having no characters (or only
 whitespace characters) after the '=' character.
 
-In addition, comment lines, starting with '#', may be found. Blank lines are 
+In addition, comment lines, starting with '#', may be found. Blank lines are
 ignored.
 
 In the source files, all text strings like:
@@ -274,13 +273,13 @@ The following variables are used to select the modules that will comprise the
 application. They also identify the absolute path of the source directory for
 each module (i.e. they will be subdirectories of the SOURCE_DIRECTORY):
 
-METAMODBASE_DIRECTORY     
-METAMODSEARCH_DIRECTORY 
-METAMODUPLOAD_DIRECTORY 
-METAMODQUEST_DIRECTORY 
-METAMODPMH_DIRECTORY 
-METAMODHARVEST_DIRECTORY 
-METAMODTHREDDS_DIRECTORY 
+METAMODBASE_DIRECTORY
+METAMODSEARCH_DIRECTORY
+METAMODUPLOAD_DIRECTORY
+METAMODQUEST_DIRECTORY
+METAMODPMH_DIRECTORY
+METAMODHARVEST_DIRECTORY
+METAMODTHREDDS_DIRECTORY
 
 If any of these variables are missing, the corresponding module will not be part
 of the application.
@@ -331,7 +330,7 @@ target files (or the target file does not exist). Directories will be created as
 needed. If the configuration file is modified later than a target file, the file
 (if it is not tagged with an equal sign) will be updated.
 
-The file pathes in each 'filelist.txt' file must all be relative to the 
+The file pathes in each 'filelist.txt' file must all be relative to the
 corresponding top module directory (or the 'common' or application directory).
 The copied files will keep these relative pathes on the the target directory.
 
@@ -344,7 +343,7 @@ from a single source file. This is done using the special directives:
 !substitute_to_file_with_new_name sourcefilepath => targetfilepath
 !end_substitute_to_file_with_new_name
 
-The 'sourcefilepath' must be a relative file path found in one of the 
+The 'sourcefilepath' must be a relative file path found in one of the
 'filelist.txt' files, and 'targetfilepath' must also be a relative file path,
 but it is not required to exist in any 'filelist.txt' file. The source file
 (given by 'sourcefilepath') will be modified and copied to the target file
@@ -359,7 +358,7 @@ By using these special directives several times for the same source file,
 and varying the target file name between each use, several target files are
 produced from the same source file, and they will have different content
 depending on the in-between substitution directives found for each target
-file. 
+file.
 
 TESTING
 -------
@@ -369,7 +368,7 @@ can be used to test the software. The following steps describes how to do
 this.
 
 1. Edit the app/example/master_config.txt file. Several variables in this file
-must be adjusted according to the local computer environment. The most 
+must be adjusted according to the local computer environment. The most
 important are:
 
 SERVER                     The server name on which the software should run
@@ -377,7 +376,7 @@ SERVER                     The server name on which the software should run
 SOURCE_DIRECTORY           The absolute path of the source directory where
                            the software is found (the same directory as in
                            which this README file resides).
-TARGET_DIRECTORY           The target directory to which the software is 
+TARGET_DIRECTORY           The target directory to which the software is
                            installed. Must NOT be a subdirectory of the
                            SOURCE_DIRECTORY.
 ADMIN_DOMAIN               This will typically be the domain found in the
@@ -423,9 +422,9 @@ run:    ./update_target.pl app/example
 
 3. Assuming the PostgreSQL software is already installed, the PostgreSQL
 users (admin and webuser) that are to access the database must be created.
-This step is only needed one time. PostgreSQL users are for the whole 
+This step is only needed one time. PostgreSQL users are for the whole
 PostgreSQL installation, and not connected to specific databases.
-cd to the target directory 
+cd to the target directory
 run:    scripts/createusers.sh
 
 4. Initialize the runtime environment:
@@ -448,14 +447,14 @@ The same runtime user for PHP and the perl scripts is assumed.
 The Apache installation must allow .htaccess files and softlinks.
 
 7. Make the METAMOD 2.x URLs accessible through the Apache server. This can
-either be done by making the METAMOD 2.x htdocs directory the Apache 2.x 
+either be done by making the METAMOD 2.x htdocs directory the Apache 2.x
 DocumentRoot directory. Otherwise, this can be done by providing a symbolic
 link in the Apache 2.x DocumentRoot directory to the METAMOD 2.x htdocs
 directory. This symbolic link must agree with the LOCAL_URL set up in the
 master_config.txt file.
 
 8. At this time all the web applications should work. Confirm this by visiting
-the URLs for the two main web pages in the example application 
+the URLs for the two main web pages in the example application
 (METAMODSEARCH and METAMODUPLOAD) from a browser (the URLs are found in
 the master_config.txt file). Check also that the administration web
 page is working.
@@ -477,7 +476,7 @@ later will be loaded into the database). Go back to the "Upload files" page
 and upload the two files test1_arctic20.200611.cdl and test1_synop_99710.cdl
 found in the testdata directory.
 
-12. After a few minutes, check that metadata from the files have been 
+12. After a few minutes, check that metadata from the files have been
 loaded into the database. This can be done by looking at the system log
 (path defined by the LOG4ALL_SYSTEM_LOG variable in master_config.txt), and by
 entering the METAMODSEARCH web page and search for the data.
