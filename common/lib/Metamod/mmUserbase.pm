@@ -87,6 +87,7 @@ use Scalar::Util;
 BEGIN { *ident = \&Scalar::Util::refaddr; }
 use DBI;
 use POSIX qw();
+use Carp;
 use Metamod::Config;
 use constant TRUE => 1;
 use constant FALSE => 0;
@@ -182,10 +183,9 @@ use constant FALSE => 0;
     #     Method: _pg_escape_string
     #
     sub _pg_escape_string {
-        my $self   = shift;
+        my ($self, $string) = @_;
         my $ident  = ident($self);
-        my $string = shift;
-        $string =~ s/\'/\'\'/mg;
+        $string =~ s/\'/\'\'/mg if $string;
         return $string;
     }
 
@@ -292,6 +292,10 @@ use constant FALSE => 0;
                 and exists( $value_array->{$field} )
                 and defined( $value_array->{$field} ) ) {
                 $val = $value_array->{$field};
+            }
+            unless (defined $val) {
+                warn "Missing value in SQL clause";
+                $val = 'NULL'; # guess this is the most logical thing to do? -ga FIXME
             }
             my $comparision_operator;
             if ( $val eq "NULL" ) {
@@ -1069,6 +1073,7 @@ Return value: TRUE on success, FALSE on error / dataset already exists.
         my $ident        = ident($self);
         my $dataset_name = shift;
         my $dataset_key  = shift;
+        confess "Can't insert undefined dataset" unless $dataset_name && $dataset_key;
         my $user_array   = $user_array{$ident};
         if ( !defined($user_array) ) {
             $self->_note_exception( 1, "No current user" );
@@ -1120,6 +1125,7 @@ Return value: TRUE on success, FALSE on error / no such dataset.
         my $ident        = ident($self);
         my $applic_id    = shift;
         my $dataset_name = shift;
+        confess "Can't lookup undefined dataset" unless $applic_id && $dataset_name;
         my $sql1         = "SELECT ds_id, u_id FROM DataSet "
             . $self->_get_SQL_WHERE_clause( 'ds_name, a_id', [ $dataset_name, $applic_id ] );
         if ( !$self->_do_query($sql1) ) {

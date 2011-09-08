@@ -49,7 +49,7 @@
     some time to process your request as it has to be manually approved.
     </p>
 
-    <form name="register" method="POST" action="[% c.uri_for('/login/register') %]">
+    <form id="register" name="register" method="POST" action="[% c.uri_for('/login/register') %]">
         <table>
 
             <tr>
@@ -66,6 +66,7 @@
             <td><label for="access_rights">Access rights</label></td>
             <td>
                 <select name="access_rights" id="access_rights">
+                    <option value=""></option> [%# default set blank to avoid wrong data resubmitted by mistake %]
                     <option value="subscription">Email subscription</option>
                     <option value="upload">Email subscription, dataset upload and metadata editor</option>
                     <option value="admin">Master of all he surveys</option>
@@ -81,6 +82,7 @@
             <td><label for="institution_name">Name of institution</label></td>
             <td>
                 <select id="institution_name" name="institution_name">
+                    <option value=""></option> [%# default set blank to avoid wrong data resubmitted by mistake %]
                     [% SET institutions = login_ui_utils.user_institutions() %]
                     [% FOREACH institution IN institutions %]
                         [% IF c.req.params.institution_name == institution.key %]
@@ -111,4 +113,22 @@
             </tr>
         </table>
     </form>
+
+    <script type="text/javascript">
+        $('#register').submit(function() {
+            if ( $("#access_rights").val() !== "subscription" && $("#institution_name").val() === "other" ) {
+                alert('Only subscription rights available for "other" institutions.');
+                return false;
+            }
+            if ( $("#access_rights").val() !== "" ) {
+                alert('Access rights cannot be blank.');
+                return false;
+            }
+            if ( $("#institution_name").val() !== "" ) {
+                alert('Institution cannot be blank.');
+                return false;
+            }
+        });
+    </script>
+
 </div>

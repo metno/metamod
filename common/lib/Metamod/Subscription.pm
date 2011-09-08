@@ -166,7 +166,9 @@ sub _get_subscriptions {
 
     my ($ds) = @_;
 
-    my ( $applic_id, $ds_name ) = split_parent_name( $ds->getParentName() );
+    my $parent = $ds->getParentName() or die "Missing parentName";
+
+    my ( $applic_id, $ds_name ) = split_parent_name( $parent );
 
     my $userbase;
     eval { $userbase = Metamod::mmUserbase->new(); };

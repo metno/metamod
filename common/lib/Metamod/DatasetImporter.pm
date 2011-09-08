@@ -914,16 +914,19 @@ sub _get_contact_id {
     my ($doc, $xpc) = @_;
 
     my $dbh = $self->config->getDBH();
+    $dbh->{PrintError} = 1;
 
     # fetch author and org from document, publisher or principalInvestigator
     my $authorXP = '//gmd:pointOfContact/gmd:CI_ResponsibleParty[ gmd:role/gmd:CI_RoleCode[ @codeListValue="publisher" or @codeListValue="principalInvestigator" ] ]/gmd:individualName';
     my $author = $self->_get_text_from_doc($doc, $authorXP, $xpc);
+    #$author =~ s/\s+$//; # suggest trim trailing spaces?
     my $orgXP = '//gmd:pointOfContact/gmd:CI_ResponsibleParty[ gmd:role/gmd:CI_RoleCode[ @codeListValue="publisher" or @codeListValue="principalInvestigator" ] ]/gmd:organisationName';
     my $organization = $self->_get_text_from_doc($doc, $orgXP, $xpc);
+    my $org_as_str = $organization || '-';
 
     # TODO: get author from other places if other code-list is used
 
-    $self->logger->debug("found contact-(author,organization)=($author,$organization||'-') in sru/iso19115") if $self->logger->is_debug();
+    $self->logger->debug("found contact-(author,organization)=($author,$org_as_str) in sru/iso19115");
 
     # search for existing author/organization
     ($author, $organization) =  map {defined $_ ? uc($_) : undef} ($author, $organization);
@@ -936,11 +939,11 @@ SELECT id_contact
    AND $orgSQL
 SQL
     my @authorOrganization = map {defined $_ ? $_ : ()} ($author, $organization);
-    $sth_search->execute(@authorOrganization);
+    $sth_search->execute(@authorOrganization) or $self->logger->error($sth_search->errstr);
     my $contact_id;
     while (my $row = $sth_search->fetchrow_arrayref) {
         $contact_id = $row->[0]; # max one row, schema enforces uniqueness
-        $self->logger->debug("found contact_id for $author, $organization: $contact_id") if $self->logger->is_debug();
+        $self->logger->debug("found contact_id for $author, $org_as_str: $contact_id");
     }
     return $contact_id if defined $contact_id;
 
@@ -949,7 +952,7 @@ SQL
     my $sth = $dbh->prepare_cached(<<"SQL");
 INSERT INTO sru.meta_contact ( author, organization ) VALUES ( ?, ? )
 SQL
-    $sth->execute($author, $organization);
+    $sth->execute($author, $organization) or $self->logger->error($sth_search->errstr);
     $contact_id = $dbh->last_insert_id(undef, 'sru', 'meta_contact', undef);
     if (! defined $contact_id) {
         $self->logger->error("cannot determine contact id from database\n");

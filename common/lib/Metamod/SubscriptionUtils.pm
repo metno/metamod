@@ -2,6 +2,7 @@ package Metamod::SubscriptionUtils;
 
 use strict;
 use warnings;
+use Carp;
 
 use base 'Exporter';
 our @EXPORT_OK = qw( split_parent_name get_basename );
@@ -33,22 +34,23 @@ On success it returns the application id and dataset name. If $parent_name does
 not have the expected format it returns (undef, undef).
 
 =cut
+
 sub split_parent_name {
-    my ($parent_name) = @_;
-    
+    my $parent_name = shift or die "Missing parent name";
+
     my ( $application_id, $ds_name, $rest ) = split '/', $parent_name;
-    
+
     if( defined $rest ){
         $logger->warn( "'$ds_name' did not have valid format" );
         return ( undef, undef );
     }
-    
-    return ( $application_id, $ds_name ); 
+
+    return ( $application_id, $ds_name );
 }
 
 =head2 get_basename( $ds_name )
 
-Get the basename part of a full dataset name.  
+Get the basename part of a full dataset name.
 
 =over
 
@@ -63,6 +65,7 @@ The basename part of the name. E.g hirlam1220100909.
 =back
 
 =cut
+
 sub get_basename {
 	my ( $ds_name ) = @_;
 
