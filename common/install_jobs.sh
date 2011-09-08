@@ -1,8 +1,22 @@
-#!/bin/sh
-# please save this file using tabs instead of spaces for indent
+#!/bin/bash
 
-VIRTUAL_HOST="[==VIRTUAL_HOST==]"
-CATALYST_APP="catalyst-[==APPLICATION_ID==]"
+if [ $# != 1 ]
+then
+    echo "You must supply the config dir as a parameter"
+    exit 1
+fi
+
+if [ ! -r $1 ]
+then
+    echo "Cannot read the file "$1
+    exit 1
+fi
+
+# Load the configuration dynamically
+SCRIPT_PATH="`dirname \"$0\"`"
+source <(perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" "$1/master_config.txt")
+
+CATALYST_APP="catalyst-$APPLICATION_ID"
 
 ordie () {
     if [ $? != 0 ]
