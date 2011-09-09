@@ -43,7 +43,7 @@ my $digest_file = "$FindBin::Bin/../../data/MetNo/nc_files_to_digest.txt";
         #remove any previous version of the out file since the order of some values will be
         # different in the second run
         unlink $out_file;
-        digest( "$FindBin::Bin/..", $digest_file, 'DAM', $out_file );
+        digest( $digest_file, 'DAM', $out_file );
     };
 
     $perf->statistic_perf_ok( $run_digest, $test_content, 'digest()' );

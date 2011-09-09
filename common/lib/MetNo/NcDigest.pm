@@ -138,7 +138,7 @@ my %parse_actions = (
 $parse_actions{ dimensions } = $parse_actions{"vocabulary"};
 
 sub digest {
-    my ( $etcdirectory, $pathfilename, $ownertag, $xml_metadata_path, $is_child ) = @_;
+    my ( $pathfilename, $ownertag, $xml_metadata_path, $is_child ) = @_;
 
     # Reset global variables before starting digest.
     @user_errors = ();
@@ -175,7 +175,7 @@ sub digest {
 
     eval {
 
-        init_escapes($etcdirectory);
+        init_escapes();
 
         #
         # Read the XML configuration file.
@@ -185,8 +185,9 @@ sub digest {
         # Later, when pieces from this XML file is incorporated into dataset XML files,
         # the opposite conversion will be done (using the &convert_to_htmlentities routine).
         #
-        my $topconfig = XMLin($etcdirectory . "/conf_digest_nc.xml",
-                              KeyAttr => [ "name" ], ForceArray => 1);
+        my $config = Metamod::Config->instance();
+        my $config_file = $config->path_to_config_file('conf_digest_nc.xml', 'etc');
+        my $topconfig = XMLin($config_file,KeyAttr => [ "name" ], ForceArray => 1);
         #
         # Recursively parse the $topconfig tree to initialize global hashes:
         #
@@ -620,9 +621,9 @@ sub dim {
 
 
 sub init_escapes {
-    my ($etcdirectory) = @_;
 
-    my $fpath = $etcdirectory . '/standard_name.txt';
+    my $config = Metamod::Config->instance();
+    my $fpath = $config->path_to_config_file('standard_name.txt', 'etc');
     unless (-r $fpath) {die "Can not read from file: $fpath\n";}
     open (STNAMES,$fpath);
     while (<STNAMES>) {

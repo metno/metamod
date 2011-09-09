@@ -47,7 +47,7 @@ close $DIGEST;
     #remove any previous version of the out file since the order of some values will be
     # different in the second run
     unlink $out_file;
-    digest( "$FindBin::Bin", $digest_file, 'DAM', $out_file );
+    digest( $digest_file, 'DAM', $out_file );
 
     compare_ok( $baseline_file, $out_file, 'Parsing NC file' );
 
