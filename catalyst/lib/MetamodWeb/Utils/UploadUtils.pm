@@ -69,7 +69,7 @@ sub process_newfiles {
     #printf STDERR " l4p = '%s'\n", $self->{config}->get('LOG4PERL_CONFIG');
 
     # FIXME - rewrite upload_indexer as library routine
-    my @command = ($self->{config}->get('TARGET_DIRECTORY') . "/scripts/upload_indexer.pl",
+    my @command = ($self->{config}->get('INSTALLATION_DIR') . "/upload/scripts/upload_indexer.pl",
         "--dataset=$dataset", "--dirkey=$dirkey");
     if (ref($filename) eq 'ARRAY') {
         push @command, @$filename;
