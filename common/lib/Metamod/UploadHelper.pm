@@ -717,13 +717,11 @@ sub process_files {
     #  Run the digest_nc.pl script and process user errors if found:
     #
 
-    my $path_to_etc = File::Spec->catdir( $self->config->config_dir(), 'etc' );
-
     #
     #  Run the digest_nc.pl script:
     #
     my $upload_ownertag = $self->config->get('UPLOAD_OWNERTAG');
-    MetNo::NcDigest::digest($path_to_etc, "$work_directory/digest_input", $upload_ownertag, $xmlpath );
+    MetNo::NcDigest::digest("$work_directory/digest_input", $upload_ownertag, $xmlpath );
 
 #    my $command = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlpath";
 #    $self->logger->debug("RUN:    $command\n");
@@ -785,7 +783,7 @@ sub process_files {
                     }
                 }
                 my $xmlFilePath = File::Spec->catfile( $xmlFileDir, $pureFile . '.xml' );
-                MetNo::NcDigest::digest( $path_to_etc, "$work_directory/digest_input", $upload_ownertag, $xmlFilePath, 'isChild');
+                MetNo::NcDigest::digest( "$work_directory/digest_input", $upload_ownertag, $xmlFilePath, 'isChild');
                 #$self->shcommand_scalar($digestCommand);
                 #if ( length($self->shell_command_error) > 0 ) {
                 #    $self->logger->error("digest_nc_file_fails $filepath");
@@ -857,7 +855,7 @@ sub process_files {
             print ERRORINFO $datestring . "\n";
             close(ERRORINFO);
             $url_to_errors_html = $local_url . '/upl/uerr/' . $name_html_errfile;
-            my $path_to_usererrors_conf  = $path_to_etc . '/usererrors.conf';
+            my $path_to_usererrors_conf  = $self->config->path_to_config_file('usererrors.conf', 'etc');
 
             #
             #     Run the print_usererrors.pl script:
