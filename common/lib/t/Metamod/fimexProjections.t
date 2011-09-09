@@ -15,8 +15,6 @@ $config->initLogger();
 use_ok('Metamod::FimexProjections');
 
 # setting target dir so that common is below
-$ENV{METAMOD_TARGET_DIRECTORY} = "$FindBin::Bin/../../..";
-# the projection path is relative to TARGET_DIRECTORY
 ok(-f Metamod::FimexProjections->getFimexProjectionsSchemaPath(), "found schema");
 
 my $obj = new Metamod::FimexProjections();

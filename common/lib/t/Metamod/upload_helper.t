@@ -36,8 +36,6 @@ init_dir_structure();
 $ENV{METAMOD_WEBRUN_DIRECTORY} = $webrun_dir;
 $ENV{METAMOD_OPENDAP_BASEDIR} = "$FindBin::Bin/opendap";
 $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/../log4perl_config.ini";
-$ENV{METAMOD_TARGET_DIRECTORY} = "$FindBin::Bin/../../../..";
-$ENV{METAMOD_SOURCE_DIRECTORY} = "$FindBin::Bin/../../../..";
 
 copy_test_files();
 
