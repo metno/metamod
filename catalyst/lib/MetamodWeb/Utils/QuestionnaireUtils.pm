@@ -124,10 +124,10 @@ sub quest_validator {
 
             my $constraint_func;
             if( $constraint eq 'wms_info' ){
-                my $wms_schema = $self->config->get("TARGET_DIRECTORY") . '/schema/ncWmsSetup.xsd';
+                my $wms_schema = $self->config->get("INSTALLATION_DIR") . '/common/schema/ncWmsSetup.xsd';
                 $constraint_func = MetamodWeb::Utils::FormValidator::Constraints::xml( $wms_schema )
             } elsif( $constraint eq 'projection_info') {
-                my $projection_schema = $self->config->get("TARGET_DIRECTORY") . '/schema/fimexProjections.xsd';
+                my $projection_schema = $self->config->get("INSTALLATION_DIR") . '/common/schema/fimexProjections.xsd';
                 $constraint_func = MetamodWeb::Utils::FormValidator::Constraints::xml( $projection_schema )
             } elsif( $constraint eq 'datetime' ) {
                 $constraint_func = date_and_time('YYYY-MM-DD hh:mm:ss');
@@ -248,17 +248,13 @@ sub quest_configuration {
 
     my $quest_config = $self->config()->get('QUEST_CONFIGURATIONS');
 
-    my $root = MetamodWeb::path_to_metamod_root(); #$self->config->get('TARGET_DIRECTORY');
-    $root .= "/quest" unless $root eq $self->config->get('TARGET_DIRECTORY');
-    #printf STDERR "** root = %s | target = %s\n", $root, $self->config->get('TARGET_DIRECTORY');
-
     my %quest_configurations = (
         'metadata' => {
-        config_file => File::Spec->catfile($root, 'etc', 'qst', 'metadata_quest.json' ),
+        config_file => $self->config->path_to_config_file('metadata_quest.json', 'etc', 'qst'),
         tag         => $self->config->get('QUEST_OWNERTAG'),
         },
         'wms_and_projection' => {
-        config_file => File::Spec->catfile($root, 'etc', 'qst', 'wms_and_projection.json' ),
+        config_file => $self->config->path_to_config_file('wms_and_projection.json', 'etc', 'qst'),
         tag         => $self->config->get('QUEST_OWNERTAG'),
         }
     );

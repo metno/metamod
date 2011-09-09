@@ -65,8 +65,7 @@ sub gcmdlist {
     my ( $quest_element ) = @_;
 
     my $file = $quest_element->{ value };
-    my $base_dir = File::Spec->catdir( $self->config->get('TARGET_DIRECTORY'), 'etc', 'qst' );
-    my $full_path = File::Spec->catfile($base_dir, $file );
+    my $full_path = $self->config->path_to_config_file($file, 'etc', 'qst');
     if( !(-r $full_path ) ){
         die "Cannot find file '$full_path'";
     }
