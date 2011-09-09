@@ -112,7 +112,7 @@ sub editxml :Path('/admin/editxml') :ActionClass('REST') {
 sub editxml_GET { # show editor for xml files
     my ( $self, $c ) = @_;
 
-    my $schema = $c->stash->{mm_config}->get("TARGET_DIRECTORY") . "/schema/";
+    my $schema = $c->stash->{mm_config}->get("INSTALLATION_DIR") . "/common/schema/";
 
     my $admin_utils = $c->stash->{admin_utils};
     my $base = $c->stash->{xmldir} . "/" . $c->stash->{path};
@@ -142,7 +142,7 @@ sub editxml_GET { # show editor for xml files
 sub editxml_POST  { # update existing xml files
     my ( $self, $c ) = @_;
 
-    my $schema = $c->stash->{mm_config}->get("TARGET_DIRECTORY") . "/schema";
+    my $schema = $c->stash->{mm_config}->get("INSTALLATION_DIR") . "/common/schema";
     my $base = $c->stash->{xmldir} . "/" . $c->stash->{path};
 
     my %xmlform = (
