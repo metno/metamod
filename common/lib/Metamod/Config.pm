@@ -456,6 +456,50 @@ sub getDSFilePath {
 
 }
 
+=head2 $self->path_to_config_file($filename, @dirnames)
+
+Get the path to a file that is either located in the application configuration catalog
+or in the config/ catalog.
+
+=over
+
+=item $filename
+
+The name of the file.
+
+=item @dirnames
+
+A list of directory names that gives the location of the file relative to the
+application config catalog or the config/ catalog.
+
+=item return
+
+The path to the file in the application configuration catalog if it exists.
+Otherwise it returns the path to the file in the config/ catalog.
+
+Dies if the file cannot be found any of the places.
+
+=back
+
+=cut
+sub path_to_config_file {
+    my $self = shift;
+
+    my ( $filename, @dirnames ) = @_;
+
+    my $path = File::Spec->catfile(@dirnames, $filename);
+    if( -f File::Spec->catfile( $self->config_dir(), $path ) ){
+        return File::Spec->catfile( $self->config_dir(), $path );
+    } elsif( -f File::Spec->catfile( $self->installation_dir(), 'config', $path ) ) {
+        return File::Spec->catfile( $self->installation_dir(), 'config', $path );
+    } else {
+        die "The configuration file '$path' you requested is not in the installation dir or the config dir";
+    }
+
+}
+
+
+
 1;
 __END__
 
