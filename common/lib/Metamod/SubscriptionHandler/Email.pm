@@ -163,10 +163,9 @@ sub _read_email_template {
     }
 
     my $config = $self->{ _config };
-    my $target = $config->get( 'TARGET_DIRECTORY' );
+    my $email_file = $config->path_to_config_file('subscription_email_template.txt', 'etc');
 
     my $email_text;
-    my $email_file = "$target/etc/subscription_email_template.txt";
     if( -e $email_file ){
 
         my $success = open my $FH, '<', $email_file;
