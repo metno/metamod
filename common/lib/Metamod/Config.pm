@@ -63,27 +63,29 @@ our $_logger_initialised;
 sub new {
     my ($class, $file_or_dir) = @_;
 
-    confess "You must supply the path to the configuration directory or the master_config.txt file" if !$file_or_dir;
-
     # we already have an object so use that instead.
     return $_config if defined $_config;
 
     my $config_file;
-    if( -d $file_or_dir ){
-        $config_file = File::Spec->catfile($file_or_dir, 'master_config.txt');
-    } else {
-        $config_file = $file_or_dir;
-    }
 
     # If the path to the master config is set in the enviroment that overrides
     # any parameters sent to the constructor.
     if( exists $ENV{METAMOD_MASTER_CONFIG} && $ENV{METAMOD_MASTER_CONFIG} ){
         $config_file = $ENV{METAMOD_MASTER_CONFIG};
+    } else {
+        confess "You must supply the path to the configuration directory or the master_config.txt file" if !$file_or_dir;
+
+        if( -d $file_or_dir ){
+            $config_file = File::Spec->catfile($file_or_dir, 'master_config.txt');
+        } else {
+            $config_file = $file_or_dir;
+        }
     }
 
+    # check file is readable
     if ((! -f $config_file) and (! -r $config_file)) {
         die "Cannot read config-file: $config_file";
-        $_config->initLogger; # staticInitLogger ?
+        $_config->initLogger;
     }
 
     $config_file = _normalizeFile($config_file);
