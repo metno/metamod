@@ -60,6 +60,7 @@ From: ${from_address}
 Bcc: oysteint\@met.no, oystein.torget\@met.no
 
 
+
 A new data file has just become available for the dataset TEST/itp04
 
 You can download it here: http://thredds.met.no/thredds/catalog/data/met.no/itp04/catalog.html?dataset=data/Metamod/SubscriptionHandler/subdir/subdir2/itp04_itp4grd0013.nc
