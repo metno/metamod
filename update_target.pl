@@ -221,7 +221,7 @@ $sourcedir = &substituteval($sourcedir);
 if (-r $sourcedir . '/common/filelist.txt') {
    push (@flistpathes,$sourcedir . '/common/filelist.txt');
 }
-foreach my $module qw(METAMODBASE METAMODSEARCH METAMODUPLOAD METAMODQUEST METAMODPMH METAMODHARVEST METAMODTHREDDS) {
+foreach my $module qw(METAMODBASE METAMODUPLOAD METAMODQUEST METAMODPMH METAMODHARVEST METAMODTHREDDS) {
    if (exists($conf{$module . '_DIRECTORY'}) and $conf{$module . '_DIRECTORY'} ne "") {
       my $moduledir = $conf{$module . '_DIRECTORY'};
       $moduledir = &substituteval($moduledir);
