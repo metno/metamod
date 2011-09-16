@@ -259,15 +259,19 @@
   <!-- bounding_box -->
   <xsl:template match="*[@name='bounding_box']">
     <Spatial_Coverage>
-      <!-- order must be SNWE -->
-      <xsl:variable name="SNWE" select="."/>
-      <Southernmost_Latitude><xsl:value-of select="substring-before($SNWE, ',')"/></Southernmost_Latitude>
-      <xsl:variable name="NWE" select="substring-after($SNWE, ',')"/>
-      <Northernmost_Latitude><xsl:value-of select="substring-before($NWE, ',')"/></Northernmost_Latitude>
-      <xsl:variable name="WE" select="substring-after($NWE, ',')"/>
-      <Westernmost_Longitude><xsl:value-of select="substring-before($WE, ',')"/></Westernmost_Longitude>
-      <xsl:variable name="E" select="substring-after($WE, ',')"/>
-      <Easternmost_Longitude><xsl:value-of select="$E"/></Easternmost_Longitude>
+
+      <!-- input format is ESWN, output format is SNWE -->
+
+      <xsl:variable name="ESWN" select="."/>
+      <xsl:variable name="SWN" select="substring-after($ESWN, ',')"/>
+      <xsl:variable name="WN" select="substring-after($SWN, ',')"/>
+      <xsl:variable name="N" select="substring-after($WN, ',')"/>
+
+      <Southernmost_Latitude><xsl:value-of select="substring-before($SWN, ',')"/></Southernmost_Latitude>
+      <Northernmost_Latitude><xsl:value-of select="$N"/></Northernmost_Latitude>
+      <Westernmost_Longitude><xsl:value-of select="substring-before($WN, ',')"/></Westernmost_Longitude>
+      <Easternmost_Longitude><xsl:value-of select="substring-before($ESWN, ',')"/></Easternmost_Longitude>
+
     </Spatial_Coverage>
   </xsl:template>
 
