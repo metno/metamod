@@ -110,6 +110,12 @@ __PACKAGE__->has_many(
   { "foreign.ds_parent" => "self.ds_id" },
 );
 
+__PACKAGE__->has_many(
+  "oai_info",
+  "Metamod::DBIxSchema::Metabase::Result::OaiInfo",
+  { "foreign.ds_id" => "self.ds_id" },
+);
+
 
 # You can replace this text with custom content, and it will be preserved on regeneration
 
