@@ -4,13 +4,16 @@ use strict;
 use warnings;
 
 use File::Spec;
+use Log::Log4perl qw( get_logger );
 use Moose;
 use Try::Tiny;
 use XML::LibXML;
 
 use Metamod::Config;
+use Metamod::DatasetTransformer::ToOAIDublinCore;
 use Metamod::DBIxSchema::Metabase;
 use Metamod::ForeignDataset;
+
 
 =head1 NAME
 
@@ -28,6 +31,8 @@ repository.
 has 'config' => ( is => 'ro', isa => 'Metamod::Config', default => sub { Metamod::Config->instance() } );
 
 has 'model' => ( is => 'ro', lazy => 1, builder => '_init_model' );
+
+has 'logger' => ( is => 'ro', default => sub { get_logger(__PACKAGE__) } );
 
 has 'metadata_formats' => ( is => 'ro', isa => 'HashRef', lazy => 1, builder => '_init_formats' );
 
@@ -47,7 +52,7 @@ sub _init_formats {
     my $self = shift;
 
     my $formats = {
-        'oai_dc'   => undef,
+        'oai_dc'   => \&Metamod::DatasetTransformer::ToOAIDublinCore::foreignDataset2oai_dc,
         'dif'      => \&Metamod::DatasetTransformer::ToDIF::foreignDataset2Dif,
         'iso19115' => \&Metamod::DatasetTransformer::ToISO19115::foreignDataset2iso19115,
 
@@ -116,7 +121,7 @@ sub get_records {
 sub get_identifiers {
     my $self = shift;
 
-    my ( $from, $until, $set, $resumption_token ) = @_;
+    my ( $format, $from, $until, $set, $resumption_token ) = @_;
 
     my $datasets = $self->_search_datasets( $from, $until, $set );
 
@@ -124,7 +129,7 @@ sub get_identifiers {
     while ( my $dataset = $datasets->next() ) {
 
         my $oai_id = $dataset->oai_info()->first()->get_column('oai_identifier');
-        my $record_header = $self->_oai_record_header( $oai_id, $dataset );
+        my $record_header = $self->_oai_record_header( $oai_id, $dataset, $format );
         push @identifiers, $record_header;
     }
 
@@ -153,17 +158,12 @@ sub _oai_record {
 
     my ( $identifier, $dataset, $format ) = @_;
 
-    my $record = $self->_oai_record_header( $identifier, $dataset );
+    my $record = $self->_oai_record_header( $identifier, $dataset, $format );
 
-    my $xml_dom = $self->_get_metadata( $dataset, $format );
-    if( $self->config->get('PMH_VALIDATION') eq 'on' ){
-        my $success = $self->_validate_metadata($format, $xml_dom);
-        if($success) {
-            $record->{metadata} = $xml_dom;
-        } else {
-            $record->{status} = "deleted";
-        }
-    } else {
+    # status is only set when the record is marked as deleted. For deleted datasets
+    # we do not include metadata
+    if( !exists $record->{status} ){
+        my $xml_dom = $self->_get_metadata( $dataset, $format );
         $record->{metadata} = $xml_dom;
     }
 
@@ -174,7 +174,7 @@ sub _oai_record {
 sub _oai_record_header {
     my $self = shift;
 
-    my ( $identifier, $dataset ) = @_;
+    my ( $identifier, $dataset, $format ) = @_;
 
     my $datestring = $self->_convert_date( $dataset->get_column('ds_datestamp') );
 
@@ -188,6 +188,16 @@ sub _oai_record_header {
 
     if ( @{ $self->available_sets } > 0 ) {
         $record->{setSpec} = $dataset->ds_ownertag();
+    }
+
+    # If metadata validation is turned on we will mark all datasets with invalid
+    # metadata as deleted.
+    if( $self->config->get('PMH_VALIDATION') eq 'on' && $dataset->ds_status() != 0 ){
+        my $xml_dom = $self->_get_metadata( $dataset, $format );
+        my $success = $self->_validate_metadata($format, $xml_dom, $dataset);
+        if(!$success) {
+            $record->{status} = 'deleted';
+        }
     }
 
     return $record;
@@ -252,13 +262,39 @@ sub _search_datasets {
     return $datasets;
 }
 
+=head2 $self->_validate_metadata($format, $xml_dom)
+
+Validate that the metadata follows a specific metadata format.
+
+=over
+
+=item $format
+
+The name of the format to check the file against.
+
+=item $xml_dom
+
+A XML DOM object as returned by XML::LibXML.
+
+=item $dataset
+
+A DBIx::Class row object to the dataset.
+
+=item return
+
+Returns true if the metadata is valid or if no XSD file is registered for the
+format. False if the format is not valid.
+
+=back
+
+=cut
 sub _validate_metadata {
     my $self = shift;
 
-    my ( $format, $xml_dom ) = @_;
+    my ( $format, $xml_dom, $dataset ) = @_;
 
     my %schema_for_format = (
-        dif    => '/schema/dif_v9.8.xsd',
+        dif    => '/schema/dif_v9.8.2.xsd',
         oai_dc => '/schema/oai_dc.xsd',
     );
 
@@ -271,6 +307,9 @@ sub _validate_metadata {
     my $error = try {
         $xsd_validator->validate($xml_dom);
         $success = 1;
+    } catch {
+        my $ds_name = $dataset->ds_name();
+        $self->logger->warn("XML did not validate according to format '$format' for dataset '$ds_name': $_");
     };
 
     return $success;
