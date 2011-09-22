@@ -82,6 +82,65 @@ sub _init_available_sets {
     return \@sets;
 }
 
+=head2 $self->supports_sets()
+
+Check if the data repository supports sets.
+
+=over
+
+=item return
+
+Returns 1 if the data repository supports sets. False otherwise.
+
+=back
+
+=cut
+sub supports_sets {
+    my $self = shift;
+
+    my $available_sets = $self->available_sets();
+
+    if( @$available_sets == 0 ){
+        return;
+    } else {
+        return 1;
+    }
+}
+
+=head2 $self->identifier_exists($identifier)
+
+Check if a identifier exists in data repository.
+
+=over
+
+=item $identifier
+
+The identifier to check.
+
+=item return
+
+Returns 1 if the identifier exists in the data repository. False otherwise.
+
+=back
+
+=cut
+sub identifier_exists {
+    my $self = shift;
+
+    my ($identifier) = @_;
+
+    my $base_resultset = $self->_base_resultset();
+    my $dataset =
+        $base_resultset->search( { 'oai_info.oai_identifier' => $identifier }, { join => 'oai_info' } )->first();
+
+    if ( !defined $dataset ) {
+        return;
+    }
+
+    return 1;
+
+}
+
 sub get_record {
     my $self = shift;
 
