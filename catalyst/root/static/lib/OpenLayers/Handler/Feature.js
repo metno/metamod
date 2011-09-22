@@ -147,7 +147,8 @@ OpenLayers.Handler.Feature = OpenLayers.Class(OpenLayers.Handler, {
                 scope: this
             });
         }
-        return this.mousedown(evt);
+        return OpenLayers.Event.isMultiTouch(evt) ?
+                true : this.mousedown(evt);
     },
 
     /**
@@ -271,7 +272,7 @@ OpenLayers.Handler.Feature = OpenLayers.Class(OpenLayers.Handler, {
         var type = evt.type;
         var handled = false;
         var previouslyIn = !!(this.feature); // previously in a feature
-        var click = (type == "click" || type == "dblclick");
+        var click = (type == "click" || type == "dblclick" || type == "touchstart");
         this.feature = this.layer.getFeatureFromEvent(evt);
         if(this.feature && !this.feature.layer) {
             // feature has been destroyed
@@ -282,7 +283,7 @@ OpenLayers.Handler.Feature = OpenLayers.Class(OpenLayers.Handler, {
             this.lastFeature = null;
         }
         if(this.feature) {
-            if(evt.type === "touchstart") {
+            if(type === "touchstart") {
                 // stop the event to prevent Android Webkit from
                 // "flashing" the map div
                 OpenLayers.Event.stop(evt);
@@ -403,7 +404,7 @@ OpenLayers.Handler.Feature = OpenLayers.Class(OpenLayers.Handler, {
      * evt - {Object}
      */
     handleMapEvents: function(evt) {
-        if (!evt.property || evt.property == "order") {
+        if (evt.type == "removelayer" || evt.property == "order") {
             this.moveLayerToTop();
         }
     },

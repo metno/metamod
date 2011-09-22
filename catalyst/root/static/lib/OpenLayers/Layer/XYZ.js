@@ -120,7 +120,7 @@ OpenLayers.Layer.XYZ = OpenLayers.Class(OpenLayers.Layer.Grid, {
     getURL: function (bounds) {
         var xyz = this.getXYZ(bounds);
         var url = this.url;
-        if (url instanceof Array) {
+        if (OpenLayers.Util.isArray(url)) {
             var s = '' + xyz.x + xyz.y + xyz.z;
             url = this.selectUrl(s, url);
         }
@@ -140,13 +140,19 @@ OpenLayers.Layer.XYZ = OpenLayers.Class(OpenLayers.Layer.Grid, {
      */
     getXYZ: function(bounds) {
         var res = this.map.getResolution();
-        var x = Math.round((bounds.left - this.maxExtent.left) 
-            / (res * this.tileSize.w));
-        var y = Math.round((this.maxExtent.top - bounds.top) 
-            / (res * this.tileSize.h));
+        var x = Math.round((bounds.left - this.maxExtent.left) /
+            (res * this.tileSize.w));
+        var y = Math.round((this.maxExtent.top - bounds.top) /
+            (res * this.tileSize.h));
         var z = this.serverResolutions != null ?
             OpenLayers.Util.indexOf(this.serverResolutions, res) :
             this.map.getZoom() + this.zoomOffset;
+
+        var limit = Math.pow(2, z);
+        if (this.wrapDateLine)
+        {
+           x = ((x % limit) + limit) % limit;
+        }
 
         return {'x': x, 'y': y, 'z': z};
     },
@@ -199,5 +205,6 @@ OpenLayers.Layer.OSM = OpenLayers.Class(OpenLayers.Layer.XYZ, {
          obj = OpenLayers.Layer.XYZ.prototype.clone.apply(this, [obj]);
          return obj;
      },
+     wrapDateLine: true,
      CLASS_NAME: "OpenLayers.Layer.OSM"
 });

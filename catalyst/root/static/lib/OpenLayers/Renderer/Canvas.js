@@ -42,8 +42,15 @@ OpenLayers.Renderer.Canvas = OpenLayers.Class(OpenLayers.Renderer, {
      * Property: features
      * {Object} Internal object of feature/style pairs for use in redrawing the layer.
      */
-    features: null, 
-   
+    features: null,
+    
+    /**
+     * Property: pendingRedraw
+     * {Boolean} The renderer needs a redraw call to render features added while
+     *     the renderer was locked.
+     */
+    pendingRedraw: false,
+    
     /**
      * Constructor: OpenLayers.Renderer.Canvas
      *
@@ -60,8 +67,6 @@ OpenLayers.Renderer.Canvas = OpenLayers.Class(OpenLayers.Renderer, {
         if (this.hitDetection) {
             this.hitCanvas = document.createElement("canvas");
             this.hitContext = this.hitCanvas.getContext("2d");
-            this.hitGraphicCanvas = document.createElement("canvas");
-            this.hitGraphicContext = this.hitGraphicCanvas.getContext("2d");
         }
     },
     
@@ -113,11 +118,6 @@ OpenLayers.Renderer.Canvas = OpenLayers.Class(OpenLayers.Renderer, {
             hitCanvas.style.height = size.h + "px";
             hitCanvas.width = size.w;
             hitCanvas.height = size.h;
-            var hitGraphicCanvas = this.hitGraphicCanvas;
-            hitGraphicCanvas.style.width = size.w + "px";
-            hitGraphicCanvas.style.height = size.h + "px";
-            hitGraphicCanvas.width = size.w;
-            hitGraphicCanvas.height = size.h;
         }
     },
     
@@ -138,12 +138,24 @@ OpenLayers.Renderer.Canvas = OpenLayers.Class(OpenLayers.Renderer, {
     drawFeature: function(feature, style) {
         var rendered;
         if (feature.geometry) {
-            style = style || feature.style;
-            style = this.applyDefaultSymbolizer(style);  
-
-            this.features[feature.id] = [feature, style]; 
+            style = this.applyDefaultSymbolizer(style || feature.style);
+            // don't render if display none or feature outside extent
+            var bounds = feature.geometry.getBounds();
+            rendered = (style.display !== "none") && !!bounds && 
+                bounds.intersectsBounds(this.extent);
+            if (rendered) {
+                // keep track of what we have rendered for redraw
+                this.features[feature.id] = [feature, style];
+            }
+            else {
+                // remove from features tracked for redraw
+                delete(this.features[feature.id]);
+            }
+            this.pendingRedraw = true;
+        }
+        if (this.pendingRedraw && !this.locked) {
             this.redraw();
-            rendered = true;
+            this.pendingRedraw = false;
         }
         return rendered;
     },
@@ -195,7 +207,7 @@ OpenLayers.Renderer.Canvas = OpenLayers.Class(OpenLayers.Renderer, {
      * style    - {Object}
      * featureId - {String}
      */ 
-    drawExternalGraphic: function(pt, style, featureId) {
+    drawExternalGraphic: function(geometry, style, featureId) {
         var img = new Image();
 
         if (style.graphicTitle) {
@@ -211,47 +223,34 @@ OpenLayers.Renderer.Canvas = OpenLayers.Class(OpenLayers.Renderer, {
         var yOffset = (style.graphicYOffset != undefined) ?
            style.graphicYOffset : -(0.5 * height);
 
-        var x = pt[0] + xOffset;
-        var y = pt[1] + yOffset;
-
-        var numRows = this.root.width;
-        var numCols = this.root.height;
-
         var opacity = style.graphicOpacity || style.fillOpacity;
         
-        var rgb = this.featureIdToRGB(featureId);
-        var red = rgb[0];
-        var green = rgb[1];
-        var blue = rgb[2];
-        
         var onLoad = function() {
-            // TODO: check that we haven't moved
-            var canvas = this.canvas;
-            canvas.globalAlpha = opacity;
-            canvas.drawImage(
-                img, x, y, width, height
-            );
-            if (this.hitDetection) {
-                var hitGraphicContext = this.hitGraphicContext;
-                var hitContext = this.hitContext;
-                hitGraphicContext.clearRect(0, 0, numRows, numCols);
-                hitGraphicContext.drawImage(
-                    img, 0, 0, width, height
+            if(!this.features[featureId]) {
+                return;
+            }
+            var pt = this.getLocalXY(geometry);
+            var p0 = pt[0];
+            var p1 = pt[1];
+            if(!isNaN(p0) && !isNaN(p1)) {
+                var x = (p0 + xOffset) | 0;
+                var y = (p1 + yOffset) | 0;
+                var canvas = this.canvas;
+                canvas.globalAlpha = opacity;
+                var factor = OpenLayers.Renderer.Canvas.drawImageScaleFactor ||
+                    (OpenLayers.Renderer.Canvas.drawImageScaleFactor =
+                        /android 2.1/.test(navigator.userAgent.toLowerCase()) ?
+                            // 320 is the screen width of the G1 phone, for
+                            // which drawImage works out of the box.
+                            320 / window.screen.width : 1
+                    );
+                canvas.drawImage(
+                    img, x*factor, y*factor, width*factor, height*factor
                 );
-                var imagePixels = hitGraphicContext.getImageData(0, 0, width, height).data;
-                var indexData = hitContext.createImageData(width, height);
-                var indexPixels = indexData.data;
-                var pixelIndex;
-                for (var i=0, len=imagePixels.length; i<len; i+=4) {
-                    // look for visible pixels
-                    if (imagePixels[i+3] > 0) {
-                        indexData[i] = red;
-                        indexPixels[i+1] = green;
-                        indexPixels[i+2] = blue;
-                        indexPixels[i+3] = 255;
-                    }
+                if (this.hitDetection) {
+                    this.setHitContextStyle("fill", featureId);
+                    this.hitContext.fillRect(x, y, width, height);
                 }
-                hitContext.putImageData(indexData, x, y);
             }
         };
 
@@ -304,25 +303,6 @@ OpenLayers.Renderer.Canvas = OpenLayers.Class(OpenLayers.Renderer, {
     },
     
     /**
-     * Method: featureIdToRGB
-     * Convert a feature ID string into an RGB array.
-     *
-     * Parameters:
-     * featureId - {String} Feature id
-     *
-     * Returns:
-     * {Array} RGB values.
-     */
-    featureIdToRGB: function(featureId) {
-        var hex = this.featureIdToHex(featureId);
-        return [
-            parseInt(hex.substring(1, 3), 16),
-            parseInt(hex.substring(3, 5), 16),
-            parseInt(hex.substring(5, 7), 16)
-        ];
-    },
-
-    /**
      * Method: setHitContextStyle
      * Prepare the hit canvas for drawing by setting various global settings.
      *
@@ -358,13 +338,13 @@ OpenLayers.Renderer.Canvas = OpenLayers.Class(OpenLayers.Renderer, {
      */ 
     drawPoint: function(geometry, style, featureId) {
         if(style.graphic !== false) {
-            var pt = this.getLocalXY(geometry);
-            var p0 = pt[0];
-            var p1 = pt[1];
-            if (!isNaN(p0) && !isNaN(p1)) {
-                if (style.externalGraphic) {
-                    this.drawExternalGraphic(pt, style, featureId);
-                } else {
+            if(style.externalGraphic) {
+                this.drawExternalGraphic(geometry, style, featureId);
+            } else {
+                var pt = this.getLocalXY(geometry);
+                var p0 = pt[0];
+                var p1 = pt[1];
+                if(!isNaN(p0) && !isNaN(p1)) {
                     var twoPi = Math.PI*2;
                     var radius = style.pointRadius;
                     if(style.fill !== false) {
@@ -582,7 +562,7 @@ OpenLayers.Renderer.Canvas = OpenLayers.Class(OpenLayers.Renderer, {
         }
         this.setCanvasStyle("reset");
     },
-
+    
     /**
      * Method: getLocalXY
      * transform geographic xy into pixel xy
@@ -653,7 +633,7 @@ OpenLayers.Renderer.Canvas = OpenLayers.Class(OpenLayers.Renderer, {
      * features - {Array(<OpenLayers.Feature.Vector>)} 
      */
     eraseFeatures: function(features) {
-        if(!(features instanceof Array)) {
+        if(!(OpenLayers.Util.isArray(features))) {
             features = [features];
         }
         for(var i=0; i<features.length; ++i) {
@@ -684,7 +664,6 @@ OpenLayers.Renderer.Canvas = OpenLayers.Class(OpenLayers.Renderer, {
                 if (!this.features.hasOwnProperty(id)) { continue; }
                 feature = this.features[id][0];
                 style = this.features[id][1];
-                if (!feature.geometry) { continue; }
                 this.drawGeometry(feature.geometry, style, feature.id);
                 if(style.label) {
                     labelMap.push([feature, style]);
@@ -722,3 +701,11 @@ OpenLayers.Renderer.Canvas.LABEL_FACTOR = {
     "t": 0,
     "b": -1
 };
+
+/**
+ * Constant: OpenLayers.Renderer.Canvas.drawImageScaleFactor
+ * {Number} Scale factor to apply to the canvas drawImage arguments. This
+ *     is always 1 except for Android 2.1 devices, to work around
+ *     http://code.google.com/p/android/issues/detail?id=5141.
+ */
+OpenLayers.Renderer.Canvas.drawImageScaleFactor = null;

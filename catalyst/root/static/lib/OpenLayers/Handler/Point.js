@@ -107,13 +107,6 @@ OpenLayers.Handler.Point = OpenLayers.Class(OpenLayers.Handler, {
     pixelTolerance: 5,
 
     /**
-     * APIProperty: dblclickTolerance
-     * {Number} Maximum number of pixels between two touchend for an
-     *     event to be considered a dblclick.  Default is 20.
-     */
-    dblclickTolerance: 20,
-
-    /**
      * Property: touch
      * {Boolean} Indcates the support of touch events.
      */
@@ -175,7 +168,6 @@ OpenLayers.Handler.Point = OpenLayers.Class(OpenLayers.Handler, {
         }, this.layerOptions);
         this.layer = new OpenLayers.Layer.Vector(this.CLASS_NAME, options);
         this.map.addLayer(this.layer);
-        this.createFeature();
         return true;
     },
     
@@ -187,13 +179,10 @@ OpenLayers.Handler.Point = OpenLayers.Class(OpenLayers.Handler, {
      * pixel - {<OpenLayers.Pixel>} A pixel location on the map.
      */
     createFeature: function(pixel) {
-        var geometry;
-        if(pixel) {
-            var lonlat = this.map.getLonLatFromPixel(pixel);
-            geometry = new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat);
-        } else {
-            geometry = new OpenLayers.Geometry.Point();
-        }
+        var lonlat = this.map.getLonLatFromPixel(pixel);
+        var geometry = new OpenLayers.Geometry.Point(
+            lonlat.lon, lonlat.lat
+        );
         this.point = new OpenLayers.Feature.Vector(geometry);
         this.callback("create", [this.point.geometry, this.point]);
         this.point.geometry.clearBounds();
@@ -208,14 +197,14 @@ OpenLayers.Handler.Point = OpenLayers.Class(OpenLayers.Handler, {
         if(!OpenLayers.Handler.prototype.deactivate.apply(this, arguments)) {
             return false;
         }
-        this.cancel(true);
+        this.cancel();
         // If a layer's map property is set to null, it means that that layer
         // isn't added to the map. Since we ourself added the layer to the map
         // in activate(), we can assume that if this.layer.map is null it means
         // that the layer has been destroyed (as a result of map.destroy() for
         // example.
         if (this.layer.map != null) {
-            this.destroyFeature();
+            this.destroyFeature(true);
             this.layer.destroy(false);
         }
         this.layer = null;
@@ -226,9 +215,12 @@ OpenLayers.Handler.Point = OpenLayers.Class(OpenLayers.Handler, {
     /**
      * Method: destroyFeature
      * Destroy the temporary geometries
+     *
+     * Parameters:
+     * force - {Boolean} Destroy even if persist is true.
      */
-    destroyFeature: function() {
-        if(this.layer) {
+    destroyFeature: function(force) {
+        if(this.layer && (force || !this.persist)) {
             this.layer.destroyFeatures();
         }
         this.point = null;
@@ -246,49 +238,29 @@ OpenLayers.Handler.Point = OpenLayers.Class(OpenLayers.Handler, {
     },
 
     /**
-     * Method: finishTouchGeometry
-     * Finish the geometry and send it back to the control.
-     */
-    finishTouchGeometry: function() {
-        this.finalize();
-    },
-    
-    /**
      * Method: finalize
      * Finish the geometry and call the "done" callback.
      *
      * Parameters:
-     * cancel - {Boolean} Call cancel instead of done callback.  Default is
-     *     false.
-     * noNew - {Boolean} Do not create a new feature after
-     *     finalization.  Default is false.
+     * cancel - {Boolean} Call cancel instead of done callback.  Default
+     *          is false.
      */
-    finalize: function(cancel, noNew) {
+    finalize: function(cancel) {
         var key = cancel ? "cancel" : "done";
-        this.drawing = false;
         this.mouseDown = false;
         this.lastDown = null;
         this.lastUp = null;
         this.lastTouchPx = null;
         this.callback(key, [this.geometryClone()]);
-        if(cancel || !this.persist) {
-            this.destroyFeature();
-        }
-        if(!noNew && this.active) {
-            this.createFeature();
-        }
+        this.destroyFeature(cancel);
     },
 
     /**
      * APIMethod: cancel
      * Finish the geometry and call the "cancel" callback.
-     *
-     * Parameters:
-     * noNew - {Boolean} Do not create a new feature after
-     *     cancelation.  Default is false.
      */
-    cancel: function(noNew) {
-        this.finalize(true, noNew);
+    cancel: function() {
+        this.finalize(true);
     },
 
     /**
@@ -331,6 +303,9 @@ OpenLayers.Handler.Point = OpenLayers.Class(OpenLayers.Handler, {
      * pixel - {<OpenLayers.Pixel>} A pixel location on the map.
      */
     modifyFeature: function(pixel) {
+        if(!this.point) {
+            this.createFeature(pixel);
+        }
         var lonlat = this.map.getLonLatFromPixel(pixel);
         this.point.geometry.x = lonlat.lon;
         this.point.geometry.y = lonlat.lat;
@@ -534,8 +509,7 @@ OpenLayers.Handler.Point = OpenLayers.Class(OpenLayers.Handler, {
             return true;
         }
         // ignore double-clicks
-        if (this.lastUp && this.passesTolerance(this.lastUp, evt.xy,
-                                                this.dblclickTolerance)) {
+        if (this.lastUp && this.lastUp.equals(evt.xy)) {
             return true;
         }
         if (this.lastDown && this.passesTolerance(this.lastDown, evt.xy,
@@ -563,7 +537,7 @@ OpenLayers.Handler.Point = OpenLayers.Class(OpenLayers.Handler, {
      * evt - {Event} The browser event
      */
     mouseout: function(evt) {
-        if(OpenLayers.Util.mouseLeft(evt, this.map.viewPortDiv)) {
+        if(OpenLayers.Util.mouseLeft(evt, this.map.eventsDiv)) {
             this.stoppedDown = this.stopDown;
             this.mouseDown = false;
         }
@@ -572,13 +546,9 @@ OpenLayers.Handler.Point = OpenLayers.Class(OpenLayers.Handler, {
     /**
      * Method: passesTolerance
      * Determine whether the event is within the optional pixel tolerance.
-     * Note that the pixel tolerance check only works if mousedown events get
-     * to the listeners registered here.  If they are stopped by other
-     * elements, <pixelTolerance> and <dblclickTolerance> will have no effect
-     * here (this method will always return true).
      *
      * Returns:
-     * {Boolean} The click is within the pixel tolerance (if specified).
+     * {Boolean} The event is within the pixel tolerance (if specified).
      */
     passesTolerance: function(pixel1, pixel2, tolerance) {
         var passes = true;
