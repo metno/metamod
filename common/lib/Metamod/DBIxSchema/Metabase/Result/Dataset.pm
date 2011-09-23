@@ -99,9 +99,14 @@ __PACKAGE__->has_many(
   { "foreign.ds_id" => "self.ds_parent" },
 );
 __PACKAGE__->has_many(
-  "wmsinfos",
+  "parentwmsinfos",
   "Metamod::DBIxSchema::Metabase::Result::Wmsinfo",
   { "foreign.ds_id" => "self.ds_parent" },
+);
+__PACKAGE__->has_many(
+  "selfwmsinfos",
+  "Metamod::DBIxSchema::Metabase::Result::Wmsinfo",
+  { "foreign.ds_id" => "self.ds_id" },
 );
 
 __PACKAGE__->has_many(
@@ -275,7 +280,7 @@ Returns the C<wi_content> XML DOM for the dataset if it has any Wmsinfo. Returns
 sub wmsinfo {
     my $self = shift;
 
-    my $wmsinfo_row = $self->wmsinfos()->first();
+    my $wmsinfo_row = $self->selfwmsinfos()->first() || $self->parentwmsinfos()->first();
 
     if( !defined $wmsinfo_row ){
         #printf STDERR "* No wms setup for dataset %s\n", $self->ds_name;

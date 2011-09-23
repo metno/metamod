@@ -34,7 +34,7 @@ WMC (Web Map Context) format.
 
 use Moose;
 use namespace::autoclean;
-
+use Data::Dumper;
 use Try::Tiny;
 use XML::LibXML;
 use MetamodWeb::Utils::XML::Generator;
@@ -84,9 +84,8 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
 
         if( my $ds = $c->model('Metabase')->resultset('Dataset')->find( $$p{ds_id} ) ){
             $setup = $ds->wmsinfo;
-        } else {
-            $c->detach( 'Root', 'default' );
         }
+        $c->detach( 'Root', 'default' ) unless defined($setup);
 
     #} elsif ( $$p{wmssetup} ) {
     #    # fetch setup doc via HTTP... DEPRECATED (until told otherwise)
@@ -105,7 +104,6 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
         #printf STDERR " * URL = %s\n", $c->request->uri;
         $wms = $$p{getcap};
         $setup = defaultWMC();
-        #printf STDERR "Default WMC = \n%s\n", $setup->toString;
     }
 
     my $wmc = eval { $c->stash->{wmc}->setup2wmc($setup, $wms) };
