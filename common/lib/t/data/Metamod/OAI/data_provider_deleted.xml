@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MM2 xmlns="http://www.met.no/schema/metamod/MM2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.met.no/schema/metamod/MM2 https://wiki.met.no/_media/metamod/mm2.xsd">
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="variable">sea_water_pressure</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="variable">Oceans &gt; Ocean Temperature &gt; Water Temperature &gt; HIDDEN</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="variable">Oceans &gt; Salinity/Density &gt; Salinity &gt; HIDDEN</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="area">Kara Sea</metadata>
+    <metadata xmlns="http://www.met.no/schema/metamod/MM2" name="area">Nordic Seas</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="datacollection_period_from">2010-01-01</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="history">2009-03-12
+		creation</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="datacollection_period_to">2011-01-01</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="abstract">Short test abstract</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="title">Test title</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="bounding_box">-146.8899,78.4615,-146.8899,78.4615</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="dataref">http://thredds.met.no/thredds/catalog/data/met.no/itp04/catalog.html?dataset=met.no/itp04/itp04_itp4grd0013.nc</metadata>
+</MM2>
