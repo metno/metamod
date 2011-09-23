@@ -120,11 +120,11 @@
                 alert('Only subscription rights available for "other" institutions.');
                 return false;
             }
-            if ( $("#access_rights").val() !== "" ) {
+            if ( $("#access_rights").val() == "" ) {
                 alert('Access rights cannot be blank.');
                 return false;
             }
-            if ( $("#institution_name").val() !== "" ) {
+            if ( $("#institution_name").val() == "" ) {
                 alert('Institution cannot be blank.');
                 return false;
             }
