@@ -15,10 +15,11 @@ use Test::More;
 use Test::Files;
 
 use Metamod::Config;
+use Metamod::Test::Setup;
 use MetNo::NcDigest qw( digest );
 
-my $config = Metamod::Config->new("$FindBin::Bin/../master_config.txt");
-$config->initLogger();
+my $test_setup = Metamod::Test::Setup->new( master_config_file => "$FindBin::Bin/../master_config.txt" );
+my $config = $test_setup->mm_config();
 
 my $out_dir = "$FindBin::Bin/xml_output/xml_output";
 my $baseline_dir = "$FindBin::Bin/../data/MetNo"; # dir with the correct xml files
