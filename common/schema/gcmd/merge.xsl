@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-                xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
-                xmlns:skos="http://www.w3.org/2004/02/skos/core#" 
+                xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                xmlns:skos="http://www.w3.org/2004/02/skos/core#"
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
                 xmlns:gcmd="http://vocab.ndg.nerc.ac.uk/list/P041/current"
                 xmlns:nc="http://vocab.ndg.nerc.ac.uk/list/P071/current"
@@ -13,7 +13,7 @@
     <xsl:variable name="nc2" select="document('P072_cf.xml')"/>
     <xsl:variable name="lc" select="'abcdefghijklmnopqrstuvwxyz'"/>
     <xsl:variable name="uc" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
-  
+
     <!--<xsl:key name="nc_conc" match="skos:Concept" use="@rdf:about"/>--> <!-- doesn't work... -->
 
     <xsl:template match="/">
@@ -22,7 +22,7 @@
             <xsl:apply-templates match="/*/skos:Concept"/>
         </gcmd:variables>
     </xsl:template>
-    
+
     <xsl:template match="/*/skos:Concept">
         <gcmd:variable>
             <xsl:attribute name="label">
@@ -45,7 +45,7 @@
                 </xsl:otherwise>
             </xsl:choose>
 
-            <xsl:for-each select="skos:narrowMatch">
+            <xsl:for-each select="skos:narrowMatch | skos:exactMatch | skos:broadMatch">
                 <xsl:variable name="ncuri" select="@rdf:resource"/>
                 <xsl:choose>
                     <xsl:when test="starts-with($ncuri, 'http://vocab.ndg.nerc.ac.uk/term/P071/')">
