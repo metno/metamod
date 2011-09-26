@@ -1,0 +1,20 @@
+Source: metno-metamod-2.10
+Priority: extra
+Maintainer: METAMOD Team <heiko.klein@met.no>
+Build-Depends: debhelper (>=5), perl
+Standards-Version: 3.7.3
+Section: web
+
+Package: metno-metamod-2.10
+Section: web
+Priority: optional
+Architecture: all
+Essential: no
+Depends: postgresql-client-common, postgresql-client, libdbd-pg-perl, libmailtools-perl, libwww-perl, pdl, proj, liburi-perl, libpdl-netcdf-perl, libgeo-proj4-perl, libconfig-tiny-perl, libimager-perl, libfile-copy-recursive-perl, libpod-simple-wiki-perl
+Pre-Depends: perl
+Recommends: exim4 | postfix | sendmail, libxml2-utils, mailx, libdatetime-perl
+Suggests: metamod2-database
+Conflicts:
+Replaces:
+Provides: metamod-2
+Description: Installation packages for metamod instances, i.e. portals for geographical metadata handling.

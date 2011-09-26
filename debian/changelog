@@ -1,3 +1,9 @@
+metno-metamod-2.10 (2.10.0) stable; urgency=low
+
+  * Metamod 2.10 Release. See wiki for details
+
+ -- Øystein Torget <oysteint@pc2988.pc.met.no>  Mon, 30 Jun 2011 09:30:00 +0100
+
 metamod-2.6 (2.6.0-1) hardy; urgency=low
 
   * metamod 2.6 package
