@@ -1,4 +1,0 @@
-=etc/qst/metadata_quest.json
-=etc/qst/wms_and_projection.json
-=etc/qst/gcmd-location-keywords.txt
-=etc/qst/gcmd-science-keywords.txt

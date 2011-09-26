@@ -1,4 +1,0 @@
-#AuthType Basic
-#AuthName "Password Required"
-#AuthUserFile /metno/ipycoord/ipycoordpw
-#Require user ipycoord
