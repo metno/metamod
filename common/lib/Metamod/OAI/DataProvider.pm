@@ -3,9 +3,11 @@ package Metamod::OAI::DataProvider;
 use strict;
 use warnings;
 
+use Carp qw( confess );
 use File::Spec;
 use Log::Log4perl qw( get_logger );
 use Moose;
+use Params::Validate qw(:all);
 use Try::Tiny;
 use XML::LibXML;
 
@@ -95,6 +97,7 @@ Returns 1 if the data repository supports sets. False otherwise.
 =back
 
 =cut
+
 sub supports_sets {
     my $self = shift;
 
@@ -124,6 +127,7 @@ Returns 1 if the identifier exists in the data repository. False otherwise.
 =back
 
 =cut
+
 sub identifier_exists {
     my $self = shift;
 
@@ -141,10 +145,36 @@ sub identifier_exists {
 
 }
 
+=head2 $self->get_record($identifier, $format)
+
+Get a single record from the repository.
+
+=over
+
+=item $format
+
+The format that the metadata for the record should be in.
+
+=item $identifier
+
+The OAI identifier for the record.
+
+=item return
+
+If the record is found it returns a hash reference with the keys 'identifier' and 'datestamp'. If the dataset has
+been deleted or the metadata for the record is not valid it will also contain the key 'status'. If the dataset has
+not been deleted and the metadata is valid it will contain the key 'metadata' with a XML DOM object as value.
+
+If the record cannot be found it returns false.
+
+=back
+
+=cut
+
 sub get_record {
     my $self = shift;
 
-    my ( $identifier, $format ) = @_;
+    my ( $format, $identifier ) = validate_pos( @_, 1, 1);
 
     my $base_resultset = $self->_base_resultset();
     my $dataset =
@@ -157,6 +187,31 @@ sub get_record {
     my $record = $self->_oai_record( $identifier, $dataset, $format );
     return $record;
 }
+
+=head2 $self->get_records($format, $from, $until, $set, $resumption_token)
+
+Get all the metadata records in the repository that match the specified
+criteria.
+
+=over
+
+=item $format
+
+The metadata format that should be used for the metadata.
+
+=item $from
+
+=item $until
+
+=item $set
+
+=item $resumption_token
+
+=item return
+
+=back
+
+=cut
 
 sub get_records {
     my $self = shift;
@@ -177,6 +232,28 @@ sub get_records {
 
 }
 
+=head2 $self->get_identifiers($format, $from, $until, $set, $resumption_token)
+
+Get a list of record headers without metadata that match the specified criteria.
+
+=over
+
+=item $format
+
+=item $from
+
+=item $until
+
+=item $set
+
+=item $resumption_token
+
+=item return
+
+=back
+
+=cut
+
 sub get_identifiers {
     my $self = shift;
 
@@ -196,6 +273,25 @@ sub get_identifiers {
 
 }
 
+=head2 $self->_convert_date($datestamp)
+
+Convert a datestamp into the format that is used by OAI-PMH.
+
+=over
+
+=item $datestamp
+
+A datestamp string on the format YYYY-MM-DD HH:MM:SS
+
+=item return
+
+A datestamp string on the format YYYY-MM-DDTHH:MM:SSZ. Dies if the datestamp
+argument does not have the correct format.
+
+=back
+
+=cut
+
 sub _convert_date {
     my $self = shift;
 
@@ -211,6 +307,36 @@ sub _convert_date {
     return $datestring;
 
 }
+
+=head2 $self->_oai_record($identifier, $dataset, $format)
+
+Get the data from a dataset that is required for a OAI-PMH record.
+
+=over
+
+=item $identifier
+
+The identifier of the record.
+
+=item $dataset
+
+A C<DBIx::Class> row object for the dataset.
+
+=item $format
+
+The metadata format for the dataset.
+
+=item return
+
+A hash reference representing the OAI-PMH record. The record has the keys
+'identifier' and 'datestamp'. In addition it will have the key 'metadata' if
+the dataset is not deleted and the metadata is valid (in the case of metadata
+validation). If the dataset is deleted or it contains invalid metadata (in the
+case of metadata validation) it will have the key 'status'.
+
+=back
+
+=cut
 
 sub _oai_record {
     my $self = shift;
@@ -229,6 +355,34 @@ sub _oai_record {
     return $record;
 
 }
+
+=head2 $self->_oai_record_header($identifier, $dataset, $format)
+
+Get the data from a dataset that is required for building a OAI-PMH header.
+
+=over
+
+=item $identifier
+
+The identifier of the record.
+
+=item $dataset
+
+A C<DBIx::Class> row object for the dataset.
+
+=item $format
+
+The metadata format for the dataset.
+
+=item return
+
+A hash reference representing the OAI-PMH header. The header has the keys
+'identifier' and 'datestamp'. If the dataset is deleted or it contains invalid
+metadata (in the case of metadata validation) it will have the key 'status'.
+
+=back
+
+=cut
 
 sub _oai_record_header {
     my $self = shift;
@@ -262,6 +416,30 @@ sub _oai_record_header {
     return $record;
 }
 
+=head2 $self->_get_metadata($dataset, $format)
+
+Get the metadata for a dataset in the correct format.
+
+=over
+
+=item $dataset
+
+A C<DBIx::Class> row object to the dataset.
+
+=item $format
+
+The format name as a string. This must be one of the format availble metadata
+formats.
+
+=item return
+
+Returns the metadata in the correct XML format as a XML dom object. Dies if the
+specified format is not among the list of supported formats.
+
+=back
+
+=cut
+
 sub _get_metadata {
     my $self = shift;
 
@@ -269,12 +447,34 @@ sub _get_metadata {
 
     my $ds = Metamod::ForeignDataset->newFromFile( $dataset->ds_filepath() );
 
-    my $formats      = $self->metadata_formats();
+    my $formats = $self->metadata_formats();
+
+    if( !exists $formats->{$format}){
+        die "Invalid format '$format'. This should have been validated by the server.";
+    }
+
     my $convert_func = $formats->{$format};
 
     my $converted = $convert_func->($ds);
     return $converted->getMETA_DOC();
 }
+
+=head2 $self->_base_resultset()
+
+Get the base DBIx::Class results to use for searching. The reason we use a base
+resultset instead of the dataset resultset directly is since only level 1
+datasets are exported and depending on configuration only a subset of the level
+1 datasets.
+
+=over
+
+=item return
+
+A DBIx::Class resultset with the necessary filters in place.
+
+=back
+
+=cut
 
 sub _base_resultset {
     my $self = shift;
@@ -301,10 +501,42 @@ sub _base_resultset {
 
 }
 
+=head2 $self->_search_datasets($from, $until, $set)
+
+Search the metadata repository for datasets that match the specified conditions.
+
+=over
+
+=item $from
+
+A datestamp on the form 'YYYY-MM-DDTHH:MM:SST. Only datasets with a
+ds_datestamp larger or equal to this is returned.
+
+=item $until
+
+A datestamp on the form 'YYYY-MM-DDTHH:MM:SST. Only datasets with a
+ds_datestamp less or equal to this is returned.
+
+=item $set
+
+A string with a ownertag. Only datasets matching the ownertag is returned.
+
+=item return
+
+A DBIx::Class resultset with the correct conditions applied.
+
+=back
+
+=cut
+
 sub _search_datasets {
     my $self = shift;
 
-    my ( $from, $until, $sets ) = @_;
+    my ( $from, $until, $set ) = @_;
+
+    if( !$self->supports_sets() && $set ){
+        confess 'Cannot filter by sets when sets are not supported.';
+    }
 
     my $base_resultset = $self->_base_resultset();
 
@@ -315,6 +547,10 @@ sub _search_datasets {
         $conds{ds_datestamp} = { '>=' => $from };
     } elsif ($until) {
         $conds{ds_datestamp} = { '<=' => $until };
+    }
+
+    if( $set ) {
+        $conds{ds_ownertag} = $set;
     }
 
     my $datasets = $base_resultset->search( \%conds, { order_by => 'me.ds_id' } );
@@ -347,6 +583,7 @@ format. False if the format is not valid.
 =back
 
 =cut
+
 sub _validate_metadata {
     my $self = shift;
 
