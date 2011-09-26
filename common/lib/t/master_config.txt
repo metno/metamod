@@ -49,7 +49,7 @@ PG_ADMIN_USER_PASSWORD =
 
 # PG_WEB_USER is a PostgreSQL user who may read/write data in the metadata
 # database.
-PG_WEB_USER = webuser
+PG_WEB_USER = admin
 
 # PG_CONNECTSTRING_* are strings used to indicate hostname and port for
 # connecting to the PostgreSQL database. They are found in various
@@ -364,7 +364,7 @@ QUEST_ADM_TOPDIR = [==WEBRUN_DIRECTORY==]/XML
 # When testing, a virtual time is used which goes faster than ordinary time.
 # The following speedup factor is the number of virtual seconds per real
 # second. If set to 0, import testing is turned off.
-TEST_IMPORT_SPEEDUP = 100
+TEST_IMPORT_SPEEDUP = 0
 
 # The virtual time starts at a specific point in real time. At this point
 # the virtual date and time is the same as the real date and time. The
@@ -395,6 +395,10 @@ SRID_NESW_BOUNDING_BOX_93031 = -30 180 -90 -180
 # Basic latitude longitude earth (4035 = WGS84)
 LONLAT_SRID = 4035
 
-PMH_REPOSITORY_IDENTIFIER =
+PMH_REPOSITORY_IDENTIFIER = met.no
 
 PMH_SYNCHRONIZE_ISO_IDENTIFIER =
+
+PMH_VALIDATION = on
+
+PMH_EXPORT_TAGS = 'DAM', 'NDAM'
