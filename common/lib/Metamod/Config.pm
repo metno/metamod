@@ -85,7 +85,6 @@ sub new {
     # check file is readable
     if ((! -f $config_file) and (! -r $config_file)) {
         die "Cannot read config-file: $config_file";
-        $_config->initLogger;
     }
 
     $config_file = _normalizeFile($config_file);
@@ -96,6 +95,7 @@ sub new {
         vars => {}, # lazy loading on first get
     };
     $_config = bless $config, $class;
+    $_config->initLogger;
 
     return $_config;
 }
