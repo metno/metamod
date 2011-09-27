@@ -650,40 +650,18 @@ sub process_files {
     my $destination_url;
     my $xmlpath;
     my $destination_dir;
-    my @uploaded_basenames;
-    my @existing_basenames;
     my $opendap_directory = $self->config->get('OPENDAP_DIRECTORY');
     my $opendap_url       = $self->config->get('OPENDAP_URL');
     my $application_id    = $self->config->get('APPLICATION_ID');
     if ( $ftp_or_web ne 'TAF' ) {
-        @uploaded_basenames = $self->get_basenames( \@uploaded_files );
-        $destination_dir = File::Spec->catdir( $opendap_directory, $dataset_institution{$dataset_name}->{'institution'},
-            $dataset_name );
+        my $institution = $dataset_institution{$dataset_name}->{'institution'};
+        $destination_dir = File::Spec->catdir( $opendap_directory, $institution, $dataset_name );
         if (! -e $destination_dir) {
             mkpath($destination_dir) or $self->logger->error("unable to mkdir $destination_dir");
             $self->logger->info("Created directory " . $destination_dir);
         }
-        my @existing_files = findFiles( $destination_dir, eval 'sub {$_[0] =~ /\Q$dataset_name\E_/o;}' );
-        if ( length($self->shell_command_error) > 0 ) {
-            $self->syserrorm( "SYS", "find_fails_2", "", "process_files", "" );
-            return;
-        }
-        @existing_basenames = $self->get_basenames( \@existing_files );
-        my @reuploaded_basenames = $self->intersect( \@uploaded_basenames, \@existing_basenames );
-        my @reprocess_basenames = ();
         $xmlpath = File::Spec->catfile( $webrun_directory, 'XML', $application_id, $dataset_name . '.xml' );
-        if ( scalar @reuploaded_basenames > 0 ) {
-            #  Some of the new files have been uploaded before:
-            @reprocess_basenames =
-                $self->revert_XML_history( $dataset_name, \@existing_basenames, \@reuploaded_basenames, \@uploaded_basenames,
-                $xmlpath );
-        }
-        foreach my $fname (@uploaded_files) {
-            push( @digest_input, $fname );
-        }
-        foreach my $fname (@reprocess_basenames) {
-            push( @digest_input, File::Spec->catfile( $destination_dir, $fname ) );
-        }
+
         $destination_url = $opendap_url;
         if ( $destination_url !~ /\/$/ ) {
             $destination_url .= '/';
@@ -692,16 +670,15 @@ sub process_files {
         unless ($opendap_basedir) {
             die "undefined OPENDAP_BASEDIR variable\n";
         }
-        $destination_url .=
-            join( '/', $opendap_basedir, $dataset_institution{$dataset_name}->{'institution'}, $dataset_name, "" )
-            ;    # last for for / at end
+
+        # last for for / at end
+        $destination_url .= join( '/', $opendap_basedir, $institution, $dataset_name, "" );
     } else {
         $destination_url = 'TESTFILE';
         $xmlpath         = 'TESTFILE';
-        foreach my $fname (@uploaded_files) {
-            push( @digest_input, $fname );
-        }
     }
+
+    @digest_input = @uploaded_files;
 
     open( DIGEST, ">digest_input" );
     print DIGEST $destination_url . "\n";
@@ -939,9 +916,6 @@ sub process_files {
                     $self->syserrorm( "SYS", "Unlink TAF file etaf/$bn did not succeed", "", "process_files", "" );
                 }
             }
-        }
-        if ( $ftp_or_web ne 'TAF' ) {
-            $self->update_XML_history( $dataset_name, \@uploaded_basenames, \@existing_basenames );
         }
     }
 
@@ -1278,40 +1252,6 @@ sub get_basenames {
 #
 #---------------------------------------------------------------------------------
 #
-sub intersect {
-    my $self = shift;
-
-    my ( $a1, $a2 ) = @_;
-    my %h1 = ();
-    foreach my $elt (@$a1) {
-        $h1{$elt} = 1;
-    }
-    my @result = ();
-    foreach my $elt2 (@$a2) {
-        if ( exists( $h1{$elt2} ) ) {
-            push( @result, $elt2 );
-        }
-    }
-    return @result;
-}
-
-#
-#---------------------------------------------------------------------------------
-#
-sub union {
-    my $self = shift;
-
-    my ( $a1, $a2 ) = @_;
-    my %h1 = ();
-    foreach my $elt ( @$a1, @$a2 ) {
-        $h1{$elt} = 1;
-    }
-    return keys %h1;
-}
-
-#
-#---------------------------------------------------------------------------------
-#
 sub subtract {
     my $self = shift;
 
@@ -1503,188 +1443,6 @@ sub notify_web_system {
     $userbase->close();
 }
 
-
-#
-#---------------------------------------------------------------------------------
-#
-sub update_XML_history {
-    my $self = shift;
-
-    my ( $dataset_name, $uploaded_basenames, $existing_basenames ) = @_;
-
-    #
-    #  A new XML file has just been created for the dataset. Update the XML
-    #  history file.
-    #
-    my $webrun_directory = $self->config->get('WEBRUN_DIRECTORY');
-    my $application_id = $self->config->get('APPLICATION_ID');
-    my $xml_history_directory = $webrun_directory . '/XML/history';
-    my $xml_directory         = $webrun_directory . '/XML/' . $application_id;
-    my $xml_history_filename = File::Spec->catfile( $xml_history_directory, $dataset_name . '.hst' );
-    my $xml_filename         = File::Spec->catfile( $xml_directory,         $dataset_name . '.xml' );
-    if ( -r $xml_filename ) {
-        open( XMLFILE, $xml_filename );
-        local $/;
-        my $xml_file = <XMLFILE>;
-        close(XMLFILE);
-        my @new_xml_history;
-        my @old_and_new = &union( $uploaded_basenames, $existing_basenames );
-        my @new_element = ( \@old_and_new, \$xml_file );
-        if ( -r $xml_history_filename ) {
-            open( XMLHISTORY, $xml_history_filename );
-            local $/;
-            my $xml_history     = <XMLHISTORY>;
-            my $ref_xml_history = eval($xml_history);
-            close(XMLHISTORY);
-            if ( defined($ref_xml_history) ) {
-                @new_xml_history = ( \@new_element, @$ref_xml_history );
-            } else {
-                @new_xml_history = ( \@new_element );
-            }
-        } else {
-            @new_xml_history = ( \@new_element );
-        }
-
-        #
-        #     Write new XML-history file:
-        #
-        open( my $XMLHISTORY, '>', $xml_history_filename ) or die "Failed to open $xml_history_filename: $!";
-        $Data::Dumper::Indent = 1;
-        print $XMLHISTORY Dumper( \@new_xml_history );
-        close($XMLHISTORY);
-    } else {
-        $self->logger->error("XML file $xml_filename not found");
-    }
-}
-
-#
-#---------------------------------------------------------------------------------
-#
-sub revert_XML_history {
-    my $self = shift;
-
-    my ( $dataset_name, $existing_basenames, $reuploaded_basenames, $uploaded_basenames, $path_to_xml_file ) = @_;
-
-    #
-    #  For each dataset,
-    #  a history file is maintained that tracks the changes to the XML file and the
-    #  dataset files in the repository that the XML file represents.
-    #
-    #  This history file is constructed by the Dumper utility from a reference to an
-    #  array ($ref_xml_history).
-    #  Each element in this array is another reference to an array comprising two elements:
-    #
-    #  ->[0] Reference to an array of basenames representing all files that the
-    #        corresponding XML file describes.
-    #
-    #  ->[1] Reference to a scalar containing the XML text
-    #
-    #  The XML history array is sorted with the newest basname-set/XML-file first.
-    #
-    #  This routine search through the entries in this array to find the first entry
-    #  with a basename-set that have no common basenames with the basename-set in the
-    #  $reuploaded_basenames (array reference). When such an entry is found, the current
-    #  XML file is reverted to the XML text found in this entry, and the history file
-    #  is adjusted accordingly. The routine returns an array comprising all basenames
-    #  in the repository that must be re-processed due to this revertion to an older
-    #  XML file.
-    #
-    my $webrun_directory = $self->config->get('WEBRUN_DIRECTORY');
-    my $application_id = $self->config->get('APPLICATION_ID');
-    my $xml_history_directory = $webrun_directory . '/XML/history';
-    my $xml_directory         = $webrun_directory . '/XML/' . $application_id;
-    my $xml_history_filename = File::Spec->catfile( $xml_history_directory, $dataset_name . '.hst' );
-    my $xml_filename         = File::Spec->catfile( $xml_directory,         $dataset_name . '.xml' );
-    if ( -r $xml_history_filename ) {
-        open( XMLHISTORY, $xml_history_filename );
-
-        #
-        #  Retrieve a dumped hash reference from file
-        #  with all referenced data.
-        #  Will also work on array references.
-        #
-        local $/;
-        my $xml_history     = <XMLHISTORY>;
-        my $ref_xml_history = eval($xml_history);
-        close(XMLHISTORY);
-
-        #
-        #  Create the new XML history array:
-        #
-        my @new_xml_history = ();
-        my $ref_unaffected_basenames;
-        foreach my $ref (@$ref_xml_history) {
-            my @common_basenames = $self->intersect( $ref->[0], $reuploaded_basenames );
-            if ( scalar @common_basenames == 0 ) {
-                if ( scalar @new_xml_history == 0 ) {
-
-                    #
-                    #              Revert to this older XML-file:
-                    #
-                    open( XMLFILE, ">$xml_filename" );
-                    print XMLFILE $ref->[1];
-                    close(XMLFILE);
-                    print "Dataset $dataset_name : Revert to an older XML file\n";
-                    $ref_unaffected_basenames = $ref->[0];
-                }
-                push( @new_xml_history, $ref );
-            }
-        }
-        my @reprocess_basenames = ();
-        if ( !defined($ref_unaffected_basenames) ) {
-
-            #
-            #        All files for this dataset has to be re-processed. Remove XML- and
-            #        XML-history files:
-            #
-            $self->logger->debug("Dataset $dataset_name : All files for this dataset has to be re-processed\n");
-            if ( $self->clearXmlFile($path_to_xml_file) == 0 ) {
-                $self->logger->error("clearXmlFile file $path_to_xml_file did not succeed");
-            }
-            if ( unlink($xml_history_filename) == 0 ) {
-                $self->logger->error("Unlink file $xml_history_filename did not succeed");
-            }
-            @reprocess_basenames = $self->subtract( $existing_basenames, $reuploaded_basenames );
-        } else {
-
-            #
-            #        Write new XML-history file:
-            #
-            open( my $XMLHISTORY, '>', $xml_history_filename );
-            $Data::Dumper::Indent = 1;
-            print $XMLHISTORY Dumper( \@new_xml_history );
-            close($XMLHISTORY);
-            @reprocess_basenames = $self->subtract( $existing_basenames, $ref_unaffected_basenames );
-        }
-        return @reprocess_basenames;
-    } else {
-        $self->logger->error("no_XML_history_file");
-        if ( unlink($path_to_xml_file) == 0 ) {
-            $self->logger->error("Unlink file $path_to_xml_file did not succeed");
-        }
-        return ();
-    }
-}
-
-sub clearXmlFile {
-    my $self = shift;
-
-    my ($xmlFile) = @_;
-    if ( -r $xmlFile ) {
-        eval {
-            my $ds = Metamod::Dataset->newFromFile($xmlFile);
-            $ds->removeMetadata;
-            $ds->deleteDatasetRegion;
-            $ds->writeToFile($xmlFile);
-        };
-        if ($@) {
-            return 0;
-        }
-        return 1;
-    } else {
-        return 0;
-    }
-}
 
 =head2 clean_up_problem_dir
 
