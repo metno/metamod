@@ -236,7 +236,7 @@ sub test_POST  {
             );
 
             if( $success ){
-                $self->logger->debug("File $fn replaced, will be processed shortly.");
+                $self->logger->info("File $fn uploaded, will be tested shortly.");
             } else {
                 $self->logger->error('Internal error: Could not add file to processing queue!');
             }
