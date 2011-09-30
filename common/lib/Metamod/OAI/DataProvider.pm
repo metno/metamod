@@ -595,7 +595,7 @@ sub _search_datasets {
         my $offset = 0;
 
         if( defined $resumption_token ){
-            $offset = $resumption_token->{count} + $max_records;
+            $offset = $resumption_token->{cursor} + $max_records;
             $attrs{offset} = $offset;
         }
 
@@ -693,7 +693,7 @@ sub _get_resumption_token {
 sub _create_resumption_token {
     my $self = shift;
 
-    my ($from, $until, $set, $count, $complete_list_size ) = @_;
+    my ($from, $until, $set, $cursor, $complete_list_size ) = @_;
 
     # for robustness we make the directory in case it does not exist already
     if( !-d $self->resumption_token_dir() ){
@@ -707,7 +707,7 @@ sub _create_resumption_token {
         from => $from,
         until => $until,
         set => $set,
-        count => $count,
+        cursor => $cursor,
         complete_list_size => $complete_list_size,
         expiration_date => "${expire}Z", # stringify. DateTime does not add Z so we must do so ourselves
         token_id => undef,
@@ -715,7 +715,7 @@ sub _create_resumption_token {
 
     # create a resumption token id and file if this is not the last
     # part of the list.
-    if( $count + $self->max_records < $complete_list_size ){
+    if( $cursor + $self->max_records < $complete_list_size ){
 
         my $token_id = random_string();
         my $token_file = $self->_token_file($token_id);

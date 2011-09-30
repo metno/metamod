@@ -358,7 +358,7 @@ foreach my $dataset_file (@dataset_files) {
         from => '',
         until => '',
         set => '',
-        count => 0,
+        cursor => 0,
         complete_list_size => 4,
     };
 
@@ -380,7 +380,7 @@ foreach my $dataset_file (@dataset_files) {
         from => '',
         until => '',
         set => '',
-        count => 1,
+        cursor => 1,
         complete_list_size => 4,
     };
 
@@ -401,7 +401,7 @@ foreach my $dataset_file (@dataset_files) {
         from => '',
         until => '',
         set => '',
-        count => 2,
+        cursor => 2,
         complete_list_size => 4,
     };
 
@@ -423,7 +423,7 @@ foreach my $dataset_file (@dataset_files) {
         from => '',
         until => '',
         set => '',
-        count => 3,
+        cursor => 3,
         complete_list_size => 4,
         token_id => undef,
     };
@@ -450,7 +450,7 @@ foreach my $dataset_file (@dataset_files) {
         from => '2010-01-01T00:00:00Z',
         until => '',
         set => '',
-        count => 0,
+        cursor => 0,
         complete_list_size => 2,
     };
     is_deeply( $identifiers, $expected_identifiers, 'First identifiers when condition and resumption token is used');
@@ -468,7 +468,7 @@ foreach my $dataset_file (@dataset_files) {
         from => '2010-01-01T00:00:00Z',
         until => '',
         set => '',
-        count => 1,
+        cursor => 1,
         complete_list_size => 2,
         token_id => undef,
     };
