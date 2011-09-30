@@ -7,6 +7,8 @@ use FindBin;
 use lib "$FindBin::Bin/../../..";
 use lib "$FindBin::Bin";
 
+use File::Copy;
+use File::Path;
 use Test::More;
 use Test::Exception;
 
@@ -46,7 +48,7 @@ foreach my $dataset_file (@dataset_files) {
     #
     # Testing without any conditions
     #
-    my $identifiers = $dp->get_identifiers( 'dif', '', '', '', '' );
+    my ($identifiers, $resumption_token) = $dp->get_identifiers( 'dif', '', '', '', '' );
     my $expected_identifiers = [
         { identifier => 'oai:met.no:metamod/OTHER/data_provider1', datestamp => '2009-03-20T11:08:29Z' },
         {
@@ -62,11 +64,12 @@ foreach my $dataset_file (@dataset_files) {
     ];
 
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: No conditions. Sets not supported" );
+    is( $resumption_token, undef, "get_identifiers: No resumption token when not above max limit." );
 
     #
     # Testing from condition
     #
-    $identifiers = $dp->get_identifiers( 'dif', '2010-01-01T00:00:00Z', '', '', '' );
+    ($identifiers, $resumption_token) = $dp->get_identifiers( 'dif', '2010-01-01T00:00:00Z', '', '', '' );
     $expected_identifiers = [
         {
             identifier => 'oai:met.no:metamod/OTHER/data_provider_deleted',
@@ -81,7 +84,7 @@ foreach my $dataset_file (@dataset_files) {
     #
     # Testing until condition
     #
-    $identifiers = $dp->get_identifiers( 'dif', '', '2009-12-31T00:00:00Z', '', '' );
+    ($identifiers, $resumption_token) = $dp->get_identifiers( 'dif', '', '2009-12-31T00:00:00Z', '', '' );
     $expected_identifiers = [
         { identifier => 'oai:met.no:metamod/OTHER/data_provider1', datestamp => '2009-03-20T11:08:29Z' },
         {
@@ -95,7 +98,7 @@ foreach my $dataset_file (@dataset_files) {
     #
     # Testing until and from condition
     #
-    $identifiers = $dp->get_identifiers( 'dif', '2009-12-31T00:00:00Z', '2010-12-31T00:00:00Z', '', '' );
+    ($identifiers, $resumption_token) = $dp->get_identifiers( 'dif', '2009-12-31T00:00:00Z', '2010-12-31T00:00:00Z', '', '' );
     $expected_identifiers = [
         {
             identifier => 'oai:met.no:metamod/OTHER/data_provider_deleted',
@@ -116,7 +119,7 @@ foreach my $dataset_file (@dataset_files) {
     #
     # Testing of metadata validation
     $ENV{METAMOD_PMH_VALIDATION} = 'on';
-    $identifiers = $dp->get_identifiers( 'dif', '', '', '', '' );
+    ($identifiers, $resumption_token) = $dp->get_identifiers( 'dif', '', '', '', '' );
     $expected_identifiers = [
         { identifier => 'oai:met.no:metamod/OTHER/data_provider1', datestamp => '2009-03-20T11:08:29Z' },
         {
@@ -139,7 +142,7 @@ foreach my $dataset_file (@dataset_files) {
     #
     # Test for not matchin records
     #
-    $identifiers = $dp->get_identifiers( 'dif', '', '2008-01-01T00:00:00Z', '', '' );
+    ($identifiers, $resumption_token) = $dp->get_identifiers( 'dif', '', '2008-01-01T00:00:00Z', '', '' );
     $expected_identifiers = [];
 
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: No matching datasets" );
@@ -149,7 +152,7 @@ foreach my $dataset_file (@dataset_files) {
     #
     $ENV{METAMOD_PMH_SETCONFIG} = 'DAM|dummy|dummy\nNDAM|dummy|dummy';
     my $dp2 = Metamod::OAI::DataProvider->new();
-    $identifiers = $dp2->get_identifiers( 'dif', '', '', '', '' );
+    ($identifiers, $resumption_token) = $dp2->get_identifiers( 'dif', '', '', '', '' );
     $expected_identifiers = [
         {
             identifier => 'oai:met.no:metamod/OTHER/data_provider1',
@@ -176,7 +179,7 @@ foreach my $dataset_file (@dataset_files) {
 
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: No conditions. Sets supported" );
 
-    $identifiers = $dp2->get_identifiers( 'dif', '', '', 'NDAM', '' );
+    ($identifiers, $resumption_token) = $dp2->get_identifiers( 'dif', '', '', 'NDAM', '' );
     $expected_identifiers = [
         {
             identifier => 'oai:met.no:metamod/OTHER/data_provider_different_tag',
@@ -187,7 +190,7 @@ foreach my $dataset_file (@dataset_files) {
 
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: Set condition. Sets supported" );
 
-    BEGIN { $num_tests += 9 }
+    BEGIN { $num_tests += 10 }
 
 }
 
@@ -199,7 +202,7 @@ foreach my $dataset_file (@dataset_files) {
     #
     # Testing without any conditions
     #
-    my $records = $dp->get_records( 'dif', '', '', '', '' );
+    my ($records, $resumption_token) = $dp->get_records( 'dif', '', '', '', '' );
     my $expected_records = [
         {
             identifier => 'oai:met.no:metamod/OTHER/data_provider1',
@@ -224,12 +227,13 @@ foreach my $dataset_file (@dataset_files) {
     ];
 
     compare_records( $records, $expected_records, "get_records: No conditions" );
+    is( $resumption_token, undef, 'get_records: No resumption token when not over max limit.');
 
     #
     # Test with metadata validation turned on
     #
     $ENV{METAMOD_PMH_VALIDATION} = 'on';
-    $records = $dp->get_records( 'dif', '', '', '', '' );
+    ($records, $resumption_token) = $dp->get_records( 'dif', '', '', '', '' );
     $expected_records = [
         {
             identifier => 'oai:met.no:metamod/OTHER/data_provider1',
@@ -259,12 +263,12 @@ foreach my $dataset_file (@dataset_files) {
     #
     # Test for no matching records
     #
-    $records = $dp->get_records( 'dif', '', '2008-03-20T11:08:29Z', '', '' );
+    ($records, $resumption_token) = $dp->get_records( 'dif', '', '2008-03-20T11:08:29Z', '', '' );
     $expected_records = [];
 
     compare_records( $records, $expected_records, "get_records: No records match" );
 
-    BEGIN { $num_tests += 11 }
+    BEGIN { $num_tests += 12 }
 }
 
 #
@@ -332,6 +336,158 @@ foreach my $dataset_file (@dataset_files) {
 
 }
 
+# tests including resumption tokens
+{
+
+    $ENV{METAMOD_PMH_VALIDATION} = 'off';
+    $ENV{METAMOD_PMH_SETCONFIG}  = '';
+    $ENV{METAMOD_PMH_MAXRECORDS} = '1';
+    my $dp = Metamod::OAI::DataProvider->new( resumption_token_dir => "$FindBin::Bin/resumption_tokens");
+
+    #
+    # Testing without any conditions
+    #
+    my ($identifiers, $resumption_token) = $dp->get_identifiers( 'dif', '', '', '', '' );
+    my $expected_identifiers = [
+        { identifier => 'oai:met.no:metamod/OTHER/data_provider1', datestamp => '2009-03-20T11:08:29Z' },
+    ];
+
+    my $token_id = delete $resumption_token->{token_id};
+    delete $resumption_token->{expiration_date};
+    my $expected_resumption_token = {
+        from => '',
+        until => '',
+        set => '',
+        count => 0,
+        complete_list_size => 4,
+    };
+
+    is_deeply( $identifiers, $expected_identifiers, 'First identifiers with no conditions when resumption token is used.');
+    is_deeply( $resumption_token, $expected_resumption_token, 'Resumption token without any conditions. First run');
+
+    ($identifiers, $resumption_token) = $dp->get_identifiers( '', '', '', '', $token_id );
+    $expected_identifiers = [
+        {
+            identifier => 'oai:met.no:metamod/OTHER/data_provider_deleted',
+            datestamp  => '2010-01-01T00:00:00Z',
+            status     => 'deleted'
+        },
+    ];
+
+    $token_id = delete $resumption_token->{token_id};
+    delete $resumption_token->{expiration_date};
+    $expected_resumption_token = {
+        from => '',
+        until => '',
+        set => '',
+        count => 1,
+        complete_list_size => 4,
+    };
+
+    is_deeply( $identifiers, $expected_identifiers, 'Second identifiers with no conditions when resumption token is used.');
+    is_deeply( $resumption_token, $expected_resumption_token, 'Resumption token without any conditions. Second run');
+
+
+    ($identifiers, $resumption_token) = $dp->get_identifiers( '', '', '', '', $token_id );
+    $expected_identifiers = [
+        { identifier => 'oai:met.no:metamod/OTHER/data_provider_different_tag', datestamp => '2011-01-01T00:00:00Z' },
+    ];
+
+    my ($identifiers2, $dummy) = $dp->get_identifiers( '', '', '', '', $token_id );
+
+    $token_id = delete $resumption_token->{token_id};
+    delete $resumption_token->{expiration_date};
+    $expected_resumption_token = {
+        from => '',
+        until => '',
+        set => '',
+        count => 2,
+        complete_list_size => 4,
+    };
+
+    is_deeply( $identifiers, $expected_identifiers, 'Third identifiers with no conditions when resumption token is used.');
+    is_deeply( $resumption_token, $expected_resumption_token, 'Resumption token without any conditions. Third run');
+    is_deeply( $identifiers2, $identifiers, 'Re-query with a resumption token gives the same result each time' );
+
+
+    ($identifiers, $resumption_token) = $dp->get_identifiers( '', '', '', '', $token_id );
+    $expected_identifiers = [
+        {
+            identifier => 'oai:met.no:metamod/OTHER/data_provider_invalid_metadata',
+            datestamp  => '2009-01-01T00:00:00Z'
+        },
+    ];
+
+    delete $resumption_token->{expiration_date};
+    $expected_resumption_token = {
+        from => '',
+        until => '',
+        set => '',
+        count => 3,
+        complete_list_size => 4,
+        token_id => undef,
+    };
+    is_deeply( $identifiers, $expected_identifiers, 'Fourth identifiers with no conditions when resumption token is used.');
+    is_deeply( $resumption_token, $expected_resumption_token, 'Resumption token without any conditions. Fourth run');
+
+
+    #
+    # Testing resumption token with condition from condition
+    #
+    ($identifiers, $resumption_token) = $dp->get_identifiers( 'dif', '2010-01-01T00:00:00Z', '', '', '' );
+    $expected_identifiers = [
+        {
+            identifier => 'oai:met.no:metamod/OTHER/data_provider_deleted',
+            datestamp  => '2010-01-01T00:00:00Z',
+            status     => 'deleted'
+        },
+
+    ];
+
+    $token_id = delete $resumption_token->{token_id};
+    delete $resumption_token->{expiration_date};
+    $expected_resumption_token = {
+        from => '2010-01-01T00:00:00Z',
+        until => '',
+        set => '',
+        count => 0,
+        complete_list_size => 2,
+    };
+    is_deeply( $identifiers, $expected_identifiers, 'First identifiers when condition and resumption token is used');
+    is_deeply( $resumption_token, $expected_resumption_token, 'Resumption token with conditions. First run');
+
+
+    ($identifiers, $resumption_token) = $dp->get_identifiers( '', '', '', '', $token_id );
+
+    $expected_identifiers = [
+        { identifier => 'oai:met.no:metamod/OTHER/data_provider_different_tag', datestamp => '2011-01-01T00:00:00Z' },
+    ];
+
+    delete $resumption_token->{expiration_date};
+    $expected_resumption_token = {
+        from => '2010-01-01T00:00:00Z',
+        until => '',
+        set => '',
+        count => 1,
+        complete_list_size => 2,
+        token_id => undef,
+    };
+    is_deeply( $identifiers, $expected_identifiers, 'Second identifiers when condition and resumption token is used');
+    is_deeply( $resumption_token, $expected_resumption_token, 'Resumption token with conditions. Second run');
+
+    #
+    # Testing old resumption token.
+    #
+    copy("$FindBin::Bin/old_resumption_token", "$FindBin::Bin/resumption_tokens/old_resumption_token");
+
+    ($identifiers, $resumption_token) = $dp->get_identifiers( '', '', '', '', 'old_resumption_token' );
+
+    is_deeply($identifiers, undef, 'Old resumption token gives no result');
+    is_deeply($resumption_token, undef, 'Old resumption token gives no new resumption token');
+
+    BEGIN { $num_tests += 15 }
+}
+
 BEGIN { plan tests => $num_tests }
 
 
@@ -352,4 +508,8 @@ sub compare_records {
     }
 
     is_deeply($records, $expected_records, $testname);
+}
+
+END {
+    rmtree("$FindBin::Bin/resumption_tokens");
 }

@@ -4,7 +4,10 @@ use strict;
 use warnings;
 
 use Carp qw( confess );
+use DateTime;
+use DateTime::Format::Strptime;
 use File::Spec;
+use JSON;
 use Log::Log4perl qw( get_logger );
 use Moose;
 use Params::Validate qw(:all);
@@ -15,6 +18,7 @@ use Metamod::Config;
 use Metamod::DatasetTransformer::ToOAIDublinCore;
 use Metamod::DBIxSchema::Metabase;
 use Metamod::ForeignDataset;
+use Metamod::Utils qw( random_string );
 
 
 =head1 NAME
@@ -39,6 +43,10 @@ has 'logger' => ( is => 'ro', default => sub { get_logger(__PACKAGE__) } );
 has 'metadata_formats' => ( is => 'ro', isa => 'HashRef', lazy => 1, builder => '_init_formats' );
 
 has 'available_sets' => ( is => 'ro', isa => 'ArrayRef', lazy => 1, builder => '_init_available_sets' );
+
+has 'resumption_token_dir' => ( is => 'ro', lazy => 1, builder => '_init_resumption_token_dir' );
+
+has 'max_records' => ( is => 'ro', lazy => 1, default => sub { $_[0]->config->get('PMH_MAXRECORDS') || '1000' } );
 
 sub _init_model {
     my $self = shift;
@@ -82,6 +90,15 @@ sub _init_available_sets {
     }
 
     return \@sets;
+}
+
+sub _init_resumption_token_dir {
+    my $self = shift;
+
+    my $webrun = $self->config->get('WEBRUN_DIRECTORY');
+    confess 'WEBRUN_DIRECTORY is required for using resumption tokens' if !$webrun;
+
+    return File::Spec->catdir($webrun, 'resumption_tokens');
 }
 
 =head2 $self->supports_sets()
@@ -216,9 +233,11 @@ The metadata format that should be used for the metadata.
 sub get_records {
     my $self = shift;
 
-    my ( $format, $from, $until, $set, $resumption_token ) = @_;
+    my ( $format, $from, $until, $set, $token_id ) = @_;
 
-    my $datasets = $self->_search_datasets( $from, $until, $set );
+    my ($datasets, $resumption_token) = $self->_search_datasets( $from, $until, $set, $token_id );
+
+    return (undef, undef) if !defined $datasets;
 
     my @records = ();
     while ( my $dataset = $datasets->next() ) {
@@ -228,7 +247,7 @@ sub get_records {
         push @records, $record;
     }
 
-    return \@records;
+    return (\@records, $resumption_token);
 
 }
 
@@ -257,9 +276,11 @@ Get a list of record headers without metadata that match the specified criteria.
 sub get_identifiers {
     my $self = shift;
 
-    my ( $format, $from, $until, $set, $resumption_token ) = @_;
+    my ( $format, $from, $until, $set, $token_id ) = @_;
 
-    my $datasets = $self->_search_datasets( $from, $until, $set );
+    my ($datasets, $resumption_token) = $self->_search_datasets( $from, $until, $set, $token_id );
+
+    return (undef, undef) if !defined $datasets;
 
     my @identifiers = ();
     while ( my $dataset = $datasets->next() ) {
@@ -269,7 +290,7 @@ sub get_identifiers {
         push @identifiers, $record_header;
     }
 
-    return \@identifiers;
+    return (\@identifiers, $resumption_token);
 
 }
 
@@ -532,7 +553,7 @@ A DBIx::Class resultset with the correct conditions applied.
 sub _search_datasets {
     my $self = shift;
 
-    my ( $from, $until, $set ) = @_;
+    my ( $from, $until, $set, $token_id ) = @_;
 
     if( !$self->supports_sets() && $set ){
         confess 'Cannot filter by sets when sets are not supported.';
@@ -541,6 +562,19 @@ sub _search_datasets {
     my $base_resultset = $self->_base_resultset();
 
     my %conds = ();
+    my %attrs = ( order_by => 'me.ds_id' );
+    my $resumption_token;
+    if( $token_id ){
+        $resumption_token = $self->_get_resumption_token($token_id);
+
+        # We have a invalid or expired resumption token.
+        return (undef, undef) if !defined $resumption_token;
+
+        $from = $resumption_token->{from};
+        $until = $resumption_token->{until};
+        $set = $resumption_token->{set};
+    }
+
     if ( $from && $until ) {
         $conds{ds_datestamp} = [ '-and' => { '>=' => $from }, { '<=' => $until } ];
     } elsif ($from) {
@@ -553,8 +587,24 @@ sub _search_datasets {
         $conds{ds_ownertag} = $set;
     }
 
-    my $datasets = $base_resultset->search( \%conds, { order_by => 'me.ds_id' } );
-    return $datasets;
+    my $datasets_count = $base_resultset->search( \%conds )->count();
+    my $max_records = $self->max_records();
+    my $new_resumption_token;
+    if( $datasets_count > $max_records ){
+        $attrs{rows} = $max_records;
+        my $offset = 0;
+
+        if( defined $resumption_token ){
+            $offset = $resumption_token->{count} + $max_records;
+            $attrs{offset} = $offset;
+        }
+
+        $new_resumption_token = $self->_create_resumption_token($from, $until, $set, $offset, $datasets_count);
+    }
+
+    my $datasets = $base_resultset->search( \%conds, \%attrs );
+
+    return ($datasets, $new_resumption_token);
 }
 
 =head2 $self->_validate_metadata($format, $xml_dom)
@@ -610,6 +660,87 @@ sub _validate_metadata {
 
     return $success;
 
+}
+
+sub _get_resumption_token {
+    my $self = shift;
+
+    my ($token_id) = @_;
+
+    my $dir = $self->resumption_token_dir();
+    my $token_file = $self->_token_file($token_id);
+
+    # if the file does not exist it has like been cleaned or have never existed.
+    # In either way OAI-PMH make no distinction between invalid and expired tokens.
+    if( !-f $token_file ){
+        return;
+    }
+
+    open my $TOKEN, '<', $token_file or confess "Failed to open token file '$token_file' for reading: $!";
+
+    my $resumption_token = JSON->new()->decode(<$TOKEN>);
+
+    my $now = DateTime->now;
+    my $formatter = DateTime::Format::Strptime->new( pattern => '%Y-%m-%dT%H:%M:%SZ');
+    my $expiration_date = $formatter->parse_datetime( $resumption_token->{expiration_date} );
+    if( $now > $expiration_date ){
+        return;
+    }
+
+    return $resumption_token;
+}
+
+sub _create_resumption_token {
+    my $self = shift;
+
+    my ($from, $until, $set, $count, $complete_list_size ) = @_;
+
+    # for robustness we make the directory in case it does not exist already
+    if( !-d $self->resumption_token_dir() ){
+        mkdir $self->resumption_token_dir() or confess "Failed to create resumption token dir $!";
+    }
+
+    my $expire = DateTime->now();
+    $expire->add( days => 1 );
+
+    my $resumption_token = {
+        from => $from,
+        until => $until,
+        set => $set,
+        count => $count,
+        complete_list_size => $complete_list_size,
+        expiration_date => "${expire}Z", # stringify. DateTime does not add Z so we must do so ourselves
+        token_id => undef,
+    };
+
+    # create a resumption token id and file if this is not the last
+    # part of the list.
+    if( $count + $self->max_records < $complete_list_size ){
+
+        my $token_id = random_string();
+        my $token_file = $self->_token_file($token_id);
+
+        # prevent overwriting a file in the unlikely event of a collision
+        while( -f $token_file ) {
+            $token_id = random_string();
+            $token_file = $self->_token_file($token_id);
+        }
+
+        $resumption_token->{token_id} = $token_id;
+
+        my $json = JSON->new()->encode($resumption_token);
+        open my $TOKEN, '>', $token_file or confess "Could not open token file '$token_file' for writing: $!";
+        print $TOKEN $json;
+        close $TOKEN;
+    }
+
+    return $resumption_token;
+}
+
+sub _token_file {
+    my ($self, $token_id) = @_;
+
+    return File::Spec->catfile($self->resumption_token_dir(), $token_id);
 }
 
 __PACKAGE__->meta->make_immutable();
