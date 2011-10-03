@@ -24,12 +24,13 @@
     </xsl:template>
 
     <xsl:template match="/*/skos:Concept">
+        <xsl:variable name="label" select="substring-after(skos:prefLabel, 'EARTH SCIENCE &gt; ')"/>
         <gcmd:variable>
             <xsl:attribute name="label">
-                <xsl:value-of select="substring-after(skos:prefLabel, 'EARTH SCIENCE &gt; ')"/>
+                <xsl:value-of select="$label"/>
             </xsl:attribute>
 
-            <xsl:variable name="body"    select="translate(skos:prefLabel, $lc, $uc)"/>
+            <xsl:variable name="body"    select="translate($label, $lc, $uc)"/>
             <gcmd:category><xsl:value-of select="substring-before($body, ' &gt; ')"/></gcmd:category>
             <xsl:variable name="tail"    select="substring-after ($body, ' &gt; ')"/>
             <gcmd:topic><xsl:value-of    select="substring-before($tail, ' &gt; ')"/></gcmd:topic>
@@ -61,7 +62,40 @@
                     </xsl:when>
                 </xsl:choose>
             </xsl:for-each>
+
+            <xsl:for-each select="document('')/*/gcmd:variable[@label = $label]">
+                <xsl:comment>custom mapping</xsl:comment>
+                <nc:standard_name><xsl:value-of select="nc:standard_name"/></nc:standard_name>
+            </xsl:for-each>
+
         </gcmd:variable>
     </xsl:template>
+
+
+    <gcmd:variable label="Atmosphere &gt; Atmospheric Water Vapor &gt; Water Vapor">
+        <nc:standard_name>atmosphere_water_content</nc:standard_name>
+    </gcmd:variable>
+    <gcmd:variable label="Atmosphere &gt; Atmospheric Water Vapor &gt; Humidity">
+        <nc:standard_name>tendency_of_atmosphere_water_vapor_content_due_to_advection</nc:standard_name>
+    </gcmd:variable>
+    <gcmd:variable label="Cryosphere &gt; Sea Ice &gt; Ice Edges">
+        <nc:standard_name>ice_edge</nc:standard_name>
+    </gcmd:variable>
+    <gcmd:variable label="Oceans &gt; Sea Ice &gt; Ice Edges">
+        <nc:standard_name>ice_edge</nc:standard_name>
+    </gcmd:variable>
+    <gcmd:variable label="Cryosphere &gt; Sea Ice &gt; Sea Ice Concentration">
+        <nc:standard_name>ice_concentration</nc:standard_name>
+    </gcmd:variable>
+    <gcmd:variable label="Oceans &gt; Sea Ice &gt; Sea Ice Concentration">
+        <nc:standard_name>ice_concentration</nc:standard_name>
+    </gcmd:variable>
+    <gcmd:variable label="Cryosphere &gt; Sea Ice &gt; Ice Types">
+        <nc:standard_name>ice_type</nc:standard_name>
+    </gcmd:variable>
+    <gcmd:variable label="Oceans &gt; Sea Ice &gt; Ice Types">
+        <nc:standard_name>ice_type</nc:standard_name>
+    </gcmd:variable>
+
 
 </xsl:stylesheet>

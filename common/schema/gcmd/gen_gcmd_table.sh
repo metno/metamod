@@ -1,5 +1,19 @@
 #!/bin/sh
 
+XSLTPROC=`which xsltproc`
+if [ $? != 0 ]
+then
+    echo STDERR "xsltproc command not installed!"
+    exit 1
+fi
+
+XMLLINT=`which xmllint`
+if [ $? != 0 ]
+then
+    echo STDERR "xmllint command not installed!"
+    exit 1
+fi
+
 WGET=`which wget`
 echo " <$WGET>"
 if [ $? != 0 ]
@@ -26,20 +40,6 @@ $WGET -O P072_cf.xml 'http://vocab.ndg.nerc.ac.uk/list/P072/current'
 if [ $? != 0 ]
 then
     echo STDERR "Download from NERC failed"
-    exit 1
-fi
-
-XSLTPROC=`which xsltproc`
-if [ $? != 0 ]
-then
-    echo STDERR "xsltproc command not installed!"
-    exit 1
-fi
-
-XMLLINT=`which xmllint`
-if [ $? != 0 ]
-then
-    echo STDERR "xmllint command not installed!"
     exit 1
 fi
 
