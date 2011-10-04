@@ -37,7 +37,7 @@ use FindBin;
 use lib "$FindBin::Bin/../";
 
 
-use Test::More tests => 16;
+use Test::More tests => 17;
 use Test::Exception;
 
 BEGIN {use_ok('Metamod::Config');}
@@ -56,6 +56,8 @@ ok(!$config->get('NOT_THERE'), 'getting false value on NOT_THERE');
 ok(index($config->get("SOURCE_DIRECTORY"), $config->get("BASE_DIRECTORY")) == 0, "get sustitutes variables");
 
 is($config->getDSN(), "dbi:Pg:dbname=metamod_unittest;host=localhost;password=admin", "getDSN");
+
+is($config->get('PSQL'), 'psql', "Variable not defined in master config file gets value from default file");
 
 is($config->get('INSTALLATION_DIR'), Cwd::abs_path("$FindBin::Bin/../../../"), 'Installation dir figured out correctly.');
 

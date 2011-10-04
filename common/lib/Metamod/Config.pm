@@ -178,52 +178,58 @@ sub _checkFile {
 
 sub _readConfig {
     my ($self) = @_;
-    open my $fh, $self->{filename} or die "Cannot read file".$self->{filename}.": $!\n";
+
+    my $default_config = File::Spec->catfile($self->installation_dir(), 'config', 'default_config.txt');
+
     my %conf;
-    #
-    #  Loop through all lines read from a file:
-    my %newfilenames = ();
-    my $value = "";
-    my $varname = "";
-    my $origname = "";
-    my $newname = "";
-    my $line = "";
-    while (defined (my $line = <$fh>)) {
-        chomp($line);
+    for my $filename (($default_config, $self->{filename})) {
+
+        open my $fh, '<', $filename or confess "Cannot read file".$filename.": $!\n";
         #
-        #     Check if expression matches RE:
-        #
-        if ($line =~ /^[A-Z0-9_#!]/ && $varname ne "") {
-            if (length($origname) > 0) {
-                $conf{$varname . ':' . $origname . ':' . $newname} = $value;
-                $newfilenames{$origname . ':' . $newname} = 1;
-            } else {
-                $conf{$varname} = $value;
+        #  Loop through all lines read from a file:
+        my %newfilenames = ();
+        my $value = "";
+        my $varname = "";
+        my $origname = "";
+        my $newname = "";
+        my $line = "";
+        while (defined (my $line = <$fh>)) {
+            chomp($line);
+            #
+            #     Check if expression matches RE:
+            #
+            if ($line =~ /^[A-Z0-9_#!]/ && $varname ne "") {
+                if (length($origname) > 0) {
+                    $conf{$varname . ':' . $origname . ':' . $newname} = $value;
+                    $newfilenames{$origname . ':' . $newname} = 1;
+                } else {
+                    $conf{$varname} = $value;
+                }
+                $varname = "";
             }
-            $varname = "";
+            if ($line =~ /^([A-Z0-9_]+)\s*=(.*)$/) {
+                $varname = $1; # First matching ()-expression
+                $value = $2; # Second matching ()-expression
+                $value =~ s/^\s*//;
+                $value =~ s/\s*$//;
+            } elsif ($line =~ /^!substitute_to_file_with_new_name\s+(\S+)\s+=>\s+(\S+)\s*$/) {
+                $origname = $1;
+                $newname = $2;
+            } elsif ($line =~ /^!end_substitute_to_file_with_new_name\s*$/) {
+                $origname = "";
+                $newname = "";
+            } elsif ($line !~ /^#/ && $line !~ /^\s*$/) {
+                $value .= "\n" . $line;
+            }
         }
-        if ($line =~ /^([A-Z0-9_]+)\s*=(.*)$/) {
-            $varname = $1; # First matching ()-expression
-            $value = $2; # Second matching ()-expression
-            $value =~ s/^\s*//;
-            $value =~ s/\s*$//;
-        } elsif ($line =~ /^!substitute_to_file_with_new_name\s+(\S+)\s+=>\s+(\S+)\s*$/) {
-            $origname = $1;
-            $newname = $2;
-        } elsif ($line =~ /^!end_substitute_to_file_with_new_name\s*$/) {
-            $origname = "";
-            $newname = "";
-        } elsif ($line !~ /^#/ && $line !~ /^\s*$/) {
-            $value .= "\n" . $line;
+        if ($varname ne "") {
+            $conf{$varname} = $value;
         }
-    }
-    if ($varname ne "") {
-        $conf{$varname} = $value;
+        close $fh;
     }
 
 
     $self->{vars} = \%conf;
-    close $fh;
 }
 
 # get a variable from env or the internal hash, without substitution
