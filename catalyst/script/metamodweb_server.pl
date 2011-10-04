@@ -56,12 +56,6 @@ if( !$config_dir && !exists $ENV{METAMOD_MASTER_CONFIG}){
 
 Metamod::Config->new($config_dir);
 
-#if( !exists $ENV{METAMOD_MASTER_CONFIG } ){
-#    $FindBin::Bin =~ qw!(.+)/(catalyst/script|fscript)$! or die "Couldn't find master_config around here. Try setting ENV.";
-#    $ENV{METAMOD_MASTER_CONFIG} = "$1/master_config.txt";
-#}
-#die "Cannot open master config $ENV{METAMOD_MASTER_CONFIG}" unless -r $ENV{METAMOD_MASTER_CONFIG};
-
 use Catalyst::ScriptRunner;
 Catalyst::ScriptRunner->run('MetamodWeb', 'Server');
 
