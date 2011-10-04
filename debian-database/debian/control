@@ -1,19 +1,19 @@
-Source: metamod2-database
+Source: metno-metamoddb-2.10
 Priority: extra
 Maintainer: Heiko Klein <heiko.klein@met.no>
 Build-Depends: debhelper (>=5)
 Standards-Version: 3.7.3
 Section: web
 
-Package: metamod2-database
-Section: web 
+Package: metno-metamoddb-2.10
+Section: web
 Priority: optional
 Architecture: all
 Essential: no
-Depends: postgresql-8.3, postgresql-contrib-8.3, postgresql-8.3-postgis
-Recommends: postgresql-client-8.3 
-Suggests:  
-Conflicts: 
-Replaces: 
-Provides: 
+Depends: postgresql, postgresql-contrib, postgis, postgresql-8.4-postgis | postgresql-8.3-postgis
+Recommends: postgresql-client
+Suggests:
+Conflicts:
+Replaces:
+Provides:
 Description: Virtual package for postgres database for metamod2.
