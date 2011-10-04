@@ -1007,7 +1007,7 @@ sub get_dataset_institution {
                         #last;              # we're ignoring this user
                     } else {
                         push( @user_values, $val );
-                        $self->logger->debug( "User: " . join('|', @user_values) );
+                        #$self->logger->debug( "User: " . join('|', @user_values) );
                     }
                 }
             }

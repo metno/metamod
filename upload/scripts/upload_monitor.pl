@@ -44,9 +44,11 @@ use lib ( "$FindBin::Bin/../../common/lib", );
 
 use Getopt::Long;
 use Pod::Usage;
-use TheSchwartz;
+use Data::Dumper;
 
 use Metamod::Utils;
+use Metamod::Queue;
+use Metamod::Queue::Worker;
 use Metamod::Queue::Worker::Upload;
 use Metamod::Config;
 use Metamod::UploadHelper;
@@ -107,34 +109,28 @@ my $config = Metamod::Config->new($config_file_or_dir);
 my $upload_helper = Metamod::UploadHelper->new();
 
 # setup queue
-my $queue_worker = TheSchwartz->new(
-    databases => [
-        {
-            dsn  => $config->getDSN_Userbase(),
-            user => $config->get('PG_WEB_USER'),
-            pass => $config->get('PG_WEB_USER_PASSWORD')
-        }
-    ]
-);
+my $queue_worker = Metamod::Queue::Worker->new( 'Metamod::Queue::Worker::Upload' );
+
 
 eval {
     if ($test) {
 
-        print STDERR "Testrun: " . $ARGV[0] . "\n";
-        $queue_worker->can_do('Metamod::Queue::Worker::Upload');
-        $queue_worker->work_until_done(); # built-in TheSchwartz method, exiting when job queue is empty
+        print STDERR "Testrun...\n";
+        #$queue_worker->work_until_done();
+        my $job = $queue_worker->get_a_job;
+        #print STDERR Dumper $job;
+        $queue_worker->wojk_once($job);
 
     } elsif($daemon) {
 
         Metamod::Utils::daemonize($logfile, $pidfile);
-        $queue_worker->can_do('Metamod::Queue::Worker::Upload');
-        $queue_worker->work();
+        $queue_worker->wojk();
 
     } else {
 
+        # running in foreground
         print STDERR "Not running as daemon. Stop me with Ctrl + C\n";
-        $queue_worker->can_do('Metamod::Queue::Worker::Upload');
-        $queue_worker->work();
+        $queue_worker->wojk();
     }
 };
 
@@ -144,9 +140,5 @@ if ($@) {
     $upload_helper->syserrorm( "SYS", "NORMAL TERMINATION", "", "", "" );
 }
 
-# not sure if this is still necessary...
-#our $SIG_TERM = 0;
-#sub sigterm { ++$SIG_TERM; }
-#$SIG{TERM} = \&sigterm;
 
 # END
