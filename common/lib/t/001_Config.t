@@ -37,7 +37,7 @@ use FindBin;
 use lib "$FindBin::Bin/../";
 
 
-use Test::More tests => 14;
+use Test::More tests => 16;
 use Test::Exception;
 
 BEGIN {use_ok('Metamod::Config');}
@@ -68,3 +68,12 @@ $config2 = Metamod::Config->instance();
 isa_ok($config2, 'Metamod::Config');
 
 ok($config2->get('TARGET_DIRECTORY'), 'get TARGET_DIRECTORY of default');
+
+Metamod::Config->_reset_singleton();
+my $config4 = Metamod::Config->new($FindBin::Bin);
+is($config4->config_dir(), $FindBin::Bin, 'Config dir when initialising with dir');
+
+Metamod::Config->_reset_singleton();
+my $config3 = Metamod::Config->new($FindBin::Bin.'/master_config.txt');
+is($config3->config_dir(), $FindBin::Bin, 'Config dir when initialising with file');
+

@@ -66,21 +66,21 @@ sub new {
     # we already have an object so use that instead.
     return $_config if defined $_config;
 
-    my $config_file;
-
     # If the path to the master config is set in the enviroment that overrides
     # any parameters sent to the constructor.
     if( exists $ENV{METAMOD_MASTER_CONFIG} && $ENV{METAMOD_MASTER_CONFIG} ){
-        $config_file = $ENV{METAMOD_MASTER_CONFIG};
-    } else {
-        confess "You must supply the path to the configuration directory or the master_config.txt file" if !$file_or_dir;
-
-        if( -d $file_or_dir ){
-            $config_file = File::Spec->catfile($file_or_dir, 'master_config.txt');
-        } else {
-            $config_file = $file_or_dir;
-        }
+        $file_or_dir = $ENV{METAMOD_MASTER_CONFIG};
     }
+
+    confess "You must supply the path to the configuration directory or the master_config.txt file" if !$file_or_dir;
+
+    my $config_file;
+    if( -d $file_or_dir ){
+        $config_file = File::Spec->catfile($file_or_dir, 'master_config.txt');
+    } else {
+        $config_file = $file_or_dir;
+    }
+
 
     # check file is readable
     if ((! -f $config_file) and (! -r $config_file)) {
@@ -107,6 +107,18 @@ sub instance {
 
     return $_config;
 
+}
+
+=head2 _reset_singleton()
+
+Undefs the current singleton object. The B<ONLY> reason to use this is for testing of
+the class it self.
+
+=cut
+sub _reset_singleton {
+    my $class = shift;
+
+    $_config = undef
 }
 
 ## get the file from METAMOD_MASTER_CONFIG or in (source|target)/master_config.txt
