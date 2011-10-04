@@ -10,9 +10,9 @@ Section: web
 Priority: optional
 Architecture: all
 Essential: no
-Depends: postgresql-client-common, postgresql-client, libdbd-pg-perl, libmailtools-perl, libwww-perl, pdl, proj, liburi-perl, libpdl-netcdf-perl, libgeo-proj4-perl, libconfig-tiny-perl, libimager-perl, libfile-copy-recursive-perl, libpod-simple-wiki-perl
+Depends: postgresql-client-common, postgresql-client, libdbd-pg-perl, pdl, proj, libgeo-proj4-perl, libpdl-netcdf-perl, libconfig-tiny-perl, libimager-perl, libpod-simple-wiki-perl, libxml2, libxslt1.1, metno-perl-webdev-ver1
 Pre-Depends: perl
-Recommends: exim4 | postfix | sendmail, libxml2-utils, mailx, libdatetime-perl
+Recommends: exim4 | postfix | sendmail, libxml2-utils, mailx
 Suggests: metamod2-database
 Conflicts:
 Replaces:
