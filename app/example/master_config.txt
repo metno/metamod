@@ -473,14 +473,14 @@ THREDDS_CATALOG_FILE = catalog.xml
 # When testing, a virtual time is used which goes faster than ordinary time.
 # The following speedup factor is the number of virtual seconds per real
 # second. If set to 0, import testing is turned off.
-TEST_IMPORT_SPEEDUP = 100
+TEST_IMPORT_SPEEDUP = 0
 
 # The virtual time starts at a specific point in real time. At this point
 # the virtual date and time is the same as the real date and time. The
 # following number represents this point of time as number of seconds since
 # the epoch. (Use the show_time_now.pl utility to get a value for this number).
 # *** WARNING *** THIS DATE MUST BE NO OLDER THAN 3 MONTHS OR YOU WILL GET AN INTEGER OVERFLOW!!!
-TEST_IMPORT_BASETIME = 1309258594
+TEST_IMPORT_BASETIME = 0
 
 # Set this value to a '#' to activate sending E-mail regarding errors in
 # uploaded files to actual users. It comments out setting the E-mail recipient
