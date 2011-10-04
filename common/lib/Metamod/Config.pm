@@ -179,7 +179,7 @@ sub _checkFile {
 sub _readConfig {
     my ($self) = @_;
 
-    my $default_config = File::Spec->catfile($self->installation_dir(), 'config', 'default_config.txt');
+    my $default_config = $self->path_to_config_file('default_config.txt');
 
     my %conf;
     for my $filename (($default_config, $self->{filename})) {
@@ -510,8 +510,8 @@ sub path_to_config_file {
     my $path = File::Spec->catfile(@dirnames, $filename);
     if( -f File::Spec->catfile( $self->config_dir(), $path ) ){
         return File::Spec->catfile( $self->config_dir(), $path );
-    } elsif( -f File::Spec->catfile( $self->installation_dir(), 'config', $path ) ) {
-        return File::Spec->catfile( $self->installation_dir(), 'config', $path );
+    } elsif( -f File::Spec->catfile( $self->installation_dir(), 'app', 'default', $path ) ) {
+        return File::Spec->catfile( $self->installation_dir(), 'app', 'default', $path );
     } else {
         die "The configuration file '$path' you requested is not in the installation dir or the config dir";
     }
