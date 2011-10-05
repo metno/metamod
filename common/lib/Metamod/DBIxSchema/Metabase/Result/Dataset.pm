@@ -115,6 +115,18 @@ __PACKAGE__->has_many(
   { "foreign.ds_parent" => "self.ds_id" },
 );
 
+__PACKAGE__->has_one(
+  "parent_dataset",
+  "Metamod::DBIxSchema::Metabase::Result::Dataset",
+  { "foreign.ds_id" => "self.parent_id" },
+);
+
+__PACKAGE__->has_many(
+  "sibling_datasets",
+  "Metamod::DBIxSchema::Metabase::Result::Dataset",
+  { "foreign.ds_parent" => "self.ds_parent" },
+);
+
 __PACKAGE__->has_many(
   "oai_info",
   "Metamod::DBIxSchema::Metabase::Result::OaiInfo",
@@ -388,6 +400,7 @@ sub wmsthumb {
             xysize  => $size,
             datamap => "$wms_url?$wmsparams&LAYERS=$layer{name}&STYLES=$layer{style}",
             outline => "$mapserver$map?$wmsparams&TRANSPARENT=true&LAYERS=borders&STYLES=",
+            wms_url => $wms_url,
         };
 
         #print STDERR Dumper($out);
