@@ -1,8 +1,7 @@
 #!/usr/bin/perl -w
 
 use FindBin;
-use lib "$FindBin::Bin/../../common/lib";
-use lib "$FindBin::Bin/../lib";
+use lib ("$FindBin::Bin/../../common/lib");
 
 use strict;
 use warnings;
@@ -17,16 +16,20 @@ use Metamod::Queue;
 use Metamod::Queue::Worker;
 use Metamod::Queue::Worker::PrepareDownload;
 
-
 # Parse cmd line params
-my ($pid, $errlog, $ownertag);
+my ($pid, $errlog, $ownertag, $config_file_or_dir);
 GetOptions ('pid|p=s' => \$pid,     # name of pid file - if given, run as daemon
             'log|l=s' => \$errlog,  # optional, redirect STDERR and STDOUT here
+            'config=s' => \$config_file_or_dir,     # path to config dir/file
 ) or usage();
 
+if(!Metamod::Config->config_found($config_file_or_dir)){
+    print STDERR "Could not find the configuration on the commandline or the in the environment\n";
+    exit 3;
+}
+
 # init config + logger
-my $master_config = shift @ARGV or usage();
-my $mm_config    = Metamod::Config->new($master_config);
+my $mm_config = Metamod::Config->new($config_file_or_dir);
 my $log = get_logger('metamod.basket');
 
 # setup queue
@@ -62,6 +65,6 @@ if ($@) {
 # END
 
 sub usage {
-    print "usage: $0 <path to master_config.txt>\n";
+    print "usage: $0 [ --config <configpath> ] [ --pid <pidfile> ] [ --log <logfile> ] \n";
     exit 1;
 }
