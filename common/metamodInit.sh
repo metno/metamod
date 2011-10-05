@@ -1,20 +1,13 @@
 #!/bin/bash
 
+SCRIPT_PATH="`dirname \"$0\"`"
 if [ $# != 2 ]
 then
-    echo "You must supply the config dir as a parameter"
-    exit 1
+    # assume config set in env
+    source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl")
+else
+    source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" "--config" $2)
 fi
-
-if [ ! -r $2 ]
-then
-    echo "Cannot read the file "$2
-    exit 1
-fi
-
-# Load the configuration dynamically
-SCRIPT_PATH="`dirname \"$0\"`"
-source <(perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" "$2/master_config.txt")
 
 webrun_directory="$WEBRUN_DIRECTORY"
 target_directory="$TARGET_DIRECTORY"
