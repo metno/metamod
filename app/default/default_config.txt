@@ -365,7 +365,7 @@ PMH_SETCONFIG =
 # When testing, a virtual time is used which goes faster than ordinary time.
 # The following speedup factor is the number of virtual seconds per real
 # second. If set to 0, import testing is turned off.
-TEST_IMPORT_SPEEDUP = 100
+TEST_IMPORT_SPEEDUP = 0
 
 # The virtual time starts at a specific point in real time. At this point
 # the virtual date and time is the same as the real date and time. The
