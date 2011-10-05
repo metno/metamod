@@ -45,16 +45,16 @@ use Metamod::Config;
 
 $ENV{CATALYST_SCRIPT_GEN} = 40;
 
-my $config_file;
-GetOptions("config-dir=s", \$config_dir);
+my $config_file_or_dir;
+GetOptions("config=s", \$config_file_or_dir);
 
-if( !$config_dir && !exists $ENV{METAMOD_MASTER_CONFIG}){
-    print "You must supply either the config-dir parameter or set the METAMOD_MASTER_CONFIG environment variable\n";
+if( !Metamod::Config->config_found($config_file_or_dir)){
+    print "You must supply either the config parameter or set the METAMOD_MASTER_CONFIG environment variable\n";
     exit 1;
 }
 
 
-Metamod::Config->new($config_dir);
+Metamod::Config->new($config_file_or_dir);
 
 use Catalyst::ScriptRunner;
 Catalyst::ScriptRunner->run('MetamodWeb', 'Server');
