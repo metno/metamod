@@ -39,7 +39,8 @@ use strict;
 use warnings;
 use File::Spec;
 
-use lib ('$FindBin::Bin/../../common/lib');
+use FindBin;
+use lib ("$FindBin::Bin/../../common/lib");
 
 use Carp;
 use POSIX;
@@ -64,21 +65,19 @@ use Log::Log4perl qw( get_logger );
 
 # Parse cmd line params
 #
-my ($pid, $errlog, $ownertag);
+my ($pid, $errlog, $ownertag, $config_file_or_dir);
 GetOptions ('pid|p=s' => \$pid,     # name of pid file - if given, run as daemon
             'log|l=s' => \$errlog,  # optional, redirect STDERR and STDOUT here
             'owner=s' => \$ownertag, # archive files under this owner
+            'config=s'  => \$config_file_or_dir,
 );
 
-
-if( @ARGV != 1 ){
-    print "You must supply the config file as a parameter\n";
-    exit 1;
+if(!Metamod::Config->config_found($config_file_or_dir)){
+    print "Could not find the configuration on the commandline or the in the environment\n";
+    exit;
 }
-my $config_file_or_dir = shift @ARGV;
 
 my $config = Metamod::Config->new($config_file_or_dir);
-$config->initLogger();
 my $log = get_logger('metamod.harvester');
 
 
@@ -459,8 +458,8 @@ sub trim {
 
 sub usage {
     print STDERR <<EOT;
-command line usage: harvester.pl [--owner OWNERTAG] [--log LOGFILE] FILE|URL
-daemon usage:       harvester.pl --pid PIDFILE [--log LOGFILE]
+command line usage: harvester.pl [--owner OWNERTAG] [--log LOGFILE] [--confg FILE_OR_DIR] FILE|URL
+daemon usage:       harvester.pl --pid PIDFILE [--log LOGFILE] [--confg FILE_OR_DIR]
 EOT
     exit(1);
 }
