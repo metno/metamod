@@ -42,26 +42,19 @@ use FindBin;
 use lib "$FindBin::Bin/../../common/lib";
 use lib "$FindBin::Bin/../lib";
 
+use Getopt::Long;
+use Pod::Usage;
+
 use Metamod::Config;
 
-if( @ARGV != 1 ) {
-    print STDERR "usage $0 <path to master config>\n";
-    exit 1;
+my $config_file_or_dir;
+GetOptions("config=s" => \$config_file_or_dir) or print_exit_bash();
+
+if(!Metamod::Config->config_found($config_file_or_dir)){
+    print_exit_bash();
 }
 
-my $master_config_file = shift @ARGV;
-
-if( !( -f $master_config_file ) ){
-    print STDERR "'$master_config_file' is not a file\n";
-    exit 1;
-}
-
-if( !( -e $master_config_file ) || !( -r $master_config_file ) ){
-    print STDERR "'$master_config_file' does not exist or is not readable\n";
-    exit 1;
-}
-
-my $config = Metamod::Config->new($master_config_file);
+my $config = Metamod::Config->new($config_file_or_dir);
 
 my @configVars = $config->getVarNames();
 
@@ -96,6 +89,14 @@ END_MULTILINE
 
 print $bash_script;
 
+sub print_exit_bash {
+
+    print "echo 'Missing configuration in gen_bash_conf.pl.'\n";
+    print "echo 'Have you supplied the config parameter or set METAMOD_MASTER_CONFIG in env?'\n";
+    print "exit";
+    exit 1;
+}
+
 =head1 NAME
 
 B<gen_bash_conf.pl> - Generate a bash script that creates one bash variable for each config variable
@@ -107,9 +108,12 @@ master_config.txt file. The default master_config.txt file (decided by
 C<Metamod::Config>) will be used. Or you can override the default by setting
 the environment. See C<Metamod::Config> for details.
 
-=head1 USAGE
+=head1 SYNOPSIS
 
- gen_bash_conf.pl
+gen_initd_script.pl [options]
+
+  Options:
+    --config Path to application directory or application config file.
 
 =head1 LICENSE
 
