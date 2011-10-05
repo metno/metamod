@@ -66,9 +66,8 @@ sub new {
     # we already have an object so use that instead.
     return $_config if defined $_config;
 
-    # If the path to the master config is set in the enviroment that overrides
-    # any parameters sent to the constructor.
-    if( exists $ENV{METAMOD_MASTER_CONFIG} && $ENV{METAMOD_MASTER_CONFIG} ){
+    # The environment is only used if the parameter is not supplied.
+    if( !$file_or_dir && exists $ENV{METAMOD_MASTER_CONFIG} && $ENV{METAMOD_MASTER_CONFIG} ){
         $file_or_dir = $ENV{METAMOD_MASTER_CONFIG};
     }
 
@@ -121,10 +120,40 @@ sub _reset_singleton {
     $_config = undef
 }
 
+=head2 $class->config_found($file_or_dir)
+
+Check if the class can find a config either in the supplied parameter or the
+enviroment. Dies if the found config does not actually exist.
+
+=over
+
+=item $file_or_dir
+
+A variable (possibly empty) with the path to the config file or directory.
+
+=item return
+
+Returns the path to the config file. If $file_or_dir is a file or directory the
+parameter is returned. If that variable is empty the value of METAMOD_MASTER_CONFIG
+is returned.
+
+=back
+
+=cut
+
 sub config_found {
     my $class = shift;
 
     my ($config_file) = @_;
+
+    if( $config_file ){
+
+        if( ! -e $config_file ){
+            confess "Config file or directory was given, but it does not exist: " . $config_file;
+        }
+
+        return $config_file;
+    }
 
     if( exists $ENV{METAMOD_MASTER_CONFIG} ){
 
@@ -134,15 +163,6 @@ sub config_found {
         }
 
         return $ENV{METAMOD_MASTER_CONFIG}
-    }
-
-    if( $config_file ){
-
-        if( ! -e $config_file ){
-            confess "Config file or directory was given, but it does not exist: " . $config_file;
-        }
-
-        return $config_file;
     }
 
     return;
