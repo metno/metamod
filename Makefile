@@ -18,10 +18,12 @@ debian_package:
 	fakeroot rsync -aC $(CURDIR)/base/* $(DESTDIR)/base
 	fakeroot rsync -aC $(CURDIR)/catalyst/* $(DESTDIR)/catalyst
 	fakeroot rsync -aC $(CURDIR)/common/* $(DESTDIR)/common
-	fakeroot rsync -aC $(CURDIR)/config/* $(DESTDIR)/config
 	fakeroot rsync -aC $(CURDIR)/docs/* $(DESTDIR)/docs
 	fakeroot rsync -aC $(CURDIR)/harvest/* $(DESTDIR)/harvest
 	fakeroot rsync -aC $(CURDIR)/upload/* $(DESTDIR)/upload
+	fakeroot rsync -aC $(CURDIR)/activate_env $(DESTDIR)/
+	fakeroot rsync -aC $(CURDIR)/LICENCE $(DESTDIR)/
+	fakeroot rsync -aC $(CURDIR)/README $(DESTDIR)/
 
 	fakeroot dh_fixperms
 	fakeroot dh_gencontrol
