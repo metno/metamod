@@ -42,7 +42,7 @@
   <xsl:template match="//wms:Layer">
 
     <Layer queryable="0" hidden="0">
-      <Server service="OGC:WMS" version="1.1.1" foo="bar">
+      <Server service="OGC:WMS" version="1.1.1">
         <OnlineResource xlink:type="simple"
             xlink:href="{/*/wms:Capability/wms:Request/wms:GetMap/wms:DCPType/wms:HTTP/wms:Get/wms:OnlineResource/@xlink:href}"/>
       </Server>
@@ -50,6 +50,11 @@
       <Name><xsl:value-of select="wms:Name"/></Name>
       <Title><xsl:value-of select="wms:Title"/></Title>
       <Abstract><xsl:value-of select="wms:Abstract"/></Abstract>
+
+      <DimensionList>
+        <xsl:apply-templates select="wms:Dimension"/>
+      </DimensionList>
+
       <FormatList>
         <xsl:for-each select="/*/wms:Capability/wms:Request/wms:GetMap/wms:Format">
           <Format>
@@ -65,6 +70,17 @@
       </StyleList>
     </Layer>
 
+  </xsl:template>
+
+  <xsl:template match="//wms:Layer/wms:Dimension">
+    <xsl:element name="Dimension">
+      <xsl:for-each select="@*">
+        <xsl:attribute name="{local-name()}">
+          <xsl:value-of select="."/>
+        </xsl:attribute>
+      </xsl:for-each>
+      <xsl:value-of select="normalize-space(.)"/>
+    </xsl:element>
   </xsl:template>
 
   <!-- next 4 templates only used for transforming style nodes -->
