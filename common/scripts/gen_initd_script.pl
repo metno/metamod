@@ -3,16 +3,39 @@
 use strict;
 use warnings;
 
+=head1 NAME
+
+gen_initd_script.pl Generate instance specific Catalyst init.d scripts and default file.
+
+=head1 DESCRIPTION
+
+This script generates a instance specific Catalyst init.d file and default file
+based on a template and the application configuration.
+
+=head1 SYNOPSIS
+
+gen_initd_script.pl [options]
+
+  Options:
+    --config Path to application directory or application config file.
+
+=cut
+
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
+use File::Path qw(make_path);
+use Getopt::Long;
+use Pod::Usage;
+
 use Metamod::Config;
 
-my $config_file = shift @ARGV;
+my $config_file;
+GetOptions('config=s' => \$config_file) or pod2usage(1);
 
 if( !Metamod::Config->config_found($config_file)){
     print "Path to config must either be supplied on the commandline or given in the environment.";
-    print "usage: $0 [config file]\n";
+    print "usage: $0 [--config config file]\n";
 }
 
 my $config = Metamod::Config->new($config_file);
@@ -35,7 +58,7 @@ my $initd_output = File::Spec->catfile($config->get('CONFIG_DIR'), 'etc', 'init.
 my $default_output = File::Spec->catfile($config->get('CONFIG_DIR') ,'etc', 'default', "catalyst-$applicaiton_id" );
 
 if( ! -e File::Spec->catfile($config->get('CONFIG_DIR'), 'etc', 'init.d' ) ){
-    mkdir File::Spec->catfile($config->get('CONFIG_DIR'), 'etc', 'init.d');
+    make_path(File::Spec->catfile($config->get('CONFIG_DIR'), 'etc', 'init.d')) or die "Failed to create init.d directory";
 }
 
 open my $NEW_INITD, '>', $initd_output or die $!;
@@ -43,7 +66,7 @@ print $NEW_INITD $generated_initd;
 close $NEW_INITD;
 
 if( ! -e File::Spec->catfile($config->get('CONFIG_DIR'), 'etc', 'default' ) ){
-    mkdir File::Spec->catfile($config->get('CONFIG_DIR'), 'etc', 'default');
+    make_path(File::Spec->catfile($config->get('CONFIG_DIR'), 'etc', 'default')) or die "Failed to create default directory";
 }
 
 open my $NEW_DEFAULT, '>', $default_output or die $!;
