@@ -41,6 +41,9 @@ GROUP=
 if [ -f "/etc/default/catalyst-$APPID" ]; then
     # use this file to set prefork engine + master_config path
     . "/etc/default/catalyst-$APPID"
+else
+    echo "Missing defaults file /etc/default/catalyst-$APPID"
+    exit 1
 fi
 
 # -------------
