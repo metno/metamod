@@ -73,8 +73,8 @@ GetOptions ('pid|p=s' => \$pid,     # name of pid file - if given, run as daemon
 );
 
 if(!Metamod::Config->config_found($config_file_or_dir)){
-    print "Could not find the configuration on the commandline or the in the environment\n";
-    exit;
+    print STDERR "Could not find the configuration on the commandline or the in the environment\n";
+    exit 3;
 }
 
 my $config = Metamod::Config->new($config_file_or_dir);
