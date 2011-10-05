@@ -492,8 +492,11 @@ The maximum total size of the basket in bytes.
 sub max_size {
     my $self = shift;
 
-    return $self->config->get('COLLECTION_BASKET_MAX_SIZE') || 524288000;
-
+    if ($self->config->has('COLLECTION_BASKET_MAX_SIZE')) {
+        return $self->config->get('COLLECTION_BASKET_MAX_SIZE');
+    } else {
+        return 524288000;
+    }
 }
 
 sub add_user_msg {
