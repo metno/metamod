@@ -121,6 +121,33 @@ sub _reset_singleton {
     $_config = undef
 }
 
+sub config_found {
+    my $class = shift;
+
+    my ($config_file) = @_;
+
+    if( exists $ENV{METAMOD_MASTER_CONFIG} ){
+
+        if( ! -e $ENV{METAMOD_MASTER_CONFIG} ){
+            confess "METAMOD_MASTER_CONFIG environment variable set but file does not exist: "
+                . $ENV{METAMOD_MASTER_CONFIG};
+        }
+
+        return $ENV{METAMOD_MASTER_CONFIG}
+    }
+
+    if( $config_file ){
+
+        if( ! -e $config_file ){
+            confess "Config file or directory was given, but it does not exist: " . $config_file;
+        }
+
+        return $config_file;
+    }
+
+    return;
+}
+
 ## get the file from METAMOD_MASTER_CONFIG or in (source|target)/master_config.txt
 #sub _getDefaultConfigFile {
 #    # allow the use of none standard location of the config file. This is functionality
