@@ -1,58 +1,46 @@
 #!/usr/bin/perl -w
-#
-#----------------------------------------------------------------------------
-#  METAMOD - Web portal for metadata search and upload
-#
-#  Copyright (C) 2009 met.no
-#
-#  Contact information:
-#  Norwegian Meteorological Institute
-#  Box 43 Blindern
-#  0313 OSLO
-#  NORWAY
-#  email: egil.storen@met.no
-#
-#  This file is part of METAMOD
-#
-#  METAMOD is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  METAMOD is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with METAMOD; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-#----------------------------------------------------------------------------
-#
-# create_thredds_catalogs.pl
-# ==========================
-#
-# This script wakes up periodically to update the THREDDS
-# catalog that makes the data repository available to users through the
-# THREDDS Data Server (TDS) installation.
-#
-# If this script introduces any changes in the catalog, the script will NOT
-# restart the TDS. The TDS is assumed to restart at fixed periods.
-#
+
+=begin LICENSE
+
+Copyright (C) YYYY The Norwegian Meteorological Institute.  All Rights Reserved.
+
+B<METAMOD> - Web portal for metadata search and upload
+
+Copyright (C) 2008 met.no
+
+Contact information:
+Norwegian Meteorological Institute
+Box 43 Blindern
+0313 OSLO
+NORWAY
+email: egil.storen@met.no
+
+This file is part of METAMOD
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+METAMOD is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with METAMOD; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=end LICENSE
+
+=cut
+
 use strict;
 use warnings;
 use File::Spec;
 
-# small routine to get lib-directories relative to the installed file
-sub getTargetDir {
-    my ($finalDir) = @_;
-    my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
-    $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
-    $dir = File::Spec->catdir($dir, $finalDir);
-    return File::Spec->catpath($vol, $dir, "");
-}
-
-use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
+use FindBin;
+use lib ("$FindBin::Bin/../../common/lib");
 
 use Metamod::Dataset;
 use Metamod::Utils qw(findFiles);
@@ -66,8 +54,23 @@ use File::Path;
 use Fcntl ':flock';
 use mmTtime;
 
+
+# Parse cmd line params
+my ($pidFile, $logFile, $config_file_or_dir);
+GetOptions ('pid|p=s'  => \$pidFile,                # name of pid file - if given, run as daemon
+            'log|l=s'  => \$logFile,                # redirect STDERR and STDOUT here
+            'config=s' => \$config_file_or_dir,     # path to config dir/file
+);
+
+usage() unless $pidFile && $logFile;
+
+if(!Metamod::Config->config_found($config_file_or_dir)){
+    print STDERR "Could not find the configuration on the commandline or the in the environment\n";
+    exit 3;
+}
+
 my $logger = Log::Log4perl->get_logger('metamod.thredds.create_thredds_catalogs');
-my $config = new Metamod::Config();
+my $config = new Metamod::Config($config_file_or_dir);
 my $dbname = $config->get("DATABASE_NAME");
 my $user   = $config->get("PG_ADMIN_USER");
 my $opendap_directory = $config->get("OPENDAP_DIRECTORY");
@@ -87,7 +90,7 @@ my %old_catalog_hash = ();
 our $SIG_TERM = 0;
 
 eval {
-   Metamod::Utils::daemonize($ARGV[0], $ARGV[1]);
+   Metamod::Utils::daemonize($logFile, $pidFile);
    $SIG{TERM} = \&sigterm;
    while (!$SIG_TERM) {
       &main_body();
@@ -425,4 +428,9 @@ sub datestring {
    my $hour = $ta[2]; # 0-23
    my $min = $ta[1]; # 0-59
    return sprintf ('%04d-%02d-%02d %02d:%02d',$year,$mon,$mday,$hour,$min);
+}
+
+sub usage {
+    print STDERR "usage: $0 --pid PIDFILE --log LOGFILE [--config FILE_OR_DIR]";
+    exit(1);
 }
