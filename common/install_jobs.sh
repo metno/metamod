@@ -18,6 +18,7 @@ source <(perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" "$1/master_config.txt")
 
 CATALYST_APP="catalyst-$APPLICATION_ID"
 
+# don't overwrite existing text files in /etc (only symlinks are ok)
 ordie () {
     if [ $? != 0 ]
     then
@@ -36,7 +37,6 @@ else
 fi
 
 # install catalyst job
-# TODO: check if files already exist (then die)
 sudo ln -s $CONFIG_DIR/etc/default/$CATALYST_APP /etc/default/$CATALYST_APP; ordie
 sudo ln -s $CONFIG_DIR/etc/init.d/$CATALYST_APP /etc/init.d/$CATALYST_APP; ordie
 # start Catalyst at boot
@@ -50,10 +50,6 @@ if [ $APPLICATION_USER ]; then
 		su -c "$INSTALLATION_DIR/common/metamodInit.sh \$*" -s /bin/sh $APPLICATION_USER
 	EOT
 	# make sure the tabs above are not replaced with spaces (or the script will break)
-	sudo mv /tmp/metamodServices-$APPLICATION_ID /etc/init.d/; ordie
+    sudo mv /tmp/metamodServices-$APPLICATION_ID /etc/init.d/; ordie
     sudo ln -s /etc/init.d/metamodServices-$APPLICATION_ID /etc/rc2.d/S99metamodServices-$APPLICATION_ID; ordie
 fi
-
-# install config link (no longer in use?)
-#sudo mkdir -p /etc/metamod-[==MAJORVERSION==]
-#sudo ln -s [==TARGET_DIRECTORY==]/master_config.txt  /etc/metamod-[==MAJORVERSION==]/[==APPLICATION_ID==].cfg; ordie
