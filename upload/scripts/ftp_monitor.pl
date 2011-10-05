@@ -39,16 +39,8 @@ use strict;
 use warnings;
 use File::Spec;
 
-# small routine to get lib-directories relative to the installed file
-sub getTargetDir {
-    my ($finalDir) = @_;
-    my ( $vol, $dir, $file ) = File::Spec->splitpath(__FILE__);
-    $dir = $dir ? File::Spec->catdir( $dir, ".." ) : File::Spec->updir();
-    $dir = File::Spec->catdir( $dir, $finalDir );
-    return File::Spec->catpath( $vol, $dir, "" );
-}
-
-use lib ( '../../common/lib', getTargetDir('lib'), getTargetDir('scripts') );
+use FindBin;
+use lib ("$FindBin::Bin/../../common/lib");
 
 use POE qw(Component::Schedule);
 use POE::Component::Cron;
@@ -74,28 +66,37 @@ See Metamod::UploadHelper
 
 =cut
 
-#  Action starts here:
-#  -------------------
 
+# Parse cmd line params
+my ($pidFile, $logFile, $test, $config_file_or_dir);
+GetOptions ('pid|p=s'  => \$pidFile,                # name of pid file - if given, run as daemon
+            'log|l=s'  => \$logFile,                # optional, redirect STDERR and STDOUT here
+            'config=s' => \$config_file_or_dir,     # path to config dir/file
+            'test!'    => \$test,                   # dry run
+);
+
+if(!Metamod::Config->config_found($config_file_or_dir)){
+    print "Could not find the configuration on the commandline or the in the environment\n";
+    exit;
+}
+
+
+# can we skip this now?
 my $sleeping_seconds      = 60;
-if ( $config->get('TEST_IMPORT_SPEEDUP') and $config->get('TEST_IMPORT_SPEEDUP') > 1 ) {
+if ( $config->has('TEST_IMPORT_SPEEDUP') and $config->get('TEST_IMPORT_SPEEDUP') > 1 ) {
     $sleeping_seconds = 1;
 }
 
 eval {
-    if ( $ARGV[0] && $ARGV[0] eq 'test' ) {
+    if ($test) {
         print STDERR "Testrun: " . $ARGV[0] . "\n";
-        main_loop( $ARGV[0] );
+        $upload_helper->ftp_process_test();
     } elsif(0 == @ARGV) {
         print STDERR "Not running as daemon. Stop me with Ctrl + C\n";
-        #main_loop();
-        #$upload_helper->get_dataset_institution(); # now run automatically by process_files
         $upload_helper->ftp_process_hour();
     } else {
         my ($logFile, $pidFile) = @ARGV;
         Metamod::Utils::daemonize($logFile, $pidFile);
-        #$SIG{TERM} = \&sigterm;
-        #&main_loop();
         start_cronjob();
     }
 };
@@ -105,57 +106,6 @@ if ($@) {
     $upload_helper->syserrorm( "SYS", "NORMAL TERMINATION", "", "", "" );
 }
 
-# let POE handle kills since custom event handlers don't work under it
-#our $SIG_TERM = 0;
-#sub sigterm { ++$SIG_TERM; }
-#$SIG{TERM} = \&sigterm;
-
-#
-# ----------------------------------------------------------------------------
-#
-#sub main_loop {
-#    my ($testrun) = @_;    # if test, always run, but only once
-#    print STDERR "Starting main_loop...\n";
-#
-#    &init;
-#
-#    #
-#    #  Loop which will continue until terminated SIG{TERM}.
-#    #
-#    #  For each new hour, the loop will check (in the ftp_process_hour
-#    #  routine) if any FTP-processing are scheduled (looking in the %ftp_events hash).
-#    #
-#    #  After processing, the routine will wait until the system clock arrives at
-#    #  a new fresh hour. Then the loop repeats, and new processing will eventually
-#    #  be perfomed.
-#    #
-#
-#    my @ltime         = localtime( mmTtime::ttime() );
-#    my $current_day   = $ltime[3];                       # 1-31
-#    my $hour_finished = -1;
-#
-#    while ( ( !$SIG_TERM ) || $testrun ) {
-#        @ltime = localtime( mmTtime::ttime() );
-#        my $newday       = $ltime[3];                    # 1-31
-#        my $current_hour = $ltime[2];                    # 0-23
-#        #printf STDERR "...looping...%s > %s?\n", $current_hour, $hour_finished;
-#        if ( $current_day != $newday || ( $testrun && $testrun eq 'newday' ) ) {
-#            &clean_up_problem_dir(); # move to separate job - FIXME
-#            &clean_up_repository();  # move to separate job - FIXME
-#            $file_in_error_counter = 1;
-#            $hour_finished         = -1;
-#            $current_day           = $newday;
-#        }
-#        if ( $current_hour > $hour_finished ) {
-#            &get_dataset_institution( \%dataset_institution );
-#            &ftp_process_hour( \%ftp_events, $current_hour );
-#            @ltime         = localtime( mmTtime::ttime() );
-#            $hour_finished = $ltime[2];                       # 0-23
-#        }
-#        if ($testrun) { last; }
-#        sleep($sleeping_seconds);
-#    }
-#}
 
 sub ftp_monitor {
     my ($kernel, $heap, $session) = @_[KERNEL, HEAP, SESSION];

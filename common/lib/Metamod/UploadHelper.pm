@@ -135,6 +135,18 @@ sub read_ftp_events {
     }
 }
 
+
+=head2 ftp_process_test
+
+Check and process files in the FTP upload area, then exit.
+See ftp_process_hour for details.
+
+=cut
+
+sub ftp_process_test {
+    die "Not yet implemented.";
+}
+
 =head2 ftp_process_hour
 
 Check the FTP upload area.
