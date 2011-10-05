@@ -47,6 +47,8 @@ use XML::Simple qw(:strict);
 use mmTtime;
 # use Data::Dumper;
 use DBI;
+use Getopt::Long;
+use Pod::Usage;
 use Metamod::Config;
 
 # global variables
@@ -55,18 +57,15 @@ use vars qw($dbh @logarr %searchdata @ancestors
             $sql_getkey_HK $sql_insert_HK $sql_insert_HKBK
             );
 
+my $config_file_or_dir;
+GetOptions('config=s' => \$config_file_or_dir) or pod2usage(1);
 
-
-if (scalar @ARGV != 1) {
-   die "\nUsage:\n\n     $0 <path to config directory>\n\n";
+if(!Metamod::Config->config_found($config_file_or_dir)){
+    pod2usage(1);
 }
 
-
-my $config_directory = shift @ARGV;
-my $master_config_file = File::Spec->catfile($config_directory, "master_config.txt");
-
-my $config = new Metamod::Config($master_config_file);
-my $searchdataxml = File::Spec->catfile($config_directory, 'staticdata', 'searchdata.xml');
+my $config = new Metamod::Config($config_file_or_dir);
+my $searchdataxml = $config->path_to_config_file('searchdata.xml', 'staticdata');
 
 #
 #  Connect to PostgreSQL database:

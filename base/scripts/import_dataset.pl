@@ -42,29 +42,41 @@ use lib ("$FindBin::Bin/../../common/lib", '.');
 
 use Metamod::DatasetImporter;
 use Metamod::Config;
+use Getopt::Long;
 use Log::Log4perl qw();
 use Data::Dumper;
+use Pod::Usage;
 
-#
-#  Import datasets from XML files into the database.
-#
-#  With one command line argument, the program will import the XML file
-#  given by this argument.
-#
+=head1 NAME
 
-#
-#  Check number of command line arguments
-#
-if ( scalar @ARGV != 2 ) {
-    die "\nUsage:\n\n"
-      . "   Import single XML file:     $0 path-to-config filename\n"
-      . "   Import a directory:         $0 path-to-config directory\n"
+B<import_dataset.pl> - Import an dataset or a directory with datasets into the metadata database
+
+=head1 DESCRIPTION
+
+Imports an XML file or a directory of metadata XML files inthe the metadata database.
+
+=head1 SYNOPSIS
+
+import_dataset.pl [options] <file or dir>
+
+  Options:
+    --config Path to application directory or application config file.
+
+=cut
+
+my $config_file_or_dir;
+GetOptions('config=s' => \$config_file_or_dir) or pod2usage(1);
+
+if(!Metamod::Config->config_found($config_file_or_dir)){
+    pod2usage(1);
 }
 
-my $config_dir = shift @ARGV;
+if ( scalar @ARGV != 1 ) {
+    pod2usage(1);
+}
 
-my $config = Metamod::Config->new($config_dir);
-$config->initLogger();
+my $config = Metamod::Config->new($config_file_or_dir);
+
 my $logger = Log::Log4perl->get_logger('metamod.base.import_dataset');
 
 
