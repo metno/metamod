@@ -64,21 +64,21 @@ Start digest_nc.pl on uploaded files.
 
 =head1 USAGE
 
-upload_monitor.pl [option] <config file or directory>
+upload_monitor.pl [ --test | --pidfile <path> ] [ --logfile <path> ] [ --config <path> ]
 
 =over
 
-=item --daemon
+=item --config
 
-Run the script in deamon mode. Also requires --logfile and --pidfile
-
-=item --logfile
-
-Path to the log file to use when running in daemon mode.
+Path to the configuration (file or dir). Mandatory unless set via environment variable.
 
 =item --pidfile
 
-Path to the pid file to use when running in daemon mode.
+Path to the pid file to use when running in daemon mode. Also requires --logfile
+
+=item --logfile
+
+Path to the log file to use (mandatory when running in daemon mode, otherwise optional if/when implemented)
 
 =item --test
 
@@ -89,19 +89,17 @@ Run the script in test mode.
 =cut
 
 my $test;
-my $daemon;
 my $logfile;
 my $pidfile;
+my $config_file_or_dir;
 
-GetOptions("daemon" => \$daemon, 'test' => \$test, 'logfile=s' => \$logfile, 'pidfile=s' => \$pidfile) or pod2usage();
-
-my $config_file_or_dir = shift @ARGV;
+GetOptions('config=s' => , \$config_file_or_dir, 'test!' => \$test, 'logfile=s' => \$logfile, 'pidfile=s' => \$pidfile) or pod2usage();
 
 if( !$config_file_or_dir ){
     pod2usage("Missing config file or directory");
 }
 
-if( $daemon && (!$logfile || !$pidfile)){
+if( $pidfile && !$logfile){
     pod2usage("You must specify both --logfile and --pidfile when running in daemon mode");
 }
 
@@ -121,7 +119,7 @@ eval {
         #print STDERR Dumper $job;
         $queue_worker->wojk_once($job);
 
-    } elsif($daemon) {
+    } elsif($pidfile) {
 
         Metamod::Utils::daemonize($logfile, $pidfile);
         $queue_worker->wojk();
