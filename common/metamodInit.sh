@@ -1,13 +1,9 @@
 #!/bin/bash
 
 SCRIPT_PATH="`dirname \"$0\"`"
-if [ $# != 2 ]
-then
-    # assume config set in env
-    source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl")
-else
-    source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" "--config" $2)
-fi
+CONFIG=$2
+# config must be set in $METAMOD_MASTER_CONFIG envvar if not given as command line param
+source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG)
 
 webrun_directory="$WEBRUN_DIRECTORY"
 target_directory="$TARGET_DIRECTORY"
@@ -26,7 +22,6 @@ harvester_pid=$webrun_directory/harvester.pid
 harvester_script=$SCRIPT_PATH/../harvest/scripts/harvester.pl
 create_thredds_catalogs_pid=$webrun_directory/create_thredds_catalogs.pid
 create_thredds_catalogs_script=$SCRIPT_PATH/../thredds/scripts/create_thredds_catalogs.pl
-
 
 . /lib/lsb/init-functions
 
@@ -78,7 +73,7 @@ start() {
          rm -rf $work_flat
          rm -f $path_to_shell_error
          # actually start the daemon
-         start_daemon -n 10 -p $upload_monitor_pid $upload_monitor_script $system_log $upload_monitor_pid
+         start_daemon -n 10 -p $upload_monitor_pid $upload_monitor_script -l $system_log -p $upload_monitor_pid  ${CONFIG:+"--config"} $CONFIG)
          if [ $? -ne 0 ]; then
             echo "upload_monitor failed: $?"
             return $?;
@@ -97,7 +92,7 @@ start() {
          rm -rf $work_flat
          rm -f $path_to_shell_error
          # actually start the daemon
-         start_daemon -n 10 -p $ftp_monitor_pid $ftp_monitor_script $system_log $ftp_monitor_pid
+         start_daemon -n 10 -p $ftp_monitor_pid $ftp_monitor_script -l $system_log -p $ftp_monitor_pid ${CONFIG:+"--config"} $CONFIG)
          if [ $? -ne 0 ]; then
             echo "ftp_monitor failed: $?"
             return $?;
@@ -108,7 +103,8 @@ start() {
    fi
    if [ "$METAMODBASE_DIRECTORY" != "" -a -r $prepare_download_script ]; then
       if ! running $prepare_download_pid; then
-         start_daemon -n 10 -p $prepare_download_pid $prepare_download_script -log $system_log -pid $prepare_download_pid $2/master_config.txt
+         #start_daemon -n 10 -p $prepare_download_pid $prepare_download_script -log $system_log -pid $prepare_download_pid $2/master_config.txt
+         start_daemon -n 10 -p $prepare_download_pid $prepare_download_script -l $system_log -p $prepare_download_pid ${CONFIG:+"--config"} $CONFIG)
          if [ $? -ne 0 ]; then
             echo "prepare_download failed: $?"
             return $?;
@@ -119,7 +115,7 @@ start() {
    fi
    if [ "$METAMODHARVEST_DIRECTORY" != "" -a -r $harvester_script ]; then
       if ! running $harvester_pid; then
-         start_daemon -n 10 -p $harvester_pid $harvester_script -log $system_log -pid $harvester_pid
+         start_daemon -n 10 -p $harvester_pid $harvester_script -l $system_log -p $harvester_pid ${CONFIG:+"--config"} $CONFIG)
          if [ $? -ne 0 ]; then
             echo "harvester failed: $?"
             return $?;
@@ -130,7 +126,7 @@ start() {
    fi
    if [ "$METAMODTHREDDS_DIRECTORY" != "" -a -r $create_thredds_catalogs_script ]; then
       if ! running $create_thredds_catalogs_pid; then
-         start_daemon -n 10 -p $create_thredds_catalogs_pid $create_thredds_catalogs_script $system_log $create_thredds_catalogs_pid
+         start_daemon -n 10 -p $create_thredds_catalogs_pid $create_thredds_catalogs_script -l $system_log -p $create_thredds_catalogs_pid ${CONFIG:+"--config"} $CONFIG)
          if [ $? -ne 0 ]; then
             echo "create_thredds_catalogs failed: $?"
             return $?;
@@ -228,7 +224,7 @@ case "$1" in
         status $VERSION
         ;;
     *)
-        echo "Usage: $0 {start|stop|restart|reload|force-reload|status} <path to config>"
+        echo "Usage: $0 {start|stop|restart|reload|force-reload|status} [ <configpath> ]"
         exit 1
         ;;
 esac
