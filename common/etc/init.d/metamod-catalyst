@@ -25,17 +25,12 @@ UNIXNAME=$(echo $APPNAME | perl -pe 's/::/_/;$_=lc')
 APPID=[==APPLICATION_ID==]
 
 # settings for running from target
-APPDIR=[==TARGET_DIRECTORY==]
-COMMON_LIB=[==TARGET_DIRECTORY==]/lib
-BINDIR=[==TARGET_DIRECTORY==]/scripts
-
-# settings for running from source (DOESN'T SEEM TO WORK)
-#APPDIR=[==SOURCE_DIRECTORY==]/catalyst
-#COMMON_LIB=[==SOURCE_DIRECTORY==]/common/lib
-#BINDIR=[==TARGET_DIRECTORY==]/script
+APPDIR=[==CONFIG_DIR==]
+COMMON_LIB=[==INSTALLATION_DIR==]/common/lib:[==INSTALLATION_DIR==]/catalyst/lib
+BINDIR=[==INSTALLATION_DIR==]/catalyst/script
 
 LOCAL_LIB=[==CATALYST_LIB==]
-export PERL5LIB=$APPDIR/lib:$COMMON_LIB:$LOCAL_LIB
+export PERL5LIB=$COMMON_LIB:$LOCAL_LIB
 
 # -------------
 
