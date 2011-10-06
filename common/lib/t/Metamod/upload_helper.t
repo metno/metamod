@@ -39,7 +39,7 @@ $ENV{METAMOD_LOG4PERL_CONFIG} = "$FindBin::Bin/../log4perl_config.ini";
 
 copy_test_files();
 
-my $test_setup = Metamod::Test::Setup->new( master_config_file => "$FindBin::Bin/../../../master_config.txt");
+my $test_setup = Metamod::Test::Setup->new( master_config_file => "$FindBin::Bin/../master_config.txt");
 $test_setup->mm_config->initLogger();
 $test_setup->populate_userbase("$FindBin::Bin/upload_helper_userbase.sql");
 
