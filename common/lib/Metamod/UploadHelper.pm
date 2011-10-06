@@ -44,6 +44,7 @@ given by FIXME [was: the global variables $ftp_dir_path and $upload_dir_path].
 use Cwd;
 use Data::Dump qw(dump);
 use Data::Dumper;
+use File::Basename;
 use File::Copy;
 use File::Path;
 use Log::Log4perl qw( get_logger );
@@ -289,7 +290,6 @@ sub process_upload {
 
 }
 
-
 =head2 process_files
 
 Process uploaded files for one dataset from either the FTP or web area.
@@ -372,7 +372,7 @@ sub process_files {
         my ( undef, undef, $baseupldname ) = File::Spec->splitpath($uploadname);
         $taf_basename = $baseupldname;
         my $extension;
-        if ( $baseupldname =~ /\.([^.]+)$/ ) {
+        if ( $baseupldname =~ /(\.[^.]+)$/ ) {
             $extension = $1;    # First matching ()-expression
         }
 
@@ -388,115 +388,37 @@ sub process_files {
 
         if ( $filetype =~ /^gzip/ ) {    # gzip or gzip-compressed
 
-            # Uncompress file:
-            my $result = $self->shcommand_scalar("gunzip $newpath");
-            if ( !defined($result) ) {
+            my $uncompressed_path = $self->gunzip_file($newpath);
+            if( !defined $uncompressed_path){
                 $self->syserrorm( "SYSUSER", "gunzip_problem_with_uploaded_file", $uploadname, "process_files", "" );
                 $errors = 1;
                 next;
             }
-            if ( defined($extension) && ( $extension eq "gz" || $extension eq "GZ" ) ) {
-
-                # Strip ".gz" extension from $baseupldname
-                $baseupldname = substr( $baseupldname, 0, length($baseupldname) - 3 );
-                undef $extension;
-                if ( $baseupldname =~ /\.([^.]+)$/ ) {
-                    $extension = $1;    # First matching ()-expression
-                }
-            } elsif ( defined($extension) && ( $extension eq "tgz" || $extension eq "TGZ" ) ) {
-
-                # Substitute "tgz" extension with "tar"
-                $baseupldname = substr( $baseupldname, 0, length($baseupldname) - 3 ) . 'tar';
-                $extension = 'tar';
-            } else {
-                $self->syserrorm( "SYSUSER", "uploaded_filename_with_missing_gz_or_tgz", $uploadname, "process_files", "" );
-                $errors = 1;
-                next;
-            }
-            $newpath = File::Spec->catfile( $work_start, $baseupldname );
+            (undef, undef, $extension) = fileparse($uncompressed_path, qr/\.[^.]*/);
+            $newpath = $uncompressed_path;
             $filetype = getFiletype($newpath);
+
         }
 
         #
         if ( $filetype eq "tar" ) {
-            if ( !defined($extension) || ( $extension ne "tar" && $extension ne "TAR" ) ) {
+            if ( !defined($extension) || ( $extension ne ".tar" && $extension ne ".TAR" ) ) {
                 $self->syserrorm( "SYSUSER", "uploaded_filename_with_missing_tar_ext", $uploadname, "process_files", "" );
                 $errors = 1;
                 next;
             }
 
-            # Get all component file names in the tar file:
-            my @tarcomponents = $self->shcommand_array("tar tf $newpath");
-            if ( length($self->shell_command_error) > 0 ) {
-                $self->syserrorm( "SYSUSER", "unable_to_unpack_tar_archive", $uploadname, "process_files", "" );
-                next;
+            my $tar_orignames = $self->validate_tar_components($newpath, $uploadname, $dataset_name);
+            if( !defined $tar_orignames ){
+                $errors = 1;
+            } else {
+                %orignames = (%orignames, %$tar_orignames);
             }
-            if ( $self->logger->is_debug ) {
-                my $msg = "Components of the tar file $newpath : ";
-                $msg .= join "\t", split( "\n", Dumper( \@tarcomponents ) );
-                $self->logger->debug( $msg . "\n" );
-            }
-            my %basenames    = ();
-            my $errcondition = "";
 
-            # Check the component file names:
-            foreach my $component (@tarcomponents) {
-                if ( substr( $component, 0, 1 ) eq "/" ) {
-                    $self->syserrorm( "USER", "uploaded_tarfile_with_abs_pathes",
-                        $uploadname, "process_files", "Component: $component" );
-                    $errors = 1;
-                    next;
-                }
-                my $basename = $component;
-                if ( $component =~ /\/([^\/]+)$/ ) {
-                    $basename = $1;    # First matching ()-expression
-                }
-                if ( exists( $basenames{$basename} ) ) {
-                    $self->syserrorm( "USER", "uploaded_tarfile_with_duplicates",
-                        $uploadname, "process_files", "Component: $basename" );
-                    $errors = 1;
-                    next;
-                }
-                $basenames{$basename} = 1;
-                $orignames{$basename} = $uploadname;
-                if ( index( $basename, $dataset_name . '_' ) < 0 ) {
-                    $self->syserrorm( "USER", "uploaded_tarfile_with_illegal_component_name",
-                        $uploadname, "process_files", "Component: $basename" );
-                    $errors = 1;
-                }
-            }
             if ( $errors == 0 ) {
 
-                # Expand the tar file onto the $work_expand directory
-                unless ( chdir $work_expand ) {
-                    die "Could not cd to $work_expand: $!\n";
-                }
-                my $tar_results = $self->shcommand_scalar("tar xf $newpath");
-                if ( length($self->shell_command_error) > 0 ) {
-                    $self->syserrorm( "SYSUSER", "tar_xf_fails", $uploadname, "process_files", "" );
-                    next;
-                }
+                $errors = $self->unpack_tar_archive($newpath, $uploadname, $work_expand, $work_flat);
 
-                # Move all expanded files to the $work_flat directory, which
-                # will not contain any subdirectories. Check that no duplicate
-                # file names arise.
-                foreach my $component (@tarcomponents) {
-                    my $bname = $component;
-                    if ( $component =~ /\/([^\/]+)$/ ) {
-                        $bname = $1;    # First matching ()-expression
-                    }
-                    if ( -e File::Spec->catfile( $work_flat, $bname ) ) {
-                            $self->syserrorm( "USER", "uploaded_tarfile_with_component_already_encountered",
-                                $uploadname, "process_files", "Component: $bname" );
-                            $errors = 1;
-                        next;
-                    }
-                    if ( move( $component, $work_flat ) == 0 ) {
-                        $self->syserrorm( "SYS", "move_tar_component_did_not_succeed",
-                            "", "process_files", "Component: $component Error code: $!" );
-                        next;
-                    }
-                }
                 if ( $errors == 1 ) {
                     $self->syserrorm( "SYS", "uploaded_tarfile_with_components_already_encountered",
                         $uploadname, "process_files", "" );
@@ -930,6 +852,120 @@ sub process_files {
     }
 }
 
+sub gunzip_file {
+    my $self = shift;
+
+    my ($filename) = @_;
+
+    # Uncompress file:
+    my $result = $self->shcommand_scalar("gunzip $filename");
+    if ( !defined($result) ) {
+        $self->syserrorm( "SYSUSER", "gunzip_problem_with_uploaded_file", $filename, "process_files", "" );
+        return;
+    }
+
+    my ($basename, $dirs, $extension) = fileparse($filename, qr/\.[^.]*/);
+
+    return File::Spec->catfile($dirs, $basename);
+
+}
+
+sub validate_tar_components {
+    my $self = shift;
+
+    my ($tarfile, $orig_name, $dataset_name) = @_;
+
+    # Get all component file names in the tar file:
+    my @tarcomponents = $self->shcommand_array("tar tf $tarfile");
+    if ( length($self->shell_command_error) > 0 ) {
+        $self->syserrorm( "SYSUSER", "unable_to_unpack_tar_archive", $orig_name, "process_files", "" );
+        return;
+    }
+    if ( $self->logger->is_debug ) {
+        my $msg = "Components of the tar file $tarfile : ";
+        $msg .= join "\t", split( "\n", Dumper( \@tarcomponents ) );
+        $self->logger->debug( $msg . "\n" );
+    }
+    my %basenames    = ();
+    my %orignames    = ();
+    my $errcondition = "";
+
+    # Check the component file names:
+    foreach my $component (@tarcomponents) {
+        if ( substr( $component, 0, 1 ) eq "/" ) {
+            $self->syserrorm( "USER", "uploaded_tarfile_with_abs_pathes",
+                $orig_name, "process_files", "Component: $component" );
+            return;
+        }
+        my $basename = $component;
+        if ( $component =~ /\/([^\/]+)$/ ) {
+            $basename = $1;    # First matching ()-expression
+        }
+        if ( exists( $basenames{$basename} ) ) {
+            $self->syserrorm( "USER", "uploaded_tarfile_with_duplicates",
+                $orig_name, "process_files", "Component: $basename" );
+            return;
+        }
+        $basenames{$basename} = 1;
+        $orignames{$basename} = $orig_name;
+        if ( index( $basename, $dataset_name . '_' ) < 0 ) {
+            $self->syserrorm( "USER", "uploaded_tarfile_with_illegal_component_name",
+                $orig_name, "process_files", "Component: $basename" );
+            return;
+        }
+    }
+
+    return \%orignames;
+
+}
+
+sub unpack_tar_archive {
+    my $self = shift;
+
+    my ($tar_file, $uploadname, $work_expand, $work_flat) = @_;
+
+    # Expand the tar file onto the $work_expand directory
+    unless ( chdir $work_expand ) {
+        die "Could not cd to $work_expand: $!\n";
+    }
+    my $tar_results = $self->shcommand_scalar("tar xf $tar_file");
+    if ( length($self->shell_command_error) > 0 ) {
+        $self->syserrorm( "SYSUSER", "tar_xf_fails", $uploadname, "process_files", "" );
+        next;
+    }
+
+    my @tarcomponents = $self->shcommand_array("tar tf $tar_file");
+    if ( length($self->shell_command_error) > 0 ) {
+        $self->syserrorm( "SYSUSER", "unable_to_unpack_tar_archive", $uploadname, "process_files", "" );
+        next;
+    }
+
+    my $errors = 0;
+
+    # Move all expanded files to the $work_flat directory, which
+    # will not contain any subdirectories. Check that no duplicate
+    # file names arise.
+    foreach my $component (@tarcomponents) {
+        my $bname = $component;
+        if ( $component =~ /\/([^\/]+)$/ ) {
+            $bname = $1;    # First matching ()-expression
+        }
+        if ( -e File::Spec->catfile( $work_flat, $bname ) ) {
+                $self->syserrorm( "USER", "uploaded_tarfile_with_component_already_encountered",
+                    $uploadname, "process_files", "Component: $bname" );
+                $errors = 1;
+            next;
+        }
+        if ( move( $component, $work_flat ) == 0 ) {
+            $self->syserrorm( "SYS", "move_tar_component_did_not_succeed",
+                "", "process_files", "Component: $component Error code: $!" );
+            next;
+        }
+    }
+
+    return $errors;
+
+}
 
 sub get_date_and_time_string {
     my $self = shift;
