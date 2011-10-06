@@ -83,35 +83,28 @@ access the data repository.
 
 =back
 
-B<Note:> SEARCH and UPLOAD are now integrated with Catalyst and will always be installed (however
+B<Note:> SEARCH, PMH and UPLOAD are now integrated with Catalyst and will always be installed (however
 you are free not to start it).
 
 =head2 Directory structure
 
 On each server where METAMOD should run, the generic METAMOD software must be available in some directory.
-In the description below, this directory is called the B<source> directory.
+If you installed METAMOD using a met.no Debian package it will be located in /opt/metamod-<version>.
+In the description below, this directory is called the B<installation> directory.
 
-When deploying a METAMOD application, files in the source directory are copied to a B<target> directory.
-The target directory is part of the runtime environment for the METAMOD application. Each application has
-its own target directory, and the actual scripts and web generation tools are taken from the target
-directory. The source directory has no role to play in the runtime environment.
+In addition to the generic installation directory you need a configuration
+directory. This directory contains configuration files, style sheets etc., and
+also files regulating metadata requirements. An example application configuration
+directory is included in the generic installation directory (the C<app/example>
+subdirectory of the installation directory).
 
-In addition to the generic source directory, the METAMOD target directory is built from an
-B<application source directory>. This directory contains configuration files, style sheets etc., and also
-files regulating metadata requirements. An example application source directory is included in the generic
-source directory (the C<app/example> subdirectory of the source directory).
-
-The main subdirectories of the generic source directory are:
+The main subdirectories of the generic installation directory are:
 
 =over 10
 
 =item base
 
 Files only used in the BASE module
-
-=item search
-
-Files only used in the SEARCH module
 
 =item upload
 
@@ -120,10 +113,6 @@ Files only used in the UPLOAD module
 =item harvest
 
 Files only used in the HARVEST module
-
-=item pmh
-
-Files only used in the PMH module
 
 =item thredds
 
@@ -159,8 +148,6 @@ all have a similar set of subdirectories:
 
 =item htdocs
 
-=item cgi-bin
-
 =item lib
 
 =item schema
@@ -176,39 +163,12 @@ all have a similar set of subdirectories:
 A module directory will not contain all of these subdirectories. Some subdirectories are only
 found in one module directory.
 
-While deploying a METAMOD application, after the top level target directory is created, this directory
-structure will be created directly beneath the top level target directory. The division between
-modules will not be passed on to the target directory. Instead, a merging process will take place. Files
-from different module directories, but contained in the same subdirectory, will all end up in the
-same subdirectory in the target directory. For example: C<source/upload/etc/file1> and
-C<source/base/etc/file2> will end up as C<target/etc/file1> and C<target/etc/file2>.
-
-The application source directory will have the same structure as the target directory (or any of
-the module directories). Not all the subdirectories listed above need to be present in the application
-source directory.
-
-In each of the module directories, and also in the application source directory there exists
-a file C<filelist.txt> that contains a list of file names that should be
-copied from that directory to the target directory. While copying the files, some files may be modified
-as described in the B<Source file modification> paragraph below.
-
-Since the target directory is populated from different sources, a possibility exist that the same target
-file may correspond to several source files, each from a different module directory or from the
-application source directory. In this case, a file in the application source directory have precedence.
-Collisions like this between different module directories are not supposed to happen.
-
-Since files in the application source directory have precedence, this fact can be used to replace any
-file in any of the module directories with an application specific file. For the basic software (Perl
-scripts etc.) this is not a recommended practice. But for typical configuration files, this is the
-intended mechanism for tailoring a METAMOD instance to the users needs.
-
 =head2 METAMOD configuration
 
 =head3 master_config.txt
 
-The application source directory contains a very important file, the B<master_config.txt> file. This file
-governs how the target directory is built, and also provides runtime values for a set of configuration
-variables.
+The application configuration directory contains a very important file, the B<master_config.txt> file. This file
+governs how METAMOD will run.
 
 The master_config.txt file is a text file containing lines as follows:
 
@@ -221,29 +181,6 @@ the last non-whitespace character on the line. Additional lines may be
 appended to 'VALUE' immediately after the initial 'VARNAME = ...' line. Such
 lines must start with a space character. No whitespace are removed from such
 appended lines.
-
-Two variables are mandatory in master_config.txt:
-
-   TARGET_DIRECTORY      This is the absolute path of the target directory, the
-                         top level of the target directory tree.
-   SOURCE_DIRECTORY      This is the absolute path of the generic source directory.
-
-One important role for the master_config.txt file is to decide which modules should be included
-in the application. For this purpose, the following variables are used:
-
-   METAMODBASE_DIRECTORY
-   METAMODSEARCH_DIRECTORY
-   METAMODUPLOAD_DIRECTORY
-   METAMODHARVEST_DIRECTORY
-   METAMODPMH_DIRECTORY
-   METAMODTHREDDS_DIRECTORY
-
-If any of these variables are missing, the corresponding module will not be part
-of the application. The value of these variables should be the absolute path of the subdirectory
-in the generic source directory where the module is defined (i.e. the module directory).
-
-B<Note:> SEARCH and UPLOAD are now integrated with Catalyst and will always be installed (however
-you are free not to start it).
 
 A complete inventory of the variables that should be part of the master_config.txt file is found
 in the C<app/example/master_config.txt> file in the generic source directory.
@@ -297,8 +234,7 @@ Files for translating from foreign metadata formats (... more text is needed)
 
 METAMOD can be configured with custom texts and stylesheets. To modify the
 styles of the application add the following directories to your application
-directory and add all files that you want copy during the update_target.pl
-process to filelist.txt.
+configuration directory.
 
 =over
 
@@ -382,89 +318,52 @@ as in
 
 =back
 
-=head2 Source file modification
-
-While copying files from the source directories to the target directory, the files may be modified
-according to the C<master_config.txt> file. Not all files will undergo such modification. Modification
-can be suppressed by editing the  C<filelist.txt> file; by placing a "=" character as the first
-character on the lines containing file names that should not undergo modification. The
-following example from a C<filelist.txt> file shows how this is done:
-
-   =scripts/createChildDatasets.pl
-   =scripts/load_userbase.pl
-   etc/standard_name.txt
-   =etc/conf_digest_nc.xsd
-
-Here only the C<etc/standard_name.txt> file will be modified.
-
-The actual modification is done in the following way:
-
-=over
-
-=item *
-
-In the file to be modified, all text strings matching C<[==VARNAME==]>, where C<VARNAME> is a
-configuration variable defined in C<master_config.txt>, is substituted with the value assigned to
-this variable in C<master_config.txt>.
-
-=back
 
 =head2 Deploying a METAMOD application
 
 After the initial configuration has been completed, a number of scripts must be run before the
 application is up and running. As these scripts will create files and directories that also are used
 by the Apache runtime environment, it is important that
-I<the user running these scripts is the same as the user running Apache>. 
-[This is probably in error. You must run update_target with write permissions to both source and target.]
+I<the user running these scripts is the same as the user running Apache>.
 
-=head3 Generating target files
+=head3 Activating environment
 
-The first script should be run from the generic source directory. It will set up the target directory
-and do some preparatory work:
+To make it easier to run the following scripts you can use the bash script activate_env that sets
+the correct environment variables. All commands also run without this command, but you must then
+specify the correct paths, configuration directory and PERL5LIB for all commands.
 
-   update_target.pl application_directory
+From anywhere execute the following command:
 
-The argument is the absolute or relative path of the application source directory, the
-directory containing the master_config.txt file for the application. This script will do the
-following tasks:
+  $ source /opt/metno-metamod-<version>/activate_env <PATH TO CONFIGURATION DIR>
 
-=over
+This will enable the correct environment. To disable the environment again execute
 
-=item *
+ $ source /opt/metno-metamod-<version>/activate_env deactivate
 
-Copy all files that are needed for the application, either from the generic source directory, or
-from the application source directory. Only files used for modules included in the
-master_config.txt file are copied. In each of the module directories only the files listed in
-C<filelist.txt> are copied, and if a file is listed in C<filelist.txt> in the application source
-directory, that file takes precedence, as explained above.
-While copying the files, some files may be modified as described in
-the B<Source file modification> paragraph above.
+=head3 Generate Apache config for the site
 
-=item *
+Create an Apache configuration file for the application. This is done by
 
-Install the Perl Catalyst framework onto the target directory. This is done
-automatically by Module::Install using the Makefile.PL specified, building
-into the blib directory (which is why you need write permission to the source
-dir).
+  gen_httpd_conf.pl
 
-=item *
+which creates a file <configuration dir>/etc/httpd.conf with the necessary configuration.
 
-Create an Apache configuration file for the application. This is done by get_httpd_conf.pl,
-which creates a file target/etc/httpd.conf with the necessary configuration.
-
-=item *
+=head3 Generate init.d scripts
 
 Create init.d scripts for automatic starting and stopping of Catalyst and the various METAMOD
 services.
 
-=back
+  gen_initd_script.pl
 
-=head3 Creating the webrun
+This script generates a file in <configuration dir>/etc/init.d/ and
+<configuration dir>/etc/default/
 
-After a successful run of the C<update_target.pl> script, the following script
-must be run from the target directory as APPLICATION_USER:
+=head3 Creating the webrun directory
 
-	./prepare_runtime_env.sh
+The application also needs several directories to store files during operation.
+Run the
+
+  prepare_runtime_env.sh
 
 This script will initialize a runtime directory used by the application for logging, temporary
 files etc.
@@ -474,10 +373,10 @@ files etc.
 After installation, you should now install the application services where the
 operating system can find it. Currently only Debian-based Linux systems are
 supported. The following scripts will generate symlinks in /etc for Apache and
-init.d pointing back to the target directory, as well as a small script for running
+init.d pointing back to the configuration directory, as well as a small script for running
 metamodInit.sh. You will need sudo permissions to successfully run the script.
 
-	./install_jobs.sh
+  install_jobs.sh
 
 =head3 Initializing the BASE module
 
@@ -493,22 +392,20 @@ The two PostgreSQL databases used by the cluster must be initialized. Note that 
 operated through two database users. The name of these users are found in the C<master_config.txt>
 file as the value of PG_ADMIN_USER and PG_WEB_USER configuration variables. These users must be
 defined in the PostgreSQL database environment before the database initialization scripts can be
-run. The C<init/createusers.sh> script may be used for this purpose. It is only necessary to run this
+run. The C<base/init/createusers.sh> script may be used for this purpose. It is only necessary to run this
 script once for a PostgreSQL database environment.
 
-The first SQL database initialization script will create the Meta database. This script must be run
-from the C<init> subdirectory of the target directory:
+The first SQL database initialization script will create the Meta database.
 
-	./create_and_load_all.sh
+	create_and_load_all.sh
 
 This script will create the database, and load the static content of the database (taken from
 C<staticdata/searchdata.xml>). You may check the output of this script in the
-C<create_and_load_all.out> file in the same C<init> directory.
+C<create_and_load_all.out> file in the directory where you are running the command.
 
-The next SQL database initialization script will create the User database. This script must be run
-from the C<userinit> subdirectory of the target directory:
+The next SQL database initialization script will create the User database.
 
-	./run_createuserdb.sh
+	run_createuserdb.sh
 
 Note that I<this script must only be used during setup of a completely new METAMOD cluster>. If a
 User database already exists, all data in the database will be lost. If this should happen, you must
@@ -516,7 +413,7 @@ recreate the database from a backup copy you hopefully have. But METAMOD will no
 that such a backup exists.
 
 This warning is only adequate for the C<run_createuserdb.sh> script. The other scripts in this
-paragraph (C<update_target.pl>, C<prepare_runtime_env.sh>, C<create_and_load_all.sh>) may all be
+paragraph (C<prepare_runtime_env.sh>, C<create_and_load_all.sh>) may all be
 used on an existing installation, without harming existing data. The C<create_and_load_all.sh> script
 will take some time to complete, though. On an existing installation, all metadata in the database
 will be loaded from the XML archive.
@@ -537,6 +434,12 @@ If all set you should see the METAMOD search interface.
 
 =head3 Apache
 
+If this has not already been done you need to enable the Apache proxy modules.
+Look in /etc/apache2/mods-enabled to see if they have already been enabled.
+
+   sudo a2enmod proxy
+   sudo a2enmod proxy_http
+
 Restart Apache:
 
 	sudo apache2ctl restart
@@ -547,10 +450,10 @@ or if the site is busy:
 
 which will wait until all connections are terminated before restarting.
 
-The site should now hopefully be available on 
+The site should now hopefully be available on
 
 	http://localhost/APPLICATION_ID
-	
+
 
 =head3 METAMOD services
 
