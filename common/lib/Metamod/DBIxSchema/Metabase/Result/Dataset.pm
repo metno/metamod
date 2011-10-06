@@ -118,7 +118,7 @@ __PACKAGE__->has_many(
 __PACKAGE__->has_one(
   "parent_dataset",
   "Metamod::DBIxSchema::Metabase::Result::Dataset",
-  { "foreign.ds_id" => "self.parent_id" },
+  { "foreign.ds_id" => "self.ds_parent" },
 );
 
 __PACKAGE__->has_many(
