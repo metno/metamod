@@ -29,6 +29,12 @@ deactivate_mm () {
         unset _OLD_VIRTUAL_PS1
     fi
 
+    if [ -n "$_OLD_VIRTUAL_PATH" ] ; then
+        PATH="$_OLD_VIRTUAL_PATH"
+        export PATH
+        unset _OLD_VIRTUAL_PATH
+    fi
+
     unset VIRTUAL_ENV
     if [ ! "$1" = "nondestructive" ] ; then
     # Self destruct!
@@ -41,15 +47,22 @@ activate_mm() {
     # unset irrelavent variables
     deactivate_mm nondestructive
 
-    METAMOD_MASTER_CONFIG=$1
+    METAMOD_MASTER_CONFIG=`readlink -f $1`
     export METAMOD_MASTER_CONFIG
 
     _OLD_VIRTUAL_PERL5LIB="$PERL5LIB"
     PERL5LIB=$PERL5LIB:"/opt/metno-perl-webdev-ver1/lib/perl5"
     export PERL5LIB
 
-    _OLD_VIRTUAL_PS1="$PS1"
+    _OLD_VIRTUAL_PATH="$PATH"
 
+    # we are sourcing the file so we cannot use dirname $0 to find the location of the script
+    SCRIPT_PATH=`readlink -f ${BASH_SOURCE[0]}`
+    SCRIPT_PATH=`dirname $SCRIPT_PATH`
+    PATH=$PATH:"$SCRIPT_PATH/base/init":"$SCRIPT_PATH/base/userinit":"$SCRIPT_PATH/common":"$SCRIPT_PATH/common/scripts":"$SCRIPT_PATH/catalyst/script"
+    export PATH
+
+    _OLD_VIRTUAL_PS1="$PS1"
     if [ -f $1 ] ; then
         PS1="(`dirname \"$METAMOD_MASTER_CONFIG\"`)$PS1"
     else
@@ -69,7 +82,11 @@ if [ $# != 1 ]
 then
     echo "You must supply the config dir as a parameter"
 else
-    activate_mm $1
+    if [ $1 == 'deactivate' ] ; then
+    	deactivate_mm
+    else
+        activate_mm $1
+    fi
 fi
 
 
