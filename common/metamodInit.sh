@@ -3,7 +3,7 @@
 SCRIPT_PATH="`dirname \"$0\"`"
 CONFIG=$2
 # config must be set in $METAMOD_MASTER_CONFIG envvar if not given as command line param
-source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG)
+source <(perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG)
 
 webrun_directory="$WEBRUN_DIRECTORY"
 target_directory="$TARGET_DIRECTORY"
