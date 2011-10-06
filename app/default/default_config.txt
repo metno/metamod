@@ -20,17 +20,10 @@ LOCAL_URL = /metamod
 # must be same as owner of webrun directory
 APPLICATION_USER = www-data
 
-# Application name:
-APPLICATION_NAME = Example Application
-
-# Application id (has to be short and unique among applications using the same
-# database, use only capital characters A-Z)::
-APPLICATION_ID = EXAMPLE
-
 # ============== Logging configuration ==================
-LOG4PERL_CONFIG = [==APPLIC_DIRECTORY==]/log4perl_config.ini
+LOG4PERL_CONFIG = [==CONFIG_DIR==]/log4perl_config.ini
 LOG4PERL_WATCH_TIME = 30
-LOG4PHP_CONFIG = [==APPLIC_DIRECTORY==]/log4php_config.ini
+LOG4PHP_CONFIG = [==CONFIG_DIR==]/log4php_config.ini
 LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
 
 # ============== Catalyst configuration =================
@@ -301,17 +294,12 @@ FTP_EVENTS_INITIAL_CONTENT =
 
 # ============ METAMODQUEST configuration ==============
 #
-# Produce two different files from the same source file
-# (htdocs/qst/quest.php). Each having its own values for the
-# following macro variables:
 #
 #  QUEST_OUTPUT_DIRECTORY     The directory (absolute path) where
 #                             XML output files should be written.
 #
 
-!substitute_to_file_with_new_name htdocs/qst/quest.php => htdocs/qst/fmmeta.php
 QUEST_OUTPUT_DIRECTORY = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
-!end_substitute_to_file_with_new_name
 
 # Ownertag used to tag all dataset entries sent to the database:
 QUEST_OWNERTAG = [==UPLOAD_OWNERTAG==]
@@ -325,12 +313,6 @@ HARVEST_HOUR = 1
 # "text/plain" is easier to view. On a production site you should use
 # "text/xml".
 PMH_CONTENT_TYPE = text/xml
-
-# If an unusual port number is used for the base URL, set the following to
-# a string like:
-#                     .':8080'
-# Othervise, leave this empty.
-PMH_PORT_NUMBER =
 
 # Earliest datastamp:
 PMH_EARLIEST_DATESTAMP = 1900-01-01
@@ -401,3 +383,8 @@ AUTH_TYPE = DB
 # A comma separated list of distribution statements that are interpreted as
 # freely available and can be downloaded via the collection basket.
 COLLECTION_BASKET_DIST_STATEMENTS = free
+
+# The maximum number of bytes that are allowed in a collection basket download.
+# Used to restrict the load on the server. If this is not set the collection basket
+# will use a hard coded default value.
+COLLECTION_BASKET_MAX_SIZE = 524288000
