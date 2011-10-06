@@ -25,12 +25,12 @@ DROPDB=dropdb
 #
 exec >create_and_load_all.out 2>&1
 echo "------------ Reinitialize the database, create dynamic tables:"
-. ./createdb.sh $CONFIG
+. $SCRIPT_PATH/createdb.sh $CONFIG
 echo ""
 echo "------------ Importing searchdata:"
 PERL5LIB=$PERL5LIB:/opt/metno-perl-webdev-ver1/lib/perl5
 
-./import_searchdata.pl ${CONFIG:+"--config"} $CONFIG
+$SCRIPT_PATH/import_searchdata.pl ${CONFIG:+"--config"} $CONFIG
 
 echo "------------ Importing datasets:"
 cat >t_1 <<EOF
@@ -38,7 +38,7 @@ $IMPORTDIRS
 EOF
 if [ $IMP != "noimport" ]; then
     for dir in `cat t_1`; do
-        ../scripts/import_dataset.pl ${CONFIG:+"--config"} $CONFIG $dir
+        $SCRIPT_PATH/../scripts/import_dataset.pl ${CONFIG:+"--config"} $CONFIG $dir
     done
 fi
 rm t_1

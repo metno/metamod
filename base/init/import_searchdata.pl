@@ -39,10 +39,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 use strict;
 use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../../common/lib";
+
 use File::Spec;
 use File::Basename;
-
-use lib ('../../common/lib' );
 use XML::Simple qw(:strict);
 use mmTtime;
 # use Data::Dumper;
