@@ -3,7 +3,7 @@
 SCRIPT_PATH="`dirname \"$0\"`"
 CONFIG=$1
 # config must be set in $METAMOD_MASTER_CONFIG envvar if not given as command line param
-source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG)
+source <(perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG)
 
 CATALYST_APP="catalyst-$APPLICATION_ID"
 
@@ -12,7 +12,7 @@ ordie () {
     if [ $? != 0 ]
     then
         echo "Please remove target file(s) before trying automatic install:"
-        echo "sudo rm /etc/default/$CATALYST_APP /etc/init.d/$CATALYST_APP /etc/init.d/metamodServices-$APPLICATION_ID /etc/rc2.d/S92$CATALYST_APP /etc/apache2/conf.d/$APPLICATION_ID"
+        echo "sudo rm /etc/default/$CATALYST_APP /etc/init.d/$CATALYST_APP /etc/init.d/metamodServices-$APPLICATION_ID /etc/rc2.d/S92$CATALYST_APP /etc/rc2.d/S99metamodServices-$APPLICATION_ID /etc/apache2/conf.d/$APPLICATION_ID"
         exit 1
     fi
 }
