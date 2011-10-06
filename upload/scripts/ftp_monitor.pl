@@ -38,18 +38,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use strict;
 use warnings;
 use File::Spec;
-
 use FindBin;
 use lib ("$FindBin::Bin/../../common/lib");
-
+use Getopt::Long;
 use POE qw(Component::Schedule);
 use POE::Component::Cron;
 use Metamod::Utils;
 use Metamod::UploadHelper;
-
-my $upload_helper = Metamod::UploadHelper->new();
-my $logger = $upload_helper->logger;
-my $config = $upload_helper->config;
 
 =head1 NAME
 
@@ -80,21 +75,27 @@ if(!Metamod::Config->config_found($config_file_or_dir)){
     exit;
 }
 
+my $config = Metamod::Config->new($config_file_or_dir);
+my $upload_helper = Metamod::UploadHelper->new();
+my $logger = $upload_helper->logger;
 
 # can we skip this now?
 my $sleeping_seconds      = 60;
-if ( $config->has('TEST_IMPORT_SPEEDUP') and $config->get('TEST_IMPORT_SPEEDUP') > 1 ) {
-    $sleeping_seconds = 1;
-}
+#if ( $config->has('TEST_IMPORT_SPEEDUP') and $config->get('TEST_IMPORT_SPEEDUP') > 1 ) {
+#    $sleeping_seconds = 1;
+#}
 
 eval {
     if ($test) {
-        print STDERR "Testrun: " . $ARGV[0] . "\n";
-        $upload_helper->ftp_process_test();
+        print STDERR "Testrun...\n";
+        $upload_helper->ftp_process_hour();
     } elsif(0 == @ARGV) {
         print STDERR "Not running as daemon. Stop me with Ctrl + C\n";
-        $upload_helper->ftp_process_hour();
+        while( $upload_helper->ftp_process_hour() ) {
+            sleep $sleeping_seconds;
+        }
     } else {
+        print STDERR "Daemonizing...\n";
         my ($logFile, $pidFile) = @ARGV;
         Metamod::Utils::daemonize($logFile, $pidFile);
         start_cronjob();

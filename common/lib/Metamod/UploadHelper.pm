@@ -136,17 +136,6 @@ sub read_ftp_events {
 }
 
 
-=head2 ftp_process_test
-
-Check and process files in the FTP upload area, then exit.
-See ftp_process_hour for details.
-
-=cut
-
-sub ftp_process_test {
-    die "Not yet implemented.";
-}
-
 =head2 ftp_process_hour
 
 Check the FTP upload area.
@@ -164,7 +153,7 @@ sub ftp_process_hour {
     my $current_hour = $ltime[2];                    # 0-23
     my $eventsref = $self->ftp_events;
 
-die unless $self->config;
+die unless $self->config; # remove when stable
     my $ftp_dir_path = $self->config->get('UPLOAD_FTP_DIRECTORY');
     my $logger = $self->logger or die "Missing logger object";
     $logger->info("Processing FTP upload area");
@@ -253,6 +242,7 @@ die unless $self->config;
             }
         }
     }
+    return 1;
 }
 
 sub add_user_error {
