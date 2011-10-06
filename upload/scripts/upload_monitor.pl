@@ -95,8 +95,8 @@ my $config_file_or_dir;
 
 GetOptions('config=s' => , \$config_file_or_dir, 'test!' => \$test, 'logfile=s' => \$logfile, 'pidfile=s' => \$pidfile) or pod2usage();
 
-if( !$config_file_or_dir ){
-    pod2usage("Missing config file or directory");
+if(!Metamod::Config->config_found($config_file_or_dir)){
+    pod2usage "Could not find the configuration on the commandline or the in the environment\n";
 }
 
 if( $pidfile && !$logfile){

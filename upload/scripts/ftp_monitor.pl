@@ -45,6 +45,7 @@ use POE qw(Component::Schedule);
 use POE::Component::Cron;
 use Metamod::Utils;
 use Metamod::UploadHelper;
+use Pod::Usage;
 
 =head1 NAME
 
@@ -59,20 +60,47 @@ uploaded files.
 
 See Metamod::UploadHelper
 
+=head1 USAGE
+
+ftp_monitor.pl [ --test | --pidfile <path> ] [ --logfile <path> ] [ --config <path> ]
+
+=over
+
+=item --config
+
+Path to the configuration (file or dir). Mandatory unless set via environment variable.
+
+=item --pidfile
+
+Path to the pid file to use. Runs in daemon mode, Also requires --logfile
+
+=item --logfile
+
+Path to the log file to use (mandatory when running in daemon mode, otherwise optional if/when implemented)
+
+=item --test
+
+Run the script in test mode (no loop)
+
+=back
+
 =cut
 
 
 # Parse cmd line params
 my ($pidFile, $logFile, $test, $config_file_or_dir);
-GetOptions ('pid|p=s'  => \$pidFile,                # name of pid file - if given, run as daemon
-            'log|l=s'  => \$logFile,                # optional, redirect STDERR and STDOUT here
-            'config=s' => \$config_file_or_dir,     # path to config dir/file
-            'test!'    => \$test,                   # dry run
-);
+GetOptions ('pidfile|p=s'   => \$pidFile,                # name of pid file - if given, run as daemon
+            'logfile|l=s'   => \$logFile,                # optional, redirect STDERR and STDOUT here
+            'config=s'      => \$config_file_or_dir,     # path to config dir/file
+            'test!'         => \$test,                   # dry run
+) or pod2usage();
 
 if(!Metamod::Config->config_found($config_file_or_dir)){
-    print "Could not find the configuration on the commandline or the in the environment\n";
-    exit;
+    pod2usage "Could not find the configuration on the commandline or the in the environment\n";
+}
+
+if( $pidFile && !$logFile){
+    pod2usage("You must specify both --logfile and --pidfile when running in daemon mode");
 }
 
 my $config = Metamod::Config->new($config_file_or_dir);
