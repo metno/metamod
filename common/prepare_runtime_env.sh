@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SCRIPT_PATH="`dirname \"$0\"`"
+CONFIG=$1
 SHELL_CONF=/tmp/metamod_tmp_bash_config.sh
 perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
 source $SHELL_CONF
