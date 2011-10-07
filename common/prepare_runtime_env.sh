@@ -1,12 +1,10 @@
 #!/bin/bash
 
 SCRIPT_PATH="`dirname \"$0\"`"
-if [ $# != 1 ]
-then
-	source <(perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl")
-else
-    source <(perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" "--config" $1)
-fi
+SHELL_CONF=/tmp/metamod_tmp_bash_config.sh
+perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
+source $SHELL_CONF
+rm $SHELL_CONF
 
 #
 #  Initialise webrun directory:

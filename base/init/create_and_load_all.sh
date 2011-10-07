@@ -5,17 +5,20 @@ SCRIPT_PATH="`dirname \"$0\"`"
 if [ $# -eq 1 ]
 then
 	CONFIG=$1
-	source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" "--config" $CONFIG)
 elif [ $# -eq 2 ]
 then
     CONFIG=$1
     IMP=$2
-    source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" "--config" $CONFIG)
 else
     # assume that config is set in environment
-    source <(perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl")
     CONFIG=''
 fi
+
+SHELL_CONF=/tmp/metamod_tmp_bash_config.sh
+perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
+source $SHELL_CONF
+rm $SHELL_CONF
+
 PSQL=psql
 CREATEDB=createdb
 DROPDB=dropdb
