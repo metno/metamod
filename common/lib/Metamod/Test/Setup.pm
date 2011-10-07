@@ -136,8 +136,8 @@ sub run_import_dataset {
 
     my $import_script = $self->import_dataset_path;
     my $dataset_dir   = $self->dataset_dir;
-    my $config_file    = $self->master_config_file;
-    my $output        = `$import_script $config_file $dataset_dir`;
+    my $config_path   = File::Spec->catfile($self->mm_config->config_dir, $self->master_config_file);
+    my $output        = `$import_script --config $config_path $dataset_dir`;
 
     print $output;
 
