@@ -292,6 +292,14 @@ sub wms :Path('/search/wms') :Args {
 
     $c->stash( template => 'search/wms.tt', 'current_view' => 'Raw' );
 
+    my $dslist = [];
+    foreach ( @{ $c->req->params->{ ds_id } } ) {
+        my $ds = $c->model('Metabase::Dataset')->find($_);
+        #printf STDERR " -- %d %s\n", $ds->ds_id, $ds->ds_name;
+        push @$dslist, $ds;
+    }
+    $c->stash( datasets => $dslist );
+
 }
 
 =head2 display_help
