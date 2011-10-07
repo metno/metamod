@@ -35,7 +35,6 @@ use warnings;
 use encoding 'utf-8';
 use UNIVERSAL;
 use Carp qw();
-use quadtreeuse;
 use mmTtime;
 use Metamod::Config;
 use Log::Log4perl;
@@ -190,16 +189,13 @@ sub transform {
         }
         $ds->setInfo(\%info);
 
-        # conversion to quadtreeuse and to datasetregion
-        # TODO: remove one or the other
-        require quadtreeuse;
+        # conversion to datasetregion
         my %metadata = $ds->getMetadata;
         my $datasetRegion = $ds->getDatasetRegion();
         my ($south, $north, $east, $west) = qw(southernmost_latitude northernmost_latitude
                                                easternmost_longitude westernmost_longitude);
         if (exists $metadata{bounding_box}) {
             my @bbs = @{ $metadata{bounding_box} };
-            my @nodes;
             foreach my $bb (@bbs) {
                 # bounding_box consists of 4 degree values
                 my @bounding_box = split ',', $bb;
@@ -220,32 +216,12 @@ sub transform {
                         $datasetRegion->addPolygon([[$eLon, $nLat], [$eLon, $sLat], [$wLon, $sLat], [$wLon, $nLat], [$eLon, $nLat]]);
                     }
                     $logger->debug("adding polygon [[$eLon, $nLat], [$eLon, $sLat], [$wLon, $sLat], [$wLon, $nLat], [$eLon, $nLat]]");
-                    # and now the quadtree
-                    my $qtu = new quadtreeuse(90, 0, 3667387.2, 7, "+proj=stere +lat_0=90 +datum=WGS84");
-                    if (defined $sLat && defined $nLat && defined $wLon && defined $eLon) {
-                        if ($sLat <= -90) {
-                            if ($nLat <= -89.9) {
-                                warn "cannot build northern polar-stereographic quadtree on southpole";
-                            } else {
-                                $sLat = 89.9;
-                            }
-                        }
-                        $qtu->add_lonlats("area",
-                                      [$eLon, $wLon, $wLon, $eLon, $eLon],
-                                      [$sLat, $sLat, $nLat, $nLat, $sLat]);
-                        push @nodes, $qtu->get_nodes;
-                    }
                 }; if ($@) {
                     my %info = $ds->getInfo();
                     warn "problems setting boundingBox for ".$info{name}.": $@";
                 }
             }
             $ds->setDatasetRegion($datasetRegion);
-            if (@nodes) {
-                my %unique;
-                @nodes = map {$unique{$_}++ ? () : $_} @nodes;
-                $ds->setQuadtree(\@nodes);
-            }
         }
     }
 

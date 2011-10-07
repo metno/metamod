@@ -35,7 +35,7 @@ use Data::Dumper qw(Dumper);
 use FindBin;
 use lib "$FindBin::Bin/../";
 
-use Test::More tests => 19;
+use Test::More tests => 18;
 
 BEGIN{
     $ENV{METAMOD_SOURCE_DIRECTORY} = "$FindBin::Bin/../../..";
@@ -60,7 +60,7 @@ isa_ok($dsDoc, 'XML::LibXML::Document');
 isa_ok($mm2Doc, 'XML::LibXML::Document');
 require_ok "Metamod::Dataset";
 my $ds = newFromDoc Metamod::Dataset($mm2Doc, $dsDoc);
-is(scalar $ds->getQuadtree, 48, "getting quadtree");
+
 #$ds->writeToFile("testDatasetOut$$");
 
 # test the datasetRegion

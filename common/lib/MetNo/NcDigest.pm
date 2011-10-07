@@ -14,7 +14,6 @@ use XML::Simple qw(:strict);
 use Metamod::Dataset;
 use encoding 'utf-8';
 use MetNo::NcFind;
-use quadtreeuse;
 # use Data::Dump qw(dump);
 use Data::Dumper;
 use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX);
@@ -975,14 +974,6 @@ sub parse_all {
    $info{'creationDate'} = (delete $metadata{'creationDate'})->[0] if exists $metadata{'creationDate'};
    $ds->setInfo(\%info);
 
-   #
-   #  Find QuadTree-nodes from latitude,longitude coordinates, and merge
-   #  with existing nodes if found in the previous version of the XML file:
-   #
-   my @nodes = get_quadtree_nodes(\%all_variables, \%all_globatts, \%metadata);
-   $ds->setQuadtree(\@nodes);
-   delete $metadata{'quadtree_nodes'};
-
     #
     # Find DatasetRegin from the files, and merge
     # with existing datasetRegion if found in the xml-file
@@ -1183,133 +1174,7 @@ sub rule_take_union {
    }
    $ref_metadata->{$attname} = [keys %values];
 };
-#
-#---------------------------------------------------------------------------------
-#
-sub get_quadtree_nodes {
-   my ($ref_all_variables, $ref_all_globatts, $ref_metadata) = @_;
-   my $QT_lat = 90.0;
-   my $QT_lon = 0.0;
-   my $QT_r = 3667387.2;
-   my $QT_depth = 7;
-   my $QT_proj = "+proj=stere +lat_0=90 +datum=WGS84";
-   my $qtuseobj = quadtreeuse->new($QT_lat,$QT_lon,$QT_r,$QT_depth,$QT_proj);
-   foreach my $fpath (keys %$ref_all_variables) {
-      my $longitudevar;
-      my $latitudevar;
-      my $latitude_dimcount;
-      my $longitude_dimcount;
-      my $latitude_dimname;
-      my $longitude_dimname;
-      my $refvarfound = $ref_all_variables->{$fpath};
-      my $refglobatts = $ref_all_globatts->{$fpath};
-      foreach my $varname (keys %$refvarfound) {
-         my $refval = $refvarfound->{$varname};
-         if (ref($refval) ne "HASH") {
-            die 'parse_all: ref($refval) ne "HASH" in $fpath->{$varname}';
-         }
-         if ($varname eq "longitude" ||
-                 $refval->{"stdname"} eq "longitude" ||
-                 substr($refval->{"type"},0,15) eq '%Data_longitude') {
-            $longitudevar = $varname;
-            $longitude_dimcount = $refval->{"dimcount"};
-            if ($longitude_dimcount == 1) {
-               $longitude_dimname = $refval->{"dimensions"}->[0];
-            }
-         }
-         if ($varname eq "latitude" ||
-                 $refval->{"stdname"} eq "latitude" ||
-                 substr($refval->{"type"},0,14) eq '%Data_latitude') {
-            $latitudevar = $varname;
-            $latitude_dimcount = $refval->{"dimcount"};
-            if ($latitude_dimcount == 1) {
-               $latitude_dimname = $refval->{"dimensions"}->[0];
-            }
-         }
-      }
-      if (defined($longitudevar) && defined($latitudevar)) {
-         if ($longitude_dimcount != $latitude_dimcount) {
-            &add_errmsg("File: $fpath\nVariables: $longitudevar $latitudevar",
-                        "latlon_dimension_count_mismatch");
-         }
-         my $ncfindobj = MetNo::NcFind->new($fpath);
-         if ($longitude_dimcount == 0) {
-            my ($rlons,$rlats) = $ncfindobj->get_lonlats($longitudevar,$latitudevar);
-            $qtuseobj->add_lonlats("points",$rlons,$rlats);
-         } elsif ($longitude_dimcount == 1 && defined($longitude_dimname)
-                  && defined($latitude_dimname) && $longitude_dimname ne $latitude_dimname) {
-            my @lons = $ncfindobj->get_values($longitudevar);
-            my @lats = $ncfindobj->get_values($latitudevar);
-            my $countlons = scalar @lons;
-            my $countlats = scalar @lats;
-            my @blons = ();
-            my @blats = ();
-            my $ilon = 0;
-            my $ilat = 0;
-            while ($ilon < $countlons) {
-               push (@blats, $lats[$ilat]);
-               push (@blons, $lons[$ilon]);
-               $ilon++;
-            }
-            $ilon--;
-            $ilat++;
-            while ($ilat < $countlats) {
-               push (@blats, $lats[$ilat]);
-               push (@blons, $lons[$ilon]);
-               $ilat++;
-            }
-            $ilat--;
-            $ilon--;
-            while ($ilon >= 0) {
-               push (@blats, $lats[$ilat]);
-               push (@blons, $lons[$ilon]);
-               $ilon--;
-            }
-            $ilon++;
-            $ilat--;
-            while ($ilat >= 0) {
-               push (@blats, $lats[$ilat]);
-               push (@blons, $lons[$ilon]);
-               $ilat--;
-            }
-            $qtuseobj->add_lonlats("area",\@blons,\@blats);
-         } elsif ($longitude_dimcount == 1) {
-            my ($rlons,$rlats) = $ncfindobj->get_lonlats($longitudevar,$latitudevar);
-            $qtuseobj->add_lonlats("points",$rlons,$rlats);
-         } elsif ($longitude_dimcount == 2) {
-            my @lons = $ncfindobj->get_bordervalues($longitudevar);
-            my @lats = $ncfindobj->get_bordervalues($latitudevar);
-            $qtuseobj->add_lonlats("area",\@lons,\@lats);
-         }
-      } elsif (exists($refglobatts->{"southernmost_latitude"}) &&
-               exists($refglobatts->{"northernmost_latitude"}) &&
-               exists($refglobatts->{"westernmost_longitude"}) &&
-               exists($refglobatts->{"easternmost_longitude"})) {
-         my @lons = ($refglobatts->{"westernmost_longitude"},
-                     $refglobatts->{"westernmost_longitude"},
-                     $refglobatts->{"easternmost_longitude"},
-                     $refglobatts->{"easternmost_longitude"},
-                     $refglobatts->{"westernmost_longitude"});
-         my @lats = ($refglobatts->{"southernmost_latitude"},
-                     $refglobatts->{"northernmost_latitude"},
-                     $refglobatts->{"northernmost_latitude"},
-                     $refglobatts->{"southernmost_latitude"},
-                     $refglobatts->{"southernmost_latitude"});
-         $qtuseobj->add_lonlats("area",\@lons,\@lats);
-      } else {
-         &add_errmsg("File: $fpath","latlon_no_coordinate_info");
-      }
-   }
-   if (exists($ref_metadata->{'quadtree_nodes'})) {
-      my $refnodes = $ref_metadata->{'quadtree_nodes'};
-      if (ref($refnodes) ne "ARRAY") {
-         die 'ref($refnodes) ne "ARRAY"';
-      }
-      my @nodes = grep(/^\d+$/, split(/\s*\n\s*/,$refnodes->[0]));
-      $qtuseobj->add_nodes(\@nodes);
-   }
-   return $qtuseobj->get_nodes();
-};
+
 
 #
 #---------------------------------------------------------------------------------

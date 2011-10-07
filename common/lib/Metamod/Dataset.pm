@@ -109,7 +109,7 @@ sub getMetadata {
     		if ($child->nodeType == XML::LibXML::XML_TEXT_NODE) {
    				$value .= $child->nodeValue;
             }
-        } 
+        }
         push @{ $metadata{$n->getAttribute("name")} }, $value;
     }
     return %metadata;
@@ -120,7 +120,7 @@ sub addMetadata {
     foreach my $name (keys %$metaRef) {
         foreach my $val (@{ $metaRef->{$name} }) {
         	$val = $self->_decode($val);
-            $val = Metamod::ForeignDataset::removeUndefinedXMLCharacters($val); 
+            $val = Metamod::ForeignDataset::removeUndefinedXMLCharacters($val);
             if (!defined $val) {
                 Carp::carp("undefined value for metadata $name");
                 next;
@@ -153,7 +153,7 @@ sub removeMetadataName {
         push @oldValues, $value;
         $n->parentNode->removeChild($n);
     }
-       
+
     return @oldValues;
 }
 
@@ -188,7 +188,7 @@ Metamod::Dataset - working with Metamod datasets
 =head1 SYNOPSIS
 
   use Metamod::Dataset;
-  
+
   # create a new dataset/mm2
   $ds = new Metamod::Dataset();
   %info = ('name' => 'NEW/Name',
@@ -199,12 +199,11 @@ Metamod::Dataset - working with Metamod datasets
   $ds->addMetadata(\%metadata);
   # write the file to $basename.xml and $basename.xmd
   $ds->writeToFile($basename);
-  
+
   # read an existing dataset from $basename.xml and $basename.xmd
   $ds = newFromFile Metamod::Dataset($basename);
   %info = $ds->getInfo;
   %metadata = $ds->getMetadata;
-  @quadtreeNodes = $ds->getQuadtree;
 
 =head1 DESCRIPTION
 
@@ -273,7 +272,7 @@ Return: @values list of $name
 
 overwritten function from L<Metamod::ForeignDataset>. When ForeignDataset's region
 returns a invalid region (do polygon) without bounding-box, this function will
-try to extract the bounding-box from the metadata, i.e. bounding_box.  
+try to extract the bounding-box from the metadata, i.e. bounding_box.
 
 =back
 

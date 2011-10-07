@@ -49,7 +49,6 @@ use DBI;
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape);
 use Fcntl qw(LOCK_SH LOCK_UN LOCK_EX SEEK_SET);
-use quadtreeuse;
 use mmTtime;
 use XML::LibXML;
 use POE qw(Component::Schedule);
