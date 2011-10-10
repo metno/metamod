@@ -30,7 +30,7 @@
                 <xsl:value-of select="$label"/>
             </xsl:attribute>
 
-            <xsl:variable name="body"    select="translate($label, $lc, $uc)"/>
+            <xsl:variable name="body"    select="translate(skos:prefLabel, $lc, $uc)"/>
             <gcmd:category><xsl:value-of select="substring-before($body, ' &gt; ')"/></gcmd:category>
             <xsl:variable name="tail"    select="substring-after ($body, ' &gt; ')"/>
             <gcmd:topic><xsl:value-of    select="substring-before($tail, ' &gt; ')"/></gcmd:topic>
