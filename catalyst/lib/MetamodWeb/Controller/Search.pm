@@ -24,6 +24,7 @@ use Moose;
 use namespace::autoclean;
 
 use Data::Dump qw( dump );
+use Data::Dumper;
 
 use MetamodWeb::Utils::UI::Search;
 use MetamodWeb::Utils::SearchUtils;
@@ -293,11 +294,18 @@ sub wms :Path('/search/wms') :Args {
     $c->stash( template => 'search/wms.tt', 'current_view' => 'Raw' );
 
     my $dslist = [];
-    foreach ( @{ $c->req->params->{ ds_id } } ) {
-        my $ds = $c->model('Metabase::Dataset')->find($_);
-        #printf STDERR " -- %d %s\n", $ds->ds_id, $ds->ds_name;
+    my $para = $c->req->params->{ ds_id };
+    if ( ref $para ) {
+        foreach ( @$para ) {
+            my $ds = $c->model('Metabase::Dataset')->find($_);
+            #printf STDERR " -- %d %s\n", $ds->ds_id, $ds->ds_name;
+            push @$dslist, $ds;
+        }
+    } else {
+        my $ds = $c->model('Metabase::Dataset')->find($para);
         push @$dslist, $ds;
     }
+    #print STDERR Dumper \$dslist;
     $c->stash( datasets => $dslist );
 
 }

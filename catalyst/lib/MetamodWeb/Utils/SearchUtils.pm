@@ -20,6 +20,22 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
+=head1 NAME
+
+MetamodWeb::Utils::SearchUtils - Utilities for search.
+
+=head1 SYNOPSIS
+
+Blah blah blah FIXME
+
+=head1 DESCRIPTION
+
+Blah blah blah FIXME
+
+=head1 FUNCTIONS/METHODS
+
+=cut
+
 use Moose;
 use namespace::autoclean;
 
@@ -41,20 +57,6 @@ has 'c' => (
         user_db => [ model => 'Userbase' ],
     }
 );
-
-
-
-=head1 NAME
-
-MetamodWeb::Utils::SearchUtils - Utilities for search.
-
-=head1 SYNOPSIS
-
-=head1 DESCRIPTION
-
-=head1 FUNCTIONS/METHODS
-
-=cut
 
 =head2 $self->selected_criteria($parameters)
 

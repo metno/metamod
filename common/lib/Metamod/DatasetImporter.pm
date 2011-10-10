@@ -37,15 +37,15 @@ Metamod::DatasetImporter - Module for importing dataset information into the met
 
 =head1 SYNOPSIS
 
-FIXME
+Blah blah blah FIXME
 
 =head1 DESCRIPTION
 
-FIXME
+Blah blah blah FIXME
 
 =head1 FUNCTIONS/METHODS
 
-FIXME
+Blah blah blah FIXME
 
 =cut
 

@@ -1,7 +1,7 @@
 <script type="text/javascript">
 jQuery(document).ready( function () {
 
-    // doesn't work either...
+    // doesn't work either... (or does it?)
     jQuery("a.visual").fancybox({
         'width'           : '90%',
         'height'          : '90%',
@@ -85,8 +85,23 @@ jQuery(document).ready( function () {
 
                     [% c.req.params.return_path = c.uri_for(c.req.path) %]
                     <a class="btn" href="[% c.uri_for( '/search/add_to_basket', dataset.ds_id, c.req.params ) %]"
-                       title="Add all child dataset to the collection basket"><span>Add to basket</span></a><br/><br/>
+                       title="Add all child dataset to the collection basket"><span>Add to basket</span></a><br clear="all"/>
                     [% c.req.params.delete('return_path') %]
+                [% END %]
+                [% IF dataset.wmsinfo != '' %]
+                    [% SET ds2show = (dataset.num_children() != 0) ? dataset.child_datasets.0 : dataset %]
+                    [% SET thumbsize = 64 %]
+                    [% SET wmsthumb = ds2show.wmsthumb(thumbsize) %]
+                    <a class="visual" href="[% c.uri_for('/search/wms') %]?ds_id=[% ds2show.ds_id %]"><span>Visualize</span></a><br clear="all"/>
+                    [% IF dataset.num_children() == 0 %]
+                        <a class="visual" href="http://thredds.met.no/thredds/godiva2/godiva2.html?server=[% wmsthumb.wms_url %]"><span>Visualize more</span></a><br clear="all"/>
+                    [% END %]
+                    <div class="wmsthumb"
+                        style="position: absolute; height: [% thumbsize %]px; width: [% thumbsize %]px; z-index:12"
+                        ><img src="[% wmsthumb.outline %]"/></div>
+                    <div class="wmsthumb"
+                        style="height: [% thumbsize %]px; width: [% thumbsize %]px; z-index:10"
+                        ><img src="[% wmsthumb.datamap %]"/></div>
                 [% END %]
             </div>
         </td>

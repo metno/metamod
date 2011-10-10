@@ -20,6 +20,22 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
+=head1 NAME
+
+MetamodWeb::Utils::CollectionBasket - The class responsible for implementing the collection basket.
+
+=head1 DESCRIPTION
+
+This class implements the actual collection basket. That is it implements a
+basket of datasets that the user can later download.
+
+This class is responsible for handling all the interaction with the underlying
+storage mechanism, whether it is in a cookie or on the server.
+
+=head1 FUNCTIONS/METHODS
+
+=cut
+
 use Data::Dump qw(dump);
 use Log::Log4perl qw(get_logger);
 use Moose;
@@ -68,22 +84,6 @@ has 'user_msgs' => ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
 # stored in the database or cookie or not stored at all.
 #
 has 'temp_basket' => ( is => 'ro', default => 0 );
-
-=head1 NAME
-
-MetamodWeb::Utils::CollectionBasket - The class responsible for implementing the collection basket.
-
-=head1 DESCRIPTION
-
-This class implements the actual collection basket. That is it implements a
-basket of datasets that the user can later download.
-
-This class is responsible for handling all the interaction with the underlying
-storage mechanism, whether it is in a cookie or on the server.
-
-=head1 FUNCTIONS/METHODS
-
-=cut
 
 =head2 $self->add_dataste($ds_id)
 

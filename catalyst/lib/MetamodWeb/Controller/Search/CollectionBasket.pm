@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 use Email::Valid;
 use Moose;
-use TheSchwartz;
+use TheSchwartz; # can this be removed? FIXME
 use namespace::autoclean;
 
 use Metamod::Queue;
@@ -61,6 +61,7 @@ requested by the user.
 =cut
 
 sub request_download : Path('/search/collectionbasket/request_download') {
+    # should be rewritten to only accept POST - FIXME
     my ( $self, $c ) = @_;
 
     my $email_address = $c->req->params->{email_address};
@@ -84,7 +85,7 @@ sub request_download : Path('/search/collectionbasket/request_download') {
     my $queue = Metamod::Queue->new();
     my $job_parameters = {
             locations => \@dataset_locations,
-            email     => $email_address
+            email     => $email_address,
     };
 
     my $success = $queue->insert_job( job_type => 'Metamod::Queue::Worker::PrepareDownload',

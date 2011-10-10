@@ -1,3 +1,18 @@
+<script type="text/javascript">
+jQuery(document).ready( function () {
+
+    // doesn't work either... (or does it?)
+    jQuery("a.visual").fancybox({
+        'width'           : '90%',
+        'height'          : '90%',
+        'autoScale'       : false,
+        'transitionIn'    : 'none',
+        'transitionOut'   : 'none',
+        'type'            : 'iframe'
+    });
+} );
+</script>
+
 [% SET files = collection_basket.files() %]
 
 <h2 class="std">Basket</h2>
@@ -50,7 +65,9 @@
         <tr>
         <td class="collection-basket"></td>
         <td class="collection-basket">&nbsp;</td>
-        <td class="collection-basket" style="text-align: right;">[% collection_basket.human_readable_size( collection_basket.calculate_size() ) %]</td>
+        <td class="collection-basket" style="text-align: right;">
+            [% collection_basket.human_readable_size( collection_basket.calculate_size() ) %]
+        </td>
         </tr>
 
     </table>
@@ -58,9 +75,11 @@
     <input type="submit" name="collection_basket_remove" value="Remove selected" />
     <a class="button-link" href="[% c.uri_for( '/search/collectionbasket/empty_basket', c.req.params ) %]"><button type="button">Empty basket</button></a>
 
-    [% SET basket_params = { dataset_ids => collection_basket.dataset_ids } %]
+    [% SET basket_params = { ds_id => collection_basket.dataset_ids } %]
     <a class="button-link" target="_blank" href="[% c.uri_for( '/search/collectionbasket/link_basket', basket_params  ) %]"><button type="button">Get basket URL</button></a>
-    </form>
+    <a class="visual" href="[% c.uri_for( '/search/wms', basket_params  ) %]"><button type="button">Visualize</button></a>
+
+</form>
 
 
 [% ELSE %]

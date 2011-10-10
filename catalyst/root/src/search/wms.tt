@@ -7,7 +7,22 @@
         <style type="text/css">
             #warning {font-size: x-large; padding:22 22 22 22; text-decoration: blink; color: red;}
             form, .olControlPermalink {font-size: x-small; font-family: sans-serif}
+            /* crappy css selectors below don't work... have to use inline styles instead :( */
+            /*#timebox { visibility: hidden };*/
+            /*img#legend { float: right; position: relative; top: 200px; z-index: 1000 };*/
+            /*#form1 { float: top; }*/
         </style>
+
+        <!-- calendar stylesheet -->
+        <link rel="stylesheet" type="text/css" media="all" href="[% c.uri_for('/static/js/jscalendar-1.0/calendar-win2k-cold-1.css') %]" title="win2k-cold-1" />
+        <!-- main calendar program -->
+        <script type="text/javascript" src="[% c.uri_for('/static/js/jscalendar-1.0/calendar.js') %]"></script>
+        <!-- language for the calendar -->
+        <script type="text/javascript" src="[% c.uri_for('/static/js/jscalendar-1.0/lang/calendar-en.js') %]"></script>
+        <!-- the following script defines the Calendar.setup helper function, which makes
+             adding a calendar a matter of 1 or 2 lines of code. -->
+        <script type="text/javascript" src="[% c.uri_for('/static/js/jscalendar-1.0/calendar-setup.js') %]"></script>
+
         <script src="[% c.uri_for('/static/lib/OpenLayers.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/lib/Firebug/firebug.js') %]"></script>
         <script type="text/javascript">
@@ -16,18 +31,18 @@
             // debugging/inspecting in Firebug
             var map = null;
 
-            //read CGI args
-            var args = new OpenLayers.Util.getArgs();
-            var ds_id = args.ds_id;
-            var wms_setup; args.wmssetup;
-            var wms_url = args.wmsurl;
-
             var wmsCapabilities;
             var wmsLayers;
             var error;
 
             function init(){
                 // run after document is loaded
+
+                //read CGI args
+                var args = new OpenLayers.Util.getArgs();
+                var ds_id = [% datasets.0.ds_id %];
+                var wms_setup = args.wmssetup;
+                var wms_url = args.wmsurl;
 
                 // remove "javascript not installed" message from window
                 document.getElementById('docs').removeChild( document.getElementById('warning') );
@@ -45,6 +60,7 @@
                 } else {
                     alert("Missing ds_id or wmsurl parameter!");
                 }
+
             }
 
             function buildStyleSelector(styles, layername) {
@@ -56,7 +72,7 @@
                     var opt = styles[i].name;
                     var option = document.createElement('option');
                     option.setAttribute('value', opt);
-                    option.appendChild(document.createTextNode(opt.slice(8))); // remove BOXFILL prefix
+                    option.appendChild( document.createTextNode(opt.slice(8)) ); // remove BOXFILL prefix
                     sel.appendChild(option);
                     if (opt == current) {
                         //alert(opt);
@@ -68,12 +84,51 @@
                 }
             }
 
+            function buildTimeSelector(times) {
+                //
+
+                //current = times[0];
+                var sel = document.forms["form1"].wmstime;
+                sel.length = 0;
+
+                if (typeof times != 'undefined') {
+                    for (i = 0; i < times.values.length; i++) {
+                        var opt = times.values[i];
+                        var option = document.createElement('option');
+                        option.setAttribute('value', opt);
+                        option.appendChild( document.createTextNode(opt) );
+                        sel.appendChild(option);
+                        //if (opt == current) {
+                        //    //alert(opt);
+                        //    // set current option as selected
+                        //    sel.selectedIndex = i;
+                        //}
+                    }
+                }
+
+                // hide or show depending on time dimension existing in this layer
+                if (times.values.length > 0 ) {
+                    $('timebox').show;
+                } else {
+                    $('timebox').hide;
+                }
+
+            }
+
+            function changeFile(new_ds_id) {
+                map.destroy();
+                OpenLayers.loadURL("[% c.uri_for('/gc2wmc') %]?ds_id=" + new_ds_id, "", this, drawMap, showError);
+                //$('wmstime').length = 0;
+                //buildTimeSelector(map.layer[0].dimensions.time);
+            }
+
             function changeLayer(event) {
                 // triggered when user changes layer
 //                alert("layer = " + event.layer.name);
                 document.getElementById('legend').src = "/static/img/blank.gif";
                 if (event.layer.isBaseLayer && event.layer.visibility) {
                     buildStyleSelector(event.layer.metadata.styles, event.layer.params.LAYERS);
+                    buildTimeSelector(event.layer.dimensions.time);
                 }
 
             }
@@ -82,6 +137,16 @@
                 // triggered when user changes style
 //                alert("style = " + style);
                 map.baseLayer.mergeNewParams( {STYLES: style} );
+            }
+
+            function changeTime(dtime) {
+                // triggered when user changes time
+                //alert(dtime);
+                map.baseLayer.mergeNewParams( {time: dtime} );
+                //for (l in map.layers) {
+                //    alert(l);
+                //    l.mergeNewParams( {time: dtime} );
+                //}
             }
 
             function changeLegend(event) { // deprecated
@@ -103,7 +168,7 @@
 
                 wmcParser = new OpenLayers.Format.WMC();
                 try {
-                    map = wmcParser.read( wmsContext, { map: {div: 'map', controls: [] } } );
+                    map = wmcParser.read( wmsContext, { map: { div: 'map', controls: [] } } );
                 } catch (error) {
                     alert("Invalid GetMapContext:\n" + error + "\n" + response.responseText);
                     //return 0;
@@ -146,22 +211,19 @@
                 map.addControl( new OpenLayers.Control.Permalink('permalink') );
                 //map.addControl( new OpenLayers.Control.OverviewMap( {layers: [coastlines]} ) );
 
-                document.getElementById('map').style.height = map.getSize().h - 60;
-                map.updateSize();
-                //map.zoomToExtent(map.maxExtent);
-
                 layersw.maximizeControl(true);
                 var layer0 = map.layers[0].params.LAYERS;
                 buildStyleSelector(map.layers[0].metadata.styles, layer0);
+                buildTimeSelector(map.layers[0].dimensions.time);
 
                 // set legend URL (have to set both LAYER and LAYERS due to bug in ncWMS)
                 document.getElementById('legend').src = map.layers[0].metadata.styles[0].legend.href + '&LAYERS=' + layer0;
 
                 // Print resource link for debugging
-                var a = document.createElement("a");
+                //var a = document.createElement("a");
                 //a.href = wms_url + "?service=WMS&version=1.3.0&request=GetCapabilities";
-                a.href = wms_setup;
-                a.appendChild( document.createTextNode(wms_setup) );
+                //a.href = wms_setup;
+                //a.appendChild( document.createTextNode(wms_setup) );
                 //document.getElementById('shortdesc').appendChild(a);
 
                 // set page headings
@@ -180,17 +242,52 @@
             }
 
         </script>
+
     </head>
     <body onload="init()">
-        <img id="legend" src="/static/img/blank.gif"
-                style="float: right; position: relative; top: 200px; z-index: 1000"> <!--fix vpos-->
-        <form name="form1" action="#">
-            Style:
-            <select name="wmsstyle" id="wmsstyle" onChange="changeStyle(this[this.selectedIndex].value)"></select>
-            <span id="shortdesc"><!--Data file (direct): --></span>
-        </form>
+
         <div id="map" class="largemap"></div>
         <div id="docs"><p id="warning">Javascript must be enabled for WMS client to work!</p></div>
         <!--<div id="tags"></div>-->
+
+        <img id="legend" src="/static/img/blank.gif" style="position: absolute; right: 5px; top: 200px; z-index: 1000"/> <!--fix vpos-->
+        <form name="form1" id="form1" action="#" style="position: absolute; top: 0px; left: 60px; z-index: 1000">
+
+            <label>Dataset:
+                <select name="dataset"  id="dataset" onChange="changeFile(this[this.selectedIndex].value)">
+                    [% FOR ds IN datasets %]
+                        <option value="[% ds.ds_id %]">[% ds.ds_name %]</option>
+                    [% END %]
+                </select>
+            </label>
+
+            <label>Style: <select name="wmsstyle" id="wmsstyle" onChange="changeStyle(this[this.selectedIndex].value)"></select></label>
+
+            <label id="timebox">Time: <select name="wmstime" id="wmstime" onChange="changeTime(this[this.selectedIndex].value)"></select></label>
+
+            <!--<input type="hidden" name="date" id="f_date_e" />-->
+            <!--<img src="[% c.uri_for('/static/js/jscalendar-1.0/img.gif') %]" id="f_trigger_e" style="cursor: pointer; border: 1px solid red;"-->
+            <!--     title="Date selector" onmouseover="this.style.background='red';"-->
+            <!--     onmouseout="this.style.background=''" />-->
+            <!--<span id="show_e">-- not entered --</span>-->
+            <!--<script type="text/javascript">-->
+            <!--    Calendar.setup({-->
+            <!--        inputField     :    "f_date_e",     // id of the input field-->
+            <!--        ifFormat       :    "%Y/%d/%m",     // format of the input field (even if hidden, this format will be honored)-->
+            <!--        displayArea    :    "show_e",       // ID of the span where the date is to be shown-->
+            <!--        daFormat       :    "%A, %B %d, %Y",// format of the displayed date-->
+            <!--        button         :    "f_trigger_e",  // trigger button (well, IMG in our case)-->
+            <!--        align          :    "Tl",           // alignment (defaults to "Bl")-->
+            <!--        singleClick    :    true-->
+            <!--    });-->
+            <!--</script>-->
+            <!--<style type="text/css">-->
+            <!--    .calendar .combo { z-index: 2147483647; }-->
+            <!--</style>-->
+
+            <span id="shortdesc"><!--Data file (direct): --></span>
+
+        </form>
+
     </body>
 </html>
