@@ -1072,8 +1072,8 @@ Return value: TRUE on success, FALSE on error / dataset already exists.
         my $self         = shift;
         my $ident        = ident($self);
         my $dataset_name = shift;
-        my $dataset_key  = shift;
-        confess "Can't insert undefined dataset" unless $dataset_name && $dataset_key;
+        my $dataset_key  = shift || "";
+        confess "Can't insert undefined dataset" unless $dataset_name;
         my $user_array   = $user_array{$ident};
         if ( !defined($user_array) ) {
             $self->_note_exception( 1, "No current user" );
