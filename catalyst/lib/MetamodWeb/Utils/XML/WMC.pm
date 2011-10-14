@@ -26,6 +26,7 @@ use Moose;
 use namespace::autoclean;
 use XML::LibXML::XPathContext;
 use Metamod::WMS;
+use Carp;
 
 has 'c' => (
     is       => 'ro',
@@ -64,7 +65,7 @@ sub setup2wmc {
     $getcap .= '?service=WMS&version=1.3.0&request=GetCapabilities';
     my $stylesheet = $xslt->parse_stylesheet_file($xslfile);
     my $results = eval { $stylesheet->transform( getXML($getcap), XML::LibXSLT::xpath_to_string(%bbox) ); };
-    print STDERR "WMC error: $@" if $@;
+    croak " error: $@" if $@;
     my $xc = XML::LibXML::XPathContext->new( $results->documentElement() );
     $xc->registerNs('v', $wmcns);
     my ($layerlist) = $xc->findnodes('/*/v:LayerList');
@@ -78,17 +79,20 @@ sub setup2wmc {
     # loop thru layers in setup file
     foreach ( $sxc->findnodes('/*/s:layer') ) {
         my $lname = $_->getAttribute('name');
-        my $style = $_->getAttribute('style') || '';
+        my $style = lc $_->getAttribute('style') || '';
+        #printf STDERR "*WMC* setup: %s - %s\n", $lname, $style;
         # find matching layer nodes in Capabilities
-        foreach my $layer ($xc->findnodes("v:Layer[v:Name = '$lname']", $layerlist)) {
-            foreach ( $xc->findnodes("v:StyleList/v:Style[v:Name = '$style']", $layer) ) { # FIXME: wrong namespace
-                 $_->setAttribute('current', 1);
+        foreach my $gclayer ($xc->findnodes("v:Layer[v:Name = '$lname']", $layerlist)) {
+            #printf STDERR "*WMC* getcap: %s\n", $layer->serialize;
+            foreach my $gcstyle ( $xc->findnodes("v:StyleList/v:Style[v:Name = '$style']", $gclayer) ) { # FIXME: wrong namespace
+                #printf STDERR "*WMC* stylelist: %s\n", $gcstyle->serialize;
+                $gcstyle->setAttribute('current', 1);
                 # move preferred style node to top of list
-                my $pn = $_->parentNode;
-                $pn->insertBefore( $pn->removeChild($_), $pn->firstChild);
+                my $pn = $gcstyle->parentNode;
+                $pn->insertBefore( $pn->removeChild($gcstyle), $pn->firstChild );
             }
             # move priority layer to new list
-            $newlayers->appendChild( $layerlist->removeChild($layer) );
+            $newlayers->appendChild( $layerlist->removeChild($gclayer) );
         }
     }
 
