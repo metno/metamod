@@ -30,6 +30,8 @@ jQuery(document).ready( function () {
     <input type="submit" value="Request download" />
 </form>
 
+<p>Datasets shown in italic are unavailable for download.</p>
+
 <form name="search_form" id="search_form" method="GET" action="[% c.uri_for('/search/collectionbasket/remove_selected' ) %]">
     [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
 
@@ -50,24 +52,25 @@ jQuery(document).ready( function () {
         </tr>
 
         [% FOREACH file IN files %]
+            [% filesize = file.data_file_size %]
             <tr>
                 <td class="collection-basket">
                     <input type="checkbox" name="remove_file" value="[% file.ds_id %]" />
                 </td>
                 <td class="collection-basket">
-                    [% file.name %]
+                    <span style="[% filesize > 0 ? '' : 'font-style: italic' %]">[% file.name %]</span>
                 </td>
                 <td class="collection-basket" style="text-align: right">
-                    [% collection_basket.human_readable_size( file.data_file_size ) %]
+                    [% filesize > 0 ? collection_basket.human_readable_size( file.data_file_size ) : '&nbsp' %]
                 </td>
             </tr>
         [% END %]
         <tr>
-        <td class="collection-basket"></td>
-        <td class="collection-basket">&nbsp;</td>
-        <td class="collection-basket" style="text-align: right;">
-            [% collection_basket.human_readable_size( collection_basket.calculate_size() ) %]
-        </td>
+            <td class="collection-basket"></td>
+            <td class="collection-basket"><b>Total</b></td>
+            <td class="collection-basket" style="text-align: right;">
+                <b>[% collection_basket.human_readable_size( collection_basket.calculate_size() ) %]</b>
+            </td>
         </tr>
 
     </table>

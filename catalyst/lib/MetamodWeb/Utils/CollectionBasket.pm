@@ -374,7 +374,8 @@ sub file_info {
 
     my $metadata = $dataset->metadata( [qw(data_file_location data_file_size)] );
 
-    return if !exists $metadata->{data_file_location} || !defined $metadata->{data_file_location}->[0];
+    # now allowing for datasets w/o file info
+    #return if !exists $metadata->{data_file_location} || !defined $metadata->{data_file_location}->[0];
 
     my $file_info = {
         ds_id              => $dataset->ds_id(),
