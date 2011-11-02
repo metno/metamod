@@ -48,10 +48,14 @@ use Params::Validate qw(:all);
 use TheSchwartz;
 use TheSchwartz::Job;
 
+#
 # The current METAMOD configuration object
+#
 has 'mm_config' => ( is => 'ro', isa => 'Metamod::Config', default => sub { return Metamod::Config->instance() } );
 
+#
 # The TheSchwartz client that is used to insert jobs into the queue
+#
 has 'job_client' => ( is => 'ro', isa => 'TheSchwartz', lazy => 1, builder => '_build_job_client' );
 
 sub _build_job_client {
@@ -70,13 +74,14 @@ sub _build_job_client {
     );
 
     return $job_client;
+
+
 }
 
 
 =head2 $self->insert_job(%PARAMS)
 
-Insert a new job into the job queue. The job is tagged with APPLICATION_ID to avoid
-other installed sites to steal jobs when using same userbase;
+Insert a new job into the job queue.
 
 =over
 
@@ -99,10 +104,8 @@ Returns 1 if the job was inserted successfully. False otherwise.
 =back
 
 =cut
-
 sub insert_job {
     my $self = shift;
-    my $mm_config = $self->mm_config();
 
     my %params = validate( @_, {
         job_type => { type => SCALAR },
@@ -112,16 +115,12 @@ sub insert_job {
 
     my ($job_parameters, $job_type, $priority) = @params{qw(job_parameters job_type priority)};
 
-    my $appid = $mm_config->get('APPLICATION_ID');
-    print STDERR "* APPID = $appid\n";
-
     my $job = TheSchwartz::Job->new(
         funcname => $job_type,
         arg => $job_parameters,
         priority => $priority,
-        coalesce => $appid,
     );
-    my $status = $self->job_client->insert($job);
+    my $status = $self->job_client->insert( $job_type, $job_parameters );
 
     return if !defined $status;
 

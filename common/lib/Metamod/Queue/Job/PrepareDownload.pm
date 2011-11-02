@@ -108,16 +108,6 @@ sub prepare_download {
     my $config          = Metamod::Config->instance();
     my $download_area   = $config->get('WEBRUN_DIRECTORY') . "/download";
 
-    if( !(-e $download_area) ){
-        if (mkdir $download_area) {
-            $logger->info("Download directory '$download_area' created");
-        } else {
-            $self->error_msg("Download directory '$download_area' could not be created: $@");
-            $logger->error($self->error_msg);
-            return;
-        }
-    }
-
     if( !(-d $download_area) ){
         $self->error_msg("'$download_area' is not a directory. Cannot continue to create zip");
         $logger->error($self->error_msg);

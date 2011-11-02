@@ -6,14 +6,13 @@ use lib ("$FindBin::Bin/../../common/lib");
 use strict;
 use warnings;
 use Getopt::Long;
+use TheSchwartz;
 
 use Log::Log4perl qw(:easy get_logger);
 Log::Log4perl->easy_init($DEBUG);
 
 use Metamod::Config;
 use Metamod::Utils;
-use Metamod::Queue;
-use Metamod::Queue::Worker;
 use Metamod::Queue::Worker::PrepareDownload;
 
 # Parse cmd line params
@@ -33,7 +32,15 @@ my $mm_config = Metamod::Config->new($config_file_or_dir);
 my $log = get_logger('metamod.basket');
 
 # setup queue
-my $queue_worker = Metamod::Queue::Worker->new( 'Metamod::Queue::Worker::PrepareDownload' );
+my $queue_worker = TheSchwartz->new(
+    databases => [
+        {
+            dsn  => $mm_config->getDSN_Userbase(),
+            user => $mm_config->get('PG_WEB_USER'),
+            pass => $mm_config->get('PG_WEB_USER_PASSWORD')
+        }
+    ]
+);
 
 # now we're ready for demonization
 if ($pid) {
@@ -44,18 +51,16 @@ if ($pid) {
     } else {
         $log->info("prepare_download daemon started successfully");
     }
-} else {
-    # running in foreground
-    print STDERR "Not running as daemon. Stop me with Ctrl + C\n";
 }
 
-## probably no longer needed since TheSchwartz handles interrupts correctly
-#our $SIG_TERM = 0;
-#sub sigterm {++$SIG_TERM;}
-#$SIG{TERM} = \&sigterm;
+
+our $SIG_TERM = 0;
+sub sigterm {++$SIG_TERM;}
+$SIG{TERM} = \&sigterm;
 
 eval {
-    $queue_worker->wojk();
+    $queue_worker->can_do('Metamod::Queue::Worker::PrepareDownload');
+    $queue_worker->work();
 };
 if ($@) {
     $log->error($@);
