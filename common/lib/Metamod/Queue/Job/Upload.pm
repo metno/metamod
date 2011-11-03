@@ -79,9 +79,10 @@ sub process_file {
         validate_pos( @_, 1, 1, 1 );
     my $logger = get_logger('job');
 
-    $logger->debug("Processing file $file ($type)");
+    #print STDERR "Processing file $file ($type)\n";
+    $logger->info("Processing file $file ($type)");
     $upload_helper->process_upload($file, $type);
-    $logger->debug('Job done');
+    $logger->debug('Job $file done');
     return 1;
 
 }

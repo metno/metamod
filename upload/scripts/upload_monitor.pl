@@ -118,12 +118,13 @@ my $queue_worker = TheSchwartz->new(
 eval {
     if ($test) {
 
-        print STDERR "Testrun: " . $ARGV[0] . "\n";
+        print STDERR "Testrun\n";
         $queue_worker->can_do('Metamod::Queue::Worker::Upload');
         $queue_worker->work_until_done(); # built-in TheSchwartz method, exiting when job queue is empty
 
     } elsif($pidfile) {
 
+        print STDERR "Daemonizing upload monitor (see $logfile)\n";
         Metamod::Utils::daemonize($logfile, $pidfile);
         $queue_worker->can_do('Metamod::Queue::Worker::Upload');
         $queue_worker->work();

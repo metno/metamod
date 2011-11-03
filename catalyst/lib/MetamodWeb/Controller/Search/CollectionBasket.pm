@@ -112,7 +112,7 @@ Action for adding a dataset to the collection basket.
 
 =cut
 
-sub add_to_basket : Path("/search/add_to_basket/") : Args(1) {
+sub add_to_basket : Path("/search/add_to_basket/") : Args(1) { # FIXME: should be a POST request
     my ($self, $c, $ds_id) = @_;
 
     my $basket = $c->stash->{ collection_basket };
@@ -146,7 +146,7 @@ Action for completely emptying the collection basket.
 
 =cut
 
-sub empty_basket : Path('/search/collectionbasket/empty_basket') : Args(0) {
+sub empty_basket : Path('/search/collectionbasket/empty_basket') : Args(0) { # FIXME: should be a POST request
     my ( $self, $c ) = @_;
 
     my $basket = $c->stash->{collection_basket};
@@ -162,7 +162,7 @@ Remove a list of selected datasets from the current collection basket.
 
 =cut
 
-sub remove_selected : Path('/search/collectionbasket/remove_selected') : Args(0) {
+sub remove_selected : Path('/search/collectionbasket/remove_selected') : Args(0) { # FIXME: should be a POST request
     my ( $self, $c ) = @_;
 
     my $dataset_ids = $c->req->params->{'remove_file'} || [];
@@ -180,7 +180,7 @@ sub remove_selected : Path('/search/collectionbasket/remove_selected') : Args(0)
     $c->res->redirect($c->uri_for('/search/collectionbasket'));
 }
 
-sub link_basket : Path('/search/collectionbasket/link_basket' ) : Args(0) {
+sub link_basket : Path('/search/collectionbasket/link_basket' ) : Args(0) { # FIXME: should be a POST request
     my ($self, $c) = @_;
 
     my $dataset_ids = $c->req->params->{'dataset_ids'} || [];
@@ -196,7 +196,7 @@ sub link_basket : Path('/search/collectionbasket/link_basket' ) : Args(0) {
 
 }
 
-sub replace_basket : Path('/search/collectionbasket/replace_basket' ) : Args(0) {
+sub replace_basket : Path('/search/collectionbasket/replace_basket' ) : Args(0) { # FIXME: should be a POST request
     my ($self, $c) = @_;
 
     my $basket = $c->stash->{ collection_basket };
@@ -208,7 +208,7 @@ sub replace_basket : Path('/search/collectionbasket/replace_basket' ) : Args(0) 
 
 }
 
-sub merge_basket : Path('/search/collectionbasket/merge_basket' ) : Args(0) {
+sub merge_basket : Path('/search/collectionbasket/merge_basket' ) : Args(0) { # FIXME: should be a POST request
     my ($self, $c) = @_;
 
     $self->_add_list_to_basket($c);
@@ -217,7 +217,7 @@ sub merge_basket : Path('/search/collectionbasket/merge_basket' ) : Args(0) {
 
 }
 
-sub _add_list_to_basket : Private {
+sub _add_list_to_basket : Private { # FIXME: should be a POST request
     my ($self, $c ) = @_;
 
     my $dataset_ids = $c->req->params->{'dataset_ids'} || [];

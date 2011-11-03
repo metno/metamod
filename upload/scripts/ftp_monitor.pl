@@ -123,8 +123,8 @@ eval {
             sleep $sleeping_seconds;
         }
     } else {
-        print STDERR "Daemonizing...\n";
         my ($logFile, $pidFile) = @ARGV;
+        print STDERR "Daemonizing ftp monitor (see $logFile)\n";
         Metamod::Utils::daemonize($logFile, $pidFile);
         start_cronjob();
     }

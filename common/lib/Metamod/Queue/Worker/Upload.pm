@@ -26,7 +26,7 @@ use strict;
 use warnings;
 
 use TheSchwartz::Job;
-
+use Log::Log4perl qw(get_logger);
 use Metamod::Queue::Job::Upload;
 
 my $mm_job;
@@ -64,6 +64,8 @@ A TheSchwartz::Job object. The job is expected to have the filepath as an argume
 
 sub work {
     my ( $class, $job ) = @_;
+    my $logger = get_logger('job');
+    $logger->debug( sprintf "Worked starting job %d, file %s of type %s", $job->jobid(), $job->arg->{file}, $job->arg->{type} );
 
     eval {
 
