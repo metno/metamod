@@ -211,6 +211,16 @@ sub has {
     return exists $self->{vars}{$var};
 }
 
+sub is {
+    my ($self, $var) = @_;
+    return undef unless $var;
+
+    $self->_checkFile();
+    return undef unless exists $self->{vars}{$var};
+    my $val = $self->_substituteVariable($var);
+    return ($val && $val != 'false') ? 1 : 0;
+}
+
 # check for updates of config and reread
 sub _checkFile {
     my ($self) = @_;
@@ -611,12 +621,18 @@ if the same config file is opened several times.
 =item get("configVar")
 
 return the configuration variable configVar as currently set. This will reread the
-config-file each time it has been changed.
+config-file each time it has been changed. Gives a warning if not specified in
+master_config.
 
 =item has("configVar")
 
 return true if the configuration variable configVar is currently set. This will reread the
-config-file each time it has been changed.
+config-file each time it has been changed. Does not give any warnings.
+
+=item is("configVar")
+
+return true if the configuration variable has been set and is not among a list of
+false values (0, false, empty string). Does not give any warnings.
 
 =item initLogger()
 

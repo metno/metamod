@@ -184,6 +184,7 @@
                     coastlines_url = "http://wms.met.no/maps/southpole.map?";
                 }
 
+                [%  isBaseLayer = mm_config.get('WMS_BACKGROUND_ISBASELAYER') %]
                 var coastlines = new OpenLayers.Layer.WMS(
                     "Met.no kart",
                     coastlines_url,
@@ -192,7 +193,7 @@
                         layers: 'borders'
                     },
                     {
-                        isBaseLayer: false
+                        isBaseLayer: [% false %]
                     }
                 );
 
