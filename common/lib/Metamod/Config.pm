@@ -218,7 +218,8 @@ sub is {
     $self->_checkFile();
     return undef unless exists $self->{vars}{$var};
     my $val = $self->_substituteVariable($var);
-    return ($val && $val != 'false') ? 1 : 0;
+    #printf STDERR "Config boolean %s = %s\n", $var, $val;
+    return ($val && $val ne 'false') ? 1 : 0;
 }
 
 # check for updates of config and reread
