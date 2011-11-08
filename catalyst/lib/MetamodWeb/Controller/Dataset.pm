@@ -188,6 +188,8 @@ sub rss :Chained("ds_id") :PathPart("rss") : Args(0) {
         link      => $base_url . $local_url,
         generator => 'METAMOD',
     );
+    
+     $rss->add_module(prefix => 'georss', uri => 'http://www.georss.org/georss');
 
     my @level2_datasets = $c->model('Metabase::Dataset')->level2_datasets( { ds_id => $ds_id } );
 
@@ -195,15 +197,19 @@ sub rss :Chained("ds_id") :PathPart("rss") : Args(0) {
     my @level2_ids = map { $_->ds_id } @level2_datasets;
     if (@level2_ids) {
         foreach my $ds (@level2_datasets){
-            my $md       = $ds->metadata( [qw( title abstract dataref )] );
+            my $md       = $ds->metadata( [qw( title abstract dataref bounding_box )] );
             my $title    = join " ", @{ $md->{title} };
             my $abstract = join " ", @{ $md->{abstract} };
             my $link     = $md->{dataref}->[0];               #assume one dataref. Concating links does not make sense.
+            my $bbox     = $md->{bounding_box}->[0];
 
             $rss->add_item(
                 title       => $title,
                 link        => $link,
                 description => $abstract,
+                georss      => {
+                                box  => $bbox,
+                               }
             );
         }
     }
