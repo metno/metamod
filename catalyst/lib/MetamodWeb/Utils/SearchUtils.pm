@@ -38,6 +38,7 @@ Blah blah blah FIXME
 
 use Moose;
 use namespace::autoclean;
+use Data::Dumper;
 
 use warnings;
 
@@ -180,6 +181,69 @@ sub get_ownertags {
         @ownertags = map {s/^'//; s/'$//; $_} @ownertags;
     }
     return \@ownertags;
+}
+
+=head2 $self->dist_statements()
+
+=over
+
+=item return
+
+Returns a list of distribution statements that can be downloaded via the
+collection basket.
+
+=back
+
+=cut
+
+sub dist_statements {
+    my $self = shift;
+
+    my $dist_statments = $self->config->get('COLLECTION_BASKET_DIST_STATEMENTS');
+    my @dist_statements = split ',', $dist_statments;
+    my %dist_statements = map { lc(trim($_)) => 1 } @dist_statements;
+
+    return \%dist_statements;
+
+}
+
+=head2 $self->freely_available($dataset)
+
+Check whether a dataset is freely available or not.
+
+=over
+
+=item $file
+
+A basket item hashref
+
+=item return
+
+Returns true if the dataset is freely available according its distribution
+statement and the configuration variable COLLECTION_BASKET_DIST_STATEMENTS.
+
+=back
+
+=cut
+
+sub freely_available {
+    my $self = shift;
+
+    my ($file) = @_;
+    
+    print STDERR "++++++++++++" . Dumper \$file;
+
+    if(!exists $file->{distribution_statement}){
+        return 1;
+    }
+
+    my $dist_statements = $self->dist_statements();
+    my $dist_statement = lc(trim($file->{distribution_statement}));
+
+    return 1 if exists $dist_statements->{$dist_statement};
+
+    return;
+
 }
 
 =head1 LICENSE

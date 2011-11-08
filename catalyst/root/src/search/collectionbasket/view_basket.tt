@@ -61,10 +61,10 @@ jQuery(document).ready( function () {
                     <input type="checkbox" name="remove_file" value="[% file.ds_id %]" />
                 </td>
                 <td class="collection-basket">
-                    <span style="[% filesize > 0 ? '' : 'font-style: italic' %]">[% file.name %]</span>
+                    <span style="[% filesize ? '' : 'font-style: italic' %]">[% file.name %]</span>
                 </td>
                 <td class="collection-basket" style="text-align: right">
-                    [% filesize > 0 ? collection_basket.human_readable_size( file.data_file_size ) : '&nbsp' %]
+                    [% filesize ? collection_basket.human_readable_size( file.data_file_size ) : '&nbsp' %]
                 </td>
             </tr>
         [% END %]

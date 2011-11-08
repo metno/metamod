@@ -24,6 +24,7 @@ use Email::Valid;
 use Moose;
 use TheSchwartz; # can this be removed? FIXME
 use namespace::autoclean;
+use Data::Dumper;
 
 use Metamod::Queue;
 use MetamodWeb::Utils::CollectionBasket;
@@ -72,16 +73,12 @@ sub request_download : Path('/search/collectionbasket/request_download') {
     }
 
     my $basket = $c->stash->{collection_basket};
-    my $files = $basket->files();
 
-    my @dataset_locations;
+    my $dataset_locations = $basket->find_data_locations();
     
-    for (@$files) {
-        my $loc = $_->{data_file_location};
-        push @dataset_locations, $loc if defined $loc;
-    }
-
-    if ( 0 == @dataset_locations ) {
+    print STDERR "+++++++++++++++++" . Dumper \$dataset_locations;
+    
+    if ( 0 == @$dataset_locations ) {
         $self->add_info_msgs($c, 'There are no files in the collection basket to download');
         $c->res->redirect($c->uri_for('/search/collectionbasket'));
         return;
@@ -89,7 +86,7 @@ sub request_download : Path('/search/collectionbasket/request_download') {
 
     my $queue = Metamod::Queue->new();
     my $job_parameters = {
-            locations => \@dataset_locations,
+            locations => $dataset_locations,
             email     => $email_address,
     };
 

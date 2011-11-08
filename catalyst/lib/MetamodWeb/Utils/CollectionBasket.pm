@@ -37,10 +37,10 @@ storage mechanism, whether it is in a cookie or on the server.
 =cut
 
 use Data::Dump qw(dump);
+use Data::Dumper;
 use Log::Log4perl qw(get_logger);
 use Moose;
 use namespace::autoclean;
-
 use warnings;
 
 use Metamod::Config;
@@ -203,6 +203,38 @@ sub _metadata_search_params {
 
 }
 
+=head2 $self->find_data_locations()
+
+Returns ref to list of file locations (may be fewer than # of items in basket, possibly none)
+
+=over
+
+=item Parameters
+
+Collection basket ref
+
+=back
+
+=cut
+
+sub find_data_locations {
+    my $self = shift;
+
+    my $files = $self->files();
+    
+    #print STDERR "*********" . Dumper \$files;
+    my @dataset_locations;
+    my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $self->c, config => $self->config } );
+    
+    for (@$files) {
+        my $loc = $_->{data_file_location};
+        my $free = $search_utils->freely_available($_);
+        push @dataset_locations, $loc if $loc && $free;
+    }
+    return \@dataset_locations;
+
+}
+
 =head2 $self->empty_basket()
 
 Make the basket empty, i.e. remove all datasets from the basket.
@@ -282,7 +314,8 @@ sub calculate_size {
 
     my $total_size = 0;
     for my $file (@$files) {
-        $total_size += $file->{data_file_size};
+        my $size = $file->{data_file_size};
+        $total_size += $size if $size;
     }
 
     return $total_size;
@@ -372,7 +405,7 @@ sub file_info {
 
     my ($dataset) = @_;
 
-    my $metadata = $dataset->metadata( [qw(data_file_location data_file_size)] );
+    my $metadata = $dataset->metadata( [qw( data_file_location data_file_size distribution_statement )] );
 
     # now allowing for datasets w/o file info
     #return if !exists $metadata->{data_file_location} || !defined $metadata->{data_file_location}->[0];
@@ -381,9 +414,11 @@ sub file_info {
         ds_id              => $dataset->ds_id(),
         data_file_location => $metadata->{data_file_location}->[0],
         data_file_size     => $metadata->{data_file_size}->[0],
-        name               => $dataset->ds_name()
+        name               => $dataset->ds_name(), 
+        distribution       => $metadata->{distribution_statement}->[0],
     };
 
+    #print STDERR '$$$$$$$$$$$$' . Dumper $file_info;
     return $file_info;
 
 }
