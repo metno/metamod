@@ -68,11 +68,15 @@
                 <a class="btn" href="[% c.uri_for('/search/fimexdownload') %]?dataset_name=[% child.ds_name %]&projection=[% projection %]" target="_blank"
                     title="Download file in [% projection %]"><span>[% projection %] Downl.</span></a><br clear="all"/>
             [% END %]
+
+            [% c.req.params.return_path = c.uri_for(c.req.path) %]
+            <a class="btn" href="[% c.uri_for( '/search/add_to_basket', child.ds_id, c.req.params ) %]"
+               title="Add the dataset to the collection basket"><span>Add to basket</span></a><br clear="all"/>
+
             [% IF child.wmsinfo != '' %]
                 [% SET thumbsize = 64 %]
                 [% SET wmsthumb = child.wmsthumb(thumbsize) %]
                 <a class="visual" href="[% c.uri_for('/search/wms') %]?ds_id=[% child.ds_id %]"><span>Visualize</span></a><br clear="all"/>
-                <a class="visual" href="http://thredds.met.no/thredds/godiva2/godiva2.html?server=[% wmsthumb.wms_url %]"><span>Visualize more</span></a><br clear="all"/>
                 <div class="wmsthumb"
                     style="position: absolute; height: [% thumbsize %]px; width: [% thumbsize %]px; z-index:12"
                     ><img src="[% wmsthumb.outline %]"/></div>
@@ -81,12 +85,7 @@
                     ><img src="[% wmsthumb.datamap %]"/></div>
             [% END %]
 
-            [% c.req.params.return_path = c.uri_for(c.req.path) %]
-            <a class="btn" href="[% c.uri_for( '/search/add_to_basket', child.ds_id, c.req.params ) %]"
-               title="Add the dataset to the collection basket"><span>Add to basket</span></a><br clear="all"/>
             [% c.req.params.delete('return_path') %]
-            <a class="visual" href="[% c.uri_for('/gc2wmc') %]?ds_id=[% child.ds_id %]"><span>WMC data</span></a><br clear="all"/>
-            <a class="visual" href="[% wmsthumb.wms_url %]?service=WMS&version=1.3.0&request=GetCapabilities"><span>WMS data</span></a><br clear="all"/>
         </div>
     </td>
     [% FOREACH metadata_name IN diff_names %]
