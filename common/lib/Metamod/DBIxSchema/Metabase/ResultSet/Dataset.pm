@@ -25,6 +25,7 @@ use base 'Metamod::DBIxSchema::Resultset';
 use Data::Dump qw( dump );
 use Log::Log4perl qw( get_logger );
 use Params::Validate qw( :all );
+use Time::localtime;
 
 =head2 $self->metadata_search(%PARAMS)
 
@@ -64,7 +65,8 @@ sub metadata_search {
         {
             curr_page       => { type => SCALAR, optional => 1 },
             ownertags       => { type => ARRAYREF },
-            rows_per_page   => { type => SCALAR, optional => 10 },
+            #rows_per_page   => { type => SCALAR, optional => 10 }, # typo?
+            rows_per_page   => { type => SCALAR, default => 10 },
             search_criteria => { type => HASHREF },
             all_levels      => { type => SCALAR, default => 0 },
         }
@@ -165,8 +167,8 @@ sub metadata_search_params {
             my $numberitem_search = $numberitem_rs->search(
                 {
                     sc_id   => $sc_id,
-                    ni_from => { '<=' => $date->{to} },
-                    ni_to   => { '>=', $date->{from} },
+                    ni_from => { '<=' => $date->{to}||scalar time },
+                    ni_to   => { '>=' => $date->{from}||0 },
 
                 }
             );

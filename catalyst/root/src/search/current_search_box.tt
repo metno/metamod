@@ -47,7 +47,7 @@ function submitSearchForm(actionUrl){
         [% ELSIF category.sc_type == 'date_interval' %]
 
             [% IF c.req().param( search_ui_utils.html_id_for_date( category.sc_id, 'from' ) )
-               && c.req().param( search_ui_utils.html_id_for_date( category.sc_id, 'to' ) ) %]
+               || c.req().param( search_ui_utils.html_id_for_date( category.sc_id, 'to' ) ) %]
                 <div class="[% item_class %]">
                     [% INCLUDE 'search/remove_criteria.tt' html_ids = [ search_ui_utils.html_id_for_date( category.sc_id, 'from' ), search_ui_utils.html_id_for_date( category.sc_id, 'to' ) ] %]
                     [% c.req().param( search_ui_utils.html_id_for_date( category.sc_id, 'from' ) ) %]
