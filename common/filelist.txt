@@ -14,6 +14,8 @@ etc/default/catalyst-myapp
 =schema/oldDataset2Dataset.xslt
 =schema/oldDataset2MM2.xslt
 =schema/dif2dataset.xslt
+=schema/mm2dif.xsl
+=schema/jif.xsl
 =schema/MM2.xsd
 =schema/dataset.xsd
 =schema/datasetRegion.xsd
