@@ -31,7 +31,7 @@
         <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
     [% ELSIF param.key.search('freetext_') && category_type != 'fulltext' %]
         <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
-    [% ELSIF param.key.search('map_coord_') && category_type != 'map_search' %]
+    [% ELSIF ( param.key.search('map_coord_') || param.key == 'selected_map' ) && category_type != 'map_search' %]
         <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
     [% ELSIF ( param.key.search('shown_mt_name_')
                || param.key == 'vertical_mt_name'
