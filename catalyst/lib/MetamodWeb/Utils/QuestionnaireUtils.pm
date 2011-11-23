@@ -130,7 +130,8 @@ sub quest_validator {
                 my $projection_schema = $self->config->get("INSTALLATION_DIR") . '/common/schema/fimexProjections.xsd';
                 $constraint_func = MetamodWeb::Utils::FormValidator::Constraints::xml( $projection_schema )
             } elsif( $constraint eq 'datetime' ) {
-                $constraint_func = date_and_time('YYYY-MM-DD hh:mm:ss');
+                $constraint_func = date_and_time('YYYY-MM-DD hh:mm(:ss)?( UTC)?');
+                # works fine in Data::FormValidator::Constraints::Dates tests
             } elsif( $constraint eq 'boundingbox' ) {
                 $constraint_func = MetamodWeb::Utils::FormValidator::Constraints::boundingbox();
             } else {
@@ -246,8 +247,6 @@ sub config_for_id {
 sub quest_configuration {
     my $self = shift;
 
-    my $quest_config = $self->config()->get('QUEST_CONFIGURATIONS');
-
     my %quest_configurations = (
         'metadata' => {
         config_file => $self->config->path_to_config_file('metadata_quest.json', 'etc', 'qst'),
@@ -259,16 +258,19 @@ sub quest_configuration {
         }
     );
 
-    my @configurations = split("\n", $quest_config);
-    foreach my $line (@configurations){
+    if ($self->config()->has('QUEST_CONFIGURATIONS')) {
+        my $quest_config = $self->config()->get('QUEST_CONFIGURATIONS');
 
-        chomp($line);
-        next if !$line;
+        my @configurations = split("\n", $quest_config);
+        foreach my $line (@configurations){
 
-        my ($config_id, $config_file, $tag) = split " ", $line;
+            chomp($line);
+            next if !$line;
 
-        $quest_configurations{$config_id} = { config_file => $config_file, tag => $tag };
+            my ($config_id, $config_file, $tag) = split " ", $line;
 
+            $quest_configurations{$config_id} = { config_file => $config_file, tag => $tag };
+        }
     }
 
     return \%quest_configurations;

@@ -75,7 +75,7 @@
 
     {
      "type" : "text",
-     "label" : "Data collection period - start (in the form YYYY-MM-DD HH:MM UTC)",
+     "label" : "Data collection period - start (in the form YYYY-MM-DD HH:MM; using UTC)",
      "name" : "datacollection_period_from",
      "constraint" : "datetime",
      "length" : 25
@@ -83,7 +83,7 @@
 
     {
         "type" : "text",
-        "label" : "Data collection period - end (in the form YYYY-MM-DD HH:MM UTC)",
+        "label" : "Data collection period - end (in the form YYYY-MM-DD HH:MM; using UTC)",
         "name" : "datacollection_period_to",
         "constraint" : "datetime",
         "length" : 25
@@ -188,4 +188,3 @@
         "type" : "sectionend"
     }
 ]
-
