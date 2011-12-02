@@ -93,9 +93,6 @@ jQuery(document).ready( function () {
                     [% SET thumbsize = 64 %]
                     [% SET wmsthumb = ds2show.wmsthumb(thumbsize) %]
                     <a class="visual" href="[% c.uri_for('/search/wms') %]?ds_id=[% ds2show.ds_id %]"><span>Visualize</span></a><br clear="all"/>
-                    [% IF dataset.num_children() == 0 %]
-                        <a class="visual" href="http://thredds.met.no/thredds/godiva2/godiva2.html?server=[% wmsthumb.wms_url %]"><span>Visualize more</span></a><br clear="all"/>
-                    [% END %]
                     <div class="wmsthumb"
                         style="position: absolute; height: [% thumbsize %]px; width: [% thumbsize %]px; z-index:12"
                         ><img src="[% wmsthumb.outline %]"/></div>

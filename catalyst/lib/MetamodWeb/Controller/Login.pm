@@ -303,6 +303,7 @@ END_BODY
 Display a password reset form.
 
 =cut
+
 sub reset_password_form : Path('/login/reset_password_form') : Args(0) {
     my ($self, $c) = @_;
 
@@ -316,6 +317,7 @@ Reset the users password with a new random password and send the new password
 to the users email.
 
 =cut
+
 sub reset_password : Path('/login/reset_password') : Args(0) {
     my ($self, $c) = @_;
 
@@ -381,6 +383,7 @@ Request a new role for the current user. The request will send an email to the
 site operator and a receipt to the user.
 
 =cut
+
 sub request_role : Path('/login/request_role') : Args(0) {
     my ($self, $c ) = @_;
 
