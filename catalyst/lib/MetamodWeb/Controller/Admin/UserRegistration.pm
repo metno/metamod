@@ -83,15 +83,7 @@ sub confirm_user_POST {
     my $signature        = $mm_config->get('EMAIL_SIGNATURE') || '';
     my $name             = $userbase_user->u_name();
     my $username         = $userbase_user->u_loginname();
-    my $email_body = <<"END_BODY";
-Dear $name,
-
-you have been granted access to $application_name.
-Username: $username
-Password: $random_pass
-
-$signature
-END_BODY
+    my $email_body       = $mm_config->get('NEW_USER_GREETING') or die "Missing user greeting";
 
     Metamod::Email::send_simple_email(
         to      => [ $userbase_user->u_email ],

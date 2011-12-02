@@ -191,6 +191,7 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
     $c->stash( datasets => [ $datasets->all() ] );
     $c->stash( datasets_pager => $datasets->pager() );
     $c->stash( dataset_count => $datasets->count() );
+    $c->stash( debug => $self->logger->is_debug() );
 
 }
 

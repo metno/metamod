@@ -388,3 +388,15 @@ COLLECTION_BASKET_DIST_STATEMENTS = free
 # Used to restrict the load on the server. If this is not set the collection basket
 # will use a hard coded default value.
 COLLECTION_BASKET_MAX_SIZE = 524288000
+
+# ============== Admin configuration =================
+
+# Text in mail body sent to newly registered users.
+NEW_USER_GREETING =
+ Dear [NAME],
+
+ You have been granted access to [==APPLICATION_NAME==]. ***********
+ Username: [USERNAME]
+ Password: [RANDOM_PASS]
+
+ [==EMAIL_SIGNATURE==]
