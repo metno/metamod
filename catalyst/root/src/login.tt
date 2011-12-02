@@ -67,9 +67,10 @@
             <td>
                 <select name="access_rights" id="access_rights">
                     <option value=""></option> [%# default set blank to avoid wrong data resubmitted by mistake %]
-                    <option value="subscription">Email subscription</option>
-                    <option value="upload">Email subscription, dataset upload and metadata editor</option>
-                    <option value="admin">Master of all he surveys</option>
+                    <option value="subscription">Data consumer (email subscription)</option>
+                    <option value="upload">Data provider (upload/metadata editor)</option>
+                    <option value="dataadmin">Data administrator</option>
+                    <option value="admin">System administrator</option>
                 </select>
             </tr>
 
