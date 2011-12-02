@@ -126,7 +126,7 @@ use Digest;
 use Carp;
 use Metamod::Utils qw(random_string);
 
-use constant ROLETYPES => qw(admin upload subscription);
+use constant ROLETYPES => qw(admin dataadmin upload subscription);
 
 =head2 $self->merge_roles
 
