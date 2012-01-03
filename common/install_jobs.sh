@@ -43,5 +43,6 @@ if [ $APPLICATION_USER ]; then
 	EOT
 	# make sure the tabs above are not replaced with spaces (or the script will break)
     sudo mv /tmp/metamodServices-$APPLICATION_ID /etc/init.d/; ordie
+    sudo chmod +x /etc/init.d/metamodServices-$APPLICATION_ID; ordie
     sudo ln -s /etc/init.d/metamodServices-$APPLICATION_ID /etc/rc2.d/S99metamodServices-$APPLICATION_ID; ordie
 fi
