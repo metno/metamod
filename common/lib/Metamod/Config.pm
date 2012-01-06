@@ -219,7 +219,7 @@ sub is {
     return undef unless exists $self->{vars}{$var};
     my $val = $self->_substituteVariable($var);
     #printf STDERR "Config boolean %s = %s\n", $var, $val;
-    return ($val && $val ne 'false') ? 1 : 0;
+    return ($val && lc($val) ne 'false') ? 1 : 0;
 }
 
 # check for updates of config and reread
