@@ -1,5 +1,11 @@
 #!/usr/bin/perl -w
 
+# TODO:
+# - fails to die using SIGTERM (must use SIGKILL)
+# - add docs
+# - add more interactive error msgs so can also work when started manually
+# - check upload_monitor and try to harmonize since both scripts essentially do the same thing
+
 use FindBin;
 use lib ("$FindBin::Bin/../../common/lib");
 
@@ -49,14 +55,15 @@ if ($pid) {
     if ($@) {
         $log->fatal($@);
     } else {
+        print STDERR "Daemonizing prepare_download (see $errlog)\n";
         $log->info("prepare_download daemon started successfully");
     }
 }
 
-
-our $SIG_TERM = 0;
-sub sigterm {++$SIG_TERM;}
-$SIG{TERM} = \&sigterm;
+# doesn not work together with TheSchwartz
+#our $SIG_TERM = 0;
+#sub sigterm {++$SIG_TERM;}
+#$SIG{TERM} = \&sigterm;
 
 eval {
     $queue_worker->can_do('Metamod::Queue::Worker::PrepareDownload');
