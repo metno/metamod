@@ -98,9 +98,13 @@ my $harvest_schema;
 
 #
 if ($pid) {
+
+    print STDERR "Daemonizing harvester (see $errlog)\n";
     eval { Metamod::Utils::daemonize($errlog, $pid); };
     $log->fatal($@) if $@;
+
 } elsif (@ARGV) {
+
     # run for input file/url rather than source-harvesting
     foreach (@ARGV) {
         $log->info("Fetching document '$_'...");
@@ -120,8 +124,11 @@ if ($pid) {
         }
     }
     exit(0);
+
 } else {
+
     usage();
+
 }
 
 # this is probably no longer needed as POE itself should handle breaks correctly
