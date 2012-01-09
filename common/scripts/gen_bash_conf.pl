@@ -93,7 +93,7 @@ sub print_exit_bash {
 
     print "echo 'Missing configuration in gen_bash_conf.pl.'\n";
     print "echo 'Have you supplied the config parameter or set METAMOD_MASTER_CONFIG in env?'\n";
-    print "exit";
+    print "exit 1";
     exit 1;
 }
 
