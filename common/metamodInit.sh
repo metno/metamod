@@ -14,9 +14,9 @@ webrun_directory="$WEBRUN_DIRECTORY"
 target_directory="$TARGET_DIRECTORY"
 system_log="$LOG4ALL_SYSTEM_LOG"
 
-echo "METAMOD_MASTER_CONFIG $METAMOD_MASTER_CONFIG"
-echo "system_log = $system_log"
-exit 0
+#echo "METAMOD_MASTER_CONFIG=$METAMOD_MASTER_CONFIG"
+#echo "CONFIG=$CONFIG"
+#echo "system_log = $system_log"
 
 COMMON_LIB=$SCRIPT_PATH/lib
 export PERL5LIB="$PERL5LIB:$CATALYST_LIB:$COMMON_LIB"
