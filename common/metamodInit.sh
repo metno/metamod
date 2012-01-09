@@ -187,7 +187,7 @@ status() {
          echo "upload_monitor running";
       else
          echo "upload_monitor not running";
-         retval=1
+         let retval+=1
       fi
    fi
    if [ "$METAMODUPLOAD_DIRECTORY" != "" -a -r $ftp_monitor_script ]; then
@@ -195,7 +195,7 @@ status() {
          echo "ftp_monitor running";
       else
          echo "ftp_monitor not running";
-         retval=1
+         let retval+=2
       fi
    fi
    if [ "$METAMODBASE_DIRECTORY" != "" -a -r $prepare_download_script ]; then
@@ -203,7 +203,7 @@ status() {
          echo "prepare_download running"
       else
          echo "prepare_download not running"
-         retval=2
+         let retval+=4
       fi
    fi
    if [ "$METAMODHARVEST_DIRECTORY" != "" -a -r $harvester_script ]; then
@@ -211,7 +211,7 @@ status() {
          echo "harvester running"
       else
          echo "harvester not running"
-         retval=3
+         let retval+=8
       fi
    fi
    if [ "$METAMODTHREDDS_DIRECTORY" != "" -a -r $create_thredds_catalogs_script ]; then
@@ -219,7 +219,7 @@ status() {
          echo "create_thredds_catalogs running"
       else
          echo "create_thredds_catalogs not running"
-         retval=4
+         let retval+=16
       fi
    fi
    if [ $retval -ne 0 ]; then
