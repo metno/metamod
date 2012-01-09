@@ -4,6 +4,13 @@
 # This file is authoriative in that all legal directives should be specified here
 # Use this file as a starting point for local customization
 
+METAMODBASE_DIRECTORY = dummy_true_value
+METAMODSEARCH_DIRECTORY = dummy_true_value
+METAMODUPLOAD_DIRECTORY = dummy_true_value
+METAMODPMH_DIRECTORY = dummy_true_value
+METAMODHARVEST_DIRECTORY = dummy_true_value
+METAMODQUEST_DIRECTORY = dummy_true_value
+
 SERVER = localhost
 
 # ============ General configuration ==============
@@ -277,6 +284,7 @@ EXTERNAL_REPOSITORY = false
 # from UTF8 to latin-1. If this is the case, set the following variable to
 # TRUE:
 DECODE_FROM_UTF8 = FALSE
+# please change this to true/false or 1/0 - FIXME
 
 # Directory path for files uploaded by the web application:
 UPLOAD_DIRECTORY = [==WEBRUN_DIRECTORY==]/webupload
@@ -443,6 +451,7 @@ PMH_EXPORT_TAGS = [==DATASET_TAGS==]
 # records that do not validate are marked as deleted. To turn this validation
 # off, set PMH_VALIDATION to off.
 PMH_VALIDATION = on
+# please change this to true/false or 1/0 - FIXME
 
 # optional set configuration, one set per row ownertag|name|description
 # the ownertag needs to be one of the export-tags
@@ -495,6 +504,7 @@ TEST_EMAIL_RECIPIENT =
 SUBSCRIPTION_SMS_DIRECTORY = some dir
 
 SUBSCRIPTION_ENABLED = ENABLED
+# please change this to true/false or 1/0 - FIXME
 
 # ============ Authentication configuration ============
 #
