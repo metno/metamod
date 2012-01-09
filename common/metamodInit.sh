@@ -1,7 +1,9 @@
 #!/bin/bash
 
 SCRIPT_PATH="`dirname \"$0\"`"
+COMMAND=$1
 CONFIG=$2
+
 # config must be set in $METAMOD_MASTER_CONFIG envvar if not given as command line param
 SHELL_CONF=/tmp/metamod_tmp_bash_config.sh
 perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
@@ -11,6 +13,10 @@ rm $SHELL_CONF
 webrun_directory="$WEBRUN_DIRECTORY"
 target_directory="$TARGET_DIRECTORY"
 system_log="$LOG4ALL_SYSTEM_LOG"
+
+echo "METAMOD_MASTER_CONFIG $METAMOD_MASTER_CONFIG"
+echo "system_log = $system_log"
+exit 0
 
 COMMON_LIB=$SCRIPT_PATH/lib
 export PERL5LIB="$PERL5LIB:$CATALYST_LIB:$COMMON_LIB"
@@ -56,16 +62,27 @@ running() {
 }
 
 start() {
-   if [ ! -f $PHPLOGFILE ]; then
-      # create world writeable logfile (i.e. by nobody)
-      > $PHPLOGFILE
-      chmod 666 $PHPLOGFILE
-   fi
-   if [ ! -f $WEBRUN_DIRECTORY/userlog ]; then
+
+   ## deprecated? FIXME
+   #if [ ! -f $PHPLOGFILE ]; then
+   #   # create world writeable logfile (i.e. by nobody)
+   #   > $PHPLOGFILE
+   #   chmod 666 $PHPLOGFILE
+   #fi
+   #
+   ## deprecated? FIXME
+   #if [ ! -f $WEBRUN_DIRECTORY/userlog ]; then
+   #   # create world writeable logfile
+   #   > $WEBRUN_DIRECTORY/userlog
+   #   chmod 666 $WEBRUN_DIRECTORY/userlog
+   #fi
+
+   if [ ! -f $system_log ]; then
       # create world writeable logfile
-      > $WEBRUN_DIRECTORY/userlog
-      chmod 666 $WEBRUN_DIRECTORY/userlog
+      touch $system_log
+      chmod 666 $system_log
    fi
+
    if [ "$METAMODUPLOAD_DIRECTORY" != "" -a "$EXTERNAL_REPOSITORY" != "true" -a -r $upload_monitor_script ]; then
       if ! running $upload_monitor_pid; then
          work_directory=$webrun_directory/upl/work
@@ -76,7 +93,7 @@ start() {
          rm -rf $work_flat
          rm -f $path_to_shell_error
          # actually start the daemon
-         start_daemon -n 10 -p $upload_monitor_pid $upload_monitor_script -l $system_log -p $upload_monitor_pid  ${CONFIG:+"--config"} $CONFIG)
+         start_daemon -n 10 -p $upload_monitor_pid $upload_monitor_script -l $system_log -p $upload_monitor_pid  ${CONFIG:+"--config"} $CONFIG
          if [ $? -ne 0 ]; then
             echo "upload_monitor failed: $?"
             return $?;
@@ -95,7 +112,7 @@ start() {
          rm -rf $work_flat
          rm -f $path_to_shell_error
          # actually start the daemon
-         start_daemon -n 10 -p $ftp_monitor_pid $ftp_monitor_script -l $system_log -p $ftp_monitor_pid ${CONFIG:+"--config"} $CONFIG)
+         start_daemon -n 10 -p $ftp_monitor_pid $ftp_monitor_script -l $system_log -p $ftp_monitor_pid ${CONFIG:+"--config"} $CONFIG
          if [ $? -ne 0 ]; then
             echo "ftp_monitor failed: $?"
             return $?;
@@ -107,7 +124,7 @@ start() {
    if [ "$METAMODBASE_DIRECTORY" != "" -a -r $prepare_download_script ]; then
       if ! running $prepare_download_pid; then
          #start_daemon -n 10 -p $prepare_download_pid $prepare_download_script -log $system_log -pid $prepare_download_pid $2/master_config.txt
-         start_daemon -n 10 -p $prepare_download_pid $prepare_download_script -l $system_log -p $prepare_download_pid ${CONFIG:+"--config"} $CONFIG)
+         start_daemon -n 10 -p $prepare_download_pid $prepare_download_script -l $system_log -p $prepare_download_pid ${CONFIG:+"--config"} $CONFIG
          if [ $? -ne 0 ]; then
             echo "prepare_download failed: $?"
             return $?;
@@ -118,7 +135,7 @@ start() {
    fi
    if [ "$METAMODHARVEST_DIRECTORY" != "" -a -r $harvester_script ]; then
       if ! running $harvester_pid; then
-         start_daemon -n 10 -p $harvester_pid $harvester_script -l $system_log -p $harvester_pid ${CONFIG:+"--config"} $CONFIG)
+         start_daemon -n 10 -p $harvester_pid $harvester_script -l $system_log -p $harvester_pid ${CONFIG:+"--config"} $CONFIG
          if [ $? -ne 0 ]; then
             echo "harvester failed: $?"
             return $?;
@@ -129,7 +146,7 @@ start() {
    fi
    if [ "$METAMODTHREDDS_DIRECTORY" != "" -a -r $create_thredds_catalogs_script ]; then
       if ! running $create_thredds_catalogs_pid; then
-         start_daemon -n 10 -p $create_thredds_catalogs_pid $create_thredds_catalogs_script -l $system_log -p $create_thredds_catalogs_pid ${CONFIG:+"--config"} $CONFIG)
+         start_daemon -n 10 -p $create_thredds_catalogs_pid $create_thredds_catalogs_script -l $system_log -p $create_thredds_catalogs_pid ${CONFIG:+"--config"} $CONFIG
          if [ $? -ne 0 ]; then
             echo "create_thredds_catalogs failed: $?"
             return $?;
@@ -210,7 +227,7 @@ status() {
    fi
 }
 
-case "$1" in
+case "$COMMAND" in
     start)
         start;
         ;;
