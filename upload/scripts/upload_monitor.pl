@@ -91,7 +91,11 @@ my $logfile;
 my $pidfile;
 my $config_file_or_dir;
 
-GetOptions('config=s' => , \$config_file_or_dir, 'test!' => \$test, 'logfile=s' => \$logfile, 'pidfile=s' => \$pidfile) or pod2usage();
+GetOptions ('pidfile|p=s'   => \$pidfile,                # name of pid file - if given, run as daemon
+            'logfile|l=s'   => \$logfile,                # optional, redirect STDERR and STDOUT here
+            'config=s'      => \$config_file_or_dir,     # path to config dir/file
+            'test!'         => \$test,                   # dry run
+) or pod2usage();
 
 if(!Metamod::Config->config_found($config_file_or_dir)){
     pod2usage "Could not find the configuration on the commandline or the in the environment\n";
@@ -122,7 +126,7 @@ eval {
         $queue_worker->can_do('Metamod::Queue::Worker::Upload');
         $queue_worker->work_until_done(); # built-in TheSchwartz method, exiting when job queue is empty
 
-    } elsif($pidfile) {
+    } elsif ($pidfile) {
 
         print STDERR "Daemonizing upload monitor (see $logfile)\n";
         Metamod::Utils::daemonize($logfile, $pidfile);
@@ -131,7 +135,7 @@ eval {
 
     } else {
 
-        print STDERR "Not running as daemon. Stop me with Ctrl + C\n";
+        print STDERR "upload monitor: Not running as daemon. Stop me with Ctrl + C\n";
         $queue_worker->can_do('Metamod::Queue::Worker::Upload');
         $queue_worker->work();
     }
@@ -143,9 +147,5 @@ if ($@) {
     $upload_helper->syserrorm( "SYS", "NORMAL TERMINATION", "", "", "" );
 }
 
-# not sure if this is still necessary...
-#our $SIG_TERM = 0;
-#sub sigterm { ++$SIG_TERM; }
-#$SIG{TERM} = \&sigterm;
 
 # END

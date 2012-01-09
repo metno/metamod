@@ -88,9 +88,9 @@ Run the script in test mode (no loop)
 
 
 # Parse cmd line params
-my ($pidFile, $logFile, $test, $config_file_or_dir);
-GetOptions ('pidfile|p=s'   => \$pidFile,                # name of pid file - if given, run as daemon
-            'logfile|l=s'   => \$logFile,                # optional, redirect STDERR and STDOUT here
+my ($pidfile, $logfile, $test, $config_file_or_dir);
+GetOptions ('pidfile|p=s'   => \$pidfile,                # name of pid file - if given, run as daemon
+            'logfile|l=s'   => \$logfile,                # optional, redirect STDERR and STDOUT here
             'config=s'      => \$config_file_or_dir,     # path to config dir/file
             'test!'         => \$test,                   # dry run
 ) or pod2usage();
@@ -99,7 +99,7 @@ if(!Metamod::Config->config_found($config_file_or_dir)){
     pod2usage "Could not find the configuration on the commandline or the in the environment\n";
 }
 
-if( $pidFile && !$logFile){
+if( $pidfile && !$logfile){
     pod2usage("You must specify both --logfile and --pidfile when running in daemon mode");
 }
 
@@ -115,18 +115,23 @@ my $sleeping_seconds      = 60;
 
 eval {
     if ($test) {
+
         print STDERR "Testrun...\n";
         $upload_helper->ftp_process_hour();
-    } elsif(0 == @ARGV) {
-        print STDERR "Not running as daemon. Stop me with Ctrl + C\n";
+
+    } elsif ($pidfile) {
+
+        print STDERR "Daemonizing ftp monitor (see $logfile)\n";
+        Metamod::Utils::daemonize($logfile, $pidfile);
+        start_cronjob();
+
+    } else {
+
+        print STDERR "ftp monitor: Not running as daemon. Stop me with Ctrl + C\n";
         while( $upload_helper->ftp_process_hour() ) {
             sleep $sleeping_seconds;
         }
-    } else {
-        my ($logFile, $pidFile) = @ARGV;
-        print STDERR "Daemonizing ftp monitor (see $logFile)\n";
-        Metamod::Utils::daemonize($logFile, $pidFile);
-        start_cronjob();
+
     }
 };
 if ($@) {
