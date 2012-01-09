@@ -3,6 +3,7 @@
 SCRIPT_PATH="`dirname \"$0\"`"
 CONFIG=$1
 # config must be set in $METAMOD_MASTER_CONFIG envvar if not given as command line param
+## actually you MUST give it on commandline or the script won't be properly installed (FIXME)
 SHELL_CONF=/tmp/metamod_tmp_bash_config.sh
 perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
 source $SHELL_CONF
@@ -39,7 +40,7 @@ sudo ln -s /etc/init.d/$CATALYST_APP /etc/rc2.d/S92$CATALYST_APP; ordie
 if [ $APPLICATION_USER ]; then
 	cat > /tmp/metamodServices-$APPLICATION_ID <<- EOT
 		#! /bin/sh
-		su -c "$INSTALLATION_DIR/common/metamodInit.sh \$*" -s /bin/sh $APPLICATION_USER
+		su -c "$INSTALLATION_DIR/common/metamodInit.sh \$1 $CONFIG" -s /bin/sh $APPLICATION_USER
 	EOT
 	# make sure the tabs above are not replaced with spaces (or the script will break)
     sudo mv /tmp/metamodServices-$APPLICATION_ID /etc/init.d/; ordie
