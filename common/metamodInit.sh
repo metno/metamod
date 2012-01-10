@@ -184,23 +184,23 @@ status() {
    retval=0
    if [ "$METAMODUPLOAD_DIRECTORY" != "" -a -r $upload_monitor_script ]; then
       if running $upload_monitor_pid; then
-         echo "upload_monitor running";
+         echo "upload_monitor is running (pid `cat $upload_monitor_pid`)"
       else
-         echo "upload_monitor not running";
+         echo "upload_monitor not running"
          let retval+=1
       fi
    fi
    if [ "$METAMODUPLOAD_DIRECTORY" != "" -a -r $ftp_monitor_script ]; then
       if running $ftp_monitor_pid; then
-         echo "ftp_monitor running";
+         echo "ftp_monitor is running (pid `cat $ftp_monitor_pid`)"
       else
-         echo "ftp_monitor not running";
+         echo "ftp_monitor not running"
          let retval+=2
       fi
    fi
    if [ "$METAMODBASE_DIRECTORY" != "" -a -r $prepare_download_script ]; then
       if running $prepare_download_pid; then
-         echo "prepare_download running"
+         echo "prepare_download is running (pid `cat $prepare_download_pid`)"
       else
          echo "prepare_download not running"
          let retval+=4
@@ -208,7 +208,7 @@ status() {
    fi
    if [ "$METAMODHARVEST_DIRECTORY" != "" -a -r $harvester_script ]; then
       if running $harvester_pid; then
-         echo "harvester running"
+         echo "harvester is running (pid `cat $harvester_pid`)"
       else
          echo "harvester not running"
          let retval+=8
@@ -216,14 +216,14 @@ status() {
    fi
    if [ "$METAMODTHREDDS_DIRECTORY" != "" -a -r $create_thredds_catalogs_script ]; then
       if running $create_thredds_catalogs_pid; then
-         echo "create_thredds_catalogs running"
+         echo "create_thredds_catalogs is running (pid `cat $create_thredds_catalogs_pid`)"
       else
          echo "create_thredds_catalogs not running"
          let retval+=16
       fi
    fi
    if [ $retval -ne 0 ]; then
-      exit 3;
+      exit 3
    fi
 }
 
