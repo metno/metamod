@@ -10,6 +10,7 @@ source $SHELL_CONF
 rm $SHELL_CONF
 
 CATALYST_APP="catalyst-$APPLICATION_ID"
+COMMON_LIB=$SCRIPT_PATH/lib
 
 # don't overwrite existing text files in /etc (only symlinks are ok)
 ordie () {
@@ -40,7 +41,7 @@ sudo ln -s /etc/init.d/$CATALYST_APP /etc/rc2.d/S92$CATALYST_APP; ordie
 if [ $APPLICATION_USER ]; then
 	cat > /tmp/metamodServices-$APPLICATION_ID <<- EOT
 		#! /bin/sh
-		su -c "$INSTALLATION_DIR/common/metamodInit.sh \$1 $CONFIG" -s /bin/sh $APPLICATION_USER
+		su -c "export PERL5LIB=$PERL5LIB:$CATALYST_LIB:$COMMON_LIB; $INSTALLATION_DIR/common/metamodInit.sh \$1 $CONFIG" -s /bin/sh $APPLICATION_USER
 	EOT
 	# make sure the tabs above are not replaced with spaces (or the script will break)
     sudo mv /tmp/metamodServices-$APPLICATION_ID /etc/init.d/; ordie
