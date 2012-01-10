@@ -54,7 +54,7 @@ if(!Metamod::Config->config_found($config_file_or_dir)){
     print_exit_bash();
 }
 
-my $config = Metamod::Config->new($config_file_or_dir);
+my $config = Metamod::Config->new( $config_file_or_dir, { nolog => 1 } );
 
 my @configVars = $config->getVarNames();
 

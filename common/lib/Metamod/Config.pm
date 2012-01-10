@@ -61,7 +61,7 @@ our $_config; #_config{file} => $config
 our $_logger_initialised;
 
 sub new {
-    my ($class, $file_or_dir) = @_;
+    my ($class, $file_or_dir, $options) = @_;
 
     # we already have an object so use that instead.
     return $_config if defined $_config;
@@ -94,7 +94,7 @@ sub new {
         vars => {}, # lazy loading on first get
     };
     $_config = bless $config, $class;
-    $_config->initLogger;
+    $_config->initLogger unless $$options{nolog};
 
     return $_config;
 }
@@ -114,6 +114,7 @@ Undefs the current singleton object. The B<ONLY> reason to use this is for testi
 the class it self.
 
 =cut
+
 sub _reset_singleton {
     my $class = shift;
 
@@ -579,7 +580,6 @@ sub path_to_config_file {
 
 
 1;
-__END__
 
 =head1 NAME
 
@@ -599,11 +599,11 @@ Metamod::Config - get runtime configuration environment
 
 This module can be used to read the configuration file.
 
-=head1 FUNCTIONS
+=head1 CONSTRUCTOR
 
 =over 4
 
-=item new([configfilename])
+=item new([configfilename], [options])
 
 Initialize the configuration with a config-file. If no config-file is given,
 the environment-variable METAMOD_MASTER_CONFIG will be used (useful for testing),
@@ -614,6 +614,18 @@ This function will die if the config-file cannot be found.
 
 This function makes sure, that each config-file will only be opened once, even
 if the same config file is opened several times.
+
+=back
+
+=head2 Options
+
+=over 4
+
+=item nolog
+
+Skip logging initialization
+
+=back
 
 =head1 FUNCTIONS
 
