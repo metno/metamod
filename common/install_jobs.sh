@@ -6,8 +6,21 @@ CONFIG=$1
 ## actually you MUST give it on commandline or the script won't be properly installed (FIXME)
 SHELL_CONF=/tmp/metamod_tmp_bash_config.sh
 perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
-source $SHELL_CONF
-rm $SHELL_CONF
+
+if [ -s "$SHELL_CONF" ]
+then
+    source $SHELL_CONF
+    rm $SHELL_CONF
+else
+    echo "Configuration file is empty!" 1>&2
+    exit 2
+fi
+
+if [ -z "$APPLICATION_ID" ]
+then
+    echo "Missing application id! Config not read?" 1>&2
+    exit 1
+fi
 
 CATALYST_APP="catalyst-$APPLICATION_ID"
 COMMON_LIB=$SCRIPT_PATH/lib
