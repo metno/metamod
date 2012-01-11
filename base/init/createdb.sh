@@ -12,7 +12,7 @@ COMMON="$SCRIPT_PATH/common.sh"
 
 if [ -e  $COMMON ]
 then
-    echo $COMMON found!
+    #echo $COMMON found!
     . "$COMMON"
 else
         echo "Library $COMMON not found."
@@ -27,12 +27,14 @@ check "PG_POSTGIS_SYSREF_SCRIPT" 1
 check "SRUSCHEMA" 1
 
 # create DB
-$DROPDB -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $DBNAME
-$CREATEDB -E UTF-8 -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $DBNAME
+$DROPDB -e -w -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $DBNAME
+ordie "Can't drop database $DBNAME"
+$CREATEDB -e -w -E UTF-8 -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $DBNAME
+ordie "Can't create database $DBNAME"
 echo "----------------- Database $DBNAME created ------------------"
 
 echo "----------------- Allow PLSQL ------------------"
-$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<'EOF'
+$PSQL -a -w -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<'EOF'
 -- allow plpgsql
 CREATE TRUSTED LANGUAGE plpgsql;
 EOF
@@ -47,13 +49,13 @@ echo "----------- Trying to install PostGIS Coordinate systems -----------------
 $PSQL -q -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $PG_POSTGIS_SYSREF_SCRIPT
 echo "----------- Trying to install PostGIS Additional Coordinate systems ---------------------"
 # this may be blank
-$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<EOT
+$PSQL -a -w -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<EOT
 $PG_POSTGIS_ADDITIONAL_SYSREF
 EOT
 
 # start creating tables and functions
 #
-$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<EOF
+$PSQL -a -w -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<EOF
 
 -- drop eventuelly existing stuff
 DROP TRIGGER IF EXISTS update_MD_content_fulltext ON Metadata;
@@ -238,17 +240,19 @@ CREATE TABLE HarvestStatus (
 
 \q
 EOF
+ordie "Table creation failed"
 
 echo "----------------- ADD GEOMETRY COLUMNS FOR EACH COORD-SYSTEM -----------"
 for i in $SRID_ID_COLUMNS; do
-$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<EOF
+$PSQL -a -w -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<EOF
 SELECT AddGeometryColumn('public', 'dataset_location', 'geom_$i', $i, 'GEOMETRY', 2);
 CREATE INDEX Idx_Dataset_Location_geom_$i ON Dataset_Location USING GIST (geom_$i);
 EOF
+ordie "SRID column $i failed"
 done
 
 echo "----------------- ADDING SRU2JDBC SUPPORT -----------"
-$PSQL -a --set PG_WEB_USER=$PG_WEB_USER -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $SRUSCHEMA
-
+$PSQL -a -w --set PG_WEB_USER=$PG_WEB_USER -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $SRUSCHEMA
+ordie "SRU2JDBC failed"
 
 date +'%Y-%m-%d %H:%M Database re-initialized, dynamic tables created'

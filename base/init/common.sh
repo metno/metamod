@@ -26,6 +26,14 @@ check () {
     fi
 }
 
+ordie () {
+    if [ $? != 0 ]
+    then
+        echo "$*" 1>&2
+        exit $?
+    fi
+}
+
 # init required config variables
 DBNAME=$DATABASE_NAME
 
