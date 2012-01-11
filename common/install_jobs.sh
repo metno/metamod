@@ -1,9 +1,29 @@
 #!/bin/bash
 
 SCRIPT_PATH="`dirname \"$0\"`"
-CONFIG=$1
+
 # config must be set in $METAMOD_MASTER_CONFIG envvar if not given as command line param
-## actually you MUST give it on commandline or the script won't be properly installed (FIXME)
+if [ ! -z "$1" ]
+then
+    CONFIG=`readlink -f "$1"`
+else
+    if [ ! -z "$METAMOD_MASTER_CONFIG" ]
+    then
+        CONFIG=$METAMOD_MASTER_CONFIG
+    else
+        echo "No configuration specified (param or envvar)" 1>&2
+        exit 1
+    fi
+fi
+
+if [ -r $CONFIG ]
+then
+    echo "Using config file $CONFIG"
+else
+    echo "Config file $CONFIG not readable" 1>&2
+    exit 1
+fi
+
 SHELL_CONF=/tmp/metamod_tmp_bash_config.sh
 perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
 
@@ -48,7 +68,6 @@ sudo ln -s $CONFIG_DIR/etc/default/$CATALYST_APP /etc/default/$CATALYST_APP; ord
 sudo ln -s $CONFIG_DIR/etc/init.d/$CATALYST_APP /etc/init.d/$CATALYST_APP; ordie
 # start Catalyst at boot
 sudo ln -s /etc/init.d/$CATALYST_APP /etc/rc2.d/S92$CATALYST_APP; ordie
-
 
 # install metamodInit.sh job [code copied from Egil]
 if [ $APPLICATION_USER ]; then
