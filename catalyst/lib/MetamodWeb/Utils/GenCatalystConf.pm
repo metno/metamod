@@ -151,7 +151,7 @@ sub _rget {    # required get
 sub _oget {    # optional get
     my $conf = shift;
     my $key  = shift or die "Missing config key param";
-    my $val  = eval { $conf->get($key); };
+    my $val  = $conf->has($key) ? $conf->get($key) : undef;
     return $val;
 }
 
