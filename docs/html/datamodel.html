@@ -1,0 +1,140 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>METAMOD Datamodel</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#metamod_datamodel">METAMOD Datamodel</a></li>
+	<ul>
+
+		<li><a href="#the_metadata">The Metadata</a></li>
+		<ul>
+
+			<li><a href="#io_libraries">IO-Libraries</a></li>
+		</ul>
+
+		<li><a href="#the_metadata_store">The Metadata Store</a></li>
+		<li><a href="#the__sql__database">The (SQL) Database</a></li>
+		<ul>
+
+			<li><a href="#index_database">Index-Database</a></li>
+			<li><a href="#user_database">User-Database</a></li>
+		</ul>
+
+	</ul>
+
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="metamod_datamodel">METAMOD Datamodel</a></h1>
+<p>This text describes the data-model and the data-flow within METAMOD2. It is not
+about the real data files which are often handled by other applications, i.e. thredds.</p>
+<p>
+</p>
+<h2><a name="the_metadata">The Metadata</a></h2>
+<p>All metadata in METAMOD should consist of two files, the .xml-files (META) and
+the .xmd-files (XMD).</p>
+<p>The META files contain the discovery metadata as retrieved from
+an metadata-editor, extracted from netcdf-files or harvested from external metadata-
+repositories. The META files should be stored in the format they have been retrieved, e.g.
+DIF, ISO19139 or MM2. They will be converted on export from the <a href="#the_metadata_store">The Metadata Store</a>.</p>
+<p>The XMD files are metamod-related information of the metadata. They contain the following information:</p>
+<dl>
+<dt><strong><a name="name_the_unique_identifier_consisting_of_2_or_3_path_arguments_like_application_id_parent_name_child_name_or_application_id_name" class="item"><strong>name</strong>: the unique identifier, consisting of 2 or 3 path arguments like
+            APPLICATION_ID/PARENT_NAME/CHILD_NAME or APPLICATION_ID/NAME</a></strong></dt>
+
+<dt><strong><a name="use" class="item"><strong>status</strong>: indicate if the metadata is in use (active) or expired (deleted)</a></strong></dt>
+
+<dt><strong><a name="metadata" class="item"><strong>ownertag</strong>: identifies the source of the metadata (usually one tag for uploaded data per APPLICATION_ID
+                and one tag for each harvester source)</a></strong></dt>
+
+<dt><strong><a name="creationdate_when_the_metadata_whas_created_retrieved_by_metamod" class="item"><strong>creationDate</strong>: when the metadata whas created/retrieved by metamod</a></strong></dt>
+
+<dt><strong><a name="datestamp_last_change_of_the_xmd_file" class="item"><strong>datestamp</strong>: last change of the xmd-file</a></strong></dt>
+
+<dt><strong><a name="metadataformat_the_format_of_the_metadata_this_is_only_a_best_effort_and_not_a_guarantee" class="item"><strong>metadataFormat</strong>: The format of the metadata. This is only a best-effort and not a guarantee.</a></strong></dt>
+
+</dl>
+<p>The <code>creationDate</code> and <code>datestamp</code> are only accurate concerning METAMOD and XMD-files.
+The META files might have own means to control the creationDate and datastamp and it is up to the
+metadata-creator to control those fields.</p>
+<p>The XMD-files might also contain information which does not fit in discovery-metadata and is usable
+by METAMOD only. That is currently:</p>
+<dl>
+<dt><strong><a name="region" class="item"><strong>quadtree_nodes</strong>: high accuracy geographical region (deprecated since Metamod 2.3)</a></strong></dt>
+
+<dt><strong><a name="datasetregion_high_accuracy_geographical_region" class="item"><strong>datasetRegion</strong>: high accuracy geographical region</a></strong></dt>
+
+<dt><strong><a name="projectioninfo_control_of_data_reprojections_through_fimex" class="item"><strong>projectionInfo</strong>: control of data-reprojections through fimex</a></strong></dt>
+
+<dt><strong><a name="wmsinfo_control_of_wms_client_for_the_data_representation" class="item"><strong>wmsInfo</strong>: control of WMS-client for the data-representation</a></strong></dt>
+
+</dl>
+<p>
+</p>
+<h3><a name="io_libraries">IO-Libraries</a></h3>
+<p>To access the XMD files only use <a href="/Metamod/ForeignDataset.html">the Metamod::ForeignDataset manpage</a>. To access the information in the
+META files, too (converted to MM2), use <a href="/Metamod/Dataset.html">the Metamod::Dataset manpage</a>.</p>
+<p>
+</p>
+<h2><a name="the_metadata_store">The Metadata Store</a></h2>
+<p>The Metadata Store of METAMOD is file-based in the <code>webrun/XML</code> directory of the instanses.
+It is the authoritative source of all information about Metadata and the way Metamod uses it
+(META and XMD files). It has no information related to metamod-users, though.</p>
+<p>The XMD and META files are stored in directories named APPLICATION_ID.</p>
+<p>
+</p>
+<h2><a name="the__sql__database">The (SQL) Database</a></h2>
+<p>The SQL Database consists of two parts, called Index- and User-databse. The database
+can be used by several instances of metamod. Currently, one instance will have the ownership
+of the database. That intance is then responsible for database-creation and all metadata-indexing.
+That instance will need the path to all instances <code>webrun/XML</code> directories.</p>
+<p>
+</p>
+<h3><a name="index_database">Index-Database</a></h3>
+<p>The Index-database is an excerpt of all Metadata Stores for faster (indexed) access.
+All META files are converted to MM2 metadata to be searchable in an easy way. Only the
+web-needed information from the META-files can be found in the database.</p>
+<p>
+</p>
+<h3><a name="user_database">User-Database</a></h3>
+<p>The User-database stores all information related directly to users of metamod. That is:</p>
+<dl>
+<dt><strong><a name="user_user_names_passwords_might_be_externalized_i_e_ldap_this_information_is_unique_among_all_instances" class="item"><strong>user, user-names, passwords, ...</strong>: (might be externalized, i.e. LDAP) This information is unique
+      among all instances.</a></strong></dt>
+
+<dt><strong><a name="user_roles_in_instances_roles_for_the_instances_are_prepended_by_the_application_id" class="item"><strong>user-roles in instances</strong>: roles for the instances are prepended by the 'APPLICATION_ID'</a></strong></dt>
+
+<dt><strong><a name="ownerships" class="item"><strong>datasets ownerships</strong> (owned by users)</a></strong></dt>
+
+<dt><strong><a name="datasets" class="item"><strong>access-keys for users to datasets</strong> (dirkeys)</a></strong></dt>
+
+<dt><strong><a name="user_subscriptions_to_datasets" class="item"><strong>user-subscriptions to datasets</strong></a></strong></dt>
+
+<dt><strong><a name="users" class="item"><strong>collection-baskets of users</strong> (temporary?)</a></strong></dt>
+
+<dt><strong><a name="store" class="item"><strong>temporary information</strong> i.e. database-tables for queues and everything which is faster/simpler to store (medium temporary)
+in a database than in the file-system.</a></strong></dt>
+
+</dl>
+
+</body>
+
+</html>

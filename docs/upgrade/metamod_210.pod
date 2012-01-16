@@ -1,0 +1,45 @@
+=head1 Upgrading to METAMOD 2.10 from 2.9
+
+=head2 PHP no longer used
+
+
+=head2 Configuration variables
+
+
+=head2 Perl modules
+
+=over 4
+
+=item HTTP::OAI
+
+=item XML::SAX::Writer
+
+=back
+
+=head2 Simplified installation
+
+=head3 Program installation via Debian packages
+
+    dpkg -i metno-perl-webdev-ver1
+
+    dpkg -i metno-metamod-2.10_2.10.0-1_all.deb
+
+=head3 Program installation (manual)
+
+    cpan install
+
+=head3 Local configuration
+
+applic directory
+
+=head3 Automatic setup
+
+    createusers.sh
+    createdb.sh
+    createuserdb.sh
+
+    prepare_runtime_env.sh
+    gen_httpd_conf
+    gen_initd_script
+    install_jobs
+

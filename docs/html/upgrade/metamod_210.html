@@ -1,0 +1,94 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Upgrading to METAMOD 2.10 from 2.9</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#upgrading_to_metamod_2_10_from_2_9">Upgrading to METAMOD 2.10 from 2.9</a></li>
+	<ul>
+
+		<li><a href="#php_no_longer_used">PHP no longer used</a></li>
+		<li><a href="#configuration_variables">Configuration variables</a></li>
+		<li><a href="#perl_modules">Perl modules</a></li>
+		<li><a href="#simplified_installation">Simplified installation</a></li>
+		<ul>
+
+			<li><a href="#program_installation_via_debian_packages">Program installation via Debian packages</a></li>
+			<li><a href="#program_installation__manual_">Program installation (manual)</a></li>
+			<li><a href="#local_configuration">Local configuration</a></li>
+			<li><a href="#automatic_setup">Automatic setup</a></li>
+		</ul>
+
+	</ul>
+
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="upgrading_to_metamod_2_10_from_2_9">Upgrading to METAMOD 2.10 from 2.9</a></h1>
+<p>
+</p>
+<h2><a name="php_no_longer_used">PHP no longer used</a></h2>
+<p>
+</p>
+<h2><a name="configuration_variables">Configuration variables</a></h2>
+<p>
+</p>
+<h2><a name="perl_modules">Perl modules</a></h2>
+<dl>
+<dt><strong><a name="http_oai" class="item">HTTP::OAI</a></strong></dt>
+
+<dt><strong><a name="xml_sax_writer" class="item">XML::SAX::Writer</a></strong></dt>
+
+</dl>
+<p>
+</p>
+<h2><a name="simplified_installation">Simplified installation</a></h2>
+<p>
+</p>
+<h3><a name="program_installation_via_debian_packages">Program installation via Debian packages</a></h3>
+<pre>
+    dpkg -i metno-perl-webdev-ver1</pre>
+<pre>
+    dpkg -i metno-metamod-2.10_2.10.0-1_all.deb</pre>
+<p>
+</p>
+<h3><a name="program_installation__manual_">Program installation (manual)</a></h3>
+<pre>
+    cpan install</pre>
+<p>
+</p>
+<h3><a name="local_configuration">Local configuration</a></h3>
+<p>applic directory</p>
+<p>
+</p>
+<h3><a name="automatic_setup">Automatic setup</a></h3>
+<pre>
+    createusers.sh
+    createdb.sh
+    createuserdb.sh</pre>
+<pre>
+    prepare_runtime_env.sh
+    gen_httpd_conf
+    gen_initd_script
+    install_jobs</pre>
+
+</body>
+
+</html>

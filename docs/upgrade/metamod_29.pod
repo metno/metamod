@@ -1,0 +1,24 @@
+=head1 Upgrading to METAMOD 2.9 from 2.8
+
+=head2 Configuration variables
+
+
+
+=head2 Perl modules
+
+The following modules are new requirements
+
+=over 4
+
+=item TheSchwartz
+
+=item Archive::Zip
+
+=item POE
+
+=item POE::Component::Cron
+
+=item DateTime::Set
+
+=back
+

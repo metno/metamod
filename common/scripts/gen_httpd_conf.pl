@@ -107,6 +107,7 @@ my $conf_text = <<EOT;
 #ProxyPass           $local/static   !
 
 ProxyPass           $local/upl      !
+ProxyPass           $local/docs     !
 
 ProxyPass           $local/         http://127.0.0.1:$port/
 ProxyPassReverse    $local/         http://127.0.0.1:$port/
@@ -120,14 +121,17 @@ ProxyPassReverse    $local/         http://127.0.0.1:$port/
 $old_redirect
 
 # static files should be served directly from Apache
-#Alias               $local/static   $paths{root}/static
+#Alias               $local/static      $paths{root}/static
 
 # ditto for error reports (which has a hardcoded url)
-Alias               $local/upl/uerr $webrun/upl/uerr
+Alias               $local/upl/uerr     $webrun/upl/uerr
+
+# as well as system documentation
+Alias               $local/docs         $installation_dir/docs/html
 
 # if you don't want the default favicon, put custom file in applic-dir and update filelist.txt
 # FIXME: make custom icon per app
-#Alias               favicon.ico     $paths{root}/favicon.ico
+#Alias               favicon.ico        $paths{root}/favicon.ico
 
 <Directory $installation_dir/pmh/htdocs>
     Options Indexes FollowSymLinks MultiViews
@@ -136,6 +140,15 @@ Alias               $local/upl/uerr $webrun/upl/uerr
     Order allow,deny
     allow from all
 </Directory>
+
+<Directory $installation_dir/docs/html>
+    Options Indexes FollowSymLinks MultiViews
+    AddDefaultCharset UTF-8
+    #AllowOverride None
+    Order allow,deny
+    allow from all
+</Directory>
+
 EOT
 
 if ($virtualhost) {

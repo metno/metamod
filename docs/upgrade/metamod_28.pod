@@ -1,4 +1,4 @@
-=head1 Upgrading METAMOD 2.8
+=head1 Upgrading to METAMOD 2.8
 
 =head2 From version 2.7
 
