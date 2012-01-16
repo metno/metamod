@@ -1,0 +1,60 @@
+
+2.10    ?
+    - Simplified installation - now running directly from source, Debian installer
+    - WMS visualization of time series, aggregated datasets, collection basket
+    - Final PHP module (OAI-PMH) rewritten in Perl
+    - Added config defaults, simplifying site administration
+
+2.9     Thu Sep 8 09:33:55 2011
+    - Allowing near-realtime web upload
+    - Queue system implemented for background jobs
+    - Cron scheduling for Harvester, FTP upload
+    - Improvements in the metadata backend
+    - Each site must now run separate userbase
+
+2.8     Wed May 18 10:50:41 2011
+    - Stable release using Catalyst/Perl web frontend
+    - Hashed passwords for improved security
+
+2.7     Internal milestone, not released
+    - Technology preview using Catalyst/Perl for web interface instead of PHP
+
+2.6     Thu Nov 25 08:00:00 2010
+    - Connecting to SRU2JDBC for ISO23950 support
+    - Dataset subscription via e-mail and RSS support
+    - Improved ISO19115/19139 support compatible with WIS and GeoNetworks
+    - WMS improvements
+    - User database added
+
+2.5     Tue May 11 11:15:51 2010
+    - WMS presentation of data
+    - WMS preview in client
+    - Registration of files in existing repository
+    - Search in different world maps
+
+2.4     Fri Mar 12 13:11:59 2010
+    - Internal release number only
+
+2.3     Wed Nov 18 09:57:57 2009
+    - general text search
+    - methods for re-projecting 2D data (fimex)
+    - methods for connecting to WMS server
+    - module for automatic update of THREDDS catalog.
+    - improvements in PMH server and dataset administration.
+
+2.2     Wed Apr 1 13:54:53 2009
+    - Implementation of a two-level view of datasets. At the highest level,
+      datasets representing several files are described. Details of each file
+      are described at the second level
+
+2.1     Fri Dec 19 14:31:13 2008
+
+2.0     Mon Jul 21 07:44:07 2008
+
+1.x     2002-2007
+    During 2001/2002, the Norwegian Meteorological Institute (METNO) implemented
+    a web based tool (MetaMod) for searching data archived under the NoSerC
+    project (http://noserc.met.no/). This tool was adapted for the DAMOCLES
+    project in 2006/2007. The web interface and the overall functionality of the
+    tool were very much improved during the DAMOCLES development, and just a
+    small part of the original code base has remained unchanged.
