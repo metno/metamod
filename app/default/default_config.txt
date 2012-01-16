@@ -20,6 +20,9 @@ LOCAL_URL = /metamod
 # must be same as owner of webrun directory
 APPLICATION_USER = www-data
 
+# obsolete - remove from code and use custom templates instead - FIXME
+SEARCH_APP_TITLE = Metadata Catalogue Search
+
 # ============== Logging configuration ==================
 LOG4PERL_CONFIG = [==CONFIG_DIR==]/log4perl_config.ini
 LOG4PERL_WATCH_TIME = 30

@@ -145,7 +145,7 @@ it will also run a2ensite to enable it.
 
 Init.d script to start/stop Catalyst.
 
-=item /etc/init.d//metamodServices-APPLICATION_ID
+=item /etc/init.d/metamodServices-APPLICATION_ID
 
 Actually not a symlink, but a one-line script to run metamodInit.sh as the correct user.
 

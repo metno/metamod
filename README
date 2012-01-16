@@ -9,8 +9,7 @@ catalogue developed by the Norwegian Metrological Institute. METAMOD can
 harvest metadata from several different sources and offers a web-based
 search interface to the metadata catalogue.
 
-METAMOD is mostly written in Perl with some PHP and shell scripting as
-well.
+METAMOD is written in Perl with some shell scripting for installation.
 
 MODULES
 -------
@@ -59,9 +58,9 @@ DEPENDENCIES
 This software depends on the following external software which is not part
 of the METAMOD 2.x distribution:
 
-- PostgreSQL database system. Tested on version 8.1
+- PostgreSQL database system. Tested on version 8.4
 
-- Apache 2.x web server with PHP 5.x installed
+- Apache 2.x web server with mod_proxy installed
 
 - libxml and libxslt library from xmlsoft.org
 
@@ -69,19 +68,15 @@ of the METAMOD 2.x distribution:
 
 - NetCDF software 3.x (x >= 5): libnetcdf, ncdump and ncgen (METAMODUPLOAD)
 
-- PHP 5.x with libxml, libxslt, libgd and libpsql installed and the PEAR-modules:
-  Auth, DB, Log
+- Perl v5.8 with a whole host of Perl modules, of which Moose, Catalyst,
+  Template Toolkit, DBIx::Class, HTTP::OAI, TheSchwartz and Data::FormValidator
+  are the most important. A complete list should be found in catalyst/Makefile.PL.
 
-- Perl v5.8 with the following Perl modules:
-  XML::Simple, XML::LibXML, XML::LibXSLT, DBI, DBD::Pg
-  Geo::Proj4, Mail::Mailer, PDL, PDL::Char, PDL::NetCDF,
-  LWP* (libwww-perl), URI::Escape, XML-RSS-LibXML, Config::Tiny
-
-METAMOD 2.x has been developed and tested using Ubuntu Linux 8.04, but
+METAMOD 2.x has been developed and tested using Ubuntu Linux 10.04, but
 should work on most operating systems supporting the mentioned libraries.
 
 
-SYSTEM OVERVIEW
+SYSTEM OVERVIEW (OBSOLETE - FIXME)
 ---------------
 
 For each module there is a more detailed README file describing the
@@ -161,7 +156,7 @@ are pending. These perl scripts have to be manually started by the
 'metamodInit.sh start' shell script. They will run until another shell script,
 'metamodInit.sh stop', stops the scripts in an orderly fashion.
 
-DIRECTORY STRUCTURE
+DIRECTORY STRUCTURE (OBSOLETE - FIXME)
 -------------------
 
 The top METAMOD 2.x directory (the directory where this README file resides)
@@ -206,10 +201,10 @@ possible to taylor a METAMOD application to any specific need, but usually this
 mechanism is only used for presentation purposes (stylesheets etc.) and for
 static data used to setting up the search interface.
 
-CONFIGURATION
+CONFIGURATION (OBSOLETE - FIXME)
 -------------
 
-PHP CONFIGURATION
+PHP CONFIGURATION (OBSOLETE - FIXME)
 -----------------
 The following values should be configured in the php.ini file
 
@@ -217,7 +212,7 @@ track_errors = On
 upload_max_filesize = 100M
 post_max_size = 100M
 
-METAMOD CONFIGURATION
+METAMOD CONFIGURATION (OBSOLETE - FIXME)
 ---------------------
 
 The source files within the METAMOD 2.x directories contain a variety of file
@@ -289,7 +284,7 @@ METAMODUPLOAD, METAMODHARVEST and/or the METAMODQUEST module) must have a short
 acronym that uniquely identify the application for the database. This acronym is
 included in the master_config.txt file as the value of variable APPLICATION_ID.
 
-INSTALLATION
+INSTALLATION (OBSOLETE - FIXME)
 ------------
 
 To install an application, the following installation script (located in the top
@@ -334,7 +329,7 @@ The file pathes in each 'filelist.txt' file must all be relative to the
 corresponding top module directory (or the 'common' or application directory).
 The copied files will keep these relative pathes on the the target directory.
 
-MULTIPLE TARGET FILES
+MULTIPLE TARGET FILES (OBSOLETE - FIXME)
 ---------------------
 
 It is possible to use the configuration file to produce several target files
@@ -360,7 +355,7 @@ produced from the same source file, and they will have different content
 depending on the in-between substitution directives found for each target
 file.
 
-TESTING
+TESTING (OBSOLETE - FIXME)
 -------
 
 The EXAMPLE application that is included in this source tree (app/example)

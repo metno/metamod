@@ -19,6 +19,7 @@ perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} 
 source $SHELL_CONF
 rm $SHELL_CONF
 
+# why are these redefined here when they are already set in master_config? FIXME
 PSQL=psql
 CREATEDB=createdb
 DROPDB=dropdb

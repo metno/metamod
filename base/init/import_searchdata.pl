@@ -34,9 +34,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
-#
-#  Update static search data in the database from an XML file.
-#
 use strict;
 use warnings;
 
@@ -418,3 +415,31 @@ sub hkloop {
       }
    }
 }
+
+
+=head1 NAME
+
+B<import_searchdata.pl> - Update static search data in the database from an XML file
+
+=head1 DESCRIPTION
+
+More later...
+
+=head1 SYNOPSIS
+
+More later...
+
+=head1 TODO
+
+Rewrite using log4perl (just wasted a whole day trying to figure out why the script crashed with no error msgs to be found)
+
+=head1 LICENSE
+
+Copyright (C) 2010 The Norwegian Meteorological Institute.
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+=cut

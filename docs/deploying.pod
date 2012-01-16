@@ -459,6 +459,6 @@ The site should now hopefully be available on
 
 Start METAMOD:
 
-	sudo /etc/init.d//metamodServices-APPLICATION_ID start
+	sudo /etc/init.d/metamodServices-APPLICATION_ID start
 
 This should start the required services daemons.
