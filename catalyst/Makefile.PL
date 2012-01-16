@@ -48,6 +48,10 @@ requires 'Imager'; # If installing from CPAN you need libpng-dev (Ubuntu)
 requires 'XML::LibXML';
 requires 'XML::LibXSLT';
 requires 'XML::RSS::LibXML';
+requires 'POE';
+requires 'POE::Component::Cron';
+requires 'DateTime::Set';
+
 
 test_requires 'Test::More' => '0.88';
 test_requires 'Test::WWW::Mechanize::Catalyst';
