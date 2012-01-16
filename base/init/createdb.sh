@@ -13,10 +13,10 @@ COMMON="$SCRIPT_PATH/common.sh"
 if [ -e  $COMMON ]
 then
     #echo $COMMON found!
-    . "$COMMON"
+    source "$COMMON"
 else
-        echo "Library $COMMON not found."
-        exit 1
+    echo "Library $COMMON not found."
+    exit 1
 fi
 
 SRUSCHEMA="$SCRIPT_PATH/sruSchema.sql"
@@ -28,7 +28,7 @@ check "SRUSCHEMA" 1
 
 # create DB
 $DROPDB -e -w -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $DBNAME
-ordie "Can't drop database $DBNAME"
+#ordie "Can't drop database $DBNAME" # may not exist
 $CREATEDB -e -w -E UTF-8 -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $DBNAME
 ordie "Can't create database $DBNAME"
 echo "----------------- Database $DBNAME created ------------------"
