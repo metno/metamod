@@ -106,7 +106,7 @@ my %default_config = (
 
     'Plugin::Session' => {
         #expires => 3600,
-        storage => '/tmp/' . $mm_config->get('APPLICATION_ID') . '/session_data'
+        $mm_config->get('WEBRUN_DIRECTORY') . '/session_data',
     },
 
 );
@@ -143,7 +143,6 @@ sub path_to_metamod_root {
         get_logger('MetamodWeb')->error("Could not determine the absolute path from $FindBin::Bin to the METAMOD root directory.");
         return;
     }
-
 
 }
 
