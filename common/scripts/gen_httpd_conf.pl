@@ -84,7 +84,7 @@ my $site = $local;
 $site .= " on $virtualhost" if $virtualhost;
 my $apache_config_dir = $virtualhost ? "/etc/apache/sites-available" : "/etc/apache2/conf.d";
 
-my $installation_dir = $mm_config->get('INSTALLATION_DIR');
+my $installation_dir = $mm_config->get('INSTALLATION_DIR') or die "Missing INSTALLATION_DIR in config";
 my %paths = ( root => "$installation_dir/catalyst/root" );
 
 my $conf_text = <<EOT;

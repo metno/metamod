@@ -34,14 +34,15 @@ my $config_file;
 GetOptions('config=s' => \$config_file) or pod2usage(1);
 
 if( !Metamod::Config->config_found($config_file)){
-    print "Path to config must either be supplied on the commandline or given in the environment.";
-    print "usage: $0 [--config config file]\n";
+    print STDERR "Path to config must either be supplied on the commandline or given in the environment.";
+    print STDERR "usage: $0 [--config config file]\n";
 }
 
 my $config = Metamod::Config->new($config_file);
+my $instdir = $config->get('INSTALLATION_DIR') or die "Missing INSTALLATION_DIR in config";
 
-my $initd_file = File::Spec->catfile($config->get('INSTALLATION_DIR'), 'common', 'etc', 'init.d', 'metamod-catalyst' );
-my $default_file = File::Spec->catfile($config->get('INSTALLATION_DIR'), 'common', 'etc', 'default', 'catalyst-myapp' );
+my $initd_file = File::Spec->catfile($instdir, 'common', 'etc', 'init.d', 'metamod-catalyst' );
+my $default_file = File::Spec->catfile($instdir, 'common', 'etc', 'default', 'catalyst-myapp' );
 
 open my $INITD, '<', $initd_file or die $!;
 my $initd_content = do { local $/, <$INITD> };
@@ -53,25 +54,28 @@ my $default_content = do { local $/, <$DEFAULT> };
 my $generated_default = replace_config_vars($default_content);
 close $DEFAULT;
 
-my $applicaiton_id = $config->get('APPLICATION_ID');
-my $initd_output = File::Spec->catfile($config->get('CONFIG_DIR'), 'etc', 'init.d', "catalyst-$applicaiton_id" );
-my $default_output = File::Spec->catfile($config->get('CONFIG_DIR') ,'etc', 'default', "catalyst-$applicaiton_id" );
+my $application_id = $config->get('APPLICATION_ID') or die "Missing APPLICATION_ID in config";
+my $config_dir = $config->get('CONFIG_DIR') or die "Missing CONFIG_DIR in config";
+my $initd_output = File::Spec->catfile($config_dir, 'etc', 'init.d', "catalyst-$application_id" );
+my $default_output = File::Spec->catfile($config_dir ,'etc', 'default', "catalyst-$application_id" );
 
-if( ! -e File::Spec->catfile($config->get('CONFIG_DIR'), 'etc', 'init.d' ) ){
-    make_path(File::Spec->catfile($config->get('CONFIG_DIR'), 'etc', 'init.d')) or die "Failed to create init.d directory";
+if( ! -e File::Spec->catfile($config_dir, 'etc', 'init.d' ) ){
+    make_path(File::Spec->catfile($config_dir, 'etc', 'init.d')) or die "Failed to create init.d directory";
 }
 
 open my $NEW_INITD, '>', $initd_output or die $!;
 print $NEW_INITD $generated_initd;
 close $NEW_INITD;
 
-if( ! -e File::Spec->catfile($config->get('CONFIG_DIR'), 'etc', 'default' ) ){
-    make_path(File::Spec->catfile($config->get('CONFIG_DIR'), 'etc', 'default')) or die "Failed to create default directory";
+if( ! -e File::Spec->catfile($config_dir, 'etc', 'default' ) ){
+    make_path(File::Spec->catfile($config_dir, 'etc', 'default')) or die "Failed to create default directory";
 }
 
 open my $NEW_DEFAULT, '>', $default_output or die $!;
 print $NEW_DEFAULT $generated_default;
 close $NEW_DEFAULT;
+
+print STDERR "Writing init.d scripts to $config_dir/etc\n";
 
 sub replace_config_vars {
     my ($file_content) = @_;
@@ -81,7 +85,7 @@ sub replace_config_vars {
 
         my $value = $config->get($1);
 
-        die "No value found in config for '$1'" if !$value;
+        die "No value found in config for '$1'" if !defined($value); # some vars can be blank (e.g. CATALYST_LIB)
 
         $used_variables{$1} = $value;
     }
