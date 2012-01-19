@@ -24,11 +24,12 @@ debian_package:
 	fakeroot rsync -aC $(CURDIR)/activate_env $(DESTDIR)/
 	fakeroot rsync -aC $(CURDIR)/LICENCE $(DESTDIR)/
 	fakeroot rsync -aC $(CURDIR)/README $(DESTDIR)/
+	fakeroot rsync -aC $(CURDIR)/install_jobs.sh $(DESTDIR)/
 
 	fakeroot dh_fixperms
 	fakeroot dh_gencontrol
 	fakeroot dh_md5sums
-	
+
 	dpkg-deb --build debian/$(PACKAGENAME) .
 	dpkg-genchanges -b -u. > ./$(PACKAGENAME).changes
 
@@ -38,6 +39,3 @@ debian_clean:
 	rm -f *.deb
 	rm -f $(CURDIR)/debian/files
 	rm -rf $(DESTDIR)
-
-
-	
