@@ -58,12 +58,18 @@ export PERL5LIB="$CATALYST_LIB:$PERL5LIB"
 
 # write Apache conf and init.d scripts to applic dir
 
-sudo mkdir -p "$CONFIG_DIR/etc"
+mkdir -p "$CONFIG_DIR/etc"
 
-sudo PERL5LIB="$CATALYST_LIB:$PERL5LIB" perl "$SCRIPT_PATH/scripts/gen_httpd_conf.pl" ${CONFIG:+"--config"} $CONFIG
+if [ ! -w "$CONFIG_DIR/etc" ]
+then
+    echo "Cannot write to $CONFIG_DIR/etc directory" 1>&2
+    exit 1
+fi
+
+PERL5LIB="$CATALYST_LIB:$PERL5LIB" perl "$SCRIPT_PATH/scripts/gen_httpd_conf.pl" ${CONFIG:+"--config"} $CONFIG
 ordie "Can't generate httpd config"
 
-sudo PERL5LIB="$CATALYST_LIB:$PERL5LIB" perl "$SCRIPT_PATH/scripts/gen_initd_script.pl" ${CONFIG:+"--config"} $CONFIG
+PERL5LIB="$CATALYST_LIB:$PERL5LIB" perl "$SCRIPT_PATH/scripts/gen_initd_script.pl" ${CONFIG:+"--config"} $CONFIG
 ordie "Can't generate init.d scripts"
 
 # link files to /etc

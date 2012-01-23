@@ -10,13 +10,19 @@ rm $SHELL_CONF
 #
 #  Initialise webrun directory:
 #
-if [ '$WEBRUN_DIRECTORY' = '' ]; then
+if [ -z "$WEBRUN_DIRECTORY" ]; then
    echo "ERROR: WEBRUN_DIRECTORY must be defined in the configuration file"
-   echo "exit prepare_runtime_env.sh"
-   echo ""
-   exit
+   #echo "exit prepare_runtime_env.sh" # what's this for?
+   #echo ""
+   exit 1
 fi
+
 mkdir -p $WEBRUN_DIRECTORY
+
+if [ ! -w "$WEBRUN_DIRECTORY" ]; then
+    echo "$WEBRUN_DIRECTORY not writable. Suggest you run this script via sudo"
+    exit 1
+fi
 
 #
 # Initialise the collection basket download directory
@@ -46,6 +52,8 @@ mkdir -p $WEBRUN_DIRECTORY/XML/history
 #
 if [ '$UPLOAD_DIRECTORY' != '' ]; then mkdir -p $UPLOAD_DIRECTORY; fi
 if [ '$UPLOAD_FTP_DIRECTORY' != '' ]; then mkdir -p $UPLOAD_FTP_DIRECTORY; fi
+
+# OpENDAP currently not accessible (missing from Apache config)
 if [ '$OPENDAP_DIRECTORY' != '' ]; then
     mkdir -p $OPENDAP_DIRECTORY
     if [ -w $OPENDAP_DIRECTORY -a ! -f $OPENDAP_DIRECTORY/.htaccess ]; then
@@ -54,4 +62,9 @@ Order Deny,Allow
 Deny from all
 EOF
     fi
+fi
+
+# make sure webrun dir is writable by the application
+if [ ! -z "$APPLICATION_USER" ]; then
+    sudo chown -R "$APPLICATION_USER" $WEBRUN_DIRECTORY
 fi

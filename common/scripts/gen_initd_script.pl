@@ -59,6 +59,8 @@ my $config_dir = $config->get('CONFIG_DIR') or die "Missing CONFIG_DIR in config
 my $initd_output = File::Spec->catfile($config_dir, 'etc', 'init.d', "catalyst-$application_id" );
 my $default_output = File::Spec->catfile($config_dir ,'etc', 'default', "catalyst-$application_id" );
 
+print STDERR "Writing init.d scripts to $config_dir/etc\n";
+
 if( ! -e File::Spec->catfile($config_dir, 'etc', 'init.d' ) ){
     make_path(File::Spec->catfile($config_dir, 'etc', 'init.d')) or die "Failed to create init.d directory";
 }
@@ -66,6 +68,7 @@ if( ! -e File::Spec->catfile($config_dir, 'etc', 'init.d' ) ){
 open my $NEW_INITD, '>', $initd_output or die $!;
 print $NEW_INITD $generated_initd;
 close $NEW_INITD;
+chmod 0755, $initd_output or die $!; # make sure init script is executable
 
 if( ! -e File::Spec->catfile($config_dir, 'etc', 'default' ) ){
     make_path(File::Spec->catfile($config_dir, 'etc', 'default')) or die "Failed to create default directory";
@@ -74,8 +77,6 @@ if( ! -e File::Spec->catfile($config_dir, 'etc', 'default' ) ){
 open my $NEW_DEFAULT, '>', $default_output or die $!;
 print $NEW_DEFAULT $generated_default;
 close $NEW_DEFAULT;
-
-print STDERR "Writing init.d scripts to $config_dir/etc\n";
 
 sub replace_config_vars {
     my ($file_content) = @_;
