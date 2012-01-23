@@ -21,8 +21,8 @@ BASE_PART_OF_EXTERNAL_URL = http://[==SERVER==]:3000
 # Set this directive to enable Apache virtualhosts (requires separate DNS hostname)
 VIRTUAL_HOST =
 
-# Initial part of local URLs:
-LOCAL_URL = /
+# Initial part of local URLs (cannot be blank or slash):
+LOCAL_URL = /metamod
 
 # posix user for web stuff (in 2.7, only used for catalyst)
 # must be same as owner of webrun directory
