@@ -85,6 +85,11 @@ sub confirm_user_POST {
     my $username         = $userbase_user->u_loginname();
     my $email_body       = $mm_config->get('NEW_USER_GREETING') or die "Missing user greeting";
 
+    $email_body =~ s/\[NAME\]/$name/g;
+    $email_body =~ s/\[USERNAME\]/$username/g;
+    $email_body =~ s/\[RANDOM_PASS\]/$random_pass/g;
+    $email_body =~ s/\[EMAIL_SIGNATURE\]/$signature/g;
+
     Metamod::Email::send_simple_email(
         to      => [ $userbase_user->u_email ],
         from    => $operator_email,
