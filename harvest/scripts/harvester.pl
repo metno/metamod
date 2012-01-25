@@ -404,7 +404,7 @@ sub getContentFromUrl {
     my $useragent = LWP::UserAgent->new;
     $useragent->timeout(60*15);
     my $getrequest = $useragent->get($urlsent);
-    my $content_from_get;
+    my $content_from_get = '';
     if ($getrequest->is_success) {
         $content_from_get = $getrequest->decoded_content || '';
     } else {
