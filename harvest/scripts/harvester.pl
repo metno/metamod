@@ -205,7 +205,7 @@ sub do_harvest {
             my $resumptionToken = process_DIF_records($ownertag, $content_from_get);
             while ($resumptionToken) {
                 # continue reading records
-                my $resumptionUrl = $url . '?verb=ListRecord&resumptionToken='. uri_escape($resumptionToken);
+                my $resumptionUrl = $url . '?verb=ListRecords&resumptionToken='. uri_escape($resumptionToken);
                 my $content_from_get = getContentFromUrl($resumptionUrl);
                 last unless $content_from_get;
                 $resumptionToken = process_DIF_records($ownertag, $content_from_get);
