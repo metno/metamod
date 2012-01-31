@@ -126,6 +126,8 @@ if [ $# -eq 2 -a $1 = '-i' ]; then
    read idstring
    echo -n "Port number for Apache server: "
    read apacheport
+   echo -n "Port number for Catalyst server: "
+   read catalystport
    echo -n "URL of OPeNDAP server (any URL will do): "
    read opendapurl
    echo -n "Domain name required for admin user (e.g somedomain.com): "
@@ -145,6 +147,7 @@ if [ $# -eq 2 -a $1 = '-i' ]; then
 sourceurl = $sourceurl
 idstring = $idstring
 apacheport = $apacheport
+catalystport = $catalystport
 opendapurl = $opendapurl
 admindomain = $admindomain
 operatoremail = $operatoremail
@@ -169,6 +172,7 @@ elif [ $# -eq 1 -a -d $1 -a -d $1/source -a -r $1/testrc ]; then
    read dummy1 dummy2 sourceurl
    read dummy1 dummy2 idstring
    read dummy1 dummy2 apacheport
+   read dummy1 dummy2 catalystport
    read dummy1 dummy2 opendapurl
    read dummy1 dummy2 admindomain
    read dummy1 dummy2 operatoremail
@@ -237,6 +241,7 @@ sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 /^UPLOAD_FTP_DIRECTORY *=/s|=.*$|= '$basedir/ftpupload'|
 /^OPENDAP_DIRECTORY *=/s|=.*$|= '$basedir/[==OPENDAP_BASEDIR==]'|
 /^OPENDAP_URL *=/s|=.*$|= '$opendapurl'|
+/^CATALYST_PORT *=/s|=.*$|= '$catalystport'|
 /^OPERATOR_EMAIL *=/s|=.*$|= '$operatoremail'|
 /^OPERATOR_INSTITUTION *=/s|=.*$|= EXAMPLE|
 /^DATASET_TAGS *=/s|=.*$|= '"'$idstring','$oaiharvesttag'"'|
