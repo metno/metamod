@@ -71,10 +71,10 @@ SMTP_RELAY = smtp.met.no
 CATALYST_SITE_CONFIG =
 
 # Port for running local catalyst server
-CATALYST_PORT = 3000
+CATALYST_PORT = Substituted by test_application.sh
 
 # lib for Catalyst etc
-CATALYST_LIB = /opt/metno-catalyst-dependencies-ver1/lib/perl5
+CATALYST_LIB = /opt/metno-perl-webdev-ver1/lib/perl5
 
 # ============== PostgreSQL configuration =================
 
