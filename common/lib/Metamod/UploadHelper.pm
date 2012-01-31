@@ -663,10 +663,14 @@ sub process_files {
             foreach my $filepath (@uploaded_files) {
                 my ( undef, undef, $basename ) = File::Spec->splitpath($filepath);
                 my $destination_path = $destination_paths{$filepath};
+                my $thredds_dataset_prefix = '';
+                if ($self->config->get('THREDDS_DATASET_PREFIX')) {
+                    $thredds_dataset_prefix = $self->config->get('THREDDS_DATASET_PREFIX');
+                }
                 my $fileURL =
                       $destination_url
                     . "catalog.html?dataset="
-                    . $self->config->get('THREDDS_DATASET_PREFIX') || ''
+                    . $thredds_dataset_prefix
                     . join( '/', $dataset_institution{$dataset_name}->{'institution'}, $dataset_name, $basename );
                 open( my $digest, ">$work_directory/digest_input" );
                 print $digest $fileURL,  "\n";
