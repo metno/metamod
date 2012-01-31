@@ -105,17 +105,35 @@ sub showconfig :Local :Args(0) {
 sub showlog :Local :Args(0) {
     my ( $self, $c ) = @_;
 
+    my $testout = '/home/egils/egil/m2test/tdamoc/webrun/testout';
+    open (TESTOUT,">$testout");
+    print TESTOUT "Hoy\n";
+
     my $mm_config = $c->stash->{ mm_config };
     my $log_filename = $mm_config->get("LOG4ALL_SYSTEM_LOG");
     my $pars = $c->req->parameters;
     my $result = "";
+    my $categories = "";
+    my $files = "";
+    my $levels = "";
+    my $msg = "";
+    my $excludes = "";
     my $get_result = 0;
+    my $showresult = 0;
     my $fromdate = "";
-    if (exists($pars->{'fromdate'})) {
+    my @clearfields = ();
+    if (exists($pars->{'clear'})) {
+        if (ref($pars->{'clear'}) eq "ARRAY") {
+            @clearfields = @{$pars->{'clear'}};
+        } else {
+            @clearfields = ($pars->{'clear'});
+        }
+    }
+    if (exists($pars->{'fromdate'}) and !grep(/dates/,@clearfields)) {
         $fromdate = $pars->{'fromdate'};
     }
     my $todate = "";
-    if (exists($pars->{'todate'})) {
+    if (exists($pars->{'todate'}) and !grep(/dates/,@clearfields)) {
         $todate = $pars->{'todate'};
     }
     if ($todate eq "") {
@@ -124,13 +142,19 @@ sub showlog :Local :Args(0) {
     if ($fromdate eq "") {
         $fromdate = $todate;
     }
-    my $logger = "";
-    if (exists($pars->{'logger'})) {
-        $logger = $pars->{'logger'};
+    my $fromtime = "";
+    if (exists($pars->{'fromtime'}) and !grep(/time/,@clearfields)) {
+        $fromtime = $pars->{'fromtime'};
     }
-    my $level = "";
-    if (exists($pars->{'level'})) {
-        $level = $pars->{'level'};
+    my $totime = "";
+    if (exists($pars->{'totime'}) and !grep(/time/,@clearfields)) {
+        $totime = $pars->{'totime'};
+    }
+    if ($totime eq "") {
+        $totime = $fromtime;
+    }
+    if ($fromtime eq "") {
+        $fromtime = $totime;
     }
     my $multiline_is_checked = "";
     my $multiline = "";
@@ -140,6 +164,41 @@ sub showlog :Local :Args(0) {
     if ($multiline eq "multiline") {
         $multiline_is_checked = "checked";
     }
+    my @selected_categories = ();
+    if (exists($pars->{'category'}) and !grep(/categories/,@clearfields)) {
+        if (ref($pars->{'category'}) eq "ARRAY") {
+            @selected_categories = @{$pars->{'category'}};
+        } else {
+            @selected_categories = ($pars->{'category'});
+        }
+    }
+    my @selected_files = ();
+    if (exists($pars->{'files'}) and !grep(/files/,@clearfields)) {
+        if (ref($pars->{'files'}) eq "ARRAY") {
+            @selected_files = @{$pars->{'files'}};
+        } else {
+            @selected_files = ($pars->{'files'});
+        }
+    }
+    my @selected_levels = ();
+    if (exists($pars->{'levels'}) and !grep(/levels/,@clearfields)) {
+        if (ref($pars->{'levels'}) eq "ARRAY") {
+            @selected_levels = @{$pars->{'levels'}};
+        } else {
+            @selected_levels = ($pars->{'levels'});
+        }
+    }
+    if (exists($pars->{'msg'}) and !grep(/words/,@clearfields)) {
+        $msg = $pars->{'msg'};
+    }
+    my @exclude_sentences = ();
+    if (exists($pars->{'excludesents'}) and !grep(/excludes/,@clearfields)) {
+        if (ref($pars->{'excludesents'}) eq "ARRAY") {
+            @exclude_sentences = @{$pars->{'excludesents'}};
+        } else {
+            @exclude_sentences = split(/\n/m,$pars->{'excludesents'});
+        }
+    }
     my $optionstring = $multiline . " logfile=" . $log_filename . " ";
     if (exists($pars->{'summarydate'})) {
         $optionstring .= 'summarydate ';
@@ -148,14 +207,15 @@ sub showlog :Local :Args(0) {
         $get_result = 1;
     } elsif (exists($pars->{'summarylogger'})) {
         $optionstring .= 'summarylogger ';
-        $logger = "";
         $get_result = 1;
     } elsif (exists($pars->{'summarylevel'})) {
         $optionstring .= 'summarylevel ';
-        $level = "";
+        $get_result = 1;
+    } elsif (exists($pars->{'summaryfile'})) {
+        $optionstring .= 'summaryfile ';
+        $files = "";
         $get_result = 1;
     } elsif (exists($pars->{'getmessages'})) {
-        $result = mmLogView::run($optionstring);
         $get_result = 1;
     }
     if ($fromdate ne "") {
@@ -164,14 +224,111 @@ sub showlog :Local :Args(0) {
     if ($todate ne "") {
         $optionstring .= "to=" . $todate . " ";
     }
-    if ($logger ne "") {
-        $optionstring .= "logger=" . $logger . " ";
+    if ($fromtime ne "") {
+        $optionstring .= "timefrom=" . $fromtime . " ";
     }
-    if ($level ne "") {
-        $optionstring .= "level=" . $level . " ";
+    if ($totime ne "") {
+        $optionstring .= "timeto=" . $totime . " ";
+    }
+    if (scalar @selected_categories > 0 and !exists($pars->{'summarylogger'})) {
+        foreach my $cat (@selected_categories) {
+            $optionstring .= "logger=" . $cat . " ";
+        }
+    }
+    if (scalar @selected_files > 0 and !exists($pars->{'summaryfile'})) {
+        foreach my $cat (@selected_files) {
+            $optionstring .= "file=" . $cat . " ";
+        }
+    }
+    if (scalar @selected_levels > 0 and !exists($pars->{'summarylevel'})) {
+        foreach my $cat (@selected_levels) {
+            $optionstring .= "level=" . $cat . " ";
+        }
+    }
+    if ($msg ne "") {
+        my @msgarray = split(/\s+/,$msg);
+        foreach my $word (@msgarray) {
+            my $cat = $word;
+            $cat =~ s/=/EQLXYZ/mg;
+            $optionstring .= "msg=" . $cat . " ";
+        }
+    }
+    if (scalar @exclude_sentences > 0) {
+        foreach my $exclude (@exclude_sentences) {
+            my $exc = $exclude;
+            $exc =~ s/ /SPCXYZ/mg;
+            $exc =~ s/=/EQLXYZ/mg;
+            $optionstring .= "exclude=" . $exc . " ";
+        }
     }
     if ($get_result == 1) {
         $result = mmLogView::run($optionstring);
+        $showresult = 1;
+    }
+    if (exists($pars->{'summarylogger'})) {
+        my @resultarr = split(/\n/,$result);
+        $result = "";
+        foreach my $line (@resultarr) {
+            my ($name,$count) = split(/\s+/,$line);
+            my $checked = "";
+            if (grep(/$name/,@selected_categories)) {
+                $checked = "checked";
+            }
+            $categories .= '<tr><td>&nbsp;</td><td><input type="checkbox" ' . $checked . 
+                           ' name="category" value = "' .  $name . '" />' .  $name . "</td><td>" .
+                            $count . '</td><td colspan="3">&nbsp;</td></tr>' . "\n"; 
+        }
+    } elsif (scalar @selected_categories > 0) {
+        foreach my $cat (@selected_categories) {
+            $categories .= '<tr><td>&nbsp;</td><td>' . $cat .
+                           '<input type="hidden" checked name="category" value = "' . $cat .
+                           '" /></td><td colspan ="4">&nbsp;</td></tr>' . "\n";
+        }
+    }
+    if (exists($pars->{'summaryfile'})) {
+        my @resultarr = split(/\n/,$result);
+        $result = "";
+        foreach my $line (@resultarr) {
+            my ($name,$count) = split(/\s+/,$line);
+            my $checked = "";
+            if (grep(/$name/,@selected_files)) {
+                $checked = "checked";
+            }
+            $files .= '<tr><td>&nbsp;</td><td><input type="checkbox" ' . $checked . 
+                           ' name="files" value = "' .  $name . '" />' .  $name . "</td><td>" .
+                            $count . '</td><td colspan="3">&nbsp;</td></tr>' . "\n"; 
+        }
+    } elsif (scalar @selected_files > 0) {
+        foreach my $cat (@selected_files) {
+            $files .= '<tr><td>&nbsp;</td><td>' . $cat .
+                           '<input type="hidden" checked name="files" value = "' . $cat .
+                           '" /></td><td colspan ="4">&nbsp;</td></tr>' . "\n";
+        }
+    }
+    if (exists($pars->{'summarylevel'})) {
+        my @resultarr = split(/\n/,$result);
+        $result = "";
+        foreach my $line (@resultarr) {
+            my ($name,$count) = split(/\s+/,$line);
+            my $checked = "";
+            if (grep(/$name/,@selected_levels)) {
+                $checked = "checked";
+            }
+            $levels .= '<tr><td>&nbsp;</td><td><input type="checkbox" ' . $checked . 
+                           ' name="levels" value = "' .  $name . '" />' .  $name . "</td><td>" .
+                            $count . '</td><td colspan="3">&nbsp;</td></tr>' . "\n"; 
+        }
+    } elsif (scalar @selected_levels > 0) {
+        foreach my $cat (@selected_levels) {
+            $levels .= '<tr><td>&nbsp;</td><td>' . $cat .
+                           '<input type="hidden" checked name="levels" value = "' . $cat .
+                           '" /></td><td colspan ="4">&nbsp;</td></tr>' . "\n";
+        }
+    }
+    if (scalar @exclude_sentences > 0) {
+        foreach my $exclude (@exclude_sentences) {
+            $excludes .= $exclude . "\n";
+        }
     }
     $c->stash(template => 'admin/showlog.tt');
     $c->stash(current_view => 'Raw');
@@ -179,9 +336,16 @@ sub showlog :Local :Args(0) {
     $c->stash(optionstring => $optionstring);
     $c->stash(fromdate => $fromdate);
     $c->stash(todate => $todate);
-    $c->stash(logger => $logger);
-    $c->stash(level => $level);
+    $c->stash(fromtime => $fromtime);
+    $c->stash(totime => $totime);
+    $c->stash(levels => $levels);
+    $c->stash(categories => $categories);
+    $c->stash(files => $files);
+    $c->stash(msg => $msg);
+    $c->stash(excludes => $excludes);
+    $c->stash(showresult => $showresult);
     $c->stash(multiline_is_checked => $multiline_is_checked);
+    close (TESTOUT);
 }
 
 =head1 AUTHOR
