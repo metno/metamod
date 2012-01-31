@@ -1,16 +1,16 @@
-metno-metamod-2.10 (2.10.0-1) stable; urgency=low
+metno-metamod-2.10 (2.10.0-3) stable; urgency=low
 
   [ Øystein Torget ]
   * Metamod 2.10 Test Release. See wiki for details
 
   [ geira ]
   * Release candidate 1
+  * now with fixes!
 
- -- geira <user@met.no>  Mon, 09 Jan 2012 17:52:10 +0100
+ -- geira <geira@met.no>  Tue, 24 Jan 2012 11:26:24 +0100
 
 metamod-2.6 (2.6.0-1) hardy; urgency=low
 
   * metamod 2.6 package
 
  -- Heiko Klein <heiko.klein@met.no>  Mon,  11 Oct 2010 14:31:04 +0100
-
