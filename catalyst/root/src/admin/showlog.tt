@@ -4,6 +4,7 @@
 <table border="0" bgcolor="#f5f5dc" width="100%">
 <tr>
 <th align="right">Dates:</th>
+<td>(<input type="checkbox" name="clear" value="dates" />clear)&nbsp;&nbsp;&nbsp;</td>
 <td>From: <input type="text" name="fromdate" value="[% fromdate %]" />
    &nbsp;&nbsp;&nbsp;To:<input type="text" name="todate" value="[% todate %]" /></td>
 <td>&nbsp;</td>
@@ -12,20 +13,68 @@
 <td align="right"><input type="submit" name="summarydate" value="Date summary" /></td>
 </tr>
 <tr>
-<th align="right">Category:</th>
-<td><input type="text" name="logger" value="[% logger %]" size="55" /></td>
+<th align="right">Time (HH:MM):</th>
+<td>(<input type="checkbox" name="clear" value="time" />clear)&nbsp;&nbsp;&nbsp;</td>
+<td>From: <input type="text" name="fromtime" value="[% fromtime %]" />
+   &nbsp;&nbsp;&nbsp;To:<input type="text" name="totime" value="[% totime %]" /></td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<th align="right">Categories:</th>
+<td>(<input type="checkbox" name="clear" value="categories" />clear)&nbsp;&nbsp;&nbsp;</td>
+<td>&nbsp;</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 <td align="right"><input type="submit" name="summarylogger" value="Category summary" /></td>
 </tr>
+[% FOREACH row IN categories %]
+    [% row %]
+[% END %]
 <tr>
-<th align="right">Level:</th>
-<td><input type="text" name="level" value="[% level %]" /></td>
+<th align="right">Levels:</th>
+<td>(<input type="checkbox" name="clear" value="levels" />clear)&nbsp;&nbsp;&nbsp;</td>
+<td>&nbsp;</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 <td align="right"><input type="submit" name="summarylevel" value="Level summary" /></td>
+</tr>
+[% FOREACH row IN levels %]
+    [% row %]
+[% END %]
+<tr>
+<th align="right">Files:</th>
+<td>(<input type="checkbox" name="clear" value="files" />clear)&nbsp;&nbsp;&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td align="right"><input type="submit" name="summaryfile" value="File summary" /></td>
+</tr>
+[% FOREACH row IN files %]
+    [% row %]
+[% END %]
+<tr>
+<th align="right">Words in msg text:</th>
+<td>(<input type="checkbox" name="clear" value="words" />clear)&nbsp;&nbsp;&nbsp;</td>
+<td><input type="text" name="msg" value="[% msg %]" size="55" /></td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<th align="right" valign="top">Exclude messages with text:</th>
+<td valign="top">(<input type="checkbox" name="clear" value="excludes" />clear)&nbsp;&nbsp;&nbsp;</td>
+<td><textarea name="excludesents" cols="55" rows="3">[% excludes %]</textarea></td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
 </tr>
 </table>
 <p>Show messages on multiple lines with blank lines between messages:
@@ -34,10 +83,12 @@
 </form>
 <hr />
 <pre>
+[% IF showresult %]
 [% FILTER html %]
 [% optionstring %]
 
 [% result %]
+[% END %]
 [% END %]
 </pre>
 [% INCLUDE admin/admin_footer.tt %]
