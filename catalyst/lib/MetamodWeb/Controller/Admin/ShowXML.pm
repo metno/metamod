@@ -24,6 +24,7 @@ use Moose;
 use namespace::autoclean;
 use MetamodWeb::Utils::AdminUtils;
 use MetamodWeb::Utils::FormValidator;
+use MetamodWeb::Utils::Exception qw( error_from_exception );
 use Metamod::ForeignDataset;
 
 BEGIN { extends 'MetamodWeb::BaseController::Base'; }
