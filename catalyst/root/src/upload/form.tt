@@ -54,7 +54,11 @@
         <td class="list_table">[% fi.f_status %]</td>
         <td class="list_table">
             [% IF fi.f_errurl %]
-                <a href="[% mm_config.get('BASE_PART_OF_EXTERNAL_URL') %][% fi.f_errurl %]">Error</a>
+                [% IF fi.f_errurl.match('http://') %]
+                     <a href="[% fi.f_errurl %]">Error</a>
+                [% ELSE %]
+                     <a href="[% mm_config.get('BASE_PART_OF_EXTERNAL_URL') %][% fi.f_errurl %]">Error</a>
+                [% END %]
             [% END %]
         </td>
         </tr>
