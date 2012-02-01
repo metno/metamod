@@ -1,0 +1,97 @@
+=head1 METAMOD software installation
+
+=head2 Introduction
+
+This describes how to install the METAMOD base software on a Linux server.
+No services will be available until you configure and set up a METAMOD instance
+(see L<deploying>).
+
+METAMOD is developed, tested and used on Ubuntu LTS servers (Hardy, Lucid).
+Debian packages are provided regularly for easy installation and upgrading.
+Installation from source is also possible, but requires much more work (at
+least for dependency libraries).
+
+=head2 Required software
+
+=over 4
+
+=item PostgreSQL database system
+
+Tested on version 8.3 and 8.4. If running a local database you need the PostgreSQL
+server, otherwise only the client is required.
+
+=item Apache 2.x web server
+
+With mod_proxy installed (sudo a2enmod proxy)
+
+=item libxml and libxslt library
+
+From xmlsoft.org
+
+=item Proj4 library
+
+L<http://proj.maptools.org>
+
+=item NetCDF software 3.5 or later
+
+libnetcdf, ncdump and ncgen
+
+=back
+
+=head2 Installation from Debian packages
+
+This requires you have sufficient sudo privileges to install packages and
+add repositories.
+
+=head3 Adding the met.no package repository
+
+Add the corresponding lines to your /etc/apt/sources.list depending on your
+version of Ubuntu:
+
+  deb http://repo.met.no/met.no hardy main contrib
+  deb-src http://repo.met.no/met.no hardy main contrib
+
+  deb http://repo.met.no/met.no lucid main contrib
+  deb-src http://repo.met.no/met.no lucid main contrib
+
+B<Note: At the moment this repo is not available outside met.no.
+In that case you're out of luck. Please contact the authors for instructions
+on how to obtain the packages manually.>
+
+=head3 Installing METAMOD and dependencies via apt
+
+  $ sudo apt-get install metno-perl-webdev-ver1
+  $ sudo apt-get install metno-metamod-2.10
+
+Alternately you may download the .deb files from repo.met.no and install manually.
+
+  $ sudo dpkg -i metno-metamod-2.10_2.10.0-3_all.deb
+
+=head2 Installation from source
+
+=head3 Perl module dependencies
+
+We really do not recommend installing the 350 required Perl modules (plus an
+additional baker's dozen of compiled C libraries) from CPAN unless you're really
+hardcore (or desperate). If you can, install the metno-perl-webdev-ver1 Debian
+package as specified above.
+
+A complete list of Perl module dependencies (as per 2012-01-31) can be found in
+metamod-deps.txt; this can be used as a source for scripting. At some point
+there might be a METAMOD::Bundle module, but don't hold your breath.
+
+=head3 Checking out the METAMOD source
+
+Assuming you have the dependencies sorted out, installing METAMOD from source
+is a piece of cake. All you need is to check out the code from Subversion
+into a suitable directory. No special privileges are required (yet).
+
+  $ mkdir metamod
+  $ cd metamod
+  $ svn co https://svn.met.no/metamod/trunk
+
+=head3 Conclusion
+
+You will now have the necessary software installed, however it will not do anything
+until you configure and set up a METAMOD application. See L<deploying>
+for further instructions.

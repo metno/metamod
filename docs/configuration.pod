@@ -1,0 +1,310 @@
+=head1 METAMOD Configuration
+
+=head2 Site configuration
+
+The application configuration directory contains a very important file, the
+B<master_config.txt> file. This file governs how METAMOD will run.
+
+=head2 Example app
+
+The EXAMPLE application that is included in this source tree (app/example)
+can be used to test the software. The following steps describes how to do
+this. Copy the app/example directory to somewhere local, preferably renaming it
+to whatever your METAMOD application is called. Then you are ready to edit
+the master configuration file.
+
+=head2 Configuration defaults
+
+FIXME
+
+=head2 The master_config.txt file
+
+Several variables in this file must be adjusted according to the local computer
+environment. The most important are:
+
+=over 4
+
+=item APPLICATION_ID
+
+Each application delivering data to a database (an application with the
+METAMODUPLOAD, METAMODHARVEST and/or the METAMODQUEST module) must have a short
+name (typical an acronym) that uniquely identify the application for the database.
+Only upper case letters and numbers are allowed.
+
+=item SERVER
+
+The server name on which the software should run (something like
+mycomputer.mydomain.com).
+
+=item ADMIN_DOMAIN
+
+This will typically be the domain found in the SERVER variable (like
+mydomain.com).
+
+=item BASE_PART_OF_EXTERNAL_URL
+
+This is the initial part of URLs that external links to the web applications are
+to use. It will typically be L<http://mycomputer.mydomain.com> or
+L<http://mycomputer.mydomain.com:8080> if you are using an unusual port (note: not
+to be confused with the Catalyst port - usually 3000).
+
+=item LOCAL_URL
+
+Appended to BASE_PART_OF_EXTERNAL_URL, this represents the top URL for the web
+applications. URLs for the individual applications are constructed by appending
+directory names for each of the applications to this top URL.
+
+=item WEBRUN_DIRECTORY
+
+The top directory for the runtime environment.
+
+=item OPENDAP_DIRECTORY
+
+The top directory of the data repository. This directory is assumed to be
+accessible through an OPeNDAP server which has to be installed as a separate
+package (not part of METAMOD 2.x). If no OPeNDAP server is installed, the
+METAMOD 2.x software will mostly work, apart from links to data files from the
+web applications.
+
+=item OPENDAP_URL
+
+The URL used to access the data files. If no OPeNDAP server is installed, use an
+URL for HTTP download.
+
+=item OPERATOR_EMAIL
+
+E-mail address for the person responsible for operating the METAMOD 2.x
+installation.
+
+=item SMTP_RELAY
+
+If you wish to send email via an external MTA, enter the qualified hostname here.
+Otherwise it is assumed you are running a local (sendmail-compatible) MTA which
+is configured correctly (firewall will often block this). See L<deploying>
+
+=back
+
+The following variables are used to select the modules that will comprise the
+application. whereas they previously indicated the absolute path of the source
+directory for each module, they are now only used as booleans (where any
+non-empty string means true).
+
+    METAMODBASE_DIRECTORY
+    METAMODUPLOAD_DIRECTORY
+    METAMODPMH_DIRECTORY
+    METAMODHARVEST_DIRECTORY
+    METAMODTHREDDS_DIRECTORY
+
+If any of these variables are missing, the corresponding module will not be part
+of the application.
+
+A complete inventory of the variables that could be part of the
+master_config.txt file is found in the C<app/default/default_config.txt> file in
+the installation directory.
+
+=head2 Config file format
+
+The configuration files contain lines as follows:
+
+    VARNAME = VALUE
+
+'VARNAME' must start from the first character on the line, and be all uppercase
+letters [A-Z], underscore or digits. Any number
+of white space characters may separate 'VARNAME' and '=', and also '=' and
+'VALUE'. 'VALUE' starts with the first non-whitespace character and ends with
+the last non-whitespace character on the line. Additional lines may be
+appended to 'VALUE' immideately after the initial 'VARNAME = ...' line. Such
+lines must start with a space character. No whitespace are removed from such
+appended lines.
+
+VALUEs may be empty, which sometimes indicate that some aspect of the software
+is turned off. An empty value is indicated by having no characters (or only
+whitespace characters) after the '=' character.
+
+In addition, comment lines, starting with '#', may be found. Blank lines are
+ignored.
+
+In the source files, all text strings like:
+
+[==VARNAME==]
+
+will be substituted with the corresponding value at runtime when the variable is
+accessed. Such text strings may also be found within 'VALUE'
+strings, and they will be substituted as appropriate.
+
+=head3 TEST_IMPORT_BASETIME (OBSOLETE?)
+
+The app/example/master_config.txt file is already configured for testing,
+meaning that E-mails sent from the system to users are sent to the
+operator instead, and that the system works on a "virtual timescale"
+which goes faster than real time. But one variable has to be adjusted in the
+'Test configuration' section of the master_config.txt: TEST_IMPORT_BASETIME
+
+This variable should be set to the value returned by the
+upload/scripts/show_time_now.pl script, which returns the current time as
+"seconds since the epoch".
+
+
+=head2 Multiple target files (OBSOLETE - FIXME)
+
+It is possible to use the configuration file to produce several target files
+from a single source file. This is done using the special directives:
+
+    !substitute_to_file_with_new_name sourcefilepath => targetfilepath
+    !end_substitute_to_file_with_new_name
+
+The 'sourcefilepath' must be a relative file path found in one of the
+'filelist.txt' files, and 'targetfilepath' must also be a relative file path,
+but it is not required to exist in any 'filelist.txt' file. The source file
+(given by 'sourcefilepath') will be modified and copied to the target file
+(given by 'targetfilepath') using the ordinary substitution directives in
+the configuration file. In addition to these substitutions, any substitution
+directive between the '!substitute_to_file_with_new_name' directive and the
+corresponding '!end_substitute_to_file_with_new_name' directive will be
+performed. Note that these substitution directives will not affect any of the
+other files produced by the installation script.
+
+By using these special directives several times for the same source file,
+and varying the target file name between each use, several target files are
+produced from the same source file, and they will have different content
+depending on the in-between substitution directives found for each target
+file.
+
+=head2 Metadata configuration (optional)
+
+METAMOD is able to handle a large range of metadata frameworks. For metadata
+generated through the UPLOAD module (by parsing netCDF files), METAMOD has
+defined its own XML format, called MM2. This format has a similar structure as
+Dublin core; it is a flat structure with freely selected metadata keywords. For
+each keyword one or more values may be found. Other metadata frameworks, like
+DIF or ISO19115, are also accepted, and such frameworks will typically emerge
+when harvesting from other metadata providers through OAI-PMH. While such
+frameworks (DIF, ISO19115) are hierarchical in nature, a flattening of these
+structures takes place when they are imported to the SQL database and presented
+through the METAMOD search interface.
+
+The following configuration files regulate which metadata are imported to the
+SQL database and available for search, how metadata imported by the HARVEST
+module are translated into the internal flat structure used in the SQL database,
+and how metadata found in the uploaded netCDF files are translated to MM2 XML
+files.
+
+=over
+
+=item staticdata/searchdata.xml
+
+This XML file contains metadata vocabularies that are imported into the SQL
+database, and used in the SEARCH module for setting up the interactive forms for
+web users searching the database.
+
+=item etc/conf_digest_nc.xml
+
+This XML file describes the parsing of netCDF files in the UPLOAD module.
+Specifically how attributes and variable values in a netCDF file are translated
+into keyword - value pairs and stored into an MM2 XML file. The
+C<conf_digest_nc.xml> file will contain rules regarding which metadata are
+required in the netCDF files. The C<app/example/etc/conf_digest_nc.xml> file
+represents a well commented example of such a file that can be used as a
+starting point for a version tailored to specific needs.
+
+=item etc/usererrors.conf
+
+This file contain html templates that are used in error reports sent to data
+providers that have uploaded netCDF files using the UPLOAD module. Each template
+corresponds to an error condition defined in the etc/conf_digest_nc.xml file. An
+example file in the C<app/example/etc> directory corresponds to the
+C<conf_digest_nc.xml> in the same directory.
+
+=item XSLT
+
+Files for translating from foreign metadata formats (... more text is needed)
+
+=back
+
+=head3 Stylesheets and other web configuration
+
+METAMOD can be configured with custom texts and stylesheets. To modify the
+styles of the application add the following directories to your application
+configuration directory.
+
+=over
+
+=item custom/templates
+
+This directory contains the Template::Toolkit templates that you want to
+override in your configuration. It is generally never a good idea to override
+anything other than the C<custom.tt> file.
+
+=item custom/static/css
+
+This directory contains the CSS files that you want to override in your
+configuration. It is generally never a good idea to override anything but the
+C<custom.css> file in this folder.
+
+=item custom/static/images
+
+This folder contains the images that you use in your style configuration.
+
+=back
+
+=head3 Overriding texts
+
+To override texts in the application you use the C<custom.tt> file.
+C<custom.tt> is a file in C<Template::Toolkit> format.
+
+The way it is used is that it re-defines the default texts found in
+C<defaults.tt>.
+
+For instance the following would re-define the HTML used for the header of the
+application.
+
+  [%
+
+    # get a safe path to the header image that works in both Apache and outside of Apache
+    SET header_image_url = c.uri_for('/static/images/logo.png');
+    app.common.header_html = '<img src="' _ header_image_url _ '" />';
+
+  %]
+
+In the same way you can re-define any of the variables found in C<defaults.tt>
+
+=head3 Overriding the CSS
+
+In METAMOD you can override any of the CSS styles in the application using
+C<custom.css> since this stylesheet will be the last one loaded by the
+application. It is however wise to C<only> modify properties such as background
+colors, foreground colors, borders and font size. Modifying the height, width,
+padding, margins, display type etc. of elements can lead to the application not
+displaying properly in different browsers. Also modifying these properties can
+break between different versions of METAMOD.
+
+The style for any element can be modified, but only a few are usually needed.
+For an example of the common ones see C<app/example/custom/css/custom.css>
+
+=head3 Path to images
+
+One of the most common customisations are adding a logo image to the header and
+the footer of the page. When adding images to the style it is important to get
+the path to the image right.
+
+=over
+
+=item custom.tt
+
+To get the path correct in the C<custom.tt> file you can use the following helper function.
+
+ SET image_url = c.uri_for('/static/images/<your image name here>');
+
+This makes a variable C<image_url> that contains the correct URL to the image file.
+
+=item custom.css
+
+To get the path correct in the C<custom.css> file you can use the following path.
+
+  url("../images/aboutheader.gif");
+
+as in
+
+  background-image: url("../images/aboutheader.gif");
+
+=back
