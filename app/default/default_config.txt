@@ -63,15 +63,23 @@ WEBRUN_DIRECTORY = [==CONFIG_DIR==]/webrun
 # Institution set up for the Admin user during user database initialization:
 #OPERATOR_INSTITUTION = someinstitution
 
-# Specify here if you want to use external SMTP relay instead of localhost MTA
+# Specify here if you want to use external SMTP relay instead of local MTA (sendmail
+# or similar).
+# Note that local sendmail normally must be configured to relay to external smtp
+# server unless directly connected to the Internet (i.e. not behind a firewall).
+# On the other hand Metamod SMTP_RELAY often fails due to a bug in Net::SMTP
+# which doesn't send a FQDN in the sender address. See the installation manual
+# for more info, and don't forget to test which method works for you.
 #SMTP_RELAY = smtp.example.com
 
 # ============== Logging configuration ==================
 
 LOG4PERL_CONFIG = [==CONFIG_DIR==]/log4perl_config.ini
 LOG4PERL_WATCH_TIME = 30
-LOG4PHP_CONFIG = [==CONFIG_DIR==]/log4php_config.ini
 LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
+
+# obsolete
+#LOG4PHP_CONFIG = [==CONFIG_DIR==]/log4php_config.ini
 
 # Path for logfile of php-messages (leave empty to log to webserver-errorlogfile)
 # [Are these still in use???]
@@ -90,6 +98,9 @@ CATALYST_PORT = 3000
 
 # ============== PostgreSQL configuration =================
 
+# Hostname used for connecting to the PostgreSQL database:
+#PG_HOST = localhost
+
 # Name of the PostgreSQL databases (metadata and userbase):
 #DATABASE_NAME = metamod_example
 #USERBASE_NAME = metamod_example_userbase
@@ -99,15 +110,13 @@ CATALYST_PORT = 3000
 #PG_ADMIN_USER = admin
 
 # you'll need an admin password if creating a new database on a remote server
+# for local socket connection, change local ident to trust in pg_hba.conf (see install docs)
 #PG_ADMIN_USER_PASSWORD = somethingsecret (optional)
 
 # PG_WEB_USER is a PostgreSQL user who may read/write data in the metadata
 # database. It usually also has a password.
 #PG_WEB_USER = webuser
 #PG_WEB_USER_PASSWORD = secret
-
-# Hostname used for connecting to the PostgreSQL database:
-#PG_HOST = localhost
 
 # Port used for connecting to the PostgreSQL database:
 PG_PORT = 5432
@@ -234,7 +243,7 @@ FIMEX_PROGRAM = fimex
 # ============ WMS configuration =======================
 
 # URL to background map server delivering coastlines and reticules
-#WMS_BACKGROUND_MAPSERVER = http://wms.met.no/maps/
+#WMS_BACKGROUND_MAPSERVER = http://wms.example.com/maps/
 
 # map names for different projections
 #WMS_NORTHPOLE_MAP = northpole.map
@@ -362,8 +371,8 @@ MAXLENGTH_DIRNAME = 20
 # Max length of directory keys created by users:
 MAXLENGTH_DIRKEY = 10
 
-# Max size of files to be uploaded (bytes) (can be owerridden by php.ini):
-MAX_UPLOAD_SIZE_BYTES = 10000000
+# Max size of files to be uploaded (bytes) (currently not implemented):
+#MAX_UPLOAD_SIZE_BYTES = 10000000
 
 # Text in mail body sent to a dataset owner when errors are found in an
 # uploaded file. The string [OWNER] is replaced by the name of the dataset
@@ -525,7 +534,6 @@ TEST_IMPORT_SPEEDUP = 0
 # *** WARNING *** THIS DATE MUST BE NO OLDER THAN 3 MONTHS OR YOU WILL GET AN
 # INTEGER OVERFLOW!!! THIS WILL NEED TO BE PERIODICALLY UPDATED! ***
 TEST_IMPORT_BASETIME = 1309258594
-
 
 # Set this value to a '#' to activate sending E-mail regarding errors in
 # uploaded files to actual users. It comments out setting the E-mail recipient

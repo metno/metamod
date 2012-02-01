@@ -51,24 +51,30 @@ OPERATOR_EMAIL = someuser@somedomain.com
 # Institution set up for the Admin user during user database initialization:
 OPERATOR_INSTITUTION = someinstitution
 
-# Specify here if you want to use external SMTP relay instead of localhost MTA
-#SMTP_RELAY = smtp.example.com
-
-# ============== Logging configuration ==================
-LOG4PERL_CONFIG = [==CONFIG_DIR==]/log4perl_config.ini
-LOG4PERL_WATCH_TIME = 30
-LOG4PHP_CONFIG = [==CONFIG_DIR==]/log4php_config.ini
-LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
+# Specify here if you want to use external SMTP relay instead of local MTA (sendmail
+# or similar).
+# Note that local sendmail normally must be configured to relay to external smtp
+# server unless directly connected to the Internet (i.e. not behind a firewall).
+# On the other hand Metamod SMTP_RELAY often fails due to a bug in Net::SMTP
+# which doesn't send a FQDN in the sender address. See the installation manual
+# for more info, and don't forget to test which method works for you.
+SMTP_RELAY = smtp.example.com
 
 # ============== Catalyst configuration =================
+
 # lib for Catalyst and other dependencies
 # (set this to blank if you've installed everything from CPAN instead)
-#CATALYST_LIB = /opt/metno-perl-webdev-ver1/lib/perl5
+#CATALYST_LIB =
 
-# port used by the Catalyst server
-#CATALYST_PORT = 3000
+# port used by the Catalyst server (default 3000)
+# must be unique if running several Catalyst installations per server
+#CATALYST_PORT = 3003
 
 # ============== PostgreSQL configuration =================
+
+# Hostname used for connecting to the PostgreSQL database:
+PG_HOST = localhost
+#PG_HOST = somedatabaseserver
 
 # Name of the PostgreSQL databases (metadata and userbase):
 DATABASE_NAME = metamod_example
@@ -77,17 +83,14 @@ USERBASE_NAME = metamod_example_userbase
 # PG_ADMIN_USER is the PostgreSQL user who may freely create, modify and
 # delete the metadata database.
 PG_ADMIN_USER = admin
-
 # you'll need an admin password if creating a new database on a remote server
+# for local socket connection, change local ident to trust in pg_hba.conf (see install docs)
 #PG_ADMIN_USER_PASSWORD = somethingsecret (optional)
 
 # PG_WEB_USER is a PostgreSQL user who may read/write data in the metadata
 # database. It usually also has a password.
 PG_WEB_USER = webuser
 PG_WEB_USER_PASSWORD = changethisasap
-
-# Hostname used for connecting to the PostgreSQL database:
-PG_HOST = localhost
 
 # PG_CONNECTSTRING_* are strings used to indicate hostname and port for
 # connecting to the PostgreSQL database. They are found in various
@@ -141,14 +144,6 @@ APP_MENU =
 
 # Comma-separated list of dataset tags accessible from this application:
 DATASET_TAGS = 'MM'
-
-# ============ METAMODBASE configuration ==============
-
-# List of import directories:
-#IMPORTDIRS = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
-
-# locate your fimex program for reprojection of data
-#FIMEX_PROGRAM = fimex
 
 # ============ WMS configuration =======================
 
@@ -257,41 +252,6 @@ OPENDAP_URL = http://thredds.example.com:8081/thredds/catalog/data
 
 # Ownertag for uploaded datasets:
 UPLOAD_OWNERTAG = MM
-
-# Max length of directory names created by users:
-MAXLENGTH_DIRNAME = 20
-
-# Max length of directory keys created by users:
-MAXLENGTH_DIRKEY = 10
-
-# Max size of files to be uploaded (bytes) (can be owerridden by php.ini):
-MAX_UPLOAD_SIZE_BYTES = 10000000
-
-# Text in mail body sent to a dataset owner when errors are found in an
-# uploaded file. The string [OWNER] is replaced by the name of the dataset
-# owner when the mail is sent. [DATASET] is replaced by the actual dataset
-# name, and [URL] is replaced by an url to the html-file describing the errors:
-#EMAIL_BODY_WHEN_UPLOAD_ERROR =
-# Dear [OWNER],
-#
-# The METAMOD system that automatically check files uploaded to the data
-# repository, have found errors in files recently uploaded to the [DATASET]
-# dataset. Please find the details on the URL below:
-#
-# [URL].
-
-# Subject field in E-mails sent to a dataset owner when errors are found
-# in an uploaded file:
-#EMAIL_SUBJECT_WHEN_UPLOAD_ERROR = METAMOD file upload error
-
-# Mail address used in the "from" field on automatically sent E-mails to
-# users:
-#FROM_ADDRESS = [==OPERATOR_EMAIL==]
-
-# Final greetings and signature included in E-mail to users:
-EMAIL_SIGNATURE =
- Best regards,
- The project team for the EXAMPLE project
 
 # Initial content of the [==WEBRUN_DIRECTORY==]/ftp_events file. Note that
 # this file can be edited and new events added while the application is in
@@ -408,15 +368,3 @@ SUBSCRIPTION_ENABLED = ENABLED
 # A comma separated list of distribution statements that are interpreted as
 # freely available and can be downloaded via the collection basket.
 #COLLECTION_BASKET_DIST_STATEMENTS = free, something else
-
-# ============== Admin configuration =================
-
-# Text in mail body sent to newly registered users.
-#NEW_USER_GREETING =
-# Dear [NAME],
-#
-# You have been granted access to [==APPLICATION_NAME==]. ***********
-# Username: [USERNAME]
-# Password: [RANDOM_PASS]
-#
-# [==EMAIL_SIGNATURE==]
