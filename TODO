@@ -1,6 +1,42 @@
-General tasks for Metamod2
-==========================
+General cleanup tasks for Metamod2
+==================================
+
+Major bugs should be registered in Bugzilla.
+Feature requests should go into the METSIS project priority lists.
+
+Remaining (non-controversional) household chores of minor importance can go
+here lest they are forgotten.  These are not meant as topics for discussion,
+just as an electronic Post-It note for developers to quickly note action
+points for later.
+
+--------------------
 
 * deletion of datasets by user
 * better metadata conversion
-* concentrate on one scripting language (perl), avoid the other
+
+remove remaining php stuff:
+
+common/htdocs/funcs/mmConfig.inc
+
+common/lib/Metamod/LoggerConfigParser.pm
+166:    my $log4php_config_file = $mm_config->get('LOG4PHP_CONFIG');
+184:        warn "LOG4PHP_CONFIG missing from master config. log4php config not created\n";
+
+common/scripts/update_logger_config.pl
+79:    my $php_config_path = $mm_config->get("LOG4PHP_CONFIG");
+
+
+
+
+
+
+
+
+
+
+adduser script
+
+show_gen_config script
+
+mailtest script
+
