@@ -80,7 +80,8 @@ installation.
 
 If you wish to send email via an external MTA, enter the qualified hostname here.
 Otherwise it is assumed you are running a local (sendmail-compatible) MTA which
-is configured correctly (firewall will often block this). See L<deploying>
+is configured correctly (firewall will often block this). See L<Deploying a
+METAMOD application|deploying>
 
 =back
 

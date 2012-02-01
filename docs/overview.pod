@@ -195,14 +195,14 @@ For each module there is a more detailed README file describing the
 operations of that module. This paragraph gives a summary of the operations
 of a full application comprising all modules.
 
-An application must be configured and setup as described in L<deploying>.
-After installation, if the application is a fresh one (where
-no database for the application already exists), a new database must be
-initialized and filled with static data. Also, if not already done for the
-PostgreSQL installation, two database users must be defined. The default names
-of these users are 'admin' and 'webuser', but these names are configurable.
-The users can be created by the createusers.sh script, and this must be done
-prior to creating the database.
+An application must be configured and setup as described in L<Deploying a
+METAMOD application|deploying>. After installation, if the application is a
+fresh one (where no database for the application already exists), a new database
+must be initialized and filled with static data. Also, if not already done for
+the PostgreSQL installation, two database users must be defined. The default
+names of these users are 'admin' and 'webuser', but these names are
+configurable. The users can be created by the createusers.sh script, and this
+must be done prior to creating the database.
 
 Initializing the database and loading the static data are done by running the
 init/create_and_load_all.sh script as described in base/README. The static

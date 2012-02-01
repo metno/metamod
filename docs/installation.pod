@@ -4,7 +4,7 @@
 
 This describes how to install the METAMOD base software on a Linux server.
 No services will be available until you configure and set up a METAMOD instance
-(see L<deploying>).
+(see L<Deploying a METAMOD application|deploying>).
 
 METAMOD is developed, tested and used on Ubuntu LTS servers (Hardy, Lucid).
 Debian packages are provided regularly for easy installation and upgrading.

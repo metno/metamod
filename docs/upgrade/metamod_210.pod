@@ -2,11 +2,25 @@
 
 =head2 PHP no longer used
 
-
 =head2 Configuration variables
 
+=over 4
+
+=item PG_CONNECTSTRING_SHELL
+
+Should no longer be used, instead configure Postgres to use sockets
+(change local ident to trust in pg_hba.conf)
+
+=item PG_ADMIN_USER_PASSWORD
+
+This may be necessary in Perl scripts for creating databases over tcp/ip.
+
+=back
 
 =head2 Perl modules
+
+These should be included in the Debian dependencies package and are only
+listed for those wishing to install manually.
 
 =over 4
 
@@ -38,8 +52,7 @@ applic directory
     createdb.sh
     createuserdb.sh
 
-    prepare_runtime_env.sh
-    gen_httpd_conf
-    gen_initd_script
     install_jobs
 
+    prepare_runtime_env.sh
+    (ownership?)

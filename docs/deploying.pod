@@ -1,7 +1,7 @@
 =head1 Deploying a METAMOD application
 
-Before you can deploy a METAMOD application you must make a configuration,
-see configuration.html.
+Before you can deploy a METAMOD application you must set up a configuration
+directory, see L<METAMOD Configuration|configuration>.
 
 After the initial configuration has been completed, a number of scripts must be
 run before the application is up and running.
