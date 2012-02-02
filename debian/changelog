@@ -1,3 +1,10 @@
+metno-metamod-2.10 (2.10.0-4) stable; urgency=low
+
+  [ egils ]
+  * Ported changes from 2.9
+
+ -- egils <egil.storen@met.no>  Mon, 01 Feb 2012 11:35:52 +0100
+
 metno-metamod-2.10 (2.10.0-3) stable; urgency=low
 
   [ Øystein Torget ]
