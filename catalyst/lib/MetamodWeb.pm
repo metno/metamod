@@ -106,7 +106,7 @@ my %default_config = (
 
     'Plugin::Session' => {
         #expires => 3600,
-        $mm_config->get('WEBRUN_DIRECTORY') . '/session_data',
+        storage => $mm_config->get('WEBRUN_DIRECTORY') . '/session_data',
     },
 
 );
