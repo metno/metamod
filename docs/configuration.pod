@@ -1,5 +1,7 @@
 =head1 METAMOD Configuration
 
+Back to L<Index|index>
+
 =head2 Site configuration
 
 The application configuration directory contains a very important file, the

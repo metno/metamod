@@ -1,5 +1,7 @@
 =head1 METAMOD software installation
 
+Back to L<Index|index>
+
 =head2 Introduction
 
 This describes how to install the METAMOD base software on a Linux server.

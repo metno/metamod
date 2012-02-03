@@ -1,5 +1,7 @@
 =head1 Deploying a METAMOD application
 
+Back to L<Index|index>
+
 Before you can deploy a METAMOD application you must set up a configuration
 directory, see L<METAMOD Configuration|configuration>.
 
@@ -62,7 +64,7 @@ correct executable paths, configuration directory and PERL5LIB for all commands.
 =head3 Using activate_env (optional)
 
 For simplicity you may instead use the bash script F<activate_env> that sets the
-relevant environment variables. 
+relevant environment variables.
 
 From anywhere execute the following command:
 

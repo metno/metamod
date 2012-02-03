@@ -5,6 +5,7 @@ use warnings;
 
 my $pod = Metamod::Pod::Simple::HTML->new;
 $pod->index(1);
+$pod->html_css('mmdocs.css');
 $pod->parse_from_file( @ARGV );
 
 # move this to lib later
@@ -24,7 +25,7 @@ sub do_link {
     my $section = $token->attr('section');
 
     return $self->SUPER::do_link($token) unless $type eq 'pod';
-    
+
     if ($section) {
         # stole this part from Marcus Ramberg... seems to work
         #$section = "#$section"
@@ -33,9 +34,8 @@ sub do_link {
         return $self->{base}||'' . "#$section";
         # TODO - make anchors for head2
     } elsif ($link) {
-        return "./" . $$link[2] . ".html";
+        return "./" . $$link[2] . ".html?view=co";
     }
 }
 
 1;
-

@@ -1,6 +1,4 @@
-
 =head1 METAMOD documentation
-
 
 METAMOD 2.x is a portal solution providing Discovery, Access and Retrieve
 functionality for scientific datasets along with tools for metadata handling

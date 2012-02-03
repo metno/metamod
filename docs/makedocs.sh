@@ -5,5 +5,4 @@ do
     ./pod2html.pl $f > html/$g.html
 done
 
-cp ../CHANGES ../README ../LICENCE *.txt html/
-
+cp ../CHANGES ../README ../LICENCE *.txt *.css html/

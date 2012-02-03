@@ -1,5 +1,7 @@
 =head1 METAMOD overview
 
+Back to L<Index|index>
+
 =head2 Introduction
 
 This document assumes that the basic METAMOD software are working on the various servers where METAMOD
