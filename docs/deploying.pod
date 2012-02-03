@@ -252,9 +252,9 @@ To start all services (substitute EXAMPLE with your APPLICATION_ID):
 
 --------------------
 
+=begin OBSOLETE
 
-
-=head2 TESTING (OBSOLETE - FIXME)
+=head2 TESTING (FIXME)
 
 
 2. To copy the software to the target directory and make the substitutions
@@ -334,3 +334,5 @@ this E-mail will be sent to the operator instead.
 14. Stop the perl scripts responsible for loading data into the database:
 cd to the target directory
 run:     ./metamodInit.sh stop
+
+=end OBSOLETE

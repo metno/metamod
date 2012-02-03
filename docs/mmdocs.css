@@ -30,6 +30,10 @@ pre {
     padding: 4 4 4 4;
 }
 
+dt a {
+    color: #660000;
+}
+
 div.indexgroup {
     position: fixed;
     top:20;

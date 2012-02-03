@@ -143,51 +143,56 @@ METAMOD documentation directory
 
 =back
 
-    DIRECTORY STRUCTURE (OBSOLETE - FIXME)
-    -------------------
+=begin OBSOLETE
 
-    The top METAMOD 2.x directory (the directory where this README file resides)
-    is divided into one subdirectory for each module (base, search, upload, quest,
-    pmh, harvest and thredds). There is also a subdirectory (common) where files
-    used by many modules resides, and a subdirectory (test) containing a test suite
-    for periodically excercising the software while software developement are going
-    on. In addition, one subdirectory (app) contains an example application.
+DIRECTORY STRUCTURE (OBSOLETE - FIXME)
+-------------------
 
-    The module directories shares a common structure. During installation of an
-    application, a new directory is created (the target directory), and all module
-    directories are merged into this target directory. In each module directory
-    there is a htdocs subdirectory. The htdocs directories for all the selected
-    modules are in the same way merged into one htdocs subdirectory in the target
-    directory.  To avoid name collisions, the actual HTML and PHP files etc. are
-    contained within subdirectories of the htdocs directory. For example, all such
-    files are contained in the directory htdocs/sch for the METAMODSEARCH module,
-    and htdocs/upl for the METAMODUPLOAD module. On the target directory, there
-    will be a htdocs directory containing both the sch and the upl subdirectories.
-    Some htdocs subdirectories may be shared among several modules. For example,
-    the METAMODBASE module and the METAMODQUEST module both have files in the adm
-    subdirectory. Special care must be taken for these files to avoid name
-    collisions.
+The top METAMOD 2.x directory (the directory where this README file resides)
+is divided into one subdirectory for each module (base, search, upload, quest,
+pmh, harvest and thredds). There is also a subdirectory (common) where files
+used by many modules resides, and a subdirectory (test) containing a test suite
+for periodically excercising the software while software developement are going
+on. In addition, one subdirectory (app) contains an example application.
 
-    Each module directory must also contain a file 'filelist.txt' which
-    lists all files comprising the module.
+The module directories shares a common structure. During installation of an
+application, a new directory is created (the target directory), and all module
+directories are merged into this target directory. In each module directory
+there is a htdocs subdirectory. The htdocs directories for all the selected
+modules are in the same way merged into one htdocs subdirectory in the target
+directory.  To avoid name collisions, the actual HTML and PHP files etc. are
+contained within subdirectories of the htdocs directory. For example, all such
+files are contained in the directory htdocs/sch for the METAMODSEARCH module,
+and htdocs/upl for the METAMODUPLOAD module. On the target directory, there
+will be a htdocs directory containing both the sch and the upl subdirectories.
+Some htdocs subdirectories may be shared among several modules. For example,
+the METAMODBASE module and the METAMODQUEST module both have files in the adm
+subdirectory. Special care must be taken for these files to avoid name
+collisions.
 
-    Each METAMOD application must be configured in a separate directory tree.
-    This application directory tree will generally be independent of the METAMOD
-    source tree (where this README file resides at the top level). But an example
-    of a METAMOD application directory (app/example) is included in the source
-    tree as a template for real application directories.
+Each module directory must also contain a file 'filelist.txt' which
+lists all files comprising the module.
 
-    In each application directory there must be a configuration file called
-    'master_config.txt', and a 'filelist.txt' file containing a list of files that
-    are specific for the application (image files, style sheets etc.). An
-    application directory has the same structure as any of the module directories,
-    and contains a htdocs subdirectory divided into sch, upl etc. as needed.
-    Any file found in the application directory (and included in the 'filelist.txt'
-    file) will replace a corresponding file in a module directory. This makes it
-    possible to taylor a METAMOD application to any specific need, but usually this
-    mechanism is only used for presentation purposes (stylesheets etc.) and for
-    static data used to setting up the search interface.
+Each METAMOD application must be configured in a separate directory tree.
+This application directory tree will generally be independent of the METAMOD
+source tree (where this README file resides at the top level). But an example
+of a METAMOD application directory (app/example) is included in the source
+tree as a template for real application directories.
 
+In each application directory there must be a configuration file called
+'master_config.txt', and a 'filelist.txt' file containing a list of files that
+are specific for the application (image files, style sheets etc.). An
+application directory has the same structure as any of the module directories,
+and contains a htdocs subdirectory divided into sch, upl etc. as needed.
+Any file found in the application directory (and included in the 'filelist.txt'
+file) will replace a corresponding file in a module directory. This makes it
+possible to taylor a METAMOD application to any specific need, but usually this
+mechanism is only used for presentation purposes (stylesheets etc.) and for
+static data used to setting up the search interface.
+
+=end OBSOLETE
+
+=begin OBSOLETE
 
 =head2 SYSTEM OVERVIEW (OBSOLETE - FIXME)
 
@@ -267,3 +272,5 @@ in the background. They wake up at regular intervals to see if any work
 are pending. These perl scripts have to be manually started by the
 'metamodInit.sh start' shell script. They will run until another shell script,
 'metamodInit.sh stop', stops the scripts in an orderly fashion.
+
+=end OBSOLETE

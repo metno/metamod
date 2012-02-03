@@ -17,7 +17,7 @@ the master configuration file.
 
 =head2 Configuration defaults
 
-FIXME
+Add some text here... FIXME
 
 =head2 The master_config.txt file
 
@@ -135,6 +135,8 @@ will be substituted with the corresponding value at runtime when the variable is
 accessed. Such text strings may also be found within 'VALUE'
 strings, and they will be substituted as appropriate.
 
+=begin OBSOLETE
+
 =head3 TEST_IMPORT_BASETIME (OBSOLETE?)
 
 The app/example/master_config.txt file is already configured for testing,
@@ -172,6 +174,8 @@ and varying the target file name between each use, several target files are
 produced from the same source file, and they will have different content
 depending on the in-between substitution directives found for each target
 file.
+
+=end OBSOLETE
 
 =head2 Metadata configuration (optional)
 
