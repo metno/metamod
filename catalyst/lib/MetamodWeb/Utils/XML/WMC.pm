@@ -63,8 +63,12 @@ sub setup2wmc {
     my $getcap = $wmsurl || $setup->documentElement->getAttribute('url') or die("Missing setup or WMS url");
     #printf STDERR "XML: %s\n", $getcap;
     $getcap .= '?service=WMS&version=1.3.0&request=GetCapabilities';
+    # Trond test for HALO...
+    #$getcap = 'http://dev-vm202/cgi-bin/getcapabilities.cgi?service=verportal&map=verportal.map';
     my $stylesheet = $xslt->parse_stylesheet_file($xslfile);
-    my $results = eval { $stylesheet->transform( getXML($getcap), XML::LibXSLT::xpath_to_string(%bbox) ); };
+    my $dom = eval { getXML($getcap) };
+    croak " error: $@" if $@;
+    my $results = eval { $stylesheet->transform( $dom, XML::LibXSLT::xpath_to_string(%bbox) ); };
     croak " error: $@" if $@;
     my $xc = XML::LibXML::XPathContext->new( $results->documentElement() );
     $xc->registerNs('v', $wmcns);

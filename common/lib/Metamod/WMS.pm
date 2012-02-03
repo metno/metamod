@@ -85,7 +85,7 @@ sub abandon {
 </html>
 EOT
     $logger->error($text);
-    exit;
+    die $text;
 }
 
 
