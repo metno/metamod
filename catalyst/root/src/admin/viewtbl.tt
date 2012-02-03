@@ -9,7 +9,13 @@
 [% FOREACH row IN wholetable %]
     <tr>
     [% FOREACH item IN row %]
-        <td>[% item %]</td>
+        [% IF item.match('^\s*<a href') # escape all values except links %]
+            <td>[% item %]</td>
+        [% ELSIF item.match('\n') %]
+            <td><pre>[% item FILTER html # show line breaks in xml %]</pre></td>
+        [% ELSE %]
+            <td>[% item FILTER html %]</td>
+        [% END %]
     [% END %]
     </tr>
 [% END %]
