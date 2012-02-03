@@ -5,7 +5,7 @@ use warnings;
 
 my $pod = Metamod::Pod::Simple::HTML->new;
 $pod->index(1);
-$pod->html_css('mmdocs.css');
+$pod->html_css('mmdocs.css?view=co');
 $pod->parse_from_file( @ARGV );
 
 # move this to lib later
