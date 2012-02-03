@@ -14,6 +14,64 @@ scripts is the same as the user running Apache>.
 
 =end obsolete
 
+=head2 Installing services
+
+After installation of the software and one or more configurations, you should
+now install the application services where the operating system can find it.
+Currently only Debian-based Linux systems are supported.
+
+This script will create an Apache configuration file, as well as init.d scripts
+for automatic starting and stopping of Catalyst and the various METAMOD services
+for the specific application. These files are normally owned by root and will be
+placed in in <configuration dir>/etc, and then symlinked into F</etc/apache2> and
+F</etc/init.d>.
+
+  $ cd /opt/metno-metamod-2.10 # or elsewhere if installed from source
+  $ ./install_jobs.sh <config>
+
+=head3 Users with restricted sudo privileges
+
+Some users may not have full sudo rights, and/or having PERL5LIB stripped out when
+running under sudo (see L<http://www.sudo.ws/sudo/alerts/perl_env.html>). You will
+then typically get the following error message:
+
+  sudo: sorry, you are not allowed to set the following environment variables: PERL5LIB
+
+If so you may run install_jobs with the -u option (for unprivileged), in which case
+all files will be owned by yourself instead of root:
+
+  $ ./install_jobs.sh -u <config>
+
+Note that this is not recommended in production environments where several login
+users are administering the system.
+
+=head2 Setting the environment
+
+Before running any other scripts you must tell METAMOD where to find its libraries:
+
+  $ export PERL5LIB="/opt/metno-perl-webdev-ver1/lib/perl5"
+
+If desired you may also predefine the application config path. Then you won't have
+to specify the <config> parameter for each script.
+
+  $ export METAMOD_MASTER_CONFIG="/path/to/applic/config"
+
+All commands also run without these variables, but you must then specify the
+correct executable paths, configuration directory and PERL5LIB for all commands.
+
+=head3 Using activate_env (optional)
+
+For simplicity you may instead use the bash script F<activate_env> that sets the
+relevant environment variables. 
+
+From anywhere execute the following command:
+
+  $ source /opt/metno-metamod-<version>/activate_env <PATH TO CONFIGURATION DIR>
+
+This will enable the correct environment. To disable the environment again execute
+
+  $ source /opt/metno-metamod-<version>/activate_env deactivate
+
 =head2 Creating the webrun directory
 
 The application also needs several directories to store files during operation.
@@ -26,34 +84,6 @@ logging, temporary files etc. owned by the APPLICATION_USER user. If already
 existing nothing will be deleted, although file ownership may be updated to the
 current configuration. (Note that if your current user does not have write
 privileges to WEBRUN_DIRECTORY this script will fail.)
-
-=head2 Installing services
-
-After installation of the software and one or more configurations, you should
-now install the application services where the operating system can find it.
-Currently only Debian-based Linux systems are supported.
-
-This script will create an Apache configuration file, as well as init.d scripts
-for automatic starting and stopping of Catalyst and the various METAMOD services
-for the specific application. These files will be placed in in
-<configuration dir>/etc, and then symlinked into /etc/apache2 and /etc/init.d.
-
-  install_jobs.sh <config>
-
-=head2 Activating environment (optional)
-
-To make it easier to run commandline scripts you can use the bash script
-activate_env that sets the correct environment variables. All commands also run
-without this command, but you must then specify the correct paths, configuration
-directory and PERL5LIB for all commands.
-
-From anywhere execute the following command:
-
-  $ source /opt/metno-metamod-<version>/activate_env <PATH TO CONFIGURATION DIR>
-
-This will enable the correct environment. To disable the environment again execute
-
-  $ source /opt/metno-metamod-<version>/activate_env deactivate
 
 =head2 Initializing the BASE module
 
