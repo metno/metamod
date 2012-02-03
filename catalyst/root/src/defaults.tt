@@ -38,7 +38,8 @@ app = {
         \"Administration\" page), and upload files to these directories (using the \"Upload
         files\" page). New files are checked against a set of file format requirements.
         If the file does not comply with these requirements, you will recieve an E-mail
-        explaining the errors found."
+        explaining the errors found. You may also upload files that merely are checked
+        against the file format requirements. To do this, use the \"Test a file\" page"
 
     }
 

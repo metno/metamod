@@ -1,8 +1,8 @@
 
-<p>[% app.upload.common_text %] xxx</p>
+<p>[% app.upload.common_text %]</p>
 
 <p>Use the "Browse..." button below to enter the name of a file on your local file system
-that you want to upload to the Catalyst testbed data repository.</p>
+that you want to upload to the data repository.</p>
 
 <p>You may also re-upload a previously uploaded file. The files previously uploaded are
 shown in the table <b>Previously uploaded files</b> below. If the file to be uploaded should
