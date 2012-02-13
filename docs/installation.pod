@@ -50,11 +50,23 @@ add repositories.
 Add the corresponding lines to your /etc/apt/sources.list depending on your
 version of Ubuntu:
 
+  # for lucid
+  deb http://repo.met.no/met.no lucid main contrib
+  deb-src http://repo.met.no/met.no lucid main contrib
+
+  # for hardy
   deb http://repo.met.no/met.no hardy main contrib
   deb-src http://repo.met.no/met.no hardy main contrib
 
-  deb http://repo.met.no/met.no lucid main contrib
-  deb-src http://repo.met.no/met.no lucid main contrib
+If you want to run development versions (recommended until 2.11), also add:
+
+  # for lucid
+  deb http://repo.met.no/devel lucid main contrib
+  deb-src http://repo.met.no/devel lucid main contrib
+
+  # for hardy
+  deb http://repo.met.no/devel hardy main contrib
+  deb-src http://repo.met.no/devel hardy main contrib
 
 B<Note: At the moment this repo is not available outside met.no.
 In that case you're out of luck. Please contact the authors for instructions
