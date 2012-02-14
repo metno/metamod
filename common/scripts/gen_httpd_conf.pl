@@ -53,7 +53,7 @@ if(!Metamod::Config->config_found($config_file_or_dir)){
     usage();
 }
 
-my $mm_config = Metamod::Config->new($config_file_or_dir);
+my $mm_config = Metamod::Config->new($config_file_or_dir, { nolog => 1 } );
 my $webrun = $mm_config->get('WEBRUN_DIRECTORY');
 my $config_dir = $mm_config->get('CONFIG_DIR');
 my $conf_file = "$config_dir/etc/httpd.conf";

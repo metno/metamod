@@ -38,7 +38,7 @@ if( !Metamod::Config->config_found($config_file)){
     print STDERR "usage: $0 [--config config file]\n";
 }
 
-my $config = Metamod::Config->new($config_file);
+my $config = Metamod::Config->new($config_file, { nolog => 1 } );
 my $instdir = $config->get('INSTALLATION_DIR') or die "Missing INSTALLATION_DIR in config";
 
 my $initd_file = File::Spec->catfile($instdir, 'common', 'etc', 'init.d', 'metamod-catalyst' );
