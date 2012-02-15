@@ -1,12 +1,62 @@
 #!/bin/bash
 
-SCRIPT_PATH="`dirname \"$0\"`/common"
+usage()
+{
+cat << EOF
+usage: $0 [-u] <config>
 
-# config must be set in $METAMOD_MASTER_CONFIG envvar if not given as command line param
+This script will install the necessary services for a METAMOD application
+
+OPTIONS:
+  -h    show this message
+  -u    unprivileged (scripts will be owned by your login user, not root)
+EOF
+}
+
+# unset this for users with restricted sudo privileges
+PERLSUDO=sudo
+
+#
+# parse command line options
+#
+
+while getopts “hu” OPTION
+do
+    case $OPTION in
+        h)
+            usage
+            exit 1
+            ;;
+        u)
+            PERLSUDO=
+            echo "Installing scripts as $USER instead of root"
+            ;;
+        ?)
+            usage
+            exit
+            ;;
+    esac
+    shift $((OPTIND-1)); OPTIND=1
+done
+
+psudo () { # hack to allow both sudo and non-sudo running of perl scripts
+    if [ "$PERLSUDO" ]
+    then
+        sudo PERL5LIB="$CATALYST_LIB" ${*}
+    else
+        PERL5LIB="$CATALYST_LIB" $*
+    fi
+}
+
+#
+# calculate config path
+#
+
 if [ ! -z "$1" ]
 then
     CONFIG=`readlink -f "$1"`
 else
+    # config must be set in $METAMOD_MASTER_CONFIG envvar if not given as command line param
     if [ ! -z "$METAMOD_MASTER_CONFIG" ]
     then
         CONFIG=$METAMOD_MASTER_CONFIG
@@ -24,6 +74,11 @@ else
     exit 1
 fi
 
+#
+# read configuration and store in env
+#
+
+SCRIPT_PATH="`dirname \"$0\"`/common"
 SHELL_CONF=/tmp/metamod_tmp_bash_config.sh
 perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
 
@@ -41,6 +96,10 @@ then
     echo "Missing application id! Config not read?" 1>&2
     exit 1
 fi
+
+#
+# start installation
+#
 
 CATALYST_APP="catalyst-$APPLICATION_ID"
 COMMON_LIB=$SCRIPT_PATH/lib
@@ -66,11 +125,11 @@ then
     exit 1
 fi
 
-PERL5LIB="$CATALYST_LIB:$PERL5LIB" perl "$SCRIPT_PATH/scripts/gen_httpd_conf.pl" ${CONFIG:+"--config"} $CONFIG
-ordie "Can't generate httpd config"
+psudo perl "$SCRIPT_PATH/scripts/gen_httpd_conf.pl" ${CONFIG:+"--config"} $CONFIG
+ordie "Can't generate httpd config - use -u option if insufficient sudo rights"
 
-PERL5LIB="$CATALYST_LIB:$PERL5LIB" perl "$SCRIPT_PATH/scripts/gen_initd_script.pl" ${CONFIG:+"--config"} $CONFIG
-ordie "Can't generate init.d scripts"
+psudo perl "$SCRIPT_PATH/scripts/gen_initd_script.pl" ${CONFIG:+"--config"} $CONFIG
+ordie "Can't generate init.d scripts - use -u option if insufficient sudo rights"
 
 # link files to /etc
 
@@ -81,7 +140,7 @@ ordie "Can't generate init.d scripts"
 #)
 
 LINKERRMSG=$(cat <<EOT
-Looks like you have manual configuration in /etc. Please the following non-symlinked files:
+Looks like you have manual configuration in /etc. Please fix the following non-symlinked files:
 /etc/default/$CATALYST_APP
 /etc/init.d/$CATALYST_APP
 /etc/init.d/metamodServices-$APPLICATION_ID
