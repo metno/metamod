@@ -11,32 +11,21 @@ points for later.
 
 --------------------
 
-* deletion of datasets by user
-* better metadata conversion
+* deletion of datasets by user (done)
 
-remove remaining php stuff:
-
-common/htdocs/funcs/mmConfig.inc
-
-common/lib/Metamod/LoggerConfigParser.pm
-166:    my $log4php_config_file = $mm_config->get('LOG4PHP_CONFIG');
-184:        warn "LOG4PHP_CONFIG missing from master config. log4php config not created\n";
-
-common/scripts/update_logger_config.pl
-79:    my $php_config_path = $mm_config->get("LOG4PHP_CONFIG");
+* better metadata conversion (new major feature)
 
 
+adduser script (for userbase)
 
-
-
-
-
-
-
-
-adduser script
-
-show_gen_config script
+show_gen_config script (as in admin web)
 
 mailtest script
+
+add packagees, update download docs in https://wiki.met.no/metamod/download
+
+find out how to move index link in html docs to left col
+
+http://bit.ly/A05CQe
+
 
