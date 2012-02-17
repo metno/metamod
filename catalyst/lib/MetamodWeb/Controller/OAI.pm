@@ -366,6 +366,12 @@ sub _oai_header {
     return $header;
 }
 
+sub old : Path('/pmh/oai2.php') : Args {
+    # redirect old php version to new
+    my ( $self, $c ) = @_;
+    return $c->res->redirect( $c->uri_for( '/oai', $c->req->params ) );
+}
+
 __PACKAGE__->meta->make_immutable;
 
 =head1 LICENSE
