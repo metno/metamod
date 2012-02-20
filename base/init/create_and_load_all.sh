@@ -13,6 +13,7 @@ then
 elif [ ! -z "$METAMOD_MASTER_CONFIG" ]
 then
     CONFIG=`readlink -f $METAMOD_MASTER_CONFIG`
+    CONFIG=`dirname $CONFIG`
 else
     echo ""
     echo "Usage: $0 Path_to_config_directory                         or"
