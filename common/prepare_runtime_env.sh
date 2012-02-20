@@ -21,7 +21,7 @@ rm $SHELL_CONF
 
 if [ ! -z "$APPLICATION_USER" ]; then
     eff_user=`whoami`
-    if [$eff_user -ne $APPLICATION_USER]; then
+    if [ $eff_user != $APPLICATION_USER ]; then
         echo "ERROR: This script must be run as user $APPLICATION_USER"
         exit 1
     fi
