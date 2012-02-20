@@ -1,7 +1,8 @@
 #!/bin/bash
 
 IMP=import
-SCRIPT_PATH="`dirname \"$0\"`"
+cd `dirname $0`
+SCRIPT_PATH=`pwd`
 if [ $# -eq 1 ]
 then
 	CONFIG=$1
@@ -9,10 +10,18 @@ elif [ $# -eq 2 ]
 then
     CONFIG=$1
     IMP=$2
+elif [ ! -z "$METAMOD_MASTER_CONFIG" ]
+then
+    CONFIG=`readlink -f $METAMOD_MASTER_CONFIG`
 else
-    # assume that config is set in environment
-    CONFIG=''
+    echo ""
+    echo "Usage: $0 Path_to_config_directory                         or"
+    echo "       $0 Path_to_config_directory noimport"
+    echo ""
+    exit
 fi
+
+cd $CONFIG
 
 SHELL_CONF=/tmp/metamod_tmp_bash_config.sh
 perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF

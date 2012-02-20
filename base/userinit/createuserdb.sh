@@ -1,6 +1,5 @@
 #!/bin/bash
 
-SCRIPT_PATH="`dirname \"$0\"`"
 CONFIG=$1
 # config must be set in $METAMOD_MASTER_CONFIG envvar if not given as command line param
 SHELL_CONF=/tmp/metamod_tmp_bash_config.sh
