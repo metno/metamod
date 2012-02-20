@@ -1,12 +1,31 @@
 #!/bin/bash
 
-SCRIPT_PATH="`dirname \"$0\"`"
-CONFIG=$1
+cd `dirname $0`
+SCRIPT_PATH=`pwd`
+
+if [ $# -eq 1 ]; then
+    CONFIG=`readlink -f $1`
+elif [ ! -z "$METAMOD_MASTER_CONFIG" ]; then
+    CONFIG=`readlink -f $METAMOD_MASTER_CONFIG`
+    CONFIG=`dirname $CONFIG`
+else
+    echo "Usage: $0 Path_to_config_directory\n"
+    exit
+fi
+cd $CONFIG
+
 SHELL_CONF=/tmp/metamod_tmp_bash_config.sh
 perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
 source $SHELL_CONF
 rm $SHELL_CONF
 
+if [ ! -z "$APPLICATION_USER" ]; then
+    eff_user=`whoami`
+    if [$eff_user -ne $APPLICATION_USER]; then
+        echo "ERROR: This script must be run as user $APPLICATION_USER"
+        exit 1
+    fi
+fi
 #
 #  Initialise webrun directory:
 #
@@ -20,7 +39,7 @@ fi
 mkdir -p $WEBRUN_DIRECTORY
 
 if [ ! -w "$WEBRUN_DIRECTORY" ]; then
-    echo "$WEBRUN_DIRECTORY not writable. Suggest you run this script via sudo"
+    echo "$WEBRUN_DIRECTORY not writable."
     exit 1
 fi
 
@@ -64,7 +83,8 @@ EOF
     fi
 fi
 
+# REMOVED, since APPLICATION_USER can not run sudo:
 # make sure webrun dir is writable by the application
-if [ ! -z "$APPLICATION_USER" ]; then
-    sudo chown -R "$APPLICATION_USER" $WEBRUN_DIRECTORY
-fi
+# if [ ! -z "$APPLICATION_USER" ]; then
+#     sudo chown -R "$APPLICATION_USER" $WEBRUN_DIRECTORY
+# fi
