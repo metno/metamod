@@ -29,3 +29,18 @@ find out how to move index link in html docs to left col
 http://bit.ly/A05CQe
 
 
+sort out how to deal with different times for each layer
+
+fix sorting so works for both wmsdiana and ncwms
+
+add baselayer/transparency options to wmssetup
+
+style selector must differentiate between layers
+
+
+++++++++ DONE ++++++++++++++
+
+add verportal datasets for testing wmsdiana
+
+remove remaining php stuff
+
