@@ -23,24 +23,38 @@
              adding a calendar a matter of 1 or 2 lines of code. -->
         <!--<script type="text/javascript" src="[% c.uri_for('/static/js/jscalendar-1.0/calendar-setup.js') %]"></script>-->
 
-        <script src="[% c.uri_for('/static/lib/OpenLayers.js') %]"></script>
+        <script type="text/javascript" src="[% c.uri_for('/static/js/log4javascript-1.4.2/js/log4javascript.js') %]"></script>
+        <script type="text/javascript" src="[% c.uri_for('/static/lib/OpenLayers.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/lib/Firebug/firebug.js') %]"></script>
         <script type="text/javascript">
+
+			var	log = log4javascript.getDefaultLogger();
+
+            [% IF 1 # ! debug # disable logging in production %]
+                log = log4javascript.getNullLogger();
+            [% END %]
 
             // making this a global variable so that it is accessible for
             // debugging/inspecting in Firebug
             var map = null;
+            OpenLayers.IMAGE_RELOAD_ATTEMPTS = 5;
 
-            var wmsCapabilities;
-            var wmsLayers;
-            var error;
+            //var wmsCapabilities;
+            //var wmsLayers;
+            //var error;
+
+            var coastlinemaps = { // read from master_config
+                "EPSG:4326":  "http://wms.met.no/maps/world.map?",
+                "EPSG:32661": "http://wms.met.no/maps/northpole.map?",
+                "EPSG:32761": "http://wms.met.no/maps/southpole.map?"
+            }
 
             function init(){
                 // run after document is loaded
 
                 //read CGI args
                 var args = new OpenLayers.Util.getArgs();
-                var ds_id = [% datasets.0.ds_id %];
+                var ds_id = [% datasets.0.ds_id || 'undefined' %];
                 var wms_setup = args.wmssetup;
                 var wms_url = args.wmsurl;
 
@@ -65,7 +79,7 @@
 
             function buildStyleSelector(styles, layername) {
                 // called every time layer or style is changed
-                current = map.baseLayer.params["STYLES"] || styles[0].name;
+                current = map.baseLayer.params["STYLES"] || styles[0].name || '';
                 var sel = document.forms["form1"].wmsstyle;
                 sel.length = 0;
                 for (i = 0; i < styles.length; i++) {
@@ -85,8 +99,6 @@
             }
 
             function buildTimeSelector(times) {
-                //
-
                 //current = times[0];
                 var sel = document.forms["form1"].wmstime;
                 sel.length = 0;
@@ -104,6 +116,8 @@
                         //    sel.selectedIndex = i;
                         //}
                     }
+                } else {
+                    log.trace('times is null');
                 }
 
                 // hide or show depending on time dimension existing in this layer
@@ -119,37 +133,47 @@
                 map.destroy();
                 OpenLayers.loadURL("[% c.uri_for('/gc2wmc') %]?ds_id=" + new_ds_id, "", this, drawMap, showError);
                 //$('wmstime').length = 0;
-                //buildTimeSelector(map.layer[0].dimensions.time);
+                buildTimeSelector(map.layer[0].dimensions.time);
             }
 
             function changeLayer(event) {
                 // triggered when user changes layer
-//                alert("layer = " + event.layer.name);
-                document.getElementById('legend').src = "/static/img/blank.gif";
-                if (event.layer.isBaseLayer && event.layer.visibility) {
-                    buildStyleSelector(event.layer.metadata.styles, event.layer.params.LAYERS);
-                    buildTimeSelector(event.layer.dimensions.time);
+                log.debug("layer " + event.layer.name + " is " + ( event.layer.getVisibility ? "on" : "off" ) );
+                document.getElementById('legend').src = "[% c.uri_for('/static/img/blank.gif') %]"; // placeholder image
+                //if (event.layer.isBaseLayer && event.layer.visibility) { // why baselayer?
+                if (event.layer.visibility) {
+                    //buildStyleSelector(event.layer.metadata.styles, event.layer.params.LAYERS);
+                    //buildTimeSelector(event.layer.dimensions.time); // FIXME accumulate - don't remove times when turning grid on
                 }
 
             }
 
             function changeStyle(style) {
                 // triggered when user changes style
-//                alert("style = " + style);
+                log.debug("new style = " + style);
                 map.baseLayer.mergeNewParams( {STYLES: style} );
             }
 
             function changeTime(dtime) {
                 // triggered when user changes time
-                //alert(dtime);
-                map.baseLayer.mergeNewParams( {time: dtime} );
-                //for (l in map.layers) {
-                //    alert(l);
-                //    l.mergeNewParams( {time: dtime} );
-                //}
+                log.debug("setting time to " + dtime + " for " + map.layers.length + " layers");
+                //map.baseLayer.mergeNewParams( {time: dtime} ); // FIXME - won't work if map
+                for (var i = 0; i < map.layers.length; i++) {
+                    var li = map.layers[i];
+                    //log.debug(i + ": setting layer " + li.name + " to " + dtime);
+                    try {
+                        if (li.dimensions.time !== undefined) {
+                            li.mergeNewParams( {time: dtime} );
+                        } else {
+                            log.debug('layer ' + li.name + ' is beyond space and time')
+                        }
+                    } catch (error) {
+                        log.warn("Could not set layer time: " + error);
+                    }
+                }
             }
 
-            function changeLegend(event) { // deprecated
+            function changeLegend(event) { // deprecated (why?)
                 // triggered when user changes layer
                 if (event.layer.isBaseLayer) {
                     document.getElementById('legend').src = event.layer.legend;
@@ -160,48 +184,48 @@
 
                 wmsContext = response.responseXML;
                 if (wmsContext === undefined) {
-                    alert("WMC is null!");
+                    log.fatal("WMC is null!");
                     return 0;
                 }
 
-                var layersw = new OpenLayers.Control.LayerSwitcher({'autoActivate': true, 'ascending': true});
+                var layersw = new OpenLayers.Control.LayerSwitcher({'autoActivate': false, 'ascending': false});
 
                 wmcParser = new OpenLayers.Format.WMC();
                 try {
                     map = wmcParser.read( wmsContext, { map: { div: 'map', controls: [] } } );
                 } catch (error) {
-                    alert("Invalid GetMapContext:\n" + error + "\n" + response.responseText);
-                    //return 0;
+                    log.fatal("Invalid GetMapContext:\n" + error + "\n" + response.responseText);
+                    return 0;
                 }
 
                 //map.events.on( { changeLayer: changeLegend } );
                 this.map.events.register("changelayer", this, changeLayer);
 
-                var coastlines_url = "http://wms.met.no/maps/world.map?";
-                if (map.projection == "EPSG:32661") {
-                    coastlines_url = "http://wms.met.no/maps/northpole.map?";
-                } else if (map.projection == "EPSG:32761") {
-                    coastlines_url = "http://wms.met.no/maps/southpole.map?";
-                }
+                var coastlines_url = coastlinemaps[map.projection];
+                log.debug("Projection = " + map.projection + "; map = " + coastlines_url);
 
                 [%  isBaseLayer = mm_config.get('WMS_BACKGROUND_ISBASELAYER') %]
-                var coastlines = new OpenLayers.Layer.WMS(
-                    "Met.no kart",
-                    coastlines_url,
-                    {
-                        transparent: "true",
-                        layers: 'borders'
-                    },
-                    {
-                        isBaseLayer: false
-                    }
-                );
 
-                try {
-                    map.addLayer(coastlines);
-                } catch (error) {
-                    alert(error);
-                    return 0;
+                if (coastlines_url !== undefined) {
+                    var coastlines = new OpenLayers.Layer.WMS(
+                        "Met.no kart",
+                        coastlines_url,
+                        {
+                            transparent: "true",
+                            layers: 'borders'
+                        },
+                        {
+                            isBaseLayer: false
+                        }
+                    );
+
+                    try {
+                        map.addLayer(coastlines);
+                    } catch (error) {
+                        log.fatal(error);
+                        return 0;
+                    }
+                    //map.addControl( new OpenLayers.Control.OverviewMap( {layers: [coastlines]} ) ); // gives "bounds is null" error
                 }
 
                 map.addControl(layersw);
@@ -210,15 +234,33 @@
                 map.addControl( new OpenLayers.Control.Navigation() );
                 map.addControl( new OpenLayers.Control.ScaleLine() );
                 map.addControl( new OpenLayers.Control.Permalink('permalink') );
-                //map.addControl( new OpenLayers.Control.OverviewMap( {layers: [coastlines]} ) );
-
                 layersw.maximizeControl(true);
+
+                for (var i=0; i < map.layers.length; i++) {
+                    var times = map.layers[i].dimensions.time;
+                    log.debug(i + ' >>> ' + typeof times + ' vals=' + times.values.length);
+                    if (times !== undefined) {
+                        //log.debug("layer " + map.layers[i].name + " has " + times.length + " timestamps")
+                        log.debug(map.layers[i].name + " time: " + times.values[0] + ", default: " + times.default);
+                        var start = times.default || times.values[0];
+                        try {
+                            buildTimeSelector(times);
+                            changeTime(start);
+                        } catch (error) {
+                            log.error(i + ': ' + error + '; Bad timing: ' + start);
+                        }
+                        break; // loop until a layer with times found
+                        // TODO: layers have not the same amount of time values
+                    }
+                }
+
                 var layer0 = map.layers[0].params.LAYERS;
-                buildStyleSelector(map.layers[0].metadata.styles, layer0);
-                buildTimeSelector(map.layers[0].dimensions.time);
+                buildStyleSelector(map.layers[0].metadata.styles, layer0); // FIXME hack
 
                 // set legend URL (have to set both LAYER and LAYERS due to bug in ncWMS)
-                document.getElementById('legend').src = map.layers[0].metadata.styles[0].legend.href + '&LAYERS=' + layer0;
+                //if (map.layers[0].metadata.styles[0].legend) {
+                //    document.getElementById('legend').src = map.layers[0].metadata.styles[0].legend.href + '&LAYERS=' + layer0;
+                //}
 
                 // Print resource link for debugging
                 //var a = document.createElement("a");
@@ -251,7 +293,7 @@
         <div id="docs"><p id="warning">Javascript must be enabled for WMS client to work!</p></div>
         <!--<div id="tags"></div>-->
 
-        <img id="legend" src="/static/img/blank.gif" style="position: absolute; right: 5px; top: 200px; z-index: 1000"/> <!--fix vpos-->
+        <img id="legend" src="[% c.uri_for('/static/img/blank.gif') %]" style="position: absolute; right: 5px; top: 200px; z-index: 1000"/> <!--fix vpos-->
         <form name="form1" id="form1" action="#" style="position: absolute; top: 0px; left: 60px; z-index: 1000">
 
             <label>Dataset:

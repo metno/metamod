@@ -367,23 +367,31 @@ sub wmsthumb {
         my $sxc = XML::LibXML::XPathContext->new( $setup->documentElement() );
         $sxc->registerNs('s', "http://www.met.no/schema/metamod/ncWmsSetup");
 
+        my (%area, %layer);
+
         # find base URL from wmsinfo
         my $wms_url = $sxc->findvalue('/*/@url') or die "Missing URL in wmsinfo";
+        my ($thumbnail) = $sxc->findnodes('/*/s:thumbnail');
+
+        # use first layer found if not specified
+        foreach ( $thumbnail ? $sxc->findnodes('/*/s:thumbnail[1]/@*') : $sxc->findnodes('/*/s:layer[1]/@*') ) {
+            $layer{$_->nodeName} = $_->getValue;
+        }
+        $layer{url} = $wms_url unless exists $layer{url};
+
+        print STDERR "*******************************\n" . Dumper \%layer;
 
         # find area info (dimensions, projection)
-        my (%area, %layer);
         foreach ( $sxc->findnodes('/*/s:displayArea[1]/@*') ) {
             $area{$_->nodeName} = $_->getValue;
         }
-        # find metadata of first layer (name, style)
-        foreach ( $sxc->findnodes('/*/s:layer[1]/@*') ) {
-            $layer{$_->nodeName} = $_->getValue;
-        }
 
         # build WMS params for maps
+        my @t = gmtime(time); my ($d, $m, $h) = ($t[3], $t[4]+1, $t[2]+1); # HACK HACK HACK
         my $wmsparams = "SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&FORMAT=image%2Fpng"
             . "&SRS=$area{crs}&BBOX=$area{left},$area{bottom},$area{right},$area{top}&WIDTH=$size&HEIGHT=$size"
-            . "&EXCEPTIONS=application%2Fvnd.ogc.se_inimage";
+            . "&EXCEPTIONS=application%2Fvnd.ogc.se_inimage"
+            . ($thumbnail ? "&TIME=2012-$m-${d}T18:00" : ''); # HACK HACK FIXME
 
         # get map url's according to projection
         my $mapserver = $config->get('WMS_BACKGROUND_MAPSERVER');
@@ -398,12 +406,12 @@ sub wmsthumb {
 
         my $out = {
             xysize  => $size,
-            datamap => "$wms_url?$wmsparams&LAYERS=$layer{name}&STYLES=$layer{style}",
-            outline => "$mapserver$map?$wmsparams&TRANSPARENT=true&LAYERS=borders&STYLES=",
+            datamap => "$layer{url}?$wmsparams&LAYERS=$layer{name}&STYLES=$layer{style}",
+            outline => $thumbnail ? undef : "$mapserver$map?$wmsparams&TRANSPARENT=true&LAYERS=borders&STYLES=",
             wms_url => $wms_url,
         };
 
-        #print STDERR Dumper($out);
+        print STDERR Dumper($out);
 
         return $out;
 

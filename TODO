@@ -37,6 +37,10 @@ add baselayer/transparency options to wmssetup
 
 style selector must differentiate between layers
 
+diana(?) bug crops west edge for hirlam
+
+how to spec boundingbox and maxextent (from getcap?)
+
 
 ++++++++ DONE ++++++++++++++
 

@@ -10,11 +10,13 @@
     <!-- embedded elements -->
     <element name='displayArea' type="w:DisplayArea" />
     <element name='layer' type="w:Layer" />
+    <element name='thumbnail' type="w:Thumbnail" />
 
     <complexType name='NcWmsSetup'>
         <sequence>
             <element ref='w:displayArea' minOccurs='0' maxOccurs='1'/>
             <element ref='w:layer' minOccurs='0' maxOccurs="unbounded"/>
+            <element ref='w:thumbnail' minOccurs='0' maxOccurs='1'/>
         </sequence>
         <attribute name="url" type="string" use="required"/>
     </complexType>
@@ -25,11 +27,19 @@
         <attribute name="right" type="double" use="optional"/>
         <attribute name="top" type="double" use="optional"/>
         <attribute name="bottom" type="double" use="optional"/>
-    </complexType>
-    <complexType name='Layer'>
-        <attribute name="name" type="string" use="required"/>
-        <attribute name="style" type="string" use="optional"/>
+        <attribute name="units" type="string" use="optional"/>
     </complexType>
 
+    <complexType name='Layer'>
+        <attribute name="name" type="string" use="required"/>  <!-- use '*' for default attrs -->
+        <attribute name="style" type="string" use="optional"/>
+        <attribute name="transparent" type="boolean" use="optional"/>
+    </complexType>
+
+    <complexType name='Thumbnail'>
+        <attribute name="name" type="string" use="required"/>
+        <attribute name="url" type="string" use="required"/>
+        <attribute name="style" type="string" use="optional"/>
+    </complexType>
 
 </schema>

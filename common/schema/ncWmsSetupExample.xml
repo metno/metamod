@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<w:ncWmsSetup url="http://tempuri.org?%DATASET_PARENT%/%DATASET%.nc"
-          xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://www.met.no/schema/metamod/ncWmsSetup ncWmsSetup.xsd ">
-          <w:displayArea crs="EPSG:2033" left="-700000" right="8000000" bottom="1500" top="17000"/>
-          <w:layer name="ice_conc" style="BOXFILL/redblue"/>
-          <w:layer name="lat"/>
+<w:ncWmsSetup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.met.no/schema/metamod/ncWmsSetup ncWmsSetup.xsd "
+  xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup"
+  url="http://tempuri.org?%DATASET_PARENT%/%DATASET%.nc">
+
+  <w:displayArea crs="EPSG:2033" left="-700000" right="8000000" bottom="1500" top="17000" units="m"/>
+  <w:layer name="ice_conc" style="BOXFILL/redblue" transparent="false"/>
+  <w:layer name="*" style="BOXFILL/redblue" transparent="true"/>
+  <w:thumbnail name="ice_conc,map" url="http://tempuri.org?%DATASET_PARENT%/%DATASET%.nc" style="BOXFILL/redblue,BOXFILL/greyscale"/>
+
 </w:ncWmsSetup>

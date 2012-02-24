@@ -160,3 +160,7 @@ h2.std {
 li {
     margin-left: 15px;
 }
+
+textarea.wms_info textarea.projection_info {
+	white-space: pre;
+}

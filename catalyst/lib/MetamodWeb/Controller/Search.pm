@@ -293,6 +293,7 @@ sub wms :Path('/search/wms') :Args {
     my ($self, $c) = @_;
 
     $c->stash( template => 'search/wms.tt', 'current_view' => 'Raw' );
+    $c->stash( debug => $self->logger->is_debug() );
 
     my $dslist = [];
     my $para = $c->req->params->{ ds_id };
