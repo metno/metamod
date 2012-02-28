@@ -204,8 +204,6 @@
                 var coastlines_url = coastlinemaps[map.projection];
                 log.debug("Projection = " + map.projection + "; map = " + coastlines_url);
 
-                [%  isBaseLayer = mm_config.get('WMS_BACKGROUND_ISBASELAYER') %]
-
                 if (coastlines_url !== undefined) {
                     var coastlines = new OpenLayers.Layer.WMS(
                         "Met.no kart",
