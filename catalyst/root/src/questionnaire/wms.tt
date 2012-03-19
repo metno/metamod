@@ -1,7 +1,8 @@
 [% INCLUDE 'questionnaire/textarea.tt' %]
+
 <tr>
     <td>
-        <button type="button" onclick="jQuery('#[% element.name %]').val('[% app.quest.wms_default | collapse | html %]')">
+        <button type="button" onclick="jQuery('#[% element.name %]').val('[% app.quest.wms_default | replace("\n", '\n') | html %]')">
         Set to default
         </button>
     </td>
