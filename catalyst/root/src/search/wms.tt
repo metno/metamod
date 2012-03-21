@@ -26,13 +26,17 @@
                 /*background-color: #eeeeff;*/
             }
 
+            .ui-state-default {
+                background-image: url("[% c.uri_for('/static/css/metamod_theme/images/ui-bg_highlight-soft_100_hack_1x100.png') %]") !important;
+            }
+
             .ui-accordion-header input {
                 /*float: right;*/
             }
 
             .ui-accordion-content {
                 /*background-color: black !important;*/
-                /*background-image: url("[% c.uri_for('/static/css/metamod_theme/images/ui-bg_highlight-soft_100_f6f6f6_1x100_darker.png') %]");*/
+                /*background-image: url("[% c.uri_for('/static/css/metamod_theme/images/ui-bg_highlight-soft_100_hack_1x100.png') %]");*/
                 /*float: right;*/
             }
 
