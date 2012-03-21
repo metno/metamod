@@ -2,12 +2,11 @@
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns="http://www.opengis.net/context"
-  xmlns:wms="http://www.opengis.net/wms"
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:ol="http://openlayers.org/context"
 >
 
-  <!-- stylesheet for transforming WMS 1.3.0 (only) to WMC 1.1.0 -->
+  <!-- stylesheet for transforming WMS 1.1.1 (only) to WMC 1.1.0 -->
 
   <xsl:output indent="yes"/>
   <xsl:param name="crs" select="'EPSG:4326'"/> <!-- default proj is lat/lon -->
@@ -35,38 +34,38 @@
         </Extension>
       </General>
       <LayerList>
-        <xsl:apply-templates select="//wms:Layer[not(child::wms:Layer)]"/>
+        <xsl:apply-templates select="//Layer[not(child::Layer)]"/>
       </LayerList>
     </ViewContext>
 
   </xsl:template>
 
 
-  <xsl:template match="//wms:Layer">
+  <xsl:template match="//Layer">
 
     <Layer queryable="{@queryable}" hidden="1">
       <Server service="OGC:WMS" version="1.1.1">
         <OnlineResource xlink:type="simple"
-            xlink:href="{/*/wms:Capability/wms:Request/wms:GetMap/wms:DCPType/wms:HTTP/wms:Get/wms:OnlineResource/@xlink:href}"/>
+            xlink:href="{/*/Capability/Request/GetMap/DCPType/HTTP/Get/OnlineResource/@xlink:href}"/>
       </Server>
 
-      <Name><xsl:value-of select="wms:Name"/></Name>
-      <Title><xsl:value-of select="wms:Title"/></Title>
-      <Abstract><xsl:value-of select="wms:Abstract"/></Abstract>
+      <Name><xsl:value-of select="Name"/></Name>
+      <Title><xsl:value-of select="Title"/></Title>
+      <Abstract><xsl:value-of select="Abstract"/></Abstract>
 
-      <xsl:for-each select="ancestor::wms:Layer/wms:CRS">
+      <xsl:for-each select="ancestor::Layer/SRS">
         <!-- TODO: check rules if defined on multiple layers... sum or replacement? FIXME -->
         <SRS><xsl:value-of select="."/></SRS>
       </xsl:for-each>
 
       <DimensionList>
-        <xsl:apply-templates select="wms:Dimension"/>
+        <xsl:apply-templates select="Dimension"/>
       </DimensionList>
 
       <FormatList>
-        <xsl:for-each select="/*/wms:Capability/wms:Request/wms:GetMap/wms:Format">
+        <xsl:for-each select="/*/Capability/Request/GetMap/Format">
           <Format>
-            <xsl:if test="text() = 'image/png'">
+            <xsl:if test="starts-with(text(), 'image/png')">
               <xsl:attribute name="current">1</xsl:attribute>
             </xsl:if>
             <xsl:value-of select="."/>
@@ -74,22 +73,19 @@
         </xsl:for-each>
       </FormatList>
       <StyleList>
-        <xsl:apply-templates select="./wms:Style"/>
+        <xsl:apply-templates select="./Style"/>
       </StyleList>
     </Layer>
 
   </xsl:template>
 
-  <xsl:template match="//wms:Layer/wms:Dimension"> <!-- maybe add default time? -->
+  <xsl:template match="//Layer/Dimension"> <!-- maybe add default time? -->
     <xsl:element name="Dimension">
       <xsl:for-each select="@*">
         <xsl:attribute name="{local-name()}">
           <xsl:value-of select="."/>
         </xsl:attribute>
       </xsl:for-each>
-      <xsl:attribute name="current">
-        <xsl:value-of select="1"/> <!-- if dimensions given, they must be used in request -->
-      </xsl:attribute>
       <xsl:value-of select="normalize-space(.)"/>
     </xsl:element>
   </xsl:template>
@@ -102,14 +98,14 @@
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="@*[namespace-uri() = 'http://www.opengis.net/wms']">
+  <xsl:template match="@*[namespace-uri() = '']">
     <!-- strip namespace from native WMS attributes -->
     <xsl:attribute name="{local-name()}">
       <xsl:value-of select="."/>
     </xsl:attribute>
   </xsl:template>
 
-  <xsl:template match="@*[namespace-uri() != 'http://www.opengis.net/wms']">
+  <xsl:template match="@*[namespace-uri() != '']">
     <!-- should only match xlinks in WMS document -->
     <xsl:attribute name="{name()}">
       <xsl:value-of select="."/>

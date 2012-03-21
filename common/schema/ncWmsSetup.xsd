@@ -9,12 +9,14 @@
     <element name='ncWmsSetup' type="w:NcWmsSetup" />
     <!-- embedded elements -->
     <element name='displayArea' type="w:DisplayArea" />
-    <element name='layer' type="w:Layer" />
+    <element name='baselayer' type="w:Layer" /> <!--opaque-->
+    <element name='layer' type="w:Layer" /> <!--transparent-->
     <element name='thumbnail' type="w:Thumbnail" />
 
     <complexType name='NcWmsSetup'>
         <sequence>
-            <element ref='w:displayArea' minOccurs='0' maxOccurs='1'/>
+            <element ref='w:displayArea' minOccurs='1' maxOccurs='1'/>
+            <element ref='w:baselayer' minOccurs='0' maxOccurs="unbounded"/>
             <element ref='w:layer' minOccurs='0' maxOccurs="unbounded"/>
             <element ref='w:thumbnail' minOccurs='0' maxOccurs='1'/>
         </sequence>
@@ -33,7 +35,7 @@
     <complexType name='Layer'>
         <attribute name="name" type="string" use="required"/>  <!-- use '*' for default attrs -->
         <attribute name="style" type="string" use="optional"/>
-        <attribute name="transparent" type="boolean" use="optional"/>
+        <attribute name="url" type="string" use="optional"/>
     </complexType>
 
     <complexType name='Thumbnail'>

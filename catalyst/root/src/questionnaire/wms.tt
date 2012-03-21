@@ -5,5 +5,17 @@
         <button type="button" onclick="jQuery('#[% element.name %]').val('[% app.quest.wms_default | replace("\n", '\n') | html %]')">
         Set to default
         </button>
+        <button type="button" onclick="jQuery('#wmshelp').toggle()">Help</button>
+    </td>
+</tr>
+<tr id="wmshelp" style="display:none;">
+    <td>
+
+<h2 class="std">WMSinfo format guide</h2>
+
+<pre style="font-family: monospace !important">
+[% app.quest.wms_help | html %]
+</pre>
+
     </td>
 </tr>

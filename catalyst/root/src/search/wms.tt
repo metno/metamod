@@ -6,31 +6,70 @@
         <!--link rel="stylesheet" href="style.css" type="text/css" /-->
         <style type="text/css">
             #warning {font-size: x-large; padding:22 22 22 22; text-decoration: blink; color: red;}
-            form, .olControlPermalink {font-size: x-small; font-family: sans-serif}
+            #form1, .olControlPermalink {font-size: x-small; font-family: sans-serif}
             /* crappy css selectors below don't work... have to use inline styles instead :( */
             /*#timebox { visibility: hidden };*/
             /*img#legend { float: right; position: relative; top: 200px; z-index: 1000 };*/
             /*#form1 { float: top; }*/
+
+            .container {
+                position: relative;
+                width: 100%;
+            }
+
+            #accordion {
+                /*position: absolute;*/
+                float: right !important;
+                width: 200px;
+                font-size: x-small;
+                /*border:1px solid purple;*/
+                /*background-color: #eeeeff;*/
+            }
+
+            .ui-accordion-header input {
+                /*float: right;*/
+            }
+
+            .ui-accordion-content {
+                /*background-color: black !important;*/
+                /*background-image: url("[% c.uri_for('/static/css/metamod_theme/images/ui-bg_highlight-soft_100_f6f6f6_1x100_darker.png') %]");*/
+                /*float: right;*/
+            }
+
+            .container div#map {
+                /*position:absolute;*/
+                margin-right: 205px !important;
+                /*float: right;*/
+            }
+
         </style>
 
-        <!-- calendar stylesheet -->
-        <!--<link rel="stylesheet" type="text/css" media="all" href="[% c.uri_for('/static/js/jscalendar-1.0/calendar-win2k-cold-1.css') %]" title="win2k-cold-1" />-->
-        <!-- main calendar program -->
-        <!--<script type="text/javascript" src="[% c.uri_for('/static/js/jscalendar-1.0/calendar.js') %]"></script>-->
-        <!-- language for the calendar -->
-        <!--<script type="text/javascript" src="[% c.uri_for('/static/js/jscalendar-1.0/lang/calendar-en.js') %]"></script>-->
-        <!-- the following script defines the Calendar.setup helper function, which makes
-             adding a calendar a matter of 1 or 2 lines of code. -->
-        <!--<script type="text/javascript" src="[% c.uri_for('/static/js/jscalendar-1.0/calendar-setup.js') %]"></script>-->
+        <link rel="stylesheet" href="[% c.uri_for('/static/css/metamod_theme/jquery-ui.css') %]" />
+        <script type="text/javascript" src="[% c.uri_for('/static/js/jquery.min.js') %]"></script>
+        <script type="text/javascript" src="[% c.uri_for('/static/js/jquery-ui.min.js') %]"></script>
 
         <script type="text/javascript" src="[% c.uri_for('/static/js/log4javascript-1.4.2/js/log4javascript.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/lib/OpenLayers.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/lib/Firebug/firebug.js') %]"></script>
         <script type="text/javascript">
 
-			var	log = log4javascript.getDefaultLogger();
+            $(function() { // runs after document loaded
+                $('#accordion').accordion( {
+                    create: function(event, ui) {
+                        alert('accordion!');
+                        log.debug('accordion created!');
+                    },
+                    change: function(event, ui) {
+                        log.debug('layer change: ' + ui.oldHeader.attr('id') + ' to ' + ui.newHeader.attr('id'));
+                        map.layers[ui.oldHeader.attr('id').slice(5)].setVisibility(false);
+                        map.layers[ui.newHeader.attr('id').slice(5)].setVisibility(true);
+                    }
+                } );
+            });
 
-            [% IF 1 # ! debug # disable logging in production %]
+            var log = log4javascript.getDefaultLogger();
+
+            [% IF ! debug # disable logging in production %]
                 log = log4javascript.getNullLogger();
             [% END %]
 
@@ -38,16 +77,6 @@
             // debugging/inspecting in Firebug
             var map = null;
             OpenLayers.IMAGE_RELOAD_ATTEMPTS = 5;
-
-            //var wmsCapabilities;
-            //var wmsLayers;
-            //var error;
-
-            var coastlinemaps = { // read from master_config
-                "EPSG:4326":  "http://wms.met.no/maps/world.map?",
-                "EPSG:32661": "http://wms.met.no/maps/northpole.map?",
-                "EPSG:32761": "http://wms.met.no/maps/southpole.map?"
-            }
 
             function init(){
                 // run after document is loaded
@@ -77,106 +106,28 @@
 
             }
 
-            function buildStyleSelector(styles, layername) {
-                // called every time layer or style is changed
-                current = map.baseLayer.params["STYLES"] || styles[0].name || '';
-                var sel = document.forms["form1"].wmsstyle;
-                sel.length = 0;
-                for (i = 0; i < styles.length; i++) {
-                    var opt = styles[i].name;
-                    var option = document.createElement('option');
-                    option.setAttribute('value', opt);
-                    option.appendChild( document.createTextNode(opt.slice(8)) ); // remove BOXFILL prefix
-                    sel.appendChild(option);
-                    if (opt == current) {
-                        //alert(opt);
-                        // set current option as selected
-                        sel.selectedIndex = i;
-                        // change legend URL (have to set both LAYER and LAYERS due to bug in ncWMS)
-                        document.getElementById('legend').src = styles[i].legend.href + '&LAYERS=' + layername;
-                    }
-                }
-            }
-
-            function buildTimeSelector(times) {
-                //current = times[0];
-                var sel = document.forms["form1"].wmstime;
-                sel.length = 0;
-
-                if (typeof times != 'undefined') {
-                    for (i = 0; i < times.values.length; i++) {
-                        var opt = times.values[i];
-                        var option = document.createElement('option');
-                        option.setAttribute('value', opt);
-                        option.appendChild( document.createTextNode(opt) );
-                        sel.appendChild(option);
-                        //if (opt == current) {
-                        //    //alert(opt);
-                        //    // set current option as selected
-                        //    sel.selectedIndex = i;
-                        //}
-                    }
-                } else {
-                    log.trace('times is null');
-                }
-
-                // hide or show depending on time dimension existing in this layer
-                if (times.values.length > 0 ) {
-                    $('timebox').show;
-                } else {
-                    $('timebox').hide;
-                }
-
-            }
-
             function changeFile(new_ds_id) {
                 map.destroy();
                 OpenLayers.loadURL("[% c.uri_for('/gc2wmc') %]?ds_id=" + new_ds_id, "", this, drawMap, showError);
-                //$('wmstime').length = 0;
-                buildTimeSelector(map.layer[0].dimensions.time);
             }
 
-            function changeLayer(event) {
-                // triggered when user changes layer
-                log.debug("layer " + event.layer.name + " is " + ( event.layer.getVisibility ? "on" : "off" ) );
-                document.getElementById('legend').src = "[% c.uri_for('/static/img/blank.gif') %]"; // placeholder image
-                //if (event.layer.isBaseLayer && event.layer.visibility) { // why baselayer?
-                if (event.layer.visibility) {
-                    //buildStyleSelector(event.layer.metadata.styles, event.layer.params.LAYERS);
-                    //buildTimeSelector(event.layer.dimensions.time); // FIXME accumulate - don't remove times when turning grid on
+            function timeHandlerFactory(layer) {
+                return function() {
+                    var dtime = this[this.selectedIndex].value;
+                    log.debug("setting time to " + dtime + " for " + layer.name);
+                    layer.mergeNewParams( {time: dtime} );
                 }
-
             }
 
-            function changeStyle(style) {
-                // triggered when user changes style
-                log.debug("new style = " + style);
-                map.baseLayer.mergeNewParams( {STYLES: style} );
-            }
-
-            function changeTime(dtime) {
-                // triggered when user changes time
-                log.debug("setting time to " + dtime + " for " + map.layers.length + " layers");
-                //map.baseLayer.mergeNewParams( {time: dtime} ); // FIXME - won't work if map
-                for (var i = 0; i < map.layers.length; i++) {
-                    var li = map.layers[i];
-                    //log.debug(i + ": setting layer " + li.name + " to " + dtime);
-                    try {
-                        if (li.dimensions.time !== undefined) {
-                            li.mergeNewParams( {time: dtime} );
-                        } else {
-                            log.debug('layer ' + li.name + ' is beyond space and time')
-                        }
-                    } catch (error) {
-                        log.warn("Could not set layer time: " + error);
+            function styleHandlerFactory(layer, l_image) {
+                return function() {
+                    var style = this[this.selectedIndex].value;
+                    layer.mergeNewParams( {STYLES: style} );
+                    log.debug('Style changed for ' + layer.id + ' to ' + style);
+                    var legend = layer.metadata.styles[this.selectedIndex].legend;
+                    if ( legend !== undefined ) {
+                        l_image.attr('src', legend.href + '&LAYERS=' + layer.name); // ncwms fix
                     }
-                }
-            }
-
-            function changeLegend(event) { // deprecated (why?)
-                // triggered when user changes layer
-                if (event.layer.isBaseLayer) {
-                    document.getElementById('legend').src = event.layer.legend;
                 }
             }
 
@@ -188,7 +139,7 @@
                     return 0;
                 }
 
-                var layersw = new OpenLayers.Control.LayerSwitcher({'autoActivate': false, 'ascending': false});
+                var layersw = new OpenLayers.Control.LayerSwitcher({'autoActivate': false, 'ascending': true});
 
                 wmcParser = new OpenLayers.Format.WMC();
                 try {
@@ -198,33 +149,7 @@
                     return 0;
                 }
 
-                //map.events.on( { changeLayer: changeLegend } );
-                this.map.events.register("changelayer", this, changeLayer);
-
-                var coastlines_url = coastlinemaps[map.projection];
-                log.debug("Projection = " + map.projection + "; map = " + coastlines_url);
-
-                if (coastlines_url !== undefined) {
-                    var coastlines = new OpenLayers.Layer.WMS(
-                        "Met.no kart",
-                        coastlines_url,
-                        {
-                            transparent: "true",
-                            layers: 'borders'
-                        },
-                        {
-                            isBaseLayer: false
-                        }
-                    );
-
-                    try {
-                        map.addLayer(coastlines);
-                    } catch (error) {
-                        log.fatal(error);
-                        return 0;
-                    }
-                    //map.addControl( new OpenLayers.Control.OverviewMap( {layers: [coastlines]} ) ); // gives "bounds is null" error
-                }
+                log.debug("Projection = " + map.projection);
 
                 map.addControl(layersw);
                 map.addControl( new OpenLayers.Control.MousePosition() );
@@ -232,45 +157,86 @@
                 map.addControl( new OpenLayers.Control.Navigation() );
                 map.addControl( new OpenLayers.Control.ScaleLine() );
                 map.addControl( new OpenLayers.Control.Permalink('permalink') );
-                layersw.maximizeControl(true);
+                //layersw.maximizeControl(true);
 
                 for (var i=0; i < map.layers.length; i++) {
-                    var times = map.layers[i].dimensions.time;
-                    log.debug(i + ' >>> ' + typeof times + ' vals=' + times.values.length);
-                    if (times !== undefined) {
-                        //log.debug("layer " + map.layers[i].name + " has " + times.length + " timestamps")
-                        log.debug(map.layers[i].name + " time: " + times.values[0] + ", default: " + times.default);
-                        var start = times.default || times.values[0];
-                        try {
-                            buildTimeSelector(times);
-                            changeTime(start);
-                        } catch (error) {
-                            log.error(i + ': ' + error + '; Bad timing: ' + start);
-                        }
-                        break; // loop until a layer with times found
-                        // TODO: layers have not the same amount of time values
+                    var l = map.layers[i];
+                    var lc = '#layer' + i;
+
+                    //var lvis = l.isBaseLayer ?
+                    //    '<input name="baselayer_visible" id="' + lc + '_show" type="radio"/>' :
+                    //    '';
+                    $("#accordion").append('<h3 layer="' + i + '"><a href="#">' + l.name + '</a></h3>');
+                    $("#accordion").append('<div id="layer' + i + '"></div>');
+                    if (l.metadata.abstract !== undefined) {
+                        $(lc).append('<p>' + l.metadata.abstract + '</p>');
                     }
+                    if (! l.isBaseLayer) {
+                        $(lc).append('<label><input name="' + lc + '_visible" id="' + lc + '_show" type="checkbox" '
+                        + 'onchange="map.layers[' + i + '].sticky = this.checked"/>stay visible</label>');
+                    }
+
+                    if (l.dimensions !== undefined && l.dimensions.time !== undefined) {
+
+                        var times = l.dimensions.time.values;
+                        var deft = l.dimensions.time.default || times[0];
+                        //log.debug(i + ' >>> ' + typeof times);
+                        //log.debug("layer " + map.layers[i].name + " has " + times.length + " timestamps")
+                        //log.debug(map.layers[i].name + " time: " + times[0] + ", default: " + deft);
+
+                        // initialize time for all layers (needed for wmsdiana)
+                        l.mergeNewParams( {time: deft} );
+
+                        // build time selector
+                        $(lc).append('<p>Time:<br/><select id="layer' + i + '_time"/></p>');
+                        for (t in times) {
+                            //log.debug(times[t]);
+                            $(lc + '_time').append("<option>" + times[t] + "</option>");
+                        }
+
+                        $(lc + '_time').change( timeHandlerFactory(l) );
+                    }
+
+
+                    if (l.metadata.styles !== undefined && l.metadata.styles.length > 0) {
+
+                        // build style selector
+                        $(lc).append('<p>Style:<br/><select id="layer' + i + '_styles"/></p>');
+                        var sty = l.metadata.styles;
+                        for (s in sty) {
+                            //log.debug(st);
+                            $(lc + '_styles').append("<option>" + sty[s].name + "</option>");
+                        }
+                        if (sty[0].legend) {
+                            $(lc).append('<img id="layer' + i + '_legend" src="' + sty[0].legend.href + '&LAYERS=' + l.name + '"/>');
+                        }
+
+                        $(lc + '_styles').change( styleHandlerFactory( l, $(lc + '_legend') ) );
+                    }
+
                 }
 
-                var layer0 = map.layers[0].params.LAYERS;
-                buildStyleSelector(map.layers[0].metadata.styles, layer0); // FIXME hack
-
-                // set legend URL (have to set both LAYER and LAYERS due to bug in ncWMS)
-                //if (map.layers[0].metadata.styles[0].legend) {
-                //    document.getElementById('legend').src = map.layers[0].metadata.styles[0].legend.href + '&LAYERS=' + layer0;
-                //}
-
-                // Print resource link for debugging
-                //var a = document.createElement("a");
-                //a.href = wms_url + "?service=WMS&version=1.3.0&request=GetCapabilities";
-                //a.href = wms_setup;
-                //a.appendChild( document.createTextNode(wms_setup) );
-                //document.getElementById('shortdesc').appendChild(a);
-
-                // set page headings
-                //var heading = map.layers[0].name;
-                //document.title = heading;
-                //document.getElementById('title').appendChild( document.createTextNode(heading) );
+                $("#accordion").accordion("destroy");
+                $("#accordion").accordion({ // why defined twice?
+                    fillSpace:true,
+                    icons: true,
+                    create: function(event, ui) {
+                        alert('accordion!');
+                        log.debug('accordion created!');
+                    },
+                    change: function(event, ui) {
+                        log.debug('layer change: ' + ui.oldHeader.attr("layer") + ' to ' + ui.newHeader.attr("layer"));
+                        var o_index = ui.oldHeader.attr('layer');
+                        var n_index = ui.newHeader.attr('layer');
+                        if (map.layers[o_index].isBaseLayer) {
+                            log.debug('layer ' + o_index + ' is baselayer');
+                        } else {
+                            map.layers[o_index].setVisibility( map.layers[o_index].sticky );
+                        }
+                        map.layers[n_index].setVisibility(true);
+                    }
+                });
+                $("#accordion").accordion("resize");
 
             }
 
@@ -287,12 +253,17 @@
     </head>
     <body onload="init()">
 
-        <div id="map" class="largemap"></div>
+        <form>
+            <div class="container">
+                <div id="accordion"></div>
+                <div id="map" class="largemap"></div>
+            </div>
+        </form>
+
         <div id="docs"><p id="warning">Javascript must be enabled for WMS client to work!</p></div>
         <!--<div id="tags"></div>-->
 
-        <img id="legend" src="[% c.uri_for('/static/img/blank.gif') %]" style="position: absolute; right: 5px; top: 200px; z-index: 1000"/> <!--fix vpos-->
-        <form name="form1" id="form1" action="#" style="position: absolute; top: 0px; left: 60px; z-index: 1000">
+        <form name="form1" id="form1" action="#" style="position: absolute; top: 0px; left: 05px; z-index: 1000">
 
             <label>Dataset:
                 <select name="dataset"  id="dataset" onChange="changeFile(this[this.selectedIndex].value)">
@@ -301,30 +272,6 @@
                     [% END %]
                 </select>
             </label>
-
-            <label>Style: <select name="wmsstyle" id="wmsstyle" onChange="changeStyle(this[this.selectedIndex].value)"></select></label>
-
-            <label id="timebox">Time: <select name="wmstime" id="wmstime" onChange="changeTime(this[this.selectedIndex].value)"></select></label>
-
-            <!--<input type="hidden" name="date" id="f_date_e" />-->
-            <!--<img src="[% c.uri_for('/static/js/jscalendar-1.0/img.gif') %]" id="f_trigger_e" style="cursor: pointer; border: 1px solid red;"-->
-            <!--     title="Date selector" onmouseover="this.style.background='red';"-->
-            <!--     onmouseout="this.style.background=''" />-->
-            <!--<span id="show_e">-- not entered --</span>-->
-            <!--<script type="text/javascript">-->
-            <!--    Calendar.setup({-->
-            <!--        inputField     :    "f_date_e",     // id of the input field-->
-            <!--        ifFormat       :    "%Y/%d/%m",     // format of the input field (even if hidden, this format will be honored)-->
-            <!--        displayArea    :    "show_e",       // ID of the span where the date is to be shown-->
-            <!--        daFormat       :    "%A, %B %d, %Y",// format of the displayed date-->
-            <!--        button         :    "f_trigger_e",  // trigger button (well, IMG in our case)-->
-            <!--        align          :    "Tl",           // alignment (defaults to "Bl")-->
-            <!--        singleClick    :    true-->
-            <!--    });-->
-            <!--</script>-->
-            <!--<style type="text/css">-->
-            <!--    .calendar .combo { z-index: 2147483647; }-->
-            <!--</style>-->
 
             <span id="shortdesc"><!--Data file (direct): --></span>
 

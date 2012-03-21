@@ -104,36 +104,49 @@ app = {
         adm_background = c.uri_for('/static/images/ipydis_background.jpg')
 
         wms_default = '
-     <w:ncWmsSetup url="http://dev-vm188/thredds/wms/osisaf/met.no/%DATASET_PARENT%/%DATASET%.nc"
-          xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://www.met.no/schema/metamod/ncWmsSetup ncWmsSetup.xsd ">
-          <w:displayArea crs="EPSG:32661" left="-3000000" right="7000000" bottom="-3000000" top="7000000"/>
-          <w:layer name="ice_conc" style="BOXFILL/greyscale"/>
-          <w:layer name="lat"/>
-     <!-- displayArea (EPSG:32661 (northpole), EPSG:32761 (southpole) and EPSG:4326 (lat/lon)) -->
-     <!-- internal thredds can be set up with url="%THREDDS_DATAREF%" -->
-     <!-- The layer/palette setup is optional. -->
-     </w:ncWmsSetup>
+<w:ncWmsSetup xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.met.no/schema/metamod/ncWmsSetup ncWmsSetup.xsd "
+  url="http://dev-vm188/thredds/wms/osisaf/met.no/%DATASET_PARENT%/%DATASET%.nc">
+
+  <w:displayArea crs="EPSG:32661" left="-3000000" right="7000000" bottom="-3000000" top="7000000"/>
+  <w:baselayer name="map" style="contour"/>
+  <w:layer name="ice_conc" style="boxfill/greyscale"/>
+  <w:thumbnail name="ec.Temperatur,kart" url="http://dev-vm202/verportal/verportal2.map" style=",contour"/>
+</w:ncWmsSetup>
+        '
+        wms_help = '
+Internal thredds can be set up with url="%THREDDS_DATAREF%" (is this implemented?)
+
+The layer/palette setup is optional.
+
+displayArea can be:
+    EPSG:32661 - north pole stereographic
+    EPSG:32761 - south pole stereographic
+    EPSG:4326  - lat/lon
         '
 
         projection_default = '
-     <fi:fimexProjections xmlns:fi="http://www.met.no/schema/metamod/fimexProjections"
-                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="http://www.met.no/schema/metamod/fimexProjections https://wiki.met.no/_media/metamod/fimexProjections.xsd">
-     <fi:dataset urlRegex="!(.*/thredds).*dataset=(.*)!" urlReplace="$1/fileServer/data/$2"/>
-     <!-- see fimex-interpolation for more info on options -->
-     <fi:projection name="Lat/Long" method="nearestneighbor"
-            projString="+proj=latlong +a=6371000 +ellps=sphere +e=0"
-            xAxis="-180,-179,...,180"
-            yAxis="60,61,...,90"
-            toDegree="true"/>
-     <fi:projection name="Stereo" method="bilinear"
-            projString="+proj=stere +lon_0=0 +lat_0=90 +lat_ts=-32 +a=6371000 +ellps=sphere +e=0"
-            xAxis="0,50000,...,x;relativeStart=0"
-            yAxis="0,50000,...,x;relativeStart=0"
-            toDegree="false" />
-     </fi:fimexProjections>
+<fi:fimexProjections xmlns:fi="http://www.met.no/schema/metamod/fimexProjections"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.met.no/schema/metamod/fimexProjections https://wiki.met.no/_media/metamod/fimexProjections.xsd">
+<fi:dataset urlRegex="!(.*/thredds).*dataset=(.*)!" urlReplace="$1/fileServer/data/$2"/>
+<!-- see fimex-interpolation for more info on options -->
+<fi:projection name="Lat/Long" method="nearestneighbor"
+       projString="+proj=latlong +a=6371000 +ellps=sphere +e=0"
+       xAxis="-180,-179,...,180"
+       yAxis="60,61,...,90"
+       toDegree="true"/>
+<fi:projection name="Stereo" method="bilinear"
+       projString="+proj=stere +lon_0=0 +lat_0=90 +lat_ts=-32 +a=6371000 +ellps=sphere +e=0"
+       xAxis="0,50000,...,x;relativeStart=0"
+       yAxis="0,50000,...,x;relativeStart=0"
+       toDegree="false" />
+</fi:fimexProjections>
+        '
+
+        projection_help = '
+text to come...
         '
 
     }

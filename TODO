@@ -26,8 +26,19 @@ add packagees, update download docs in https://wiki.met.no/metamod/download
 
 find out how to move index link in html docs to left col
 
-http://bit.ly/A05CQe
+how to spec boundingbox and maxextent (from getcap?)
 
+multiple thumbnails in wmsinfo (for separate map and data layers)
+
+add timeslider in wms (from nrk)
+
+++++++++ DONE ++++++++++++++
+
+add verportal datasets for testing wmsdiana
+
+remove remaining php stuff
+
+fixed linebreaks in example wms/proj xml
 
 sort out how to deal with different times for each layer
 
@@ -39,12 +50,5 @@ style selector must differentiate between layers
 
 diana(?) bug crops west edge for hirlam
 
-how to spec boundingbox and maxextent (from getcap?)
-
-
-++++++++ DONE ++++++++++++++
-
-add verportal datasets for testing wmsdiana
-
-remove remaining php stuff
+wms/proj help texts
 

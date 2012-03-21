@@ -371,7 +371,7 @@ sub wmsthumb {
 
         # find base URL from wmsinfo
         my $wms_url = $sxc->findvalue('/*/@url') or die "Missing URL in wmsinfo";
-        my ($thumbnail) = $sxc->findnodes('/*/s:thumbnail');
+        my ($thumbnail) = $sxc->findnodes('/*/s:thumbnail'); # TODO - support multiple thumbs (map + data) - FIXME
 
         # use first layer found if not specified
         foreach ( $thumbnail ? $sxc->findnodes('/*/s:thumbnail[1]/@*') : $sxc->findnodes('/*/s:layer[1]/@*') ) {
@@ -411,7 +411,7 @@ sub wmsthumb {
             wms_url => $wms_url,
         };
 
-        print STDERR Dumper($out);
+        #print STDERR Dumper($out);
 
         return $out;
 

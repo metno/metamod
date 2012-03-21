@@ -4,5 +4,16 @@
         <button type="button" onclick="jQuery('#[% element.name %]').val('[% app.quest.projection_default |  replace("\n", '\n') | html %]')">
         Set to default
         </button>
+        <button type="button" onclick="jQuery('#projhelp').toggle()">Help</button>
     </td>
+</tr>
+<tr id="projhelp" style="display:none;">
+    <td>
+
+<h2 class="std">Projectioninfo format guide</h2>
+
+<pre style="font-family: monospace !important">
+[% app.quest.projection_help | html %]
+</pre>
+
 </tr>
