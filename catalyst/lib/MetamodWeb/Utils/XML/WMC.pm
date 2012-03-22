@@ -99,7 +99,7 @@ sub setup2wmc {
         }
 
         my $style = lc $setuplayer->getAttribute('style') || '';
-        printf STDERR "*****WMC* setup %s: %s - %s\n", $setuplayer->localname, $lname, $style;
+        #printf STDERR "*****WMC* setup %s: %s - %s\n", $setuplayer->localname, $lname, $style;
 
         if ( $setuplayer->getAttribute('url') ) {
             #do later
@@ -109,9 +109,9 @@ sub setup2wmc {
         # find matching layer nodes in Capabilities
         foreach my $gclayer ($gcxc->findnodes("v:Layer[v:Name = '$lname']", $layerlist)) {
             # should only loop once
-            printf STDERR "*WMC* getcap: %s\n", $gclayer->serialize;
+            #printf STDERR "*WMC* getcap: %s\n", $gclayer->serialize;
             foreach my $gcstyle ( $gcxc->findnodes("v:StyleList/v:Style[v:Name = '$style']", $gclayer) ) { # FIXME: wrong namespace
-                printf STDERR "*WMC* stylelist: %s\n", $gcstyle->serialize;
+                #printf STDERR "*WMC* stylelist: %s\n", $gcstyle->serialize;
                 $gcstyle->setAttribute('current', 1);
                 # move preferred style node to top of list - FIXME
                 my $pn = $gcstyle->parentNode;
