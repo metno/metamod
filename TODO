@@ -32,6 +32,8 @@ multiple thumbnails in wmsinfo (for separate map and data layers)
 
 add timeslider in wms (from nrk)
 
+merge layers from several datasets in wmc
+
 ++++++++ DONE ++++++++++++++
 
 add verportal datasets for testing wmsdiana

@@ -164,7 +164,7 @@ Takes a ref to a hash with roles, setting those who are true and deletes all oth
 
 sub set_roles {
     my ($self, $roles) = @_;
-    print STDERR "Setting " . Dumper $roles;
+    #print STDERR "Setting " . Dumper $roles;
     foreach ( $self->roles ) {
         $_->delete; # first delete all roles
     }

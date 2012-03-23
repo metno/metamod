@@ -379,7 +379,7 @@ sub wmsthumb {
         }
         $layer{url} = $wms_url unless exists $layer{url};
 
-        print STDERR "*******************************\n" . Dumper \%layer;
+        #print STDERR "*******************************\n" . Dumper \%layer;
 
         # find area info (dimensions, projection)
         foreach ( $sxc->findnodes('/*/s:displayArea[1]/@*') ) {
