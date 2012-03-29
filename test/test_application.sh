@@ -267,8 +267,7 @@ rm -rf data/*
 mkdir -p webupload/EXAMPLE
 
 # Write a log4perl_config.ini file to the [target] webrun directory to avoid bug #122:
-# (using webrun since applic dir is under svn control)
-cat >$basedir/webrun/log4perl_config.ini <<'EOF'
+cat >$APP_DIR/log4perl_config.ini <<'EOF'
 log4perl.rootLogger=INFO, SYSTEM_LOG
 log4perl.appender.SYSTEM_LOG=Log::Log4perl::Appender::File
 log4perl.appender.SYSTEM_LOG.filename = ${METAMOD_SYSTEM_LOG}

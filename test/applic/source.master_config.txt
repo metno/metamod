@@ -45,7 +45,8 @@ APPLICATION_ID = Substituted by test_application.sh
 WEBRUN_DIRECTORY = Substituted by test_application.sh
 
 # Logging configuration
-LOG4PERL_CONFIG = [==WEBRUN_DIRECTORY==]/log4perl_config.ini
+#LOG4PERL_CONFIG = [==WEBRUN_DIRECTORY==]/log4perl_config.ini
+# seems like log4perl_config now is hardcoded to config_dir?
 LOG4PERL_WATCH_TIME = 30
 LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
 
