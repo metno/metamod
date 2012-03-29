@@ -37,7 +37,7 @@ use FindBin;
 use lib "$FindBin::Bin/../";
 
 
-use Test::More tests => 17;
+use Test::More tests => 16;
 use Test::Exception;
 
 BEGIN {use_ok('Metamod::Config');}
@@ -50,7 +50,6 @@ my $confFile = $FindBin::Bin.'/master_config.txt';
 my $config = Metamod::Config->new($confFile);
 isa_ok($config, 'Metamod::Config');
 can_ok($config, 'get');
-ok($config->get('TARGET_DIRECTORY'), 'get TARGET_DIRECTORY');
 
 ok(!$config->get('NOT_THERE'), 'getting false value on NOT_THERE');
 ok(index($config->get("SOURCE_DIRECTORY"), $config->get("BASE_DIRECTORY")) == 0, "get sustitutes variables");
@@ -69,7 +68,7 @@ is($config, $config2, "config-singleton on same file");
 $config2 = Metamod::Config->instance();
 isa_ok($config2, 'Metamod::Config');
 
-ok($config2->get('TARGET_DIRECTORY'), 'get TARGET_DIRECTORY of default');
+ok(!$config2->get('TARGET_DIRECTORY'), 'not getting obsolete TARGET_DIRECTORY');
 
 Metamod::Config->_reset_singleton();
 my $config4 = Metamod::Config->new($FindBin::Bin);
@@ -78,4 +77,3 @@ is($config4->config_dir(), $FindBin::Bin, 'Config dir when initialising with dir
 Metamod::Config->_reset_singleton();
 my $config3 = Metamod::Config->new($FindBin::Bin.'/master_config.txt');
 is($config3->config_dir(), $FindBin::Bin, 'Config dir when initialising with file');
-

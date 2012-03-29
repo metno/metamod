@@ -17,7 +17,6 @@ else
 fi
 
 webrun_directory="$WEBRUN_DIRECTORY"
-target_directory="$TARGET_DIRECTORY"
 system_log="$LOG4ALL_SYSTEM_LOG"
 
 #echo "METAMOD_MASTER_CONFIG=$METAMOD_MASTER_CONFIG"
