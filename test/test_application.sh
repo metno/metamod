@@ -264,8 +264,9 @@ rm -rf data/*
 # Add institution directory in the web upload area
 mkdir -p webupload/EXAMPLE
 
-# Write a log4perl_config.ini file to the target directory to avoid bug #122:
-cat >target/log4perl_config.ini <<'EOF'
+# Write a log4perl_config.ini file to the [target] webrun directory to avoid bug #122:
+# (using webrun since applic dir is under svn control)
+cat >$basedir/webrun/log4perl_config.ini <<'EOF'
 log4perl.rootLogger=INFO, SYSTEM_LOG
 log4perl.appender.SYSTEM_LOG=Log::Log4perl::Appender::File
 log4perl.appender.SYSTEM_LOG.filename = ${METAMOD_SYSTEM_LOG}
@@ -275,7 +276,7 @@ log4perl.appender.SYSTEM_LOG.syswrite=1
 EOF
 
 #
-# D. The software is installed into the target directory:
+# D. The software is installed into the target directory (not really):
 # =======================================================
 #
 cd $basedir/source
@@ -424,7 +425,10 @@ perl $basedir/source/run_automatic_tests.pl --smolder --no-pod
 
 # enable tomcat (SRU2jdbc) connection to database
 # this is a hack, TODO: make configurable
-/root/apache-tomcat-6.0.16/bin/catalina.sh start
+if [ -e /root/apache-tomcat-6.0.16/bin/catalina.sh ]
+then
+    /root/apache-tomcat-6.0.16/bin/catalina.sh start
+fi
 
 # start the catalyst servers
 /etc/init.d/catalyst-$idstring start

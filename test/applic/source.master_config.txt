@@ -1,13 +1,10 @@
 SERVER = dev-vm140
 
-SOURCE_DIRECTORY = Substituted by test_application.sh
-TARGET_DIRECTORY = Substituted by test_application.sh
-METAMODBASE_DIRECTORY = [==SOURCE_DIRECTORY==]/base
-METAMODSEARCH_DIRECTORY = [==SOURCE_DIRECTORY==]/search
-METAMODUPLOAD_DIRECTORY = [==SOURCE_DIRECTORY==]/upload
-METAMODPMH_DIRECTORY = [==SOURCE_DIRECTORY==]/pmh
-METAMODHARVEST_DIRECTORY = [==SOURCE_DIRECTORY==]/harvest
-METAMODQUEST_DIRECTORY = [==SOURCE_DIRECTORY==]/quest
+#METAMODBASE_DIRECTORY = dummy_true_value
+#METAMODUPLOAD_DIRECTORY = dummy_true_value
+#METAMODPMH_DIRECTORY = dummy_true_value
+#METAMODHARVEST_DIRECTORY = dummy_true_value
+#METAMODTHREDDS_DIRECTORY = dummy_true_value
 
 # ============ General configuration ==============
 # Base part of external URL's. Concatenate this with the LOCAL_URL to get the
@@ -48,9 +45,8 @@ APPLICATION_ID = Substituted by test_application.sh
 WEBRUN_DIRECTORY = Substituted by test_application.sh
 
 # Logging configuration
-LOG4PERL_CONFIG = [==TARGET_DIRECTORY==]/log4perl_config.ini
+LOG4PERL_CONFIG = [==WEBRUN_DIRECTORY==]/log4perl_config.ini
 LOG4PERL_WATCH_TIME = 30
-LOG4PHP_CONFIG = [==TARGET_DIRECTORY==]/log4php_config.ini
 LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
 
 # Mail address for person/group responsible for daily operation of the file
