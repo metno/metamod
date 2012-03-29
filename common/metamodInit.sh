@@ -6,9 +6,15 @@ CONFIG=$2
 
 # config must be set in $METAMOD_MASTER_CONFIG envvar if not given as command line param
 SHELL_CONF=/tmp/metamod_tmp_bash_config.sh
-perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
-source $SHELL_CONF
-rm $SHELL_CONF
+if perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
+then
+    source $SHELL_CONF
+    rm $SHELL_CONF
+else
+    rm $SHELL_CONF
+    echo "Missing config for $0" >2
+    exit 1
+fi
 
 webrun_directory="$WEBRUN_DIRECTORY"
 target_directory="$TARGET_DIRECTORY"

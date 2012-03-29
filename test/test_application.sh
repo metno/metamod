@@ -212,7 +212,8 @@ svn update
 # B. The master_config.txt file in the application directory is 'doctored'
 # ========================================================================
 #
-cd $basedir/source/test/applic
+APP_DIR="$basedir/source/test/applic"
+cd $APP_DIR
 importbasetime=\
 `perl -e 'use DateTime; my $dt=DateTime->now; $dt->set(hour => 0, minute => 0, second => 0); print $dt->epoch;'`
 servername=`uname -n`
@@ -244,7 +245,7 @@ sed '/^WEBRUN_DIRECTORY *=/s|=.*$|= '$basedir/webrun'|
 /^OPERATOR_INSTITUTION *=/s|=.*$|= EXAMPLE|
 /^DATASET_TAGS *=/s|=.*$|= '"'$idstring','$oaiharvesttag'"'|
 /^UPLOAD_OWNERTAG *=/s|=.*$|= '$idstring'|
-/^TEST_IMPORT_BASETIME *=/s|=.*$|= '$importbasetime'|' source.master_config.txt >master_config.txt
+/^TEST_IMPORT_BASETIME *=/s|=.*$|= '$importbasetime'|' $APP_DIR/source.master_config.txt >$APP_DIR/master_config.txt
 #
 # C. Purging of the directory structure:
 # ======================================
@@ -253,7 +254,8 @@ sed '/^WEBRUN_DIRECTORY *=/s|=.*$|= '$basedir/webrun'|
 
 cd $basedir
 # stop metamod if it is still running
-source/common/metamodInit.sh stop
+su $WEBUSER -c "$basedir/source/common/metamodInit.sh stop $APP_DIR"
+#source/common/metamodInit.sh stop $APP_DIR
 /etc/init.d/catalyst-$idstring stop
 #rm -rf target/*
 rm -rf webrun/*
@@ -332,7 +334,7 @@ chown -R $WEBUSER $basedir/webupload
 chown -R $WEBUSER $basedir/ftpupload
 chown -R $WEBUSER $basedir/data
 cd $basedir/source
-su $WEBUSER -c "$basedir/source/common/metamodInit.sh start"
+su $WEBUSER -c "$basedir/source/common/metamodInit.sh start $APP_DIR"
 
 #
 # H. Uploads to the system is simulated.
@@ -368,7 +370,7 @@ done
 #
 cd $basedir/source
 sleep 300
-su $WEBUSER -c "$basedir/source/common/metamodInit.sh stop"
+su $WEBUSER -c "$basedir/source/common/metamodInit.sh stop $APP_DIR"
 sleep 100
 #
 # J. Postprocessing:
@@ -417,7 +419,7 @@ else
 fi
 
 # keep it running after testing
-su $WEBUSER -c "$basedir/source/common/metamodInit.sh start"
+su $WEBUSER -c "$basedir/source/common/metamodInit.sh start $APP_DIR"
 
 #
 # Run the automatic test suite
