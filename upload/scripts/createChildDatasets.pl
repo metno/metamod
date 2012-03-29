@@ -1,76 +1,111 @@
 #!/usr/bin/perl -w
-#
-#----------------------------------------------------------------------------
-#  METAMOD - Web portal for metadata search and upload
-#
-#  Copyright (C) 2009 met.no
-#
-#  Contact information:
-#  Norwegian Meteorological Institute
-#  Box 43 Blindern
-#  0313 OSLO
-#  NORWAY
-#  email: heiko.klein@met.no
-#
-#  This file is part of METAMOD
-#
-#  METAMOD is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  METAMOD is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with METAMOD; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-#----------------------------------------------------------------------------
-#
 
-#
-# create the child = file dataset files from the parent xml-files
-#
-# * parse parent xml files, find 'dataref' element, if this links to the known local
-#   opendap-server, map the 'dataref' to the file-system file
-# * run digset_nc on the child, output the file to the output-dir in the same structure
-#   as the parents
-#
-#
+=begin LICENCE
+
+----------------------------------------------------------------------------
+  METAMOD - Web portal for metadata search and upload
+
+  Copyright (C) 2011 met.no
+
+  Contact information:
+  Norwegian Meteorological Institute
+  Box 43 Blindern
+  0313 OSLO
+  NORWAY
+  email: egil.storen@met.no
+
+  This file is part of METAMOD
+
+  METAMOD is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  METAMOD is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with METAMOD; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+----------------------------------------------------------------------------
+
+=end LICENCE
+
+=head1 NAME
+
+createChildDatasets.pl
+
+=head1 SYNOPSIS
+
+createChildDatasets.pl --config CONFIG_DIR
+
+=head1 DESCRIPTION
+
+create the child = file dataset files from the parent xml-files
+
+=over 4
+
+=item *
+
+parse parent xml files, find 'dataref' element, if this links to the known local
+opendap-server, map the 'dataref' to the file-system file
+
+=item *
+
+run digset_nc on the child, output the file to the output-dir in the same
+structure as the parents
+
+=back
+
+=cut
+
 use strict;
 use warnings;
 use File::Spec;
+use FindBin;
+#use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.'); # does this work outside target?
+use lib "$FindBin::Bin/../lib"; # let's try using the standard method instead... TESTME
+use File::Path qw(make_path mkpath);
+use Getopt::Long;
+use Pod::Usage;
+use Metamod::Utils qw(findFiles isNetcdf trim);
+use Metamod::Dataset;
+use Metamod::DatasetTransformer;
+use Metamod::Config qw(:init_logger);
+
+use constant DEBUG => 0;
+
+my $config_file;
+GetOptions('config=s' => \$config_file) or pod2usage(1);
+
+if( !Metamod::Config->config_found($config_file)){
+    print STDERR "Path to config must either be supplied on the commandline or given in the environment.";
+    print STDERR "usage: $0 [--config config file]\n";
+}
+
+my $config = Metamod::Config->new($config_file, { nolog => 1 } );
+my $instdir = $config->get('INSTALLATION_DIR') or die "Missing INSTALLATION_DIR in config";
+my $config_dir = $config->get('CONFIG_DIR') or die "Missing CONFIG_DIR in config";
+
 # small routine to get lib-directories relative to the installed file
 sub getTargetDir {
     my ($finalDir) = @_;
     my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
     $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
-    $dir = File::Spec->catdir($dir, $finalDir); 
+    $dir = File::Spec->catdir($dir, $finalDir);
     return File::Spec->catpath($vol, $dir, "");
 }
 
-use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
-
-use File::Path qw(mkpath);
-use Metamod::Utils qw(findFiles isNetcdf trim);
-use Metamod::Dataset;
-use Metamod::DatasetTransformer;
-use Metamod::Config qw(:init_logger);
-my $config = new Metamod::Config;
-
-use constant DEBUG => 0;
-
-our $TARGETDIR      = $config->get('TARGET_DIRECTORY');
 our $NCFILE_PREFIX  = File::Spec->catfile(trim($config->get('OPENDAP_DIRECTORY')), ""); # have directory-separator at end
 our @PARENT_DIRS    = split (' ', $config->get('IMPORTDIRS'));
 our $OPENDAP_PREFIX = trim($config->get('OPENDAP_URL'));
 if (substr($OPENDAP_PREFIX, length($OPENDAP_PREFIX) -1) ne '/') {
 	$OPENDAP_PREFIX .= '/';
 }
-our $ETCDIR         = File::Spec->catdir( $TARGETDIR, "etc" );
-our $DIGESTNC   = File::Spec->catdir( $TARGETDIR, 'scripts', 'digest_nc.pl' );
+our $ETCDIR         = File::Spec->catdir( $config_dir, "etc" );
+our $DIGESTNC   = File::Spec->catdir( $instdir, 'upload', 'scripts', 'digest_nc.pl' );
 
 if ( !-x $DIGESTNC ) {
 	print STDERR "$0 needs to be called from the same directory as digest_nc.pl";
@@ -111,7 +146,7 @@ if ($FILELIST) {
    undef $/;
    my $pfiles = <FLIST>;
    chomp($pfiles);
-   $/ = "\n"; 
+   $/ = "\n";
    close (FLIST);
    my @parentFiles = split(/\s*\n\s*/m,$pfiles);
    &process_parentfiles(\@parentFiles);
@@ -150,7 +185,7 @@ sub process_parentfiles {
 			}
 			# extract institution from original dataref, it is the first path after the general opendap url
 			my $institution = $metadata{dataref}[0];
-			$institution =~ s:\Q$opendapURL\E([^/]+)/.*:$1:o; 
+			$institution =~ s:\Q$opendapURL\E([^/]+)/.*:$1:o;
 			my @ncFiles = findFiles( $dataref, \&isNetcdf );
 			foreach my $ncFile (@ncFiles) {
 				my ( $vol, $directory, $file ) = File::Spec->splitpath($ncFile);
@@ -165,7 +200,7 @@ sub process_parentfiles {
 				my $opendapRef = $ncFile;
 				$opendapRef =~ s:\Q$NCFILE_PREFIX\E:$opendapURL:o;
 				$opendapRef =~ s:[^/]+$::; # remove file
-				$opendapRef .= 'catalog.html?dataset=' . join('/', $institution, $parentDir[-1], $file); 
+				$opendapRef .= 'catalog.html?dataset=' . join('/', $institution, $parentDir[-1], $file);
 				my $digestInput = "digest_input$$";
 				open( my $digestFH, ">$digestInput" )
 				  or die "Cannot write file $digestInput: $!\n";

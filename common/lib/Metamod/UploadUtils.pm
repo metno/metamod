@@ -64,7 +64,6 @@ our @EXPORT_OK = qw(notify_web_system
     $upload_ownertag
     $application_id
     $xml_directory
-    $target_directory
     $opendap_directory
     $opendap_url
     $days_to_keep_errfiles
@@ -92,7 +91,6 @@ our $uerr_directory        = $webrun_directory . "/upl/uerr";
 our $upload_ownertag       = $config->get('UPLOAD_OWNERTAG');
 our $application_id        = $config->get('APPLICATION_ID');
 our $xml_directory         = $webrun_directory . '/XML/' . $application_id;
-our $target_directory      = $config->get('TARGET_DIRECTORY');
 our $opendap_directory     = $config->get('OPENDAP_DIRECTORY');
 our $opendap_url           = $config->get('OPENDAP_URL');
 our $days_to_keep_errfiles = 14;
