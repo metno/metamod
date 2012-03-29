@@ -42,11 +42,11 @@
 #                               - Directory containing XML files that will
 #                                 be copied to the XML repository. (After
 #                                 copying, these files are edited so they
-#                                 will contain correct identification 
-#                                 metadata). 
+#                                 will contain correct identification
+#                                 metadata).
 #
 #                     target    - The target directory for the installed
-#                                 application.
+#                                 application. *OBSOLETED*
 #
 #                     webrun    - The webrun directory for the installed
 #                                 application.
@@ -77,9 +77,9 @@
 #
 # C. Purging of the directory structure: All content in the following
 #    directories are deleted:
-#    target, webrun, webupload, ftpupload, data
+#    [target], webrun, webupload, ftpupload, data
 #
-# D. The software is installed into the target directory.
+# D. *SKIPPED* The software is installed into the target directory.
 #
 # E. Create directories for test data
 #
@@ -196,7 +196,7 @@ fi
 exec >test_application.out 2>&1
 set -x
 cd $basedir
-mkdir -p target
+#mkdir -p target
 mkdir -p webrun
 mkdir -p ftpupload
 mkdir -p webupload
@@ -224,9 +224,7 @@ else
    pmhport=''
 fi
 basedirbasename=`basename $basedir`
-sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
-/^TARGET_DIRECTORY *=/s|=.*$|= '$basedir/target'|
-/^WEBRUN_DIRECTORY *=/s|=.*$|= '$basedir/webrun'|
+sed '/^WEBRUN_DIRECTORY *=/s|=.*$|= '$basedir/webrun'|
 /^ADMIN_DOMAIN *=/s|=.*$|= '$admindomain'|
 /^DATABASE_NAME *=/s|=.*$|= '$idstring'|
 /^USERBASE_NAME *=/s|=.*$|= '$idstring-userbase'|
@@ -255,9 +253,9 @@ sed '/^SOURCE_DIRECTORY *=/s|=.*$|= '$basedir/source'|
 
 cd $basedir
 # stop metamod if it is still running
-target/metamodInit.sh stop
+source/common/metamodInit.sh stop
 /etc/init.d/catalyst-$idstring stop
-rm -rf target/*
+#rm -rf target/*
 rm -rf webrun/*
 rm -rf webupload/*
 rm -rf ftpupload/*
@@ -283,9 +281,12 @@ EOF
 cd $basedir/source
 # this should be configurable - not everybody uses our debian pkg... FIXME
 export PERL5LIB=/opt/metno-catalyst-dependencies-ver1/lib/perl5/
-./update_target.pl test/applic
-cd $basedir/target
-./prepare_runtime_env.sh
+
+#update_target.pl no longer exists
+#./update_target.pl test/applic
+#cd $basedir/target
+./common/prepare_runtime_env.sh
+
 #
 # E. Create directories for test data
 # =================================================================
@@ -294,13 +295,17 @@ cd $basedir/data
 for dir in `cat $basedir/source/test/directories`; do
    mkdir -p EXAMPLE/$dir
 done
+
 #
 # F. The XML repository and databases (metadatabase and user database) is initialized and filled with data.
 # =========================================================================================================
 #
 # disable tomcat (SRU2jdbc) connection to database
 # this is a hack, TODO: make configurable
-/root/apache-tomcat-6.0.16/bin/catalina.sh stop
+if [ -e /root/apache-tomcat-6.0.16/bin/catalina.sh ]
+then
+    /root/apache-tomcat-6.0.16/bin/catalina.sh stop
+fi
 #
 cp -r $basedir/source/test/xmlinput/* $basedir/webrun/XML/$idstring/
 find $basedir/webrun/XML/$idstring -name '*.xmd' | xargs perl -pi -e "s/name=\"DAMOC/name=\"$idstring/g; s/ownertag=\"DAM/ownertag=\"$idstring/"
@@ -312,11 +317,11 @@ for pid in `cat pids_to_remove`; do
 done
 rm pids_to_remove
 #
-cd $basedir/target/init
+cd $basedir/source/base/init
 ./create_and_load_all.sh
-cd $basedir/target/userinit
+cd $basedir/source/base/userinit
 ./run_createuserdb.sh
-$basedir/target/scripts/userbase_add_datasets.pl $operatoremail <$basedir/source/test/directories
+$basedir/source/upload/scripts/userbase_add_datasets.pl $operatoremail <$basedir/source/test/directories
 #
 # G. The services defined for the application is started.
 # =======================================================
@@ -325,8 +330,8 @@ chown -R $WEBUSER $basedir/webrun
 chown -R $WEBUSER $basedir/webupload
 chown -R $WEBUSER $basedir/ftpupload
 chown -R $WEBUSER $basedir/data
-cd $basedir/target
-su $WEBUSER -c "$basedir/target/metamodInit.sh start"
+cd $basedir/source
+su $WEBUSER -c "$basedir/source/common/metamodInit.sh start"
 
 #
 # H. Uploads to the system is simulated.
@@ -351,7 +356,7 @@ for fil in `cat $filestoupload`; do
       filename=`basename $fil`
       su $WEBUSER -c "mkdir -p $basedir/webupload/EXAMPLE/$dataset"
       su $WEBUSER -c "mv $basedir/t_dir/* $basedir/webupload/EXAMPLE/$dataset"
-      $basedir/target/scripts/add_file_to_queue.pl $basedir/webupload/EXAMPLE/$dataset/$filename
+      $basedir/source/upload/scripts/add_file_to_queue.pl $basedir/webupload/EXAMPLE/$dataset/$filename
       switch=0
    fi
    sleep 10
@@ -360,9 +365,9 @@ done
 # I. After sleeping some time the services is stopped.
 # ====================================================
 #
-cd $basedir/target
+cd $basedir/source
 sleep 300
-su $WEBUSER -c "$basedir/target/metamodInit.sh stop"
+su $WEBUSER -c "$basedir/source/common/metamodInit.sh stop"
 sleep 100
 #
 # J. Postprocessing:
@@ -411,7 +416,7 @@ else
 fi
 
 # keep it running after testing
-su $WEBUSER -c "$basedir/target/metamodInit.sh start"
+su $WEBUSER -c "$basedir/source/common/metamodInit.sh start"
 
 #
 # Run the automatic test suite
