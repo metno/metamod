@@ -448,7 +448,7 @@ HARVEST_CRONTAB = 45 * * * *
 # the source. Each source (given by the base URL) must have its own ownertag,
 OAI_HARVEST_SOURCES = Substituted by test_application.sh
 # Strict validation of schema. Leave empty to switch off.
-OAI_HARVEST_VALIDATION_SCHEMA = [==TARGET_DIRECTORY==]/schema/OAI-PMH.xsd
+OAI_HARVEST_VALIDATION_SCHEMA = [==INSTALLATION_DIRECTORY==]/common/schema/OAI-PMH.xsd
 
 # ============ METAMODTHREDDS configuration ==============
 # Name of the THREDDS catalog (the name attribute in the catalog element in

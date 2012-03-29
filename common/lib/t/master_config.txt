@@ -3,12 +3,12 @@
 
 SERVER = somecomputer.somedomain.com
 BASE_DIRECTORY = /home/someuser
-SOURCE_DIRECTORY = [==BASE_DIRECTORY==]/metamod_2.2.0
-TARGET_DIRECTORY = [==BASE_DIRECTORY==]/example
-METAMODBASE_DIRECTORY = [==SOURCE_DIRECTORY==]/base
-METAMODSEARCH_DIRECTORY = [==SOURCE_DIRECTORY==]/search
-METAMODUPLOAD_DIRECTORY = [==SOURCE_DIRECTORY==]/upload
-METAMODQUEST_DIRECTORY = [==SOURCE_DIRECTORY==]/quest
+
+#METAMODBASE_DIRECTORY = dummy_true_value
+#METAMODUPLOAD_DIRECTORY = dummy_true_value
+#METAMODPMH_DIRECTORY = dummy_true_value
+#METAMODHARVEST_DIRECTORY = dummy_true_value
+#METAMODTHREDDS_DIRECTORY = dummy_true_value
 
 # ============ General configuration ==============
 # Base part of external URL's. Concatenate this with the LOCAL_URL to get the
