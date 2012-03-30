@@ -77,6 +77,13 @@ my $user   = $config->get("PG_ADMIN_USER");
 my $opendap_directory = $config->get("OPENDAP_DIRECTORY");
 my $opendap_url = $config->get("OPENDAP_URL");
 my $webrun_directory = $config->get("WEBRUN_DIRECTORY");
+
+#
+# setup thredds environment
+#
+foreach ( qw(THREDDS_CATALOG_FILE THREDDS_CATALOG_DIR THREDDS_CATALOG_NAME THREDDS_TOP_DATASET_NAME) ) {
+	die "Missing directive $_ in master_config" unless $config->has($_);
+}
 my $thredds_config_path = $webrun_directory . "/thredds_config";
 my $thredds_catalog_name = $config->get("THREDDS_CATALOG_NAME");
 my $thredds_top_dataset_name = $config->get("THREDDS_TOP_DATASET_NAME");
@@ -88,6 +95,10 @@ my $thredds_catalog_path = "$catalog_dir/$catalog_file";
 my $path_to_syserrors = $webrun_directory . "/syserrors";
 my $old_catalog_signature = "";
 my %old_catalog_hash = ();
+
+#
+# start daemon
+#
 our $SIG_TERM = 0;
 
 eval {
