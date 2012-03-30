@@ -33,6 +33,28 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
+=head1 NAME
+
+Metamod::Config - get runtime configuration environment
+
+=head1 SYNOPSIS
+
+  use Metamod::Config;
+
+  my $config = new Metamod::Config("configFilePath");
+  my $var = $config->get("configVar");
+
+  # initialise the logger at compile time
+  use Metamod::Config qw( :init_logger );
+
+=head1 DESCRIPTION
+
+This module can be used to read the configuration file.
+
+=head1 FUNCTIONS
+
+=cut
+
 package Metamod::Config;
 
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
@@ -59,6 +81,32 @@ our $_config; #_config{file} => $config
 # we only initialise the logger once during the entire run. Different configuration
 # files cannot have their own logger config.
 our $_logger_initialised;
+
+=head2 new([configfilename], [options]) (is this up to date?)
+
+Initialize the configuration with a config-file. If no config-file is given,
+the environment-variable METAMOD_MASTER_CONFIG will be used (useful for testing),
+otherwise, the default config-file located in '../../master_config.txt' relative to the
+installation of Metamod::Config will be used.
+
+This function will die if the config-file cannot be found.
+
+This function makes sure, that each config-file will only be opened once, even
+if the same config file is opened several times.
+
+=back
+
+=head3 Options
+
+=over 4
+
+=item nolog
+
+Skip logging initialization
+
+=back
+
+=cut
 
 sub new {
     my ($class, $file_or_dir, $options) = @_;
@@ -196,6 +244,14 @@ sub _normalizeFile {
     return Cwd::abs_path($file);
 }
 
+=head2 get("configVar")
+
+return the configuration variable configVar as currently set. This will reread the
+config-file each time it has been changed. Gives a warning if not specified in
+master_config.
+
+=cut
+
 sub get {
     my ($self, $var) = @_;
     return undef unless $var;
@@ -204,6 +260,13 @@ sub get {
     return $self->_substituteVariable($var);
 }
 
+=head2 has("configVar")
+
+return true if the configuration variable configVar is currently set. This will reread the
+config-file each time it has been changed. Does not give any warnings.
+
+=cut
+
 sub has {
     my ($self, $var) = @_;
     return undef unless $var;
@@ -211,6 +274,13 @@ sub has {
     $self->_checkFile();
     return exists $self->{vars}{$var};
 }
+
+=head2 is("configVar")
+
+return true if the configuration variable has been set and is not among a list of
+false values (0, false, empty string). Does not give any warnings.
+
+=cut
 
 sub is {
     my ($self, $var) = @_;
@@ -335,6 +405,13 @@ sub _substituteVariable {
     return $textline;
 }
 
+=head2 getDSN()
+
+Return the database source name of the metadata database,
+i.e. "dbi:Pg:dbname=damocles;host=localhost;port=5432"
+
+=cut
+
 sub getDSN {
     my ($self) = @_;
     my $dbname = $self->get("DATABASE_NAME");
@@ -345,6 +422,13 @@ sub getDSN {
     }
     return $dsn;
 }
+
+=head2 getDSN_Userbase
+
+Return the database source name of the user-database,
+i.e. "dbi:Pg:dbname=userbase;host=localhost;port=5432"
+
+=cut
 
 sub getDSN_Userbase {
     my ($self) = @_;
@@ -357,6 +441,16 @@ sub getDSN_Userbase {
     return $dsn;
 }
 
+=head2 getDBH()
+
+Return a cached/pooled DBI-handler to the default database of metamod. The handler is in
+AutoCommit = 0 and RaiseError = 1, FetchHash mode. This function will die on error. (DBI-connect error)
+
+disconnect will free the database. Be careful when using getDBH and transactions.
+A call to getDBH will commit a transaction, and cached connections might be used
+several places.
+
+=cut
 
 sub getDBH {
     my ($self) = @_;
@@ -371,6 +465,13 @@ sub getDBH {
                                    } );
     return $dbh;
 }
+
+
+=head2 initLogger()
+
+Initialise a Log::Log4perl logger.
+
+=cut
 
 sub initLogger {
     my ($self) = @_;
@@ -422,6 +523,17 @@ The path to the directory containing the configuration file.
 =back
 
 =cut
+
+#=head2 staticInitLogger([$path_to_master_config])
+#
+#Static/class version of C<initLogger()>. Will first create a config object
+#and then initialise the logger with C<initLogger()>.
+#
+#The $path_to_master_config parameter is optional and if not supplied the default master config
+#will be used.
+#
+#=cut
+
 sub config_dir {
     my $self = shift;
 
@@ -444,6 +556,7 @@ the location cannot be determined.
 =back
 
 =cut
+
 sub installation_dir {
     my $self = shift;
 
@@ -510,6 +623,7 @@ ending is not part of it.
 =back
 
 =cut
+
 sub getDSFilePath {
     my $self = shift;
 
@@ -561,6 +675,7 @@ Dies if the file cannot be found any of the places.
 =back
 
 =cut
+
 sub path_to_config_file {
     my $self = shift;
 
@@ -577,111 +692,7 @@ sub path_to_config_file {
 
 }
 
-
-
 1;
-
-=head1 NAME
-
-Metamod::Config - get runtime configuration environment
-
-=head1 SYNOPSIS
-
-  use Metamod::Config;
-
-  my $config = new Metamod::Config("configFilePath");
-  my $var = $config->get("configVar");
-
-  # initialise the logger at compile time
-  use Metamod::Config qw( :init_logger );
-
-=head1 DESCRIPTION
-
-This module can be used to read the configuration file.
-
-=head1 CONSTRUCTOR
-
-=over 4
-
-=item new([configfilename], [options])
-
-Initialize the configuration with a config-file. If no config-file is given,
-the environment-variable METAMOD_MASTER_CONFIG will be used (useful for testing),
-otherwise, the default config-file located in '../../master_config.txt' relative to the
-installation of Metamod::Config will be used.
-
-This function will die if the config-file cannot be found.
-
-This function makes sure, that each config-file will only be opened once, even
-if the same config file is opened several times.
-
-=back
-
-=head2 Options
-
-=over 4
-
-=item nolog
-
-Skip logging initialization
-
-=back
-
-=head1 FUNCTIONS
-
-=over 4
-
-=item get("configVar")
-
-return the configuration variable configVar as currently set. This will reread the
-config-file each time it has been changed. Gives a warning if not specified in
-master_config.
-
-=item has("configVar")
-
-return true if the configuration variable configVar is currently set. This will reread the
-config-file each time it has been changed. Does not give any warnings.
-
-=item is("configVar")
-
-return true if the configuration variable has been set and is not among a list of
-false values (0, false, empty string). Does not give any warnings.
-
-=item initLogger()
-
-Initialise a Log::Log4perl logger.
-
-=item staticInitLogger([$path_to_master_config])
-
-Static/class version of C<initLogger()>. Will first create a config object
-and then initialise the logger with C<initLogger()>.
-
-The $path_to_master_config parameter is optional and if not supplied the default master config
-will be used.
-
-=item getDSN()
-
-Return the database source name of the metadata database,
-i.e. "dbi:Pg:dbname=damocles;host=localhost;port=5432"
-
-=item getDSN_Userbase
-
-Return the database source name of the user-database,
-i.e. "dbi:Pg:dbname=userbase;host=localhost;port=5432"
-
-
-
-=item getDBH()
-
-Return a cached/pooled DBI-handler to the default database of metamod. The handler is in
-AutoCommit = 0 and RaiseError = 1, FetchHash mode. This function will die on error. (DBI-connect error)
-
-disconnect will free the database. Be careful when using getDBH and transactions.
-A call to getDBH will commit a transaction, and cached connections might be used
-several places.
-
-
-=back
 
 =head1 AUTHOR
 
