@@ -1,15 +1,31 @@
 =head1 Upgrading to METAMOD 2.10 from 2.9
 
-=head2 PHP no longer used
+=head2 Main features
+
+There is no more generation of scripts, and install_target.pl has been removed.
+Instead everything is now run from the source directory. As a consequence all
+scripts must be told where to find the config (either via a parameter or setting
+an enviroment variable).
+
+PHP is no longer used. The mod_php Apache module is no longer needed.
 
 =head2 Configuration variables
 
 =over 4
 
+=item BASE_DIRECTORY
+
+=item SOURCE_DIRECTORY
+
+=item TARGET_DIRECTORY
+
+These are no longer used. Target no longer exists, and the config may be used
+unchanged for several source installations (handy for development).
+
 =item PG_CONNECTSTRING_SHELL
 
 Should no longer be used, instead configure Postgres to use sockets
-(change local ident to trust in pg_hba.conf)
+(change local ident to trust in pg_hba.conf).
 
 =item PG_ADMIN_USER_PASSWORD
 
