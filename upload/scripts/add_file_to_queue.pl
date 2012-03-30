@@ -38,6 +38,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use strict;
 use warnings;
 use File::Spec;
+use Getopt::Long;
 
 # small routine to get lib-directories relative to the installed file
 sub getTargetDir {
@@ -47,11 +48,23 @@ sub getTargetDir {
     $dir = File::Spec->catdir( $dir, $finalDir );
     return File::Spec->catpath( $vol, $dir, "" );
 }
+
 use lib ( getTargetDir('lib'), getTargetDir('scripts'), '../../common/lib' );
 use TheSchwartz;
 use Metamod::Queue;
+use Metamod::Config;
 
-my $queue = Metamod::Queue->new();
+# Parse cmd line params
+my $config_file_or_dir;
+GetOptions ('config=s' => \$config_file_or_dir) or usage();
+
+if(!Metamod::Config->config_found($config_file_or_dir)){
+    print STDERR "Could not find the configuration on the commandline or the in the environment\n";
+    exit 3;
+}
+my $mm_config = Metamod::Config->new($config_file_or_dir);
+
+my $queue = Metamod::Queue->new( 'mm_config' => \$mm_config);
 
 if (scalar @ARGV != 1) {
    die "\nUsage:\n\n     $0 abs_path_to_ncfile\n\n";
@@ -64,4 +77,9 @@ my $success = $queue->insert_job(
 
 if( ! $success ){
     die "Could not add $abs_path_to_ncfile to processing queue!\n";
+}
+
+sub usage {
+    print "usage: $0 [ --config <configpath> ] [ --pid <pidfile> ] [ --log <logfile> ] \n";
+    exit 1;
 }

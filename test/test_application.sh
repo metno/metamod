@@ -312,7 +312,7 @@ fi
 cp -r $basedir/source/test/xmlinput/* $basedir/webrun/XML/$idstring/
 find $basedir/webrun/XML/$idstring -name '*.xmd' | xargs perl -pi -e "s/name=\"DAMOC/name=\"$idstring/g; s/ownertag=\"DAM/ownertag=\"$idstring/"
 #
-# Hack to remove webuser connections to the databases. Othervise postgres rejects to reinitialize the databases (UGLY):
+# Hack to remove webuser connections to the databases. Othervise postgres rejects to reinitialize the databases (UGLY - FIXME):
 ps -ef | grep 'postgres: webuser' | grep -v grep | sed 's/^postgres *//' | sed 's/^\([0-9]*\)[^0-9].*/\1/' >pids_to_remove
 for pid in `cat pids_to_remove`; do
    kill -9 $pid
@@ -358,7 +358,7 @@ for fil in `cat $filestoupload`; do
       filename=`basename $fil`
       su $WEBUSER -c "mkdir -p $basedir/webupload/EXAMPLE/$dataset"
       su $WEBUSER -c "mv $basedir/t_dir/* $basedir/webupload/EXAMPLE/$dataset"
-      $basedir/source/upload/scripts/add_file_to_queue.pl $basedir/webupload/EXAMPLE/$dataset/$filename
+      $basedir/source/upload/scripts/add_file_to_queue.pl --config $APP_DIR $basedir/webupload/EXAMPLE/$dataset/$filename
       switch=0
    fi
    sleep 10

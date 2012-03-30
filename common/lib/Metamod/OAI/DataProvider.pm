@@ -53,7 +53,7 @@ sub _init_model {
 
     my $dns      = $self->config->getDSN();
     my $user     = $self->config->get('PG_WEB_USER');
-    my $password = $self->config->get('PG_WEB_USER_PASSWORD');
+    my $password = $self->config->has('PG_WEB_USER_PASSWORD') ? $self->config->get('PG_WEB_USER_PASSWORD') : '';
 
     return Metamod::DBIxSchema::Metabase->connect( $dns, $user, $password, { pg_enable_utf8 => 1 } );
 }

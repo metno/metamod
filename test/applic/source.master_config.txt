@@ -1,10 +1,10 @@
 SERVER = dev-vm140
 
-#METAMODBASE_DIRECTORY = dummy_true_value
-#METAMODUPLOAD_DIRECTORY = dummy_true_value
-#METAMODPMH_DIRECTORY = dummy_true_value
-#METAMODHARVEST_DIRECTORY = dummy_true_value
-#METAMODTHREDDS_DIRECTORY = dummy_true_value
+METAMODBASE_DIRECTORY = dummy_true_value
+METAMODUPLOAD_DIRECTORY = dummy_true_value
+METAMODPMH_DIRECTORY = dummy_true_value
+METAMODHARVEST_DIRECTORY = dummy_true_value
+METAMODTHREDDS_DIRECTORY = dummy_true_value
 
 # ============ General configuration ==============
 # Base part of external URL's. Concatenate this with the LOCAL_URL to get the
@@ -448,7 +448,7 @@ HARVEST_CRONTAB = 45 * * * *
 # the source. Each source (given by the base URL) must have its own ownertag,
 OAI_HARVEST_SOURCES = Substituted by test_application.sh
 # Strict validation of schema. Leave empty to switch off.
-OAI_HARVEST_VALIDATION_SCHEMA = [==INSTALLATION_DIRECTORY==]/common/schema/OAI-PMH.xsd
+OAI_HARVEST_VALIDATION_SCHEMA = [==INSTALLATION_DIR==]/common/schema/OAI-PMH.xsd
 
 # ============ METAMODTHREDDS configuration ==============
 # Name of the THREDDS catalog (the name attribute in the catalog element in
