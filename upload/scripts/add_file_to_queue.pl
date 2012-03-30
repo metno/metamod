@@ -64,7 +64,7 @@ if(!Metamod::Config->config_found($config_file_or_dir)){
 }
 my $mm_config = Metamod::Config->new($config_file_or_dir);
 
-my $queue = Metamod::Queue->new( 'mm_config' => \$mm_config);
+my $queue = Metamod::Queue->new( 'mm_config' => $mm_config);
 
 if (scalar @ARGV != 1) {
    die "\nUsage:\n\n     $0 abs_path_to_ncfile\n\n";
