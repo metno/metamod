@@ -46,13 +46,14 @@ use Metamod::Dataset;
 use Metamod::Utils qw(findFiles);
 use Metamod::Config qw(:init_logger);
 use Data::Dumper;
+use Getopt::Long;
 use Log::Log4perl;
 use DBI;
 use File::Spec qw();
 use File::Copy;
 use File::Path;
 use Fcntl ':flock';
-use mmTtime;
+use mmTtime; # can we get away from this, please? FIXME
 
 
 # Parse cmd line params
