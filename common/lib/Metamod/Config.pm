@@ -41,11 +41,19 @@ Metamod::Config - get runtime configuration environment
 
   use Metamod::Config;
 
-  my $config = new Metamod::Config("configFilePath");
+  if(!Metamod::Config->config_found($config_file_or_dir)){
+    die "Could not find the configuration on the commandline or the in the environment\n";
+  }
+
+  my $config = Metamod::Config->new($config_file_or_dir);
   my $var = $config->get("configVar");
+
+=begin OBSOLETE?
 
   # initialise the logger at compile time
   use Metamod::Config qw( :init_logger );
+
+=end OBSOLETE?
 
 =head1 DESCRIPTION
 
@@ -62,6 +70,9 @@ our $DEBUG = 0;
 
 use strict;
 use warnings;
+
+use Exporter;
+our %EXPORT_TAGS = ( init_logger => [] ); # hack for old scipts using Metamod::Config qw(:init_logger)
 
 use Carp qw(cluck croak carp confess);
 
@@ -93,8 +104,6 @@ This function will die if the config-file cannot be found.
 
 This function makes sure, that each config-file will only be opened once, even
 if the same config file is opened several times.
-
-=back
 
 =head3 Options
 
