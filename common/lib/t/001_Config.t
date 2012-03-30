@@ -52,7 +52,7 @@ isa_ok($config, 'Metamod::Config');
 can_ok($config, 'get');
 
 ok(!$config->get('NOT_THERE'), 'getting false value on NOT_THERE');
-ok(index($config->get("SOURCE_DIRECTORY"), $config->get("BASE_DIRECTORY")) == 0, "get sustitutes variables");
+ok(!$config->get("SOURCE_DIRECTORY"), "not getting obsolete SOURCE_DIRECTORY");
 
 is($config->getDSN(), "dbi:Pg:dbname=metamod_unittest;host=localhost;password=admin", "getDSN");
 
