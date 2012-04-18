@@ -1,0 +1,37 @@
+#warning {font-size: x-large; padding:22 22 22 22; text-decoration: blink; color: red;}
+#form1, .olControlPermalink {font-size: x-small; font-family: sans-serif}
+/* crappy css selectors below don't work... have to use inline styles instead :( */
+/*#timebox { visibility: hidden };*/
+/*img#legend { float: right; position: relative; top: 200px; z-index: 1000 };*/
+/*#form1 { float: top; }*/
+
+.container {
+    position: relative;
+    width: 100%;
+}
+
+#accordion {
+    /*position: absolute;*/
+    float: right !important;
+    width: 200px;
+    font-size: x-small;
+    /*border:1px solid purple;*/
+    /*background-color: #eeeeff;*/
+}
+
+.ui-accordion-header input {
+    /*float: right;*/
+}
+
+.ui-accordion-content {
+    /*background-color: black !important;*/
+    /*background-image: url("[% c.uri_for('/static/css/metamod_theme/images/ui-bg_highlight-soft_100_hack_1x100.png') %]");*/
+    /*float: right;*/
+}
+
+.container div#map {
+    /*position:absolute;*/
+    margin-right: 205px !important;
+    /*float: right;*/
+}
+
