@@ -74,13 +74,16 @@ sub list_files {
     foreach (<*.xml>) { # find dataset metadata files
         my ($base) = /(.+)\.xml$/;
         if (-d $base) { # check if level 2
-            my @files = map /$base\/(.+)\.xml$/, <$base/*.xml>; # strip file ext
+            my @files = <$base/*.xml>;
             my $count = @files;
             if ( $maxfiles && ($count > $maxfiles) ) {
                 my @short = splice @files, 0, $maxfiles;
-                $$list{$base} = [$maxfiles, \@short];
+                @short = map /$base\/(.+)\.xml$/, @short; # strip file ext
+                $$list{$base} = [$count, \@short];
+            } else {
+                @files = map /$base\/(.+)\.xml$/, @files; # strip file ext
+                $$list{$base} = [$count, \@files];
             }
-            $$list{$base} = [$count, \@files];
         } else {
             $$list{$base} = [0];
         }
