@@ -210,9 +210,8 @@ to the internally used MM2 format.
 
 =item $XSLT_DIR
 
-Default directory of XSLT files. Uses ENV{METAMOD_XSLT_DIR} or
-$config->get("SOURCE_DIRECTORY") . '/common/schema/'. The ENV part
-is mainly thought for testing independently of config.
+Default directory of XSLT files. Uses ENV{METAMOD_XSLT_DIR} or INSTALLATION_DIR/common/schema/.
+The ENV part is mainly thought for testing independently of config.
 
 =back
 

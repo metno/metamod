@@ -6,13 +6,14 @@
 /*#form1 { float: top; }*/
 
 .container {
-    position: relative;
-    width: 100%;
+    /* do not use width: 100% as it makes it disappear! ;*/
 }
 
 #accordion {
-    /*position: absolute;*/
-    float: right !important;
+    position:absolute;
+    right: 0;
+    top: 0;
+    /*float: right !important;*/
     width: 200px;
     font-size: x-small;
     /*border:1px solid purple;*/
@@ -29,9 +30,13 @@
     /*float: right;*/
 }
 
-.container div#map {
-    /*position:absolute;*/
+#map {
     margin-right: 205px !important;
-    /*float: right;*/
 }
 
+#map {
+    /* doesn't work, makes page blank... */
+    /*position: fixed;*/
+    /*top: 0;*/
+    /*left: 0;*/
+}

@@ -312,6 +312,36 @@ sub wms :Path('/search/wms') :Args {
 
 }
 
+=head2 wms
+
+Action for displaying list of WMS layers from datasets
+
+=cut
+
+sub wmslist :Path('/search/wmslist') :Args {
+    my ($self, $c) = @_;
+
+    $c->stash( template => 'search/wmslist.tt', 'current_view' => 'Raw' );
+    #$c->stash( 'current_view' => 'Raw' ) if $c->req->params->{ raw };
+    $c->stash( debug => $self->logger->is_debug() );
+
+    my $dslist = [];
+    my $para = $c->req->params->{ ds_id };
+    if ( ref $para ) {
+        foreach ( @$para ) {
+            my $ds = $c->model('Metabase::Dataset')->find($_);
+            #printf STDERR " -- %d %s\n", $ds->ds_id, $ds->ds_name;
+            push @$dslist, $ds;
+        }
+    } else {
+        my $ds = $c->model('Metabase::Dataset')->find($para);
+        push @$dslist, $ds;
+    }
+    #print STDERR Dumper \$dslist;
+    $c->stash( datasets => $dslist );
+
+}
+
 =head2 display_help
 
 Action for displaying the help message to the user.

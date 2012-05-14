@@ -2,6 +2,8 @@
 
     <head>
         <title>WMS client</title>
+        <link rel="stylesheet" href="[% c.uri_for('/static/css/reset.css') %]" />
+        <link rel="stylesheet" href="[% c.uri_for('/static/css/base.css') %]" />
         <link rel="stylesheet" href="[% c.uri_for('/static/css/openlayers_theme/default/style.css') %]" type="text/css" />
         <!--link rel="stylesheet" href="style.css" type="text/css" /-->
         <link rel="stylesheet" href="[% c.uri_for('/static/css/wms.css') %]" type="text/css" />
@@ -24,10 +26,11 @@
             var map = null;
             var ds_id = [% datasets.0.ds_id || 'undefined' %];
             var wmcpath = "[% c.uri_for('/gc2wmc') %]";
+            var multiwmcpath = "[% c.uri_for('/multiwmc', c.req.params ) %]" ;
         </script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/wms.js') %]"></script>
         <script type="text/javascript">
-            [% IF ! debug # disable logging in production %]
+            [% IF 1 # ! debug # disable logging in production %]
                 log = log4javascript.getNullLogger();
             [% END %]
         </script>
@@ -37,14 +40,15 @@
 
         <form>
             <div class="container">
-                <div id="accordion"></div>
                 <div id="map" class="largemap"></div>
+                <div id="accordion"></div>
             </div>
         </form>
 
         <div id="docs"><p id="warning">Javascript must be enabled for WMS client to work!</p></div>
         <!--<div id="tags"></div>-->
 
+        [% IF datasets.0.ds_id # size is 1 even if empty... %]
         <form name="form1" id="form1" action="#" style="position: absolute; top: 0px; left: 05px; z-index: 1000">
 
             <label>Dataset:
@@ -53,11 +57,12 @@
                         <option value="[% ds.ds_id %]">[% ds.ds_name %]</option>
                     [% END %]
                 </select>
-            </label>
+            </label> [% datasets.size %]
 
             <span id="shortdesc"><!--Data file (direct): --></span>
 
         </form>
+        [% END %]
 
     </body>
 </html>

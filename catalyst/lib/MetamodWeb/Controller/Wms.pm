@@ -87,17 +87,6 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
         }
         $c->detach( 'Root', 'default' ) unless defined($setup);
 
-    #} elsif ( $$p{wmssetup} ) {
-    #    # fetch setup doc via HTTP... DEPRECATED (until told otherwise)
-    #    printf STDERR "Fetching %s...\n", $$p{wmssetup};
-    #
-    #    try { # not really tested... doesn't work unless running preforking catalyst
-    #        $setup = getXML( $c->request->params->{wmssetup} );
-    #    } catch {
-    #        error($c, 502, $_);
-    #        return;
-    #    }
-
     } elsif ( $$p{getcap} ) {
         # fetch GetCapabilites directly (for files w/o setup docs)
         $self->logger->debug("Fetching GetCap at " . $$p{getcap});
@@ -106,9 +95,9 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
         $setup = defaultWMC();
     }
 
-    my $wmc = eval { $c->stash->{wmc}->setup2wmc($setup, $wms) };
+    my $wmc = eval { $c->stash->{wmc}->old_gen_wmc($setup, $wms) };
     if ($@) {
-        $self->logger->warn("setup2wmc failed: $@");
+        $self->logger->warn("old_gen_wmc failed: $@");
         error($c, 502, $@);
     } else {
         my $out = $wmc->toString;
@@ -117,6 +106,54 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
         $c->response->content_type('text/xml');
         $c->response->body( $out );
     }
+
+}
+
+
+sub multiwmc :Path("/multiwmc") :Args(0) {
+    my ( $self, $c ) = @_;
+
+    my $mm_config = $c->stash->{ mm_config };
+    #my $bgurl = $mm_config->get('WMS_BACKGROUND_MAPSERVER');
+    #my bgmaps = (
+    #    '' => $bgurl . $mm_config->get('WMS_NORTHPOLE_MAP'),
+    #    '' => $bgurl . $mm_config->get('WMS_SOUTHPOLE_MAP'),
+    #    '' => $bgurl . $mm_config->get('WMS_WORLD_MAP'),
+    #);
+
+    my $para = $c->request->params;
+    my (%wmsurls, %layers);
+
+    my $setup = defaultWMC($para);
+    my $root = $setup->documentElement;
+    my $nsURI = 'http://www.met.no/schema/metamod/ncWmsSetup';
+
+    foreach (keys %$para) {
+        next unless my ($ds_id) = /^layer_(\d+)$/;
+
+        my $url;
+        my $layers = ref($$para{$_}) eq 'ARRAY' ? $$para{$_} : [ $$para{$_} ];
+        if( my $ds = $c->model('Metabase')->resultset('Dataset')->find( $ds_id ) ){
+            $url = $ds->wmsinfo->findvalue('/*/@url');
+        }
+        $c->detach( 'Root', 'default' ) unless defined($url);
+        #print STDERR ">>> $ds_id - $url\n";
+
+        foreach (@$layers) {
+            my $layernode = $root->addNewChild( $nsURI, 'layer');
+            $layernode->setAttribute( 'url', $url );
+            $layernode->setAttribute( 'name', $_);
+        }
+    }
+
+    my $wmc = eval { $c->stash->{wmc}->setup2wmc($setup) };
+    $wmc->documentElement->appendChild($setup->documentElement);
+    die " error: $@" if $@;
+    my $out = $wmc->toString(1);
+    # another hack to work around inexplainable duplicate namespace bug
+    $out =~ s|( xmlns:xlink="http://www.w3.org/1999/xlink"){2}|$1|g;
+    $c->response->content_type('text/xml');
+    $c->response->body( $out );
 
 }
 
@@ -131,7 +168,9 @@ sub qtips :Path("/qtips") :Args(0) {
     my ( $self, $c ) = @_;
 
     my $dom = new MetamodWeb::Utils::XML::Generator;
-    my @params;
+    my (@params, %attr);
+
+    $attr{method} = $c->request->method;
 
     my $p = $c->request->params;
     foreach (sort keys %$p) {
@@ -149,7 +188,7 @@ sub qtips :Path("/qtips") :Args(0) {
     #print STDERR $c->request->query_keywords || '-' . "\n";
 
     $dom->setDocumentElement(
-        $dom->tag('request', \@params )
+        $dom->tag('request', \%attr, \@params )
     );
 
     $c->response->content_type('text/xml');

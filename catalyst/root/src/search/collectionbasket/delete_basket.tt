@@ -1,0 +1,10 @@
+
+<form name="search_form" id="search_form" method="POST" action="[% c.uri_for('/search/collectionbasket/empty_basket' ) %]">
+
+    <p>Really remove all [% files = collection_basket.files.size %] files from basket?</p>
+
+    <input type="submit" name="empty_basket" value="Empty basket" />
+    <input type="submit" name="empty_basket" value="Cancel" />
+
+</form>
+

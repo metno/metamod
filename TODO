@@ -15,6 +15,7 @@ points for later.
 
 * better metadata conversion (new major feature)
 
+set default time in wms selector
 
 adduser script (for userbase)
 
@@ -34,7 +35,16 @@ add timeslider in wms (from nrk)
 
 merge layers from several datasets in wmc
 
+DBIx::Class::Storage::DBI::Pg: DBD::Pg 2.9.2 or greater is strongly recommended
+
+upgrade List::MoreUtils to 0.30 Thu 16 Dec 2010
+	- Change the way we localise PERL_DL_NONLAZY to false to remove
+	  a warning that some people were seeing. The new approach is taken
+	  from the way that List::Util does it.
+
 ++++++++ DONE ++++++++++++++
+
+fix scripts using Metamod::Config qw(:init_logger)
 
 add verportal datasets for testing wmsdiana
 

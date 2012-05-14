@@ -39,7 +39,7 @@ has 'c' => (
 );
 
 
-sub setup2wmc {
+sub old_gen_wmc {
 
     my ($self, $setup, $wmsurl) = @_;
 
@@ -55,17 +55,17 @@ sub setup2wmc {
         #printf STDERR " -- %s = %s\n", $k, $v;
     }
 
-    %bbox = ( # wmsdiana test hack - FIXME
-        crs     => 'EPSG:432600',
-        #crs     => 'EPSG:4326',
-        #crs     => 'EPSG:42000',
-        left    => 0,
-        bottom  => 30,
-        right   => 60,
-        top     => 90,
-        time    => $time,
-        transparent => 'true', # FIXME handle via wmssetup instead
-    ) if defined $wmsurl && $wmsurl =~ q|^http://dev-vm202/|;
+    #%bbox = ( # wmsdiana test hack - FIXME
+    #    crs     => 'EPSG:432600',
+    #    #crs     => 'EPSG:4326',
+    #    #crs     => 'EPSG:42000',
+    #    left    => 0,
+    #    bottom  => 30,
+    #    right   => 60,
+    #    top     => 90,
+    #    time    => $time,
+    #    transparent => 'true', # FIXME handle via wmssetup instead
+    #) if defined $wmsurl && $wmsurl =~ q|^http://dev-vm202/|;
 
     $bbox{units} = $setupxc->findvalue('/*/s:layer');
 
@@ -203,7 +203,7 @@ sub gc2wmc {
 
     my $xslt = XML::LibXSLT->new();
     # get capabilities xml
-    my $dom = eval { getXML($wmsurl . $gcquery ) };
+    my $dom = eval { getXML($wmsurl . $gcquery ) }; # use wmscap in Dataset FIXME
     croak " error: $@" if $@;
 
     # check if wms 1.1.1 or 1.3.0
@@ -214,6 +214,24 @@ sub gc2wmc {
     # generate wmc from capab
     my $wmcdoc = eval {
         $stylesheet->transform( $dom, XML::LibXSLT::xpath_to_string( %{$params} ) );
+    };
+    croak " error: $@" if $@;
+
+    return $wmcdoc;
+
+}
+
+#################################
+# transform ncWmsSetup to WMC
+#
+sub setup2wmc {
+    my ($self, $setup, $params) = @_;
+
+    my $xslt = XML::LibXSLT->new();
+
+    my $stylesheet = $xslt->parse_stylesheet_file( $self->c->path_to( '/root/xsl/setup2wmc.xsl' ) );
+    my $wmcdoc = eval {
+        $stylesheet->transform( $setup, XML::LibXSLT::xpath_to_string( %{$params} ) );
     };
     croak " error: $@" if $@;
 

@@ -9,6 +9,7 @@ use Data::Dumper;
 use Metamod::Config;
 use Log::Log4perl qw();
 use Metamod::FimexProjections;
+use Metamod::WMS;
 
 my $logger = Log::Log4perl::get_logger(__PACKAGE__);
 
@@ -329,7 +330,7 @@ sub wmsinfo {
             $threddsDataref =~ s:(.*/thredds)/catalog/.*\?dataset=(.*):$1/wms/$2:;
             $url =~ s|%THREDDS_DATAREF%|$threddsDataref|;
         } else {
-            # TODO: some logging
+            # TODO: some logging... FIXME
         }
     }
 
@@ -339,6 +340,31 @@ sub wmsinfo {
     return $dom;
 
 }
+
+=head2 $self->wmscap()
+
+=over
+
+=item return
+
+Returns the GetCapabilities XML DOM for the dataset if it has any Wmsinfo. Returns undef otherwise.
+
+=back
+
+=cut
+
+sub wmscap {
+    my $self = shift;
+
+    my $setup = $self->wmsinfo or return;
+    my $url = $setup->documentElement->getAttribute('url') or die "Missing url in wmsinfo";
+    $logger->debug("Getting WMS Capabilities at $url");
+    my $cap = eval { getXML($url . '?service=WMS&version=1.3.0&request=GetCapabilities') };
+    croak " error: $@" if $@;
+    return $cap;
+
+}
+
 
 =head2 $self->wmsthumb()
 

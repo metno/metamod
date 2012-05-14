@@ -174,7 +174,7 @@ die unless $self->config; # remove when stable
         $logger->debug(" [ftp_process_hour] Dataset=$dataset_name, hour=$hour, wait_minutes=$wait_minutes\n");
         my @files_found = findFiles( $ftp_dir_path, eval 'sub {$_[0] =~ /^\Q$dataset_name\E_/o;}' );
         if ( scalar @files_found == 0 && length($self->shell_command_error) > 0 ) {
-            &syserrorm( "SYS", "find_fails", "", "ftp_process_hour", "" );
+            $self->syserrorm( "SYS", "find_fails", "", "ftp_process_hour", "" );
             next;
         }
         my $current_epoch_time = time();
@@ -216,7 +216,7 @@ die unless $self->config; # remove when stable
     #
     my @all_files_found = findFiles($ftp_dir_path);
     if ( scalar @all_files_found == 0 && length($self->shell_command_error) > 0 ) {
-        &syserrorm( "SYS", "find_fails_2", "", "ftp_process_hour", "" );
+        $self->syserrorm( "SYS", "find_fails_2", "", "ftp_process_hour", "" );
     } else {
         foreach my $filename (@all_files_found) {
             my $dataset_name;
@@ -230,14 +230,14 @@ die unless $self->config; # remove when stable
 
                     # egils: Should not die, because uploaded files may have temporary names while uploading:
                     #die "Could not stat $filename\n";
-                    &syserrorm( "SYS", "Could not stat problem file $filename", "", "ftp_process_hour", "" );
+                    $self->syserrorm( "SYS", "Could not stat problem file $filename", "", "ftp_process_hour", "" );
                 } else {
 
                     # Get last modification time of file (seconds since the epoch)
                     my $current_epoch_time = time();
                     my $modification_time  = $file_stat[9];
                     if ( $current_epoch_time - $modification_time > 60 * 60 * 5 ) {
-                        &syserrorm( "SYS", "file_with_no_dataset", $filename, "ftp_process_hour", "" );
+                        $self->syserrorm( "SYS", "file_with_no_dataset", $filename, "ftp_process_hour", "" );
                     }
                 }
             }
@@ -1499,7 +1499,7 @@ sub clean_up_problem_dir {
 
     my @files_found = findFiles( $problem_dir_path, sub { $_[0] =~ /^\d/; } );
     if ( scalar @files_found == 0 && length($self->shell_command_error) > 0 ) {
-        &syserrorm( "SYS", "find_fails", "", "clean_up_problem_dir", "" );
+        $self->syserrorm( "SYS", "find_fails", "", "clean_up_problem_dir", "" );
     }
 
     # Find current time (epoch) as number of seconds since the epoch (1970)
@@ -1509,14 +1509,14 @@ sub clean_up_problem_dir {
         if ( -r $filename ) {
             my @file_stat = stat($filename);
             if ( scalar @file_stat == 0 ) {
-                &syserrorm( "SYS", "Could not stat old problem file $filename", "", "clean_up_problem_dir", "" );
+                $self->syserrorm( "SYS", "Could not stat old problem file $filename", "", "clean_up_problem_dir", "" );
             }
 
             # Get last modification time of file (seconds since the epoch)
             my $modification_time = $file_stat[9];
             if ( $current_epoch_time - $modification_time > $age_seconds ) {
                 if ( unlink($filename) == 0 ) {
-                    &syserrorm( "SYS", "Unlink file $filename did not succeed", "", "clean_up_problem_dir", "" );
+                    $self->syserrorm( "SYS", "Unlink file $filename did not succeed", "", "clean_up_problem_dir", "" );
                 }
             }
         }
@@ -1540,7 +1540,7 @@ sub clean_up_repository {
         my $days_to_keep_files = $self->all_ftp_datasets->{$dataset};
         if ( $days_to_keep_files > 0 ) {
             if ( !defined( $dataset_institution{$dataset} ) ) {
-                &syserrorm( "SYS", "$dataset not in any userfiler", "", "clean_up_repository", "" );
+                $self->syserrorm( "SYS", "$dataset not in any userfiler", "", "clean_up_repository", "" );
                 next;
             }
             my $directory = $opendap_directory . "/" . $dataset_institution{$dataset}->{'institution'} . "/" . $dataset;
@@ -1549,7 +1549,7 @@ sub clean_up_repository {
             foreach my $fname (@files) {
                 my @file_stat = stat($fname);
                 if ( scalar @file_stat == 0 ) {
-                    &syserrorm( "SYS", "Could not stat old repo file $fname", "", "clean_up_repository", "" );
+                    $self->syserrorm( "SYS", "Could not stat old repo file $fname", "", "clean_up_repository", "" );
                     next;
                 }
 
@@ -1559,7 +1559,7 @@ sub clean_up_repository {
                     $logger->debug("$fname\n");
                     my @cdlcontent = &shcommand_array("ncdump -h $fname");
                     if ( length($self->shell_command_error) > 0 ) {
-                        &syserrormm( "SYS", "Could not ncdump -h $fname", "", "clean_up_repository", "" );
+                        $self->syserrormm( "SYS", "Could not ncdump -h $fname", "", "clean_up_repository", "" );
                         next;
                     }
                     my $lnum = 0;
@@ -1582,7 +1582,7 @@ sub clean_up_repository {
                     }
                     $logger->debug("'variables:' found at line = $lnum\n");
                     if ( $lnum >= $lmax ) {
-                        &syserrorm( "SYS", "Error while changing CDL content from $fname",
+                        $self->syserrorm( "SYS", "Error while changing CDL content from $fname",
                             "", "clean_up_repository", "" );
                         next;
                     }
@@ -1591,7 +1591,7 @@ sub clean_up_repository {
                     close(CDLFILE);
                     &shcommand_scalar("ncgen tmp_file.cdl -o $fname");
                     if ( length($self->shell_command_error) > 0 ) {
-                        &syserrorm( "SYS", "Could not ncgen tmp_file.cdl -o $fname", "", "clean_up_repository", "" );
+                        $self->syserrorm( "SYS", "Could not ncgen tmp_file.cdl -o $fname", "", "clean_up_repository", "" );
                         next;
                     }
                 }

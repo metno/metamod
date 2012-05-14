@@ -52,54 +52,16 @@ sub auto : Private {
 
 }
 
-=head2 request_download()
+=head2 view()
 
-Action for requesting the download of the collection basket. This action will
-insert a job into a work queue that will create a zip file of all the files in
-the collection basket and send a link to the zip file to the email address
-requested by the user.
+Action for displaying the collection basket.
 
 =cut
 
-sub request_download : Path('/search/collectionbasket/request_download') {
-    # should be rewritten to only accept POST - FIXME
+sub view : Path('/search/collectionbasket') : Args(0) {
     my ( $self, $c ) = @_;
 
-    my $email_address = $c->req->params->{email_address};
-    if ( !$email_address || !Email::Valid->address($email_address) ) {
-        $self->add_error_msgs($c, 'You must supply a valid email address before requesting a download');
-        $c->res->redirect($c->uri_for('/search/collectionbasket'));
-        return;
-    }
-
-    my $basket = $c->stash->{collection_basket};
-
-    my $dataset_locations = $basket->find_data_locations();
-    
-    print STDERR "+++++++++++++++++" . Dumper \$dataset_locations;
-    
-    if ( 0 == @$dataset_locations ) {
-        $self->add_info_msgs($c, 'There are no files in the collection basket to download');
-        $c->res->redirect($c->uri_for('/search/collectionbasket'));
-        return;
-    }
-
-    my $queue = Metamod::Queue->new();
-    my $job_parameters = {
-            locations => $dataset_locations,
-            email     => $email_address,
-    };
-
-    my $success = $queue->insert_job( job_type => 'Metamod::Queue::Worker::PrepareDownload',
-                                      job_parameters => $job_parameters );
-
-    if( $success ){
-        $self->add_info_msgs( $c, 'The download is being prepared for you. Please wait for an email' );
-    } else {
-        $self->add_error_msgs( $c, 'An error occured and your download could not be prepared' );
-    }
-
-    $c->res->redirect($c->uri_for('/search/collectionbasket'));
+    $c->stash( template => 'search/collectionbasket/view_basket.tt' );
 
 }
 
@@ -124,38 +86,70 @@ sub add_to_basket : Path("/search/add_to_basket/") : Args(1) { # FIXME: should b
 
 }
 
-=head2 view()
-
-Action for displaying the collection basket.
-
-=cut
-
-sub view : Path('/search/collectionbasket') : Args(0) {
-    my ( $self, $c ) = @_;
-
-    $c->stash( template => 'search/collectionbasket/view_basket.tt' );
-
-}
-
 =head2 empty_basket()
 
 Action for completely emptying the collection basket.
 
 =cut
 
-sub empty_basket : Path('/search/collectionbasket/empty_basket') : Args(0) { # FIXME: should be a POST request
+sub empty_basket : Path('/search/collectionbasket/empty_basket') :ActionClass('REST') : Args(0) {
+    my ( $self, $c ) = @_;
+}
+
+sub empty_basket_GET {
+    my ( $self, $c ) = @_;
+
+    $c->stash( template => 'search/collectionbasket/delete_basket.tt' );
+}
+
+sub empty_basket_POST {
     my ( $self, $c ) = @_;
 
     my $basket = $c->stash->{collection_basket};
-    $basket->empty_basket();
 
-    $self->add_info_msgs( $c, 'The collection basket has been emptied' );
+    if ($c->req->params->{'empty_basket'} ne 'Cancel') {
+        $basket->empty_basket();
+        $self->add_info_msgs( $c, 'The collection basket has been emptied' );
+    }
     $c->res->redirect($c->uri_for('/search/collectionbasket'));
 }
 
 =head2 remove_selected()
 
 Remove a list of selected datasets from the current collection basket.
+
+
+
+=cut
+
+sub remove_dataset : Path('/search/collectionbasket/remove_dataset') : Args(0) {
+    my ( $self, $c ) = @_;
+
+    if ($c->request->method ne 'POST') {
+        $c->response->status(400); # bad request
+        $c->response->body("Only POST requests allowed here");
+        $c->response->content_type("text/plain");
+        $self->logger->error("Non-POST request used for removing basket file");
+        return;
+    }
+
+    my $dataset_id = $c->req->params->{'remove_file'} || [];
+
+    if( ref( $dataset_id ) eq 'ARRAY' ){
+        die "ARRAY sent to remove_dataset should never happen";
+    }
+
+    my $basket = $c->stash->{collection_basket};
+    $self->add_info_msgs( $c, "Dataset #$dataset_id has been removed from the collection basket" );
+    $basket->remove_datasets( $dataset_id );
+
+    $c->res->redirect($c->uri_for('/search/collectionbasket'));
+}
+
+=head2 remove_selected()
+
+Remove a list of selected datasets from the current collection basket.
+B<DEPRECATED:> Re-implemented template to use a separate POST per dataset
 
 =cut
 
@@ -177,6 +171,12 @@ sub remove_selected : Path('/search/collectionbasket/remove_selected') : Args(0)
     $c->res->redirect($c->uri_for('/search/collectionbasket'));
 }
 
+=head2 link_basket()
+
+Does what? FIXME
+
+=cut
+
 sub link_basket : Path('/search/collectionbasket/link_basket' ) : Args(0) { # FIXME: should be a POST request
     my ($self, $c) = @_;
 
@@ -193,6 +193,12 @@ sub link_basket : Path('/search/collectionbasket/link_basket' ) : Args(0) { # FI
 
 }
 
+=head2 replace_basket()
+
+Does what? FIXME
+
+=cut
+
 sub replace_basket : Path('/search/collectionbasket/replace_basket' ) : Args(0) { # FIXME: should be a POST request
     my ($self, $c) = @_;
 
@@ -204,6 +210,12 @@ sub replace_basket : Path('/search/collectionbasket/replace_basket' ) : Args(0) 
     $c->res->redirect($c->uri_for('/search/collectionbasket'));
 
 }
+
+=head2 merge_basket()
+
+Does what? FIXME
+
+=cut
 
 sub merge_basket : Path('/search/collectionbasket/merge_basket' ) : Args(0) { # FIXME: should be a POST request
     my ($self, $c) = @_;
@@ -229,6 +241,56 @@ sub _add_list_to_basket : Private { # FIXME: should be a POST request
 
 }
 
+=head2 request_download()
+
+Action for requesting the download of the collection basket. This action will
+insert a job into a work queue that will create a zip file of all the files in
+the collection basket and send a link to the zip file to the email address
+requested by the user.
+
+=cut
+
+sub request_download : Path('/search/collectionbasket/request_download') {
+    # should be rewritten to only accept POST - FIXME
+    my ( $self, $c ) = @_;
+
+    my $email_address = $c->req->params->{email_address};
+    if ( !$email_address || !Email::Valid->address($email_address) ) {
+        $self->add_error_msgs($c, 'You must supply a valid email address before requesting a download');
+        $c->res->redirect($c->uri_for('/search/collectionbasket'));
+        return;
+    }
+
+    my $basket = $c->stash->{collection_basket};
+
+    my $dataset_locations = $basket->find_data_locations();
+
+    print STDERR "+++++++++++++++++" . Dumper \$dataset_locations;
+
+    if ( 0 == @$dataset_locations ) {
+        $self->add_info_msgs($c, 'There are no files in the collection basket to download');
+        $c->res->redirect($c->uri_for('/search/collectionbasket'));
+        return;
+    }
+
+    my $queue = Metamod::Queue->new();
+    my $job_parameters = {
+            locations => $dataset_locations,
+            email     => $email_address,
+    };
+
+    my $success = $queue->insert_job( job_type => 'Metamod::Queue::Worker::PrepareDownload',
+                                      job_parameters => $job_parameters );
+
+    if( $success ){
+        $self->add_info_msgs( $c, 'The download is being prepared for you. Please wait for an email' );
+    } else {
+        $self->add_error_msgs( $c, 'An error occured and your download could not be prepared' );
+    }
+
+    $c->res->redirect($c->uri_for('/search/collectionbasket'));
+
+}
 
 __PACKAGE__->meta->make_immutable;
 

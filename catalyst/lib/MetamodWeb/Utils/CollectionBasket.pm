@@ -93,6 +93,9 @@ search criteria AND have C<data_file_location> set. In addition it will only try
 added (max basket size - current basket size) files to the basket for
 efficiency reason.
 
+If the level 1 dataset has no children but has wmsinfo, the parent dataset will be
+added instead. (work in progress)
+
 =over
 
 =item $ds_id
@@ -129,35 +132,46 @@ sub add_dataset {
     if( defined $dataset ){
 
         if ( $dataset->is_level1_dataset() ) {
+            
+            if ( $dataset->num_children() ) {
 
-            # We must take into account the search parameters that was used in
-            # the search when adding level 2 dataset.
-
-            my ($search_conds, $search_attrs) = $self->_metadata_search_params();
-            $search_attrs->{ rows } = $max_additional;
-            my $child_datasets = $dataset->child_datasets($search_conds, $search_attrs);
-
-            while ( my $child_ds = $child_datasets->next() ) {
-
-                my $file_info = $self->file_info($child_ds);
-                if ( defined $file_info ) {
-
-                    # when we reach the maximum we stop even if there might smaller files later.
-                    # This probably will seem like less random behaviour.
-                    if( $file_info->{data_file_size} + $current_size > $max_size ){
-                        my $msg = 'Could not add all files to the basket since the basket would then exceed the ';
-                        $msg .= 'allowed maximum size.';
-                        $self->add_user_msg($msg);
-                        $self->logger->debug("Could not add file to collection basket as it exceeds the max size");
-
-                        last;
+                # We must take into account the search parameters that was used in
+                # the search when adding level 2 dataset.
+    
+                my ($search_conds, $search_attrs) = $self->_metadata_search_params();
+                $search_attrs->{ rows } = $max_additional;
+                my $child_datasets = $dataset->child_datasets($search_conds, $search_attrs);
+    
+                while ( my $child_ds = $child_datasets->next() ) {
+    
+                    my $file_info = $self->file_info($child_ds);
+                    if ( defined $file_info ) {
+    
+                        # when we reach the maximum we stop even if there might smaller files later.
+                        # This probably will seem like less random behaviour.
+                        if( $file_info->{data_file_size} + $current_size > $max_size ){
+                            my $msg = 'Could not add all files to the basket since the basket would then exceed the ';
+                            $msg .= 'allowed maximum size.';
+                            $self->add_user_msg($msg);
+                            $self->logger->debug("Could not add file to collection basket as it exceeds the max size");
+    
+                            last;
+                        }
+    
+                        $current_size += $file_info->{data_file_size};
+                        $ds_ids{$child_ds->ds_id()} = 1;
+                        $new_datasets++;
                     }
-
-                    $current_size += $file_info->{data_file_size};
-                    $ds_ids{$child_ds->ds_id()} = 1;
-                    $new_datasets++;
                 }
+                
+            } elsif ( $dataset->wmsinfo() ) {
+                
+                # this is only used for visualization
+                $ds_ids{$dataset->ds_id()} = 1;
+                $new_datasets++; # why not working? FIXME
+                
             }
+            
         } else {
 
             my $file_info = $self->file_info($dataset);

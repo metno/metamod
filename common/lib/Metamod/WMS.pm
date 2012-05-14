@@ -43,6 +43,7 @@ use LWP::UserAgent;
 use XML::LibXML;
 use Log::Log4perl qw(get_logger);
 use Metamod::Config;
+use Data::Dumper;
 
 our @EXPORT = qw(logger param abandon getXML getSetup outputXML defaultWMC);
 
@@ -137,14 +138,27 @@ sub outputXML {
 # used when using GetCapabilities instead of setup file
 #
 sub defaultWMC {
+	my $p = shift;
 
+	my $crs    = $$p{crs}    || 'EPSG:32661';
+	my $left   = $$p{left}   || '-3000000';
+	my $right  = $$p{right}  ||  '7000000';
+	my $bottom = $$p{bottom} || '-3000000';
+	my $top    = $$p{top}    ||  '7000000';
+	# TODO some validation?
+
+	my $bgurl = 'http://wms.met.no/maps/world.map';
+	my $baselayer = qq|<w:baselayer url="$bgurl" name="world" />| if $bgurl;
+
+#	print STDERR Dumper $p;
 	my $default_wmc = <<EOT;
 <?xml version="1.0"?>
 <w:ncWmsSetup
     xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.met.no/schema/metamod/ncWmsSetup ncWmsSetup.xsd ">
-    <w:displayArea crs="EPSG:32661" left="-3000000" right="7000000" bottom="-3000000" top="7000000"/>
+    <w:displayArea crs="$crs" left="$left" right="$right" bottom="$bottom" top="$top"/>
+	$baselayer
 </w:ncWmsSetup>
 EOT
 	return $parser->parse_string($default_wmc);

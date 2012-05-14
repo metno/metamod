@@ -53,6 +53,22 @@ use TheSchwartz::Job;
 #
 has 'mm_config' => ( is => 'ro', isa => 'Metamod::Config', default => sub { return Metamod::Config->instance() } );
 
+=begin FIXME
+
+You must call new() once before you can call instance() at ../../common/lib/Metamod/Config.pm line 162
+        Metamod::Config::instance('Metamod::Config') called at ../../common/lib/Metamod/Queue.pm line 54
+        Metamod::Queue::__ANON__('Metamod::Queue=HASH(0x16fbdb0)') called at /opt/metno-catalyst-dependencies-ver1/lib/perl5//x86_64-linux-gnu-thread-multi/Class/MOP/Mixin/AttributeCore.pm line 53
+        Class::MOP::Mixin::AttributeCore::default('Moose::Meta::Attribute=HASH(0x16f2010)', 'Metamod::Queue=HASH(0x16fbdb0)') called at /opt/metno-catalyst-dependencies-ver1/lib/perl5//x86_64-linux-gnu-thread-multi/Moose/Meta/Attribute.pm line 472
+        Moose::Meta::Attribute::initialize_instance_slot('Moose::Meta::Attribute=HASH(0x16f2010)', 'Moose::Meta::Instance=HASH(0x16fc550)', 'Metamod::Queue=HASH(0x16fbdb0)', 'HASH(0x16f19c0)') called at /opt/metno-catalyst-dependencies-ver1/lib/perl5//x86_64-linux-gnu-thread-multi/Class/MOP/Class.pm line 603
+        Class::MOP::Class::_construct_instance('Moose::Meta::Class=HASH(0x15c27f0)', 'HASH(0x16f19c0)') called at /opt/metno-catalyst-dependencies-ver1/lib/perl5//x86_64-linux-gnu-thread-multi/Class/MOP/Class.pm line 576
+        Class::MOP::Class::new_object('Moose::Meta::Class=HASH(0x15c27f0)', 'HASH(0x16f19c0)') called at /opt/metno-catalyst-dependencies-ver1/lib/perl5//x86_64-linux-gnu-thread-multi/Moose/Meta/Class.pm line 256
+        Moose::Meta::Class::new_object('Moose::Meta::Class=HASH(0x15c27f0)', 'HASH(0x16f19c0)') called at /opt/metno-catalyst-dependencies-ver1/lib/perl5//x86_64-linux-gnu-thread-multi/Moose/Object.pm line 26
+        Moose::Object::new('Metamod::Queue') called at /root/Metamod2.x/source/upload/scripts/add_file_to_queue.pl line 54
+
+=end FIXME
+
+=cut
+
 #
 # The TheSchwartz client that is used to insert jobs into the queue
 #
@@ -104,6 +120,7 @@ Returns 1 if the job was inserted successfully. False otherwise.
 =back
 
 =cut
+
 sub insert_job {
     my $self = shift;
 

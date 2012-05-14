@@ -82,7 +82,7 @@ p {
 }
 
 a {
-    /*text-decoration: none;*/
+    text-decoration: none;
     color: #0A2C94;
 }
 
@@ -126,6 +126,10 @@ h1.info {
     text-align: center;
 }
 
+th, td {
+	border: 0;
+	padding: 0 0 0 0;
+}
 
 td {
     font-size: 0.8em;

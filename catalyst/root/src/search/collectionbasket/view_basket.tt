@@ -32,10 +32,8 @@ jQuery(document).ready( function () {
 
 <p>Datasets shown in italic are unavailable for download.</p>
 
-[%# FIXME: This should be implemented as a POST action. That also means you need submit buttons instead
-    of hyperlinks. Since it's a pain to change action urls it would probably be best to post all
-    actions to /search/collectionbasket and check the submit value before processing. %]
-<form name="search_form" id="search_form" method="GET" action="[% c.uri_for('/search/collectionbasket/remove_selected' ) %]">
+<form name="search_form" id="search_form" method="POST" action="[% c.uri_for('/search/collectionbasket/remove_dataset' ) %]">
+<!--<form name="search_form" id="search_form" method="POST" action="[% c.uri_for('/qtips' ) %]">-->
     [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
 
     <br />
@@ -43,13 +41,10 @@ jQuery(document).ready( function () {
     <table class="plain" style="width: 100%">
 
         <tr>
-            <th class="collection-basket">
-                &nbsp;
-            </th>
-            <th class="collection-basket">
+            <th class="collection-basket" colspan="2">
                 Dataset name
             </th>
-            <th class="collection-basket">
+            <th class="collection-basket" style="white-space:nowrap;">
                 File size
             </th>
         </tr>
@@ -57,11 +52,14 @@ jQuery(document).ready( function () {
         [% FOREACH file IN files %]
             [% filesize = file.data_file_size %]
             <tr>
-                <td class="collection-basket">
-                    <input type="checkbox" name="remove_file" value="[% file.ds_id %]" />
-                </td>
-                <td class="collection-basket">
+                <td class="collection-basket" width="90%">
                     <span style="[% filesize ? '' : 'font-style: italic' %]">[% file.name %]</span>
+                </td>
+                <td class="collection-basket" style="white-space:nowrap;">
+                    <a class="visual" href="[% c.uri_for( '/search/wms' ) %]?ds_id=[% file.ds_id %]"><button type="button">Visualize</button></a>
+                    <button type="submit" name="remove_file" value="[% file.ds_id %]">
+                        <img src="[% c.uri_for( '/static/images/cancel.png') %]" alt="Remove"/>
+                    </button>
                 </td>
                 <td class="collection-basket" style="text-align: right">
                     [% filesize ? collection_basket.human_readable_size( file.data_file_size ) : '&nbsp' %]
@@ -69,23 +67,25 @@ jQuery(document).ready( function () {
             </tr>
         [% END %]
         <tr>
-            <td class="collection-basket"></td>
-            <td class="collection-basket"><b>Total</b></td>
-            <td class="collection-basket" style="text-align: right;">
+            <td class="collection-basket" colspan="2"><b>Total</b></td>
+            <td class="collection-basket" style="text-align: right">
                 <b>[% collection_basket.human_readable_size( collection_basket.calculate_size() ) %]</b>
             </td>
         </tr>
 
     </table>
 
-    <input type="submit" name="collection_basket_remove" value="Remove selected" />
-    <a class="button-link" href="[% c.uri_for( '/search/collectionbasket/empty_basket', c.req.params ) %]"><button type="button">Empty basket</button></a>
-
-    [% SET basket_params = { ds_id => collection_basket.dataset_ids } %]
-    <a class="button-link" target="_blank" href="[% c.uri_for( '/search/collectionbasket/link_basket', basket_params  ) %]"><button type="button">Get basket URL</button></a>
-    <a class="visual" href="[% c.uri_for( '/search/wms', basket_params  ) %]"><button type="button">Visualize</button></a>
-
 </form>
+
+<hr/>
+
+<a class="button-link" href="[% c.uri_for( '/search/collectionbasket/empty_basket', c.req.params ) %]"><button type="button">Empty basket</button></a>
+
+[% SET basket_params = { ds_id => collection_basket.dataset_ids } %]
+<a class="button-link" target="_blank" href="[% c.uri_for( '/search/collectionbasket/link_basket', basket_params  ) %]"><button type="button">Get basket URL</button></a>
+<a class="visual" href="[% c.uri_for( '/search/wmslist', basket_params  ) %]"><button type="button">Combined WMS</button></a>
+<a class="visual" href="[% c.uri_for( '/search/wms', basket_params  ) %]"><button type="button">Visualize all</button></a>
+
 
 
 [% ELSE %]

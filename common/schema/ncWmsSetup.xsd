@@ -9,8 +9,8 @@
     <element name='ncWmsSetup' type="w:NcWmsSetup" />
     <!-- embedded elements -->
     <element name='displayArea' type="w:DisplayArea" />
-    <element name='baselayer' type="w:Layer" /> <!--opaque-->
-    <element name='layer' type="w:Layer" /> <!--transparent-->
+    <element name='baselayer' type="w:LayerAny" /> <!--opaque-->
+    <element name='layer' type="w:LayerAny" /> <!--transparent-->
     <element name='thumbnail' type="w:Thumbnail" />
 
     <complexType name='NcWmsSetup'>
@@ -20,7 +20,7 @@
             <element ref='w:layer' minOccurs='0' maxOccurs="unbounded"/>
             <element ref='w:thumbnail' minOccurs='0' maxOccurs='1'/>
         </sequence>
-        <attribute name="url" type="string" use="required"/>
+        <attribute name="url" type="string" use="optional"/> <!-- not used in DefaultWMC or multiwmc -->
     </complexType>
 
     <complexType name='DisplayArea'>
@@ -32,7 +32,7 @@
         <attribute name="units" type="string" use="optional"/>
     </complexType>
 
-    <complexType name='Layer'>
+    <complexType name='LayerAny'>
         <attribute name="name" type="string" use="required"/>  <!-- use '*' for default attrs -->
         <attribute name="style" type="string" use="optional"/>
         <attribute name="url" type="string" use="optional"/>

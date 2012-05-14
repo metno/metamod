@@ -4,18 +4,16 @@ $(function() { // runs after document loaded
         create: function(event, ui) {
             alert('accordion!');
             log.debug('accordion created!');
-        },
+        }/*,
         change: function(event, ui) {
             log.debug('layer change: ' + ui.oldHeader.attr('id') + ' to ' + ui.newHeader.attr('id'));
             map.layers[ui.oldHeader.attr('id').slice(5)].setVisibility(false);
             map.layers[ui.newHeader.attr('id').slice(5)].setVisibility(true);
-        }
+        }*/
     } );
 });
 
 var log = log4javascript.getDefaultLogger();
-
-
 
 OpenLayers.IMAGE_RELOAD_ATTEMPTS = 5;
 
@@ -41,7 +39,8 @@ function init(){
         //OpenLayers.ProxyHost = "/gc2wmc?getcap=";
         OpenLayers.loadURL(wmcpath + "?getcap=" + wms_url, "", this, drawMap, showError);
     } else {
-        alert("Missing ds_id or wmsurl parameter!");
+        OpenLayers.loadURL(multiwmcpath, "", this, drawMap, showError);
+        //alert("Missing ds_id or wmsurl parameter!");
     }
 
 }
@@ -91,13 +90,15 @@ function drawMap(response) {
 
     log.debug("Projection = " + map.projection);
 
-    map.addControl(layersw);
-    map.addControl( new OpenLayers.Control.MousePosition() );
+    //map.addControl(layersw);
+    //layersw.maximizeControl(true);
     map.addControl( new OpenLayers.Control.PanZoomBar() );
     map.addControl( new OpenLayers.Control.Navigation() );
-    map.addControl( new OpenLayers.Control.ScaleLine() );
-    map.addControl( new OpenLayers.Control.Permalink('permalink') );
-    //layersw.maximizeControl(true);
+    //map.addControl( new OpenLayers.Control.MousePosition() );
+    //map.addControl( new OpenLayers.Control.ScaleLine() );
+    //map.addControl( new OpenLayers.Control.Permalink('permalink') );
+
+    $("#accordion").empty(); // remove old layers from selector
 
     for (var i=0; i < map.layers.length; i++) {
         var l = map.layers[i];
@@ -157,8 +158,9 @@ function drawMap(response) {
     }
 
     $("#accordion").accordion("destroy");
-    $("#accordion").accordion({ // why defined twice?
+    $("#accordion").accordion({
         fillSpace:true,
+        clearStyle: true, // needed when more layers than can fit in window
         icons: true,
         create: function(event, ui) {
             alert('accordion!');
