@@ -188,9 +188,15 @@ LONLAT_SRID = 4035
 # locate your fimex program for reprojection of data
 FIMEX_PROGRAM = fimex
 
-# The WMS server URL to send the WMC page to
-WMS_URL = [==LOCAL_URL==]/sch/wms.php?wmcDoc=
+# ============ WMS configuration =======================
 
+# URL to background map server delivering coastlines and reticules
+WMS_BACKGROUND_MAPSERVER = http://wms.met.no/maps/
+
+# map names for different projections
+WMS_NORTHPOLE_MAP = northpole.map
+WMS_SOUTHPOLE_MAP = southpole.map
+WMS_WORLD_MAP     = world.map
 
 # ============ METAMODBASE configuration ==============
 # Name of psql executable:
