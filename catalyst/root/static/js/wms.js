@@ -70,6 +70,11 @@ function styleHandlerFactory(layer, l_image) {
     }
 }
 
+function toggleSticky(layer, box) {
+    log.debug('Setting layer ' + later + ' to ' + box.checked);
+    map.layers[' + layer + '].sticky = box.checked;
+}
+
 function drawMap(response) {
 
     wmsContext = response.responseXML;
@@ -100,6 +105,13 @@ function drawMap(response) {
 
     $("#accordion").empty(); // remove old layers from selector
 
+    var leds = [
+        '../static/images/led_off.png',
+        '../static/images/led_yellow.png',
+        '../static/images/led_dkgreen.png',
+        '../static/images/led_green.png'
+    ];
+
     for (var i=0; i < map.layers.length; i++) {
         var l = map.layers[i];
         var lc = '#layer' + i;
@@ -107,14 +119,18 @@ function drawMap(response) {
         //var lvis = l.isBaseLayer ?
         //    '<input name="baselayer_visible" id="' + lc + '_show" type="radio"/>' :
         //    '';
-        $("#accordion").append('<h3 layer="' + i + '"><a href="#">' + l.name + '</a></h3>');
+        $("#accordion").append('<h3 layer="' + i + '"><a href="#"><img class="onoff" src="'
+                               + leds[ l.isBaseLayer ? 2 : 0 ] + '"/> ' + l.name + '</a></h3>');
         $("#accordion").append('<div id="layer' + i + '"></div>');
         if (l.metadata.abstract !== undefined) {
             $(lc).append('<p>' + l.metadata.abstract + '</p>');
         }
         if (! l.isBaseLayer) {
             $(lc).append('<label><input name="' + lc + '_visible" id="' + lc + '_show" type="checkbox" '
-            + 'onchange="map.layers[' + i + '].sticky = this.checked"/>stay visible</label>');
+            + 'onchange="map.layers[' + i + '].sticky = this.checked;"/>stay visible</label>');
+            //+ '/>stay visible</label>'); // not working
+            //$(lc + '_show').change = function(){ alert('changed '+i); toggleSticky(i, this); }; // this craps out too
+
         }
 
         if (l.dimensions !== undefined && l.dimensions.time !== undefined) {
@@ -161,7 +177,7 @@ function drawMap(response) {
     $("#accordion").accordion({
         fillSpace:true,
         clearStyle: true, // needed when more layers than can fit in window
-        icons: true,
+        icons: false,
         create: function(event, ui) {
             alert('accordion!');
             log.debug('accordion created!');
@@ -172,10 +188,13 @@ function drawMap(response) {
             var n_index = ui.newHeader.attr('layer');
             if (map.layers[o_index].isBaseLayer) {
                 log.debug('layer ' + o_index + ' is baselayer');
+                ui.oldHeader.find('img.onoff').attr('src', leds[ 2 ]);
             } else {
                 map.layers[o_index].setVisibility( map.layers[o_index].sticky );
+                ui.oldHeader.find('img.onoff').attr('src', leds[ map.layers[o_index].sticky ? 1 : 0 ]);
             }
             map.layers[n_index].setVisibility(true);
+            ui.newHeader.find('img.onoff').attr('src', leds[ map.layers[n_index].isBaseLayer ? 3 : 1 ]);
         }
     });
     $("#accordion").accordion("resize");

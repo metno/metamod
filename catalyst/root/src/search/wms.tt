@@ -30,7 +30,7 @@
         </script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/wms.js') %]"></script>
         <script type="text/javascript">
-            [% IF 1 # ! debug # disable logging in production %]
+            [% IF ! debug # disable logging in production %]
                 log = log4javascript.getNullLogger();
             [% END %]
         </script>

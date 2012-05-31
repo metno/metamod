@@ -11,8 +11,6 @@ points for later.
 
 --------------------
 
-* deletion of datasets by user (done)
-
 * better metadata conversion (new major feature)
 
 set default time in wms selector
@@ -33,7 +31,7 @@ multiple thumbnails in wmsinfo (for separate map and data layers)
 
 add timeslider in wms (from nrk)
 
-merge layers from several datasets in wmc
+mark layerchanger title bar when visible 
 
 DBIx::Class::Storage::DBI::Pg: DBD::Pg 2.9.2 or greater is strongly recommended
 
@@ -42,7 +40,16 @@ upgrade List::MoreUtils to 0.30 Thu 16 Dec 2010
 	  a warning that some people were seeing. The new approach is taken
 	  from the way that List::Util does it.
 
+show first layer visible in layerselector on startup
+
 ++++++++ DONE ++++++++++++++
+
+show visibility in layerselector
+
+* deletion of datasets by user (done)
+	nameing problem with APPLIC_ID
+
+merge layers from several datasets in wmc
 
 fix scripts using Metamod::Config qw(:init_logger)
 

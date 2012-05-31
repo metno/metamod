@@ -40,3 +40,7 @@
     /*top: 0;*/
     /*left: 0;*/
 }
+
+img.onoff {
+    vertical-align: middle;
+}
