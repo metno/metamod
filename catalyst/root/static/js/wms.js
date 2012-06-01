@@ -105,7 +105,7 @@ function drawMap(response) {
 
     $("#accordion").empty(); // remove old layers from selector
 
-    var leds = [
+    var leds = [ // rewrite as hash... FIXME
         '../static/images/led_off.png',
         '../static/images/led_yellow.png',
         '../static/images/led_dkgreen.png',
@@ -116,11 +116,15 @@ function drawMap(response) {
         var l = map.layers[i];
         var lc = '#layer' + i;
 
+        // layer 0 always starts open, so turn on led
+        var led_index = ( map.layers[i].isBaseLayer ? 2 : 0 );
+        if ( i == 0 ) { led_index++ };
+
         //var lvis = l.isBaseLayer ?
         //    '<input name="baselayer_visible" id="' + lc + '_show" type="radio"/>' :
         //    '';
         $("#accordion").append('<h3 layer="' + i + '"><a href="#"><img class="onoff" src="'
-                               + leds[ l.isBaseLayer ? 2 : 0 ] + '"/> ' + l.name + '</a></h3>');
+                               + leds[led_index] + '"/> ' + l.name + '</a></h3>');
         $("#accordion").append('<div id="layer' + i + '"></div>');
         if (l.metadata.abstract !== undefined) {
             $(lc).append('<p>' + l.metadata.abstract + '</p>');

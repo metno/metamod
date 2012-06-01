@@ -40,7 +40,7 @@ upgrade List::MoreUtils to 0.30 Thu 16 Dec 2010
 	  a warning that some people were seeing. The new approach is taken
 	  from the way that List::Util does it.
 
-show first layer visible in layerselector on startup
+test selector for multiple baselayers
 
 ++++++++ DONE ++++++++++++++
 
