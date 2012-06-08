@@ -1,4 +1,8 @@
 
+var log = log4javascript.getDefaultLogger();
+
+OpenLayers.IMAGE_RELOAD_ATTEMPTS = 5;
+
 $(function() { // runs after document loaded
     $('#accordion').accordion( {
         create: function(event, ui) {
@@ -12,10 +16,6 @@ $(function() { // runs after document loaded
         }*/
     } );
 });
-
-var log = log4javascript.getDefaultLogger();
-
-OpenLayers.IMAGE_RELOAD_ATTEMPTS = 5;
 
 function init(){
     // run after document is loaded
@@ -116,9 +116,8 @@ function drawMap(response) {
         var l = map.layers[i];
         var lc = '#layer' + i;
 
-        // layer 0 always starts open, so turn on led
         var led_index = ( map.layers[i].isBaseLayer ? 2 : 0 );
-        if ( i == 0 ) { led_index++ };
+        if ( i == 0 ) { led_index++ }; // layer 0 always starts open, so turn on led
 
         //var lvis = l.isBaseLayer ?
         //    '<input name="baselayer_visible" id="' + lc + '_show" type="radio"/>' :
@@ -192,7 +191,10 @@ function drawMap(response) {
             var n_index = ui.newHeader.attr('layer');
             if (map.layers[o_index].isBaseLayer) {
                 log.debug('layer ' + o_index + ' is baselayer');
-                ui.oldHeader.find('img.onoff').attr('src', leds[ 2 ]);
+                if (map.layers[n_index].isBaseLayer) {
+                    ui.oldHeader.find('img.onoff').attr('src', leds[ 2 ]);
+                    log.debug('changing to base layer ' + n_index);
+                }
             } else {
                 map.layers[o_index].setVisibility( map.layers[o_index].sticky );
                 ui.oldHeader.find('img.onoff').attr('src', leds[ map.layers[o_index].sticky ? 1 : 0 ]);
