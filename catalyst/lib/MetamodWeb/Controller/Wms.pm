@@ -146,7 +146,7 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
     #);
 
     my $para = $c->request->params;
-    print STDERR Dumper $para;
+    #print STDERR Dumper $para;
     my $crs = $$para{'crs'};
     $c->detach( 'Root', 'default' ) unless defined( $crs );
     my (%wmsurls, %layers, @nodes, @areas, @x, @y);
@@ -172,7 +172,7 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
         }
 
         $c->detach( 'Root', 'default' ) unless defined($url);
-        print STDERR ">>> $base $ds_id - $url\n";
+        #print STDERR ">>> $base $ds_id - $url\n";
 
         # store layernodes away for later
         foreach (@$layers) {
@@ -226,7 +226,7 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
         $root->appendChild($_);
     }
 
-    print STDERR $setup->toString;
+    #print STDERR $setup->toString;
 
     my $wmc = eval { $c->stash->{wmc}->setup2wmc($setup) };
     $wmc->documentElement->appendChild($setup->documentElement);

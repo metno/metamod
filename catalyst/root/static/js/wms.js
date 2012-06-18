@@ -95,7 +95,7 @@ function drawMap(response) {
 
     log.debug("Projection = " + map.projection);
 
-    map.addControl(layersw);
+    //map.addControl(layersw);
     //layersw.maximizeControl(true);
     map.addControl( new OpenLayers.Control.PanZoomBar() );
     map.addControl( new OpenLayers.Control.Navigation() );
