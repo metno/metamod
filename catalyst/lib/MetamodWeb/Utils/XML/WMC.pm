@@ -39,7 +39,7 @@ has 'c' => (
 );
 
 
-sub old_gen_wmc {
+sub old_gen_wmc { # DEPRECATED
 
     my ($self, $setup, $wmsurl) = @_;
 

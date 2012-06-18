@@ -30,7 +30,7 @@
         </script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/wms.js') %]"></script>
         <script type="text/javascript">
-            [% IF ! debug # disable logging in production %]
+            [% IF 1 # ! debug # disable logging in production %]
                 log = log4javascript.getNullLogger();
             [% END %]
         </script>
@@ -49,7 +49,7 @@
         <!--<div id="tags"></div>-->
 
         [% IF datasets.0.ds_id # size is 1 even if empty... %]
-        <form name="form1" id="form1" action="#" style="position: absolute; top: 0px; left: 05px; z-index: 1000">
+        <form name="form1" id="form1" action="#" style="position: absolute; top: 0px; left: 50px; z-index: 1000">
 
             <label>Dataset:
                 <select name="dataset"  id="dataset" onChange="changeFile(this[this.selectedIndex].value)">
@@ -61,6 +61,10 @@
 
             <span id="shortdesc"><!--Data file (direct): --></span>
 
+        </form>
+        [% ELSE %]
+        <form name="form1" id="form1" action="#" style="position: absolute; top: 0px; left: 50px; z-index: 1000">
+            <button type="button" onclick="history.back()">Back to menu</button>
         </form>
         [% END %]
 

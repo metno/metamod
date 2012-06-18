@@ -60,6 +60,7 @@
             div.list { font-size: smaller; padding-left: 20px; }
             h1 { font-size: large; }
             h3 { font-size: 14px; }
+            small.info { color: #aaa };
         </style>
 
     </head>
@@ -68,6 +69,7 @@
     <h1>WMS layers</h1>
 
     <form action="[% c.uri_for('/search/wms') %]" method="get">
+    <!--<form action="[% c.uri_for('/multiwmc') %]" method="get">-->
 
         [% inputs = 0; %]
 
@@ -81,24 +83,35 @@
             [% cap = ds.wmscap %]
 
             <div class="list">
-            [% FOREACH layer IN cap.findnodes('//*[local-name() = "Layer"]');
-                names = layer.getChildrenByLocalName('Name');
-                NEXT UNLESS names; # skip wrapping layers w/o data
-                name = names.first.textContent;
-                title = layer.getChildrenByLocalName('Title').first.textContent;
+                [% FOREACH layer IN cap.findnodes('//*[local-name() = "Layer"]');
+                    names = layer.getChildrenByLocalName('Name');
+                    NEXT UNLESS names; # skip wrapping layers w/o data
+                    name = names.first.textContent;
+                    title = layer.getChildrenByLocalName('Title').first.textContent;
 
-                projs = [];
-                FOREACH pl IN layer.findnodes('ancestor-or-self::*[local-name() = "Layer"]');
-                    FOREACH crs IN pl.getChildrenByLocalName('CRS');
-                        projs.push(crs.textContent);
+                    projs = [];
+                    FOREACH pl IN layer.findnodes('ancestor-or-self::*[local-name() = "Layer"]');
+                        FOREACH crs IN pl.getChildrenByLocalName('CRS');
+                            projs.push(crs.textContent);
+                        END;
+                        bbox = pl.findnodes('ancestor-or-self::*[local-name() = "Layer"]/*[local-name() = "BoundingBox"][1]');
                     END;
-                END;
 
-                projs = projs.sort.unique;
-            %]
+                    projs = projs.sort.unique;
+                %]
 
-                <input type="checkbox" class="layer" id="input[% inputs %]" name="layer_[% ds.ds_id %]" value="[% name %]"/>[% title %]
+                [% IF ds.wmsinfo.findnodes('//*[local-name() = "baselayer" and @name="' _ name _ '"]') %]
+                    <input type="checkbox" class="layer" id="input[% inputs %]" name="baselayer_[% ds.ds_id %]" value="[% name %]"/><b>[% title %]</b>
+                [% ELSE %]
+                    <input type="checkbox" class="layer" id="input[% inputs %]" name="layer_[% ds.ds_id %]" value="[% name %]"/>[% title %]
+                [% END %]
+
                 <!--<small style="color: #aaa">[% projs.join(' ') %]</small>-->
+                <small class="info">
+                    [% FOREACH a IN ["CRS", "minx", "maxx", "miny", "maxy"];
+                        a _ '=' _ bbox.getAttribute(a) _ ' ';
+                    END %]
+                </small>
                 <script type="text/javascript">
                     layerProjs.input[% inputs %] = [ [% '"' _ projs.join('","') _ '"' %] ];
                 </script>
@@ -115,10 +128,6 @@
             <select id="crs" name="crs" style="width:150px">
                 <!--<option disabled="disabled" selected="selected">No common projection</option>-->
             </select>
-            w <input size="7" name="left" value="-3000000"/>
-            n <input size="7" name="top" value="7000000"/>
-            e <input size="7" name="right" value="7000000"/>
-            s <input size="7" name="bottom" value="-3000000"/>
             <input type="submit" value="Visualize"/>
         </div>
 

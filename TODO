@@ -26,12 +26,13 @@ add packagees, update download docs in https://wiki.met.no/metamod/download
 find out how to move index link in html docs to left col
 
 how to spec boundingbox and maxextent (from getcap?)
+- must be reprojected, insolvable problem accd to trond
 
 multiple thumbnails in wmsinfo (for separate map and data layers)
 
 add timeslider in wms (from nrk)
-
-mark layerchanger title bar when visible 
+- nrk not gpl
+- port from trond's old geoext?
 
 DBIx::Class::Storage::DBI::Pg: DBD::Pg 2.9.2 or greater is strongly recommended
 
@@ -41,8 +42,13 @@ upgrade List::MoreUtils to 0.30 Thu 16 Dec 2010
 	  from the way that List::Util does it.
 
 test selector for multiple baselayers
+- last baselayer selected must remain with led on (guessing it should work)
 
 ++++++++ DONE ++++++++++++++
+
+only allow projections usable with selected layers in selector
+
+mark layerchanger title bar when visible 
 
 show visibility in layerselector
 

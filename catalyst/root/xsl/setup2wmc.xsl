@@ -48,20 +48,28 @@
     <xsl:variable name="capab" select="document($url)"/>
     <xsl:variable name="version" select="$capab/*/@version"/>
     <xsl:comment><xsl:value-of select="concat($name,' - wms ',$version)"/></xsl:comment>
-    <xsl:variable name="foo" select="$capab/*/wms:Capability/wms:Layer"/>
+    <!--<xsl:variable name="foo" select="$capab/*/wms:Capability/wms:Layer"/>-->
     <xsl:variable name="layer" select="$capab/descendant::wms:Layer[wms:Name=$name]"/>
     <!--check which WMS version the server actually returned-->
     <xsl:choose>
-      <xsl:when test="$version = '1.3.0'">
-       <xsl:apply-templates select="$capab/descendant::wms:Layer[wms:Name=$name]"/> <!--and ancestor-or-self::wms:CRS=$proj-->
+      <xsl:when test="$version = '1.3.0' and local-name()='baselayer'">
+         <xsl:apply-templates select="$capab/descendant::wms:Layer[wms:Name=$name]" mode="baselayer"/> <!--and ancestor-or-self::wms:CRS=$proj-->
       </xsl:when>
-      <xsl:when test="$version = '1.1.1'">
-        <xsl:apply-templates select="$capab/descendant::Layer[Name=$name]"/> <!--and ancestor-or-self::SRS=$proj-->
+      <xsl:when test="$version = '1.3.0' and local-name()='layer'">
+         <xsl:apply-templates select="$capab/descendant::wms:Layer[wms:Name=$name]" mode="layer"/> <!--and ancestor-or-self::wms:CRS=$proj-->
+      </xsl:when>
+      <xsl:when test="$version = '1.1.1' and local-name()='baselayer'">
+        <xsl:apply-templates select="$capab/descendant::Layer[Name=$name]" mode="baselayer"/> <!--and ancestor-or-self::SRS=$proj-->
+      </xsl:when>
+      <xsl:when test="$version = '1.1.1' and local-name()='layer'">
+        <xsl:apply-templates select="$capab/descendant::Layer[Name=$name]" mode="layer"/> <!--and ancestor-or-self::SRS=$proj-->
       </xsl:when>
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="//wms:Layer"> <!--Cap v 1.3.1-->
+  <!-- TODO: separate common elements in Layer templates with mode=layer into extra template... FIXME -->
+
+  <xsl:template match="//wms:Layer" mode="layer"> <!--Cap v 1.3.1-->
     <Layer queryable="{@queryable}" hidden="1">
       <Server service="OGC:WMS" version="1.1.1">
         <OnlineResource xlink:type="simple"
@@ -101,7 +109,86 @@
     </Layer>
   </xsl:template>
 
-  <xsl:template match="//Layer"> <!--Cap v 1.1.1-->
+  <xsl:template match="//wms:Layer" mode="baselayer"> <!--Cap v 1.3.1-->
+    <Layer queryable="{@queryable}" hidden="1">
+      <Server service="OGC:WMS" version="1.1.1">
+        <OnlineResource xlink:type="simple"
+            xlink:href="{/*/wms:Capability/wms:Request/wms:GetMap/wms:DCPType/wms:HTTP/wms:Get/wms:OnlineResource/@xlink:href}"/>
+      </Server>
+      <Name><xsl:value-of select="wms:Name"/></Name>
+      <Title><xsl:value-of select="wms:Title"/></Title>
+      <Abstract><xsl:value-of select="wms:Abstract"/></Abstract>
+
+      <xsl:for-each select="ancestor-or-self::wms:Layer/wms:CRS">
+        <!-- TODO: check rules if defined on multiple layers... sum or replacement? FIXME -->
+        <SRS><xsl:value-of select="."/></SRS>
+      </xsl:for-each>
+
+      <DimensionList>
+        <xsl:apply-templates select="wms:Dimension"/>
+      </DimensionList>
+
+      <FormatList>
+        <xsl:for-each select="/*/wms:Capability/wms:Request/wms:GetMap/wms:Format">
+          <Format>
+            <xsl:if test="text() = 'image/png'">
+              <xsl:attribute name="current">1</xsl:attribute>
+            </xsl:if>
+            <xsl:value-of select="."/>
+          </Format>
+        </xsl:for-each>
+      </FormatList>
+
+      <StyleList>
+        <xsl:apply-templates select="./wms:Style"/> <!--TODO set current=1-->
+      </StyleList>
+
+      <ol:transparent>false</ol:transparent>
+
+    </Layer>
+  </xsl:template>
+
+  <xsl:template match="//Layer" mode="layer"> <!--Cap v 1.1.1-->
+    <Layer queryable="{@queryable}" hidden="1">
+      <Server service="OGC:WMS" version="1.1.1">
+        <OnlineResource xlink:type="simple"
+            xlink:href="{/*/Capability/Request/GetMap/DCPType/HTTP/Get/OnlineResource/@xlink:href}"/>
+      </Server>
+      <Name><xsl:value-of select="Name"/></Name>
+      <Title><xsl:value-of select="Title"/></Title>
+      <Abstract><xsl:value-of select="Abstract"/></Abstract>
+
+      <xsl:for-each select="ancestor-or-self::Layer/SRS">
+        <!-- TODO: check rules if defined on multiple layers... sum or replacement? FIXME -->
+        <SRS><xsl:value-of select="."/></SRS>
+      </xsl:for-each>
+
+      <DimensionList>
+        <xsl:apply-templates select="Extent"/>
+      </DimensionList>
+
+      <FormatList> <!--merge with above-->
+        <xsl:for-each select="/*/Capability/Request/GetMap/Format">
+          <Format>
+            <xsl:if test="text() = 'image/png'">
+              <xsl:attribute name="current">1</xsl:attribute>
+            </xsl:if>
+            <xsl:value-of select="."/>
+          </Format>
+        </xsl:for-each>
+      </FormatList>
+
+      <StyleList>
+        <xsl:apply-templates select="./Style"/> <!--TODO set current=1-->
+      </StyleList>
+
+      <ol:transparent>true</ol:transparent>
+      <ol:opacity>0.6</ol:opacity>
+
+    </Layer>
+  </xsl:template>
+
+  <xsl:template match="//Layer" mode="baselayer"> <!--Cap v 1.1.1-->
     <Layer queryable="{@queryable}" hidden="1">
       <Server service="OGC:WMS" version="1.1.1">
         <OnlineResource xlink:type="simple"

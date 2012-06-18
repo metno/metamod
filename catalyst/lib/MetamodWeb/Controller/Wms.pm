@@ -36,10 +36,12 @@ use Moose;
 use namespace::autoclean;
 use Data::Dumper;
 use Try::Tiny;
+use List::Util qw(min max sum);
 use XML::LibXML;
 use MetamodWeb::Utils::XML::Generator;
 use MetamodWeb::Utils::XML::WMC;
 use Metamod::WMS;
+use Geo::Proj4;
 
 BEGIN { extends 'MetamodWeb::BaseController::Base'; }
 
@@ -109,6 +111,28 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
 
 }
 
+=head2 multiwmc
+
+This returns a WMC document containing layers from different datasets.
+
+Parameters:
+
+=head3 layer_nnn
+
+where nnn is the ds_id and value is the WMS Name of the layer. Repeated for each layer
+
+=head3 crs
+
+projection for the map tiles
+
+=head3 left
+=head3 top
+=head3 right
+=head3 bottom
+
+Bounding box coordinates as in the given projection
+
+=cut
 
 sub multiwmc :Path("/multiwmc") :Args(0) {
     my ( $self, $c ) = @_;
@@ -122,29 +146,87 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
     #);
 
     my $para = $c->request->params;
-    my (%wmsurls, %layers);
+    print STDERR Dumper $para;
+    my $crs = $$para{'crs'};
+    $c->detach( 'Root', 'default' ) unless defined( $crs );
+    my (%wmsurls, %layers, @nodes, @areas, @x, @y);
 
-    my $setup = defaultWMC($para);
-    my $root = $setup->documentElement;
+    # move processing stuff below to utils... FIXME
+
     my $nsURI = 'http://www.met.no/schema/metamod/ncWmsSetup';
 
     foreach (keys %$para) {
-        next unless my ($ds_id) = /^layer_(\d+)$/;
+        next unless my ($base, $ds_id) = /^(base)?layer_(\d+)$/;
+        $base ||= '';
 
         my $url;
         my $layers = ref($$para{$_}) eq 'ARRAY' ? $$para{$_} : [ $$para{$_} ];
+
         if( my $ds = $c->model('Metabase')->resultset('Dataset')->find( $ds_id ) ){
             $url = $ds->wmsinfo->findvalue('/*/@url');
+            # store away bounding box areas
+            my ($anode) = $ds->wmsinfo->getElementsByLocalName('displayArea');
+            my $area = {};
+            map { $$area{$_} = $anode->getAttribute($_); } qw(crs left right bottom top);
+            push @areas, $area;
         }
-        $c->detach( 'Root', 'default' ) unless defined($url);
-        #print STDERR ">>> $ds_id - $url\n";
 
+        $c->detach( 'Root', 'default' ) unless defined($url);
+        print STDERR ">>> $base $ds_id - $url\n";
+
+        # store layernodes away for later
         foreach (@$layers) {
-            my $layernode = $root->addNewChild( $nsURI, 'layer');
+            my $layernode = XML::LibXML::Element->new( "${base}layer" ); # $root->addNewChild( $nsURI, 'layer' );
+            $layernode->setNamespace( $nsURI );
             $layernode->setAttribute( 'url', $url );
-            $layernode->setAttribute( 'name', $_);
+            $layernode->setAttribute( 'name', $_ );
+            push @nodes, $layernode;
         }
     }
+
+    #print STDERR Dumper \@areas;
+    # stupid proj doesn't like upper case proj names
+    my $to = Geo::Proj4->new( init => lc($crs) ) or die Geo::Proj4->error . "for $crs";
+    #my $to = _newProj( $crs );
+
+    foreach (@areas) {
+        #printf STDERR ">>>>>>>> From %s to %s\n", $_->{'crs'}, $crs;
+        my $from = Geo::Proj4->new( init => lc($_->{'crs'}) ) or die Geo::Proj4->error;
+        #my $from = _newProj( $_->{'crs'} );
+        my @corners = (
+            [ $_->{'left' }, $_->{'bottom'} ],
+            [ $_->{'left' }, $_->{'top'   } ],
+            [ $_->{'right'}, $_->{'bottom'} ],
+            [ $_->{'right'}, $_->{'top'   } ],
+        );
+        my $pr = $from->transform($to, \@corners);
+        #print STDERR Dumper \@corners, $pr;
+        foreach (@$pr) {
+            push @x, $_->[0];
+            push @y, $_->[1];
+        }
+    }
+
+    #print STDERR 'x = ' . Dumper \@x;
+    #print STDERR 'y = ' . Dumper \@y;
+
+    my ($left, $right, $top, $bottom);
+
+    my $setup = defaultWMC({
+        crs    => $crs,
+        left   => min(@x),
+        right  => max(@x),
+        bottom => min(@y),
+        top    => max(@y),
+        time   => $$para{'time'},
+    });
+
+    my $root = $setup->documentElement;
+    foreach (@nodes) {
+        $root->appendChild($_);
+    }
+
+    print STDERR $setup->toString;
 
     my $wmc = eval { $c->stash->{wmc}->setup2wmc($setup) };
     $wmc->documentElement->appendChild($setup->documentElement);
@@ -155,6 +237,21 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
     $c->response->content_type('text/xml');
     $c->response->body( $out );
 
+}
+
+sub _newProj {
+    my $crs = lc(shift) or die;
+    if ($crs eq 'crs:84') {
+        return Geo::Proj4->new( '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs' )
+            or die Geo::Proj4->error . " for CRS:84";
+    } else {
+        return Geo::Proj4->new( init => $crs )
+            or die Geo::Proj4->error . " for $crs";
+    }
+    #return ($crs eq 'crs:84') ?
+    #    Geo::Proj4->new( '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs' ) :
+    #    Geo::Proj4->new( init => $crs )
+    #or die Geo::Proj4->error . " for $crs";
 }
 
 =head2 qtips
