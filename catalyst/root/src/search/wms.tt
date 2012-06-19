@@ -4,6 +4,8 @@
         <title>WMS client</title>
         <link rel="stylesheet" href="[% c.uri_for('/static/css/reset.css') %]" />
         <link rel="stylesheet" href="[% c.uri_for('/static/css/base.css') %]" />
+        <link rel="stylesheet" href="[% c.uri_for('/static/css/main.css') %]" />
+
         <link rel="stylesheet" href="[% c.uri_for('/static/css/openlayers_theme/default/style.css') %]" type="text/css" />
         <!--link rel="stylesheet" href="style.css" type="text/css" /-->
         <link rel="stylesheet" href="[% c.uri_for('/static/css/wms.css') %]" type="text/css" />
@@ -57,7 +59,7 @@
                         <option value="[% ds.ds_id %]">[% ds.ds_name %]</option>
                     [% END %]
                 </select>
-            </label> [% datasets.size %]
+            </label> [% # datasets.size %]
 
             <span id="shortdesc"><!--Data file (direct): --></span>
 

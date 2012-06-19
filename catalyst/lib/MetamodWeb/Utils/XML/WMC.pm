@@ -55,18 +55,6 @@ sub old_gen_wmc { # DEPRECATED
         #printf STDERR " -- %s = %s\n", $k, $v;
     }
 
-    #%bbox = ( # wmsdiana test hack - FIXME
-    #    crs     => 'EPSG:432600',
-    #    #crs     => 'EPSG:4326',
-    #    #crs     => 'EPSG:42000',
-    #    left    => 0,
-    #    bottom  => 30,
-    #    right   => 60,
-    #    top     => 90,
-    #    time    => $time,
-    #    transparent => 'true', # FIXME handle via wmssetup instead
-    #) if defined $wmsurl && $wmsurl =~ q|^http://dev-vm202/|;
-
     $bbox{units} = $setupxc->findvalue('/*/s:layer');
 
 

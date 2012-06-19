@@ -25,14 +25,10 @@ add packagees, update download docs in https://wiki.met.no/metamod/download
 
 find out how to move index link in html docs to left col
 
-how to spec boundingbox and maxextent (from getcap?)
-- must be reprojected, insolvable problem accd to trond
-
-multiple thumbnails in wmsinfo (for separate map and data layers)
-
 add timeslider in wms (from nrk)
 - nrk not gpl
 - port from trond's old geoext?
+- use openlayers-timeslider from HALO... needs jquery 1.8 (we have 1.4)
 
 DBIx::Class::Storage::DBI::Pg: DBD::Pg 2.9.2 or greater is strongly recommended
 
@@ -41,10 +37,21 @@ upgrade List::MoreUtils to 0.30 Thu 16 Dec 2010
 	  a warning that some people were seeing. The new approach is taken
 	  from the way that List::Util does it.
 
-test selector for multiple baselayers
-- last baselayer selected must remain with led on (guessing it should work)
+wms thumbnails:
+- multiple thumbnails in wmsinfo (for separate map and data layers)
+- swap z-order so map is baselayer and data transparent
+- read wmsthumbs in wmslist from capab
+- cache wmsthums from capab in database when changing wmsinfo
 
 ++++++++ DONE ++++++++++++++
+
+refresh proj list in wmslist on history.back()
+
+how to spec boundingbox and maxextent (from getcap?)
+- must be reprojected, insolvable problem accd to trond
+
+test selector for multiple baselayers
+- last baselayer selected must remain with led on (guessing it should work)
 
 only allow projections usable with selected layers in selector
 

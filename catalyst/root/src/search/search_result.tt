@@ -87,13 +87,14 @@ jQuery(document).ready( function () {
                     <a class="btn" href="[% c.uri_for( '/search/add_to_basket', dataset.ds_id, c.req.params ) %]"
                        title="Add all child dataset to the collection basket"><span>Add to basket</span></a><br clear="all"/>
                     [% c.req.params.delete('return_path') %]
+                [% ELSIF dataset.wmsinfo != '' %]
+                    <a class="btn" href="[% c.uri_for( '/search/add_to_basket', dataset.ds_id ) %]"
+                       title="Add aggregated dataset to the collection basket"><span>Add to basket</span></a><br clear="all"/>
                 [% END %]
                 [% IF dataset.wmsinfo != '' %]
                     [% SET ds2show = (dataset.num_children() != 0) ? dataset.child_datasets.0 : dataset %]
                     [% SET thumbsize = 64 %]
                     [% SET wmsthumb = ds2show.wmsthumb(thumbsize) %]
-                    <a class="btn" href="[% c.uri_for( '/search/add_to_basket', dataset.ds_id ) %]"
-                       title="Add aggregated dataset to the collection basket"><span>Add to FUBAR</span></a><br clear="all"/>
                     <a class="visual" href="[% c.uri_for('/search/wms') %]?ds_id=[% ds2show.ds_id %]"><span>Visualize</span></a><br clear="all"/>
                     [% IF wmsthumb.outline %]
                         <div class="wmsthumb"
