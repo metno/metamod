@@ -28,6 +28,7 @@ use Data::Dumper;
 
 use MetamodWeb::Utils::UI::Search;
 use MetamodWeb::Utils::SearchUtils;
+use Metamod::WMS;
 
 BEGIN {extends 'MetamodWeb::BaseController::Base'; }
 
@@ -338,7 +339,7 @@ sub wmslist :Path('/search/wmslist') :Args {
         push @$dslist, $ds;
     }
     #print STDERR Dumper \$dslist;
-    $c->stash( datasets => $dslist );
+    $c->stash( datasets => $dslist, projections => Metamod::WMS::projList() );
 
 }
 

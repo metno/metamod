@@ -9,7 +9,7 @@ use Data::Dumper;
 use Metamod::Config;
 use Log::Log4perl qw();
 use Metamod::FimexProjections;
-use Metamod::WMS;
+use Metamod::WMS qw(getProjMap getXML);
 
 my $logger = Log::Log4perl::get_logger(__PACKAGE__);
 
@@ -405,7 +405,7 @@ sub wmsthumb {
         }
         $layer{url} = $wms_url unless exists $layer{url};
 
-        #print STDERR "*******************************\n" . Dumper \%layer;
+        print STDERR "*******************************\n" . Dumper \%layer;
 
         # find area info (dimensions, projection)
         foreach ( $sxc->findnodes('/*/s:displayArea[1]/@*') ) {
@@ -413,27 +413,27 @@ sub wmsthumb {
         }
 
         # build WMS params for maps
-        my @t = gmtime(time); my ($d, $m, $h) = ($t[3], $t[4]+1, $t[2]+1); # HACK HACK HACK
+        my @t = gmtime(time); my ($year, $day, $month, $hour) = ($t[5]+1900, $t[3], $t[4]+1, $t[2]+1); # HACK HACK HACK
+        my $time = $layer{time}; # || "[yyyy]-[mm]-[dd]T[hh]:00"; # too simplistic to work...
+        #$time =~ s|\[yyyy\]|$year|g;
+        #$time =~ s|\[mm\]|$month|g;
+        #$time =~ s|\[dd\]|$day|g;
+        #$time =~ s|\[hh\]|$hour|g;
+        #print STDERR Dumper \$time;
         my $wmsparams = "SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&FORMAT=image%2Fpng"
             . "&SRS=$area{crs}&BBOX=$area{left},$area{bottom},$area{right},$area{top}&WIDTH=$size&HEIGHT=$size"
             . "&EXCEPTIONS=application%2Fvnd.ogc.se_inimage"
-            . ($thumbnail ? "&TIME=2012-$m-${d}T18:00" : ''); # HACK HACK FIXME
+            . ($time ? "&TIME=$time" : '');
 
         # get map url's according to projection
-        my $mapserver = $config->get('WMS_BACKGROUND_MAPSERVER');
-        my $map = $config->get('WMS_WORLD_MAP');
-        if ($area{crs} eq "EPSG:32661") {
-            $map = $config->get('WMS_NORTHPOLE_MAP');
-        } elsif ($area{crs} eq "EPSG:32761") {
-            $map = $config->get('WMS_SOUTHPOLE_MAP');
-        }
+        my $mapurl = getProjMap( $area{crs} );
 
-        #print STDERR Dumper($wms_url, \%area, \%layer ); #$metadata
+        #print STDERR Dumper($wms_url, \%area, \%layer, \$mapurl); #$metadata
 
         my $out = {
             xysize  => $size,
             datamap => "$layer{url}?$wmsparams&LAYERS=$layer{name}&STYLES=$layer{style}",
-            outline => $thumbnail ? undef : "$mapserver$map?$wmsparams&TRANSPARENT=true&LAYERS=borders&STYLES=",
+            outline => $mapurl ? "$mapurl?$wmsparams&TRANSPARENT=true&LAYERS=borders&STYLES=" : undef,
             wms_url => $wms_url,
         };
 

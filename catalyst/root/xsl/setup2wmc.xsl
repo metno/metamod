@@ -53,23 +53,23 @@
     <!--check which WMS version the server actually returned-->
     <xsl:choose>
       <xsl:when test="$version = '1.3.0' and local-name()='baselayer'">
-         <xsl:apply-templates select="$capab/descendant::wms:Layer[wms:Name=$name]" mode="baselayer"/> <!--and ancestor-or-self::wms:CRS=$proj-->
+         <xsl:apply-templates select="$capab/descendant::wms:Layer[wms:Name=$name]" mode="baselayer"/>
       </xsl:when>
       <xsl:when test="$version = '1.3.0' and local-name()='layer'">
-         <xsl:apply-templates select="$capab/descendant::wms:Layer[wms:Name=$name]" mode="layer"/> <!--and ancestor-or-self::wms:CRS=$proj-->
+         <xsl:apply-templates select="$capab/descendant::wms:Layer[wms:Name=$name]" mode="layer"/>
       </xsl:when>
       <xsl:when test="$version = '1.1.1' and local-name()='baselayer'">
-        <xsl:apply-templates select="$capab/descendant::Layer[Name=$name]" mode="baselayer"/> <!--and ancestor-or-self::SRS=$proj-->
+        <xsl:apply-templates select="$capab/descendant::Layer[Name=$name]" mode="baselayer"/>
       </xsl:when>
       <xsl:when test="$version = '1.1.1' and local-name()='layer'">
-        <xsl:apply-templates select="$capab/descendant::Layer[Name=$name]" mode="layer"/> <!--and ancestor-or-self::SRS=$proj-->
+        <xsl:apply-templates select="$capab/descendant::Layer[Name=$name]" mode="layer"/>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
 
   <!-- TODO: separate common elements in Layer templates with mode=layer into extra template... FIXME -->
 
-  <xsl:template match="//wms:Layer" mode="layer"> <!--Cap v 1.3.1-->
+  <xsl:template match="//wms:Layer" mode="layer"> <!--Capabilities 1.3.1-->
     <Layer queryable="{@queryable}" hidden="1">
       <Server service="OGC:WMS" version="1.1.1">
         <OnlineResource xlink:type="simple"
@@ -109,7 +109,7 @@
     </Layer>
   </xsl:template>
 
-  <xsl:template match="//wms:Layer" mode="baselayer"> <!--Cap v 1.3.1-->
+  <xsl:template match="//wms:Layer" mode="baselayer"> <!--Capabilities 1.3.1-->
     <Layer queryable="{@queryable}" hidden="1">
       <Server service="OGC:WMS" version="1.1.1">
         <OnlineResource xlink:type="simple"
@@ -148,7 +148,7 @@
     </Layer>
   </xsl:template>
 
-  <xsl:template match="//Layer" mode="layer"> <!--Cap v 1.1.1-->
+  <xsl:template match="//Layer" mode="layer"> <!--Capabilities 1.1.1-->
     <Layer queryable="{@queryable}" hidden="1">
       <Server service="OGC:WMS" version="1.1.1">
         <OnlineResource xlink:type="simple"
@@ -188,7 +188,7 @@
     </Layer>
   </xsl:template>
 
-  <xsl:template match="//Layer" mode="baselayer"> <!--Cap v 1.1.1-->
+  <xsl:template match="//Layer" mode="baselayer"> <!--Capabilities 1.1.1-->
     <Layer queryable="{@queryable}" hidden="1">
       <Server service="OGC:WMS" version="1.1.1">
         <OnlineResource xlink:type="simple"

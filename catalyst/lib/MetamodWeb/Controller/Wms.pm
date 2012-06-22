@@ -138,12 +138,6 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
     my ( $self, $c ) = @_;
 
     my $mm_config = $c->stash->{ mm_config };
-    #my $bgurl = $mm_config->get('WMS_BACKGROUND_MAPSERVER');
-    #my bgmaps = (
-    #    '' => $bgurl . $mm_config->get('WMS_NORTHPOLE_MAP'),
-    #    '' => $bgurl . $mm_config->get('WMS_SOUTHPOLE_MAP'),
-    #    '' => $bgurl . $mm_config->get('WMS_WORLD_MAP'),
-    #);
 
     my $para = $c->request->params;
     #print STDERR Dumper $para;

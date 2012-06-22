@@ -22,14 +22,13 @@
             var layerProjs = {};
 
             var projNames = {
-                'EPSG:32661': 'WGS 84 / UPS North',
-                'EPSG:32761': 'WGS 84 / UPS South',
-                'EPSG:3411':  'NSIDC Sea Ice Polar Stereographic North',
-                'EPSG:3412':  'NSIDC Sea Ice Polar Stereographic South',
-                'EPSG:3413':  'WGS 84 / NSIDC Sea Ice Polar Stereographic North',
-                'EPSG:3995':  'WGS 84 / Arctic Polar Stereographic',
-                'EPSG:32633': 'WGS 84 / UTM zone 33N',
-                'EPSG:4326':  'WGS 84'
+                [%  # get list from Metamod::WMS
+                    jslines = [];
+                    FOR p IN projections.keys.sort;
+                        jslines.push("'" _ p _"': '" _ projections.$p.0 _ "'");
+                    END;
+                    jslines.join(",\n");
+                %]
             };
 
             function buildProjList() {
@@ -63,8 +62,8 @@
             }
 
             $(document).ready(function() {
-                // using bind instead of anon func makes it work even when using history.back()... don't ask why
-                $('.layer').bind('change', buildProjList);
+                $('.layer').bind('change', buildProjList); // fires whenever user (de)selects a layer
+                JQuery(buildProjList); // trying to make the menu rebuild when using history.back()...
             });
 
         </script>
@@ -96,7 +95,7 @@
             [% url = ds.wmsinfo.documentElement.getAttribute('url') _ '?service=WMS&version=1.3.0&request=GetCapabilities' %]
 
             <h3>
-                [% IF debug %]
+                [% IF 0 # debug %]
                     <a href="#" onclick="$(setup_[% ds.ds_id %]).toggle(800)">*</a>
                     <a href="[% url %]">[% ds.ds_id %]</a>:
                 [% END %]
@@ -107,11 +106,11 @@
 
             <div class="layers">
 
-                [%  cap = ds.wmscap;
+                [%  cap = ds.wmscap; # read in wms capabilities
                     SET thumbsize = 64;
                     SET wmsthumb = ds.wmsthumb(thumbsize);
                 %]
-                [% IF wmsthumb.outline %]
+                [% IF wmsthumb.outline # map countours as transparent overlay %]
                     <div class="wmsthumb"
                         style="position: absolute; height: [% thumbsize %]px; width: [% thumbsize %]px; z-index:12"
                         ><img src="[% wmsthumb.outline %]"/></div>
@@ -123,7 +122,7 @@
                 <div class="list">
                     [% FOREACH layer IN cap.findnodes('//*[local-name() = "Layer"]');
                         names = layer.getChildrenByLocalName('Name');
-                        NEXT UNLESS names; # skip wrapping layers w/o data
+                        NEXT UNLESS names; # skip wrapping layers w/o data (maybe better to check child layers? FIXME)
                         name = names.first.textContent;
                         title = layer.getChildrenByLocalName('Title').first.textContent;
 
@@ -144,12 +143,6 @@
                         <input type="checkbox" class="layer" id="input[% inputs %]" name="layer_[% ds.ds_id %]" value="[% name %]"/>[% title %]
                     [% END %]
 
-                    <!--<small style="color: #aaa">[% projs.join(' ') %]</small>-->
-                    <small class="info">
-                        [% # FOREACH a IN ["CRS", "minx", "maxx", "miny", "maxy"];
-                            # a _ '=' _ bbox.getAttribute(a) _ ' ';
-                        # END %]
-                    </small>
                     <script type="text/javascript">
                         layerProjs.input[% inputs %] = [ [% '"' _ projs.join('","') _ '"' %] ];
                     </script>

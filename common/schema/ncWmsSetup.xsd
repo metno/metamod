@@ -40,8 +40,9 @@
 
     <complexType name='Thumbnail'>
         <attribute name="name" type="string" use="required"/>
-        <attribute name="url" type="string" use="required"/>
+        <attribute name="url" type="string" use="optional"/>
         <attribute name="style" type="string" use="optional"/>
+        <attribute name="time" type="string" use="optional"/>
     </complexType>
 
 </schema>

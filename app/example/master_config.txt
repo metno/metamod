@@ -155,6 +155,17 @@ WMS_NORTHPOLE_MAP = northpole.map
 WMS_SOUTHPOLE_MAP = southpole.map
 WMS_WORLD_MAP     = world.map
 
+# list of supported projections (not yet implemented)
+WMS_PROJECTIONS =
+    'EPSG:32661' 'WGS 84 / UPS North'                               'http://wms.met.no/maps/northpole.map'
+    'EPSG:32761' 'WGS 84 / UPS South'                               'http://wms.met.no/maps/southpole.map'
+    'EPSG:3411'  'NSIDC Sea Ice Polar Stereographic North'
+    'EPSG:3412'  'NSIDC Sea Ice Polar Stereographic South'
+    'EPSG:3413'  'WGS 84 / NSIDC Sea Ice Polar Stereographic North'
+    'EPSG:3995'  'WGS 84 / Arctic Polar Stereographic'
+    'EPSG:32633' 'WGS 84 / UTM zone 33N'
+    'EPSG:4326'  'WGS 84'                                            'http://wms.met.no/maps/world.map'
+
 # ============ METAMODSEARCH configuration ==============
 
 # Max number of rows displayed for second level datasets with same parent:
