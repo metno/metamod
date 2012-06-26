@@ -1,3 +1,10 @@
+metno-metamod-2.11 (2.11.0-1) stable; urgency=low
+
+  [ geira ]
+  * Metamod 2.11 Test Release. See wiki for details
+
+ -- Geir Aalberg <geira@met.no>  Fri, 22 Jun 2012 14:57:13 +0200
+
 metno-metamod-2.10 (2.10.0-4) stable; urgency=low
 
   [ egils ]
