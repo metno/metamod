@@ -97,7 +97,7 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
         $setup = defaultWMC();
     }
 
-    my $wmc = eval { $c->stash->{wmc}->old_gen_wmc($setup, $wms) };
+    my $wmc = eval { $c->stash->{wmc}->old_gen_wmc($setup, $wms) }; # TODO rewrite to use gc2wmc instead - FIXME
     if ($@) {
         $self->logger->warn("old_gen_wmc failed: $@");
         error($c, 502, $@);
@@ -170,7 +170,7 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
 
         # store layernodes away for later
         foreach (@$layers) {
-            my $layernode = XML::LibXML::Element->new( "${base}layer" ); # $root->addNewChild( $nsURI, 'layer' );
+            my $layernode = XML::LibXML::Element->new( "${base}layer" );
             $layernode->setNamespace( $nsURI );
             $layernode->setAttribute( 'url', $url );
             $layernode->setAttribute( 'name', $_ );

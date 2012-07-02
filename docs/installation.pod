@@ -75,11 +75,13 @@ on how to obtain the packages manually.>
 =head3 Installing METAMOD and dependencies via apt
 
   $ sudo apt-get install metno-perl-webdev-ver1
-  $ sudo apt-get install metno-metamod-2.10
+  $ sudo apt-get install metno-metamod-2.11
 
 Alternately you may download the .deb files from repo.met.no and install manually.
 
-  $ sudo dpkg -i metno-metamod-2.10_2.10.0-3_all.deb
+  $ sudo dpkg -i metno-metamod-2.11_2.11.0-x_all.deb
+
+where 2.11.0-x is the latest version in the repository.
 
 =head2 Installation from source
 

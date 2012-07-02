@@ -28,7 +28,7 @@ for the specific application. These files are normally owned by root and will be
 placed in in <configuration dir>/etc, and then symlinked into F</etc/apache2> and
 F</etc/init.d>.
 
-  $ cd /opt/metno-metamod-2.10 # or elsewhere if installed from source
+  $ cd /opt/metno-metamod-2.11 # or elsewhere if installed from source
   $ ./install_jobs.sh <config>
 
 =head3 Users with restricted sudo privileges
@@ -227,23 +227,23 @@ This should start the required services daemons.
 
 Copy the example config:
 
-  $ cp -r /opt/metno-metamod-2.10/app/example .
+  $ cp -r /opt/metno-metamod-2.11/app/example .
 
 Then edit example/master_config.txt as needed. For local testing, set APPLICATION_USER to your own login.
 
-  $ /opt/metno-metamod-2.10/common/prepare_runtime_env.sh example
+  $ /opt/metno-metamod-2.11/common/prepare_runtime_env.sh example
 
-  $ export PERL5LIB=/opt/metno-metamod-2.10/common/lib:/opt/metno-metamod-2.10/catalyst/lib:/opt/metno-perl-webdev-ver1/lib/perl5
+  $ export PERL5LIB=/opt/metno-metamod-2.11/common/lib:/opt/metno-metamod-2.11/catalyst/lib:/opt/metno-perl-webdev-ver1/lib/perl5
 
 Try starting Catalyst:
 
-  $ /opt/metno-metamod-2.10/catalyst/script/metamodweb_server.pl -d example
+  $ /opt/metno-metamod-2.11/catalyst/script/metamodweb_server.pl -d example
 
 MetamodWeb should now be available on http://localhost:3000/. Stop with ctrl-c.
 
 To install all services:
 
-  $ /opt/metno-metamod-2.10/install_jobs.sh example
+  $ /opt/metno-metamod-2.11/install_jobs.sh example
 
 To start all services (substitute EXAMPLE with your APPLICATION_ID):
 

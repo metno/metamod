@@ -46,7 +46,7 @@ Catalyst controller for the search interface.
 
 =head2 auto
 
-Controller specific initisialisation for each request.
+Controller specific initialisation for each request.
 
 =cut
 

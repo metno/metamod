@@ -126,10 +126,10 @@
                         name = names.first.textContent;
                         title = layer.getChildrenByLocalName('Title').first.textContent;
 
-                        projs = [];
+                        projs = []; # get all projections for layer
                         FOREACH pl IN layer.findnodes('ancestor-or-self::*[local-name() = "Layer"]');
                             FOREACH crs IN pl.getChildrenByLocalName('CRS');
-                                projs.push(crs.textContent);
+                                projs.push(crs.textContent); # assuming union of all sets
                             END;
                             bbox = pl.findnodes('ancestor-or-self::*[local-name() = "Layer"]/*[local-name() = "BoundingBox"][1]');
                         END;
