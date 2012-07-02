@@ -405,7 +405,7 @@ sub wmsthumb {
         }
         $layer{url} = $wms_url unless exists $layer{url};
 
-        print STDERR "*******************************\n" . Dumper \%layer;
+        #print STDERR "*******************************\n" . Dumper \%layer;
 
         # find area info (dimensions, projection)
         foreach ( $sxc->findnodes('/*/s:displayArea[1]/@*') ) {
@@ -426,7 +426,8 @@ sub wmsthumb {
             . ($time ? "&TIME=$time" : '');
 
         # get map url's according to projection
-        my $mapurl = getProjMap( $area{crs} );
+        my $mapconf = getProjMap( $area{crs} ); # get map name in config
+        my $mapurl = $mapconf ? $config->get('WMS_BACKGROUND_MAPSERVER') . $config->get($mapconf) : undef;
 
         #print STDERR Dumper($wms_url, \%area, \%layer, \$mapurl); #$metadata
 

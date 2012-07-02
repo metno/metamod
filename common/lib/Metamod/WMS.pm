@@ -33,6 +33,20 @@
 
 =cut
 
+=head1 NAME
+
+Metamod::WMS - WMS helper methods
+
+=head1 SYNOPSIS
+
+  use Metamod::WMS;
+
+=head1 DESCRIPTION
+
+.....
+
+=cut
+
 package Metamod::WMS;
 use base qw(Exporter);
 use strict;
@@ -54,7 +68,7 @@ our @EXPORT = qw(logger param abandon getXML getSetup outputXML defaultWMC getPr
 my $q = CGI->new;
 my $parser = XML::LibXML->new;
 my $logger = get_logger('metamod.search');
-my $config = Metamod::Config->instance();
+#my $config = Metamod::Config->instance(); # can't use config since Metamod::DBIxSchema::Metabase::Result::Dataset fails... FIXME
 
 #sub new {
 #	bless [$q, $parser, $config, $logger], shift;
@@ -68,9 +82,12 @@ sub param {
 	return $q->param(shift);
 }
 
-####################
-# report error
-#
+=head2 abandon()
+
+Report error as HTML and die
+
+=cut
+
 sub abandon {
     my $text = shift || 'Something went wrong';
     my $status = shift || 500;
@@ -90,10 +107,12 @@ EOT
     die $text;
 }
 
+=head2 getXML()
 
-####################
-# webservice client
-#
+Fetch XML document from URL and parse as libxml DOM object
+
+=cut
+
 sub getXML {
     my $url = shift or die "Missing URL";
     $logger->debug('GET ' . $url);
@@ -114,9 +133,12 @@ sub getXML {
     }
 }
 
-####################
-# read setup file (or dummy if not given)
-#
+=head2 getSetup()
+
+read setup file (or dummy if not given)
+
+=cut
+
 sub getSetup {
 	my $setup_url = shift;
 	my $setup = $setup_url ? getXML($setup_url) : defaultWMC();
@@ -125,22 +147,28 @@ sub getSetup {
 	return ($setup, $sxc);
 }
 
-####################
-# webservice output
-#
+=head2 outputXML()
+
+output data to webservice
+
+=cut
+
 sub outputXML {
 	my ($ctype, $content) = @_;
 	print $q->header($ctype);
 	print $content;
 }
 
-####################
-# dummy WMCsetup document
-# used when using GetCapabilities instead of setup file
-#
+=head2 defaultWMC()
+
+Dummy WMCsetup document - used when using GetCapabilities instead of setup file
+
+=cut
+
 sub defaultWMC {
 	my $p = shift;
 
+	# the defaults only makes sense for north polar region data
 	my $crs    = $$p{crs}    || 'EPSG:32661';
 	my $left   = $$p{left}   || '-3000000';
 	my $right  = $$p{right}  ||  '7000000';
@@ -167,25 +195,54 @@ EOT
 
 my %projections = (
 	# WMS_PROJECTIONS in master_config
-    'EPSG:32661' => ['WGS 84 / UPS North', $config->get('WMS_NORTHPOLE_MAP')],
-    'EPSG:32761' => ['WGS 84 / UPS South', $config->get('WMS_SOUTHPOLE_MAP')],
+
+    'EPSG:32661' => ['WGS 84 / UPS North', 'WMS_NORTHPOLE_MAP'],
+    'EPSG:32761' => ['WGS 84 / UPS South', 'WMS_SOUTHPOLE_MAP'],
     'EPSG:3411'  => ['NSIDC Sea Ice Polar Stereographic North'],
     'EPSG:3412'  => ['NSIDC Sea Ice Polar Stereographic South'],
     'EPSG:3413'  => ['WGS 84 / NSIDC Sea Ice Polar Stereographic North'],
     'EPSG:3995'  => ['WGS 84 / Arctic Polar Stereographic'],
     'EPSG:32633' => ['WGS 84 / UTM zone 33N'],
-    'EPSG:4326'  => ['WGS 84', $config->get('WMS_WORLD_MAP')],
+    'EPSG:4326'  => ['WGS 84', 'WMS_WORLD_MAP'],
+
+    #'EPSG:32661' => ['WGS 84 / UPS North', $config->get('WMS_NORTHPOLE_MAP')],
+    #'EPSG:32761' => ['WGS 84 / UPS South', $config->get('WMS_SOUTHPOLE_MAP')],
+    #'EPSG:3411'  => ['NSIDC Sea Ice Polar Stereographic North'],
+    #'EPSG:3412'  => ['NSIDC Sea Ice Polar Stereographic South'],
+    #'EPSG:3413'  => ['WGS 84 / NSIDC Sea Ice Polar Stereographic North'],
+    #'EPSG:3995'  => ['WGS 84 / Arctic Polar Stereographic'],
+    #'EPSG:32633' => ['WGS 84 / UTM zone 33N'],
+    #'EPSG:4326'  => ['WGS 84', $config->get('WMS_WORLD_MAP')],
+
 );
+
+=head2 getProjName()
+
+Look up a descriptive name for a given EPSG code
+
+=cut
 
 sub getProjName {
 	my $code = shift or die;
 	return $projections{$code}->[0];
 }
 
+=head2 getProjMap()
+
+Look up a WMS url for any background map configured for a given EPSG code
+
+=cut
+
 sub getProjMap {
 	my $code = shift or die;
-	return $config->get('WMS_BACKGROUND_MAPSERVER') . $projections{$code}->[1];
+	return $projections{$code}->[1];
 }
+
+=head2 projList()
+
+Return the list of defined projections (used in templates to generate menus)
+
+=cut
 
 sub projList {
 	return \%projections;
@@ -193,18 +250,3 @@ sub projList {
 
 1;
 
-=head1 NAME
-
-Metamod::WMS - WMS helper methods
-
-=head1 SYNOPSIS
-
-  use Metamod::WMS;
-
-
-=head1 DESCRIPTION
-
-.....
-
-
-=cut
