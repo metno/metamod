@@ -75,9 +75,9 @@ jQuery(document).ready( function () {
             <br/>
 
             <div class="btns" _class="dataset_actions">
-                <a class="btn" href="[% c.uri_for( '/dataset', dataset.ds_id, 'xml' ) %]" target="_blank" title="Show the raw XML metadata for this file in a separate windows"><span>Show xml</span></a><br />
+                <a class="btn" href="[% c.uri_for( '/dataset', dataset.ds_id, 'xml' ) %]" target="_blank" title="Show the raw XML metadata for this file in a separate windows"><span>Show xml</span></a><br clear="all"/>
                 [% IF dataset.num_children() != 0 %]
-                    <a class="btn" href="[% c.uri_for( '/dataset', dataset.ds_id, 'rss' ) %]" target="_blank" title="The RSS feed for this dataset. The RSS feed will notify you about any new datafiles associated with this dataset"><span>RSS Feed</span></a><br />
+                    <a class="btn" href="[% c.uri_for( '/dataset', dataset.ds_id, 'rss' ) %]" target="_blank" title="The RSS feed for this dataset. The RSS feed will notify you about any new datafiles associated with this dataset"><span>RSS Feed</span></a><br clear="all"/>
 
                     [% IF mm_config.get('SUBSCRIPTION_ENABLED') == 'ENABLED' and search_ui_utils.dataset_in_userbase(dataset) %]
                         <a class="btn" href="[% c.uri_for( '/subscription', dataset.unqualified_ds_name() ) %]" title="Setup a subscription to get notified about new datafiles (requires login)"><span>Subscribe</span></a><br />
