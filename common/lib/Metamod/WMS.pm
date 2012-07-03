@@ -66,7 +66,7 @@ our @EXPORT = qw(logger param abandon getXML getSetup outputXML defaultWMC getPr
 #
 
 my $q = CGI->new;
-my $parser = XML::LibXML->new;
+my $parser = XML::LibXML->new( load_ext_dtd => 0 );
 my $logger = get_logger('metamod.search');
 #my $config = Metamod::Config->instance(); # can't use config since Metamod::DBIxSchema::Metabase::Result::Dataset fails... FIXME
 
