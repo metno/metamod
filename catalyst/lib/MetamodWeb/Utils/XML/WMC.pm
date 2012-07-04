@@ -26,6 +26,7 @@ use Moose;
 use namespace::autoclean;
 use XML::LibXML::XPathContext;
 use Metamod::WMS;
+use Metamod::Config qw(getProjMap);
 use Carp;
 use Data::Dumper;
 
@@ -76,13 +77,12 @@ sub old_gen_wmc { # DEPRECATED
     # sort layers & styles
     #
     my $newlayers = $results->createElementNS($wmcns, 'LayerList');
-    my $defaultlayer;
+    my $hidden = 0;
 
     # loop thru layers in setup file
     foreach my $setuplayer ( $setupxc->findnodes('/*/s:layer|/*/s:baselayer') ) {
         my $lname = $setuplayer->getAttribute('name');
-        if ($lname eq '*') {
-            $defaultlayer = $setuplayer;
+        if ($lname eq '*') { # DEPRECATED
             next;
         }
 
@@ -112,7 +112,7 @@ sub old_gen_wmc { # DEPRECATED
                 $gclayer->addNewChild( 'http://openlayers.org/context', 'ol:transparent' )->appendTextNode('true');
                 $gclayer->addNewChild( 'http://openlayers.org/context', 'ol:opacity' )->appendTextNode('0.6');
             }
-            $gclayer->setAttribute('hidden', 0);
+            $gclayer->setAttribute('hidden', $hidden++&&1); # sets all layers in wmsinfo visible
 
             # move priority layer to new list
             $newlayers->appendChild( $layerlist->removeChild($gclayer) );
@@ -123,13 +123,8 @@ sub old_gen_wmc { # DEPRECATED
     foreach ($gcxc->findnodes("v:Layer[not(child::v:Layer)]", $layerlist)) {
         #$_->setAttribute('hidden', 1) if $gcxc->findvalue('v:Name', $_) eq 'diana'; # FIXME
 
-        #if (defined $defaultlayer && $defaultlayer->getAttribute('transparent') eq 'true') { # removed transp attr
-            $_->addNewChild( 'http://openlayers.org/context', 'ol:transparent' )->appendTextNode('true');
-            $_->addNewChild( 'http://openlayers.org/context', 'ol:opacity' )->appendTextNode('0.6');
-        #} else {
-        #    # default is currently baselayer... FIXME (must get background map into wmc first)
-        #    $_->addNewChild( 'http://openlayers.org/context', 'ol:transparent' )->appendTextNode('false');
-        #}
+        $_->addNewChild( 'http://openlayers.org/context', 'ol:transparent' )->appendTextNode('true');
+        $_->addNewChild( 'http://openlayers.org/context', 'ol:opacity' )->appendTextNode('0.6');
 
         $newlayers->appendChild( $layerlist->removeChild($_));
     }
@@ -141,14 +136,10 @@ sub old_gen_wmc { # DEPRECATED
     #
     # copy background map layers to wmc
     #
-    my %coastlinemaps = ( # TODO: read from master_config... FIXME
-        "EPSG:4326"  => "http://wms.met.no/maps/world.map",
-        "EPSG:32661" => "http://wms.met.no/maps/northpole.map",
-        "EPSG:32761" => "http://wms.met.no/maps/southpole.map",
-    );
-
-    if (my $mapurl = $coastlinemaps{ $bbox{'crs'}||'' }) {
+    if ( my $mapconf = getProjMap( $bbox{'crs'} ) ) {
         #printf STDERR "*** Getting map for %s\n", $bbox{'crs'};
+        my $config = Metamod::Config->instance();
+        my $mapurl = $config->get('WMS_BACKGROUND_MAPSERVER') . $config->get($mapconf);
 
         my $mapdoc = $self->gc2wmc($mapurl, \%bbox);
         my $mapxc = XML::LibXML::XPathContext->new( $mapdoc ); # getcapabilities xpath context
