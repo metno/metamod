@@ -1,0 +1,28 @@
+=head1 Upgrading METAMOD
+
+How to upgrade older versions of METAMOD.
+
+=over 4
+
+=item L<Version 2.8|metamod_28>
+
+Upgrading METAMOD 2.6/2.7 to 2.8
+
+=item L<Version 2.9|metamod_29>
+
+Upgrading METAMOD 2.8 to 2.9
+
+=item L<Version 2.10|metamod_210>
+
+Upgrading METAMOD 2.9 to 2.10
+
+=item L<Version 2.11|metamod_211>
+
+Upgrading METAMOD 2.10 to 2.11
+
+=back
+
+L<Main menu|../index>
+
+METAMOD is copyright L<The Norwegian Meteorological Institute|http://met.no>.
+METAMOD is free software, released under the L<GNU General Public License, version 2|http://www.gnu.org/licenses/gpl-2.0.html>.

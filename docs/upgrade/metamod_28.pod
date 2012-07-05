@@ -13,7 +13,7 @@ Upgrading is mostly the same as 2.6.
 
 =item staticdata/searchdata.xml
 
-All <sc id=“x” type=“x”…> have change to <sc id=“1” idname=“activity_types” type=“basickey”…> (named ids + named rather than numeric types), see app/example for names and types.
+All <sc id="x" type="x"...> have change to <sc id="1" idname="activity_types" type="basickey"...> (named ids + named rather than numeric types), see app/example for names and types.
 
 Add dataset_file_location and dataset_file_size (see app/example):
 

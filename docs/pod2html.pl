@@ -5,8 +5,15 @@ use warnings;
 
 my $pod = Metamod::Pod::Simple::HTML->new;
 $pod->index(1);
-$pod->html_css('mmdocs.css?view=co');
-$pod->parse_from_file( @ARGV );
+
+foreach (@ARGV) {
+    if (/upgrade/) {
+        $pod->html_css( '../mmdocs.css?view=co' );
+    } else {
+        $pod->html_css( 'mmdocs.css?view=co' );
+    }
+    $pod->parse_from_file($_);
+}
 
 # move this to lib later
 
@@ -27,12 +34,16 @@ sub do_link {
     return $self->SUPER::do_link($token) unless $type eq 'pod';
 
     if ($section) {
-        # stole this part from Marcus Ramberg... seems to work
-        #$section = "#$section"
-            #if defined $section and length $section;
-        #$self->{base} . "$link$section";
-        return $self->{base}||'' . "#$section";
-        # TODO - make anchors for head2
+        if ($link) {
+            return "./" . $$link[2] . '/' . $$section[2] . ".html?view=co";
+        } else {
+            # stole this part from Marcus Ramberg... seems to work
+            #$section = "#$section"
+                #if defined $section and length $section;
+            #$self->{base} . "$link$section";
+            return $self->{base}||'' . "#$section";
+            # TODO - make anchors for head2
+        }
     } elsif ($link) {
         return "./" . $$link[2] . ".html?view=co";
     }

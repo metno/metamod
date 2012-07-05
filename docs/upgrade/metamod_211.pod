@@ -1,12 +1,18 @@
 =head1 Upgrading to METAMOD 2.11 from 2.10
 
-No change is necessary apart from updating the code since the only new features
+Upgrading to 2.11 only consists of stopping all services, installing the new
+version, running the install_jobs script and restarting the services as described
+in L<Deploying|../deploying>.
+
+No change in configuration is necessary  since the only new features
 are in the WMS client. To take advantage of these, some changes to the wmsinfo
 entries could be desired.
 
 =head2 WMSinfo format
 
-Old example:
+=head3 Old version 2.10
+
+Previously, the only directives available were B<displayArea> and B<layer>:
 
     <?xml version="1.0" encoding="UTF-8"?>
     <w:ncWmsSetup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -20,7 +26,22 @@ Old example:
 
     </w:ncWmsSetup>
 
-New version:
+=head3 New version 2.11
+
+Two more directives have been added:
+
+=over 4
+
+=item B<baselayer>
+
+This works like B<layer>, but specifies a non-transparent baselayer normally to be used
+for background maps.
+
+=item B<thumbnail>
+
+This is used to specify how the thumbnail in the search result should be setup
+
+=back
 
     <?xml version="1.0" encoding="UTF-8"?>
     <w:ncWmsSetup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -34,4 +55,9 @@ New version:
 
     </w:ncWmsSetup>
 
-More to come.... FIXME
+=head2 Obsolete directives
+
+These no longer have any effect in Metamod 2.11:
+
+    WMS_BACKGROUND_ISBASELAYER
+

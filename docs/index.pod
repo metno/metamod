@@ -19,6 +19,10 @@ The basic principles behind METAMOD
 
 How to get the METAMOD base software
 
+=item L<Upgrading|upgrade/index>
+
+Upgrading from an older version of METAMOD
+
 =item L<Deployment|deploying>
 
 Setting up a METAMOD application
