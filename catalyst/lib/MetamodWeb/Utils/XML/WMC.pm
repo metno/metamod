@@ -43,6 +43,7 @@ has 'c' => (
 sub old_gen_wmc { # DEPRECATED
 
     my ($self, $setup, $wmsurl) = @_;
+    die "Missing setup document" unless $setup;
 
     my $setupxc = XML::LibXML::XPathContext->new( $setup->documentElement() );
     $setupxc->registerNs('s', "http://www.met.no/schema/metamod/ncWmsSetup");

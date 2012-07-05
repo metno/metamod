@@ -190,11 +190,11 @@ sub defaultWMC {
 	$baselayer
 </w:ncWmsSetup>
 EOT
-	return $parser->parse_string($default_wmc);
+	return $parser->parse_string($default_wmc) or die "Error in parsing default WMC";
 }
 
 my %projections = (
-	# WMS_PROJECTIONS in master_config
+	# from 1.12, use WMS_PROJECTIONS in master_config instead of this hardcoded list
 
     'EPSG:32661' => ['WGS 84 / UPS North', 'WMS_NORTHPOLE_MAP'],
     'EPSG:32761' => ['WGS 84 / UPS South', 'WMS_SOUTHPOLE_MAP'],
@@ -204,15 +204,6 @@ my %projections = (
     'EPSG:3995'  => ['WGS 84 / Arctic Polar Stereographic'],
     'EPSG:32633' => ['WGS 84 / UTM zone 33N'],
     'EPSG:4326'  => ['WGS 84', 'WMS_WORLD_MAP'],
-
-    #'EPSG:32661' => ['WGS 84 / UPS North', $config->get('WMS_NORTHPOLE_MAP')],
-    #'EPSG:32761' => ['WGS 84 / UPS South', $config->get('WMS_SOUTHPOLE_MAP')],
-    #'EPSG:3411'  => ['NSIDC Sea Ice Polar Stereographic North'],
-    #'EPSG:3412'  => ['NSIDC Sea Ice Polar Stereographic South'],
-    #'EPSG:3413'  => ['WGS 84 / NSIDC Sea Ice Polar Stereographic North'],
-    #'EPSG:3995'  => ['WGS 84 / Arctic Polar Stereographic'],
-    #'EPSG:32633' => ['WGS 84 / UTM zone 33N'],
-    #'EPSG:4326'  => ['WGS 84', $config->get('WMS_WORLD_MAP')],
 
 );
 
