@@ -26,7 +26,7 @@ use Moose;
 use namespace::autoclean;
 use XML::LibXML::XPathContext;
 use Metamod::WMS;
-use Metamod::Config qw(getProjMap);
+#use Metamod::Config qw(getProjMap);
 use Carp;
 use Data::Dumper;
 
@@ -139,8 +139,17 @@ sub old_gen_wmc { # DEPRECATED
     #
     if ( my $mapconf = getProjMap( $bbox{'crs'} ) ) {
         #printf STDERR "*** Getting map for %s\n", $bbox{'crs'};
-        my $config = Metamod::Config->instance();
-        my $mapurl = $config->get('WMS_BACKGROUND_MAPSERVER') . $config->get($mapconf);
+
+        ## impossible to use Metamod::Config here... SNAFU, giving up....
+        #my $config = Metamod::Config->instance();
+        #my $mapurl = $config->get('WMS_BACKGROUND_MAPSERVER') . $config->get($mapconf);
+
+        my %coastlinemaps = ( # TODO: read from master_config... FIXME
+            "EPSG:4326"  => "http://wms.met.no/maps/world.map",
+            "EPSG:32661" => "http://wms.met.no/maps/northpole.map",
+            "EPSG:32761" => "http://wms.met.no/maps/southpole.map",
+        );
+        my $mapurl = $coastlinemaps{ $bbox{'crs'} }; # yeah, it's a cop out...
 
         my $mapdoc = $self->gc2wmc($mapurl, \%bbox);
         my $mapxc = XML::LibXML::XPathContext->new( $mapdoc ); # getcapabilities xpath context
