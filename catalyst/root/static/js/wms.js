@@ -103,6 +103,10 @@ function drawMap(response) {
     //map.addControl( new OpenLayers.Control.ScaleLine() );
     //map.addControl( new OpenLayers.Control.Permalink('permalink') );
 
+    var timeSliderDiv = document.getElementById('timesliderId');
+    if (timeSliderDiv !== undefined) {
+        map.addControl( new OpenLayers.Control.TimeSlider( {div: timeSliderDiv} ) );
+    }
     $("#accordion").empty(); // remove old layers from selector
 
     var leds = [ // rewrite as hash... FIXME

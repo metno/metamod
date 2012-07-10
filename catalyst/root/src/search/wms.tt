@@ -16,11 +16,11 @@
         </style>
 
         <link rel="stylesheet" href="[% c.uri_for('/static/css/metamod_theme/jquery-ui.css') %]" />
+        <script type="text/javascript" src="[% c.uri_for('/static/js/log4javascript-1.4.2/js/log4javascript.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/jquery.min.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/jquery-ui.min.js') %]"></script>
-
-        <script type="text/javascript" src="[% c.uri_for('/static/js/log4javascript-1.4.2/js/log4javascript.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/lib/OpenLayers.js') %]"></script>
+        <script type="text/javascript" src="[% c.uri_for('/static/js/TimeSlider.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/lib/Firebug/firebug.js') %]"></script>
 
         <script type="text/javascript">
@@ -51,23 +51,25 @@
         <!--<div id="tags"></div>-->
 
         [% IF datasets.0.ds_id # size is 1 even if empty... %]
-        <form name="form1" id="form1" action="#" style="position: absolute; top: 0px; left: 50px; z-index: 1000">
+            <form name="form1" id="form1" action="#" style="position: absolute; top: 0px; left: 50px; z-index: 1000">
+                <label>Dataset:
+                    <select name="dataset"  id="dataset" onChange="changeFile(this[this.selectedIndex].value)">
+                        [% FOR ds IN datasets %]
+                            <option value="[% ds.ds_id %]">[% ds.ds_name %]</option>
+                        [% END %]
+                    </select>
+                </label> [% # datasets.size %]
+                <span id="shortdesc"><!--Data file (direct): --></span>
+            </form>
 
-            <label>Dataset:
-                <select name="dataset"  id="dataset" onChange="changeFile(this[this.selectedIndex].value)">
-                    [% FOR ds IN datasets %]
-                        <option value="[% ds.ds_id %]">[% ds.ds_name %]</option>
-                    [% END %]
-                </select>
-            </label> [% # datasets.size %]
-
-            <span id="shortdesc"><!--Data file (direct): --></span>
-
-        </form>
         [% ELSE %]
-        <form name="form1" id="form1" action="#" style="position: absolute; top: 0px; left: 50px; z-index: 1000">
-            <button type="button" onclick="history.back()">Back to menu</button>
-        </form>
+            <form name="form1" id="form1" action="#" style="position: absolute; top: 0px; left: 50px; z-index: 1000">
+                <button type="button" onclick="history.back()">Back to menu</button>
+            </form>
+        [% END %]
+
+        [% IF debug # enable experimental timeslider support in testing %]
+            <div id="timesliderId" style="position: absolute; bottom: 5px; left: 5px; z-index: 1000; width: 300px;">timeslider</div>
         [% END %]
 
     </body>
