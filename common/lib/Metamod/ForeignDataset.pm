@@ -144,7 +144,7 @@ sub writeToFile {
     my ($self, $fileBase) = @_;
 
     $self->_writeToFileHelper($fileBase);
-    my $success = $self->_writeToDatabase($fileBase);
+    my $success = eval { $self->_writeToDatabase($fileBase); };
 
     my $is_level_2 = (defined $self->getParentName()) ? 1 : undef;
     if( $success && $is_level_2 ){
@@ -218,13 +218,14 @@ The filename for this dataset.
 =back
 
 =cut
+
 sub _writeToDatabase {
     my $self = shift;
 
     my ($filename) = @_;
 
     my $importer = Metamod::DatasetImporter->new();
-    return $importer->write_to_database( $filename );
+    return $importer->write_to_database( $filename ); # dies on failure
 
 }
 

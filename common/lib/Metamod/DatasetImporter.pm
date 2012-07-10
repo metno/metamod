@@ -27,6 +27,7 @@ use List::Util qw(max min);
 use Log::Log4perl;
 use Moose;
 use Try::Tiny;
+use Carp;
 
 use Metamod::Dataset;
 use Metamod::DatasetTransformer::ToISO19115;
@@ -170,7 +171,7 @@ the .xml and .xmd extension.
 
 =item return
 
-Returns 1 on success. Returns false on failure.
+Returns 1 on success. Dies on failure, so must be eval-ed.
 
 =back
 
@@ -191,7 +192,8 @@ sub write_to_database {
     my $ds = Metamod::Dataset->newFromFile($inputBaseFile);
     unless ($ds) {
         $logger->error("cannot initialize dataset for $inputBaseFile");
-        return;
+        #return;
+        croak("Cannot initialize dataset for $inputBaseFile");
     }
 
     # we turn of auto commit since we want to either update all or not update at all.
@@ -264,15 +266,16 @@ sub write_to_database {
         $self->_updateExtraSearch($ds, $dsid, $inputBaseFile);
 
 
-    # TODO: This code should be moved somewhere else.
-    #    if( $config->get("USERBASE_NAME") && $ds->getParentName() && $activateSubscriptions ){
-    #        my $subscription = Metamod::Subscription->new();
-    #        my $num_subscribers = $subscription->activate_subscription_handlers($ds);
-    #    }
+        # TODO: This code should be moved somewhere else.
+        #    if( $config->get("USERBASE_NAME") && $ds->getParentName() && $activateSubscriptions ){
+        #        my $subscription = Metamod::Subscription->new();
+        #        my $num_subscribers = $subscription->activate_subscription_handlers($ds);
+        #    }
 
         $dbh->commit;
         $dbh->{AutoCommit} = $previous_auto_commit;
         $success = 1;
+
     } catch {
 
         $logger->error("Failed to write information to database: $_");
@@ -280,6 +283,7 @@ sub write_to_database {
         $dbh->rollback();
         $dbh->{AutoCommit} = $previous_auto_commit;
         $success = 0;
+        croak("Failed to write information to database: $_");
     };
 
     if(!$success){

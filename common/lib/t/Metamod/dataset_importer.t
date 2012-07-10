@@ -263,7 +263,7 @@ my $importer = Metamod::DatasetImporter->new();
         push @previous_counts, $count;
     }
 
-    my $success = $fail_importer->write_to_database("$FindBin::Bin/../data/Metamod/dataset_importer1.xml");
+    my $success = eval { $fail_importer->write_to_database("$FindBin::Bin/../data/Metamod/dataset_importer1.xml"); };
     is($success, undef, "Re-import fails for DatasetImporterFailer" );
 
     foreach my $table (@affected_tables) {
@@ -300,7 +300,7 @@ my $importer = Metamod::DatasetImporter->new();
         push @previous_counts, $count;
     }
 
-    my $success = $fail_importer->write_to_database("$FindBin::Bin/../data/Metamod/dataset_importer4.xml");
+    my $success = eval { $fail_importer->write_to_database("$FindBin::Bin/../data/Metamod/dataset_importer4.xml"); };
     is($success, undef, "New import fails for DatasetImporterFailer" );
 
 

@@ -135,8 +135,10 @@ sub process_found_file {
             eval { update_database( $file ); };
             if ($@) {
                 $dbh->rollback or $logger->logdie( $dbh->errstr . "\n");
-                my $stm = $dbh->{"Statement"};
-                $logger->error("$file database error: $@\n   Statement: $stm\n");
+                $logger->error("$file database error: $@");
+                if ( my $stm = $dbh->{"Statement"} ) {
+                    $logger->error("SQL Statement: $stm\n");
+                }
             }
             else {
                 $dbh->commit or $logger->logdie( $dbh->errstr . "\n");
@@ -171,7 +173,7 @@ sub update_database {
     my ($inputBaseFile) = @_;
 
     my $importer = Metamod::DatasetImporter->new();
-    $importer->write_to_database($inputBaseFile);
+    $importer->write_to_database($inputBaseFile); # dies on failure
 
     return;
 }
