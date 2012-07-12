@@ -56,7 +56,8 @@ if(!Metamod::Config->config_found($config_file_or_dir)){
 my $mm_config = Metamod::Config->new($config_file_or_dir, { nolog => 1 } );
 my $webrun = $mm_config->get('WEBRUN_DIRECTORY');
 my $config_dir = $mm_config->get('CONFIG_DIR');
-my $conf_file = "$config_dir/etc/httpd.conf";
+my $etc_dir = "$config_dir/etc";
+my $conf_file = "$etc_dir/httpd.conf";
 my $virtualhost = $mm_config->get('VIRTUAL_HOST');
 my $local = $mm_config->get('LOCAL_URL');
 my $base = $mm_config->get('BASE_PART_OF_EXTERNAL_URL');
@@ -167,6 +168,7 @@ EOT2
 }
 
 if ($conf_file && !$opt_p) {
+    mkdir $etc_dir unless -e $etc_dir;
     open FH, ">$conf_file" or die "Cannot open $conf_file for writing";
     print STDERR "Writing Apache config to $conf_file\n";
     print FH $conf_text;

@@ -102,7 +102,7 @@ fi
 #
 
 CATALYST_APP="catalyst-$APPLICATION_ID"
-COMMON_LIB=$SCRIPT_PATH/lib
+COMMON_LIB=`readlink -f $SCRIPT_PATH/lib`
 
 ordie () {
     if [ $? != 0 ]
@@ -117,13 +117,13 @@ export PERL5LIB="$CATALYST_LIB:$PERL5LIB"
 
 # write Apache conf and init.d scripts to applic dir
 
-mkdir -p "$CONFIG_DIR/etc"
-
-if [ ! -w "$CONFIG_DIR/etc" ]
-then
-    echo "Cannot write to $CONFIG_DIR/etc directory" 1>&2
-    exit 1
-fi
+#mkdir -p "$CONFIG_DIR/etc"
+#
+#if [ ! -w "$CONFIG_DIR/etc" ]
+#then
+#    echo "Cannot write to $CONFIG_DIR/etc directory" 1>&2
+#    exit 1
+#fi
 
 psudo perl "$SCRIPT_PATH/scripts/gen_httpd_conf.pl" ${CONFIG:+"--config"} $CONFIG
 ordie "Can't generate httpd config - use -u option if insufficient sudo rights"
