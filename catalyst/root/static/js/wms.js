@@ -172,7 +172,8 @@ function drawMap(response) {
                 $(lc + '_styles').append("<option>" + sty[s].name + "</option>");
             }
             if (sty[0].legend) {
-                $(lc).append('<img id="layer' + i + '_legend" src="' + sty[0].legend.href + '&LAYERS=' + l.name + '"/>');
+                var leg_url = '<img id="layer' + i + '_legend" src="' + sty[0].legend.href + '&LAYERS=' + l.name + '"/>';
+                $(lc).append( leg_url.replace(/PALETTE=[^&]+[&]?/i, '') ); // remove PALETTE param and let server decide default style
             }
 
             $(lc + '_styles').change( styleHandlerFactory( l, $(lc + '_legend') ) );
