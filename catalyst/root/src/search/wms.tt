@@ -32,7 +32,7 @@
         </script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/wms.js') %]"></script>
         <script type="text/javascript">
-            [% IF 1 # ! debug # disable logging in production %]
+            [% IF ! debug # disable logging in production %]
                 log = log4javascript.getNullLogger();
             [% END %]
         </script>
@@ -68,9 +68,7 @@
             </form>
         [% END %]
 
-        [% IF debug # enable experimental timeslider support in testing %]
-            <div id="timesliderId" style="position: absolute; bottom: 5px; left: 5px; z-index: 1000; width: 300px;">timeslider</div>
-        [% END %]
+        <div id="timesliderId" style="position: absolute; bottom: 5px; left: 5px; z-index: 1000; width: 300px;"></div>
 
     </body>
 </html>

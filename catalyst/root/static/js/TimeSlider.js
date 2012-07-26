@@ -77,22 +77,27 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
     updateAvailableTimes : function () {
 
         var newTimes = {};
+        var timedLayers = 0;
         for( var i = 0; i < this.visibleLayers.length; i++ ){
 
             var layerTimes = this.timesForLayer(this.visibleLayers[i]);
-            for( var j = 0; j < layerTimes.length; j++ ){
-                var time = jQuery.trim(layerTimes[j]);
+            if (layerTimes.length) {
+                timedLayers++;
+                for( var j = 0; j < layerTimes.length; j++ ){
+                    var time = jQuery.trim(layerTimes[j]);
 
-                if( time in newTimes ){
-                    newTimes[time] = newTimes[time] + 1;
-                } else {
-                    newTimes[time] = 1;
+                    if( time in newTimes ){
+                        newTimes[time] = newTimes[time] + 1;
+                    } else {
+                        newTimes[time] = 1;
+                    }
                 }
             }
         }
 
         this.availableTimes = newTimes;
-        this.sortedTimes = this.sortTimes(this.availableTimes);
+        this.sortedTimes = this.sortTimes(this.availableTimes, timedLayers);
+        //log.debug(this.sortedTimes);
     },
 
     /**
@@ -193,7 +198,7 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
     timesliderValueChange : function (slider) {
 
         var currentTime = this.sortedTimes[slider.value];
-        jQuery('#' + this.sliderCurrentId).text(currentTime);
+        jQuery('#' + this.sliderCurrentId).text( currentTime.slice(0,10) + ' ' + currentTime.slice(11) );
         this.changeLayerTime(currentTime);
     },
 
@@ -206,6 +211,7 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
         for( var i = 0; i < this.visibleLayers.length; i++ ){
             var layer = this.visibleLayers[i];
             layer.mergeNewParams( { time: time } );
+            log.debug('Changing layer ' + layer.name + ' to ' + time);
         }
 
     },
@@ -228,11 +234,12 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
      */
     timesliderHtml : function () {
         var html = '<div id="' + this.sliderId + '">';
+        html += '<span id="' + this.sliderCurrentId + '" class="timeslider-current" style="margin-left: 310px; white-space: nowrap;"></span>';
         html += '</div>';
         html += '<div id="' + this.buttonDivId + '" class="timeslider-button-div">';
-        html += '<button id="' + this.previousButtonId + '" class="timeslider-previous">Previous</button>';
-        html += '<span id="' + this.sliderCurrentId + '" class="timeslider-current"></span>';
-        html += '<button id="' + this.nextButtonId + '" class="timeslider-next">Next</button>';
+        //html += '<button id="' + this.previousButtonId + '" class="timeslider-previous">Previous</button>'; // not working
+        //html += '<span id="' + this.sliderCurrentId + '" class="timeslider-current"></span>';
+        //html += '<button id="' + this.nextButtonId + '" class="timeslider-next">Next</button>'; // not working
         html += '</div>';
         return html;
     },
@@ -240,12 +247,16 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
 
     /**
      * Sort a dictionary/hash of times as stored in the availableTime
+     * optional argument limit filters out times without matching value count
      */
-    sortTimes : function ( availableTimes ) {
+    sortTimes : function ( availableTimes, limit ) {
 
         var times = [];
         for( var time in availableTimes){
-            times.push(time);
+            //log.debug('>>>' + time + ': ' + availableTimes[time]);
+            if (limit === undefined || availableTimes[time] === limit) {
+                times.push(time);
+            }
         }
 
         times.sort();

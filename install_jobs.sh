@@ -2,10 +2,13 @@
 
 usage()
 {
-cat << EOF
+    cat << EOF
 usage: $0 [-u] <config>
 
-This script will install the necessary services for a METAMOD application
+This script will install the necessary services for a METAMOD application.
+
+It should not be run as sudo as is already calling sudo on relevant commands and
+root user usually does not have sudo privileges.
 
 OPTIONS:
   -h    show this message
@@ -13,7 +16,7 @@ OPTIONS:
 EOF
 }
 
-# unset this for users with restricted sudo privileges
+# unset this later in the script for users with restricted sudo privileges
 PERLSUDO=sudo
 
 #
@@ -102,7 +105,7 @@ fi
 #
 
 CATALYST_APP="catalyst-$APPLICATION_ID"
-COMMON_LIB=`readlink -f $SCRIPT_PATH/lib`
+COMMON_LIB=`readlink -f $SCRIPT_PATH/lib` # make path absolute before using in PERL5LIB
 
 ordie () {
     if [ $? != 0 ]
@@ -117,6 +120,8 @@ export PERL5LIB="$CATALYST_LIB:$PERL5LIB"
 
 # write Apache conf and init.d scripts to applic dir
 
+# disabled creation of etc dir since we don't know who is the correct owner
+# this is instead now done by gen_httpd_conf.pl
 #mkdir -p "$CONFIG_DIR/etc"
 #
 #if [ ! -w "$CONFIG_DIR/etc" ]

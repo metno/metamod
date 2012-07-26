@@ -103,7 +103,7 @@ sub abandon {
 </body>
 </html>
 EOT
-    $logger->error($text);
+    $logger->logcarp($text);
     die $text;
 }
 
@@ -195,6 +195,7 @@ EOT
 
 my %projections = (
 	# from 1.12, use WMS_PROJECTIONS in master_config instead of this hardcoded list
+	# currently not possible to access master_config at compile time
 
     'EPSG:32661' => ['WGS 84 / UPS North', 'WMS_NORTHPOLE_MAP'],
     'EPSG:32761' => ['WGS 84 / UPS South', 'WMS_SOUTHPOLE_MAP'],
@@ -240,4 +241,3 @@ sub projList {
 }
 
 1;
-

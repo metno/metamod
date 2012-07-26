@@ -152,13 +152,15 @@ function drawMap(response) {
             l.mergeNewParams( {time: deft} );
 
             // build time selector
-            $(lc).append('<p>Time:<br/><select id="layer' + i + '_time"/></p>');
-            for (t in times) {
-                //log.debug(times[t]);
-                $(lc + '_time').append("<option>" + times[t] + "</option>");
-            }
-
-            $(lc + '_time').change( timeHandlerFactory(l) );
+            $(lc).append('<p>Timeseries points: ' + times.length + '</p>');
+            // DISABLED
+            //$(lc).append('<p>Time:<br/><select id="layer' + i + '_time"/></p>');
+            //for (t in times) {
+            //    //log.debug(times[t]);
+            //    $(lc + '_time').append("<option>" + times[t] + "</option>");
+            //}
+            //
+            //$(lc + '_time').change( timeHandlerFactory(l) );
         }
 
 
@@ -213,9 +215,11 @@ function drawMap(response) {
 }
 
 function showError(response) {
-    var b = document.createElement('b');
-    b.appendChild( document.createTextNode("Could not contact WMS server! ") );
-    document.getElementById('shortdesc').appendChild(b);
-    document.getElementById('shortdesc').appendChild( document.createElement('br') );
-    document.getElementById('shortdesc').appendChild( document.createTextNode("Error from backend is: " + response.status + " " + response.statusText) );
+    log.error("Could not contact WMS server! ");
+    log.error("Error from backend is: " + response.status + " " + response.statusText);
+    //var b = document.createElement('b');
+    //b.appendChild( document.createTextNode("Could not contact WMS server! ") );
+    //document.getElementById('shortdesc').appendChild(b);
+    //document.getElementById('shortdesc').appendChild( document.createElement('br') );
+    //document.getElementById('shortdesc').appendChild( document.createTextNode("Error from backend is: " + response.status + " " + response.statusText) );
 }
