@@ -121,7 +121,10 @@ function drawMap(response) {
         var lc = '#layer' + i;
 
         var led_index = ( map.layers[i].isBaseLayer ? 2 : 0 );
-        if ( i == 0 ) { led_index++ }; // layer 0 always starts open, so turn on led
+        if ( i == 0 ) {
+            led_index++; // layer 0 always starts open, so turn on led
+            map.layers[0].setVisibility(true); // trigger event so timeslider works on default layer
+        };
 
         //var lvis = l.isBaseLayer ?
         //    '<input name="baselayer_visible" id="' + lc + '_show" type="radio"/>' :
