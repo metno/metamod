@@ -80,17 +80,29 @@ sub newFromDoc {
 
 sub newFromFile {
     my ($class, $basename, %options) = @_;
-    my ($dsXML, $mm2XML) = Metamod::DatasetTransformer::getFileContent($basename);
-    my @plugins = Metamod::DatasetTransformer::getPlugins();
-    foreach my $plugin (@plugins) {
-        my $p = $plugin->new($dsXML, $mm2XML, %options);
-        if ($p->test) {
-            my $format = $p->originalFormat;
-            my ($docDS, $docMM2) = $p->transform;
-            return $class->_initSelf($format, $docDS, $docMM2);
-        }
-    }
-    return undef;
+	my $something;
+	eval {
+	    my ($dsXML, $mm2XML) = Metamod::DatasetTransformer::getFileContent($basename);
+	    my @plugins = Metamod::DatasetTransformer::getPlugins();
+		foreach my $plugin (@plugins) {
+			print STDERR "* newFromFile found a plugin\n";
+			my $p = $plugin->new($dsXML, $mm2XML, %options);
+			if ($p->test) {
+				print STDERR "* newFromFile found a test\n";
+				my $format = $p->originalFormat;
+				my ($docDS, $docMM2) = $p->transform;
+				print STDERR "* newFromFile should return here\n";
+				$something = $class->_initSelf($format, $docDS, $docMM2);
+				last;
+			}
+		}
+	};
+	if ($@) {
+		$logger->error('newFromFile error: ', $@);
+		confess("newFromFile error: $@");
+	}
+	print STDERR $something ? "newFromFile succeded" : "newFromFile failed, but didn't die\n";
+	return $something;
 }
 
 sub _initSelf {
@@ -285,4 +297,3 @@ Heiko Klein, E<lt>H.Klein@met.noE<gt>
 L<XML::LibXML>, L<Metamod::DatasetTransformer>
 
 =cut
-
