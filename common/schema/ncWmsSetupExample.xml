@@ -2,11 +2,21 @@
 <w:ncWmsSetup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.met.no/schema/metamod/ncWmsSetup ncWmsSetup.xsd "
   xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup"
-  url="http://tempuri.org?%DATASET_PARENT%/%DATASET%.nc">
+  url="http://thredds.met.no/thredds/wcs/cryoclim/met.no/%DATASET_PARENT%/%DATASET%.nc"
+  aggregate_url="http://thredds.met.no/thredds/wms/cryoclim/met.no/osisaf-sh-agg"
+  >
 
-  <w:displayArea crs="EPSG:2033" left="-700000" right="8000000" bottom="1500" top="17000" units="m"/>
-  <w:layer name="ice_conc" style="BOXFILL/redblue" transparent="false"/>
-  <w:layer name="*" style="BOXFILL/redblue"/>
-  <w:thumbnail name="ice_conc,map" url="http://tempuri.org?%DATASET_PARENT%/%DATASET%.nc" style="BOXFILL/redblue,BOXFILL/greyscale"/>
+  <!-- this specifies the projection and bounding box -->
+  <w:displayArea crs="EPSG:432600" left="0" right="60" bottom="30" top="90" units="degrees"/> <!--are units necessary?-->
+
+  <!-- this layer will be used as map background -->
+  <w:baselayer name="kart" style="default" url="http://tempuri.org?wms/"/>
+
+  <!-- show these layers at top of menu -->
+  <w:layer name="ice_conc" style="BOXFILL/redblue"/>
+  <!-- the first layer here will be also used in the thumbnail unless another specified below -->
+
+  <!-- don't use default thumbnail, fetch this instead -->
+  <w:thumbnail name="ice_conc,map" url="http://tempuri.org?foo/bar.nc" style="BOXFILL/redblue,BOXFILL/greyscale"/>
 
 </w:ncWmsSetup>

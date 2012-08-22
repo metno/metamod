@@ -91,11 +91,10 @@ jQuery(document).ready( function () {
                     <a class="btn" href="[% c.uri_for( '/search/add_to_basket', dataset.ds_id ) %]"
                        title="Add aggregated dataset to the collection basket"><span>Add to basket</span></a><br clear="all"/>
                 [% END %]
-                [% IF dataset.wmsinfo != '' %]
-                    [% SET ds2show = (dataset.num_children() != 0) ? dataset.child_datasets.0 : dataset %]
+                [% IF dataset.wmsurl != '' %]
                     [% SET thumbsize = 64 %]
-                    [% SET wmsthumb = ds2show.wmsthumb(thumbsize) %]
-                    <a class="visual" href="[% c.uri_for('/search/wms') %]?ds_id=[% ds2show.ds_id %]"><span>Visualize</span></a><br clear="all"/>
+                    [% SET wmsthumb = dataset.wmsthumb(thumbsize) %]
+                    <a class="visual" href="[% c.uri_for('/search/wms') %]?ds_id=[% dataset.ds_id %]"><span>Visualize</span></a><br clear="all"/>
                     [% IF wmsthumb.outline %]
                         <div class="wmsthumb"
                             style="position: absolute; height: [% thumbsize %]px; width: [% thumbsize %]px; z-index:12"

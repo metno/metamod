@@ -53,6 +53,7 @@ use strict;
 use warnings;
 
 use CGI;
+use Carp;
 use LWP::UserAgent;
 use XML::LibXML;
 use Log::Log4perl qw(get_logger);
@@ -104,7 +105,7 @@ sub abandon {
 </html>
 EOT
     $logger->logcarp($text);
-    die $text;
+    croak $text;
 }
 
 =head2 getXML()

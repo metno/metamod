@@ -43,7 +43,8 @@ has 'c' => (
 sub old_gen_wmc { # DEPRECATED
 
     my ($self, $setup, $wmsurl) = @_;
-    die "Missing setup document" unless $setup;
+    croak "Missing setup document" unless $setup;
+    croak "Missing WMS URL" unless $wmsurl;
 
     my $setupxc = XML::LibXML::XPathContext->new( $setup->documentElement() );
     $setupxc->registerNs('s', "http://www.met.no/schema/metamod/ncWmsSetup");
@@ -63,7 +64,9 @@ sub old_gen_wmc { # DEPRECATED
     #################################
     # transform data Capabilities to WMC
     #
-    my $getcap_url = $wmsurl || $setup->documentElement->getAttribute('url') or die("Missing setup or WMS url");
+    my $getcap_url = $wmsurl || $setup->documentElement->getAttribute('url') or confess("Missing setup or WMS url");
+    # reading from setup is now deprecated
+    
     my $wmcns = "http://www.opengis.net/context";
 
     my $results = $self->gc2wmc($getcap_url, \%bbox);

@@ -73,7 +73,7 @@
             <a class="btn" href="[% c.uri_for( '/search/add_to_basket', child.ds_id, c.req.params ) %]"
                title="Add the dataset to the collection basket"><span>Add to basket</span></a><br clear="all"/>
 
-            [% IF child.wmsinfo != '' %]
+            [% IF child.wmsurl != '' %]
                 [% SET thumbsize = 64 %]
                 [% SET wmsthumb = child.wmsthumb(thumbsize) %]
                 <a class="visual" href="[% c.uri_for('/search/wms') %]?ds_id=[% child.ds_id %]"><span>Visualize</span></a><br clear="all"/>

@@ -86,8 +86,9 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
 
         if( my $ds = $c->model('Metabase')->resultset('Dataset')->find( $$p{ds_id} ) ){
             $setup = $ds->wmsinfo;
+            $wms   = $ds->wmsurl;
         }
-        $c->detach( 'Root', 'default' ) unless defined($setup);
+        $c->detach( 'Root', 'default' ) unless defined($setup) && defined($wms);
 
     } elsif ( $$p{getcap} ) {
         # fetch GetCapabilites directly (for files w/o setup docs)
@@ -97,6 +98,8 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
         $setup = defaultWMC();
     }
 
+    # TODO - add better handling for timeout errors... FIXME
+    
     my $wmc = eval { $c->stash->{wmc}->old_gen_wmc($setup, $wms) }; # TODO rewrite to use gc2wmc instead - FIXME
     if ($@) {
         $self->logger->warn("old_gen_wmc failed: $@");

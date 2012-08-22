@@ -1,5 +1,10 @@
+
+=================================================
+This is Geir's internal refactoring scratchpad.
+If you name is not Geir, you should stop reading.
+=================================================
+
 General cleanup tasks for Metamod2
-==================================
 
 Major bugs should be registered in Bugzilla.
 Feature requests should go into the METSIS project priority lists.
@@ -10,6 +15,8 @@ just as an electronic Post-It note for developers to quickly note action
 points for later.
 
 --------------------
+
+proper handling of timeout from wms server
 
 * better metadata conversion (new major feature)
 
@@ -35,11 +42,18 @@ upgrade List::MoreUtils to 0.30 Thu 16 Dec 2010
 impossible to access metamod::config->instance in metamod::wms and wmc.pm so
 links to wms.met.no must be hardcoded
 
+fix timeslider to show on startup layer (again)
+
 wms thumbnails:
 - multiple thumbnails in wmsinfo (for separate map and data layers)
-- swap z-order so map is baselayer and data transparent
+- swap z-order so map is baselayer and data transparent (maybe not? why?)
 - read wmsthumbs in wmslist from capab
 - cache wmsthums from capab in database when changing wmsinfo
+
+reset password should send a link to reset instead of resetting directly to
+avoid misuse
+- also check that username exists before confirming
+- must use POST
 
 ++++++++ DONE ++++++++++++++
 

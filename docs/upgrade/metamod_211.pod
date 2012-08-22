@@ -12,7 +12,9 @@ entries could be desired.
 
 =head3 Old version 2.10
 
-Previously, the only directives available were B<displayArea> and B<layer>:
+Previously, the only elements available were B<displayArea> and B<layer>.
+Also there was only a single url attribute which could be used for either
+parent or child datasets, but not both:
 
     <?xml version="1.0" encoding="UTF-8"?>
     <w:ncWmsSetup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -28,30 +30,69 @@ Previously, the only directives available were B<displayArea> and B<layer>:
 
 =head3 New version 2.11
 
-Two more directives have been added:
+The WMS URLs for parent and child datasets are now specified separately:
 
 =over 4
 
-=item B<baselayer>
+=item url
+
+WMS URL for level 2 datasets (children). The substitutions %DATASET%, %DATASET_PARENT% and
+%THREDDS_DATAREF% are allowed
+
+=item aggregate_url
+
+WMS URL for level 1 datasets (parents). Only %DATASET% can be substituted
+
+=back
+
+
+Two more elements have been added:
+
+=head4 baselayer
 
 This works like B<layer>, but specifies a non-transparent baselayer normally to be used
 for background maps.
 
-=item B<thumbnail>
+=head4 thumbnail
 
-This is used to specify how the thumbnail in the search result should be setup
+This is used to specify how the thumbnail in the search result should be setup.
+Currently the same thumbnail element is used for both parent and children (subject to change).
+
+All elements share a few common attributes:
+
+=over 4
+
+=item name
+
+The Layer Name from WMS Capabilities
+
+=item style
+
+(Only for thumbnails) The preferred Layer Name from WMS Capabilities
+
+=item url
+
+WMS URL (if different from the one in the ncWmsSetup element).
+No %...% substitutions are allowed
+
+=item time
+
+ISO timestamp as given in Dimensions in WMS Capabilities (mandatory in timeseries
+unless the WMS server handles default time parameters)
 
 =back
 
     <?xml version="1.0" encoding="UTF-8"?>
     <w:ncWmsSetup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:w="http://www.met.no/schema/metamod/ncWmsSetup"
-        url="http://dev-vm202/cgi-bin/getcapabilities2.cgi/verportal/verportal2"
+        aggregate_url="http://thredds.met.no/thredds/wms/cryoclim/met.no/osisaf-sh-agg"
+        url="http://thredds.met.no/thredds/wcs/cryoclim/met.no/%DATASET_PARENT%/%DATASET%.nc"
         xsi:schemaLocation="http://www.met.no/schema/metamod/ncWmsSetup ncWmsSetup.xsd ">
 
         <w:displayArea crs="EPSG:432600" left="0" right="60" bottom="30" top="90" units="degrees"/>
         <w:baselayer name="kart" style="default"/>
-        <w:thumbnail name="ec.Temperatur,kart" style=",contour"/>
+        <w:thumbnail name="ec.Temperatur,kart" style=",contour" time="2012-08-20T12:00:00.000Z"
+          url="http://thredds.met.no/thredds/wms/sea_ice/SIW-OSISAF-GLO-SIT_SIE_SIC-OBS/ice_conc_north_aggregated"/>
 
     </w:ncWmsSetup>
 
@@ -60,4 +101,3 @@ This is used to specify how the thumbnail in the search result should be setup
 These no longer have any effect in Metamod 2.11:
 
     WMS_BACKGROUND_ISBASELAYER
-

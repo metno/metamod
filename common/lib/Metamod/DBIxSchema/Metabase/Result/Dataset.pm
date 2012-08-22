@@ -286,6 +286,9 @@ sub fimex_projections {
 
 Returns the C<wi_content> XML DOM for the dataset if it has any Wmsinfo. Returns undef otherwise.
 
+From 2.11 wmsinfo is delivered "as is" - variable substituion (%DATASET% etc) is
+now done in $self->wmsurl which should be called insteadd of wmsinfo() where appropriate.
+
 =back
 
 =cut
@@ -293,12 +296,8 @@ Returns the C<wi_content> XML DOM for the dataset if it has any Wmsinfo. Returns
 sub wmsinfo {
     my $self = shift;
 
-    my $wmsinfo_row = $self->selfwmsinfos()->first() || $self->parentwmsinfos()->first();
-
-    if( !defined $wmsinfo_row ){
-        #printf STDERR "* No wms setup for dataset %s\n", $self->ds_name;
-        return;
-    }
+    my $wmsinfo_row = $self->selfwmsinfos()->first() || $self->parentwmsinfos()->first()
+        or return; # this dataset doesn't have any wmsinfo
 
     my $parser = new XML::LibXML;
     my $dom = $parser->parse_string( $wmsinfo_row->wi_content() );
@@ -308,36 +307,76 @@ sub wmsinfo {
         carp "Wrong WMSinfo format!\n";
         return;
     }
-    my $url = $root->getAttribute('url');
-    if (!$url) {
-        carp "Missing url in wmsinfo!";
-        return;
-    }
+
+    #printf STDERR " ******** RAW WMSINFO: %s\n", $dom->toString(1);
+
+    return $dom;
+
+}
+
+=head2 $self->wmsurl()
+
+=over
+
+=item return
+
+Returns the WMS URL for the dataset if it has any Wmsinfo, or undef otherwise.
+The URL is given in either the B<aggregate_url> or B<url> attribute depending on level 1 or 2 dataset.
+
+Use this method to check whether a dataset is "visualizable".
+
+=back
+
+=cut
+
+sub wmsurl{
+    my $self = shift;
+
+    my $setup = $self->wmsinfo or return;
+    my $url = $self->is_level1_dataset ?
+        $setup->documentElement->getAttribute('aggregate_url') :
+        $setup->documentElement->getAttribute('url');
+
+    return unless $url; # both urls are optional
+
+    #if (! $url) {
+    #    my $foo = $self->ds_id;
+    #    $logger->error("Missing WMS url in wmsinfo for dataset $foo"); # stupid bareword errors
+    #    $logger->debug( $setup->toString(1) );
+    #    carp "Missing WMS url in wmsinfo for dataset $foo";
+    #}
 
     my ($tag, $parent, $dataset) = split '/', $self->ds_name;
     #printf STDERR " *** %s\n", join '|', ($tag, $parent, $dataset);
-    $url =~ s|%DATASET%|$dataset|;
-    $url =~ s|%DATASET_PARENT%|$parent|;
-    if ($url =~ m|%THREDDS_DATAREF%|) {
-        my $metadata = $self->metadata(['dataref']);
-        if (exists $metadata->{dataref}) {
-            my $threddsDataref = $metadata->{dataref}[0];
-            # translate url like
-            # http://osisaf.met.no/thredds/catalog/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/catalog.html?dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
-            # to
-            # http://osisaf.met.no/thredds/wms/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/05/ice_drift_nh_polstere-625_amsr-aqua_201005291200-201005311200.nc.gz
-            #                          dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
-            $threddsDataref =~ s:(.*/thredds)/catalog/.*\?dataset=(.*):$1/wms/$2:;
-            $url =~ s|%THREDDS_DATAREF%|$threddsDataref|;
-        } else {
-            # TODO: some logging... FIXME
+
+    if ($self->is_level1_dataset) {
+
+        $url =~ s|%DATASET%|$parent|;
+
+    } else {
+
+        $url =~ s|%DATASET%|$dataset|;
+        $url =~ s|%DATASET_PARENT%|$parent|;
+        if ($url =~ m|%THREDDS_DATAREF%|) {
+            my $metadata = $self->metadata(['dataref']);
+            if (exists $metadata->{dataref}) {
+                my $threddsDataref = $metadata->{dataref}[0];
+                # translate url like
+                # http://osisaf.met.no/thredds/catalog/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/catalog.html?dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
+                # to
+                # http://osisaf.met.no/thredds/wms/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/05/ice_drift_nh_polstere-625_amsr-aqua_201005291200-201005311200.nc.gz
+                #                          dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
+                $threddsDataref =~ s:(.*/thredds)/catalog/.*\?dataset=(.*):$1/wms/$2:;
+                $url =~ s|%THREDDS_DATAREF%|$threddsDataref|;
+            } else {
+                # TODO: some logging... FIXME
+            }
         }
+
     }
 
-    $dom->documentElement->setAttribute('url', $url);
-    #printf STDERR " ******** WMSINFO: %s\n", $wmsinfo_row->wi_content();
-
-    return $dom;
+    $logger->debug("*** WMS URL after substitution: $url");
+    return $url;
 
 }
 
@@ -356,8 +395,7 @@ Returns the GetCapabilities XML DOM for the dataset if it has any Wmsinfo. Retur
 sub wmscap {
     my $self = shift;
 
-    my $setup = $self->wmsinfo or return;
-    my $url = $setup->documentElement->getAttribute('url') or die "Missing url in wmsinfo";
+    my $url = $self->wmsurl or return;
     $logger->debug("Getting WMS Capabilities at $url");
     my $cap = eval { getXML($url . '?service=WMS&version=1.3.0&request=GetCapabilities') };
     croak " error: $@" if $@;
@@ -380,7 +418,7 @@ Make sure to check if wmsinfo exist before calling this method.
 
 =cut
 
-sub wmsthumb {
+sub wmsthumb { # TODO - move this somewhere else so we can use config runtime instead of compile time
     my $self = shift;
     my ($size) = @_;
 
@@ -395,8 +433,8 @@ sub wmsthumb {
 
         my (%area, %layer);
 
-        # find base URL from wmsinfo
-        my $wms_url = $sxc->findvalue('/*/@url') or die "Missing URL in wmsinfo";
+        # find base WMS URL from wmsurl (NOT wmsinfo!)
+        my $wms_url = $self->wmsurl or return;
         my ($thumbnail) = $sxc->findnodes('/*/s:thumbnail'); # TODO - support multiple thumbs (map + data) - FIXME
 
         # use first layer found if not specified

@@ -21,6 +21,7 @@
             <element ref='w:thumbnail' minOccurs='0' maxOccurs='1'/>
         </sequence>
         <attribute name="url" type="string" use="optional"/> <!-- not used in DefaultWMC or multiwmc -->
+        <attribute name="aggregate_url" type="string" use="optional"/> <!-- currently not expanded for %PARENT% etc -->
     </complexType>
 
     <complexType name='DisplayArea'>
@@ -35,12 +36,12 @@
     <complexType name='LayerAny'>
         <attribute name="name" type="string" use="required"/>  <!-- use '*' for default attrs -->
         <attribute name="style" type="string" use="optional"/>
-        <attribute name="url" type="string" use="optional"/>
+        <attribute name="url" type="string" use="optional"/> <!-- currently not expanded for %PARENT% etc -->
     </complexType>
 
     <complexType name='Thumbnail'>
         <attribute name="name" type="string" use="required"/>
-        <attribute name="url" type="string" use="optional"/>
+        <attribute name="url" type="string" use="optional"/> <!-- currently not expanded for %PARENT% etc -->
         <attribute name="style" type="string" use="optional"/>
         <attribute name="time" type="string" use="optional"/>
     </complexType>
