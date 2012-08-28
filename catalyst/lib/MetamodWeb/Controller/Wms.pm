@@ -99,7 +99,7 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
     }
 
     # TODO - add better handling for timeout errors... FIXME
-    
+
     my $wmc = eval { $c->stash->{wmc}->old_gen_wmc($setup, $wms) }; # TODO rewrite to use gc2wmc instead - FIXME
     if ($@) {
         $self->logger->warn("old_gen_wmc failed: $@");
@@ -157,10 +157,10 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
         $base ||= '';
 
         my $url;
-        my $layers = ref($$para{$_}) eq 'ARRAY' ? $$para{$_} : [ $$para{$_} ];
+        my $layers = ref($$para{$_}) eq 'ARRAY' ? $$para{$_} : [ $$para{$_} ]; # make array if single
 
         if( my $ds = $c->model('Metabase')->resultset('Dataset')->find( $ds_id ) ){
-            $url = $ds->wmsinfo->findvalue('/*/@url');
+            $url = $ds->wmsurl;
             # store away bounding box areas
             my ($anode) = $ds->wmsinfo->getElementsByLocalName('displayArea');
             my $area = {};
@@ -168,8 +168,8 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
             push @areas, $area;
         }
 
+        #print STDERR ">>> ${base}layer $ds_id - $url\n";
         $c->detach( 'Root', 'default' ) unless defined($url);
-        #print STDERR ">>> $base $ds_id - $url\n";
 
         # store layernodes away for later
         foreach (@$layers) {
