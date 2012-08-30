@@ -155,6 +155,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =end LICENSE
 
+=head1 NAME
+
+Metamod::DBIxSchema::Metabase::Result::Dataset
+
+=head1 DESCRIPTION
+
+DBIx::Class Dataset class in the metadata database
+
+=head1 METHODS
+
 =cut
 
 use Carp;
@@ -187,7 +197,7 @@ sub unqualified_ds_name {
 
 }
 
-=head2 $self->metadata([$metadata_names])
+=head2 $self->metadata( [ $metadata_names ] )
 
 Get metadata associated with the dataset.
 
@@ -304,7 +314,9 @@ sub wmsinfo {
     my $root = $dom->documentElement;
     # check if correct wmsinfo format
     if ($root->namespaceURI ne 'http://www.met.no/schema/metamod/ncWmsSetup') {
-        carp "Wrong WMSinfo format!\n";
+        my $foo = $self->ds_id;
+        my $bar = $self->ds_name;
+        $logger->error("Wrong WMSinfo format for dataset $foo: $bar");
         return;
     }
 
@@ -329,7 +341,7 @@ Use this method to check whether a dataset is "visualizable".
 
 =cut
 
-sub wmsurl{
+sub wmsurl {
     my $self = shift;
 
     my $setup = $self->wmsinfo or return;
@@ -357,17 +369,27 @@ sub wmsurl{
 
         $url =~ s|%DATASET%|$dataset|;
         $url =~ s|%DATASET_PARENT%|$parent|;
-        if ($url =~ m|%THREDDS_DATAREF%|) {
+        if ( $url =~ /%(THREDDS_|UGLY_HACK)/ ){
+            $logger->debug("*** WMS URL before substitution: $url");
             my $metadata = $self->metadata(['dataref']);
             if (exists $metadata->{dataref}) {
+
                 my $threddsDataref = $metadata->{dataref}[0];
-                # translate url like
+                # %THREDDS_DATAREF% translates url like
                 # http://osisaf.met.no/thredds/catalog/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/catalog.html?dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
                 # to
                 # http://osisaf.met.no/thredds/wms/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/05/ice_drift_nh_polstere-625_amsr-aqua_201005291200-201005311200.nc.gz
                 #                          dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
+                $logger->debug("*** dataref: $threddsDataref");
                 $threddsDataref =~ s:(.*/thredds)/catalog/.*\?dataset=(.*):$1/wms/$2:;
+                my $datarefq = $2 || 'ERROR_IN_THREDDS_DATAREF';
                 $url =~ s|%THREDDS_DATAREF%|$threddsDataref|;
+
+                # %THREDDS_DATASET% only gives you the dataset parameter in the query string
+                my @datarefpath = split('/', $datarefq);
+                my $foo = $datarefpath[1] || $datarefq;
+                $url =~ s|%THREDDS_DATASET%|$datarefq|;
+                $url =~ s|%UGLY_HACK_FOR_MYOCEAN%|$foo|; #FIXME ASAP
             } else {
                 # TODO: some logging... FIXME
             }
@@ -543,7 +565,7 @@ sub num_children {
 
 }
 
-=head2 file_location()
+=head2 $self->file_location()
 
 Calculate the file location where the dataset is located if possible.
 
