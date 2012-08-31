@@ -45,6 +45,17 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
             scope: this
         });
 
+        this.visibleLayers = [];
+        for( var i = 0; i < this.map.layers.length; i++ ){
+            var layer = this.map.layers[i];
+            if(layer.getVisibility()){
+                this.visibleLayers.push(layer);
+            }
+        }
+
+        this.updateAvailableTimes();
+        this.redraw();
+
     },
 
     /**
