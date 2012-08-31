@@ -16,6 +16,8 @@ points for later.
 
 --------------------
 
+separate thumbnail elements in wmsinfo for level 1 and 2
+
 proper handling of timeout from wms server
 
 * better metadata conversion (new major feature)
@@ -42,8 +44,6 @@ upgrade List::MoreUtils to 0.30 Thu 16 Dec 2010
 impossible to access metamod::config->instance in metamod::wms and wmc.pm so
 links to wms.met.no must be hardcoded
 
-fix timeslider to show on startup layer (again)
-
 wms thumbnails:
 - multiple thumbnails in wmsinfo (for separate map and data layers)
 - swap z-order so map is baselayer and data transparent (maybe not? why?)
@@ -56,6 +56,10 @@ avoid misuse
 - must use POST
 
 ++++++++ DONE ++++++++++++++
+
+fix timeslider to show on startup layer (again)
+
+get visualize basket to work again
 
 add timeslider in wms
 - use openlayers-timeslider from HALO

@@ -63,7 +63,7 @@
 <form name="dataset" action="[% root %]/[% ds_id %]" method="POST" class="datasetedit">
 <table class="airy">
     <tr><td>[% files %] files uploaded in dataset.</td></tr>
-    <tr><td>Delete dataset? <input type="checkbox" name="delete" value="1"/> Yup</td></tr>
+    <tr><td><input type="checkbox" name="delete" value="1"/> delete dataset</td></tr>
     <tr><td><input type="submit" value="Delete"/></td></tr>
 </table>
 </form>

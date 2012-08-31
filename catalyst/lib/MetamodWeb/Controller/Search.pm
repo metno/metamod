@@ -298,7 +298,7 @@ sub wms :Path('/search/wms') :Args {
 
     my $dslist = [];
     my $para = $c->req->params->{ ds_id };
-    if ( ref $para ) {
+    if ( ref $para ) { # more than one ds_id
         foreach ( @$para ) {
             my $ds = $c->model('Metabase::Dataset')->find($_);
             #printf STDERR " -- %d %s\n", $ds->ds_id, $ds->ds_name;

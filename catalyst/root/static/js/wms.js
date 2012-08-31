@@ -119,11 +119,13 @@ function drawMap(response) {
     for (var i=0; i < map.layers.length; i++) {
         var l = map.layers[i];
         var lc = '#layer' + i;
+        log.debug(lc);
 
         var led_index = ( map.layers[i].isBaseLayer ? 2 : 0 );
         if ( i == 0 ) {
             led_index++; // layer 0 always starts open, so turn on led
-            map.layers[0].setVisibility(true); // trigger event so timeslider works on default layer
+            map.layers[0].setVisibility(true); // trigger event so timeslider works on default layer (fixed somewhere else - try removing this later. FIXME)
+            log.debug('Setting layer 0 visible');
         };
 
         //var lvis = l.isBaseLayer ?

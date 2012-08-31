@@ -328,14 +328,42 @@ sub wmsinfo {
 
 =head2 $self->wmsurl()
 
-=over
-
-=item return
-
 Returns the WMS URL for the dataset if it has any Wmsinfo, or undef otherwise.
 The URL is given in either the B<aggregate_url> or B<url> attribute depending on level 1 or 2 dataset.
 
 Use this method to check whether a dataset is "visualizable".
+
+=head3 Substitutions
+
+The following variables can be used in wmsinfo URLs:
+
+=over
+
+=item I<%DATASET%>
+
+The ds_name of the current dataset. This is the only variable expanded
+for level 1 datasets
+
+=item I<%DATASET_PARENT%>
+
+The ds_name of the parent dataset
+
+=item I<%THREDDS_DATAREF%>
+
+B<DEPRECATED - use I<%THREDDS_DATASET%> instead!> An attempt to construct a WMS URL from a THREDDS dataset URL
+as per OSISAF file organization. Basically this consists of
+"http://hostname.example.com/thredds/wms/" + the "dataset" query parameter.
+Example:
+
+    http://osisaf.met.no/thredds/catalog/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/catalog.html?dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
+
+will be translated to
+
+    http://osisaf.met.no/thredds/wms/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/05/ice_drift_nh_polstere-625_amsr-aqua_201005291200-201005311200.nc.gz
+
+=item I<%THREDDS_DATASET%>
+
+The value of the "dataset" parameter in the query string of the THREDDS URL above
 
 =back
 
@@ -375,11 +403,7 @@ sub wmsurl {
             if (exists $metadata->{dataref}) {
 
                 my $threddsDataref = $metadata->{dataref}[0];
-                # %THREDDS_DATAREF% translates url like
-                # http://osisaf.met.no/thredds/catalog/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/catalog.html?dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
-                # to
-                # http://osisaf.met.no/thredds/wms/osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/05/ice_drift_nh_polstere-625_amsr-aqua_201005291200-201005311200.nc.gz
-                #                          dataset=osisaf/met.no/ice/drift_lr/single_sensor/amsr-aqua/2010/02/ice_drift_nh_polstere-625_amsr-aqua_201002221200-201002241200.nc.gz
+                # %THREDDS_DATAREF% translates OSISAF-like THREDDS URLs into WMS URLs... DEPRECATED
                 $logger->debug("*** dataref: $threddsDataref");
                 $threddsDataref =~ s:(.*/thredds)/catalog/.*\?dataset=(.*):$1/wms/$2:;
                 my $datarefq = $2 || 'ERROR_IN_THREDDS_DATAREF';

@@ -1,10 +1,15 @@
-metno-metamod-2.11 (2.11.0-2) stable; urgency=low
+metno-metamod-2.11 (2.11.0-7) stable; urgency=low
 
   [ geira ]
   * Metamod 2.11 Test Release. See wiki for details
   * Fixes for wms thumbs
+  * v4: Fixes for install_jobs and import_dataset
+  * v5: Added timeslider in wms
+  * v6: more bugfixes in import and timeslider 
+  * v7: feature for combining aggregate and level 2 datasets, more
+  * timeslider bugfixes
 
- -- geira <geira@met.no>  Mon, 02 Jul 2012 14:26:06 +0200
+ -- geira <geira@met.no>  Thu, 31 Aug 2012 16:00:00 +0200
 
 metno-metamod-2.10 (2.10.0-4) stable; urgency=low
 

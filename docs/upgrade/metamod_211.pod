@@ -36,8 +36,13 @@ The WMS URLs for parent and child datasets are now specified separately:
 
 =item url
 
-WMS URL for level 2 datasets (children). The substitutions %DATASET%, %DATASET_PARENT% and
-%THREDDS_DATAREF% are allowed
+WMS URL for level 2 datasets (children). The substitutions C<%DATASET%>, C<%DATASET_PARENT%>,
+C<%THREDDS_DATASET%> and C<%THREDDS_DATAREF%> (deprecated) are allowed. See wmsurl()
+in the API documentation on the Dataset class for further explanation:
+
+  perldoc Metamod::DBIxSchema::Userbase::Result::Dataset
+
+I<(Make sure your PERL5LIB contains the path to ./common/lib of your METAMOD installation.)>
 
 =item aggregate_url
 

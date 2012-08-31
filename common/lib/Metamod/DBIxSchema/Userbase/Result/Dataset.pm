@@ -66,6 +66,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =end LICENSE
 
+=head1 NAME
+
+Metamod::DBIxSchema::Userbase::Result::Dataset
+
+=head1 DESCRIPTION
+
+DBIx::Class Dataset class in the userdata database
+
+=head1 METHODS
+
 =cut
 
 use Carp;
