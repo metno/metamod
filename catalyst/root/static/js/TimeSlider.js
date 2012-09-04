@@ -56,6 +56,12 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
         this.updateAvailableTimes();
         this.redraw();
 
+        var defaultTime = this.map.layers[0].dimensions.time.default;
+        if (defaultTime !== undefined) {
+            log.debug('Default time is ' + defaultTime);
+            this.timesliderSetTime(defaultTime);
+        }
+
     },
 
     /**
@@ -199,6 +205,19 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
             this.slider.slider("value", val - 1);
         } else {
             this.slider.slider("value", this.sortedTimes.length - 1);
+        }
+    },
+
+    /**
+     * Move the slider to a specific time (if exists in visible layers)
+     */
+    timesliderSetTime : function (time) {
+        for( var i = 0; i < this.sortedTimes.length; i++ ){
+            //log.debug(this.sortedTimes[i]);
+            if (this.sortedTimes[i] === time) {
+                log.debug('Setting slider to ' + time);
+                this.slider.slider("value", i);
+            }
         }
     },
 

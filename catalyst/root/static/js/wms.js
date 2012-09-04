@@ -119,7 +119,7 @@ function drawMap(response) {
     for (var i=0; i < map.layers.length; i++) {
         var l = map.layers[i];
         var lc = '#layer' + i;
-        log.debug(lc);
+        //log.debug(lc);
 
         var led_index = ( map.layers[i].isBaseLayer ? 2 : 0 );
         if ( i == 0 ) {
