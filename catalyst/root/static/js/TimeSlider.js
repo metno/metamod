@@ -56,12 +56,13 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
         this.updateAvailableTimes();
         this.redraw();
 
-        var defaultTime = this.map.layers[0].dimensions.time.default;
-        if (defaultTime !== undefined) {
-            log.debug('Default time is ' + defaultTime);
-            this.timesliderSetTime(defaultTime);
+        if (this.map.layers[0].dimensions.time !== undefined ) {
+            var defaultTime = this.map.layers[0].dimensions.time.default;
+            if (defaultTime !== undefined) {
+                log.debug('Default time is ' + defaultTime);
+                this.timesliderSetTime(defaultTime);
+            }
         }
-
     },
 
     /**
