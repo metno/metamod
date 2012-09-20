@@ -193,7 +193,8 @@ sub write_to_database {
     unless ($ds) {
         $logger->error("cannot initialize dataset for $inputBaseFile");
         #return;
-        croak("Cannot initialize dataset for $inputBaseFile");
+        my $error_text =  Metamod::Dataset->getErrorText();
+        croak("Cannot initialize dataset for $inputBaseFile : $error_text");
     }
 
     # we turn of auto commit since we want to either update all or not update at all.

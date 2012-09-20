@@ -50,6 +50,7 @@ use constant MM2 => <<'EOT';
 EOT
 
 my $logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
+my $error_text = "";
 
 sub new {
     my ($class, %options) = @_;
@@ -83,6 +84,8 @@ sub newFromFile {
 	my $something;
 	eval {
 	    my ($dsXML, $mm2XML) = Metamod::DatasetTransformer::getFileContent($basename);
+        die "No XMD file" unless $dsXML;
+        die "No metadata xml file (MM2, DIF, ...)" unless $mm2XML;
 	    my @plugins = Metamod::DatasetTransformer::getPlugins();
 		foreach my $plugin (@plugins) {
 			my $p = $plugin->new($dsXML, $mm2XML, %options);
@@ -95,8 +98,9 @@ sub newFromFile {
 		}
 	};
 	if ($@) {
+        $error_text = $@;
 		$logger->error('newFromFile error: ', $@);
-		confess("newFromFile error: $@");
+		die("newFromFile error: $@");
 	}
 	#print STDERR $something ? "newFromFile succeded" : "newFromFile failed, but didn't die\n";
 	return $something;
@@ -186,6 +190,9 @@ sub getDatasetRegion {
     return $region;
 }
 
+sub getErrorText {
+    return $error_text;
+}
 
 1;
 __END__
