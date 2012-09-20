@@ -107,6 +107,7 @@ if ( defined($inputfile) ) {
     #  If not empty, an error has occured
     #
     if ($@) {
+        print STDERR "Error while importing $inputfile : $@\n";
         $logger->error("$inputfile (single file) database error: $@\n");
         $dbh->rollback or die $dbh->errstr;
     }
