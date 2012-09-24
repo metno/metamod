@@ -63,7 +63,7 @@
 
             $(document).ready(function() {
                 $('.layer').bind('change', buildProjList); // fires whenever user (de)selects a layer
-                #JQuery(buildProjList); // trying to make the menu rebuild when using history.back()...
+                //JQuery(buildProjList); // trying to make the menu rebuild when using history.back()...
             });
 
         </script>
