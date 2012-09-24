@@ -1,3 +1,9 @@
+metno-metamod-2.11 (2.11.1) lucid; urgency=low
+
+  * v1: fixes for basket wms and passwords in url
+
+ -- geira <geira@met.no>  Mon, 24 Sep 2012 13:12:40 +0200
+
 metno-metamod-2.11 (2.11.0-8) stable; urgency=low
 
   [ geira ]
