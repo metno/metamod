@@ -89,19 +89,20 @@ sub authenticate :Path('authenticate') :Args(0) {
     # Get the username and password from form
     my $username = $c->request->params->{username};
     my $password = $c->request->params->{password};
+    my $method = $c->request->method;
+
+    # If the user was redirected from a different page, e.g. subscription/,
+    # then we want to send them back to where they wanted in the first place.
+    # For that we use the CGI param 'return_path' if set.
+    my $return_path = $c->request->param( 'return_path' ) || '/';
+    $self->logger->debug( "Return:" . $return_path );
+    my $return_params = $c->request->param('return_params') || '';
 
     # If the username and password values were found in form
     if ($username && $password) {
         # Attempt to log the user in
         if ($c->authenticate({ u_loginname => $username,
                                u_password => $password  } )) {
-
-            # If the user was redirected from a different page, e.g. subscription/,
-            # then we want to send them back to where they wanted in the first place.
-            # For that we use the CGI param 'return_path' if set.
-            my $return_path = $c->request->param( 'return_path' ) || '/';
-            $self->logger->debug( "Return:" . $return_path );
-            my $return_params = $c->request->param('return_params') || '';
 
             $c->response->redirect($c->uri_for($return_path) . "?$return_params" );
             return;
@@ -112,7 +113,11 @@ sub authenticate :Path('authenticate') :Args(0) {
         $self->add_error_msgs($c, 'Empty username or password.' );
     }
 
-    $c->res->redirect($c->uri_for('/login', $c->req->params() ) );
+    # strip away username/passwd from redirect url
+    $c->res->redirect( $c->uri_for('/login', {
+                                                return_params => $return_params,
+                                                return_path => $return_path,
+                                              } ) );
 
 }
 
