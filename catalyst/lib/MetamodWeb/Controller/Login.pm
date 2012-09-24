@@ -177,7 +177,7 @@ sub register : Path('register') :Args(0) {
 
     $self->send_operator_email($c, $new_user, $user_values);
 
-    $self->add_info_msgs($c, 'New user has been requested. A receipt has been sent to your email');
+    $self->add_info_msgs($c, 'Your request will be processed. If accepted, you will receive an E-mail within a few days.');
     $c->res->redirect($c->uri_for('/login' ));
 
 }
