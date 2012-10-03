@@ -27,6 +27,7 @@ use namespace::autoclean;
 use XML::LibXML::XPathContext;
 use Metamod::WMS;
 #use Metamod::Config qw(getProjMap);
+use List::Util qw(min max sum);
 use Carp;
 use Data::Dumper;
 
@@ -39,10 +40,17 @@ has 'c' => (
     }
 );
 
+=head2 old_gen_wmc
+
+Generate WMC document from Capabilities based on wmsinfo setup data
+
+DEPRECATED: refactor to use setup2wmc instead.
+
+=cut
 
 sub old_gen_wmc { # DEPRECATED
 
-    my ($self, $setup, $wmsurl) = @_;
+    my ($self, $setup, $wmsurl, $crs) = @_;
     croak "Missing setup document" unless $setup;
     croak "Missing WMS URL" unless $wmsurl;
 
@@ -60,16 +68,48 @@ sub old_gen_wmc { # DEPRECATED
 
     $bbox{units} = $setupxc->findvalue('/*/s:layer');
 
+    if ( defined $crs and $crs ne $bbox{crs} ) {
+
+        # stupid proj doesn't like upper case proj names
+        my $to   = Geo::Proj4->new( init => lc($crs) )       or die Geo::Proj4->error . " for $crs";
+        my $from = Geo::Proj4->new( init => lc($bbox{crs}) ) or die Geo::Proj4->error;
+        my @corners = (
+            [ $bbox{'left' }, $bbox{'bottom'} ],
+            [ $bbox{'left' }, $bbox{'top'   } ],
+            [ $bbox{'right'}, $bbox{'bottom'} ],
+            [ $bbox{'right'}, $bbox{'top'   } ],
+        );
+        my $pr = $from->transform($to, \@corners);
+        #print STDERR Dumper \@corners, $pr;
+
+        my (@x, @y); # x resp y coord for each corner
+        foreach (@$pr) {
+            push @x, $_->[0];
+            push @y, $_->[1];
+        }
+
+        #print STDERR 'x = ' . Dumper \@x;
+        #print STDERR 'y = ' . Dumper \@y;
+
+        $bbox{ crs    } = $crs;
+        $bbox{ left   } = min(@x);
+        $bbox{ right  } = max(@x);
+        $bbox{ bottom } = min(@y);
+        $bbox{ top    } = max(@y);
+
+        #print STDERR Dumper \%bbox;
+
+    }
 
     #################################
     # transform data Capabilities to WMC
     #
     my $getcap_url = $wmsurl || $setup->documentElement->getAttribute('url') or confess("Missing setup or WMS url");
     # reading from setup is now deprecated
-    
+
     my $wmcns = "http://www.opengis.net/context";
 
-    my $results = $self->gc2wmc($getcap_url, \%bbox);
+    my $results = $self->_gen_wmc($getcap_url, \%bbox);
 
     my $gcxc = XML::LibXML::XPathContext->new( $results->documentElement() ); # getcapabilities xpath context
     $gcxc->registerNs('v', $wmcns);
@@ -141,7 +181,7 @@ sub old_gen_wmc { # DEPRECATED
     # copy background map layers to wmc
     #
     if ( my $mapconf = getProjMap( $bbox{'crs'} ) ) {
-        #printf STDERR "*** Getting map for %s\n", $bbox{'crs'};
+        printf STDERR "*** Getting map for %s\n", $bbox{'crs'};
 
         ## impossible to use Metamod::Config here... SNAFU, giving up....
         #my $config = Metamod::Config->instance();
@@ -154,7 +194,7 @@ sub old_gen_wmc { # DEPRECATED
         );
         my $mapurl = $coastlinemaps{ $bbox{'crs'} }; # yeah, it's a cop out...
 
-        my $mapdoc = $self->gc2wmc($mapurl, \%bbox);
+        my $mapdoc = $self->_gen_wmc($mapurl, \%bbox);
         my $mapxc = XML::LibXML::XPathContext->new( $mapdoc ); # getcapabilities xpath context
         $mapxc->registerNs('v', $wmcns);
         $mapxc->registerNs('ol', 'http://openlayers.org/context');
@@ -182,10 +222,13 @@ sub old_gen_wmc { # DEPRECATED
 }
 
 
-#################################
-# transform Capabilities to WMC
-#
-sub gc2wmc {
+=head2 _gen_wmc
+
+Download Capabilities and transform to WMC
+
+=cut
+
+sub _gen_wmc {
     my ($self, $wmsurl, $params) = @_;
     my $gcquery = '?service=WMS&version=1.3.0&request=GetCapabilities'; # can sometimes return 1.1.1
     my %stylesheets = (
@@ -213,9 +256,12 @@ sub gc2wmc {
 
 }
 
-#################################
-# transform ncWmsSetup to WMC
-#
+=head2 setup2wmc
+
+Generate WMC directly from wmsinfo setup document (can merge several Capabilities docs)
+
+=cut
+
 sub setup2wmc {
     my ($self, $setup, $params) = @_;
 

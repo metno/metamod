@@ -82,9 +82,10 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
 
     if ( $$p{ds_id} ) {
         # lookup setup doc directly from db
-        #printf STDERR "Fetching setup for dataset %s...\n", $$p{ds_id}[0];
+        my $ds_id = ref($$p{ds_id}) eq 'ARRAY' ? $$p{ds_id}[0] : $$p{ds_id};
+        printf STDERR "Fetching setup for dataset %s...\n", $ds_id;
 
-        if( my $ds = $c->model('Metabase')->resultset('Dataset')->find( $$p{ds_id} ) ){
+        if( my $ds = $c->model('Metabase')->resultset('Dataset')->find( $ds_id ) ){
             $setup = $ds->wmsinfo;
             $wms   = $ds->wmsurl;
         }
@@ -100,7 +101,7 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
 
     # TODO - add better handling for timeout errors... FIXME
 
-    my $wmc = eval { $c->stash->{wmc}->old_gen_wmc($setup, $wms) }; # TODO rewrite to use gc2wmc instead - FIXME
+    my $wmc = eval { $c->stash->{wmc}->old_gen_wmc($setup, $wms, $$p{crs}) }; # TODO rewrite to use gc2wmc instead - FIXME
     if ($@) {
         $self->logger->warn("old_gen_wmc failed: $@");
         error($c, 502, $@);
@@ -183,7 +184,7 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
 
     #print STDERR Dumper \@areas;
     # stupid proj doesn't like upper case proj names
-    my $to = Geo::Proj4->new( init => lc($crs) ) or die Geo::Proj4->error . "for $crs";
+    my $to = Geo::Proj4->new( init => lc($crs) ) or die Geo::Proj4->error . " for $crs";
     #my $to = _newProj( $crs );
 
     foreach (@areas) {
@@ -236,20 +237,20 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
 
 }
 
-sub _newProj {
-    my $crs = lc(shift) or die;
-    if ($crs eq 'crs:84') {
-        return Geo::Proj4->new( '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs' )
-            or die Geo::Proj4->error . " for CRS:84";
-    } else {
-        return Geo::Proj4->new( init => $crs )
-            or die Geo::Proj4->error . " for $crs";
-    }
-    #return ($crs eq 'crs:84') ?
-    #    Geo::Proj4->new( '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs' ) :
-    #    Geo::Proj4->new( init => $crs )
-    #or die Geo::Proj4->error . " for $crs";
-}
+#sub _newProj {
+#    my $crs = lc(shift) or die;
+#    if ($crs eq 'crs:84') {
+#        return Geo::Proj4->new( '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs' )
+#            or die Geo::Proj4->error . " for CRS:84";
+#    } else {
+#        return Geo::Proj4->new( init => $crs )
+#            or die Geo::Proj4->error . " for $crs";
+#    }
+#    #return ($crs eq 'crs:84') ?
+#    #    Geo::Proj4->new( '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs' ) :
+#    #    Geo::Proj4->new( init => $crs )
+#    #or die Geo::Proj4->error . " for $crs";
+#}
 
 =head2 qtips
 

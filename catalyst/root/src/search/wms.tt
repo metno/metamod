@@ -27,8 +27,8 @@
             // making this a global variable so that it is accessible for debugging/inspecting in Firebug
             var map = null;
             var ds_id = [% datasets.0.ds_id || 'undefined' %];
-            var wmcpath = "[% c.uri_for('/gc2wmc') %]";
-            var multiwmcpath = "[% c.uri_for('/multiwmc', c.req.params ) %]" ;
+            var wmcpath      = "[% c.uri_for( '/gc2wmc',   c.req.params ) %]";
+            var multiwmcpath = "[% c.uri_for( '/multiwmc', c.req.params ) %]" ;
         </script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/wms.js') %]"></script>
         <script type="text/javascript">

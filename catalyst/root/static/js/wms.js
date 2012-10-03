@@ -29,7 +29,7 @@ function init(){
     document.getElementById('docs').removeChild( document.getElementById('warning') );
 
     if (typeof ds_id != 'undefined') {
-        OpenLayers.loadURL(wmcpath + "?ds_id=" + ds_id, "", this, drawMap, showError);
+        OpenLayers.loadURL(wmcpath, "", this, drawMap, showError);
     } else if (typeof wms_setup != 'undefined') {
         alert('wmssetup not supported - use ds_id istead!');
         //OpenLayers.ProxyHost = "/gc2wmc?wmssetup=";
