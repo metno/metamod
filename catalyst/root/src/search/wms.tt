@@ -28,6 +28,7 @@
             var map = null;
             var ds_id = [% datasets.0.ds_id || 'undefined' %];
             var wmcpath      = "[% c.uri_for( '/gc2wmc',   c.req.params ) %]";
+            var wmcstub      = "[% c.uri_for( '/gc2wmc' ) %]";
             var multiwmcpath = "[% c.uri_for( '/multiwmc', c.req.params ) %]" ;
         </script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/wms.js') %]"></script>
@@ -50,23 +51,35 @@
         <div id="docs"><p id="warning">Javascript must be enabled for WMS client to work!</p></div>
         <!--<div id="tags"></div>-->
 
-        [% IF datasets.0.ds_id # size is 1 even if empty... %]
-            <form name="form1" id="form1" action="#" style="position: absolute; top: 0px; left: 50px; z-index: 1000">
-                <label>Dataset:
-                    <select name="dataset"  id="dataset" onChange="changeFile(this[this.selectedIndex].value)">
-                        [% FOR ds IN datasets %]
-                            <option value="[% ds.ds_id %]">[% ds.ds_name %]</option>
-                        [% END %]
+        <div id="formcontainer" style="position: absolute; top: 0px; left: 50px; z-index: 1000">
+
+            [% IF datasets.0.ds_id # size is 1 even if empty... %]
+                [% IF false # disabled since multiple dataset support is broken in 2.11 %]
+                <form name="form1" id="form1" action="#" style="">
+                    <label>Dataset:
+                        <select name="dataset" id="dataset" onChange="changeFile(this[this.selectedIndex].value)">
+                            [% FOR ds IN datasets %]
+                                <option value="[% ds.ds_id %]">[% ds.ds_name %]</option>
+                            [% END %]
+                        </select>
+                    </label> [% # datasets.size %]
+                    <span id="shortdesc"><!--Data file (direct): --></span>
+                </form>
+                [% END %]
+            [% ELSE %]
+                <form name="form1" id="form1" action="#" style="">
+                    <button type="button" onclick="history.back()">Back to menu</button>
+                </form>
+            [% END %]
+
+            <form name="form2" id="form2" action="#" style="">
+                <label>Projection:
+                    <select name="crs" id="crs" onChange="changeCRS(this[this.selectedIndex].value)">
                     </select>
                 </label> [% # datasets.size %]
-                <span id="shortdesc"><!--Data file (direct): --></span>
             </form>
 
-        [% ELSE %]
-            <form name="form1" id="form1" action="#" style="position: absolute; top: 0px; left: 50px; z-index: 1000">
-                <button type="button" onclick="history.back()">Back to menu</button>
-            </form>
-        [% END %]
+        </div>
 
         <div id="timesliderId" style="position: absolute; bottom: 5px; left: 5px; z-index: 1000; width: 300px;"></div>
 

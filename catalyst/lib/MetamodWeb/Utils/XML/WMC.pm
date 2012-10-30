@@ -122,6 +122,7 @@ sub old_gen_wmc { # DEPRECATED
     #
     my $newlayers = $results->createElementNS($wmcns, 'LayerList');
     my $hidden = 0;
+    my $nobaselayer = 1;
 
     # loop thru layers in setup file
     foreach my $setuplayer ( $setupxc->findnodes('/*/s:layer|/*/s:baselayer') ) {
@@ -152,6 +153,7 @@ sub old_gen_wmc { # DEPRECATED
 
             if ($setuplayer->localname eq 'baselayer') {
                 $gclayer->addNewChild( 'http://openlayers.org/context', 'ol:transparent' )->appendTextNode('false');
+                $nobaselayer = 0;
             } else { # overlay
                 $gclayer->addNewChild( 'http://openlayers.org/context', 'ol:transparent' )->appendTextNode('true');
                 $gclayer->addNewChild( 'http://openlayers.org/context', 'ol:opacity' )->appendTextNode('0.6');
@@ -180,7 +182,7 @@ sub old_gen_wmc { # DEPRECATED
     #
     # copy background map layers to wmc
     #
-    if ( my $mapconf = getProjMap( $bbox{'crs'} ) ) {
+    if ( $nobaselayer and (my $mapconf = getProjMap( $bbox{'crs'} )) ) {
         printf STDERR "*** Getting map for %s\n", $bbox{'crs'};
 
         ## impossible to use Metamod::Config here... SNAFU, giving up....

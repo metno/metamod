@@ -1,6 +1,9 @@
 
 var log = log4javascript.getDefaultLogger();
 
+//read CGI args
+var args = new OpenLayers.Util.getArgs();
+
 OpenLayers.IMAGE_RELOAD_ATTEMPTS = 5;
 
 $(function() { // runs after document loaded
@@ -20,8 +23,6 @@ $(function() { // runs after document loaded
 function init(){
     // run after document is loaded
 
-    //read CGI args
-    var args = new OpenLayers.Util.getArgs();
     var wms_setup = args.wmssetup;
     var wms_url = args.wmsurl;
 
@@ -45,9 +46,13 @@ function init(){
 
 }
 
-function changeFile(new_ds_id) {
+function changeFile(new_ds_id) { // DEPRECATED, not working in 2.11
     map.destroy();
-    OpenLayers.loadURL(wmcpath + "?ds_id=" + new_ds_id, "", this, drawMap, showError);
+    OpenLayers.loadURL(wmcpath + "?ds_id=" + new_ds_id, "", this, drawMap, showError); // also needs crs
+}
+
+function changeCRS(crs) {
+    window.location.href = 'wms?ds_id=' + ds_id + '&crs=' + crs;
 }
 
 function timeHandlerFactory(layer) {
@@ -116,10 +121,24 @@ function drawMap(response) {
         '../static/images/led_green.png'
     ];
 
+    var projs = {};
+
     for (var i=0; i < map.layers.length; i++) {
         var l = map.layers[i];
         var lc = '#layer' + i;
         //log.debug(lc);
+
+        // store # of uses of all projs for later (needed by crs selector)
+        for (var key in l.srs) {
+            if ( l.srs.hasOwnProperty(key) ) {
+                //log.debug(i, key);
+                if (projs[key] == undefined) {
+                    projs[key] = 1;
+                } else {
+                    projs[key]++;
+                }
+            }
+        }
 
         var led_index = ( map.layers[i].isBaseLayer ? 2 : 0 );
         if ( i == 0 ) {
@@ -156,7 +175,7 @@ function drawMap(response) {
             // initialize time for all layers (needed for wmsdiana)
             l.mergeNewParams( {time: deft} );
 
-            // build time selector
+            // build time selector... DEPRECATED - time selector now handled by timeslider plugin
             $(lc).append('<p>Timeseries points: ' + times.length + '</p>');
             // DISABLED
             //$(lc).append('<p>Time:<br/><select id="layer' + i + '_time"/></p>');
@@ -167,7 +186,6 @@ function drawMap(response) {
             //
             //$(lc + '_time').change( timeHandlerFactory(l) );
         }
-
 
         if (l.metadata.styles !== undefined && l.metadata.styles.length > 0) {
 
@@ -187,6 +205,13 @@ function drawMap(response) {
         }
 
     }
+
+    for (var key in projs) {
+        log.debug(key, projs[key]);
+        var opt = (key == args.crs) ? '<option selected="selected">' : '<option>';
+        $('#crs').append( opt + key + '</option>');
+    }
+
 
     $("#accordion").accordion("destroy");
     $("#accordion").accordion({
