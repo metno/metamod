@@ -365,8 +365,11 @@ sub process_DIF_records {
             $log->error("CONTENT: problems setting info in record $i: $@ " . $record->toString);
             return;
         }
-        $log->info("Writing $base_filename.xm[ld]");
-        $fds->writeToFile($base_filename);
+        if (-e "$base_filename.xmd" or $status ne "deleted") {
+           # Only write xm[ld] files for a deleted dataset if it already exists in the repository:
+           $log->info("Writing $base_filename.xm[ld]");
+           $fds->writeToFile($base_filename);
+        }
     }
 
     # check for resumptionToken
