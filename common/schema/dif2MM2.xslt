@@ -185,14 +185,29 @@ version="1.0">
     </xsl:template>
 
 
+<!--
     <xsl:template match="dif:Project/dif:Short_Name">
-        <!-- Currently unsupported item in Metamod -->
         <xsl:comment>Unsupported element <xsl:value-of select="local-name()"/> in Metamod</xsl:comment>
         <xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
             <xsl:attribute name="name">dif:Project/dif:Short_Name</xsl:attribute>
             <xsl:value-of select="." />
         </xsl:element>
     </xsl:template>
+-->
+
+	<xsl:template match="dif:Project/dif:Short_Name">
+		<xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
+            <xsl:attribute name="name">project_name</xsl:attribute>
+            <xsl:value-of select="." />
+        </xsl:element>
+	</xsl:template>
+
+	<xsl:template match="dif:Project/dif:Long_Name">
+		<xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
+            <xsl:attribute name="name">project_long_name</xsl:attribute>
+            <xsl:value-of select="." />
+        </xsl:element>
+	</xsl:template>
 
 
     <xsl:template match="dif:Access_Constraints">
