@@ -2,7 +2,42 @@
 
 Back to L<Index|index>
 
-=head2 Site configuration
+=head2 Introduction
+
+Each METAMOD application needs a B<configuration directory> where specific properties
+for the application are decribed. These properties will include:
+
+=over 2
+
+=item
+
+Which modules are activated for the application
+
+=item
+
+Basic information like domain name and URLs for accessing the web portal, identification 
+of the application, directory path for storing runtime information and XML archive, etc.
+
+=item
+
+Stylesheets and other web configuration
+
+=item
+
+Which search methods available in the metadata data base will be exposed in the web search
+interface, and how metadata are presented to the user.
+
+=item
+
+For the base application, overall information on the metadata categories that are searchable 
+in the matadata data base.
+
+=item
+
+For applications using the UPLOAD module, which metadata will be extracted from the 
+uploaded netCDF files.
+
+=back
 
 The application configuration directory contains a very important file, the
 B<master_config.txt> file. This file governs how METAMOD will run.
@@ -58,15 +93,15 @@ directory names for each of the applications to this top URL.
 
 =item WEBRUN_DIRECTORY
 
-The top directory for the runtime environment.
+The top directory for runtime files, which also contain the XML archive.
 
 =item OPENDAP_DIRECTORY
 
 The top directory of the data repository. This directory is assumed to be
-accessible through an OPeNDAP server which has to be installed as a separate
-package (not part of METAMOD 2.x). If no OPeNDAP server is installed, the
-METAMOD 2.x software will mostly work, apart from links to data files from the
-web applications.
+accessible through an OPeNDAP server (usually TDS/THREDDS) which has to be installed
+as a separate package (not part of METAMOD 2.x). If no OPeNDAP server is installed,
+some of the METAMOD 2.x software will not work. For example, links to OPeNDAP presentation
+of data files set up automaticlly by the UPLOAD module will not work.
 
 =item OPENDAP_URL
 
@@ -88,7 +123,7 @@ METAMOD application|deploying>
 =back
 
 The following variables are used to select the modules that will comprise the
-application. whereas they previously indicated the absolute path of the source
+application. Whereas they previously indicated the absolute path of the source
 directory for each module, they are now only used as booleans (where any
 non-empty string means true).
 
@@ -105,9 +140,10 @@ A complete inventory of the variables that could be part of the
 master_config.txt file is found in the C<app/default/default_config.txt> file in
 the installation directory.
 
-=head2 Config file format
+=head3 Config file format
 
-The configuration files contain lines as follows:
+The master_config.txt file (and the default and example versions of this file) 
+contain lines as follows:
 
     VARNAME = VALUE
 
@@ -135,76 +171,39 @@ will be substituted with the corresponding value at runtime when the variable is
 accessed. Such text strings may also be found within 'VALUE'
 strings, and they will be substituted as appropriate.
 
-=begin OBSOLETE
-
-=head3 TEST_IMPORT_BASETIME (OBSOLETE?)
-
-The app/example/master_config.txt file is already configured for testing,
-meaning that E-mails sent from the system to users are sent to the
-operator instead, and that the system works on a "virtual timescale"
-which goes faster than real time. But one variable has to be adjusted in the
-'Test configuration' section of the master_config.txt: TEST_IMPORT_BASETIME
-
-This variable should be set to the value returned by the
-upload/scripts/show_time_now.pl script, which returns the current time as
-"seconds since the epoch".
-
-
-=head2 Multiple target files (OBSOLETE - FIXME)
-
-It is possible to use the configuration file to produce several target files
-from a single source file. This is done using the special directives:
-
-    !substitute_to_file_with_new_name sourcefilepath => targetfilepath
-    !end_substitute_to_file_with_new_name
-
-The 'sourcefilepath' must be a relative file path found in one of the
-'filelist.txt' files, and 'targetfilepath' must also be a relative file path,
-but it is not required to exist in any 'filelist.txt' file. The source file
-(given by 'sourcefilepath') will be modified and copied to the target file
-(given by 'targetfilepath') using the ordinary substitution directives in
-the configuration file. In addition to these substitutions, any substitution
-directive between the '!substitute_to_file_with_new_name' directive and the
-corresponding '!end_substitute_to_file_with_new_name' directive will be
-performed. Note that these substitution directives will not affect any of the
-other files produced by the installation script.
-
-By using these special directives several times for the same source file,
-and varying the target file name between each use, several target files are
-produced from the same source file, and they will have different content
-depending on the in-between substitution directives found for each target
-file.
-
-=end OBSOLETE
-
-=head2 Metadata configuration (optional)
+=head2 Metadata sources
 
 METAMOD is able to handle a large range of metadata frameworks. For metadata
 generated through the UPLOAD module (by parsing netCDF files), METAMOD has
 defined its own XML format, called MM2. This format has a similar structure as
 Dublin core; it is a flat structure with freely selected metadata keywords. For
-each keyword one or more values may be found. Other metadata frameworks, like
+each keyword one or more values may be found.
+
+Other metadata frameworks, like
 DIF or ISO19115, are also accepted, and such frameworks will typically emerge
 when harvesting from other metadata providers through OAI-PMH. While such
 frameworks (DIF, ISO19115) are hierarchical in nature, a flattening of these
 structures takes place when they are imported to the SQL database and presented
 through the METAMOD search interface.
 
-The following configuration files regulate which metadata are imported to the
-SQL database and available for search, how metadata imported by the HARVEST
-module are translated into the internal flat structure used in the SQL database,
-and how metadata found in the uploaded netCDF files are translated to MM2 XML
-files.
+=head2 Configuration of the base application
 
-=over
-
-=item staticdata/searchdata.xml
+The base application in a cluster of METAMOD applications has the special responsibility
+of setting up the static tables in the SQL metadata data base that govern which metadata
+are available for search in the WEB search interface. This is done through the
+B<staticdata/searchdata.xml> file in the configuration directory.
 
 This XML file contains metadata vocabularies that are imported into the SQL
 database, and used in the SEARCH module for setting up the interactive forms for
 web users searching the database.
 
-=item etc/conf_digest_nc.xml
+Note that this file establish which categories of metadata will be available in the SQL
+data base. Each application will contain additional configuration that will taylor these
+possibilities to the needs of that application.
+
+=head2 Configuration for the UPLOAD module
+
+=head3 etc/conf_digest_nc.xml
 
 This XML file describes the parsing of netCDF files in the UPLOAD module.
 Specifically how attributes and variable values in a netCDF file are translated
@@ -214,7 +213,7 @@ required in the netCDF files. The C<app/example/etc/conf_digest_nc.xml> file
 represents a well commented example of such a file that can be used as a
 starting point for a version tailored to specific needs.
 
-=item etc/usererrors.conf
+=head3 etc/usererrors.conf
 
 This file contain html templates that are used in error reports sent to data
 providers that have uploaded netCDF files using the UPLOAD module. Each template
@@ -222,13 +221,11 @@ corresponds to an error condition defined in the etc/conf_digest_nc.xml file. An
 example file in the C<app/example/etc> directory corresponds to the
 C<conf_digest_nc.xml> in the same directory.
 
-=item XSLT
+=head2 XSLT
 
 Files for translating from foreign metadata formats (... more text is needed)
 
-=back
-
-=head3 Stylesheets and other web configuration
+=head2 Stylesheets and other web configuration
 
 METAMOD can be configured with custom texts and stylesheets. To modify the
 styles of the application add the following directories to your application

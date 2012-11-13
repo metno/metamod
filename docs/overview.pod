@@ -4,41 +4,75 @@ Back to L<Index|index>
 
 =head2 Introduction
 
-This document assumes that the basic METAMOD software are working on the various servers where METAMOD
-are intended to run.  How to achieve this is described in a separate document: ... The current document
-describes how to use the software to create a cluster of one or more co-operating METAMOD applications
-(or METAMOD instances).
+This document gives an overall description of METAMOD2. Installation of basic METAMOD2 software
+and deployment of new METAMOD2 applications are described in separate documents: L<Installation|installation>
+and L<Deployment|deployment>.
 
-=head2 Data base
+The METAMOD2 software installed on a server can be used to run one or more METAMOD2 B<applications> 
+(or METAMOD2 instances). A METAMOD2 application is a web portal connected to a data base with metadata. 
+The metadata will typically describe geoscience data files, and the web portal will offer a search interface
+that can display lists of files that meet user-supplied search criteria.
 
-All the METAMOD instances in a cluster share a common data base. This data base is divided into the
-following parts:
+The central part of METAMOD2 is the data base containing metadata. This data base may be shared between several
+METAMOD2 applications. The metadata is obtained by extracting metadata from uploaded data files,
+harvesting metadata from other sources on the internet,
+entered using a web form or inserted manually in the XML archive (see below).
+
+The METAMOD2 applications sharing a metadata data base is called a B<cluster>. In its simplest form, a cluster
+comprise just one application, and this is often how METAMOD2 is used. However, by using several applications
+in a cluster, a major strength of METAMOD2 can be utilized: The ability to 
+expose different parts of the metadata data base through different METAMOD2 applications. 
+All metadata in the common data base are available for all the applications in a cluster. An application 
+need not expose all metadata. Each application may be configured differently, so that only those metadata that
+are in agreement with the intended use of the application will be exposed through the web portal.
+
+=head2 Data bases
+
+The common metadata data base in a METAMOD2 cluster is divided into two parts:
 
 =over 17
 
-=item B<Metadatabase>
-
-SQL Database for Metadata. This can be shared among different METAMOD instances
-
-=item B<User database>
-
-SQL Database for User administration. Each METAMOD instance must have it's own private user database
-
 =item B<XML archive>
 
-Metadata file archive based on XML
+Metadata file archive based on XML. This file archive is subdivided into one directory tree for each METAMOD2
+application in the cluster.
 
-=item B<Data repository>
+=item B<Metadatabase>
 
-Archive of netCDF files
+SQL data base that is used as a fast search index for all metadata in the XML archive.
 
 =back
 
-One of the METAMOD applications in a cluster is responsible for the SQL metadata database. Initialization and
-administration of the metadata database are done through this application, which is called the I<base>
-application. Each METAMOD instance must administer its own user database.
+In addition to the common metadata data base, each METAMOD2 application has its own private user database:
 
-Although the METAMOD instances in a cluster may operate on different servers, they must share a common
+=over
+
+=item B<User database>
+
+SQL Database for User administration.
+
+=back
+
+Although METAMOD2 may be used merely as a search portal for metadata, where the data files described
+by the metatdata are situated elsewhere, METAMOD2 also facilitates handling and storing of actual data files.
+The data files managed in this way are stored in directories accessible from all the METAMOD2 applications
+in a cluster:
+
+=over
+
+=item B<The data repository>
+
+A directory tree where METAMOD2 stores the data files uploaded to METAMOD2 through the upload module 
+(see below). For the time being, only netCDF files are handled through the upload module, but the data repository
+may also comprise files with other formats.
+
+=back
+
+One of the METAMOD applications in a cluster is responsible for the SQL metadata data base. Initialization and
+administration of the metadata database are done through this application, which is called the I<base>
+application. Each METAMOD application must manage its own user database.
+
+Although the METAMOD applications in a cluster may operate on different servers, they must share a common
 file system where the XML archive and the Data repository resides. Technically they may reside on
 different file systems, but for each file, the file paths on the various servers must be the same.
 Furthermore, for a smooth operation, the clocks on all the involved servers must be synchronized.
@@ -70,8 +104,7 @@ This module is required, although some of the services may be disabled.
 
 =item BASE
 
-Used for creating the SQL databases. Since every METAMOD instance must have its
-own user database, this is also required.
+Used for configuring and creating the SQL metadata data base.
 
 =item UPLOAD
 
@@ -95,27 +128,32 @@ access the data repository.
 =head2 Directory structure
 
 On each server where METAMOD should run, the generic METAMOD software must be available in some directory.
-If you installed METAMOD using a met.no Debian package it will be located in F</opt/metamod-2.x> (where x denotes the minor version).
+If you installed METAMOD using a met.no Debian package it will be located in F</opt/metamod-2.x>
+(where x denotes the minor version).
 In the description below, this directory is called the B<installation> directory.
 
-In addition to the generic installation directory you need a configuration
+In addition to the installation directory you need a B<configuration>
 directory. This directory contains configuration files, style sheets etc., and
 also files regulating metadata requirements. An example application configuration
-directory is included in the generic installation directory (the F<app/example>
+directory is included in the installation directory (the F<app/example>
 subdirectory of the installation directory).
 
-The main subdirectories of the generic installation directory are:
+The main subdirectories of the installation directory are:
 
 =over 10
 
+=item catalyst
+
+Perl Catalyst framework files used for the WEB module
+
 =item base
 
-Files only used in the BASE module
+Files used in the BASE module, and files for initializing each user data base.
 
 =item upload
 
 Files only used in the UPLOAD module (scripts only, the user interface is implemented
-in Catalyst)
+in the catalyst directory)
 
 =item harvest
 
@@ -129,10 +167,6 @@ Files only used in the THREDDS module
 
 Files used by several modules
 
-=item catalyst
-
-Perl Catalyst framework files used for the WEB module
-
 =item app
 
 Contains the example application source directory, as well as default configuration settings
@@ -142,135 +176,3 @@ Contains the example application source directory, as well as default configurat
 METAMOD documentation directory
 
 =back
-
-=begin OBSOLETE
-
-DIRECTORY STRUCTURE (OBSOLETE - FIXME)
--------------------
-
-The top METAMOD 2.x directory (the directory where this README file resides)
-is divided into one subdirectory for each module (base, search, upload, quest,
-pmh, harvest and thredds). There is also a subdirectory (common) where files
-used by many modules resides, and a subdirectory (test) containing a test suite
-for periodically excercising the software while software developement are going
-on. In addition, one subdirectory (app) contains an example application.
-
-The module directories shares a common structure. During installation of an
-application, a new directory is created (the target directory), and all module
-directories are merged into this target directory. In each module directory
-there is a htdocs subdirectory. The htdocs directories for all the selected
-modules are in the same way merged into one htdocs subdirectory in the target
-directory.  To avoid name collisions, the actual HTML and PHP files etc. are
-contained within subdirectories of the htdocs directory. For example, all such
-files are contained in the directory htdocs/sch for the METAMODSEARCH module,
-and htdocs/upl for the METAMODUPLOAD module. On the target directory, there
-will be a htdocs directory containing both the sch and the upl subdirectories.
-Some htdocs subdirectories may be shared among several modules. For example,
-the METAMODBASE module and the METAMODQUEST module both have files in the adm
-subdirectory. Special care must be taken for these files to avoid name
-collisions.
-
-Each module directory must also contain a file 'filelist.txt' which
-lists all files comprising the module.
-
-Each METAMOD application must be configured in a separate directory tree.
-This application directory tree will generally be independent of the METAMOD
-source tree (where this README file resides at the top level). But an example
-of a METAMOD application directory (app/example) is included in the source
-tree as a template for real application directories.
-
-In each application directory there must be a configuration file called
-'master_config.txt', and a 'filelist.txt' file containing a list of files that
-are specific for the application (image files, style sheets etc.). An
-application directory has the same structure as any of the module directories,
-and contains a htdocs subdirectory divided into sch, upl etc. as needed.
-Any file found in the application directory (and included in the 'filelist.txt'
-file) will replace a corresponding file in a module directory. This makes it
-possible to taylor a METAMOD application to any specific need, but usually this
-mechanism is only used for presentation purposes (stylesheets etc.) and for
-static data used to setting up the search interface.
-
-=end OBSOLETE
-
-=begin OBSOLETE
-
-=head2 SYSTEM OVERVIEW (OBSOLETE - FIXME)
-
-For installation, see docs/html/installing.html.
-
-For each module there is a more detailed README file describing the
-operations of that module. This paragraph gives a summary of the operations
-of a full application comprising all modules.
-
-An application must be configured and setup as described in L<Deploying a
-METAMOD application|deploying>. After installation, if the application is a
-fresh one (where no database for the application already exists), a new database
-must be initialized and filled with static data. Also, if not already done for
-the PostgreSQL installation, two database users must be defined. The default
-names of these users are 'admin' and 'webuser', but these names are
-configurable. The users can be created by the createusers.sh script, and this
-must be done prior to creating the database.
-
-Initializing the database and loading the static data are done by running the
-init/create_and_load_all.sh script as described in base/README. The static
-data loaded into the database are found in an XML file: staticdata/searchdata.xml
-and defines the search categories by which it is possible to search the database.
-This file must be found in the application directory of the application owning
-the database. All applications using this database will be confined to the
-search categories defined by this file. The example application included in
-the source tree has one version of this file that is based on the
-application installed for the DAMOCLES project.
-
-The software also need a runtime environment that must be set up by the
-prepare_runtime_env.sh shell script. This script creates a directory (the
-webrun directory) if not already found. Several subdirectories in the webrun
-directory are also created. If the prepare_runtime_env.sh script has already
-been run during an earlier installation process, it is not neccessary to do it
-again (unless a new version of the software requires changes in the runtime
-environment). On the other hand, a re-run of this script will do no harm.
-
-After initialization, loading of static data and setting up the runtime
-environment, the web interfaces for the METAMODSEARCH, METAMODUPLOAD and
-METAMODQUEST modules should be up and running.
-
-To fill the database with metadata, any of the METAMODUPLOAD, METAMODQUEST
-and/or METAMODHARVEST modules must be applied. These modules produce XML files
-with metadata describing datasets (see base/README_XML).
-
-Datasets are organized hierarchically in two levels. The top level contains
-directory datasets. Each directory dataset may own one or more file datasets
-at the second (bottom) level. File datasets will correspond to physical files
-found in a local or external data repository. Directory datasets may correspond
-to directories in the data repositories where these files reside. The database
-will also contain independent datasets that own no file dataset on the second
-level. These datasets belong to the top level, and are considered directory
-datasets even if they correspond to no physical directory.
-
-The metadata comprising a dataset are found both in the database and in a set
-of XML files in the local file system. Two XML files exist for each
-dataset. With the METAMODQUEST routine, all the content of the two XML files has
-to be manually entered into an HTML form. The METAMODUPLOAD routine creates the
-XML files based on netCDF files uploaded to a data repository. Uploads may either
-be done interactively through the METAMODUPLOAD web interface, or by FTP
-(usually from a script run by the data provider). Each netCDF file will
-comprise one file dataset. The data provider decides how files and file datasets
-are organized into directories and directory datasets. The METAMODHARVEST module
-periodically harvest metadata from external sources. The harvested metadata are
-saved as XML files.
-
-The collection of XML files comprise at any time, a full backup of the database.
-A script exists that will recreate the database from the XML files.
-
-Two perl scripts are responsible for extracting the metadata from the netCDF
-files and load them into the database. The first script, upload_monitor.pl,
-belongs to the METAMODUPLOAD module. This script extracts the metadata from
-a batch of netCDF files and creates/updates the corresponding XML files. The
-other script, import_dataset.pl, belongs to the METAMODBASE module. This
-script monitors a number of directories to see if XML files are created or
-updated, and loads the XML files into the database. Both scripts are running
-in the background. They wake up at regular intervals to see if any work
-are pending. These perl scripts have to be manually started by the
-'metamodInit.sh start' shell script. They will run until another shell script,
-'metamodInit.sh stop', stops the scripts in an orderly fashion.
-
-=end OBSOLETE
