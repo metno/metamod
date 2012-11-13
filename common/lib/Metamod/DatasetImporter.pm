@@ -313,6 +313,7 @@ sub _insert_metadata {
         institution           => 7,
         datacollection_period => 8,
         operational_status    => 10,
+        project_name          => 14,
     );
 
     #  Prepare SQL statements for repeated use.
