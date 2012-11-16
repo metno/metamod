@@ -150,12 +150,12 @@ ok(eq_array(\@oldVals, \@metaVals), "removeMetadataName, oldValues");
 @oldVals = $ds->removeMetadataName('abc');
 ok(eq_array(\@oldVals, []), "removeMetadataName, really gone");
 
-my $oldDs = newFromFile Metamod::Dataset($DataDir.'oldDataset.xml');
+my $oldDs = eval { newFromFile Metamod::Dataset($DataDir.'oldDataset.xml') };
 isa_ok($oldDs, 'Metamod::Dataset');
-is($oldDs->originalFormat, 'OldDataset', "old dataset: orignal format");
-%metadata = $oldDs->getMetadata;
+is(eval { $oldDs->originalFormat }, 'OldDataset', "old dataset: orignal format");
+%metadata = eval { $oldDs->getMetadata };
 is (scalar keys %metadata, 2, "reading old datasets metadata");
-@quadTree = $oldDs->getQuadtree;
+@quadTree = eval { $oldDs->getQuadtree };
 is (scalar @quadTree, 4, "quadtree of old dataset");
 
 my $newDs = newFromFile Metamod::Dataset($DataDir.'exampleMM2.xml');

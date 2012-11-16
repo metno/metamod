@@ -34,7 +34,7 @@ our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", 
 use strict;
 use warnings;
 use encoding 'utf-8';
-use Carp qw();
+use Carp;
 use Metamod::DatasetTransformer;
 use Metamod::DatasetTransformer::MM2;
 use POSIX qw();
@@ -100,7 +100,7 @@ sub newFromFile {
 	if ($@) {
         $error_text = $@;
 		$logger->error('newFromFile error: ', $@);
-		die("newFromFile error: $@");
+		croak("newFromFile error: $@");
 	}
 	#print STDERR $something ? "newFromFile succeded" : "newFromFile failed, but didn't die\n";
 	return $something;
