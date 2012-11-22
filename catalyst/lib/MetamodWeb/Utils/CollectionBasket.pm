@@ -121,7 +121,8 @@ sub add_dataset {
 
     my $dataset = $self->meta_db->resultset('Dataset')->find($ds_id);
 
-    my $max_files = 100;
+    # default to 100 as max number of files
+    my $max_files = $self->max_files();
     my $max_additional = $max_files - scalar @ds_ids;
 
     # default to 500 MB as max size
@@ -546,6 +547,28 @@ sub max_size {
         return $self->config->get('COLLECTION_BASKET_MAX_SIZE');
     } else {
         return 524288000;
+    }
+}
+
+=head2 $self->max_files()
+
+=over
+
+=item return
+
+The maximum number of files allowed in the basket.
+
+=back
+
+=cut
+
+sub max_files {
+    my $self = shift;
+
+    if ($self->config->has('COLLECTION_BASKET_MAX_FILES')) {
+        return $self->config->get('COLLECTION_BASKET_MAX_FILES');
+    } else {
+        return 100;
     }
 }
 
