@@ -102,6 +102,11 @@ sub newFromFile {
 		$logger->error('newFromFile error: ', $@);
 		croak("newFromFile error: $@");
 	}
+    if (! $something) {
+        $error_text = "Unknown XML metadata format";
+		$logger->error('newFromFile error: ', $error_text);
+		croak("newFromFile error: $error_text");
+    }
 	#print STDERR $something ? "newFromFile succeded" : "newFromFile failed, but didn't die\n";
 	return $something;
 }
