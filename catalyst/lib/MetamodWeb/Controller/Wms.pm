@@ -104,7 +104,7 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
     my $wmc = eval { $c->stash->{wmc}->old_gen_wmc($setup, $wms, $$p{crs}) }; # TODO rewrite to use gc2wmc instead - FIXME
     if ($@) {
         $self->logger->warn("old_gen_wmc failed: $@");
-        error($c, 502, $@);
+        $c->detach( 'Root', 'error', [ 502, $@ ] );
     } else {
         my $out = $wmc->toString;
         # another hack to work around inexplainable duplicate namespace bug
@@ -293,7 +293,7 @@ sub qtips :Path("/qtips") :Args(0) {
 sub error {
     my ($c, $status, $message) = @_;
     $c->response->status($status);
-    $c->response->body( "Server Error: " . $message );
+    $c->response->body( $message );
 }
 
 =head1 LICENSE

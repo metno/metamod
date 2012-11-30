@@ -104,12 +104,12 @@ sub old_gen_wmc { # DEPRECATED
     #################################
     # transform data Capabilities to WMC
     #
-    my $getcap_url = $wmsurl || $setup->documentElement->getAttribute('url') or confess("Missing setup or WMS url");
+    #my $getcap_url = $wmsurl || $setup->documentElement->getAttribute('url') or confess("Missing setup or WMS url");
     # reading from setup is now deprecated
 
     my $wmcns = "http://www.opengis.net/context";
 
-    my $results = $self->_gen_wmc($getcap_url, \%bbox);
+    my $results = eval { $self->_gen_wmc($wmsurl, \%bbox) } or die $@;
 
     my $gcxc = XML::LibXML::XPathContext->new( $results->documentElement() ); # getcapabilities xpath context
     $gcxc->registerNs('v', $wmcns);
@@ -240,8 +240,13 @@ sub _gen_wmc {
 
     my $xslt = XML::LibXSLT->new();
     # get capabilities xml
-    my $dom = eval { getXML($wmsurl . $gcquery ) }; # use wmscap in Dataset FIXME
-    croak " error: $@" if $@;
+    my $dom = eval {
+        getXML($wmsurl . $gcquery ) # use wmscap in Dataset FIXME
+    } or die $@;
+    #if ($@) {
+    #    print STDERR "+++++++++++++ $@\n\n";
+    #    die $@;
+    #}
 
     # check if wms 1.1.1 or 1.3.0
     my $version = $dom->documentElement->getAttribute('version');
@@ -251,8 +256,7 @@ sub _gen_wmc {
     # generate wmc from capab
     my $wmcdoc = eval {
         $stylesheet->transform( $dom, XML::LibXSLT::xpath_to_string( %{$params} ) );
-    };
-    croak " error: $@" if $@;
+    } or die $@;
 
     return $wmcdoc;
 

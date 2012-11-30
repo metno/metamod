@@ -89,10 +89,10 @@ Report error as HTML and die
 
 =cut
 
-sub abandon {
+sub abandon { # deprecated - use catalyst controllers instead
     my $text = shift || 'Something went wrong';
     my $status = shift || 500;
-    print $q->header('text/html', $status);
+    print $q->header('text/html', $status); # doesn't work under catalyst which already has sent headers ...
     print <<EOT;
 <html>
 <head>
@@ -126,11 +126,14 @@ sub getXML {
     if ($response->is_success) {
         #print STDERR $response->content;
         my $dom;
-        eval { $dom = $parser->parse_string($response->content) } or abandon($@, 502);
+        #eval { $dom = $parser->parse_string($response->content) } or abandon($@, 502);
+		eval { $dom = $parser->parse_string($response->content) } or croak($@);
         return $dom;
     }
     else {
-        abandon($response->status_line . ': ' . $url, 502);
+        #abandon($response->status_line . ': ' . $url, 502);
+		$logger->info("getXML failed for for $url: " . $response->status_line);
+		die("getXML failed for for $url: " . $response->status_line);
     }
 }
 

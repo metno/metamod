@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use Moose;
 use Metamod::Config;
 use namespace::autoclean;
+use HTTP::Status qw(status_message);
 
 use Data::Dump qw( dump );
 
@@ -88,6 +89,20 @@ sub unauthorized :Private : Args {
     $self->logger->debug("Required role: $required_role");
     $c->response->status(403);
     $c->stash( template => 'unauthorized.tt', required_role => $required_role );
+}
+
+=head2 error
+
+Customizable error page
+
+=cut
+
+sub error :Path {
+    my ( $self, $c, $status, $message ) = @_;
+    #my ( $status, $message ) = @$args;
+    $c->response->content_type('text/html');
+    $c->response->status($status);
+    $c->response->body( "<h1>$status " . status_message($status) . "</h1><p>$message</p>\n" );
 }
 
 =head2 begin()

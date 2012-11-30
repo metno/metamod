@@ -402,20 +402,25 @@ sub wmsurl {
             my $metadata = $self->metadata(['dataref']);
             if (exists $metadata->{dataref}) {
 
-                my $threddsDataref = $metadata->{dataref}[0];
+                my $dataref = $metadata->{dataref}[0];
                 # %THREDDS_DATAREF% translates OSISAF-like THREDDS URLs into WMS URLs... DEPRECATED
-                $logger->debug("*** dataref: $threddsDataref");
-                $threddsDataref =~ s:(.*/thredds)/catalog/.*\?dataset=(.*):$1/wms/$2:;
-                my $datarefq = $2 || 'ERROR_IN_THREDDS_DATAREF';
+                $logger->debug("*** dataref: $dataref");
+                unless ( $dataref =~ m|(.*/thredds)/catalog/.*\?dataset=(.*)| ) {
+                    $logger->warn("Missing dataset ID in dataref $dataref");
+                    return;
+                }
+                my $threddsDataref = "$1/wms/$2";
+                my $dataset_id = $2;
                 $url =~ s|%THREDDS_DATAREF%|$threddsDataref|;
 
-                # %THREDDS_DATASET% only gives you the dataset parameter in the query string
-                my @datarefpath = split('/', $datarefq);
-                my $foo = $datarefpath[1] || $datarefq;
-                $url =~ s|%THREDDS_DATASET%|$datarefq|;
-                $url =~ s|%UGLY_HACK_FOR_MYOCEAN%|$foo|; #FIXME ASAP
+                # %THREDDS_DATASET% only gives you the dataset parameter in the query string (thredds ID)
+                my @datarefpath = split('/', $dataset_id);
+                my $filename = $datarefpath[1] || $dataset_id;
+                $url =~ s|%THREDDS_DATASET%|$dataset_id|;
+                $url =~ s|%UGLY_HACK_FOR_MYOCEAN%|$filename|; #FIXME ASAP
             } else {
-                # TODO: some logging... FIXME
+                $logger->warn("Missing dataref for dataset #" . $self->ds_id);
+                return; # wmsinfo does not compute
             }
         }
 
