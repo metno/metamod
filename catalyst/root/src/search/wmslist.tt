@@ -54,6 +54,9 @@
                 // add all projections common to all layers into selector
                 for (pc in projCount) {
                     //log.debug('** ' + pc + ' = ' + projCount[pc] + ' of ' + allLayers.length);
+                    if (pc == "CRS:84"){ 
+                        continue;  // not a proper projection
+                    }
                     if ( projCount[pc] == allLayers.length ) {
                         $('<option/>').attr('value', pc).text( projNames[pc]||pc ).appendTo('#crs');
                     }
