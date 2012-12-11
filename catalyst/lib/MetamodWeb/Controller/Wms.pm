@@ -191,13 +191,28 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
         #printf STDERR ">>>>>>>> From %s to %s\n", $_->{'crs'}, $crs;
         my $from = Geo::Proj4->new( init => lc($_->{'crs'}) ) or die Geo::Proj4->error;
         #my $from = _newProj( $_->{'crs'} );
-        my @corners = (
+
+        my @corners = ( # end points of bounding box
             [ $_->{'left' }, $_->{'bottom'} ],
             [ $_->{'left' }, $_->{'top'   } ],
             [ $_->{'right'}, $_->{'bottom'} ],
             [ $_->{'right'}, $_->{'top'   } ],
         );
-        my $pr = $from->transform($to, \@corners);
+
+        my @points;
+        while (@corners) { # compute mid points between each corner
+            my $p = shift @corners;
+            push @points, $p;
+            foreach (@corners) {
+                my $x = ( $p->[0] + $_->[0] ) / 2;
+                my $y = ( $p->[1] + $_->[1] ) / 2;
+                #print STDERR "++++++ x=$x y=$y +++++++++++++\n";
+                push @points, [$x, $y];
+            }
+        }
+
+        # call proj transformation
+        my $pr = $from->transform($to, \@points);
         #print STDERR Dumper \@corners, $pr;
         foreach (@$pr) {
             push @x, $_->[0];
