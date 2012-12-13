@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Time series</title>
+        <link rel="stylesheet" href="[% c.uri_for('/static/css/reset.css') %]" />
+        <link rel="stylesheet" href="[% c.uri_for('/static/css/base.css') %]" />
+        <link rel="stylesheet" href="[% c.uri_for('/static/css/main.css') %]" />
+
+        <link rel="stylesheet" href="[% c.uri_for('/static/css/metamod_theme/jquery-ui.css') %]" />
+        <script type="text/javascript" src="[% c.uri_for('/static/js/log4javascript-1.4.2/js/log4javascript.js') %]"></script>
+        <script type="text/javascript" src="[% c.uri_for('/static/js/jquery.min.js') %]"></script>
+        <script type="text/javascript" src="[% c.uri_for('/static/js/jquery-ui.min.js') %]"></script>
+        <script type="text/javascript" src="[% c.uri_for('/static/lib/Firebug/firebug.js') %]"></script>
+
+        <script src="[% c.uri_for('/static/js/dygraph-combined.js') %]" type="text/javascript"></script>
+
+        <script type="text/javascript">
+            [% IF ! debug # disable logging in production %]
+                log = log4javascript.getNullLogger();
+            [% END %]
+        </script>
+
+        <script type="text/javascript">
+
+            function onLoad() {
+                graph = new Dygraph(
+                    document.getElementById("graphdiv"), // containing div
+                    "[% c.uri_for('/ts', dataset.ds_id, timeseries.0, 'csv') %]", // CSV or path to a CSV file.
+                    // TODO: add support for more than one timeseries ... FIXME
+                    {
+                        title: '[% title %]',
+                        labelsDivStyles: { border: '1px solid #d1e0e1' },
+                        fillGraph: true
+                        //xlabel: 'Date',
+                        //ylabel: 'Temperature (F)'
+                    }
+                );
+
+                setTimeout(changeLabels, 500) //wait until graph has time to draw before continuing
+            }
+
+            function changeLabels() {
+                var labels = graph.getLabels();
+                graph.updateOptions({
+                    xlabel: labels[0],
+                    ylabel: labels[1]
+                });
+            }
+
+        </script>
+
+    </head>
+
+    <body onload="onLoad();" [% # onresize="onResize();" %] style="overflow:hidden">
+
+        <div id="graphdiv" style="height: 100%; width: 100%; background-color: white"></div>
+
+    </body>
+</html>

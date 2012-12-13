@@ -93,6 +93,10 @@
 
             [% END %]
 
+            [% IF metadata.timeseries %]
+                    <a class="visual" href="[% c.uri_for('/search/ts', { ds_id => child.ds_id } ) %]"><span>Time series</span></a><br clear="all"/>
+            [% END %]
+
             [% c.req.params.delete('return_path') %]
         </div>
     </td>

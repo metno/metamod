@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =end LICENSE
 
+=cut
+
 =head1 NAME
 
 MetNo::Fimex - wrapper for fimex
@@ -64,8 +66,10 @@ use warnings;
 use Params::Validate qw();
 use Moose;
 use LWP::Simple qw();
+use File::Copy qw(copy);
 use File::Spec qw();
 use File::Temp qw();
+use Data::Dumper;
 
 =head1 METHODS
 
@@ -78,44 +82,70 @@ generate a fimex object
 Get or set the path of the fimex-program. Defaults to 'fimex' in the PATH.
 
 =cut
+
 has 'program' => (
     is => 'rw',
     isa => 'Str',
     default => 'fimex',
 );
 
-=head2 inputURL([$str])
+=head2 dapURL([$str])
 
-Get or set the input-url. This will automatically  set the input-file to ''.
+Get or set the OPeNDAP url. This will automatically  set the input-file and input-url to ''.
 
 =cut
+
+has 'dapURL' => (
+    is => 'rw',
+    isa => 'Str',
+    trigger => \&_unset_input,
+);
+
+sub _unset_input { # clean up logic here... FIXME
+    my ($self, $dapURL) = @_;
+    if ($dapURL) {
+        $self->inputFile('');
+        $self->inputURL('');
+    }
+}
+
+=head2 inputURL([$str])
+
+Get or set the input-url. This will automatically  set the input-file and dap-url to ''.
+
+=cut
+
 has 'inputURL' => (
     is => 'rw',
     isa => 'Str',
     trigger => \&_unset_inputfile,
 );
 
-sub _unset_inputfile {
+sub _unset_inputfile { # clean up logic here... FIXME
     my ($self, $inputurl) = @_;
     if ($inputurl) {
         $self->inputFile('');
+        $self->dapURL('');
     }
 }
 
 =head2 inputFile([$str])
 
-Get or set the input-file. This will automatically  set the input-url to ''.
+Get or set the input-file. This will automatically  set the input-url and dap-url to ''.
 
 =cut
+
 has 'inputFile' => (
     is => 'rw',
     isa => 'Str',
     trigger => \&_unset_inputurl,
 );
-sub _unset_inputurl {
+
+sub _unset_inputurl { # clean up logic here... FIXME
     my ($self, $inputfile) = @_;
     if ($inputfile) {
         $self->inputURL('');
+        $self->dapURL('');
     }
 }
 
@@ -124,6 +154,7 @@ sub _unset_inputurl {
 Get or set the input config. Use '' to use noe config.
 
 =cut
+
 has 'inputConfig' => (
     is => 'rw',
     isa => 'Str',
@@ -135,15 +166,18 @@ Get or set the outputfile. Select only the file-part, without directory. use out
 directory. If '', a L<Temp::File> object will be selected.
 
 =cut
+
 has 'outputFile' => (
     is => 'rw',
     isa => 'Str'
 );
+
 =head2 outputDirectory([$str])
 
 Get or set the outputdirectory. Defaults to File::Spec->tmpdir
 
 =cut
+
 has 'outputDirectory' => (
     is => 'rw',
     isa => 'Str',
@@ -155,6 +189,7 @@ has 'outputDirectory' => (
 Get or set the outputconfig. Use '' to not use a config.
 
 =cut
+
 has 'outputConfig' => (
     is => 'rw',
     isa => 'Str',
@@ -164,6 +199,7 @@ has 'outputConfig' => (
 Get or set the proj4 string.
 
 =cut
+
 has 'projString' => (
     is => 'rw',
     isa => 'Str',
@@ -173,6 +209,7 @@ has 'projString' => (
 Get or set the interpolation method. Defaults to nearestneighbor.
 
 =cut
+
 has 'interpolateMethod' => (
     is => 'rw',
     isa => 'Str',
@@ -184,15 +221,18 @@ has 'interpolateMethod' => (
 Get or set the xAxisValues for the reprojection in fimex format.
 
 =cut
+
 has 'xAxisValues' => (
     is => 'rw',
     isa => 'Str',
 );
+
 =head2 xAxisValues([$str])
 
 Get or set the xAxisValues for the reprojection in fimex format.
 
 =cut
+
 has 'yAxisValues' => (
     is => 'rw',
     isa => 'Str',
@@ -203,6 +243,7 @@ has 'yAxisValues' => (
 Get or set if reprojected axes are metric or degree
 
 =cut
+
 has 'metricAxes' => (
     is => 'rw',
     isa => 'Bool',
@@ -219,11 +260,15 @@ It might internally set some variables, i.e. outputdirectory or outputfile if th
 Returns the fimex command, mostly for debugging reasons
 
 =cut
+
 sub doWork {
     my ($self) = @_;
     my $inputTemp; # make sure the temporary file object survives the fimex-call
     my $input;
-    if ($self->inputURL) {
+    if ($self->dapURL) {
+        # allow OPeNDAP
+        $input = $self->dapURL;
+    } elsif ($self->inputURL) {
         $inputTemp = _downloadToTemp($self->inputURL, $self->outputDirectory);
         $input = $inputTemp->filename();
     } else {
@@ -250,7 +295,7 @@ sub doWork {
     }
 
     my $command;
-    if ($self->projString) {
+    if ($self->projString || $self->dapURL) {
         my %args;
         # map attributes to projectFile arguments
         $args{fimexProgram} = $self->program;
@@ -307,6 +352,7 @@ reproject a file using fimex
 =back
 
 =cut
+
 sub projectFile {
     my %p = Params::Validate::validate( @_, {
         'fimexProgram' => {default => 'fimex'},
@@ -343,8 +389,9 @@ sub projectFile {
 
     my @args = delete $p{fimexProgram};
     foreach my $key (sort keys %p) {
-        push @args, '--'.$key, $p{$key};
+        push @args, '--'.$key, $p{$key} if defined $p{$key}; # skip undefs which will occur when using opendap
     }
+    #print STDERR Dumper \@args;
     my $command = join ' ', @args;
     if ($DEBUG > 0) {
         print STDERR $command, "\n" if $DEBUG == 1;

@@ -60,7 +60,7 @@ use Log::Log4perl qw(get_logger);
 use Metamod::Config;
 use Data::Dumper;
 
-our @EXPORT = qw(logger param abandon getXML getSetup outputXML defaultWMC getProjName getProjMap);
+our @EXPORT = qw(logger param abandon getXML getMapURL getSetup outputXML defaultWMC getProjName getProjMap);
 
 ####################
 # init
@@ -163,6 +163,29 @@ sub outputXML {
 	print $content;
 }
 
+=head2 getMapURL(crs)
+
+Lookup WMS URL to background map for given CRS code
+
+TODO: read from master_config (not working... FIXME)
+
+=cut
+
+sub getMapURL {
+	my $crs = shift or croak "Missing parameter 'crs'";
+
+	## impossible to use Metamod::Config here... SNAFU, giving up.... (copied from catalyst)
+	#my $config = Metamod::Config->instance();
+	#my $mapurl = $config->get('WMS_BACKGROUND_MAPSERVER') . $config->get($mapconf);
+
+	my %coastlinemaps = ( # TODO: read from master_config... FIXME
+		"EPSG:4326"  => "http://wms.met.no/maps/world.map",
+		"EPSG:32661" => "http://wms.met.no/maps/northpole.map",
+		"EPSG:32761" => "http://wms.met.no/maps/southpole.map",
+	);
+	return $coastlinemaps{ $crs }; # yeah, it's a cop out...
+}
+
 =head2 defaultWMC()
 
 Dummy WMCsetup document - used when using GetCapabilities instead of setup file
@@ -170,20 +193,29 @@ Dummy WMCsetup document - used when using GetCapabilities instead of setup file
 =cut
 
 sub defaultWMC {
-	my $p = shift;
+	my $p = shift; # probably should require CRS param
 
-	# the defaults only makes sense for north polar region data
+	my %bbox = ( # l r b t
+		'EPSG:32661' => [ '-3000000', '7000000', '-3000000', '7000000' ],
+		#'EPSG:32761' => [ "-1.99038e+08", "1.66053e+08", "-9.12659e+07", "1.97215e+08" ],
+		'EPSG:32761' => [ "-3000000", "7000000", "-3000000", "7000000" ],
+		'EPSG:4326'  => [ '-180', '180', '-90', '90' ],
+	);
+
+	my $layername = 'world'; # that's how it's called on wms.met.no... FIXME
+
 	my $crs    = $$p{crs}    || 'EPSG:32661';
-	my $left   = $$p{left}   || '-3000000';
-	my $right  = $$p{right}  ||  '7000000';
-	my $bottom = $$p{bottom} || '-3000000';
-	my $top    = $$p{top}    ||  '7000000';
+	my $left   = $$p{left}   || $bbox{$crs}->[0];
+	my $right  = $$p{right}  || $bbox{$crs}->[1];
+	my $bottom = $$p{bottom} || $bbox{$crs}->[2];
+	my $top    = $$p{top}    || $bbox{$crs}->[3];
 	# TODO some validation?
 
-	my $bgurl = 'http://wms.met.no/maps/world.map';
-	my $baselayer = qq|<w:baselayer url="$bgurl" name="world" />| if $bgurl;
+	my $bgurl = getMapURL($crs); # 'http://wms.met.no/maps/world.map';
+	my $baselayer = qq|<w:baselayer url="$bgurl" name="$layername" />| if $bgurl; #
 
-#	print STDERR Dumper $p;
+	#print STDERR "*** $crs *** $bgurl ***\n" . Dumper $bbox{$crs};
+
 	my $default_wmc = <<EOT;
 <?xml version="1.0"?>
 <w:ncWmsSetup

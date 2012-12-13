@@ -1,0 +1,213 @@
+
+<link rel="stylesheet" href="[% c.uri_for('/static/css/openlayers_theme/default/style.css') %]" type="text/css" />
+<script type="text/javascript" src="[% c.uri_for('/static/lib/OpenLayers.js') %]"></script>
+<script type="text/javascript" src="[% c.uri_for('/static/js/log4javascript-1.4.2/js/log4javascript.js') %]"></script>
+
+[% SET map_srid = search_ui_utils.selected_map() %]
+[% SET x1_id = search_ui_utils.html_id_for_map('x1') %]
+[% SET x2_id = search_ui_utils.html_id_for_map('x2') %]
+[% SET y1_id = search_ui_utils.html_id_for_map('y1') %]
+[% SET y2_id = search_ui_utils.html_id_for_map('y2') %]
+
+<script>
+
+var log = log4javascript.getDefaultLogger();
+[% IF ! debug # disable logging in production %]
+    //log = log4javascript.getNullLogger();
+[% END %]
+
+var map;
+var vectors;
+var currentProj = "4326";
+
+var maps = {
+    "EPSG:4326" : "http://wms.met.no/maps/world.map",
+    "EPSG:32661": "http://wms.met.no/maps/northpole.map",
+    "EPSG:32761": "http://wms.met.no/maps/southpole.map"
+}
+
+
+loadMap(currentProj);
+
+function updateCoords(xy) {
+    //log.debug( map.getExtent() );
+    x = map.getExtent();
+    $('#[% x1_id %]').val(x.left);
+    $('#[% x2_id %]').val(x.right);
+    $('#[% y1_id %]').val(x.top);
+    $('#[% y2_id %]').val(x.bottom);
+    log.debug( 'Click on ' + map.getLonLatFromPixel(xy) );
+    //log.debug(vectors);
+}
+
+function loadMap(proj) {
+    if (map !== undefined) { map.destroy(); }
+    jQuery('#[% x1_id %], #[% x2_id %], #[% y1_id %], #[% y2_id %]' ).val('');
+    wms_url = maps["EPSG:" + proj];
+    log.debug("WMS URL for EPSG:" + proj + " : " + wms_url);
+    currentProj = proj;
+    wmc_url = "[% c.uri_for('/gc2wmc') %]" + "?getcap=" + wms_url + "&crs=EPSG:" + proj;
+    log.debug(wmc_url);
+    OpenLayers.loadURL(wmc_url, "", this, drawMap, showError);
+}
+
+function drawMap(response) {
+
+    wmsContext = response.responseXML;
+    if (wmsContext === undefined) {
+        log.fatal("WMC is null!");
+        return 0;
+    }
+
+    wmcParser = new OpenLayers.Format.WMC();
+    try {
+        map = wmcParser.read( wmsContext, { map: { div: 'searchmap', controls: [] } } );
+    } catch (error) {
+        log.fatal("Invalid GetMapContext:\n" + error + "\n" + response.responseText);
+        return 0;
+    }
+
+    map.addControl( new OpenLayers.Control.ZoomPanel() );
+    map.addControl( new OpenLayers.Control.Navigation() );
+    map.addControl( new OpenLayers.Control.MousePosition() );
+    //map.zoomToMaxExtent();
+
+    vectors = new OpenLayers.Layer.Vector("Vector Layer");
+    map.addLayers([vectors]);
+    map.addControl(new OpenLayers.Control.EditingToolbar(vectors));
+
+    var options = {
+        hover: true,
+        //onSelect: updateCoords
+    };
+    var select = new OpenLayers.Control.SelectFeature(vectors, options);
+    map.addControl(select);
+    select.activate();
+
+    var features = {
+        "type": "Feature",
+        "properties": {
+        },
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [
+                        -3271749.6475063143,
+                        5245615.965460574
+                    ],
+                    [
+                        10269222.78538431,
+                        -1619069.8377365128
+                    ],
+                    [
+                        -11646801.961491022,
+                        -4423871.5708208475
+                    ],
+                    [
+                        12069467.67530585,
+                        10409953.227758631
+                    ],
+                    [
+                        -7028782.461256315,
+                        1543760.1502486998
+                    ],
+                    [
+                        13008725.878743352,
+                        9441617.244963426
+                    ],
+                    [
+                        -3271749.6475063143,
+                        5245615.965460574
+                    ]
+                ]
+            ]
+        },
+        "crs": {
+            "type": "name",
+            "properties": {
+                "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+            }
+        }
+    };
+
+    //vectors.addFeatures(features);
+
+    //info = OpenLayers.Control.GetFeature({
+    //    //protocol: new OpenLayers.Protocol({}),
+    //    box: true,
+    //    click: false
+    //
+    //});
+
+
+    //info = new OpenLayers.Control.WMSGetFeatureInfo({
+    //    //url: 'http://localhost/plot.png',
+    //    //url: 'http://thredds.met.no/thredds/wms/sea_ice/SIW-OSISAF-GLO-SIT_SIE_SIC-OBS/ice_conc_north_aggregated?LAYERS=ice_concentration&QUERY_LAYERS=ice_concentration&VERSION=1.1.1&STYLES=boxfill%2Frainbow&SERVICE=WMS&REQUEST=GetFeatureInfo&I=5&J=200&SRS=EPSG%3A32661&BBOX=2000000,906250,2156250,1062500&WIDTH=256&HEIGHT=256&INFO_FORMAT=image/png&TIME=2012-10-24T12%3A00%3A00.000Z,2012-10-25T12%3A00%3A00.000Z,2012-10-26T12%3A00%3A00.000Z,2012-10-27T12%3A00%3A00.000Z,2012-10-28T12%3A00%3A00.000Z,2012-10-29T12%3A00%3A00.000Z',
+    //    title: 'Identify features by clicking',
+    //    queryVisible: true,
+    //    eventListeners: {
+    //        getfeatureinfo: function(event) {
+    //            log.debug( 'Click on ' + map.getLonLatFromPixel(event.xy) );
+    //            alert( 'Click on ' + map.getLonLatFromPixel(event.xy) );
+    //        }
+    //    }
+    //});
+
+    //map.addControl(info);
+    //info.activate();
+
+}
+
+
+function showError(response) {
+    $('showmap').append("<h3>Could not contact WMS server!</h3>");
+    $('showmap').append("<p>Error from backend is: " + response.status + " " + response.statusText + "</p>");
+}
+
+</script>
+
+<!--  An anchor that is used to scroll the page back to the map after clicking the map -->
+<a name="map_search">&nbsp;</a>
+
+
+<p class="help">
+Select a rectangular search area in the map below. Click once to place the first corner of rectangle, then after the
+page reloads click again to place the second corner of the rectangle. The two selected points are used as opposite
+corners of the rectangle.
+</p>
+
+<p class="help">
+The search result will contain any datasets that partially covered by the selected area.
+</p>
+
+<p class="help">
+To clear you current selection press "Clear map". If more than one map is available you can select it from the
+dropdown list.
+</p>
+
+<label for="selected_map">Select map</label>
+<select name="selected_map2" id="selected_map2" onchange="jQuery('#[% x1_id %], #[% x2_id %], #[% y1_id %], #[% y2_id %]' ).val(''); jQuery('#search_form').attr( 'action', '[% c.uri_for('/search', 'map_search' ) %]'); jQuery('#search_form').submit()">
+[% FOREACH map IN search_ui_utils.available_maps %]
+    <option value="[% map.srid %]" [% map.selected ? 'selected="selected"' : ''%]>[% map.name %]</option>
+[% END %]
+</select>
+
+<input type="text" size="10" name="[% x1_id %]" id="[% x1_id %]" value="[% c.req().param( x1_id ) %]" />
+<input type="text" size="10" name="[% x2_id %]" id="[% x2_id %]" value="[% c.req().param( x2_id ) %]" />
+<input type="text" size="10" name="[% y1_id %]" id="[% y1_id %]" value="[% c.req().param( y1_id ) %]" />
+<input type="text" size="10" name="[% y2_id %]" id="[% y2_id %]" value="[% c.req().param( y2_id ) %]" />
+
+<!--new stuff-->
+
+<select name="selected_map" id="selected_map" onchange="loadMap(this[this.selectedIndex].value)">
+    <option value="32661">Arctic</option>
+    <option value="32761">Antarctic</option>
+    <option value="4326" selected="selected">World</option>
+</select>
+
+<div id="searchmap" style="height:540px; width:540; border: solid 1px; margin-bottom: 10px"
+     onclick="updateCoords(event.xy); jQuery('#search_form').attr('action','[% c.uri_for('/search/map_search') %]');"></div>
+
+
+<!--<input type="image" name="map_coord" alt="Map search" src="[% c.uri_for( '/search/map/' _ map_srid, search_ui_utils.map_coordinates() ) %]" onclick="jQuery( '#search_form' ).attr( 'action', '[% c.uri_for( '/search/map_search' ) %]' );" />-->

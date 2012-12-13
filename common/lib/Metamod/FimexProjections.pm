@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =end LICENSE
 
+=cut
+
 =head1 NAME
 
 Metamod::FimexProjections - access-layer for fimexProjections xml-files
@@ -75,6 +77,7 @@ my $logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
 =back
 
 =cut
+
 sub getFimexProjectionsSchemaPath {
     my $config = Metamod::Config->instance();
     return $config->get('INSTALLATION_DIR') . "/common/schema/fimexProjections.xsd";
@@ -89,6 +92,7 @@ sub getFimexProjectionsSchemaPath {
 =back
 
 =cut
+
 use constant FIMEX_PROJECTIONS_NS => "http://www.met.no/schema/metamod/fimexProjections";
 
 
@@ -105,6 +109,7 @@ use constant FIMEX_PROJECTIONS_NS => "http://www.met.no/schema/metamod/fimexProj
 Initialize a new instance of fimexProjections. This method dies if $str is not valid xml.
 
 =cut
+
 sub new {
     my ($class, $str, $validate) = Params::Validate::validate_pos(@_, 1, { default => "" }, { default => 0});
 
@@ -165,6 +170,7 @@ sub parseXmlDoc_ {
 list the available projections
 
 =cut
+
 sub listProjections {
     my ($self) = @_;
     return keys %{ $self->{projections} };
@@ -183,6 +189,7 @@ sub listProjections {
 =back
 
 =cut
+
 sub getProjectionProperty {
     my ($self, $projName, $propName) = Params::Validate::validate_pos(@_, 1, 1, 1);
     if ( exists $self->{projections}{$projName} &&
@@ -203,6 +210,7 @@ sub getProjectionProperty {
 =back
 
 =cut
+
 sub getURLRegex {
     my ($self) = @_;
     return $self->{urlRegex};
@@ -217,6 +225,7 @@ sub getURLRegex {
 =back
 
 =cut
+
 sub getURLReplace {
     my ($self) = @_;
     return $self->{urlReplace};

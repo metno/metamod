@@ -81,22 +81,30 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
     my ($setup, $wms);
 
     if ( $$p{ds_id} ) {
+
         # lookup setup doc directly from db
         my $ds_id = ref($$p{ds_id}) eq 'ARRAY' ? $$p{ds_id}[0] : $$p{ds_id};
-        printf STDERR "Fetching setup for dataset %s...\n", $ds_id;
+        #printf STDERR "Fetching setup for dataset %s...\n", $ds_id;
 
-        if( my $ds = $c->model('Metabase')->resultset('Dataset')->find( $ds_id ) ){
+        if( my $ds = $c->model('Metabase')->resultset('Dataset')->find($ds_id) ){
             $setup = $ds->wmsinfo;
             $wms   = $ds->wmsurl;
         }
-        $c->detach( 'Root', 'default' ) unless defined($setup) && defined($wms);
+        $c->detach( 'Root', 'error', [ 400, "Missing wms setup for dataset $ds_id" ] )
+            unless defined($setup) && defined($wms);
 
     } elsif ( $$p{getcap} ) {
-        # fetch GetCapabilites directly (for files w/o setup docs)
+
+        $c->detach( 'Root', 'error', [ 400, "Missing crs param" ] ) unless defined($$p{crs});
         $self->logger->debug("Fetching GetCap at " . $$p{getcap});
         #printf STDERR " * URL = %s\n", $c->request->uri;
         $wms = $$p{getcap};
-        $setup = defaultWMC();
+        $setup = defaultWMC({ crs => $$p{crs} });
+
+    } else {
+
+        $c->detach( 'Root', 'error', [ 400, "Missing parameters in request" ] );
+
     }
 
     # TODO - add better handling for timeout errors... FIXME
@@ -142,15 +150,13 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
     my ( $self, $c ) = @_;
 
     my $mm_config = $c->stash->{ mm_config };
-
     my $para = $c->request->params;
     #print STDERR Dumper $para;
-    my $crs = $$para{'crs'};
-    $c->detach( 'Root', 'default' ) unless defined( $crs );
+    my $crs = $$para{'crs'} && delete $$para{'crs'};
+    $c->detach( 'Root', 'error', [ 400, "Missing parameter 'crs' in request" ] ) unless defined($crs);
+
+    # move processing stuff below to MetamodWeb::Utils::XML::WMC ... FIXME
     my (%wmsurls, %layers, @nodes, @areas, @x, @y);
-
-    # move processing stuff below to utils... FIXME
-
     my $nsURI = 'http://www.met.no/schema/metamod/ncWmsSetup';
 
     foreach (keys %$para) {
@@ -170,7 +176,7 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
         }
 
         #print STDERR ">>> ${base}layer $ds_id - $url\n";
-        $c->detach( 'Root', 'default' ) unless defined($url);
+        $c->detach( 'Root', 'error', [ 400, "Undefined WMS URL for dataset $ds_id" ] ) unless defined($url);
 
         # store layernodes away for later
         foreach (@$layers) {
@@ -183,14 +189,15 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
     }
 
     #print STDERR Dumper \@areas;
-    # stupid proj doesn't like upper case proj names
-    my $to = Geo::Proj4->new( init => lc($crs) ) or die Geo::Proj4->error . " for $crs";
-    #my $to = _newProj( $crs );
+
+    my $to = Geo::Proj4->new( init => lc($crs) ) # stupid proj doesn't like upper case proj names
+        or die Geo::Proj4->error . " for $crs";
+    #my $to = _newProj( $crs ); # obsolete
 
     foreach (@areas) {
         #printf STDERR ">>>>>>>> From %s to %s\n", $_->{'crs'}, $crs;
         my $from = Geo::Proj4->new( init => lc($_->{'crs'}) ) or die Geo::Proj4->error;
-        #my $from = _newProj( $_->{'crs'} );
+        #my $from = _newProj( $_->{'crs'} ); # obsolete
 
         my @corners = ( # end points of bounding box
             [ $_->{'left' }, $_->{'bottom'} ],
@@ -213,7 +220,9 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
 
         # call proj transformation
         my $pr = $from->transform($to, \@points);
-        #print STDERR Dumper \@corners, $pr;
+        #print STDERR Dumper \@points, $pr;
+
+        # store all x's and y's so we later can find max and min
         foreach (@$pr) {
             push @x, $_->[0];
             push @y, $_->[1];
@@ -225,24 +234,26 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
 
     my ($left, $right, $top, $bottom);
 
-    my $setup = defaultWMC({
+    my $setopts = {
         crs    => $crs,
         left   => min(@x),
         right  => max(@x),
         bottom => min(@y),
         top    => max(@y),
         time   => $$para{'time'},
-    });
+    };
+    #print STDERR "setopts = " . Dumper $setopts;
+    my $setup = defaultWMC($setopts);
 
     my $root = $setup->documentElement;
     foreach (@nodes) {
         $root->appendChild($_);
     }
 
-    #print STDERR $setup->toString;
+    #print STDERR $setup->toString(2);
 
     my $wmc = eval { $c->stash->{wmc}->setup2wmc($setup) };
-    $wmc->documentElement->appendChild($setup->documentElement);
+    #$wmc->documentElement->appendChild($setup->documentElement); # uh, why? for debug?
     die " error: $@" if $@;
     my $out = $wmc->toString(1);
     # another hack to work around inexplainable duplicate namespace bug
@@ -250,9 +261,13 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
     $c->response->content_type('text/xml');
     $c->response->body( $out );
 
+    #print STDERR "-------------------\n$out\n---------------------------\n";
+
 }
 
-#sub _newProj {
+# _newProj - some old stuff that were never used
+#
+#sub _newProj {  # obsolete
 #    my $crs = lc(shift) or die;
 #    if ($crs eq 'crs:84') {
 #        return Geo::Proj4->new( '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs' )
@@ -266,6 +281,7 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
 #    #    Geo::Proj4->new( init => $crs )
 #    #or die Geo::Proj4->error . " for $crs";
 #}
+
 
 =head2 qtips
 

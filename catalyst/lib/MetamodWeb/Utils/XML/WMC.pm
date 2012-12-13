@@ -48,7 +48,7 @@ DEPRECATED: refactor to use setup2wmc instead.
 
 =cut
 
-sub old_gen_wmc { # DEPRECATED
+sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
 
     my ($self, $setup, $wmsurl, $crs) = @_;
     croak "Missing setup document" unless $setup;
@@ -68,6 +68,10 @@ sub old_gen_wmc { # DEPRECATED
 
     $bbox{units} = $setupxc->findvalue('/*/s:layer');
 
+
+    #################################
+    # reproject coords in setup
+    #
     if ( defined $crs and $crs ne $bbox{crs} ) {
 
         # stupid proj doesn't like upper case proj names
@@ -78,6 +82,7 @@ sub old_gen_wmc { # DEPRECATED
             [ $bbox{'left' }, $bbox{'top'   } ],
             [ $bbox{'right'}, $bbox{'bottom'} ],
             [ $bbox{'right'}, $bbox{'top'   } ],
+            # this could possibly extended with more points to avoid cropping of the bounding box
         );
         my $pr = $from->transform($to, \@corners);
         #print STDERR Dumper \@corners, $pr;
@@ -101,11 +106,11 @@ sub old_gen_wmc { # DEPRECATED
 
     }
 
-    #################################
+    ####################################
     # transform data Capabilities to WMC
     #
     #my $getcap_url = $wmsurl || $setup->documentElement->getAttribute('url') or confess("Missing setup or WMS url");
-    # reading from setup is now deprecated
+    # reading wmsurl from setup is now deprecated - must be in function call
 
     my $wmcns = "http://www.opengis.net/context";
 
@@ -185,16 +190,7 @@ sub old_gen_wmc { # DEPRECATED
     if ( $nobaselayer and (my $mapconf = getProjMap( $bbox{'crs'} )) ) {
         printf STDERR "*** Getting map for %s\n", $bbox{'crs'};
 
-        ## impossible to use Metamod::Config here... SNAFU, giving up....
-        #my $config = Metamod::Config->instance();
-        #my $mapurl = $config->get('WMS_BACKGROUND_MAPSERVER') . $config->get($mapconf);
-
-        my %coastlinemaps = ( # TODO: read from master_config... FIXME
-            "EPSG:4326"  => "http://wms.met.no/maps/world.map",
-            "EPSG:32661" => "http://wms.met.no/maps/northpole.map",
-            "EPSG:32761" => "http://wms.met.no/maps/southpole.map",
-        );
-        my $mapurl = $coastlinemaps{ $bbox{'crs'} }; # yeah, it's a cop out...
+        my $mapurl = getMapURL( $bbox{'crs'} );
 
         my $mapdoc = $self->_gen_wmc($mapurl, \%bbox);
         my $mapxc = XML::LibXML::XPathContext->new( $mapdoc ); # getcapabilities xpath context
@@ -278,6 +274,8 @@ sub setup2wmc {
         $stylesheet->transform( $setup, XML::LibXSLT::xpath_to_string( %{$params} ) );
     };
     croak " error: $@" if $@;
+
+    #print STDERR $wmcdoc->serialize;
 
     return $wmcdoc;
 

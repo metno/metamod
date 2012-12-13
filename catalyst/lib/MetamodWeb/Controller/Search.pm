@@ -343,6 +343,35 @@ sub wmslist :Path('/search/wmslist') :Args {
 
 }
 
+=head2 timeseries
+
+Action for displaying time series graphs rendered in browser
+
+=cut
+
+sub timeseries :Path('/search/ts') :Args {
+    my ($self, $c) = @_;
+
+    $c->stash( template => 'search/ts.tt', 'current_view' => 'Raw' );
+    $c->stash( debug => $self->logger->is_debug() );
+
+    my $ds_id = $c->req->params->{ ds_id };
+    if ( ref $ds_id ) { # more than one ds_id... TODO?
+        $self->logger->debug("Only one ds_id currently allowed");
+        $c->detach( 'Root', 'error', [ 400, "Only one ds_id currently allowed"] );
+    }
+    my $ds = $c->model('Metabase::Dataset')->find($ds_id) or $c->detach('Root', 'default');
+    my $parent = $ds->parent_dataset()
+        or $c->detach( 'Root', 'error', [ 400, "Not a level 2 dataset"] );
+
+    my ($title) = @{ $ds->metadata(['title'])->{'title'} };
+    my $timeseries = $parent->metadata(['timeseries'])->{'timeseries'}
+        or $c->detach( 'Root', 'error', [ 404, "Missing timeseries"] );
+    #print STDERR Dumper \$timeseries;
+    $c->stash( dataset => $ds, title => $title, timeseries => $timeseries );
+
+}
+
 =head2 display_help
 
 Action for displaying the help message to the user.

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 mkdir -p html/upgrade
 for f in *.pod upgrade/*.pod
 do

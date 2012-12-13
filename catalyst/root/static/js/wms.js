@@ -1,5 +1,6 @@
 
 var log = log4javascript.getDefaultLogger();
+var info;
 
 //read CGI args
 var args = new OpenLayers.Util.getArgs();
@@ -247,9 +248,9 @@ function drawMap(response) {
 function showError(response) {
     log.error("Could not contact WMS server! ");
     log.error("Error from backend is: " + response.status + " " + response.statusText);
-    //var b = document.createElement('b');
-    //b.appendChild( document.createTextNode("Could not contact WMS server! ") );
-    //document.getElementById('shortdesc').appendChild(b);
-    //document.getElementById('shortdesc').appendChild( document.createElement('br') );
-    //document.getElementById('shortdesc').appendChild( document.createTextNode("Error from backend is: " + response.status + " " + response.statusText) );
+    var b = document.createElement('b');
+    b.appendChild( document.createTextNode("Could not contact WMS server! ") );
+    document.getElementById('shortdesc').appendChild(b);
+    document.getElementById('shortdesc').appendChild( document.createElement('br') );
+    document.getElementById('shortdesc').appendChild( document.createTextNode("Error from backend is: " + response.status + " " + response.statusText) );
 }
