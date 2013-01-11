@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+    <head>
+        <title>Transform dataset</title>
+
+        <link rel="stylesheet" href="[% c.uri_for('/static/css/reset.css') %]" />
+        <link rel="stylesheet" href="[% c.uri_for('/static/css/base.css') %]" />
+        <link rel="stylesheet" href="[% c.uri_for('/static/css/main.css') %]" />
+
+        <link rel="stylesheet" href="[% c.uri_for('/static/css/metamod_theme/jquery-ui.css') %]" />
+        <script type="text/javascript" src="[% c.uri_for('/static/js/jquery.min.js') %]"></script>
+        <script type="text/javascript" src="[% c.uri_for('/static/js/jquery-ui.min.js') %]"></script>
+
+        <script type="text/javascript" src="[% c.uri_for('/static/js/log4javascript-1.4.2/js/log4javascript.js') %]"></script>
+        <script type="text/javascript" src="[% c.uri_for('/static/lib/Firebug/firebug.js') %]"></script>
+
+        <script type="text/javascript">
+            var log = log4javascript.getDefaultLogger();
+        </script>
+
+        <style type="text/css">
+            body { padding: 12 12 12 12 }
+            td.label { font-weight: bold; font-size: 12px; }
+            td.fields { text-align: center; padding-left: 20px; }
+            table.dapform tr { background-color: white; }
+            table.dapform tr td { padding: 5 5 5 5; border-bottom: solid 1px black; }
+            table.dapform tr th { padding: 5 5 5 5; border-bottom: solid 1px black; background-color: grey; color: white;  }
+            table.dapform input { width: 150 }
+        </style>
+
+    </head>
+    <body>
+
+    <h1 class="std">Transform</h1>
+
+    [%# IF c.request.method = "GET" %]
+
+    [% IF html %]
+
+        <form action="[% c.uri_for('/search/transform', dataset.ds_name _ '.nc') %]" method="post">
+
+            <input type="hidden" name="ds_id" value="[% dataset.ds_id %]"/>
+
+            <h2>
+                [% IF debug %]
+                    <a href="[% dap %]">[% dataset.ds_id %]</a>:
+                [% END %]
+                <a href="[% dap %]">[% dataset.ds_name %]</a>
+            </h2>
+
+            [% html %]
+
+            [% IF fiproj %]
+                <h2>Projection (not implemented)</h2>
+                <select name="projection">
+                    <option value="">(original)</option>
+                [% FOREACH proj IN fiproj.listProjections %]
+                    <option>[% proj %]</option>
+                [% END %]
+                </select>
+            [% END %]
+
+            <div>
+                <br/>
+                <input type="submit" value="Transform"/>
+            </div>
+
+        </form>
+
+    [% ELSE %]
+
+        <p>Dataset no longer available</p>
+
+    [% END %]
+
+    [%# END %]
+
+    </body>
+
+</html>

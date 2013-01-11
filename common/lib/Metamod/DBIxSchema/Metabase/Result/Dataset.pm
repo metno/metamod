@@ -95,9 +95,14 @@ __PACKAGE__->has_many(
   { "foreign.ds_id" => "self.ds_id" },
 );
 __PACKAGE__->has_many(
-  "projectioninfos",
+  "parentprojectioninfos",
   "Metamod::DBIxSchema::Metabase::Result::Projectioninfo",
   { "foreign.ds_id" => "self.ds_parent" },
+);
+__PACKAGE__->has_many(
+  "selfprojectioninfos",
+  "Metamod::DBIxSchema::Metabase::Result::Projectioninfo",
+  { "foreign.ds_id" => "self.ds_id" },
 );
 __PACKAGE__->has_many(
   "parentwmsinfos",
@@ -254,6 +259,17 @@ sub metadata {
         $self->{ _metadata_cache } = \%metadata;
     }
     return \%metadata;
+}
+
+=head2 $self->projectioninfos()
+
+Returns projectioninfo of either self or parent
+
+=cut
+
+sub projectioninfos {
+    my ($self) = @_;
+    return $self->selfprojectioninfos() || $self->parentprojectioninfos();
 }
 
 =head2 $self->fimex_projections()
@@ -618,7 +634,7 @@ sub file_location {
     my $opendap_basedir = $config->get('OPENDAP_BASEDIR') || '';
     my $thredds_dataset_prefix = $config->get('THREDDS_DATASET_PREFIX') || '';
 
-    my $server_location = "http://thredds.met.no/thredds/fileServer/$opendap_basedir/";
+    my $server_location = "http://thredds.met.no/thredds/fileServer/$opendap_basedir/"; # FIXME - remove hardcoded met.no hostname
 
     my $dataref = $metadata->{dataref}->[0];
     my $filename;
@@ -630,6 +646,36 @@ sub file_location {
 
     return "$server_location$filename";
 
+}
+
+=head2 $self->external_ts_url()
+
+Calculate URL to external timeseries plot if available (must be set in TIMESERIES_URL in master_config)
+
+=over
+
+=item return
+
+Returns an URL to the image file. Returns C<undef> if the URL cannot be calculated.
+
+=back
+
+=cut
+
+sub external_ts_url {
+    my $self = shift;
+
+    my $config = Metamod::Config->instance();
+    my $tsurl = $config->get('TIMESERIES_URL') or return;
+
+    my $metadata = $self->metadata( ['dataref_OPENDAP', 'timeseries'] );
+    my $opendap = $metadata->{dataref_OPENDAP}->[0] or return;
+    my $tsvars  = $metadata->{timeseries}->[0];
+
+    $tsurl =~ s/\[OPENDAP\]/$opendap/;
+    $tsurl =~ s/\[TIMESERIES\]/$tsvars/ if $tsvars;
+
+    return $tsurl;
 }
 
 =head1 LICENSE

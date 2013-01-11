@@ -1,0 +1,82 @@
+=head1 Upgrading to METAMOD 2.12 from 2.11
+
+Upgrading to 2.12 only consists of stopping all services, installing the new
+version, running the install_jobs script and restarting the services as described
+in L<Deploying|../deploying>.
+
+No change in configuration is required for existing sites. However, to enable the
+new features in 2.12 some additional metadata are required.
+
+=head2 Timeseries plot
+
+METAMOD 2.12 includes a JavaScript-based timeseries plotting library in the browser.
+
+To enable plotting of timeseries, add the following elements to the XML files (or use
+the metadata editor):
+
+=over 4
+
+=item Level 1 dataset
+
+A list of variables to be plotted for all files, eg:
+
+  <metadata name="timeseries">time,sea_ice_extent</metadata>
+
+The first variable will be used as the X axis. The others (up to two) will be
+plotted on the Y axis.
+
+=item Level 2 dataset
+
+The OPeNDAP URL to the file:
+
+  <metadata name="dataref_OPENDAP">http://thredds.met.no/thredds/dodsC/cryoclim/met.no/sie-mar/sie-mar_osisaf_monthly_mean_sie_mar.nc</metadata>
+
+=back
+
+=head3 Server side plotting (optional)
+
+Optionally plotting can be performed by an external server. To enable this, add the following
+directive to master_config:
+
+  TIMESERIES_URL=http://ts.example.com/jtimeseries-webservices/thredds/diagram?parameters=[TIMESERIES]&url=[OPENDAP]
+
+The placeholders C<[TIMESERIES]> and C<[OPENDAP]> will be replaced with the
+variables C<timeseries> and C<dataref_OPENDAP> respectively.
+
+=head2 Transformation of datasets via OPeNDAP
+
+For transformation, dataref_OPENDAP must be set as in the previous section.
+
+The following parameters are available for subsetting:
+
+=over 4
+
+=item *
+
+variables
+
+=item *
+
+time range
+
+=item *
+
+region (in lat/lon)
+
+=back
+
+Note that in some cases the form fields cannot be populated (or may be incorrect) due to lack of metadata.
+Transformation is still available, although the user must figure out the values by him/herself.
+
+=head3 Reprojection (optional)
+
+If Projection info has been set up for the dataset, reprojection should be available.
+A list of available projections (as specified in fimexProjections XML) will be displayed in the form.
+This feature is currently experimental.
+
+=head2 Dynamic map search
+
+This is a planned feature for a later release. To enable this your map server will need to support
+background maps in EPSG:93995 and EPSG:93031 projections. Further projections may be supported
+in later versions.
+

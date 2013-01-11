@@ -31,6 +31,19 @@ use List::Util qw(min max sum);
 use Carp;
 use Data::Dumper;
 
+=head1 NAME
+
+MetamodWeb::Utils::XML::WMC - helper methods for WMC generation
+
+=head1 DESCRIPTION
+
+Uses wmsinfo on dataset to fetch WMS Capabilities and build up WMC document with
+available layers and styles. Includes background map from central server where available.
+
+=head1 METHODS
+
+=cut
+
 has 'c' => (
     is       => 'ro',
     required => 1,

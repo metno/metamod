@@ -8,20 +8,16 @@
 [% SET diff_names = search_ui_utils.level2_metadata_columns( dataset, level2_result ) %]
 
 <tr>
+    <td class="sub_result_pager" colspan="5">
 
-<td class="sub_result_pager" colspan="5">
+        [% INCLUDE 'search/pager_navigation.tt' pager = level2_pager, url_template = '/search/page/'
+            _ datasets_pager.current_page() _ '/level2page/' _ dataset.ds_id _ '/%s' %]
 
-    [% INCLUDE 'search/pager_navigation.tt' pager = level2_pager, url_template = '/search/page/'
-        _ datasets_pager.current_page() _ '/level2page/' _ dataset.ds_id _ '/%s' %]
-
-</td>
+    </td>
 </tr>
-
 
 <tr>
 <td colspan="5">
-
-
 
 <table class="sub_result" id="sub_result_[% dataset.ds_id %]">
 <thead>
@@ -41,16 +37,17 @@
 [% WHILE (child = level2_result.next()) %]
     <tr>
     [%
+        # need to also include 'data_file_location' and 'data_file_size' to
+        # diff_names when fetching metadata to know if "add to basket" should be
+        # displayed or not.
 
-       # need to also include 'data_file_location' and 'data_file_size' to
-       # diff_names when fetching metadata to know if "add to basket" should be
-       # displayed or not.
-
-      diff_names.push('data_file_location');
-      diff_names.push('data_file_size');
-      SET child_metadata = child.metadata( diff_names );
-      SET dummy = diff_names.pop();
-      SET dummy = diff_names.pop();
+        diff_names.push('data_file_location');
+        diff_names.push('data_file_size');
+        SET child_metadata = child.metadata( diff_names );
+        SET dummy = diff_names.pop(); # ?
+        SET dummy = diff_names.pop(); # ?
+        SET opendap = child.metadata(['dataref_OPENDAP']).dataref_OPENDAP.0;
+        SET dataref = child.metadata(['dataref']).dataref.0;
     %]
     <td class="sub_result">
         [% IF search_ui_utils.looks_like_url(child_metadata.dataref.0) %]
@@ -62,21 +59,31 @@
         [% END %]
 
         <div class="btns" _class="dataset_actions">
-            <a class="btn" href="[% c.uri_for( '/dataset', child.ds_id, 'xml' ) %]" target="_blank"
+
+            <a class="visual" href="[% c.uri_for( '/dataset', child.ds_id, 'xml' ) %]" target="_blank"
                title="Show the raw XML metadata for this file in a separate windows"><span>Show xml</span></a><br clear="all"/>
-            [% FOREACH projection IN child.fimex_projections.listProjections() %]
-                <a class="btn" href="[% c.uri_for('/search/fimexdownload') %]?dataset_name=[% child.ds_name %]&projection=[% projection %]" target="_blank"
+
+            [% FOREACH projection IN child.fimex_projections.listProjections() # FIXME remove after transform tested %]
+                <a class="btn" href="[% c.uri_for( '/search/fimexdownload', { dataset_name => child.ds_name, projection => projection } ) %]" target="_blank"
                     title="Download file in [% projection %]"><span>[% projection %] Downl.</span></a><br clear="all"/>
+            [% END %]
+            [% IF opendap %]
+                <a class="visual" href="[% c.uri_for('/search/transform', { ds_id => child.ds_id }) %]"><span>Transform</span></a><br clear="all"/>
             [% END %]
 
             [% c.req.params.return_path = c.uri_for(c.req.path) %]
             <a class="btn" href="[% c.uri_for( '/search/add_to_basket', child.ds_id, c.req.params ) %]"
                title="Add the dataset to the collection basket"><span>Add to basket</span></a><br clear="all"/>
 
+            [% IF metadata.timeseries.0 # FIXME add check after demo finished %]
+                <a class="visual" href="[% c.uri_for('/search/ts', { ds_id => child.ds_id, vars => metadata.timeseries.0 } ) %]"><span>Time series</span></a><br clear="all"/>
+                <a class="visual" href="[% child.external_ts_url %]"><span>Time series EXT</span></a><br clear="all"/>
+            [% END %]
+
             [% IF child.wmsurl != '' %]
                 [% SET thumbsize = 64 %]
                 [% SET wmsthumb = child.wmsthumb(thumbsize) %]
-                <a class="visual" href="[% c.uri_for('/search/wms') %]?ds_id=[% child.ds_id %]"><span>Visualize</span></a><br clear="all"/>
+                <a class="visual" href="[% c.uri_for('/search/wms', { ds_id => child.ds_id } ) %]"><span>Visualize</span></a><br clear="all"/>
                 [% IF wmsthumb.outline %]
                     <div class="wmsthumb"
                         style="position: absolute; height: [% thumbsize %]px; width: [% thumbsize %]px; z-index:12"
@@ -85,16 +92,21 @@
                 <div class="wmsthumb"
                     style="height: [% thumbsize %]px; width: [% thumbsize %]px; z-index:10"
                     ><img src="[% wmsthumb.datamap %]"/></div>
-
-                [% IF debug %]
-                    <a class="visual" href="[% c.uri_for('/gc2wmc') %]?ds_id=[% child.ds_id %]"><span>WMC data</span></a><br clear="all"/>
-                    <a class="visual" href="[% wmsthumb.wms_url %]?service=WMS&version=1.3.0&request=GetCapabilities"><span>WMS data</span></a><br clear="all"/>
-                [% END %]
-
             [% END %]
 
-            [% IF metadata.timeseries %]
-                    <a class="visual" href="[% c.uri_for('/search/ts', { ds_id => child.ds_id } ) %]"><span>Time series</span></a><br clear="all"/>
+            [% IF debug %]
+                <hr/>
+                [% IF child.wmsurl != '' %]
+                    <a class="visual" href="[% c.uri_for('/gc2wmc', { ds_id => child.ds_id } ) %]"><span>WMC data</span></a><br clear="all"/>
+                    <a class="visual" href="[% wmsthumb.wms_url %]?service=WMS&version=1.3.0&request=GetCapabilities"><span>WMS data</span></a><br clear="all"/>
+                [% END %]
+                [% IF opendap %]
+                    <a class="visual" href="[% opendap _ '.info' %]"><span>OPeNDAP</span></a><br clear="all"/>
+                [% END %]
+
+                [% IF metadata.timeseries.0 %]
+                    <a class="visual" href="[% c.uri_for('/ts', child.ds_id, metadata.timeseries.0, 'csv') %]"><span>CSV</span></a><br clear="all"/>
+                [% END %]
             [% END %]
 
             [% c.req.params.delete('return_path') %]

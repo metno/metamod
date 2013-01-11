@@ -66,10 +66,12 @@ use warnings;
 use Params::Validate qw();
 use Moose;
 use LWP::Simple qw();
+use LWP::UserAgent;
 use File::Copy qw(copy);
 use File::Spec qw();
 use File::Temp qw();
 use Data::Dumper;
+use Carp;
 
 =head1 METHODS
 
@@ -194,6 +196,7 @@ has 'outputConfig' => (
     is => 'rw',
     isa => 'Str',
 );
+
 =head2 projString([$str])
 
 Get or set the proj4 string.
@@ -204,6 +207,7 @@ has 'projString' => (
     is => 'rw',
     isa => 'Str',
 );
+
 =head2 interpolateMethod([$str])
 
 Get or set the interpolation method. Defaults to nearestneighbor.
@@ -249,6 +253,59 @@ has 'metricAxes' => (
     isa => 'Bool',
 );
 
+=head2 selectVariables
+
+List of variables to include in output
+
+=cut
+
+has 'selectVariables' => (
+    is => 'rw',
+    isa => 'ArrayRef',
+);
+
+=head2 north
+
+=head2 south
+
+=head2 east
+
+=head2 west
+
+Cropping bounding box
+
+=cut
+
+has 'north' => (
+    is => 'rw',
+    isa => 'Num',
+);
+
+has 'south' => (
+    is => 'rw',
+    isa => 'Num',
+);
+
+has 'east' => (
+    is => 'rw',
+    isa => 'Num',
+);
+
+has 'west' => (
+    is => 'rw',
+    isa => 'Num',
+);
+
+=head2 outputPath
+
+Return full path to result file. Used after running doWork.
+
+=cut
+
+sub outputPath {
+    my ($self) = @_;
+    return File::Spec->catfile($self->outputDirectory, $self->outputFile);
+}
 
 =head2 doWork
 
@@ -309,18 +366,52 @@ sub doWork {
         $args{'interpolate.xAxisValues'} = $self->xAxisValues;
         $args{'interpolate.yAxisValues'} = $self->yAxisValues;
 
+        $args{'extract.reduceToBoundingBox.north'} = $self->north;
+        $args{'extract.reduceToBoundingBox.south'} = $self->south;
+        $args{'extract.reduceToBoundingBox.west'} = $self->west;
+        $args{'extract.reduceToBoundingBox.east'} = $self->east;
+        $args{'extract.selectVariables'} = $self->selectVariables;
+
+        #print STDERR Dumper \%args;
+
         $command = projectFile(%args);
     } else {
         # no changes, just copy to output
         File::Copy::copy($input, $outputPath)
             or die "cannot copy $input to $outputPath: $!\n";
     }
+    #print STDERR "**************** \n$command\n";
     return $command; # for debugging
 }
 
-# downloadToTemp($url, $dir)
+# _downloadToTemp($url, $dir)
 # fetch a url to a temporary file, return the temporary file in dir
+# better error handling than old_downloadToTemp
 sub _downloadToTemp {
+    my ($url, $dir) = @_;
+
+    my $temp = File::Temp->new(TEMPLATE => 'fimexDownloadXXXXX',
+                               SUFFIX => '.nc',
+                               DIR => $dir,
+                               UNLINK => 1) or die "Can not write temp file";
+    my $ua = LWP::UserAgent->new;
+    $ua->timeout(180);
+    my $response = $ua->get(
+        $url,
+        ':content_file' => $temp->filename(),
+    );
+
+    unless ($response->is_success) {
+        die "cannot download from $url: ". $response->message;
+    } else {
+        #print STDERR "File " . $temp->filename() . "downloaded successfully";
+    }
+    return $temp;
+}
+
+# old_downloadToTemp($url, $dir)
+# fetch a url to a temporary file, return the temporary file in dir
+sub old_downloadToTemp {
     my ($url, $dir) = @_;
 
     my $temp = File::Temp->new(TEMPLATE => 'fimexDownloadXXXXX',
@@ -336,6 +427,7 @@ sub _downloadToTemp {
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
+
 # below follow static functions
 
 =head2 projectFile
@@ -373,7 +465,13 @@ sub projectFile {
         # the following are currently ignored
         'interpolate.latitudeName' => 0,
         'interpolate.longitudeName' => 0,
-        'interpolate.printCS' => 0
+        'interpolate.printCS' => 0,
+        'extract.selectVariables' => 0,
+        'extract.reduceToBoundingBox.north' => 0,
+        'extract.reduceToBoundingBox.east' => 0,
+        'extract.reduceToBoundingBox.west' => 0,
+        'extract.reduceToBoundingBox.south' => 0,
+
     });
 
     if (exists $p{'interpolate.metricAxes'}) {
@@ -389,16 +487,26 @@ sub projectFile {
 
     my @args = delete $p{fimexProgram};
     foreach my $key (sort keys %p) {
-        push @args, '--'.$key, $p{$key} if defined $p{$key}; # skip undefs which will occur when using opendap
+        my $val = $p{$key};
+        next unless defined $val; # skip undefs which will occur when using opendap
+        if ( ref($val) eq 'ARRAY' ) { # check if list
+            push @args, map {'--extract.selectVariables='.$_} @$val;
+        } else {
+            push @args, '--'.$key, $val;
+        }
     }
+
     #print STDERR Dumper \@args;
     my $command = join ' ', @args;
     if ($DEBUG > 0) {
+        # simulate running command
         print STDERR $command, "\n" if $DEBUG == 1;
     } else {
+        # really execute fimex
         system(@args) == 0
             or die "system @args failed: $?";
     }
+    #print STDERR "++++++++++++++++++ \n$command\n";
     return $command; # usually not used, just for debugging
 }
 

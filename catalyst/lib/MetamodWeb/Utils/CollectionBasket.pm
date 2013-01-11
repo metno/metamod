@@ -133,21 +133,21 @@ sub add_dataset {
     if( defined $dataset ){
 
         if ( $dataset->is_level1_dataset() ) {
-            
+
             if ( $dataset->num_children() ) {
 
                 # We must take into account the search parameters that was used in
                 # the search when adding level 2 dataset.
-    
+
                 my ($search_conds, $search_attrs) = $self->_metadata_search_params();
                 $search_attrs->{ rows } = $max_additional;
                 my $child_datasets = $dataset->child_datasets($search_conds, $search_attrs);
-    
+
                 while ( my $child_ds = $child_datasets->next() ) {
-    
+
                     my $file_info = $self->file_info($child_ds);
                     if ( defined $file_info ) {
-    
+
                         # when we reach the maximum we stop even if there might smaller files later.
                         # This probably will seem like less random behaviour.
                         if( $file_info->{data_file_size} + $current_size > $max_size ){
@@ -155,24 +155,24 @@ sub add_dataset {
                             $msg .= 'allowed maximum size.';
                             $self->add_user_msg($msg);
                             $self->logger->debug("Could not add file to collection basket as it exceeds the max size");
-    
+
                             last;
                         }
-    
+
                         $current_size += $file_info->{data_file_size};
                         $ds_ids{$child_ds->ds_id()} = 1;
                         $new_datasets++;
                     }
                 }
-                
+
             } elsif ( $dataset->wmsinfo() ) {
-                
+
                 # this is only used for visualization
                 $ds_ids{$dataset->ds_id()} = 1;
                 $new_datasets++; # why not working? FIXME
-                
+
             }
-            
+
         } else {
 
             my $file_info = $self->file_info($dataset);
@@ -236,11 +236,11 @@ sub find_data_locations {
     my $self = shift;
 
     my $files = $self->files();
-    
+
     #print STDERR "*********" . Dumper \$files;
     my @dataset_locations;
     my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $self->c, config => $self->config } );
-    
+
     for (@$files) {
         my $loc = $_->{data_file_location};
         my $free = $search_utils->freely_available($_);
@@ -389,6 +389,7 @@ sub files {
         }
     }
 
+    #print STDERR Dumper \@files;
     return \@files;
 
 }
@@ -420,7 +421,7 @@ sub file_info {
 
     my ($dataset) = @_;
 
-    my $metadata = $dataset->metadata( [qw( data_file_location data_file_size distribution_statement )] );
+    my $metadata = $dataset->metadata( [qw( data_file_location data_file_size distribution_statement dataref_OPENDAP)] );
 
     # now allowing for datasets w/o file info
     #return if !exists $metadata->{data_file_location} || !defined $metadata->{data_file_location}->[0];
@@ -429,8 +430,10 @@ sub file_info {
         ds_id              => $dataset->ds_id(),
         data_file_location => $metadata->{data_file_location}->[0],
         data_file_size     => $metadata->{data_file_size}->[0],
-        name               => $dataset->ds_name(), 
+        name               => $dataset->ds_name(),
         distribution       => $metadata->{distribution_statement}->[0],
+        dataref_OPENDAP    => $metadata->{dataref_OPENDAP}->[0],
+        wms_url            => $dataset->wmsurl,
     };
 
     #print STDERR '$$$$$$$$$$$$' . Dumper $file_info;

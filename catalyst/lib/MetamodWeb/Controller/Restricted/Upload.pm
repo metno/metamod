@@ -18,6 +18,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =end LICENSE
 
+=cut
+
 =head1 NAME
 
 MetamodWeb::Controller::Restricted:Upload - Catalyst Controller for file upload

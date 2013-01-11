@@ -55,10 +55,15 @@ jQuery(document).ready( function () {
                 <td class="collection-basket" width="90%">
                     <span style="[% filesize ? '' : 'font-style: italic' %]">[% file.name %]</span>
                 </td>
-                <td class="collection-basket" style="white-space:nowrap;">
-                    <a class="visual" href="[% c.uri_for( '/search/wms' ) %]?ds_id=[% file.ds_id %]"><button type="button">Visualize</button></a>
+                <td class="collection-basket" style="white-space:nowrap;text-align: right">
+                    [% IF file.dataref_OPENDAP %]
+                        <a class="visual" href="[% c.uri_for('/search/transform', { ds_id => file.ds_id }) %]"><button type="button">Transform</button></a>
+                    [% END %]
+                    [% IF file.wms_url %]
+                        <a class="visual" href="[% c.uri_for('/search/wms') %]?ds_id=[% file.ds_id %]"><button type="button">Visualize</button></a>
+                    [% END %]
                     <button type="submit" name="remove_file" value="[% file.ds_id %]">
-                        <img src="[% c.uri_for( '/static/images/cancel.png') %]" alt="Remove"/>
+                        <img src="[% c.uri_for('/static/images/cancel.png') %]" alt="Remove"/>
                     </button>
                 </td>
                 <td class="collection-basket" style="text-align: right">
@@ -84,10 +89,9 @@ jQuery(document).ready( function () {
 [% SET basket_params = { ds_id => collection_basket.dataset_ids } %]
 <a class="button-link" target="_blank" href="[% c.uri_for( '/search/collectionbasket/link_basket', basket_params  ) %]"><button type="button">Get basket URL</button></a>
 <a class="visual" href="[% c.uri_for( '/search/wmslist', basket_params  ) %]"><button type="button">Visualize layers</button></a>
-[% IF debug %]
+[% IF 0 # multiple datasets no longer working %]
     <a class="visual" href="[% c.uri_for( '/search/wms', basket_params  ) %]"><button type="button">Visualize set</button></a>
 [% END %]
-
 
 [% ELSE %]
 

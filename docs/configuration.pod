@@ -101,7 +101,7 @@ The top directory of the data repository. This directory is assumed to be
 accessible through an OPeNDAP server (usually TDS/THREDDS) which has to be installed
 as a separate package (not part of METAMOD 2.x). If no OPeNDAP server is installed,
 some of the METAMOD 2.x software will not work. For example, links to OPeNDAP presentation
-of data files set up automaticlly by the UPLOAD module will not work.
+of data files set up automatically by the UPLOAD module will not work.
 
 =item OPENDAP_URL
 

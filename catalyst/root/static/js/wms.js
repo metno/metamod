@@ -28,7 +28,7 @@ function init(){
     var wms_url = args.wmsurl;
 
     // remove "javascript not installed" message from window
-    document.getElementById('docs').removeChild( document.getElementById('warning') );
+    $('#docs').empty();
 
     if (typeof ds_id != 'undefined') {
         OpenLayers.loadURL(wmcpath, "", this, drawMap, showError);
@@ -246,11 +246,7 @@ function drawMap(response) {
 }
 
 function showError(response) {
-    log.error("Could not contact WMS server! ");
-    log.error("Error from backend is: " + response.status + " " + response.statusText);
-    var b = document.createElement('b');
-    b.appendChild( document.createTextNode("Could not contact WMS server! ") );
-    document.getElementById('shortdesc').appendChild(b);
-    document.getElementById('shortdesc').appendChild( document.createElement('br') );
-    document.getElementById('shortdesc').appendChild( document.createTextNode("Error from backend is: " + response.status + " " + response.statusText) );
+    errmsg = "Error from WMS server: " + response.status + " " + response.statusText;
+    log.error(errmsg);
+    $('#docs').append("<p id='warning'>" + errmsg + "</p>");
 }

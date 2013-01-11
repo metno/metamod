@@ -47,6 +47,9 @@ use PDL::NetCDF;
 #use PDL::Char;
 # PDF barfs out following warning on start which seems to conflict with Catalyst inner workings... ignore for now:
 # Prototype mismatch: sub MetamodWeb::Controller::DAP::inner: none vs (;@) at /usr/local/lib/perl/5.10.1/PDL/Exporter.pm line 64
+# using PDL qw() gives Caught exception in MetamodWeb::Controller::DAP->ts:
+# "Undefined subroutine &PDL::Ops::assgn called at Basic/Core/Core.pm.PL (i.e. PDL::Core.pm) line 854."
+
 
 BEGIN { extends 'MetamodWeb::BaseController::Base'; }
 
@@ -78,36 +81,29 @@ Comma separated list of variables (the first is the X axis and should normally b
 
 Either "json" or "csv" (comma separated with header row)
 
-Example: /ts/5435/json
+Example: /ts/5435/time,ice_concentration/json
 
 =cut
 
 sub ts :Path("/ts") :Args(3) {
     my ( $self, $c, $ds_id, $varlist, $format ) = @_;
 
+    my $config = Metamod::Config->instance();
+    my $fimexpath = $config->get('FIMEX_PROGRAM')
+        or $c->detach( 'Root', 'error', [ 501, "Not available without FIMEX installed"] );
+
     my @vars = split ',', $varlist;
     #print STDERR Dumper \@vars;
 
     $MetNo::Fimex::DEBUG = 0; # turn off debug or nothing will happen
-    my $tmpdir = File::Spec->tmpdir();
-    my $tmpfile = sprintf "mmDAP_%d_%d.nc", $$, time ;
-    # make sure not to clobber if more than one request per sec per process
-    my $bis = 0;
-    while (-e "$tmpdir/$tmpfile") {
-        $tmpfile = sprintf "fimex_%d_%d_%d.nc", $$, time, ++$bis ;
-    }
 
     my $ds = $c->model('Metabase::Dataset')->find($ds_id) or $c->detach('Root', 'default');
-
-    my $urls = $ds->metadata()->{'dataref_OPENDAP'} or $c->detach('Root', 'default');
-    my $url = shift @$urls;
+    my $dapurl = $ds->metadata()->{'dataref_OPENDAP'}->[0] or $c->detach('Root', 'default');
 
     # setup fimex to fetch data via opendap
     my $f = new MetNo::Fimex(
-        dapURL => $url,
-        outputFile => $tmpfile,
-        outputDirectory => $tmpdir,
-        program => '/usr/bin/fimex',
+        dapURL => $dapurl,
+        program => $fimexpath,
     );
     eval { $f->doWork() };
     if ($@) {
@@ -115,10 +111,13 @@ sub ts :Path("/ts") :Args(3) {
         $c->detach( 'Root', 'error', [ 502, "FIMEX runtime error: $@"] );
     }
 
+    my $ncfile = $f->outputPath;
     # parse netcdf resulting file
-    my $nc = PDL::NetCDF->new ( "$tmpdir/$tmpfile", {MODE => O_RDONLY} )
-        or $c->detach( 'Root', 'error', [ 500, "Can not parse NetCDF file $tmpdir/$tmpfile"] );
-        # add logger - FIXME
+    my $nc = PDL::NetCDF->new ( $ncfile, {MODE => O_RDONLY} );
+    if (! $nc) {
+        $self->logger->warn("Can not parse NetCDF file $ncfile");
+        $c->detach( 'Root', 'error', [ 500, "Can not parse NetCDF file $ncfile"] );
+    }
 
     my $title = $nc->getatt('title');
     my (%data, %units);
@@ -175,9 +174,9 @@ sub ts :Path("/ts") :Args(3) {
     }
 
     # cleanup (should probably also be done when detaching... FIXME)
-    $self->logger->debug("Deleting temp fimex file $tmpfile");
+    $self->logger->debug("Deleting temp fimex file $ncfile");
     $nc->close;
-    unlink("$tmpdir/$tmpfile") or $self->logger->error("Could not delete temp file $tmpfile");
+    unlink($ncfile) or $self->logger->error("Could not delete temp file $ncfile");
 
 }
 

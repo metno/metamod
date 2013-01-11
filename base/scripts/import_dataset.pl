@@ -64,14 +64,15 @@ import_dataset.pl [options] <file or dir>
 
 =cut
 
-my $config_file_or_dir;
-GetOptions('config=s' => \$config_file_or_dir) or pod2usage(1);
+my $config_file_or_dir = $ENV{METAMOD_MASTER_CONFIG};
+
+GetOptions('config=s' => \$config_file_or_dir); # don't fail in case set in ENV
 
 if(!Metamod::Config->config_found($config_file_or_dir)){
     pod2usage(1);
 }
 
-if ( scalar @ARGV != 1 ) {
+if ( scalar @ARGV != 1 ) { # allow multiple file names? TODO
     pod2usage(1);
 }
 

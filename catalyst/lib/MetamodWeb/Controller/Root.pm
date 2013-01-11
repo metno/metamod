@@ -84,7 +84,7 @@ FIXME - needs better user interface
 
 =cut
 
-sub unauthorized :Private : Args {
+sub unauthorized :Private {
     my ( $self, $c, $required_role ) = @_;
     $self->logger->debug("Required role: $required_role");
     $c->response->status(403);

@@ -261,6 +261,10 @@ CLEANUP_CRONTAB = 15 00 * * *
 # gives access to the data repository by HTTP download.
 OPENDAP_URL = http://thredds.example.com:8081/thredds/catalog/data
 
+# URL of external timeseries plotter. If not given, internal client-based
+# plotting will be performed.
+#TIMESERIES_URL=http://ts.example.com/jtimeseries-webservices/thredds/diagram?parameters=[TIMESERIES]&url=[OPENDAP]
+
 # Ownertag for uploaded datasets:
 UPLOAD_OWNERTAG = MM
 

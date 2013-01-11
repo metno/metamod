@@ -265,7 +265,7 @@ sub request_download : Path('/search/collectionbasket/request_download') {
 
     my $dataset_locations = $basket->find_data_locations();
 
-    print STDERR "+++++++++++++++++" . Dumper \$dataset_locations;
+    #print STDERR "+++++++++++++++++" . Dumper \$dataset_locations;
 
     if ( 0 == @$dataset_locations ) {
         $self->add_info_msgs($c, 'There are no files in the collection basket to download');

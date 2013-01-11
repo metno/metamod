@@ -231,7 +231,7 @@ sub freely_available {
 
     my ($file) = @_;
     
-    print STDERR "++++++++++++" . Dumper \$file;
+    #print STDERR "++++++++++++" . Dumper \$file;
 
     if(!exists $file->{distribution_statement}){
         return 1;
