@@ -864,17 +864,17 @@ sub _isoDoc2SruDb {
     push @params, "metatext";
     push @values, $isods->getMETA_DOC()->textContent();
 
-    push @params, "title";
-    push @values, uc(scalar $self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:title', $xpc));
+    $self->_build_params_values(\@params,\@values,"title",
+        uc(scalar $self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:title', $xpc)));
 
-    push @params, "abstract";
-    push @values, uc(scalar $self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:abstract', $xpc));
+    $self->_build_params_values(\@params,\@values,"abstract",
+        uc(scalar $self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:abstract', $xpc)));
 
-    push @params, "subject";
-    push @values, uc(scalar $self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:subject', $xpc)); # TODO: does this exist?
+    $self->_build_params_values(\@params,\@values,"subject",
+        uc(scalar $self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:subject', $xpc))); # TODO: does this exist?
 
-    push @params, "search_strings";
-    push @values, uc(scalar $self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:keyword', $xpc)); # TODO: word separator?
+    $self->_build_params_values(\@params,\@values,"search_strings",
+        uc(scalar $self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:keyword', $xpc))); # TODO: word separator?
 
     # TODO, not in document yet ???
     #push @params, "begin_date";
@@ -884,14 +884,14 @@ sub _isoDoc2SruDb {
     #push @params, "end_date";
     #push @values, uc(scalar $self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:XXXX', $xpc));
 
-    push @params, "west";
-    push @values, min($self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:westBoundLongitude', $xpc));
-    push @params, "east";
-    push @values, max($self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:eastBoundLongitude', $xpc));
-    push @params, "south";
-    push @values, min($self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:southBoundLatitude', $xpc));
-    push @params, "north";
-    push @values, max($self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:northBoundLatitude', $xpc));
+    $self->_build_params_values(\@params,\@values,"west",
+        min($self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:westBoundLongitude', $xpc)));
+    $self->_build_params_values(\@params,\@values,"east",
+        max($self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:eastBoundLongitude', $xpc)));
+    $self->_build_params_values(\@params,\@values,"south",
+        min($self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:southBoundLatitude', $xpc)));
+    $self->_build_params_values(\@params,\@values,"north",
+        max($self->_get_text_from_doc($isods->getMETA_DOC(), '//gmd:northBoundLatitude', $xpc)));
 
     # id_contact parameter
     push @params, "id_contact";
@@ -908,6 +908,17 @@ SQL
     $self->logger->debug("Inserted sru-searchdata");
 }
 
+# Add one param and value pair to the @params and @values arrays
+# if the value is defined.
+#
+sub _build_params_values {
+    my $self = shift;
+    my ($params,$values,$newparam,$newvalue) = @_;
+    if (defined $newvalue) {
+       push @{$params}, $newparam;
+       push @{$values}, $newvalue;
+    }
+}
 
 #
 # get the author and organization from the document

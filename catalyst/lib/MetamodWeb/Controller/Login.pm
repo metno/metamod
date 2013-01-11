@@ -168,15 +168,23 @@ sub register : Path('register') :Args(0) {
         @roles = qw(subscription upload);
     }
 
-    my $new_user = $c->model('Userbase::Usertable')->new_user($user_values, \@roles);
+    $self->logger->info( "User registration attempt:" . $valid_fields->{realname} . ' ' . 
+                         $valid_fields->{register_username} );
+
+    if ($mm_config->get('JUNK_REGISTRATION') ne 'name_eq_loginname' or
+        $valid_fields->{realname} ne $valid_fields->{register_username}) {
+
+        my $new_user = $c->model('Userbase::Usertable')->new_user($user_values, \@roles);
 
     # This feature has been temporary removed since we have problems with junk regirations.
     # This might be turned on if we figure out a better way to prevent the junk registrations
     # See bug 129
     #$self->send_user_receipt($c, $user_values);
 
-    $self->send_operator_email($c, $new_user, $user_values);
+        $self->send_operator_email($c, $new_user, $user_values);
+        $self->logger->info( "User registration: Email sent to operator for approval" );
 
+    }
     $self->add_info_msgs($c, 'Your request will be processed. If accepted, you will receive an E-mail within a few days.');
     $c->res->redirect($c->uri_for('/login' ));
 
