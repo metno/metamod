@@ -1,34 +1,25 @@
 package MetNo::NcFind;
-# 
-#---------------------------------------------------------------------------- 
-#  METAMOD - Web portal for metadata search and upload 
-# 
-#  Copyright (C) 2008 met.no 
-# 
-#  Contact information: 
-#  Norwegian Meteorological Institute 
-#  Box 43 Blindern 
-#  0313 OSLO 
-#  NORWAY 
-#  email: egil.storen@met.no 
-#   
-#  This file is part of METAMOD 
-# 
-#  METAMOD is free software; you can redistribute it and/or modify 
-#  it under the terms of the GNU General Public License as published by 
-#  the Free Software Foundation; either version 2 of the License, or 
-#  (at your option) any later version. 
-# 
-#  METAMOD is distributed in the hope that it will be useful, 
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of 
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-#  GNU General Public License for more details. 
-#   
-#  You should have received a copy of the GNU General Public License 
-#  along with METAMOD; if not, write to the Free Software 
-#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
-#---------------------------------------------------------------------------- 
-#
+
+=begin LICENSE
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+METAMOD is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with METAMOD; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=end LICENSE
+
+=cut
+
 use strict;
 use warnings;
 
@@ -41,41 +32,53 @@ use PDL::NetCDF;
 use PDL::Lite qw();
 use UNIVERSAL qw();
 
-#
-# try encoding with utf8
-# if errors try encoding with iso8859-1
-# if still errors, try encoding with utf8 ignoring errors
-#
-sub _utf8Iso8859_1Decode {
-    my $retVal = $_[0];
-    eval {$retVal = Encode::decode('utf8', $retVal, Encode::FB_CROAK)};
-    if ($@) {
-        eval {$retVal = Encode::decode('iso8859-1', $retVal, Encode::FB_CROAK)};
-        if ($@) {
-            $retVal = Encode::decode('utf8', $retVal);
-        } 
-    }
-    return $retVal;
-}
+=head1 NAME
 
-#   
-# Default decoding of data to perl internal format
-# with utf-8 flag switched on.
-# It is no problem to _decode twice.
-# Original in netcdf is assumed to be 'utf8' or 'iso8859-1'.
-#
-sub _decode {
-    return wantarray ? map {_utf8Iso8859_1Decode($_)} @_
-                     : _utf8Iso8859_1Decode($_[0]);
-}
+MetNo::NcFind - access and search variables and attributes in a Nc-File
 
+=head1 SYNOPSIS
+
+  use MetNo::NcFind;
+
+  my $nc = new MetNo::NcFind('my/file.nc');
+  my @globalAttributes = $nc->globatt_names;
+  foreach my $globAtt (@globalAttributes) {
+    my $globAttValue = $nc->globatt_value($globAtt);
+  }
+  my @variables = $nc->variables;
+  my $attValue = $nc->att_value($varName, $attName);
+
+  my @dimensions = $nc->dimensions($varName);
+
+  my @borderVals = $nc->get_bordervalues($varName);
+  my @vals = $nc->get_values($varName);
+
+  my ($longRef, $latRef) = $nc->get_lonlats('longitude', 'latitude');
+
+  my @vars = $nc->findVariablesByAttributeValue('units', qr/degrees?_(north|east)/);
+  my @lonLatVars = $nc->findVariablesByDimensions(['lon','lat']);
+
+=head1 DESCRIPTION
+
+This module gives read-only access to nc-files. It hides all datatype and
+encoding issues. In contrast to the netcdf-user manual (since 3.6.3), netcdf-files
+are assumed to be in iso8859, only if that conversion fails, utf-8 is assumed.
+
+=head2 METHODS
+
+=head3 new(filename|PDL::NetCDF object)
+
+open the ncfile and generate a new object
+throws exception on errors
+
+=cut
 
 sub new {
     my ($this, $ncfile) = @_;
     my $class = ref($this) || $this;
     my $self = {};
 
-    die __PACKAGE__."::new requires ncFile as argument" unless $ncfile;    
+    die __PACKAGE__."::new requires ncFile as argument" unless $ncfile;
     if (UNIVERSAL::isa($ncfile, 'PDL::NetCDF')) {
         $self->{NCOBJ} = $ncfile;
     } else {
@@ -88,11 +91,24 @@ sub new {
     return bless($self,$class);
 }
 
+=head3 globalatt_names()
+
+get a list of all global attributes
+
+=cut
+
 sub globatt_names {
     my ($self) = @_;
     my $ncref = $self->{NCOBJ};
     return _decode(@{$ncref->getattributenames()});
 }
+
+=head3 globatt_value($attName)
+
+get the value of the global attribute named $attName
+Returns undef if variable or attribute don't exist.
+
+=cut
 
 sub globatt_value {
     my ($self, $globattname) = @_;
@@ -112,12 +128,24 @@ sub globatt_value {
     return $retVal;
 }
 
+=head3 variables()
+
+get a list of all variables
+
+=cut
+
 sub variables {
     my ($self) = @_;
     my $ncref = $self->{NCOBJ};
-    # Return all variable names 
+    # Return all variable names
     return _decode(@{$ncref->getvariablenames()});
 }
+
+=head3 att_names($varName)
+
+get a list of all the attributes for a variable
+
+=cut
 
 sub att_names {
     my ($self, $varname) = @_;
@@ -126,13 +154,20 @@ sub att_names {
     return _decode(@{$ncref->getattributenames($varname)});
 }
 
+=head3 att_value($varName, $attName)
+
+get the value of the attribute named $attName belonging to $varName.
+Returns undef if variable or attribute don't exist.
+
+=cut
+
 sub att_value {
     my ($self, $varname, $attname) = @_;
 
     my $ncref = $self->{NCOBJ};
     my $result;
     eval {
-    	$result = $ncref->getatt($attname, $varname); 
+    	$result = $ncref->getatt($attname, $varname);
     }; if ($@) {
         # don't care
     }
@@ -143,6 +178,13 @@ sub att_value {
     }
 }
 
+=head3 dimensions($varName)
+
+get a list of dimension-names belonging to variable $varName. If varName is missing, lists
+alls dimensions of the file.
+
+=cut
+
 sub dimensions {
     my ($self, $varname) = @_;
 
@@ -151,10 +193,23 @@ sub dimensions {
     return _decode(@{$ncref->getdimensionnames($varname)});
 }
 
+=head3 dimensionSize($dimName)
+
+get the integer size of the dimension $dimName
+
+=cut
+
 sub dimensionSize {
     my ($self, $dimName) = @_;
     return $self->{NCOBJ}->dimsize($dimName);
 }
+
+=head3 get_bordervalues($varName)
+
+get a list of all values on the border of the variable-array. It will
+repeat the corner values.
+
+=cut
 
 sub get_bordervalues {
     my ($self, $varname) = @_;
@@ -175,15 +230,21 @@ sub get_bordervalues {
     my $rightcol = $pdl1->slice("(-1),:");
     my $bottomrow_reversed = $pdl1->slice("-1:0,(-1)");
     my $leftcol_reversed = $pdl1->slice("(0),-1:0");
-    
+
     # Return the values as an array:
     return ($upperrow->list,$rightcol->list, $bottomrow_reversed->list, $leftcol_reversed->list);
 }
 
+=head3 get_values($varName)
+
+get a one-dimensional list of all values of $varName
+
+=cut
+
 sub get_values {
     my ($self, $varname) = @_;
 
-    my $ncref = $self->{NCOBJ};    
+    my $ncref = $self->{NCOBJ};
     # Get the values of a  netCDF variable as PDL object
     # Resulting PDL object: $pdl1. NetCDF object: $ncref,
     # variable name: $varname.
@@ -193,16 +254,24 @@ sub get_values {
     return $pdl1->list;
 }
 
+=head3 get_lonlats('longitude', 'latitude')
+
+get lists of longitude and latitude values as array-reference of the variables
+longitude and latitude. Clean the data for eventually occuring invalid values (outside -180/180, -90/90
+respectively). Both lists are guaranteed to be equal-sized. Returns [],[] if names are not found.
+
+=cut
+
 sub get_lonlats {
     my ($self, $lon_name, $lat_name) = @_;
 
     my $ncref = $self->{NCOBJ};
-    
+
     my %variables = map {$_ => 1} $self->variables;
     unless (exists $variables{$lon_name} and exists $variables{$lat_name}) {
     	return ([], []);
     }
-    
+
     # check/set valid ranges
     my $valid_min_lon = -180.0;
     my $valid_max_lon = 180.0;
@@ -222,7 +291,7 @@ sub get_lonlats {
     if (grep($_ eq "valid_max", @$attlist_lat) > 0) {
         $valid_max_lat = $self->att_value($lat_name, "valid_max");
     }
-    
+
     my $pdl_lon  = $ncref->get ($lon_name);
     my $pdl_lat  = $ncref->get ($lat_name);
     my @lon = $pdl_lon->list if defined $pdl_lon;
@@ -243,6 +312,13 @@ sub get_lonlats {
     return (\@rlon,\@rlat);
 }
 
+=head3 findVariablesByAttributeValue($attName, $pattern)
+
+get a list of variables containing a attribute that matches $pattern. $pattern
+should be a compiled regex, i.e. qr//;
+
+=cut
+
 sub findVariablesByAttributeValue {
     my ($self, $attribute, $valueRegex) = @_;
     my @variables = $self->variables;
@@ -258,6 +334,13 @@ sub findVariablesByAttributeValue {
     return @outVars;
 }
 
+=head3 findVariablesByDimensions(\@dimNameList)
+
+get a list of all variables containing at least the applied dimension-names. Gives all
+variables if @dimNameList is empty.
+
+=cut
+
 sub findVariablesByDimensions {
     my ($self, $dimRef) = @_;
     my %dims = map {$_ => 1} @$dimRef;
@@ -265,7 +348,7 @@ sub findVariablesByDimensions {
     foreach my $var ($self->variables) {
         my $foundDims = 0;
         foreach my $vDim ($self->dimensions($var)) {
-            $foundDims++ if exists $dims{$vDim};             
+            $foundDims++ if exists $dims{$vDim};
         }
         if ($foundDims == scalar keys %dims) {
             # all requested dims found
@@ -274,6 +357,18 @@ sub findVariablesByDimensions {
     }
     return @outVars;
 }
+
+=head3 findBoundingBoxByGlobalAttributes($northAtt, $southAtt, $eastAtt, $westAtt)
+
+Find the geographical bounding box by global attributes, i.e. for damocles by
+qw(northernmost_latitude southernmost_latitude easternmost_longitude westernmost_longitude)
+or for  Unidata Dataset Discovery v1.0 by
+qw(geospatial_lat_max geospatial_lat_min geospatial_lon_max geospatial_lon_min)
+
+Return: %boundingBox{north,south,east,west}, empty if not all attributes are found.
+Dies on errors, e.g. boundingBox-value out of range.
+
+=cut
 
 sub findBoundingBoxByGlobalAttributes {
     my ($self, $northAtt, $southAtt, $eastAtt, $westAtt) = @_;
@@ -307,6 +402,15 @@ sub findBoundingBoxByGlobalAttributes {
     return %boundingBox;
 }
 
+=head3 extractCFLonLat
+
+Extract lat/lon information as polygons or points from the used latitude/longitude variables
+given as CF convention.
+
+Return (errors => \@errors, polygons => \@lonLatPolygons, points => \@lonLatPoints)
+
+=cut
+
 sub extractCFLonLat {
     my ($self) = @_;
     my @lonLatPolygons;
@@ -322,15 +426,15 @@ sub extractCFLonLat {
             $realDims++;
         }
     }
-    
+
     if ($realDims == 0) {
         # no dimensions => no polygons/points, return here
         return (errors => \@errors, polygons => \@lonLatPolygons, points => \@lonLatPoints);
     }
 
-    # find latitude/longitude variables (variables with units degree(s)_(north|south|east|west))    
+    # find latitude/longitude variables (variables with units degree(s)_(north|south|east|west))
     my %latDims = map {$_ => 1} $self->findVariablesByAttributeValue('units', qr/degrees?_(north|south)/);
-    my %lonDims = map {$_ => 1} $self->findVariablesByAttributeValue('units', qr/degrees?_(east|west)/);    
+    my %lonDims = map {$_ => 1} $self->findVariablesByAttributeValue('units', qr/degrees?_(east|west)/);
 
 
     # lat/lon pairs can, according to CF-1.3 belong in differnt ways to a variable
@@ -340,7 +444,7 @@ sub extractCFLonLat {
     #
     # a) and b) will be translated to a polygon describing the outline
     # c) will be translated to a list of lat/lon points
-    
+
     # find variables directly related to each combination of lat/lon (a)
     my @lonLatCombinations;
     foreach my $lat (keys %latDims) {
@@ -354,7 +458,7 @@ sub extractCFLonLat {
     foreach my $llComb (@lonLatCombinations) {
         my @llDimVars = $self->findVariablesByDimensions($llComb);
         if (@llDimVars) {
-            push @lonLatDimVars, @llDimVars;  
+            push @lonLatDimVars, @llDimVars;
             push @usedLonLatCombinations, $llComb;
         } else {
             push @unUsedLonLatCombinations, $llComb;
@@ -370,10 +474,10 @@ sub extractCFLonLat {
             push @polygon, map{[$lons[-1], $_]} @lats;
             push @polygon, map{[$_, $lats[-1]]} reverse @lons;
             push @polygon, map{[$lons[0], $_]} reverse @lats;
-            push @lonLatPolygons, \@polygon;            
+            push @lonLatPolygons, \@polygon;
         }
     }
-    
+
     # get the coordinates values to find lat/lon pairs (b and c)
     my @coordVars = $self->findVariablesByAttributeValue('coordinates', qr/.*/);
     # remove the variables already detected as class a)
@@ -390,7 +494,7 @@ sub extractCFLonLat {
             if (exists $coordinates{$llComb->[0]} and
                 exists $coordinates{$llComb->[1]}) {
                 push @lonLatCoordinates, $llComb;
-                push @usedLonLatCombinations, $llComb;    
+                push @usedLonLatCombinations, $llComb;
             } else {
                 push @unUsedLonLatCombinations, $llComb;
             }
@@ -413,7 +517,7 @@ sub extractCFLonLat {
         my @latDims = $self->dimensions($latName);
         my @lonDims = $self->dimensions($lonName);
         if (@latDims != @lonDims) {
-            my $msg = "number $latName dimensions (@latDims) != $lonName dimensions (@lonDims), skipping ($latName,$lonName)"; 
+            my $msg = "number $latName dimensions (@latDims) != $lonName dimensions (@lonDims), skipping ($latName,$lonName)";
             warn $msg if $DEBUG;
             push @errors, $msg;
         } elsif (1 == @latDims) {
@@ -440,133 +544,51 @@ sub extractCFLonLat {
                 my $msg = "$latName dimension ".(scalar @latBorders)." != $lonName dimensions ".(scalar @lonBorders).", skipping";
                 warn $msg if $DEBUG;
                 push @errors, $msg;
-            } 
+            }
         } else {
             my $msg = "$latName and $lonName are of dimension ".(scalar @latDims). ". Don't know what to do, skipping.";
             warn $msg if $DEBUG;
             push @errors, $msg;
         }
     }
-    
+
     return (errors => \@errors, polygons => \@lonLatPolygons, points => \@lonLatPoints);
 }
 
 
+##########################################################################################
+#
+# HELPER FUNCTIONS
+
+#
+# try encoding with utf8
+# if errors try encoding with iso8859-1
+# if still errors, try encoding with utf8 ignoring errors
+#
+sub _utf8Iso8859_1Decode {
+    my $retVal = $_[0];
+    eval {$retVal = Encode::decode('utf8', $retVal, Encode::FB_CROAK)};
+    if ($@) {
+        eval {$retVal = Encode::decode('iso8859-1', $retVal, Encode::FB_CROAK)};
+        if ($@) {
+            $retVal = Encode::decode('utf8', $retVal);
+        }
+    }
+    return $retVal;
+}
+
+#
+# Default decoding of data to perl internal format
+# with utf-8 flag switched on.
+# It is no problem to _decode twice.
+# Original in netcdf is assumed to be 'utf8' or 'iso8859-1'.
+#
+sub _decode {
+    return wantarray ? map {_utf8Iso8859_1Decode($_)} @_
+                     : _utf8Iso8859_1Decode($_[0]);
+}
 
 1;
-__END__
-=head1 NAME
-
-MetNo::NcFind - access and search variables and attributes in a Nc-File
-
-=head1 SYNOPSIS
-
-  use MetNo::NcFind;
-  
-  my $nc = new MetNo::NcFind('my/file.nc');
-  my @globalAttributes = $nc->globatt_names;
-  foreach my $globAtt (@globalAttributes) {
-    my $globAttValue = $nc->globatt_value($globAtt);
-  }
-  my @variables = $nc->variables;
-  my $attValue = $nc->att_value($varName, $attName);
-  
-  my @dimensions = $nc->dimensions($varName);
-  
-  my @borderVals = $nc->get_bordervalues($varName);
-  my @vals = $nc->get_values($varName);
-  
-  my ($longRef, $latRef) = $nc->get_lonlats('longitude', 'latitude');
-
-  my @vars = $nc->findVariablesByAttributeValue('units', qr/degrees?_(north|east)/);
-  my @lonLatVars = $nc->findVariablesByDimensions(['lon','lat']);
-
-=head1 DESCRIPTION
-
-This module gives read-only access to nc-files. It hides all datatype and
-encoding issues. In contrast to the netcdf-user manual (since 3.6.3), netcdf-files
-are assumed to be in iso8859, only if that conversion fails, utf-8 is assumed.
-
-=head2 METHODS
-
-=over 8
-
-=item new(filename|PDL::NetCDF object)
-
-open the ncfile and generate a new object
-throws exception on errors
-
-=item globalatt_names()
-
-get a list of all global attributes
-
-=item globatt_value($attName)
-
-get the value of the global attribute named $attName
-Returns undef if variable or attribute don't exist.
-
-=item variables()
-
-get a list of all variables
-
-=item att_value($varName, $attName)
-
-get the value of the attribute named $attName belonging to $varName.
-Returns undef if variable or attribute don't exist.
-
-=item findVariablesByAttributeValue($attName, $pattern)
-
-get a list of variables containing a attribute that matches $pattern. $pattern
-should be a compiled regex, i.e. qr//;
-
-=item findVariablesByDimensions(\@dimNameList)
-
-get a list of all variables containing at least the applied dimension-names. Gives all
-variables if @dimNameList is empty.
-
-=item dimensions($varName)
-
-get a list of dimension-names belonging to variable $varName. If varName is missing, lists
-alls dimensions of the file.
-
-=item dimensionSize($dimName)
-
-get the integer size of the dimension $dimName
-
-=item get_bordervalues($varName)
-
-get a list of all values on the border of the variable-array. It will
-repeat the corner values.
-
-=item get_values($varName)
-
-get a one-dimensional list of all values of $varName
-
-=item get_lonlats('longitude', 'latitude')
-
-get lists of longitude and latitude values as array-reference of the variables
-longitude and latitude. Clean the data for eventually occuring invalid values (outside -180/180, -90/90 
-respectively). Both lists are guaranteed to be equal-sized. Returns [],[] if names are not found.
-
-=item findBoundingBoxByGlobalAttributes($northAtt, $southAtt, $eastAtt, $westAtt)
-
-Find the geographical bounding box by global attributes, i.e. for damocles by
-qw(northernmost_latitude southernmost_latitude easternmost_longitude westernmost_longitude)
-or for  Unidata Dataset Discovery v1.0 by 
-qw(geospatial_lat_max geospatial_lat_min geospatial_lon_max geospatial_lon_min)
-
-Return: %boundingBox{north,south,east,west}, empty if not all attributes are found.
-Dies on errors, e.g. boundingBox-value out of range.
-
-=item extractCFLonLat
-
-Extract lat/lon information as polygons or points from the used latitude/longitude variables
-given as CF convention.
-
-Return (errors => \@errors, polygons => \@lonLatPolygons, points => \@lonLatPoints)
-
-
-=back
 
 =head1 AUTHOR
 

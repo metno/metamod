@@ -42,8 +42,9 @@ use JSON::Any;
 use Fcntl;
 
 use MetNo::Fimex;
-use PDL;
-use PDL::NetCDF;
+use MetNo::NcFind;
+#use PDL;
+#use PDL::NetCDF;
 #use PDL::Char;
 # PDF barfs out following warning on start which seems to conflict with Catalyst inner workings... ignore for now:
 # Prototype mismatch: sub MetamodWeb::Controller::DAP::inner: none vs (;@) at /usr/local/lib/perl/5.10.1/PDL/Exporter.pm line 64
@@ -114,43 +115,59 @@ sub ts :Path("/ts") :Args(3) {
     my $ncfile = $f->outputPath;
     # parse netcdf resulting file
     my $nc = PDL::NetCDF->new ( $ncfile, {MODE => O_RDONLY} );
-    if (! $nc) {
+    my $nc2 = MetNo::NcFind->new($ncfile);
+    if (! $nc2) {
         $self->logger->warn("Can not parse NetCDF file $ncfile");
         $c->detach( 'Root', 'error', [ 500, "Can not parse NetCDF file $ncfile"] );
     }
 
     my $title = $nc->getatt('title');
-    my (%data, %units);
-    foreach (@{ $nc->getvariablenames }) { # fetch data from db
+    my $title2 = $nc2->globatt_value('title');
+
+    ## PDL version
+    #my (%data, %units);
+    #foreach (@{ $nc->getvariablenames }) { # fetch data from db
+    #    print STDERR "+++ $_\n";
+    #    my @v = list( $nc->get($_) );
+    #    my $name = $nc->getatt('standard_name', $_); # TODO also check long_name, short_name
+    #    next unless grep /^$name$/, @vars; # skip vars not in request
+    #    $units{$name} = $nc->getatt('units', $_);
+    #    $data{$name} = \@v;
+    #}
+    ##print STDERR Dumper \%data, \%units;
+
+    # Metno::NcFind version
+    my (%data2, %units2);
+    foreach ($nc2->variables) { # fetch data from db
         #print STDERR "+++ $_\n";
-        my @v = list( $nc->get($_) );
-        my $name = $nc->getatt('standard_name', $_); # TODO also check long_name, short_name
+        my @v = $nc2->get_values($_);
+        my $name = $nc2->att_value($_, 'standard_name'); # TODO also check long_name, short_name
         next unless grep /^$name$/, @vars; # skip vars not in request
-        $units{$name} = $nc->getatt('units', $_);
-        $data{$name} = \@v;
+        $units2{$name} = $nc2->att_value($_, 'units');
+        $data2{$name} = \@v;
     }
+    #print STDERR Dumper \%data2, \%units2;
 
     foreach (@vars) { # check that all variables actually exist
         $c->detach( 'Root', 'error', [ 400, "No such variable '$_'"] )
-            unless $data{$_};
+            unless $data2{$_};
     }
 
     if (grep /^time$/, @vars) { # convert times to ISO
         my @isotime;
-        foreach (@{ $data{'time'} }) {
+        foreach (@{ $data2{'time'} }) {
+            #print STDERR "++++++++++++++++ $_\n";
             my $dt = DateTime->from_epoch( epoch => $_ );
             push @isotime, $dt->ymd . 'T' . $dt->hms;;
         }
-        $data{'time'} = \@isotime;
+        $data2{'time'} = \@isotime;
     }
-
-    #print STDERR Dumper \%data;
 
     # output stuff
     if ($format eq 'json') {
 
         my $j = JSON::Any->new;
-        my $json = $j->encode( \%data );
+        my $json = $j->encode( \%data2 );
         $c->response->content_type('application/json');
         $c->response->body( $json );
 
@@ -158,14 +175,14 @@ sub ts :Path("/ts") :Args(3) {
 
         # push column headings first on list
         foreach (@vars) {
-            unshift @{ $data{$_} }, /^time$/ ? $_ : "$_ ($units{$_})";
+            unshift @{ $data2{$_} }, /^time$/ ? $_ : "$_ ($units2{$_})";
         }
 
         # rearrange from hash of arrays into table of rows
         my $out;
-        my $rows = $nc->dimsize('time');
+        my $rows = $nc2->dimensionSize('time'); #$nc->dimsize('time');
         for (my $i = 0; $i <= $rows; $i++) {
-            my @cells = map $data{$_}->[$i], @vars;
+            my @cells = map $data2{$_}->[$i], @vars;
             $out .= join("\t", @cells) . "\n";
         }
         $c->response->content_type('text/plain');
