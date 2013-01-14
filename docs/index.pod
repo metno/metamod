@@ -31,6 +31,10 @@ Setting up a METAMOD application
 
 Configuration details and custom templates
 
+=item L<FAQ|faq>
+
+Frequently asked questions (for any definition of frequency)
+
 =item L<Datamodel|datamodel>
 
 The data-model and the data-flow within METAMOD2

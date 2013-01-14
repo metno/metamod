@@ -1,5 +1,26 @@
 
-2.10    ?
+============================
+  METAMOD CHANGELOG
+============================
+
+
+2.12   Mon Jan 14 2013
+    - projection selector and timeslider in wms client
+    - visualization of non-gridded timeseries
+    - fimex support for reading via opendap
+    - subsetting and (experimental) reprojection via OPeNDAP
+    - bugfix for wgs84 map in basket
+
+2.11    Thu, 31 Aug 2012
+    Improved WMS client with many new features:
+    - new advanced layer selector with separate legends and time axis
+    - multiple transparent daya layers can be displayed simultaneously
+    - layers from different datasets and sources can be combined in client using collection basket
+    - timeslider allows for animation of multiple layers simultaneously
+    - support for many more projections (depending on data source WMS server)
+    - added support for WMS 1.1.1 (in addition to 1.3.0)
+
+2.10    Tue, 24 Jan 2012
     - Simplified installation - now running directly from source, Debian installer
     - WMS visualization of time series, aggregated datasets, collection basket
     - Final PHP module (OAI-PMH) rewritten in Perl
