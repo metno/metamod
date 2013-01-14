@@ -4,8 +4,11 @@ Upgrading to 2.12 only consists of stopping all services, installing the new
 version, running the install_jobs script and restarting the services as described
 in L<Deploying|../deploying>.
 
-No change in configuration is required for existing sites. However, to enable the
+No change in METAMID configuration is required for existing sites. However, to enable the
 new features in 2.12 some additional metadata are required.
+Also, FIMEX 0.41 or later must be installed, and the executable path set in master_config:
+
+  FIMEX_PROGRAM = /usr/bin/fimex
 
 =head2 Timeseries plot
 
@@ -79,4 +82,3 @@ This feature is currently experimental.
 This is a planned feature for a later release. To enable this your map server will need to support
 background maps in EPSG:93995 and EPSG:93031 projections. Further projections may be supported
 in later versions.
-

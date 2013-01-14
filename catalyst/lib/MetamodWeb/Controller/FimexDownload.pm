@@ -151,7 +151,7 @@ sub transform_POST {
     $MetNo::Fimex::DEBUG = 0; # turn off debug or nothing will happen
 
     my $p = $c->request->params;
-    printf STDERR Dumper \$p;
+    #printf STDERR Dumper \$p;
 
     my %fiParams = (
         dapURL => $c->stash->{dapurl},
@@ -159,11 +159,15 @@ sub transform_POST {
     );
 
     my $vars = $p->{variable};
-    $fiParams{selectVariables} = ref $vars ? $vars : [ $vars ]; # listify if single
+    $fiParams{selectVariables} = ref $vars ? $vars : [ $vars ] if $vars; # listify if single, skip if empty
 
     for (qw(north south east west)) {
         $fiParams{$_} = $$p{$_} if exists $$p{$_};
     }
+
+    # we should probably do some timestamp validation here, but seems to work for the moment... FIXME
+    $fiParams{'startTime'} = $$p{start_date};
+    $fiParams{'endTime'}  = $$p{stop_date};
 
     my $fiProjection = $c->stash->{fiproj};
     if ($p->{projection} && $fiProjection) {
@@ -196,7 +200,7 @@ sub transform_POST {
         $c->detach( 'Root', 'error', [ 502, "FIMEX runtime error: $@"] );
     }
 
-    print STDERR "*** FIMEX = $cmd\n";
+    $self->logger->debug("Running FIMEX: $cmd");
 
     my $ncfile = $f->outputPath;
 

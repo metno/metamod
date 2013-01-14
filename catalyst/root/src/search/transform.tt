@@ -51,6 +51,9 @@
 
             [% html %]
 
+            <script>$(function() { $( "#start_date" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
+            <script>$(function() { $( "#stop_date" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
+
             [% IF fiproj %]
                 <h2>Projection (not implemented)</h2>
                 <select name="projection">
@@ -63,6 +66,7 @@
 
             <div>
                 <br/>
+                <button type="button" onclick="jQuery('#start_date').val(''); jQuery('#stop_date').val('')">Clear dates</button>
                 <input type="submit" value="Transform"/>
             </div>
 

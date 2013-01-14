@@ -259,6 +259,8 @@ List of variables to include in output
 
 =cut
 
+# ok, not really sure if these need to be object attributes or could just be sent as params
+
 has 'selectVariables' => (
     is => 'rw',
     isa => 'ArrayRef',
@@ -294,6 +296,24 @@ has 'east' => (
 has 'west' => (
     is => 'rw',
     isa => 'Num',
+);
+
+=head2 startTime
+
+=head2 endTime
+
+ISO timestamps for start and end of subset
+
+=cut
+
+has 'startTime' => (
+    is => 'rw',
+    isa => 'Str',
+);
+
+has 'endTime' => (
+    is => 'rw',
+    isa => 'Str',
 );
 
 =head2 outputPath
@@ -371,8 +391,10 @@ sub doWork {
         $args{'extract.reduceToBoundingBox.west'} = $self->west;
         $args{'extract.reduceToBoundingBox.east'} = $self->east;
         $args{'extract.selectVariables'} = $self->selectVariables;
+        $args{'extract.reduceTime.start'} = $self->startTime;
+        $args{'extract.reduceTime.end'} = $self->endTime;
 
-        #print STDERR Dumper \%args;
+        print STDERR Dumper \%args;
 
         $command = projectFile(%args);
     } else {
@@ -462,15 +484,17 @@ sub projectFile {
         'interpolate.xAxisUnit' => 0,
         'interpolate.yAxisUnit' => 0,
         'interpolate.metricAxes' => {type => Params::Validate::BOOLEAN, optional => 1},
-        # the following are currently ignored
-        'interpolate.latitudeName' => 0,
-        'interpolate.longitudeName' => 0,
-        'interpolate.printCS' => 0,
         'extract.selectVariables' => 0,
         'extract.reduceToBoundingBox.north' => 0,
         'extract.reduceToBoundingBox.east' => 0,
         'extract.reduceToBoundingBox.west' => 0,
         'extract.reduceToBoundingBox.south' => 0,
+        'extract.reduceTime.start' => 0,
+        'extract.reduceTime.end' => 0,
+        # the following are currently ignored
+        'interpolate.latitudeName' => 0,
+        'interpolate.longitudeName' => 0,
+        'interpolate.printCS' => 0,
 
     });
 
@@ -489,14 +513,16 @@ sub projectFile {
     foreach my $key (sort keys %p) {
         my $val = $p{$key};
         next unless defined $val; # skip undefs which will occur when using opendap
+        #print STDERR '*** val *** ' . Dumper $val;
         if ( ref($val) eq 'ARRAY' ) { # check if list
-            push @args, map {'--extract.selectVariables='.$_} @$val;
+            push @args, map {'--extract.selectVariables='.$_} @$val if scalar @$val; # skip empty variable list
         } else {
             push @args, '--'.$key, $val;
         }
     }
 
-    #print STDERR Dumper \@args;
+    print STDERR Dumper \@args;
+    # NOTE that $command does not quote arguments and so is not identical to system(@args) !!
     my $command = join ' ', @args;
     if ($DEBUG > 0) {
         # simulate running command

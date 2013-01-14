@@ -16,13 +16,13 @@ points for later.
 
 --------------------
 
+check if user exists before saying password change has been effected
+
 separate thumbnail elements in wmsinfo for level 1 and 2
 
 proper handling of timeout from wms server
 
 * better metadata conversion (new major feature)
-
-set default time in wms selector
 
 adduser script (for userbase)
 
@@ -56,6 +56,8 @@ avoid misuse
 - must use POST
 
 ++++++++ DONE ++++++++++++++
+
+set default time in wms selector
 
 fix timeslider to show on startup layer (again)
 

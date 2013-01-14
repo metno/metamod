@@ -145,6 +145,9 @@ APP_MENU =
 # Comma-separated list of dataset tags accessible from this application:
 DATASET_TAGS = 'MM'
 
+# locate your FIMEX program for reprojection of data (0.41 or later required)
+#FIMEX_PROGRAM = /usr/bin/fimex
+
 # ============ WMS configuration =======================
 
 # URL to background map server delivering coastlines and reticules

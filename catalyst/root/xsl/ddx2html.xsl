@@ -73,8 +73,8 @@
       <tr>
         <td class="label">Select time range:</td>
         <td class="fields">
-          <input name="start_date" value="{dap:Attribute[@name='start_date']/dap:value}"/> to
-          <input name="stop_date"  value="{dap:Attribute[@name='stop_date']/dap:value}"/>
+          <input name="start_date" id="start_date" value="{dap:Attribute[@name='start_date']/dap:value}"/> to
+          <input name="stop_date"  id="stop_date"  value="{dap:Attribute[@name='stop_date']/dap:value}"/>
         </td>
       </tr>
     </table>
