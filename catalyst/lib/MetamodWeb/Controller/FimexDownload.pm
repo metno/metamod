@@ -90,12 +90,12 @@ sub transform :Path('/search/transform') :ActionClass('REST') :Args {
     #$dapurl = "http://thredds.met.no/thredds/dodsC/myocean/arc-mfc/arc-metno-arctic20-roms/roms_arctic20.an.20130102.nc";
     $c->stash( dapurl => $dapurl, dataset => $ds );
 
-    if ( my $projectioninfo = $ds->projectioninfos->first ) {
-        $self->logger->debug("Projectioninfo found..." . $projectioninfo->pi_content);
-        my $fiProjection = Metamod::FimexProjections->new($projectioninfo->pi_content);
-        $c->stash( fiproj => $fiProjection );
-    }
-
+    #if ( my $projectioninfo = $ds->projectioninfos->first ) {
+    #    $self->logger->debug("Projectioninfo found..." . $projectioninfo->pi_content);
+    #    my $fiProjection = Metamod::FimexProjections->new($projectioninfo->pi_content);
+    #    $c->stash( fiproj => $fiProjection );
+    #}
+    $c->stash( projections => Metamod::WMS::projList() );
 }
 
 sub transform_GET {
@@ -151,7 +151,7 @@ sub transform_POST {
     $MetNo::Fimex::DEBUG = 0; # turn off debug or nothing will happen
 
     my $p = $c->request->params;
-    #printf STDERR Dumper \$p;
+    printf STDERR Dumper \$p;
 
     my %fiParams = (
         dapURL => $c->stash->{dapurl},
@@ -169,32 +169,11 @@ sub transform_POST {
     $fiParams{'startTime'} = $$p{start_date};
     $fiParams{'endTime'}  = $$p{stop_date};
 
-    my $fiProjection = $c->stash->{fiproj};
-    if ($p->{projection} && $fiProjection) {
-        my $projString = $fiProjection->getProjectionProperty($p->{projection}, 'projString');
-        if ($projString) {
-            $fiParams{interpolateMethod} = $fiProjection->getProjectionProperty($p->{projection}, 'method');
-            $fiParams{projString} = $projString;
-            $fiParams{xAxisValues} = $fiProjection->getProjectionProperty($p->{projection}, 'xAxis');
-            $fiParams{yAxisValues} = $fiProjection->getProjectionProperty($p->{projection}, 'yAxis');
-            my $isMetric = ( $fiProjection->getProjectionProperty($p->{projection}, 'toDegree') eq "true" ) ? 0 : 1;
-            $fiParams{metricAxes} = $isMetric;
-        }
-    }
-
-    #if (exists $borders{z}) {
-    #    push @fiParams, '--extract.reduceVerticalAxis.start='.$borders{z}->[0];
-    #    push @fiParams, '--extract.reduceVerticalAxis.end='.$borders{z}->[1];
-    #    push @fiParams, '--extract.reduceVerticalAxis.unit=m';
-    #}
-    #if (exists $borders{t}) {
-    #    push @fiParams, '--extract.reduceTime.start='.$borders{t}->[0];
-    #    push @fiParams, '--extract.reduceTime.end='.$borders{t}->[1];
-    #}
-
     # setup fimex to fetch data via opendap
-    my $f = new MetNo::Fimex(\%fiParams);
-    my $cmd = eval { $f->doWork() };
+    my $fimex = new MetNo::Fimex(\%fiParams);
+    $fimex->setProjString( $p->{'projection'}, $p->{'interpolation'}, $p->{'xAxisValues'}, $p->{'yAxisValues'} )
+        if $p->{'projection'};
+    my $cmd = eval { $fimex->doWork() };
     if ($@) {
         $self->logger->warn("FIMEX runtime error: $@");
         $c->detach( 'Root', 'error', [ 502, "FIMEX runtime error: $@"] );
@@ -202,7 +181,7 @@ sub transform_POST {
 
     $self->logger->debug("Running FIMEX: $cmd");
 
-    my $ncfile = $f->outputPath;
+    my $ncfile = $fimex->outputPath;
 
     $c->detach( 'Root', 'error', [ 502, "Missing output file"] ) unless -s $ncfile;
 

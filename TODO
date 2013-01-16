@@ -16,6 +16,12 @@ points for later.
 
 --------------------
 
+put projstrings in separate list instead of hardcoded in Metno::Fimex
+
+get projection list from master_config in Metamod::WMS
+
+make services status run without sudo
+
 check if user exists before saying password change has been effected
 
 separate thumbnail elements in wmsinfo for level 1 and 2

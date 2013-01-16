@@ -54,15 +54,32 @@
             <script>$(function() { $( "#start_date" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
             <script>$(function() { $( "#stop_date" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
 
-            [% IF fiproj %]
-                <h2>Projection (not implemented)</h2>
-                <select name="projection">
-                    <option value="">(original)</option>
-                [% FOREACH proj IN fiproj.listProjections %]
-                    <option>[% proj %]</option>
-                [% END %]
-                </select>
+
+            <h2>Reprojection</h2>
+            <select name="projection">
+                <option value="">(original)</option>
+            [% FOREACH proj IN projections %]
+                <option value="[% proj.key %]">[% proj.value.0 %]</option>
             [% END %]
+            </select>
+
+            interpolation:
+            <select name="interpolation">
+                <option value="nearestneighbor">nearestneighbor</option>
+                <option value="bilinear">bilinear</option>
+                <option value="bicubic">bicubic</option>
+                <option value="coord_nearestneighbor">coord_nearestneighbor</option>
+                <option value="coord_kdtree">coord_kdtree</option>
+                <option value="forward_max">forward_max</option>
+                <option value="forward_mean">forward_mean</option>
+                <option value="forward_median">forward_median</option>
+                <option value="forward_sum">forward_sum</option>
+            </select>
+
+            <br/>
+
+            X axis values: <input type="text" name="xAxisValues" value="-180,-179,...,180"/>
+            y axis values: <input type="text" name="yAxisValues" value="-90,-89,...,90"/>
 
             <div>
                 <br/>

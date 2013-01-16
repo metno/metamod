@@ -245,22 +245,6 @@ my %projections = (
 
 );
 
-# never used since only projectioninfo in Dataset has all fimex needs
-#my %projstrings = (
-#
-#    'EPSG:32661' => '+proj=stere +lat_0=90 +lat_ts=90 +lon_0=0 +k=0.994 +x_0=2000000 +y_0=2000000 +datum=WGS84 +units=m +no_defs',
-#    'EPSG:32761' => '+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +k=0.994 +x_0=2000000 +y_0=2000000 +datum=WGS84 +units=m +no_defs',
-#    'EPSG:3411'  => '+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs',
-#    'EPSG:3412'  => '+proj=stere +lat_0=-90 +lat_ts=-70 +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs',
-#    'EPSG:3413'  => '+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs',
-#    'EPSG:3995'  => '+proj=stere +lat_0=90 +lat_ts=71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs',
-#    'EPSG:32633' => '+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs',
-#    'EPSG:4326'  => '+proj=longlat +datum=WGS84 +no_defs',
-#);
-#for (keys %projstrings) {
-#	$projections{$_}->[2] = $projstrings{$_};
-#}
-
 # we don't want templates to mess up the list by adding junk which will persist to next request
 #lock_hash(%projections); # breaks in TT when projs.key is used as hash key instead of method
 
@@ -286,17 +270,6 @@ sub getProjMap {
 	return $projections{$code}->[1];
 }
 
-=head2 getProjString()
-
-Look up Proj4 string for a given EPSG code. Returns undef if not found.
-
-=cut
-
-#sub getProjString {
-#	my $code = shift or return;
-#	return $projections{$code}->[2];
-#}
-
 =head2 projList()
 
 Return the list of defined projections (used in templates to generate menus)
@@ -304,7 +277,7 @@ Return the list of defined projections (used in templates to generate menus)
 =cut
 
 sub projList {
-	#print STDERR Dumper \%projections;
+	print STDERR Dumper \%projections;
 	use Clone qw(clone); # TT seems to mess up data structure, so best copy it
 	return clone \%projections;
 }

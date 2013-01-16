@@ -73,6 +73,19 @@ use File::Temp qw();
 use Data::Dumper;
 use Carp;
 
+# never used since only projectioninfo in Dataset has all fimex needs
+my %projstrings = (
+
+    'EPSG:32661' => '+proj=stere +lat_0=90 +lat_ts=90 +lon_0=0 +k=0.994 +x_0=2000000 +y_0=2000000 +datum=WGS84 +units=m +no_defs',
+    'EPSG:32761' => '+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +k=0.994 +x_0=2000000 +y_0=2000000 +datum=WGS84 +units=m +no_defs',
+    'EPSG:3411'  => '+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs',
+    'EPSG:3412'  => '+proj=stere +lat_0=-90 +lat_ts=-70 +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs',
+    'EPSG:3413'  => '+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs',
+    'EPSG:3995'  => '+proj=stere +lat_0=90 +lat_ts=71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs',
+    'EPSG:32633' => '+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs',
+    'EPSG:4326'  => '+proj=longlat +datum=WGS84 +no_defs',
+);
+
 =head1 METHODS
 
 =head2 new
@@ -315,6 +328,24 @@ has 'endTime' => (
     is => 'rw',
     isa => 'Str',
 );
+
+
+=head2 setProjString
+
+Set projection params by EPSG code
+
+=cut
+
+sub setProjString {
+    my ($self, $epsgcode, $interpolate, $xAxisValues, $yAxisValues) = @_;
+    my $projstr = $projstrings{$epsgcode} or die;
+    $self->projString( $projstr );
+    $self->interpolateMethod($interpolate);
+    $self->xAxisValues($xAxisValues);
+    $self->yAxisValues($yAxisValues);
+    $self->metricAxes();
+}
+
 
 =head2 outputPath
 
