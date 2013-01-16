@@ -248,6 +248,8 @@ insert a job into a work queue that will create a zip file of all the files in
 the collection basket and send a link to the zip file to the email address
 requested by the user.
 
+TODO: require login FIXME
+
 =cut
 
 sub request_download : Path('/search/collectionbasket/request_download') {

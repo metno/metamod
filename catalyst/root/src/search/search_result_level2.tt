@@ -75,9 +75,12 @@
             <a class="btn" href="[% c.uri_for( '/search/add_to_basket', child.ds_id, c.req.params ) %]"
                title="Add the dataset to the collection basket"><span>Add to basket</span></a><br clear="all"/>
 
-            [% IF metadata.timeseries.0 # FIXME add check after demo finished %]
-                <a class="visual" href="[% c.uri_for('/search/ts', { ds_id => child.ds_id, vars => metadata.timeseries.0 } ) %]"><span>Time series</span></a><br clear="all"/>
-                <a class="visual" href="[% child.external_ts_url %]"><span>Time series EXT</span></a><br clear="all"/>
+            [% IF metadata.timeseries.0 %]
+                [% IF ext_ts %]
+                    <a class="visual" href="[% child.external_ts_url %]"><span>Time series</span></a><br clear="all"/>
+                [% ELSE %]
+                    <a class="visual" href="[% c.uri_for('/search/ts', { ds_id => child.ds_id, vars => metadata.timeseries.0 } ) %]"><span>Time series</span></a><br clear="all"/>
+                [% END %]
             [% END %]
 
             [% IF child.wmsurl != '' %]
