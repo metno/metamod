@@ -277,7 +277,7 @@ Return the list of defined projections (used in templates to generate menus)
 =cut
 
 sub projList {
-	print STDERR Dumper \%projections;
+	#print STDERR Dumper \%projections;
 	use Clone qw(clone); # TT seems to mess up data structure, so best copy it
 	return clone \%projections;
 }

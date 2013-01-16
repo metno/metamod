@@ -2,7 +2,7 @@
 # Makefile that is used when generating the Debian package
 #
 
-PACKAGENAME = metno-metamod-2.11
+PACKAGENAME = metno-metamod-2.12
 
 DEBIANDIR = $(CURDIR)/debian/$(PACKAGENAME)
 

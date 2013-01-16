@@ -425,7 +425,7 @@ sub doWork {
         $args{'extract.reduceTime.start'} = $self->startTime;
         $args{'extract.reduceTime.end'} = $self->endTime;
 
-        print STDERR Dumper \%args;
+        #pri    nt STDERR Dumper \%args;
 
         $command = projectFile(%args);
     } else {
@@ -552,7 +552,7 @@ sub projectFile {
         }
     }
 
-    print STDERR Dumper \@args;
+    #print STDERR Dumper \@args;
     # NOTE that $command does not quote arguments and so is not identical to system(@args) !!
     my $command = join ' ', @args;
     if ($DEBUG > 0) {
