@@ -209,6 +209,7 @@ function drawMap(response) {
 
     for (var key in projs) {
         log.debug(key, projs[key]);
+        if (key == "CRS:84") continue;
         var opt = (key == args.crs) ? '<option selected="selected">' : '<option>';
         $('#crs').append( opt + key + '</option>');
     }

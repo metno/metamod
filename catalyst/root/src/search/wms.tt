@@ -54,6 +54,7 @@
         <div id="formcontainer" style="position: absolute; top: 0px; left: 50px; z-index: 1000">
 
             [% IF datasets.0.ds_id # size is 1 even if empty... %]
+
                 [% IF false # disabled since multiple dataset support is broken in 2.11 %]
 
                     <form name="form1" id="form1" action="#" style="">
@@ -65,17 +66,17 @@
                             </select>
                         </label> [% # datasets.size %]
                     </form>
-
-                    <form name="form2" id="form2" action="#" style="">
-                        <label>Projection:
-                            <select name="crs" id="crs" onChange="changeCRS(this[this.selectedIndex].value)">
-                            </select>
-                        </label> [% # datasets.size %]
-                    </form>
-
-                    <span id="shortdesc"><!--Data file (direct): --></span>
-
                 [% END %]
+
+                <form name="form2" id="form2" action="#" style="">
+                    <label>Projection:
+                        <select name="crs" id="crs" onChange="changeCRS(this[this.selectedIndex].value)">
+                        </select>
+                    </label> [% # datasets.size %]
+                </form>
+
+                <span id="shortdesc"><!--Data file (direct): --></span>
+
             [% ELSE %]
                 <form name="form1" id="form1" action="#" style="">
                     <button type="button" onclick="history.back()">Back to menu</button>
