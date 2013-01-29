@@ -181,7 +181,7 @@ sub register : Path('register') :Args(0) {
     # See bug 129
     #$self->send_user_receipt($c, $user_values);
 
-        $self->send_operator_email($c, $new_user, $user_values);
+        $self->send_operator_email($c, $new_user, $user_values, \@roles);
         $self->logger->info( "User registration: Email sent to operator for approval" );
 
     }
@@ -275,18 +275,33 @@ END_BODY
 }
 
 sub send_operator_email {
-    my ($self, $c, $new_user, $user_info) = @_;
+    my ($self, $c, $new_user, $user_info, $refroles) = @_;
 
     my $mm_config = $c->stash->{mm_config};
     my $local_url = $mm_config->get('BASE_PART_OF_EXTERNAL_URL') . $mm_config->get('LOCAL_URL');
+    my $roles = join(" ",@$refroles);
 
     # Normally uri_for will return relative URI's when Plugin::SmartURI is loaded,
     # so we must explicitly ask for the absolute URI.
     my $approve_url = "$local_url/admin/confirm_user/" . $new_user->u_id(); # can't use uri_for in email
 
-    my $email_body = <<"END_BODY";
-A new user has been registered. Please check the information
+    my $operator_email = $mm_config->get('OPERATOR_EMAIL');
+    my $email_approve_user = $mm_config->get('EMAIL_APPROVE_USER');
+    my $introductory_text;
+    if ($email_approve_user) {
+       $introductory_text = <<"EOF";
+A new user has requested access with rights: $roles. Please forward this E-mail to $operator_email
+if you approve the new user. Otherwise ignore.
+EOF
+    } else {
+       $email_approve_user = $operator_email;
+       $introductory_text = <<"EOF";
+A new user has requested access with rights: $roles. Please check the information
 and approve the user if the information is ok, or reject if not.
+EOF
+    }
+    my $email_body = <<"END_BODY";
+$introductory_text
 
 Name:        $user_info->{u_name}
 Email:       $user_info->{u_email}
@@ -297,11 +312,10 @@ Telephone:   $user_info->{u_telephone}
 $approve_url
 END_BODY
 
-    my $operator_email = $mm_config->get('OPERATOR_EMAIL');
     my $application_name = $mm_config->get('APPLICATION_NAME');
 
     Metamod::Email::send_simple_email(
-        to => [ $operator_email ],
+        to => [ $email_approve_user ],
         from => 'metamod@' . $mm_config->get('SERVER'),
         subject => "$application_name new user registred",
         body => $email_body,
