@@ -170,15 +170,16 @@ sub _identify {
 }
 
 sub _list_metadata_formats {
-    my ( $self, $c ) = shift;
+    my ( $self, $c ) = @_;
 
     # we convert all metadata so identifier is ignored.
-    my ($identifier) = @_;
+#    my ($identifier) = @_;
 
     my $dataprovider = Metamod::OAI::DataProvider->new( model => $c->model('Metabase') );
-    if ( !$dataprovider->identifier_exists($identifier) ) {
-        return HTTP::OAI::Error->new( code => 'idDoesNotExist' );
-    }
+
+#    if ( !$dataprovider->identifier_exists($identifier) ) {
+#        return HTTP::OAI::Error->new( code => 'idDoesNotExist' );
+#    }
 
     my $formats = $self->_formats();
 
