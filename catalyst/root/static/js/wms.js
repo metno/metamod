@@ -142,10 +142,10 @@ function drawMap(response) {
         }
 
         var led_index = ( map.layers[i].isBaseLayer ? 2 : 0 );
-        if ( i == 0 ) {
-            led_index++; // layer 0 always starts open, so turn on led
-            map.layers[0].setVisibility(true); // trigger event so timeslider works on default layer (fixed somewhere else - try removing this later. FIXME)
-            log.debug('Setting layer 0 visible');
+        if ( i == 0 ) { // first layer starts open
+            led_index++; // turn on led
+            //map.layers[0].setVisibility(true); // trigger event so timeslider works on default layer (fixed somewhere else - try removing this later. FIXME)
+            //log.debug('Setting layer 0 visible');
         };
 
         //var lvis = l.isBaseLayer ?
@@ -193,13 +193,25 @@ function drawMap(response) {
             // build style selector
             $(lc).append('<p>Style:<br/><select id="layer' + i + '_styles"/></p>');
             var sty = l.metadata.styles;
+            var current;
             for (s in sty) {
                 //log.debug(st);
                 $(lc + '_styles').append("<option>" + sty[s].name + "</option>");
+                if (sty[s].current) {
+                    current = s;
+                }
             }
-            if (sty[0].legend) {
-                var leg_url = '<img id="layer' + i + '_legend" src="' + sty[0].legend.href + '&LAYERS=' + l.name + '"/>';
-                $(lc).append( leg_url.replace(/PALETTE=[^&]+[&]?/i, '') ); // remove PALETTE param and let server decide default style
+            log.debug('Current style for layer', i, 'is', current);
+            if (current !== undefined) { // starting style defined in wmc
+                if (sty[current].legend) {
+                    var leg_url = '<img id="layer' + i + '_legend" src="' + sty[current].legend.href + '&LAYERS=' + l.name + '"/>';
+                    $(lc).append(leg_url);
+                }
+            } else {
+                if (sty[0].legend) {
+                    var leg_url = '<img id="layer' + i + '_legend" src="' + sty[0].legend.href + '&LAYERS=' + l.name + '"/>';
+                    $(lc).append( leg_url.replace(/PALETTE=[^&]+[&]?/i, '') ); // remove PALETTE param and let server decide default style
+                }
             }
 
             $(lc + '_styles').change( styleHandlerFactory( l, $(lc + '_legend') ) );
