@@ -191,29 +191,31 @@ function drawMap(response) {
         if (l.metadata.styles !== undefined && l.metadata.styles.length > 0) {
 
             // build style selector
-            $(lc).append('<p>Style:<br/><select id="layer' + i + '_styles"/></p>');
+            $(lc).append('<p>Style:<br/><select id="layer' + i + '_styles"/></p>\n');
             var sty = l.metadata.styles;
-            var current;
+            var current = undefined;
             for (s in sty) {
                 //log.debug(st);
-                $(lc + '_styles').append("<option>" + sty[s].name + "</option>");
+                var tag = '<option>';
                 if (sty[s].current) {
                     current = s;
+                    tag = '<option selected="selected">';
                 }
+                $(lc + '_styles').append("\n" + tag + sty[s].name + "</option>");
             }
             log.debug('Current style for layer', i, 'is', current);
             if (current !== undefined) { // starting style defined in wmc
                 if (sty[current].legend) {
-                    var leg_url = '<img id="layer' + i + '_legend" src="' + sty[current].legend.href + '&LAYERS=' + l.name + '"/>';
-                    $(lc).append(leg_url);
+                    leg_url = '<img id="layer' + i + '_legend" src="' + sty[current].legend.href + '&LAYERS=' + l.name + '"/>';
                 }
             } else {
                 if (sty[0].legend) {
-                    var leg_url = '<img id="layer' + i + '_legend" src="' + sty[0].legend.href + '&LAYERS=' + l.name + '"/>';
-                    $(lc).append( leg_url.replace(/PALETTE=[^&]+[&]?/i, '') ); // remove PALETTE param and let server decide default style
+                    leg_url = '<img id="layer' + i + '_legend" src="' + sty[0].legend.href + '&LAYERS=' + l.name + '"/>';
+                    leg_url = leg_url.replace(/PALETTE=[^&]+[&]?/i, ''); // remove PALETTE param and let server decide default style
                 }
             }
-
+            $(lc).append(leg_url);
+            log.debug('legend:', leg_url);
             $(lc + '_styles').change( styleHandlerFactory( l, $(lc + '_legend') ) );
         }
 
