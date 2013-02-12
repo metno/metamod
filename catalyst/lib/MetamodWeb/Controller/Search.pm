@@ -62,6 +62,7 @@ sub auto :Private {
                collection_basket => $collection_basket,
                ext_ts => $mm_config->has("TIMESERIES_URL"),
     );
+    $c->stash( debug => $self->logger->is_debug() || $c->req->params->{ debug } );
     push @{ $c->stash->{ css_files } }, $c->uri_for( '/static/css/search.css' );
 
 }
@@ -193,7 +194,6 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
     $c->stash( datasets => [ $datasets->all() ] );
     $c->stash( datasets_pager => $datasets->pager() );
     $c->stash( dataset_count => $datasets->count() );
-    $c->stash( debug => $self->logger->is_debug() );
 
 }
 
@@ -295,7 +295,7 @@ sub wms :Path('/search/wms') :Args {
     my ($self, $c) = @_;
 
     $c->stash( template => 'search/wms.tt', 'current_view' => 'Raw' );
-    $c->stash( debug => $self->logger->is_debug() );
+    #$c->stash( debug => $self->logger->is_debug() );
 
     my $dslist = [];
     my $para = $c->req->params->{ ds_id };
@@ -354,7 +354,6 @@ sub timeseries :Path('/search/ts') :Args {
     my ($self, $c) = @_;
 
     $c->stash( template => 'search/ts.tt', 'current_view' => 'Raw' );
-    $c->stash( debug => $self->logger->is_debug() );
 
     my $ds_id = $c->req->params->{ ds_id };
     if ( ref $ds_id ) { # more than one ds_id... TODO?
