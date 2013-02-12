@@ -25,7 +25,7 @@ Currently only Debian-based Linux systems are supported.
 This script will create an Apache configuration file, as well as init.d scripts
 for automatic starting and stopping of Catalyst and the various METAMOD services
 for the specific application. These files are normally owned by root and will be
-placed in in <configuration dir>/etc, and then symlinked into F</etc/apache2> and
+placed in in F<E<lt>configuration dirE<gt>/etc>, and then symlinked into F</etc/apache2> and
 F</etc/init.d>.
 
   $ cd /opt/metno-metamod-2.11 # or elsewhere if installed from source
@@ -172,25 +172,42 @@ archive.
 
 =head3 Email configuration (FIXME)
 
-configure exim
+To configure exim, run:
 
     $ sudo dpkg-reconfigure exim4-config
 
+See the Exim documentation for more information.
+
 =head2 Starting METAMOD
+
+There are two ways of starting METAMOD; either as a system service (recommended
+for production environments) or as a series of command line script (recommended
+for development). In the latter case you would normally run the Catalyst web server
+continously and start the other daemons as necessary (prepare_download, harvester
+et al).
 
 =head3 Catalyst daemon
 
-Start Catalyst by running
+First, try starting Catalyst by running
+
+  $ export PERL5LIB=/opt/metno-metamod-2.12/common/lib:/opt/metno-metamod-2.12/catalyst/lib:/opt/metno-perl-webdev-ver1/lib/perl5
+  $ /opt/metno-metamod-2.12/catalyst/script/metamodweb_server.pl -d myapp
+
+replacing the path to METAMOD on line 2 if running from source.
+
+MetamodWeb should now be available on L<http://localhost:3000/>.
+If all set you should see the METAMOD search interface.
+Stop with ctrl-c.
+
+If that worked, you may then try to start it as a service:
 
 	sudo /etc/init.d/catalyst-APPLICATION_ID start
 
-Then check if METAMOD is responding (usually on port 3000, use server name if not running locally):
-
-	http://localhost:3000/
-
-If all set you should see the METAMOD search interface.
-
 =head3 Apache
+
+Accessing METAMOD directly from Catalyst is not recommended in production;
+instead a proxy server like Apache is recommended. C<./install_jobs.sh>
+automatically generates the necessary Apache setup files for you.
 
 If this has not already been done you need to enable the Apache proxy modules.
 Look in /etc/apache2/mods-enabled to see if they have already been enabled.
@@ -221,36 +238,6 @@ Start METAMOD:
 
 This should start the required services daemons.
 
-
-----------------
-
-
-Copy the example config:
-
-  $ cp -r /opt/metno-metamod-2.11/app/example .
-
-Then edit example/master_config.txt as needed. For local testing, set APPLICATION_USER to your own login.
-
-  $ /opt/metno-metamod-2.11/common/prepare_runtime_env.sh example
-
-  $ export PERL5LIB=/opt/metno-metamod-2.11/common/lib:/opt/metno-metamod-2.11/catalyst/lib:/opt/metno-perl-webdev-ver1/lib/perl5
-
-Try starting Catalyst:
-
-  $ /opt/metno-metamod-2.11/catalyst/script/metamodweb_server.pl -d example
-
-MetamodWeb should now be available on http://localhost:3000/. Stop with ctrl-c.
-
-To install all services:
-
-  $ /opt/metno-metamod-2.11/install_jobs.sh example
-
-To start all services (substitute EXAMPLE with your APPLICATION_ID):
-
-  $ sudo /etc/init.d/catalyst-EXAMPLE start
-  $ sudo /etc/init.d/metamodServices-EXAMPLE start
-
---------------------
 
 =begin OBSOLETE
 

@@ -15,7 +15,7 @@ Which modules are activated for the application
 
 =item
 
-Basic information like domain name and URLs for accessing the web portal, identification 
+Basic information like domain name and URLs for accessing the web portal, identification
 of the application, directory path for storing runtime information and XML archive, etc.
 
 =item
@@ -29,12 +29,12 @@ interface, and how metadata are presented to the user.
 
 =item
 
-For the base application, overall information on the metadata categories that are searchable 
+For the base application, overall information on the metadata categories that are searchable
 in the matadata data base.
 
 =item
 
-For applications using the UPLOAD module, which metadata will be extracted from the 
+For applications using the UPLOAD module, which metadata will be extracted from the
 uploaded netCDF files.
 
 =back
@@ -50,11 +50,12 @@ this. Copy the app/example directory to somewhere local, preferably renaming it
 to whatever your METAMOD application is called. Then you are ready to edit
 the master configuration file.
 
-=head2 Configuration defaults
+  $ cp -r /opt/metno-metamod-2.11/app/example .
+  $ mv example myapp
 
-Add some text here... FIXME
+Then edit F<myapp/master_config.txt> as needed.
 
-=head2 The master_config.txt file
+=head2 The F<master_config.txt> file
 
 Several variables in this file must be adjusted according to the local computer
 environment. The most important are:
@@ -67,6 +68,8 @@ Each application delivering data to a database (an application with the
 METAMODUPLOAD, METAMODHARVEST and/or the METAMODQUEST module) must have a short
 name (typical an acronym) that uniquely identify the application for the database.
 Only upper case letters and numbers are allowed.
+
+For local testing, set APPLICATION_USER to your own login.
 
 =item SERVER
 
@@ -136,40 +139,39 @@ non-empty string means true).
 If any of these variables are missing, the corresponding module will not be part
 of the application.
 
+=head2 Configuration defaults
+
 A complete inventory of the variables that could be part of the
-master_config.txt file is found in the C<app/default/default_config.txt> file in
-the installation directory.
+master_config.txt file is found in the F<app/default/default_config.txt> file in
+the installation directory. This also lists default values wherever applicable.
 
 =head3 Config file format
 
-The master_config.txt file (and the default and example versions of this file) 
+The master_config.txt file (and the default and example versions of this file)
 contain lines as follows:
 
     VARNAME = VALUE
 
-'VARNAME' must start from the first character on the line, and be all uppercase
+C<VARNAME> must start from the first character on the line, and be all uppercase
 letters [A-Z], underscore or digits. Any number
-of white space characters may separate 'VARNAME' and '=', and also '=' and
-'VALUE'. 'VALUE' starts with the first non-whitespace character and ends with
+of white space characters may separate C<VARNAME> and '=', and also '=' and
+C<VALUE>. C<VALUE> starts with the first non-whitespace character and ends with
 the last non-whitespace character on the line. Additional lines may be
-appended to 'VALUE' immideately after the initial 'VARNAME = ...' line. Such
+appended to C<VALUE> immideately after the initial C<"VARNAME = ..."> line. Such
 lines must start with a space character. No whitespace are removed from such
 appended lines.
 
-VALUEs may be empty, which sometimes indicate that some aspect of the software
+C<VALUEs> may be empty, which sometimes indicate that some aspect of the software
 is turned off. An empty value is indicated by having no characters (or only
 whitespace characters) after the '=' character.
 
-In addition, comment lines, starting with '#', may be found. Blank lines are
+In addition, comment lines, starting with C<'#'>, may be found. Blank lines are
 ignored.
 
-In the source files, all text strings like:
-
-[==VARNAME==]
-
-will be substituted with the corresponding value at runtime when the variable is
-accessed. Such text strings may also be found within 'VALUE'
-strings, and they will be substituted as appropriate.
+In the source files, all text strings like C<[==VARNAME==]> will be substituted
+with the corresponding value at runtime when the variable is accessed. Such text
+strings may also be found within C<VALUE> strings, and they will be substituted
+as appropriate.
 
 =head2 Metadata sources
 
@@ -203,7 +205,7 @@ possibilities to the needs of that application.
 
 =head2 Configuration for the UPLOAD module
 
-=head3 etc/conf_digest_nc.xml
+=head3 F<etc/conf_digest_nc.xml>
 
 This XML file describes the parsing of netCDF files in the UPLOAD module.
 Specifically how attributes and variable values in a netCDF file are translated
@@ -213,7 +215,7 @@ required in the netCDF files. The C<app/example/etc/conf_digest_nc.xml> file
 represents a well commented example of such a file that can be used as a
 starting point for a version tailored to specific needs.
 
-=head3 etc/usererrors.conf
+=head3 F<etc/usererrors.conf>
 
 This file contain html templates that are used in error reports sent to data
 providers that have uploaded netCDF files using the UPLOAD module. Each template
@@ -223,7 +225,7 @@ C<conf_digest_nc.xml> in the same directory.
 
 =head2 XSLT
 
-Files for translating from foreign metadata formats (... more text is needed)
+Files for translating from foreign metadata formats. Currently not in use.
 
 =head2 Stylesheets and other web configuration
 
@@ -233,19 +235,19 @@ configuration directory.
 
 =over
 
-=item custom/templates
+=item F<custom/templates>
 
 This directory contains the Template::Toolkit templates that you want to
 override in your configuration. It is generally never a good idea to override
 anything other than the C<custom.tt> file.
 
-=item custom/static/css
+=item F<custom/static/css>
 
 This directory contains the CSS files that you want to override in your
 configuration. It is generally never a good idea to override anything but the
 C<custom.css> file in this folder.
 
-=item custom/static/images
+=item F<custom/static/images>
 
 This folder contains the images that you use in your style configuration.
 
@@ -253,29 +255,26 @@ This folder contains the images that you use in your style configuration.
 
 =head3 Overriding texts
 
-To override texts in the application you use the C<custom.tt> file.
-C<custom.tt> is a file in C<Template::Toolkit> format.
+To override texts in the application you use the F<custom.tt> file.
+F<custom.tt> is a file in I<Template::Toolkit> format.
 
 The way it is used is that it re-defines the default texts found in
-C<defaults.tt>.
+F<defaults.tt>.
 
 For instance the following would re-define the HTML used for the header of the
 application.
 
-  [%
-
-    # get a safe path to the header image that works in both Apache and outside of Apache
-    SET header_image_url = c.uri_for('/static/images/logo.png');
-    app.common.header_html = '<img src="' _ header_image_url _ '" />';
-
+  [% # get a safe path to the header image that works in both Apache and outside of Apache
+     SET header_image_url = c.uri_for('/static/images/logo.png');
+     app.common.header_html = '<img src="' _ header_image_url _ '" />';
   %]
 
-In the same way you can re-define any of the variables found in C<defaults.tt>
+In the same way you can re-define any of the variables found in F<defaults.tt>
 
 =head3 Overriding the CSS
 
 In METAMOD you can override any of the CSS styles in the application using
-C<custom.css> since this stylesheet will be the last one loaded by the
+F<custom.css> since this stylesheet will be the last one loaded by the
 application. It is however wise to C<only> modify properties such as background
 colors, foreground colors, borders and font size. Modifying the height, width,
 padding, margins, display type etc. of elements can lead to the application not
@@ -283,7 +282,7 @@ displaying properly in different browsers. Also modifying these properties can
 break between different versions of METAMOD.
 
 The style for any element can be modified, but only a few are usually needed.
-For an example of the common ones see C<app/example/custom/css/custom.css>
+For an example of the common ones see F<app/example/custom/css/custom.css>
 
 =head3 Path to images
 
@@ -293,17 +292,17 @@ the path to the image right.
 
 =over
 
-=item custom.tt
+=item F<custom.tt>
 
-To get the path correct in the C<custom.tt> file you can use the following helper function.
+To get the path correct in the F<custom.tt> file you can use the following helper function.
 
  SET image_url = c.uri_for('/static/images/<your image name here>');
 
 This makes a variable C<image_url> that contains the correct URL to the image file.
 
-=item custom.css
+=item F<custom.css>
 
-To get the path correct in the C<custom.css> file you can use the following path.
+To get the path correct in the F<custom.css> file you can use the following path.
 
   url("../images/aboutheader.gif");
 

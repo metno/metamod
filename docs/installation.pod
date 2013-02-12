@@ -47,6 +47,9 @@ add repositories.
 
 =head3 Adding the met.no package repository
 
+B<Note: Currently this repo is not available outside met.no. External users must
+download and install packages manually as described below.>
+
 Add the corresponding lines to your /etc/apt/sources.list depending on your
 version of Ubuntu:
 
@@ -58,7 +61,7 @@ version of Ubuntu:
   deb http://repo.met.no/met.no hardy main contrib
   deb-src http://repo.met.no/met.no hardy main contrib
 
-If you want to run development versions (recommended until 2.11), also add:
+If you want to run development versions (recommended), also add:
 
   # for lucid
   deb http://repo.met.no/devel lucid main contrib
@@ -68,20 +71,29 @@ If you want to run development versions (recommended until 2.11), also add:
   deb http://repo.met.no/devel hardy main contrib
   deb-src http://repo.met.no/devel hardy main contrib
 
-B<Note: At the moment this repo is not available outside met.no.
-In that case you're out of luck. Please contact the authors for instructions
-on how to obtain the packages manually.>
-
 =head3 Installing METAMOD and dependencies via apt
 
   $ sudo apt-get install metno-perl-webdev-ver1
-  $ sudo apt-get install metno-metamod-2.11
+  $ sudo apt-get install metno-metamod-2.12
 
-Alternately you may download the .deb files from repo.met.no and install manually.
+=head3 Installing packages manually
 
-  $ sudo dpkg -i metno-metamod-2.11_2.11.0-x_all.deb
+Alternately you may download the .deb files and install manually. These may be found
+on the following sites:
 
-where 2.11.0-x is the latest version in the repository.
+=over 4
+
+=item L<https://wiki.met.no/metamod/download>
+
+=item L<http://repo.met.no/devel/dists/lucid/main/binary-all/web/>
+
+=back
+
+Installation is done using a GUI packet manager or via command line:
+
+  $ sudo dpkg -i metno-metamod-2.12_2.12.0-2_all.deb
+
+where 2.12.0-2 is the latest version in the repository.
 
 =head2 Installation from source
 
@@ -93,8 +105,22 @@ hardcore (or desperate). If you can, install the metno-perl-webdev-ver1 Debian
 package as specified above.
 
 A complete list of Perl module dependencies (as per 2012-01-31) can be found in
-metamod-deps.txt; this can be used as a source for scripting. At some point
-there might be a METAMOD::Bundle module, but don't hold your breath.
+F<metamod-deps.txt>; this can be used as a source for scripting.
+At some point there might be a METAMOD::Bundle module, but don't hold your breath.
+Note however that some modules will not pass all tests and must be force
+installed; this includes but is not limited to the following CPAN modules:
+
+=over 4
+
+=item Taint
+
+=item Class::MOP
+
+=item Module::Install
+
+=item DBIx::Class
+
+=back
 
 =head3 Checking out the METAMOD source
 
@@ -109,5 +135,5 @@ into a suitable directory. No special privileges are required (yet).
 =head3 Conclusion
 
 You will now have the necessary software installed, however it will not do anything
-until you configure and set up a METAMOD application. See L<deploying>
-for further instructions.
+until you configure and set up a METAMOD application. See L<configuration> and
+L<deploying> for further instructions.

@@ -109,7 +109,7 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
 
     # TODO - add better handling for timeout errors... FIXME
 
-    my $wmc = eval { $c->stash->{wmc}->old_gen_wmc($setup, $wms, $$p{crs}) }; # TODO rewrite to use gc2wmc instead - FIXME
+    my $wmc = eval { $c->stash->{wmc}->old_gen_wmc($setup, $wms, $$p{crs}) }; # TODO rewrite to use setup2wmc instead - FIXME
     if ($@) {
         $self->logger->warn("old_gen_wmc failed: $@");
         $c->detach( 'Root', 'error', [ 502, $@ ] );

@@ -509,6 +509,7 @@ sub wmsthumb { # TODO - move this somewhere else so we can use config runtime in
             $layer{$_->nodeName} = $_->getValue;
         }
         $layer{url} = $wms_url unless exists $layer{url};
+        $layer{style} = '' unless exists $layer{style};
 
         #print STDERR "*******************************\n" . Dumper \%layer;
 
