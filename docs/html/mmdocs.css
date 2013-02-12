@@ -1,6 +1,6 @@
 
 body {
-    font-size: 11pt;
+    font-size: 10pt;
     line-height: 14pt;
     font-family: Sans, sans-serif;
     margin: 20 20 20 260;
@@ -21,6 +21,7 @@ h1 a.u { color: #003366; }
 
 p {
     font-family: "Bitstream Charter", Serif, serif;
+    font-size: 11pt;
 }
 
 pre {

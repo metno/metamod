@@ -4,11 +4,36 @@ Back to L<Index|index>
 
 =head2 Error messages
 
+=head3 Installation
+
+=over 4
+
+=item Q: I get the following error message when trying to run sudo:
+
+  sudo: sorry, you are not allowed to set the following environment variables: PERL5LIB
+
+A: You seem to be having restricted full sudo rights. See L<deploying> for more info.
+
+=back
+
+=head3 Visualization
+
+=over 4
+
+=item Q: The WMS client fails to show any images, and Log4JS reports the following error:
+
+    FATAL - Invalid GetMapContext: TypeError: maxExtent is null
+
+A: This rather cryptic error is OpenLayers complaining about having no background
+layer. Check that you have a background map available in the specified projection.
+
+=back
+
 =head3 Transformation
 
 =over 4
 
-=item I'm getting the following error in the log:
+=item Q: I'm getting the following error in the log:
 
     ERROR: no coordinate-systems with projection found, maybe you should try coordinate interpolation in CDMInterpolator.cc at line 488
     exception occured: CDMException: no coordinate-systems found
