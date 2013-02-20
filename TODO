@@ -16,6 +16,10 @@ points for later.
 
 --------------------
 
+Catalyst::Log::Log4perl is DEPRECATED, update your app to use Log::Log4perl::Catalyst FIXME 2.13
+
+catalyst/lib/MetamodWeb.pm#92: Deprecated 'static' config key used, please use the key 'Plugin::Static::Simple' instead
+
 put projstrings in separate list instead of hardcoded in Metno::Fimex
 
 get projection list from master_config in Metamod::WMS
@@ -82,7 +86,7 @@ test selector for multiple baselayers
 
 only allow projections usable with selected layers in selector
 
-mark layerchanger title bar when visible 
+mark layerchanger title bar when visible
 
 show visibility in layerselector
 
@@ -110,4 +114,3 @@ style selector must differentiate between layers
 diana(?) bug crops west edge for hirlam
 
 wms/proj help texts
-

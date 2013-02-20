@@ -25,7 +25,7 @@ use Moose;
 use namespace::autoclean;
 
 use Catalyst::Runtime 5.80;
-use Catalyst::Log::Log4perl;
+use Catalyst::Log::Log4perl; # Catalyst::Log::Log4perl is DEPRECATED, update your app to use Log::Log4perl::Catalyst FIXME 2.13
 use FindBin;
 use Log::Log4perl qw(get_logger);
 
@@ -92,7 +92,7 @@ my %default_config = (
 
     'default_view' => 'TT',
 
-    static => {
+    static => { # Deprecated 'static' config key used, please use the key 'Plugin::Static::Simple' instead
         include_path => [
             path_to_custom(),
             $mm_config->get('WEBRUN_DIRECTORY'),

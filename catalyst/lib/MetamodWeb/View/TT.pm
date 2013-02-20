@@ -29,6 +29,7 @@ __PACKAGE__->config(
     #TEMPLATE_EXTENSION => '.tt',
     WRAPPER => 'wrapper.tt',
     PRE_PROCESS => ['defaults.tt', 'custom.tt'],
+    render_die => 1, # will be default behaviour soon
 );
 
 =head1 NAME
