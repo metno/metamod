@@ -4,7 +4,7 @@ METAMOD2 software (see ../README).
 The METAMODBASE module is responsible for managing two METAMOD2 databases,
 the Metadata database and the User database.
 
-These databases can be shared between several METAMOD2 applications, but only one
+The Metadata database can be shared between several METAMOD2 applications, but only one
 of these applications will be using the METAMODBASE module (possibly together with
 other METAMOD2 modules). The METAMODBASE module includes scripts for initializing
 the databases, and for loading data into the Metadata database. The User database

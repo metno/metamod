@@ -1,5 +1,8 @@
 #!/bin/bash
 
+cd `dirname $0`
+SCRIPT_PATH=`pwd`
+
 CONFIG=$1
 # config must be set in $METAMOD_MASTER_CONFIG envvar if not given as command line param
 SHELL_CONF=/tmp/metamod_tmp_bash_config.sh
@@ -20,6 +23,7 @@ fi
 
 SRUSCHEMA="$SCRIPT_PATH/sruSchema.sql"
 
+# tsearch removed from Postgresql 8.3 onwards, won't work under 9.1
 check "PG_TSEARCH2_SCRIPT" 1
 check "PG_POSTGIS_SCRIPT" 1
 check "PG_POSTGIS_SYSREF_SCRIPT" 1
@@ -39,9 +43,12 @@ CREATE TRUSTED LANGUAGE plpgsql;
 EOF
 
 # install additional features
-echo "----------- Trying to install Fulltext-search: tsearch2.sql --"
-$PSQL -q -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $PG_TSEARCH2_SCRIPT
-echo "----------------- Database Fulltext-search prepared ---------"
+if [ "$PG_TSEARCH2_SCRIPT" ]
+then
+    echo "----------- Trying to install Fulltext-search: tsearch2.sql --"
+    $PSQL -q -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $PG_TSEARCH2_SCRIPT
+    echo "----------------- Database Fulltext-search prepared ---------"
+fi
 echo "----------- Trying to install PostGIS ---------------------"
 $PSQL -q -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $PG_POSTGIS_SCRIPT
 echo "----------- Trying to install PostGIS Coordinate systems ---------------------"
