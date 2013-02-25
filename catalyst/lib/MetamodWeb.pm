@@ -25,7 +25,8 @@ use Moose;
 use namespace::autoclean;
 
 use Catalyst::Runtime 5.80;
-use Catalyst::Log::Log4perl; # Catalyst::Log::Log4perl is DEPRECATED, update your app to use Log::Log4perl::Catalyst FIXME 2.13
+#use Catalyst::Log::Log4perl; # Catalyst::Log::Log4perl is DEPRECATED, update your app to use Log::Log4perl::Catalyst FIXME 2.13
+use Log::Log4perl::Catalyst;
 use FindBin;
 use Log::Log4perl qw(get_logger);
 
@@ -123,7 +124,7 @@ __PACKAGE__->config(
 );
 
 # Log::Log4perl is already initialised so the Catalyst logger will not initialise it again
-__PACKAGE__->log( Catalyst::Log::Log4perl->new() );
+__PACKAGE__->log( Log::Log4perl::Catalyst->new() );
 
 # Start the application
 __PACKAGE__->setup();

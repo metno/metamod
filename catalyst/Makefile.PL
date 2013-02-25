@@ -24,7 +24,8 @@ requires 'Catalyst::Plugin::ConfigLoader';
 requires 'Catalyst::Plugin::Static::Simple';
 requires 'Catalyst::Action::RenderView';
 requires 'Catalyst::View::TT' => '0.35';
-requires 'Catalyst::Log::Log4perl' => '1.04'; # DEPRECATED use Log::Log4perl::Catalyst instead
+#requires 'Catalyst::Log::Log4perl' => '1.04'; # DEPRECATED use Log::Log4perl::Catalyst instead
+requires 'Log::Log4perl' => '1.31';
 requires 'Catalyst::Controller::ActionRole' => '0.15';
 requires 'Moose' => '1.14';
 requires 'DBIx::Class' => '0.08123';
