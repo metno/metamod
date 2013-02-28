@@ -16,7 +16,8 @@ points for later.
 
 --------------------
 
-Catalyst::Log::Log4perl is DEPRECATED, update your app to use Log::Log4perl::Catalyst FIXME 2.13
+postgres preparation (postgis, pgcrypto, tsearch2) should be separate from
+database/table generation
 
 catalyst/lib/MetamodWeb.pm#92: Deprecated 'static' config key used, please use the key 'Plugin::Static::Simple' instead
 
@@ -66,6 +67,8 @@ avoid misuse
 - must use POST
 
 ++++++++ DONE ++++++++++++++
+
+Catalyst::Log::Log4perl is DEPRECATED, update your app to use Log::Log4perl::Catalyst FIXME 2.13
 
 set default time in wms selector
 

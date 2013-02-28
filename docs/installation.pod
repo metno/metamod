@@ -22,6 +22,9 @@ least for dependency libraries).
 Tested on version 8.3 and 8.4. If running a local database you need the PostgreSQL
 server, otherwise only the client is required.
 
+Note that version 9.x is currently B<not supported> since the init scripts are not
+compatible, although you should be able to use it to connect to an existing database.
+
 =item Apache 2.x web server
 
 With mod_proxy installed (sudo a2enmod proxy)

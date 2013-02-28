@@ -63,13 +63,26 @@ sub index :Path :Args(0) {
 
 }
 
+=head2 error
+
+Customizable error page (only detached to explicitly)
+
+=cut
+
+sub error :Path {
+    my ( $self, $c, $status, $message ) = @_;
+    $c->response->content_type('text/html');
+    $c->response->status($status);
+    $c->response->body( "<h1>$status " . status_message($status) . "</h1><p>$message</p>\n" );
+}
+
 =head2 default
 
 Standard 404 error page
 
 =cut
 
-sub default :Path {
+sub default :Path { # must come after error so won't be overridden
     my ( $self, $c ) = @_;
     $c->response->body( "<h1>Page not found</h1>\n" );
     $c->response->content_type('text/html');
@@ -89,20 +102,6 @@ sub unauthorized :Private {
     $self->logger->debug("Required role: $required_role");
     $c->response->status(403);
     $c->stash( template => 'unauthorized.tt', required_role => $required_role );
-}
-
-=head2 error
-
-Customizable error page
-
-=cut
-
-sub error :Path {
-    my ( $self, $c, $status, $message ) = @_;
-    #my ( $status, $message ) = @$args;
-    $c->response->content_type('text/html');
-    $c->response->status($status);
-    $c->response->body( "<h1>$status " . status_message($status) . "</h1><p>$message</p>\n" );
 }
 
 =head2 begin()
@@ -152,6 +151,19 @@ sub end : ActionClass('RenderView') :Does('DumpQueryLog') :Does('DeleteStash')  
     my ( $self, $c ) = @_;
 
 
+}
+
+=head2 version
+
+Displays version information
+
+=cut
+
+sub index :Path('/version') :Args(0) {
+    my ($self, $c) = @_;
+    
+    $c->response->content_type('text/plain');
+    $c->serve_static_file( './VERSION' );
 }
 
 __PACKAGE__->meta->make_immutable;
