@@ -159,9 +159,9 @@ Displays version information
 
 =cut
 
-sub index :Path('/version') :Args(0) {
+sub version :Path('/version') :Args(0) {
     my ($self, $c) = @_;
-    
+
     $c->response->content_type('text/plain');
     $c->serve_static_file( './VERSION' );
 }
