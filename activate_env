@@ -2,7 +2,7 @@
 # This is just a convenience for setting the correct lib paths and
 # master config environment
 #
-# This file must be used with "source activate" *from bash*
+# This file must be used with "source activate_env" *from bash*
 # you cannot run it directly
 #
 # This file has been more or less copied from what virtualenv creates.
@@ -10,10 +10,11 @@
 deactivate_mm () {
 
     if [ -n "$_OLD_VIRTUAL_PERL5LIB" ] ; then
-    	PERL5LIB="$_OLD_VIRTUAL_PERL5LIB"
-    	export PERL5LIB
-    	unset _OLD_VIRTUAL_PERL5LIB
+    	export PERL5LIB="$_OLD_VIRTUAL_PERL5LIB"
+    else
+	unset PERL5LIB
     fi
+    unset _OLD_VIRTUAL_PERL5LIB
 
 
     # This should detect bash and zsh, which have a hash command that must
@@ -50,10 +51,6 @@ activate_mm() {
     METAMOD_MASTER_CONFIG=`readlink -f $1`
     export METAMOD_MASTER_CONFIG
 
-    _OLD_VIRTUAL_PERL5LIB="$PERL5LIB"
-    PERL5LIB=$PERL5LIB:"/opt/metno-perl-webdev-ver1/lib/perl5"
-    export PERL5LIB
-
     _OLD_VIRTUAL_PATH="$PATH"
 
     # we are sourcing the file so we cannot use dirname $0 to find the location of the script
@@ -61,6 +58,13 @@ activate_mm() {
     SCRIPT_PATH=`dirname $SCRIPT_PATH`
     PATH=$PATH:"$SCRIPT_PATH/base/init":"$SCRIPT_PATH/base/userinit":"$SCRIPT_PATH/common":"$SCRIPT_PATH/common/scripts":"$SCRIPT_PATH/catalyst/script"
     export PATH
+
+    export _OLD_VIRTUAL_PERL5LIB="$PERL5LIB"
+    if [ -e "$SCRIPT_PATH/local/lib/perl5" ] ; then
+        export PERL5LIB=$PERL5LIB:"$SCRIPT_PATH/local/lib/perl5"
+    else
+	export PERL5LIB=$PERL5LIB:"/opt/metno-perl-webdev-ver1/lib/perl5"
+    fi
 
     _OLD_VIRTUAL_PS1="$PS1"
     if [ -f $1 ] ; then
