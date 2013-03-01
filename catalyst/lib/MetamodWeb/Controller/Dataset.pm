@@ -200,15 +200,16 @@ sub rss :Chained("ds_id") :PathPart("rss") : Args(0) {
             my $md       = $ds->metadata( [qw( title abstract dataref bounding_box )] );
             my $title    = join " ", @{ $md->{title} };
             my $abstract = join " ", @{ $md->{abstract} };
-            my $link     = $md->{dataref}->[0];               #assume one dataref. Concating links does not make sense.
-            my $bbox     = $md->{bounding_box}->[0];
+            my $link     = $md->{dataref}->[0];         # assume one dataref. Concating links does not make sense.
+            my $bbox     = $md->{bounding_box}->[0];    # bounding box in ESWN
+            my ($e, $s, $w, $n) = split(',', $bbox);
 
             $rss->add_item(
                 title       => $title,
                 link        => $link,
                 description => $abstract,
                 georss      => {
-                                box  => $bbox,
+                                box  => "$s $w $n $e",
                                }
             );
         }
