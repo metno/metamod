@@ -77,7 +77,10 @@ jQuery(document).ready( function () {
             <br/>
 
             <div class="btns" _class="dataset_actions">
-                <a class="btn" href="[% c.uri_for( '/dataset', dataset.ds_id, 'xml' ) %]" target="_blank" title="Show the raw XML metadata for this file in a separate window"><span>Show xml</span></a><br clear="all"/>
+
+                [% IF dataset.xmlfile %]
+                    <a class="btn" href="[% c.uri_for( '/dataset', dataset.ds_id, 'xml' ) %]" target="_blank" title="Show the raw XML metadata for this file in a separate window"><span>Show xml</span></a><br clear="all"/>
+                [% END %]
 
                 [% IF opendap %]
                     <a class="visual" href="[% c.uri_for('/search/transform', { ds_id => dataset.ds_id }) %]"><span>Transform</span></a><br clear="all"/>
