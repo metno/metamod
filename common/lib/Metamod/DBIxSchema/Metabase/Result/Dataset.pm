@@ -271,7 +271,7 @@ sub xmlfile {
     my ($self) = @_;
     my $path = $self->ds_filepath();
     $logger->debug("Reading XML file for dataset " . $self->ds_id() . " in $path ...");
-    return $path if -r "$path.xml";
+    return $path if -r $path;
 }
 
 =head2 $self->projectioninfos()
