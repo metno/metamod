@@ -261,6 +261,19 @@ sub metadata {
     return \%metadata;
 }
 
+=head2 $self->xmlfile()
+
+Returns the path to the XML file if exists, otherwise undef
+
+=cut
+
+sub xmlfile {
+    my ($self) = @_;
+    my $path = $self->ds_filepath();
+    $logger->debug("Reading XML file for dataset " . $self->ds_id() . " in $path ...");
+    return $path if -r "$path.xml";
+}
+
 =head2 $self->projectioninfos()
 
 Returns projectioninfo of either self or parent

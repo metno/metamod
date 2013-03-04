@@ -103,9 +103,9 @@ sub xml :Chained("ds_id") :PathPart("xml") :Args(0) {
     eval {
         my $ds_id = $c->stash->{ ds_id };
         my $meta_db = $c->model('Metabase');
-        my $ds = $meta_db->resultset('Dataset')->find( $ds_id );
-        my $mmDs = Metamod::ForeignDataset->newFromFile( $ds->ds_filepath() );
-
+        my $ds = $meta_db->resultset('Dataset')->find( $ds_id ) or die "Dataset $ds_id not found";
+        my $path =  $ds->xmlfile() or die "XML file not found for dataset $ds_id";
+        my $mmDs = Metamod::ForeignDataset->newFromFile( $path );
         $c->response->content_type('text/xml');
         # return the document in utf encoding
         $c->response->body( '<?xml version="1.0" encoding="UTF-8"?>'."\n"
@@ -113,9 +113,9 @@ sub xml :Chained("ds_id") :PathPart("xml") :Args(0) {
     };
 
     if( $@ ){
-        $self->logger->error("Error in dataset xml output: $@");
+        $self->logger->warn("Error in dataset xml output: $@");
         #print STDERR ("Error in dataset xml output: $@\n");
-        $c->detach( 'Root', 'default' );
+        $c->detach( 'Root', 'error', [404, $@] );
     }
 
 }
@@ -201,17 +201,21 @@ sub rss :Chained("ds_id") :PathPart("rss") : Args(0) {
             my $title    = join " ", @{ $md->{title} };
             my $abstract = join " ", @{ $md->{abstract} };
             my $link     = $md->{dataref}->[0];         # assume one dataref. Concating links does not make sense.
-            my $bbox     = $md->{bounding_box}->[0];    # bounding box in ESWN
-            my ($e, $s, $w, $n) = split(',', $bbox);
 
-            $rss->add_item(
+            my %item = (
                 title       => $title,
                 link        => $link,
                 description => $abstract,
-                georss      => {
-                                box  => "$s $w $n $e",
-                               }
             );
+
+            if( my $bbox = $md->{bounding_box}->[0] ) {
+                # convert bounding box from ESWN to SWNE
+                my ($e, $s, $w, $n) = split(',', $bbox);  
+                $item{'georss'} = { box  => "$s $w $n $e" };
+            }
+
+            $rss->add_item(%item);
+
         }
     }
 
