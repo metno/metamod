@@ -38,7 +38,7 @@ use Data::Dumper;
 #use Try::Tiny;
 use File::Spec;
 use DateTime;
-use JSON::Any;
+use JSON;
 use Fcntl;
 
 use MetNo::Fimex;
@@ -166,7 +166,7 @@ sub ts :Path("/ts") :Args(3) {
     # output stuff
     if ($format eq 'json') {
 
-        my $j = JSON::Any->new;
+        my $j = JSON->new->utf8;
         my $json = $j->encode( \%data2 );
         $c->response->content_type('application/json');
         $c->response->body( $json );
