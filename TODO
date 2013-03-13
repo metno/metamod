@@ -16,6 +16,12 @@ points for later.
 
 --------------------
 
+clean up ds_filepath in database to exclude extension whenever found
+
+remove download from basket unless has data_file_location
+
+default catalyst port to master_config, not 3000
+
 postgres preparation (postgis, pgcrypto, tsearch2) should be separate from
 database/table generation
 

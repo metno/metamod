@@ -270,6 +270,8 @@ Returns the path to the XML file if exists, otherwise undef
 sub xmlfile {
     my ($self) = @_;
     my $path = $self->ds_filepath();
+    $path =~ s/\.xm[dl]$//;
+    $path .= '.xml';
     $logger->debug("Reading XML file for dataset " . $self->ds_id() . " in $path ...");
     return $path if -r $path;
 }
