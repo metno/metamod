@@ -1,8 +1,7 @@
 <script type="text/javascript">
 jQuery(document).ready( function () {
 
-    // doesn't work either... (or does it?)
-    jQuery("a.visual").fancybox({
+    $("a.visual").fancybox({
         'width'           : '90%',
         'height'          : '90%',
         'autoScale'       : false,
@@ -10,6 +9,16 @@ jQuery(document).ready( function () {
         'transitionOut'   : 'none',
         'type'            : 'iframe'
     });
+
+    $("a.visualimg").fancybox({
+        'autoScale'         : true,
+        'transitionIn'      : 'none',
+        'transitionOut'     : 'none',
+        'titleShow'         : false,
+        'hideOnContentClick': true,
+        'type'              : 'image'
+    });
+
 } );
 </script>
 

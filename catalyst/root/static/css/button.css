@@ -11,7 +11,8 @@ div.btns:after
 }
 
 div.btns a.btn,
-div.btns a.visual
+div.btns a.visual,
+div.btns a.visualimg
 {
 	float:left;
 	color: black;
@@ -37,7 +38,8 @@ div.btns a.btn2
 }
 
 div.btns a.btn:hover span,
-div.btns a.visual:hover span
+div.btns a.visual:hover span,
+div.btns a.visualimg:hover span,
 div.btns a.btn2:hover span,
 {
 
@@ -47,7 +49,8 @@ div.btns a.btn2:hover span,
 
 div.btns a.btn span,
 div.btns a.btn2 span,
-div.btns a.visual span
+div.btns a.visual span,
+div.btns a.visualimg span
 {
 	padding:3px 8px 4px 8px;
 

@@ -79,7 +79,7 @@
 
             [% IF metadata.timeseries.0 %]
                 [% IF ext_ts %]
-                    <a class="visual" href="[% child.external_ts_url %]"><span>Time series</span></a><br clear="all"/>
+                    <a class="visualimg" href="[% child.external_ts_url %]"><span>Time series</span></a><br clear="all"/>
                 [% ELSE %]
                     <a class="visual" href="[% c.uri_for('/search/ts', { ds_id => child.ds_id, vars => metadata.timeseries.0 } ) %]"><span>Time series</span></a><br clear="all"/>
                 [% END %]
