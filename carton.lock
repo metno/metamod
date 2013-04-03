@@ -4556,6 +4556,84 @@
          "target" : "Config::Tiny",
          "version" : "2.14"
       },
+      "Const::Fast" : {
+         "dist" : "Const-Fast-0.013",
+         "mymeta" : {
+            "abstract" : "Facility for creating read-only scalars, arrays, and hashes",
+            "author" : [
+               "Leon Timmermans <fawaka@gmail.com>"
+            ],
+            "dynamic_config" : 0,
+            "generated_by" : "Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921",
+            "license" : [
+               "perl_5"
+            ],
+            "meta-spec" : {
+               "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+               "version" : "2"
+            },
+            "name" : "Const-Fast",
+            "prereqs" : {
+               "build" : {
+                  "requires" : {
+                     "Data::Dumper" : "0",
+                     "File::Find" : "0",
+                     "File::Temp" : "0",
+                     "Test::Exception" : "0.29",
+                     "Test::More" : "0.88"
+                  }
+               },
+               "configure" : {
+                  "requires" : {
+                     "ExtUtils::MakeMaker" : "6.30"
+                  }
+               },
+               "runtime" : {
+                  "requires" : {
+                     "Carp" : "0",
+                     "Scalar::Util" : "0",
+                     "Storable" : "0",
+                     "Sub::Exporter" : "0",
+                     "Sub::Exporter::Progressive" : "0",
+                     "strict" : "0",
+                     "warnings" : "0"
+                  }
+               },
+               "test" : {
+                  "requires" : {
+                     "Data::Dumper" : "0",
+                     "File::Find" : "0",
+                     "File::Temp" : "0",
+                     "Test::Exception" : "0.29",
+                     "Test::More" : "0.88"
+                  }
+               }
+            },
+            "release_status" : "stable",
+            "resources" : {
+               "bugtracker" : {
+                  "mailto" : "bug-const-fast at rt.cpan.org",
+                  "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Const-Fast"
+               },
+               "repository" : {
+                  "type" : "git",
+                  "url" : "git://github.com/Leont/const-fast.git",
+                  "web" : "http://github.com/Leont/const-fast"
+               }
+            },
+            "version" : "0.013"
+         },
+         "name" : "Const::Fast",
+         "pathname" : "L/LE/LEONT/Const-Fast-0.013.tar.gz",
+         "provides" : {
+            "Const::Fast" : {
+               "file" : "Const/Fast.pm",
+               "version" : "0.013"
+            }
+         },
+         "target" : "Const::Fast",
+         "version" : "0.013"
+      },
       "Context::Preserve" : {
          "dist" : "Context-Preserve-0.01",
          "mymeta" : {
@@ -13618,7 +13696,49 @@
       },
       "Digest::HMAC" : {
          "dist" : "Digest-HMAC-1.03",
-         "mymeta" : {},
+         "mymeta" : {
+            "abstract" : "Keyed-Hashing for Message Authentication",
+            "author" : [
+               "Gisle Aas <gisle@activestate.com>"
+            ],
+            "dynamic_config" : 0,
+            "generated_by" : "ExtUtils::MakeMaker version 6.57_05, CPAN::Meta::Converter version 2.120921",
+            "license" : [
+               "perl_5"
+            ],
+            "meta-spec" : {
+               "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+               "version" : "2"
+            },
+            "name" : "Digest-HMAC",
+            "no_index" : {
+               "directory" : [
+                  "t",
+                  "inc"
+               ]
+            },
+            "prereqs" : {
+               "build" : {
+                  "requires" : {
+                     "ExtUtils::MakeMaker" : "0"
+                  }
+               },
+               "configure" : {
+                  "requires" : {
+                     "ExtUtils::MakeMaker" : "0"
+                  }
+               },
+               "runtime" : {
+                  "requires" : {
+                     "Digest::MD5" : "2",
+                     "Digest::SHA" : "1",
+                     "perl" : "5.004"
+                  }
+               }
+            },
+            "release_status" : "stable",
+            "version" : "1.03"
+         },
          "name" : "Digest::HMAC",
          "pathname" : "G/GA/GAAS/Digest-HMAC-1.03.tar.gz",
          "provides" : {
@@ -21821,289 +21941,6 @@
          "target" : "MooseX::Types::Path::Class",
          "version" : "0.06"
       },
-      "Net::DNS" : {
-         "dist" : "Net-DNS-0.72",
-         "mymeta" : {},
-         "name" : "Net::DNS",
-         "pathname" : "N/NL/NLNETLABS/Net-DNS-0.72.tar.gz",
-         "provides" : {
-            "Net::DNS" : {
-               "file" : "Net/DNS.pm",
-               "version" : "0.72"
-            },
-            "Net::DNS::Domain" : {
-               "file" : "Net/DNS/Domain.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::DomainName" : {
-               "file" : "Net/DNS/DomainName.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::DomainName1035" : {
-               "file" : "Net/DNS/DomainName.pm"
-            },
-            "Net::DNS::DomainName2535" : {
-               "file" : "Net/DNS/DomainName.pm"
-            },
-            "Net::DNS::Header" : {
-               "file" : "Net/DNS/Header.pm",
-               "version" : "1086"
-            },
-            "Net::DNS::Mailbox" : {
-               "file" : "Net/DNS/Mailbox.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::Mailbox1035" : {
-               "file" : "Net/DNS/Mailbox.pm"
-            },
-            "Net::DNS::Mailbox2535" : {
-               "file" : "Net/DNS/Mailbox.pm"
-            },
-            "Net::DNS::Nameserver" : {
-               "file" : "Net/DNS/Nameserver.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::Packet" : {
-               "file" : "Net/DNS/Packet.pm",
-               "version" : "1086"
-            },
-            "Net::DNS::Parameters" : {
-               "file" : "Net/DNS/Parameters.pm",
-               "version" : "1074"
-            },
-            "Net::DNS::Question" : {
-               "file" : "Net/DNS/Question.pm",
-               "version" : "1074"
-            },
-            "Net::DNS::RR" : {
-               "file" : "Net/DNS/RR.pm",
-               "version" : "1094"
-            },
-            "Net::DNS::RR::A" : {
-               "file" : "Net/DNS/RR/A.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::AAAA" : {
-               "file" : "Net/DNS/RR/AAAA.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::AFSDB" : {
-               "file" : "Net/DNS/RR/AFSDB.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::APL" : {
-               "file" : "Net/DNS/RR/APL.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::APL::Item" : {
-               "file" : "Net/DNS/RR/APL.pm"
-            },
-            "Net::DNS::RR::CERT" : {
-               "file" : "Net/DNS/RR/CERT.pm",
-               "version" : "1073"
-            },
-            "Net::DNS::RR::CNAME" : {
-               "file" : "Net/DNS/RR/CNAME.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::DHCID" : {
-               "file" : "Net/DNS/RR/DHCID.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::DNAME" : {
-               "file" : "Net/DNS/RR/DNAME.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::EID" : {
-               "file" : "Net/DNS/RR/EID.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::HINFO" : {
-               "file" : "Net/DNS/RR/HINFO.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::HIP" : {
-               "file" : "Net/DNS/RR/HIP.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::IPSECKEY" : {
-               "file" : "Net/DNS/RR/IPSECKEY.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::ISDN" : {
-               "file" : "Net/DNS/RR/ISDN.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::KX" : {
-               "file" : "Net/DNS/RR/KX.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::L32" : {
-               "file" : "Net/DNS/RR/L32.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::L64" : {
-               "file" : "Net/DNS/RR/L64.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::LOC" : {
-               "file" : "Net/DNS/RR/LOC.pm",
-               "version" : "1075"
-            },
-            "Net::DNS::RR::LP" : {
-               "file" : "Net/DNS/RR/LP.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::MB" : {
-               "file" : "Net/DNS/RR/MB.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::MG" : {
-               "file" : "Net/DNS/RR/MG.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::MINFO" : {
-               "file" : "Net/DNS/RR/MINFO.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::MR" : {
-               "file" : "Net/DNS/RR/MR.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::MX" : {
-               "file" : "Net/DNS/RR/MX.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::NAPTR" : {
-               "file" : "Net/DNS/RR/NAPTR.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::NID" : {
-               "file" : "Net/DNS/RR/NID.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::NIMLOC" : {
-               "file" : "Net/DNS/RR/NIMLOC.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::NS" : {
-               "file" : "Net/DNS/RR/NS.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::NSAP" : {
-               "file" : "Net/DNS/RR/NSAP.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::NULL" : {
-               "file" : "Net/DNS/RR/NULL.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::OPT" : {
-               "file" : "Net/DNS/RR/OPT.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::PTR" : {
-               "file" : "Net/DNS/RR/PTR.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::PX" : {
-               "file" : "Net/DNS/RR/PX.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::RP" : {
-               "file" : "Net/DNS/RR/RP.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::RT" : {
-               "file" : "Net/DNS/RR/RT.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::SOA" : {
-               "file" : "Net/DNS/RR/SOA.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::SPF" : {
-               "file" : "Net/DNS/RR/SPF.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::SRV" : {
-               "file" : "Net/DNS/RR/SRV.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::SSHFP" : {
-               "file" : "Net/DNS/RR/SSHFP.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::TKEY" : {
-               "file" : "Net/DNS/RR/TKEY.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::TLSA" : {
-               "file" : "Net/DNS/RR/TLSA.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::RR::TSIG" : {
-               "file" : "Net/DNS/RR/TSIG.pm",
-               "version" : "1090"
-            },
-            "Net::DNS::RR::TXT" : {
-               "file" : "Net/DNS/RR/TXT.pm",
-               "version" : "1079"
-            },
-            "Net::DNS::RR::X25" : {
-               "file" : "Net/DNS/RR/X25.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::Resolver" : {
-               "file" : "Net/DNS/Resolver.pm",
-               "version" : "1088"
-            },
-            "Net::DNS::Resolver::Base" : {
-               "file" : "Net/DNS/Resolver/Base.pm",
-               "version" : "1094"
-            },
-            "Net::DNS::Resolver::MSWin32" : {
-               "file" : "Net/DNS/Resolver/MSWin32.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::Resolver::Recurse" : {
-               "file" : "Net/DNS/Resolver/Recurse.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::Resolver::UNIX" : {
-               "file" : "Net/DNS/Resolver/UNIX.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::Resolver::cygwin" : {
-               "file" : "Net/DNS/Resolver/cygwin.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::Resolver::os2" : {
-               "file" : "Net/DNS/Resolver/os2.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::Text" : {
-               "file" : "Net/DNS/Text.pm",
-               "version" : "1070"
-            },
-            "Net::DNS::Update" : {
-               "file" : "Net/DNS/Update.pm",
-               "version" : "1096"
-            },
-            "Net::DNS::ZoneFile" : {
-               "file" : "Net/DNS/ZoneFile.pm",
-               "version" : "1094"
-            },
-            "Net::DNS::ZoneFile::Generator" : {
-               "file" : "Net/DNS/ZoneFile.pm"
-            },
-            "Net::DNS::ZoneFile::Text" : {
-               "file" : "Net/DNS/ZoneFile.pm"
-            }
-         },
-         "target" : "Net::DNS",
-         "version" : "0.72"
-      },
       "Net::HTTP" : {
          "dist" : "Net-HTTP-6.05",
          "mymeta" : {
@@ -27555,6 +27392,80 @@
          "target" : "Test::WWW::Mechanize",
          "version" : "1.44"
       },
+      "Test::WWW::Mechanize::Catalyst" : {
+         "dist" : "Test-WWW-Mechanize-Catalyst-0.58",
+         "mymeta" : {
+            "abstract" : "Test::WWW::Mechanize for Catalyst",
+            "author" : [
+               "Ash Berlin C<< <ash@cpan.org> >> (current maintiner)"
+            ],
+            "dynamic_config" : 0,
+            "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120921",
+            "license" : [
+               "perl_5"
+            ],
+            "meta-spec" : {
+               "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+               "version" : "2"
+            },
+            "name" : "Test-WWW-Mechanize-Catalyst",
+            "no_index" : {
+               "directory" : [
+                  "inc",
+                  "t"
+               ]
+            },
+            "prereqs" : {
+               "build" : {
+                  "requires" : {
+                     "Catalyst::Plugin::Session::State::Cookie" : "0",
+                     "Catalyst::Plugin::Session::Store::Dummy" : "0",
+                     "ExtUtils::MakeMaker" : "6.59",
+                     "Test::Exception" : "0",
+                     "Test::More" : "0.88",
+                     "Test::utf8" : "0"
+                  }
+               },
+               "configure" : {
+                  "requires" : {
+                     "ExtUtils::MakeMaker" : "6.59"
+                  }
+               },
+               "runtime" : {
+                  "requires" : {
+                     "Catalyst" : "5.90",
+                     "LWP" : "5.816",
+                     "Moose" : "0.67",
+                     "Test::WWW::Mechanize" : "1.14",
+                     "WWW::Mechanize" : "1.54",
+                     "namespace::clean" : "0.09",
+                     "perl" : "5.008004"
+                  }
+               }
+            },
+            "release_status" : "stable",
+            "resources" : {
+               "license" : [
+                  "http://dev.perl.org/licenses/"
+               ],
+               "repository" : {
+                  "type" : "git",
+                  "url" : "git://git.shadowcat.co.uk/catagits/Test-WWW-Mechanize-Catalyst.git"
+               }
+            },
+            "version" : "0.58"
+         },
+         "name" : "Test::WWW::Mechanize::Catalyst",
+         "pathname" : "B/BO/BOBTFISH/Test-WWW-Mechanize-Catalyst-0.58.tar.gz",
+         "provides" : {
+            "Test::WWW::Mechanize::Catalyst" : {
+               "file" : "Test/WWW/Mechanize/Catalyst.pm",
+               "version" : "0.58"
+            }
+         },
+         "target" : "Test::WWW::Mechanize::Catalyst",
+         "version" : "0.58"
+      },
       "Test::WWW::Mechanize::PSGI" : {
          "dist" : "Test-WWW-Mechanize-PSGI-0.35",
          "mymeta" : {
@@ -27748,6 +27659,73 @@
          },
          "target" : "ok",
          "version" : "0.11"
+      },
+      "Test::utf8" : {
+         "dist" : "Test-utf8-1.00",
+         "mymeta" : {
+            "abstract" : "handy utf8 tests",
+            "author" : [
+               "Written by Mark Fowler B<mark@twoshortplanks.com>"
+            ],
+            "dynamic_config" : 0,
+            "generated_by" : "Module::Install version 1.00, CPAN::Meta::Converter version 2.120921",
+            "license" : [
+               "perl_5"
+            ],
+            "meta-spec" : {
+               "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+               "version" : "2"
+            },
+            "name" : "Test-utf8",
+            "no_index" : {
+               "directory" : [
+                  "inc",
+                  "t",
+                  "xt"
+               ]
+            },
+            "prereqs" : {
+               "build" : {
+                  "requires" : {
+                     "ExtUtils::MakeMaker" : "6.42",
+                     "Test::Builder::Tester" : "0.09"
+                  }
+               },
+               "configure" : {
+                  "requires" : {
+                     "ExtUtils::MakeMaker" : "6.42"
+                  }
+               },
+               "runtime" : {
+                  "requires" : {
+                     "Test::Builder" : "0",
+                     "perl" : "5.007003"
+                  }
+               }
+            },
+            "release_status" : "stable",
+            "resources" : {
+               "homepage" : "http://github.com/2shortplanks/Test-utf8/tree",
+               "license" : [
+                  "http://dev.perl.org/licenses/"
+               ],
+               "repository" : {
+                  "type" : "git",
+                  "url" : "git://github.com/2shortplanks/Test-utf8.git"
+               }
+            },
+            "version" : "1.00"
+         },
+         "name" : "Test::utf8",
+         "pathname" : "M/MA/MARKF/Test-utf8-1.00.tar.gz",
+         "provides" : {
+            "Test::utf8" : {
+               "file" : "Test/utf8.pm",
+               "version" : "1.00"
+            }
+         },
+         "target" : "Test::utf8",
+         "version" : "1.00"
       },
       "Text::Diff" : {
          "dist" : "Text-Diff-1.41",

@@ -16,6 +16,8 @@ points for later.
 
 --------------------
 
+change external timeseries plot from iframes to jquery image slideshow
+
 clean up ds_filepath in database to exclude extension whenever found
 
 remove download from basket unless has data_file_location
