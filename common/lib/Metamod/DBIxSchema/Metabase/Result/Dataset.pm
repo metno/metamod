@@ -270,7 +270,10 @@ Returns the path to the XML file if exists, otherwise undef
 sub xmlfile {
     my ($self) = @_;
     my $path = $self->ds_filepath();
-    $path =~ s/\.xm[dl]$//;
+    if ($path =~ s/\.xm[dl]$//) {
+        $logger->warn("Filepath for dataset " . $self->ds_id() . " contain extension: $path ...");
+        # FIXME write correct path to metabase TODO
+    }
     $path .= '.xml';
     $logger->debug("Reading XML file for dataset " . $self->ds_id() . " in $path ...");
     return $path if -r $path;
@@ -690,6 +693,8 @@ sub external_ts_url {
 
     $tsurl =~ s/\[OPENDAP\]/$opendap/;
     $tsurl =~ s/\[TIMESERIES\]/$tsvars/ if $tsvars;
+
+    $logger->debug('Timeseries URL = ' . $tsurl);
 
     return $tsurl;
 }

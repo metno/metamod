@@ -227,12 +227,16 @@ sub write_to_database {
                                  $timearr[1],
                                  $timearr[0] );
         }
+
+        my $inputFileWithoutExtension = File::Spec->rel2abs($inputBaseFile);
+        #print STDERR $inputFileWithoutExtension;
+        $inputFileWithoutExtension =~ s/\.xm[ld]$//;
         $sql_insert_DS->execute(
             $dsid,               $info{name},
             $parentId,           $dsStatus,
             $datestamp,          $info{ownertag},
             $info{creationDate}, $info{metadataFormat},
-            File::Spec->rel2abs($inputBaseFile)
+            $inputFileWithoutExtension
         );
 
         if ($dsStatus) {

@@ -52,7 +52,7 @@ my $importer = Metamod::DatasetImporter->new();
             ds_status         => 1,
             ds_ownertag       => 'DAM',
             ds_metadataformat => 'MM2',
-            ds_filepath       => "$FindBin::Bin/../data/Metamod/dataset_importer1.xml",
+            ds_filepath       => "$FindBin::Bin/../data/Metamod/dataset_importer1",
             ds_creationdate   => '2011-01-01 01:01:01',
         },
         "Importing level 1 dataset for the first time"
@@ -165,7 +165,7 @@ my $importer = Metamod::DatasetImporter->new();
             ds_status         => 1,
             ds_ownertag       => 'DAM',
             ds_metadataformat => 'MM2',
-            ds_filepath       => "$FindBin::Bin/../data/Metamod/dataset_importer1/dataset_importer1_1.xml",
+            ds_filepath       => "$FindBin::Bin/../data/Metamod/dataset_importer1/dataset_importer1_1",
             ds_creationdate   => '2011-01-01 01:01:01',
         },
         "Importing level 2 dataset"
@@ -192,7 +192,7 @@ my $importer = Metamod::DatasetImporter->new();
             ds_status         => 0,
             ds_ownertag       => 'DAM',
             ds_metadataformat => 'MM2',
-            ds_filepath       => "$FindBin::Bin/../data/Metamod/dataset_importer2.xml",
+            ds_filepath       => "$FindBin::Bin/../data/Metamod/dataset_importer2",
             ds_creationdate   => '2011-01-01 01:01:01',
         },
         "Importing inactive dataset"
