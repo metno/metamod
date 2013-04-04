@@ -31,7 +31,9 @@ Tools for reading OPeNDAP streams (experimental)
 =head1 SYNOPSIS
 
   use MetNo::OPeNDAP;
-
+  my $server = MetNo::OPeNDAP->new($url) or die $@;
+  print $server->ddx;
+  print $server->das;
 
 =head1 METHODS
 
