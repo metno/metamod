@@ -154,7 +154,7 @@ sub add_dataset {
                             my $msg = 'Could not add all files to the basket since the basket would then exceed the ';
                             $msg .= 'allowed maximum size.';
                             $self->add_user_msg($msg);
-                            $self->logger->debug("Could not add file to collection basket as it exceeds the max size");
+                            $self->logger->info("Could not add file to collection basket as it exceeds the max size");
 
                             last;
                         }
@@ -185,15 +185,15 @@ sub add_dataset {
                     my $msg = 'Could not add the file to the basket since the basket would then exceed the ';
                     $msg .= 'allowed maximum size.';
                     $self->add_user_msg($msg);
-                    $self->logger->debug("Could not add file to collection basket as it exceeds the max size");
+                    $self->logger->info("Could not add file to collection basket as it exceeds the max size");
                 }
             } else {
-                $self->logger->debug("Tried to add level 2 dataset without data_file_location to basket. Error in UI");
+                $self->logger->warn("Tried to add level 2 dataset without data_file_location to basket. Error in UI");
                 return;
             }
         }
     } else {
-        $self->logger->error("Tried to add non-existant dataset to the collection basket: $ds_id");
+        $self->logger->warn("Tried to add non-existant dataset to the collection basket: $ds_id");
         return;
     }
 
