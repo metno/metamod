@@ -105,7 +105,7 @@ The ds_id of the dataset to add.
 =item return
 
 Return the number of datasets to that was added to the collection basket.
-Returns undef if for some reason the dataset could not be added.
+Returns undef if for some reason no dataset could not be added, or number of files added if successful.
 
 =back
 
@@ -137,13 +137,14 @@ sub add_dataset {
     }
 
     if ( $max_additional <= 0 ) {
-
         # basket is full, go away
         my $msg = 'Could not add the file to the basket since the basket would then exceed the allowed number of files.';
         $self->add_user_msg($msg);
         $self->logger->info("Could not add file to collection basket as it exceeds the max count");
+        return;
+    }
 
-    } elsif ( $dataset->is_level1_dataset() ) {
+    if ( $dataset->is_level1_dataset() ) {
 
         if ( $dataset->num_children() ) {
 
@@ -158,6 +159,7 @@ sub add_dataset {
                 my $msg = 'Could not add all files to the basket since the basket would then exceed the allowed number of files.';
                 $self->add_user_msg($msg);
                 $self->logger->info("Could not add file to collection basket as it exceeds the max count");
+                return;
 
             } else {
 
@@ -173,8 +175,8 @@ sub add_dataset {
                             $msg .= 'allowed maximum size.';
                             $self->add_user_msg($msg);
                             $self->logger->info("Could not add file to collection basket as it exceeds the max size");
-
-                            last;
+                            #last;
+                            return; # better not to add any files at all if size is too big
                         }
 
                         $current_size += $file_info->{data_file_size};
@@ -205,6 +207,7 @@ sub add_dataset {
                 my $msg = 'Could not add the file to the basket since the basket would then exceed the allowed maximum byte size.';
                 $self->add_user_msg($msg);
                 $self->logger->info("Could not add file to collection basket as it exceeds the max byte size");
+                return;
             }
         } else {
             $self->logger->warn("Tried to add level 2 dataset without data_file_location to basket. Error in UI");
