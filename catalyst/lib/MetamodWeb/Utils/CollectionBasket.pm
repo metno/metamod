@@ -124,24 +124,42 @@ sub add_dataset {
     # default to 100 as max number of files
     my $max_files = $self->max_files();
     my $max_additional = $max_files - scalar @ds_ids;
+    $self->logger->debug("Space for $max_additional more files in the basket (max $max_files)");
 
     # default to 500 MB as max size
     my $max_size = $self->max_size();
     my $current_size = $self->calculate_size();
 
     my $new_datasets = 0;
-    if( defined $dataset ){
+    if ( ! defined $dataset ) {
+        $self->logger->warn("Tried to add non-existant dataset to the collection basket: $ds_id");
+        return;
+    }
 
-        if ( $dataset->is_level1_dataset() ) {
+    if ( $max_additional <= 0 ) {
 
-            if ( $dataset->num_children() ) {
+        # basket is full, go away
+        my $msg = 'Could not add the file to the basket since the basket would then exceed the allowed number of files.';
+        $self->add_user_msg($msg);
+        $self->logger->info("Could not add file to collection basket as it exceeds the max count");
 
-                # We must take into account the search parameters that was used in
-                # the search when adding level 2 dataset.
+    } elsif ( $dataset->is_level1_dataset() ) {
 
-                my ($search_conds, $search_attrs) = $self->_metadata_search_params();
-                $search_attrs->{ rows } = $max_additional;
-                my $child_datasets = $dataset->child_datasets($search_conds, $search_attrs);
+        if ( $dataset->num_children() ) {
+
+            # We must take into account the search parameters that was used in
+            # the search when adding level 2 dataset.
+
+            my ($search_conds, $search_attrs) = $self->_metadata_search_params();
+            $search_attrs->{ rows } = $max_additional;
+            my $child_datasets = $dataset->child_datasets($search_conds, $search_attrs);
+
+            if ($child_datasets->count() > $max_additional) {
+                my $msg = 'Could not add all files to the basket since the basket would then exceed the allowed number of files.';
+                $self->add_user_msg($msg);
+                $self->logger->info("Could not add file to collection basket as it exceeds the max count");
+
+            } else {
 
                 while ( my $child_ds = $child_datasets->next() ) {
 
@@ -165,36 +183,33 @@ sub add_dataset {
                     }
                 }
 
-            } elsif ( $dataset->wmsinfo() ) {
-
-                # this is only used for visualization
-                $ds_ids{$dataset->ds_id()} = 1;
-                $new_datasets++; # why not working? FIXME
-
             }
 
-        } else {
+        } elsif ( $dataset->wmsinfo() ) {
 
-            my $file_info = $self->file_info($dataset);
-            if( defined $file_info ){
+            # this is only used for visualization
+            $ds_ids{$dataset->ds_id()} = 1;
+            $new_datasets++; # why not working? FIXME (still an issue? TODO)
 
-                if( $file_info->{data_file_size} + $current_size < $max_size ){
-                    $ds_ids{$dataset->ds_id()} = 1;
-                    $new_datasets++;
-                } else {
-                    my $msg = 'Could not add the file to the basket since the basket would then exceed the ';
-                    $msg .= 'allowed maximum size.';
-                    $self->add_user_msg($msg);
-                    $self->logger->info("Could not add file to collection basket as it exceeds the max size");
-                }
-            } else {
-                $self->logger->warn("Tried to add level 2 dataset without data_file_location to basket. Error in UI");
-                return;
-            }
         }
-    } else {
-        $self->logger->warn("Tried to add non-existant dataset to the collection basket: $ds_id");
-        return;
+
+    } else { # level 2 dataset
+
+        my $file_info = $self->file_info($dataset);
+        if( defined $file_info ){
+
+            if( ($file_info->{data_file_size} || 0) + $current_size < $max_size ){
+                $ds_ids{$dataset->ds_id()} = 1;
+                $new_datasets++;
+            } else {
+                my $msg = 'Could not add the file to the basket since the basket would then exceed the allowed maximum byte size.';
+                $self->add_user_msg($msg);
+                $self->logger->info("Could not add file to collection basket as it exceeds the max byte size");
+            }
+        } else {
+            $self->logger->warn("Tried to add level 2 dataset without data_file_location to basket. Error in UI");
+            return;
+        }
     }
 
     $self->dataset_ids( [ keys %ds_ids ] );
@@ -426,17 +441,20 @@ sub file_info {
     # now allowing for datasets w/o file info
     #return if !exists $metadata->{data_file_location} || !defined $metadata->{data_file_location}->[0];
 
+    my $wmsurl = $dataset->wmsurl();
+    #print STDERR Dumper $wmsurl;
+
     my $file_info = {
         ds_id              => $dataset->ds_id(),
+        name               => $dataset->ds_name(),
+        wms_url            => $wmsurl, #$dataset->wmsurl(), # gives odd number of elements in anon hash if used directly - FIXME
         data_file_location => $metadata->{data_file_location}->[0],
         data_file_size     => $metadata->{data_file_size}->[0],
-        name               => $dataset->ds_name(),
         distribution       => $metadata->{distribution_statement}->[0],
         dataref_OPENDAP    => $metadata->{dataref_OPENDAP}->[0],
-        wms_url            => $dataset->wmsurl,
     };
 
-    #print STDERR '$$$$$$$$$$$$' . Dumper $file_info;
+    #print STDERR "CollectionBasket file_info: " . Dumper $file_info;
     return $file_info;
 
 }
@@ -568,11 +586,13 @@ The maximum number of files allowed in the basket.
 sub max_files {
     my $self = shift;
 
-    my $maxfiles = $self->config->has('COLLECTION_BASKET_MAX_FILES') || 100;
+    my $default = 3;
+
+    my $maxfiles = $self->config->has('COLLECTION_BASKET_MAX_FILES') || $default;
     if ($self->c->user) {
         return $maxfiles;
     } else {
-        return ($maxfiles < 100) ? $maxfiles : 100;
+        return ($maxfiles < $default) ? $maxfiles : $default;
     }
 
 }
