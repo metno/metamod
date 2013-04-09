@@ -586,7 +586,7 @@ The maximum number of files allowed in the basket.
 sub max_files {
     my $self = shift;
 
-    my $default = 3;
+    my $default = 100;
 
     my $maxfiles = $self->config->has('COLLECTION_BASKET_MAX_FILES') || $default;
     if ($self->c->user) {
