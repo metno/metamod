@@ -83,6 +83,7 @@
                 [% ELSE %]
                     <a class="visual" href="[% c.uri_for('/search/ts', { ds_id => child.ds_id, vars => metadata.timeseries.0 } ) %]"><span>Time series</span></a><br clear="all"/>
                 [% END %]
+                <a class="visual" href="[% c.uri_for('/ts', child.ds_id, metadata.timeseries.0, 'csv') %]"><span>ASCII</span></a><br clear="all"/>
             [% END %]
 
             [% IF child.wmsurl != '' %]
@@ -107,10 +108,6 @@
                 [% END %]
                 [% IF opendap %]
                     <a class="visual" href="[% opendap _ '.info' %]"><span>OPeNDAP</span></a><br clear="all"/>
-                [% END %]
-
-                [% IF metadata.timeseries.0 %]
-                    <a class="visual" href="[% c.uri_for('/ts', child.ds_id, metadata.timeseries.0, 'csv') %]"><span>CSV</span></a><br clear="all"/>
                 [% END %]
             [% END %]
 
