@@ -70,21 +70,21 @@
                     title="Download file in [% projection %]"><span>[% projection %] Downl.</span></a><br clear="all"/>
             [% END %]
             [% IF opendap %]
-                <a class="visual" href="[% c.uri_for('/search/transform', { ds_id => child.ds_id }) %]"><span>Transform</span></a><br clear="all"/>
+                [% IF metadata.timeseries.0 %]
+                    [% IF ext_ts %]
+                        <a class="visualimg" href="[% child.external_ts_url %]"><span>Time series</span></a><br clear="all"/>
+                    [% ELSE %]
+                        <a class="visual" href="[% c.uri_for('/search/ts', { ds_id => child.ds_id, vars => metadata.timeseries.0 } ) %]"><span>Time series</span></a><br clear="all"/>
+                    [% END %]
+                    <a class="visual" href="[% c.uri_for('/ts', child.ds_id, metadata.timeseries.0, 'csv') %]"><span>ASCII</span></a><br clear="all"/>
+                [% ELSE %]
+                    <a class="visual" href="[% c.uri_for('/search/transform', { ds_id => child.ds_id }) %]"><span>Transform</span></a><br clear="all"/>
+                [% END %]
             [% END %]
 
             [% c.req.params.return_path = c.uri_for(c.req.path) %]
             <a class="btn" href="[% c.uri_for( '/search/add_to_basket', child.ds_id, c.req.params ) %]"
                title="Add the dataset to the collection basket"><span>Add to basket</span></a><br clear="all"/>
-
-            [% IF metadata.timeseries.0 %]
-                [% IF ext_ts %]
-                    <a class="visualimg" href="[% child.external_ts_url %]"><span>Time series</span></a><br clear="all"/>
-                [% ELSE %]
-                    <a class="visual" href="[% c.uri_for('/search/ts', { ds_id => child.ds_id, vars => metadata.timeseries.0 } ) %]"><span>Time series</span></a><br clear="all"/>
-                [% END %]
-                <a class="visual" href="[% c.uri_for('/ts', child.ds_id, metadata.timeseries.0, 'csv') %]"><span>ASCII</span></a><br clear="all"/>
-            [% END %]
 
             [% IF child.wmsurl != '' %]
                 [% SET thumbsize = 64 %]
