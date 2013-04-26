@@ -114,7 +114,8 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
         $self->logger->warn("old_gen_wmc failed: $@");
         $c->detach( 'Root', 'error', [ 502, $@ ] );
     } else {
-        my $out = $wmc->toString;
+        my $out = $wmc->toString(1);
+        #print STDERR $out;
         # another hack to work around inexplainable duplicate namespace bug
         $out =~ s|( xmlns:xlink="http://www.w3.org/1999/xlink"){2}|$1|g;
         $c->response->content_type('text/xml');

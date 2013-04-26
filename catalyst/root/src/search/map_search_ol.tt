@@ -9,46 +9,95 @@
 [% SET y1_id = search_ui_utils.html_id_for_map('y1') %]
 [% SET y2_id = search_ui_utils.html_id_for_map('y2') %]
 
+<!--  An anchor that is used to scroll the page back to the map after clicking the map -->
+<a name="map_search">&nbsp;</a>
+
+
+<p class="help">
+Select a rectangular search area in the map below by dragging the mouse.
+</p>
+
+<p class="help">
+The search result will contain any datasets that partially covered by the selected area.
+</p>
+
+<p class="help">
+To clear you current selection press "Clear map". If more than one map is available you can select it from the
+dropdown list.
+</p>
+
+<label for="selected_map">Select map</label>
+<select name="selected_map" id="selected_map" onchange="clearMap();loadMap(this[this.selectedIndex].value)">
+    <!--<option value="4326">World</option>
+    <option value="32661">Arctic</option>
+    <option value="32761">Antarctic</option>-->
+    <option value="3995">Arctic</option>
+    <option value="3031">Antarctic</option>
+</select>
+
+<!-- select name="selected_map2" id="selected_map2"
+        onchange="jQuery('#[% x1_id %], #[% x2_id %], #[% y1_id %], #[% y2_id %]' ).val('');
+                  jQuery('#search_form').attr( 'action', '[% c.uri_for('/search', 'map_search' ) %]');
+                  jQuery('#search_form').submit()">
+[% FOREACH map IN search_ui_utils.available_maps %]
+    <option value="[% map.srid %]" [% map.selected ? 'selected="selected"' : ''%]>[% map.name %]</option>
+[% END %]
+</select-->
+
+<button type="button" onclick="clearMap();">Clear map</button>
+
 <script>
 
+//alert( "starting...." );
+
 var log = log4javascript.getDefaultLogger();
-[% IF ! debug # disable logging in production %]
-    //log = log4javascript.getNullLogger();
+[% IF !debug %]
+    // disable logging in production
+    log = log4javascript.getNullLogger();
 [% END %]
 
 var map;
 var vectors;
-var currentProj = "4326";
+var currentProj = "[% c.req().param('selected_map') || 3995 %]";
+log.debug("Current projection is " + currentProj);
 
 var maps = {
-    "EPSG:4326" : "http://wms.met.no/maps/world.map",
     "EPSG:32661": "http://wms.met.no/maps/northpole.map",
-    "EPSG:32761": "http://wms.met.no/maps/southpole.map"
+    "EPSG:32761": "http://wms.met.no/maps/southpole.map",
+    "EPSG:4326" : "http://wms.met.no/maps/world.map",
+    "EPSG:3995": "[% mm_config.get('SEARCH_NORTHPOLE_MAP') %]",
+    "EPSG:3031": "[% mm_config.get('SEARCH_SOUTHPOLE_MAP') %]"
 }
 
+jQuery(function() {
+    loadMap(currentProj);
+} );
 
-loadMap(currentProj);
+function clearMap() {
+    $('#[% x1_id %], #[% x2_id %], #[% y1_id %], #[% y2_id %]' ).val('');
+    vectors.removeAllFeatures();
+}
 
 function updateCoords(xy) {
-    //log.debug( map.getExtent() );
-    x = map.getExtent();
-    $('#[% x1_id %]').val(x.left);
-    $('#[% x2_id %]').val(x.right);
-    $('#[% y1_id %]').val(x.top);
-    $('#[% y2_id %]').val(x.bottom);
-    log.debug( 'Click on ' + map.getLonLatFromPixel(xy) );
-    //log.debug(vectors);
+    if ( isNaN(xy.left) ) {
+        return;
+    }
+    $('#[% x1_id %]').val(xy.left);
+    $('#[% x2_id %]').val(xy.right);
+    $('#[% y1_id %]').val(xy.top);
+    $('#[% y2_id %]').val(xy.bottom);
 }
 
 function loadMap(proj) {
     if (map !== undefined) { map.destroy(); }
-    jQuery('#[% x1_id %], #[% x2_id %], #[% y1_id %], #[% y2_id %]' ).val('');
+    //jQuery('#[% x1_id %], #[% x2_id %], #[% y1_id %], #[% y2_id %]' ).val('');
     wms_url = maps["EPSG:" + proj];
-    log.debug("WMS URL for EPSG:" + proj + " : " + wms_url);
+    log.debug("WMS URL for EPSG:" + proj + " is " + wms_url);
     currentProj = proj;
     wmc_url = "[% c.uri_for('/gc2wmc') %]" + "?getcap=" + wms_url + "&crs=EPSG:" + proj;
-    log.debug(wmc_url);
+    log.debug("WMC: " + wmc_url);
     OpenLayers.loadURL(wmc_url, "", this, drawMap, showError);
+    $('#selected_map').val(proj);
 }
 
 function drawMap(response) {
@@ -70,95 +119,72 @@ function drawMap(response) {
     map.addControl( new OpenLayers.Control.ZoomPanel() );
     map.addControl( new OpenLayers.Control.Navigation() );
     map.addControl( new OpenLayers.Control.MousePosition() );
+    //map.addControl( new OpenLayers.Control.LayerSwitcher() );
     //map.zoomToMaxExtent();
 
-    vectors = new OpenLayers.Layer.Vector("Vector Layer");
+    vectors = new OpenLayers.Layer.Vector("Selection Layer", {
+        eventListeners: {
+            "beforefeatureadded": function(event) { clearMap(); }
+        }
+    });
+    vectors.onFeatureInsert = function(f) {
+        updateCoords(f.geometry.bounds);
+    }
+
     map.addLayers([vectors]);
-    map.addControl(new OpenLayers.Control.EditingToolbar(vectors));
+    //map.addControl(new OpenLayers.Control.EditingToolbar(vectors));
 
-    var options = {
-        hover: true,
-        //onSelect: updateCoords
-    };
-    var select = new OpenLayers.Control.SelectFeature(vectors, options);
-    map.addControl(select);
-    select.activate();
+    if ( $('#[% x1_id %]').val() !== undefined ) {
+        var x1 = $('#[% x1_id %]').val();
+        var y1 = $('#[% y1_id %]').val();
+        var x2 = $('#[% x2_id %]').val();;
+        var y2 = $('#[% y2_id %]').val();
+        //alert("Box: " + x1 + " " + x2 + " " + y1 + " " + y2);
+        var points = [
+            new OpenLayers.Geometry.Point(x1, y1),
+            new OpenLayers.Geometry.Point(x1, y2),
+            new OpenLayers.Geometry.Point(x2, y2),
+            new OpenLayers.Geometry.Point(x2, y1)
+        ];
 
-    var features = {
-        "type": "Feature",
-        "properties": {
-        },
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [
-                [
-                    [
-                        -3271749.6475063143,
-                        5245615.965460574
-                    ],
-                    [
-                        10269222.78538431,
-                        -1619069.8377365128
-                    ],
-                    [
-                        -11646801.961491022,
-                        -4423871.5708208475
-                    ],
-                    [
-                        12069467.67530585,
-                        10409953.227758631
-                    ],
-                    [
-                        -7028782.461256315,
-                        1543760.1502486998
-                    ],
-                    [
-                        13008725.878743352,
-                        9441617.244963426
-                    ],
-                    [
-                        -3271749.6475063143,
-                        5245615.965460574
-                    ]
-                ]
-            ]
-        },
-        "crs": {
-            "type": "name",
-            "properties": {
-                "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+        var ring = new OpenLayers.Geometry.LinearRing(points);
+        var polygon = new OpenLayers.Geometry.Polygon([ring]);
+        var feature = new OpenLayers.Feature.Vector(polygon, {});
+        vectors.addFeatures(feature);
+    }
+
+    boxDraw = new OpenLayers.Control.DrawFeature( vectors,
+        OpenLayers.Handler.RegularPolygon, {
+            handlerOptions: {
+                sides: 4,
+                irregular: true
             }
         }
+    )
+    map.addControl(boxDraw);
+    boxDraw.activate();
+
+    var options = {
+        //hover: true
+        //onSelect: updateCoords
     };
-
-    //vectors.addFeatures(features);
-
-    //info = OpenLayers.Control.GetFeature({
-    //    //protocol: new OpenLayers.Protocol({}),
-    //    box: true,
-    //    click: false
-    //
-    //});
-
-
-    //info = new OpenLayers.Control.WMSGetFeatureInfo({
-    //    //url: 'http://localhost/plot.png',
-    //    //url: 'http://thredds.met.no/thredds/wms/sea_ice/SIW-OSISAF-GLO-SIT_SIE_SIC-OBS/ice_conc_north_aggregated?LAYERS=ice_concentration&QUERY_LAYERS=ice_concentration&VERSION=1.1.1&STYLES=boxfill%2Frainbow&SERVICE=WMS&REQUEST=GetFeatureInfo&I=5&J=200&SRS=EPSG%3A32661&BBOX=2000000,906250,2156250,1062500&WIDTH=256&HEIGHT=256&INFO_FORMAT=image/png&TIME=2012-10-24T12%3A00%3A00.000Z,2012-10-25T12%3A00%3A00.000Z,2012-10-26T12%3A00%3A00.000Z,2012-10-27T12%3A00%3A00.000Z,2012-10-28T12%3A00%3A00.000Z,2012-10-29T12%3A00%3A00.000Z',
-    //    title: 'Identify features by clicking',
-    //    queryVisible: true,
-    //    eventListeners: {
-    //        getfeatureinfo: function(event) {
-    //            log.debug( 'Click on ' + map.getLonLatFromPixel(event.xy) );
-    //            alert( 'Click on ' + map.getLonLatFromPixel(event.xy) );
-    //        }
-    //    }
-    //});
-
-    //map.addControl(info);
-    //info.activate();
+    var bbox = new OpenLayers.Control.SelectFeature(vectors, options);
+    map.addControl(bbox);
+    bbox.activate();
 
 }
 
+function allowPan(element) {
+    var stop = !element.checked;
+    boxDraw.handler.stopDown = stop;
+    boxDraw.handler.stopUp = stop;
+    if (stop) {
+        boxDraw.activate();
+    } else {
+        // suspend drawing or you'll lose selection when panning
+        boxDraw.deactivate();
+    }
+}
 
 function showError(response) {
     $('showmap').append("<h3>Could not contact WMS server!</h3>");
@@ -167,47 +193,17 @@ function showError(response) {
 
 </script>
 
-<!--  An anchor that is used to scroll the page back to the map after clicking the map -->
-<a name="map_search">&nbsp;</a>
-
-
-<p class="help">
-Select a rectangular search area in the map below. Click once to place the first corner of rectangle, then after the
-page reloads click again to place the second corner of the rectangle. The two selected points are used as opposite
-corners of the rectangle.
-</p>
-
-<p class="help">
-The search result will contain any datasets that partially covered by the selected area.
-</p>
-
-<p class="help">
-To clear you current selection press "Clear map". If more than one map is available you can select it from the
-dropdown list.
-</p>
-
-<label for="selected_map">Select map</label>
-<select name="selected_map2" id="selected_map2" onchange="jQuery('#[% x1_id %], #[% x2_id %], #[% y1_id %], #[% y2_id %]' ).val(''); jQuery('#search_form').attr( 'action', '[% c.uri_for('/search', 'map_search' ) %]'); jQuery('#search_form').submit()">
-[% FOREACH map IN search_ui_utils.available_maps %]
-    <option value="[% map.srid %]" [% map.selected ? 'selected="selected"' : ''%]>[% map.name %]</option>
-[% END %]
-</select>
-
 <input type="text" size="10" name="[% x1_id %]" id="[% x1_id %]" value="[% c.req().param( x1_id ) %]" />
 <input type="text" size="10" name="[% x2_id %]" id="[% x2_id %]" value="[% c.req().param( x2_id ) %]" />
 <input type="text" size="10" name="[% y1_id %]" id="[% y1_id %]" value="[% c.req().param( y1_id ) %]" />
 <input type="text" size="10" name="[% y2_id %]" id="[% y2_id %]" value="[% c.req().param( y2_id ) %]" />
 
-<!--new stuff-->
+<input type="checkbox" name="allow-pan" value="allow-pan" id="allowPanCheckbox" onclick="allowPan(this);" />
+<label for="allowPanCheckbox">Pan</label>
 
-<select name="selected_map" id="selected_map" onchange="loadMap(this[this.selectedIndex].value)">
-    <option value="32661">Arctic</option>
-    <option value="32761">Antarctic</option>
-    <option value="4326" selected="selected">World</option>
-</select>
 
 <div id="searchmap" style="height:540px; width:540; border: solid 1px; margin-bottom: 10px"
-     onclick="updateCoords(event.xy); jQuery('#search_form').attr('action','[% c.uri_for('/search/map_search') %]');"></div>
+     xonclick="jQuery('#search_form').attr('action','[% c.uri_for('/search/map_search') %]');"></div>
 
 
 <!--<input type="image" name="map_coord" alt="Map search" src="[% c.uri_for( '/search/map/' _ map_srid, search_ui_utils.map_coordinates() ) %]" onclick="jQuery( '#search_form' ).attr( 'action', '[% c.uri_for( '/search/map_search' ) %]' );" />-->

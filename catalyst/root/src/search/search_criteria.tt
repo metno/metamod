@@ -4,6 +4,7 @@
 <input type="hidden" name="active_criteria" id="active_criteria" />
 
 <div id="search_criteria" class="inside criteria-active-area">
+
 [% FOREACH category IN search_ui_utils.search_categories() %]
 
     [% NEXT IF category.sc_idname != active_criteria %]
@@ -17,14 +18,18 @@
     [% ELSIF category.sc_type == 'fulltext' %]
         [% INCLUDE 'search/text_form.tt' category = category %]
     [% ELSIF category.sc_type == 'map_search' %]
-        [% INCLUDE 'search/map_search_form.tt' criteria_index = loop.index() %]
-        [%# INCLUDE 'search/map_search_ol.tt' criteria_index = loop.index() # FIXME change after demo %]
+        [% IF  mm_config.get('SEARCH_NORTHPOLE_MAP')  %]
+            [% INCLUDE 'search/map_search_ol.tt' criteria_index = loop.index() # openlayers version %]
+        [% ELSE %]
+            [% INCLUDE 'search/map_search_form.tt' criteria_index = loop.index() # old static map %]
+        [% END %]
     [% ELSIF category.sc_type == 'tree' %]
         [% INCLUDE 'search/tree_form.tt'  %]
     [% END %]
 
     [% INCLUDE search/keep_search_params.tt category_type = category.sc_type category_id = category.sc_id %]
 [% END %]
+
 <button type="submit">Search</button>
 </div>
 

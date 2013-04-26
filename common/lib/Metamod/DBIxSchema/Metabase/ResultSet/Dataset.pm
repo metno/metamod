@@ -22,8 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 use base 'Metamod::DBIxSchema::Resultset';
 
-use Data::Dump qw( dump );
-use Log::Log4perl qw( get_logger );
+use Data::Dumper;
+use Log::Log4perl qw( get_logger ); # does this work?
 use Params::Validate qw( :all );
 use Time::localtime;
 
@@ -168,7 +168,8 @@ sub metadata_search_params {
                 {
                     sc_id   => $sc_id,
                     ni_from => { '<=' => $date->{to}||scalar time },
-                    ni_to   => { '>=' => $date->{from}||0 },
+                    ni_to
+                    => { '>=' => $date->{from}||0 },
 
                 }
             );
@@ -475,15 +476,18 @@ sub dataset_location_search {
 
     my $config = Metamod::Config->instance();
 
-    my $scale_factor_x = $config->get("SRID_MAP_SCALE_FACTOR_X_$srid");
-    my $scale_factor_y = $config->get("SRID_MAP_SCALE_FACTOR_Y_$srid");
-    my $offset_x = $config->get("SRID_MAP_OFFSET_X_$srid");
-    my $offset_y = $config->get("SRID_MAP_OFFSET_Y_$srid");
+    my %fake_srid = (
+        3995 => 93995,
+        3031 => 93031,
+    );
 
-    if( !$scale_factor_x || !$scale_factor_y || !$offset_x || !$offset_y ){
-        die "Need all SRID map params in config for '$srid'. Got ($scale_factor_x,$scale_factor_y,$offset_x,$offset_y)";
-    }
+    $srid = $fake_srid{$srid} if exists $fake_srid{$srid};
 
+    # default is no conversion (assuming client can calculate proper coordinates if not defined in master_config)
+    my $scale_factor_x = $config->get("SRID_MAP_SCALE_FACTOR_X_$srid") || 1;
+    my $scale_factor_y = $config->get("SRID_MAP_SCALE_FACTOR_Y_$srid") || 1;
+    my $offset_x = $config->get("SRID_MAP_OFFSET_X_$srid") || 0;
+    my $offset_y = $config->get("SRID_MAP_OFFSET_Y_$srid") || 0;
 
     my $x1m = ($x1 - $offset_x)*$scale_factor_x;
     my $x2m = ($x2 - $offset_x)*$scale_factor_x;
@@ -502,6 +506,7 @@ sub dataset_location_search {
     my $search_cond = {
         IN => \"( SELECT DISTINCT ds_id FROM dataset_location WHERE ST_DWITHIN( $bounding_box, $geom_column, 0.1))",
     };
+    #print STDERR "*** coord search is " . Dumper \$search_cond;
     return $search_cond;
 
 }

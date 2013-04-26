@@ -3,6 +3,10 @@
   METAMOD CHANGELOG
 ============================
 
+2.13
+    - dynamic search map using WMS
+    - automatic building of Perl dependencies using Carton
+    - updated to run under Ubuntu 12.4 Precise Pangolin
 
 2.12   Mon Jan 14 2013
     - projection selector and timeslider in wms client

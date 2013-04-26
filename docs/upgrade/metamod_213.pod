@@ -1,0 +1,23 @@
+=head1 Upgrading to METAMOD 2.13 from 2.12
+
+=head2 Dependency libraries
+
+Metamod now contains all necessary Perl dependencies either in the Debian package,
+or for building via Carton.
+
+  $ carton install
+
+You must set your PERL5LIB to point to metamod/local/lib
+
+=head2 Configuration settings
+
+
+=head3 PERL5LIB
+
+Setting CATALYST_LIB to metamod/local/lib
+
+=head3 Dynamic map search
+
+SEARCH_NORTHPOLE_MAP = http://dev-vm070/backgroundmaps/northpole.map
+SEARCH_SOUTHPOLE_MAP = http://dev-vm070/backgroundmaps/southpole.map
+

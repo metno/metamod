@@ -26,10 +26,13 @@ use Moose;
 use namespace::autoclean;
 use XML::LibXML::XPathContext;
 use Metamod::WMS;
+use Log::Log4perl qw(get_logger);
 #use Metamod::Config qw(getProjMap);
 use List::Util qw(min max sum);
 use Carp;
 use Data::Dumper;
+
+my $logger = get_logger('metamod.search');
 
 =head1 NAME
 
@@ -39,8 +42,6 @@ MetamodWeb::Utils::XML::WMC - helper methods for WMC generation
 
 Uses wmsinfo on dataset to fetch WMS Capabilities and build up WMC document with
 available layers and styles. Includes background map from central server where available.
-
-=head1 METHODS
 
 =cut
 
@@ -52,6 +53,8 @@ has 'c' => (
         user_db => [ model => 'Usebase' ],
     }
 );
+
+=head1 METHODS
 
 =head2 old_gen_wmc
 
@@ -66,6 +69,8 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
     my ($self, $setup, $wmsurl, $crs) = @_;
     croak "Missing setup document" unless $setup;
     croak "Missing WMS URL" unless $wmsurl;
+
+    #print STDERR "** SETUP = " . $setup->toString(1) . "\n\n";
 
     my $setupxc = XML::LibXML::XPathContext->new( $setup->documentElement() );
     $setupxc->registerNs('s', "http://www.met.no/schema/metamod/ncWmsSetup");
@@ -115,9 +120,9 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
         $bbox{ bottom } = min(@y);
         $bbox{ top    } = max(@y);
 
-        #print STDERR Dumper \%bbox;
-
     }
+
+    #print STDERR Dumper \%bbox;
 
     ####################################
     # transform data Capabilities to WMC
@@ -128,12 +133,12 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
     my $wmcns = "http://www.opengis.net/context";
 
     my $results = eval { $self->_gen_wmc($wmsurl, \%bbox) } or die $@;
+    #print STDERR "** WMC before sorting:\n" . $results->toString(1) . "\n\n";
 
     my $gcxc = XML::LibXML::XPathContext->new( $results->documentElement() ); # getcapabilities xpath context
     $gcxc->registerNs('v', $wmcns);
     #$gcxc->registerNs('ol', 'http://openlayers.org/context');
     my ($layerlist) = $gcxc->findnodes('/*/v:LayerList');
-
 
     ######################
     # sort layers & styles
@@ -149,18 +154,21 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
             next;
         }
 
-        my $style = lc $setuplayer->getAttribute('style') || '';
-        #printf STDERR "*****WMC* setup %s: %s - %s\n", $setuplayer->localname, $lname, $style;
+        my $style = lc ($setuplayer->getAttribute('style') || '');
+        my $layertype = $setuplayer->localname;
+        #printf STDERR "***** WMC setup %s: %s (%s)\n", $layertype, $lname, $style||'-';
 
         if ( $setuplayer->getAttribute('url') ) {
-            #do later
-            next;
+            #do later (do what??? FIXME)
+            #next; # why? this means it'll skip sorting and baselayers won't show up
         }
 
         # find matching layer nodes in Capabilities
-        foreach my $gclayer ($gcxc->findnodes("v:Layer[v:Name = '$lname']", $layerlist)) {
+        my $matching_layers = $gcxc->findnodes("v:Layer[v:Name = '$lname']", $layerlist);
+        #printf STDERR "####### found %d layers named %s\n", scalar @$matching_layers, $lname;
+        foreach my $gclayer (@$matching_layers) {
             # should only loop once
-            #printf STDERR "*WMC* getcap: %s\n", $gclayer->serialize;
+            #printf STDERR "*WMC* $layertype getcap: %s\n", $gclayer->serialize;
             foreach my $gcstyle ( $gcxc->findnodes("v:StyleList/v:Style[v:Name = '$style']", $gclayer) ) { # FIXME: wrong namespace
                 #printf STDERR "*WMC* stylelist: %s\n", $gcstyle->serialize;
                 $gcstyle->setAttribute('current', 1);
@@ -169,12 +177,14 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
                 $pn->insertBefore( $pn->removeChild($gcstyle), $pn->firstChild );
             }
 
-            if ($setuplayer->localname eq 'baselayer') {
+            if ($layertype eq 'baselayer') {
                 $gclayer->addNewChild( 'http://openlayers.org/context', 'ol:transparent' )->appendTextNode('false');
                 $nobaselayer = 0;
+                $logger->debug("*** $layertype $lname is opaque");
             } else { # overlay
                 $gclayer->addNewChild( 'http://openlayers.org/context', 'ol:transparent' )->appendTextNode('true');
                 $gclayer->addNewChild( 'http://openlayers.org/context', 'ol:opacity' )->appendTextNode('0.6');
+                $logger->debug("*** $layertype $lname is transparent");
             }
             $gclayer->setAttribute('hidden', $hidden++&&1); # sets all layers in wmsinfo visible
 
@@ -201,7 +211,7 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
     # copy background map layers to wmc
     #
     if ( $nobaselayer and (my $mapconf = getProjMap( $bbox{'crs'} )) ) {
-        printf STDERR "*** Getting map for %s\n", $bbox{'crs'};
+        $logger->debug("*** Getting map for " . $bbox{'crs'});
 
         my $mapurl = getMapURL( $bbox{'crs'} );
 
@@ -221,10 +231,9 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
             my $isoverlay = $mapxc->findvalue('v:Name', $mpl) eq 'borders' ? 'true' : 'false';
             $mpl->addNewChild( 'http://openlayers.org/context', 'ol:transparent' )->appendTextNode($isoverlay);
         }
-
-        #print STDERR $results->toString(1);
-
     }
+
+    #print STDERR "\n\n------ WMC \n" . $results->toString(1);
 
     # TODO: remove non-universal SRS elements
 
@@ -259,7 +268,7 @@ sub _gen_wmc {
 
     # check if wms 1.1.1 or 1.3.0
     my $version = $dom->documentElement->getAttribute('version');
-    #printf STDERR "+++++++++++ WMS ver %s\n", $version;
+    $logger->debug("WMS Capabilities version $version");
 
     my $stylesheet = $xslt->parse_stylesheet_file( $self->c->path_to( $stylesheets{$version} ) );
     # generate wmc from capab

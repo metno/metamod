@@ -158,6 +158,9 @@ WMS_NORTHPOLE_MAP = northpole.map
 WMS_SOUTHPOLE_MAP = southpole.map
 WMS_WORLD_MAP     = world.map
 
+SEARCH_NORTHPOLE_MAP = http://dev-vm070/backgroundmaps/northpole.map
+SEARCH_SOUTHPOLE_MAP = http://dev-vm070/backgroundmaps/southpole.map
+
 # list of supported projections (not yet implemented)
 WMS_PROJECTIONS =
     'EPSG:32661' 'WGS 84 / UPS North'                               'http://wms.met.no/maps/northpole.map'
