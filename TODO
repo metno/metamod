@@ -16,7 +16,10 @@ points for later.
 
 --------------------
 
-change external timeseries plot from iframes to jquery image slideshow
+more projections
+
+wms search:
+- add mercator map
 
 clean up ds_filepath in database to exclude extension whenever found
 
@@ -75,6 +78,14 @@ avoid misuse
 - must use POST
 
 ++++++++ DONE ++++++++++++++
+
+wms search:
+- convert meters to pixels in url
+- redraw selection bounding box
+- use rubber band box selection
+  - http://openlayers.org/dev/examples/draw-feature.html
+
+change external timeseries plot from iframes to jquery image slideshow
 
 Catalyst::Log::Log4perl is DEPRECATED, update your app to use Log::Log4perl::Catalyst FIXME 2.13
 

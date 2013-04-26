@@ -389,3 +389,7 @@ SUBSCRIPTION_ENABLED = ENABLED
 # A comma separated list of distribution statements that are interpreted as
 # freely available and can be downloaded via the collection basket.
 #COLLECTION_BASKET_DIST_STATEMENTS = free, something else
+
+# =============== Metadataeditor configuration ================
+
+METAEDIT_WS_URL = http://metaedit.example.com/metadataeditor/service/metaedit_api/[PROJECT]/[DATASET]
