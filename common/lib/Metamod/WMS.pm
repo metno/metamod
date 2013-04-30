@@ -183,7 +183,7 @@ sub getMapURL {
         "EPSG:4326"  => "http://wms.met.no/maps/world.map",
         "EPSG:32661" => "http://wms.met.no/maps/northpole.map",
         "EPSG:32761" => "http://wms.met.no/maps/southpole.map",
-		'EPSG:3995'  => "http://dev-vm070/backgroundmaps/northpole.map",
+		'EPSG:3995'  => "http://dev-vm070/backgroundmaps/northpole.map", # FIXME update with production servers
 		'EPSG:3031'  => "http://dev-vm070/backgroundmaps/southpole.map",
     );
     return $coastlinemaps{ $crs }; # yeah, it's a cop out...
@@ -217,7 +217,7 @@ sub defaultWMC {
     # TODO some validation?
 
     my $bgurl = getMapURL($crs); # 'http://wms.met.no/maps/world.map';
-    my $baselayer = qq|<w:baselayer url="$bgurl" name="$layername" />| if $bgurl; #
+    my $baselayer = $bgurl ? qq|<w:baselayer url="$bgurl" name="$layername" />| : ''; #
 
     #print STDERR "*** $crs *** $bgurl ***\n" . Dumper $bbox{$crs};
 

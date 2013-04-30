@@ -16,6 +16,8 @@ points for later.
 
 --------------------
 
+clean up multiwmc controller, moving processing to utils
+
 more projections
 
 wms search:
@@ -72,8 +74,7 @@ wms thumbnails:
 - read wmsthumbs in wmslist from capab
 - cache wmsthums from capab in database when changing wmsinfo
 
-reset password should send a link to reset instead of resetting directly to
-avoid misuse
+reset password should send a link to reset instead of resetting directly to avoid misuse
 - also check that username exists before confirming
 - must use POST
 

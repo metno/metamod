@@ -9,7 +9,7 @@ use Data::Dumper;
 use Metamod::Config;
 use Log::Log4perl qw();
 use Metamod::FimexProjections;
-use Metamod::WMS qw(getProjMap getXML);
+use Metamod::WMS qw(getProjMap getXML); # remove this FIXME
 
 my $logger = Log::Log4perl::get_logger(__PACKAGE__);
 
@@ -159,6 +159,8 @@ along with METAMOD; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =end LICENSE
+
+=cut
 
 =head1 NAME
 

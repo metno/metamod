@@ -156,8 +156,10 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
     my $crs = $$para{'crs'} && delete $$para{'crs'};
     $c->detach( 'Root', 'error', [ 400, "Missing parameter 'crs' in request" ] ) unless defined($crs);
 
+    #my $foo = eval { $c->stash->{wmc}->old_gen_wmc($setup, $wms, $crs) };
+
     # move processing stuff below to MetamodWeb::Utils::XML::WMC ... FIXME
-    my (%wmsurls, %layers, @nodes, @areas, @x, @y);
+    my (%wmsurls, %layers, @nodes, @areas);
     my $nsURI = 'http://www.met.no/schema/metamod/ncWmsSetup';
 
     foreach (keys %$para) {
@@ -191,12 +193,42 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
 
     #print STDERR Dumper \@areas;
 
-    my $to = Geo::Proj4->new( init => lc($crs) ) # stupid proj doesn't like upper case proj names
-        or die Geo::Proj4->error . " for $crs";
-    #my $to = _newProj( $crs ); # obsolete
+    my $setopts = $self->_calculate_bounds(\@areas, $crs);
+    $$setopts{time} = $$para{'time'};
 
-    foreach (@areas) {
-        #printf STDERR ">>>>>>>> From %s to %s\n", $_->{'crs'}, $crs;
+    my $setup = defaultWMC($setopts);
+
+    my $root = $setup->documentElement;
+    foreach (@nodes) {
+        $root->appendChild($_);
+    }
+
+    #print STDERR $setup->toString(2);
+
+    my $wmc = eval { $c->stash->{wmc}->setup2wmc($setup) };
+    #$wmc->documentElement->appendChild($setup->documentElement); # uh, why? for debug?
+    die " error: $@" if $@;
+    my $out = $wmc->toString(1);
+    # another hack to work around inexplainable duplicate namespace bug
+    $out =~ s|( xmlns:xlink="http://www.w3.org/1999/xlink"){2}|$1|g;
+    $c->response->content_type('text/xml');
+    $c->response->body( $out );
+
+    #print STDERR "-------------------\n$out\n---------------------------\n";
+
+}
+
+sub _calculate_bounds {
+    my ($self, $areas, $newcrs) = @_;
+
+    my (@x, @y); # coords of all points
+
+    my $to = Geo::Proj4->new( init => lc($newcrs) ) # stupid proj doesn't like upper case proj names
+        or die Geo::Proj4->error . " for $newcrs";
+    #my $to = _newProj( $newcrs ); # obsolete
+
+    foreach (@$areas) {
+        $self->logger->debug("WMS: Transforming bounds from $_->{'crs'} to $newcrs");
         my $from = Geo::Proj4->new( init => lc($_->{'crs'}) ) or die Geo::Proj4->error;
         #my $from = _newProj( $_->{'crs'} ); # obsolete
 
@@ -233,36 +265,19 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
     #print STDERR 'x = ' . Dumper \@x;
     #print STDERR 'y = ' . Dumper \@y;
 
-    my ($left, $right, $top, $bottom);
+    #my ($left, $right, $top, $bottom);
 
     my $setopts = {
-        crs    => $crs,
+        crs    => $newcrs,
         left   => min(@x),
         right  => max(@x),
         bottom => min(@y),
         top    => max(@y),
-        time   => $$para{'time'},
     };
+
     #print STDERR "setopts = " . Dumper $setopts;
-    my $setup = defaultWMC($setopts);
 
-    my $root = $setup->documentElement;
-    foreach (@nodes) {
-        $root->appendChild($_);
-    }
-
-    #print STDERR $setup->toString(2);
-
-    my $wmc = eval { $c->stash->{wmc}->setup2wmc($setup) };
-    #$wmc->documentElement->appendChild($setup->documentElement); # uh, why? for debug?
-    die " error: $@" if $@;
-    my $out = $wmc->toString(1);
-    # another hack to work around inexplainable duplicate namespace bug
-    $out =~ s|( xmlns:xlink="http://www.w3.org/1999/xlink"){2}|$1|g;
-    $c->response->content_type('text/xml');
-    $c->response->body( $out );
-
-    #print STDERR "-------------------\n$out\n---------------------------\n";
+    return $setopts;
 
 }
 
