@@ -434,7 +434,7 @@ sub wmsurl {
         $url =~ s|%DATASET%|$dataset|;
         $url =~ s|%DATASET_PARENT%|$parent|;
         if ( $url =~ /%(THREDDS_|UGLY_HACK)/ ){
-            $logger->debug("*** WMS URL before substitution: $url");
+            #$logger->debug("*** WMS URL before substitution: $url");
             my $metadata = $self->metadata(['dataref']);
             if (exists $metadata->{dataref}) {
 
@@ -462,7 +462,7 @@ sub wmsurl {
 
     }
 
-    $logger->debug("*** WMS URL after substitution: $url");
+    #$logger->debug("*** WMS URL after substitution: $url");
     return $url;
 
 }

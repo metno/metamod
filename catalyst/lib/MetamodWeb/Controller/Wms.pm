@@ -156,9 +156,7 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
     my $crs = $$para{'crs'} && delete $$para{'crs'};
     $c->detach( 'Root', 'error', [ 400, "Missing parameter 'crs' in request" ] ) unless defined($crs);
 
-    #my $foo = eval { $c->stash->{wmc}->old_gen_wmc($setup, $wms, $crs) };
-
-    # move processing stuff below to MetamodWeb::Utils::XML::WMC ... FIXME
+    # separate
     my (%wmsurls, %layers, @nodes, @areas);
     my $nsURI = 'http://www.met.no/schema/metamod/ncWmsSetup';
 
@@ -193,7 +191,7 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
 
     #print STDERR Dumper \@areas;
 
-    my $setopts = $self->_calculate_bounds(\@areas, $crs);
+    my $setopts = $c->stash->{wmc}->calculate_bounds(\@areas, $crs);
     $$setopts{time} = $$para{'time'};
 
     my $setup = defaultWMC($setopts);
@@ -203,10 +201,14 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
         $root->appendChild($_);
     }
 
-    #print STDERR $setup->toString(2);
+    print STDERR $setup->toString(1);
 
     my $wmc = eval { $c->stash->{wmc}->setup2wmc($setup) };
-    #$wmc->documentElement->appendChild($setup->documentElement); # uh, why? for debug?
+    $wmc->documentElement->appendChild(
+        XML::LibXML::Comment->new(
+            $setup->documentElement->toString(1)
+        )
+    ) if $self->logger->is_debug(); # uh, why? for debug?
     die " error: $@" if $@;
     my $out = $wmc->toString(1);
     # another hack to work around inexplainable duplicate namespace bug
@@ -218,68 +220,7 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
 
 }
 
-sub _calculate_bounds {
-    my ($self, $areas, $newcrs) = @_;
 
-    my (@x, @y); # coords of all points
-
-    my $to = Geo::Proj4->new( init => lc($newcrs) ) # stupid proj doesn't like upper case proj names
-        or die Geo::Proj4->error . " for $newcrs";
-    #my $to = _newProj( $newcrs ); # obsolete
-
-    foreach (@$areas) {
-        $self->logger->debug("WMS: Transforming bounds from $_->{'crs'} to $newcrs");
-        my $from = Geo::Proj4->new( init => lc($_->{'crs'}) ) or die Geo::Proj4->error;
-        #my $from = _newProj( $_->{'crs'} ); # obsolete
-
-        my @corners = ( # end points of bounding box
-            [ $_->{'left' }, $_->{'bottom'} ],
-            [ $_->{'left' }, $_->{'top'   } ],
-            [ $_->{'right'}, $_->{'bottom'} ],
-            [ $_->{'right'}, $_->{'top'   } ],
-        );
-
-        my @points;
-        while (@corners) { # compute mid points between each corner
-            my $p = shift @corners;
-            push @points, $p;
-            foreach (@corners) {
-                my $x = ( $p->[0] + $_->[0] ) / 2;
-                my $y = ( $p->[1] + $_->[1] ) / 2;
-                #print STDERR "++++++ x=$x y=$y +++++++++++++\n";
-                push @points, [$x, $y];
-            }
-        }
-
-        # call proj transformation
-        my $pr = $from->transform($to, \@points);
-        #print STDERR Dumper \@points, $pr;
-
-        # store all x's and y's so we later can find max and min
-        foreach (@$pr) {
-            push @x, $_->[0];
-            push @y, $_->[1];
-        }
-    }
-
-    #print STDERR 'x = ' . Dumper \@x;
-    #print STDERR 'y = ' . Dumper \@y;
-
-    #my ($left, $right, $top, $bottom);
-
-    my $setopts = {
-        crs    => $newcrs,
-        left   => min(@x),
-        right  => max(@x),
-        bottom => min(@y),
-        top    => max(@y),
-    };
-
-    #print STDERR "setopts = " . Dumper $setopts;
-
-    return $setopts;
-
-}
 
 # _newProj - some old stuff that were never used
 #

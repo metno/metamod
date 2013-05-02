@@ -299,16 +299,18 @@ sub wms :Path('/search/wms') :Args {
 
     my $dslist = [];
     my $para = $c->req->params->{ ds_id };
+    #print STDERR Dumper \$para;
     if ( ref $para ) { # more than one ds_id
         foreach ( @$para ) {
             my $ds = $c->model('Metabase::Dataset')->find($_);
             #printf STDERR " -- %d %s\n", $ds->ds_id, $ds->ds_name;
             push @$dslist, $ds;
         }
-    } else {
+    } elsif (defined $para) {
         my $ds = $c->model('Metabase::Dataset')->find($para);
         push @$dslist, $ds;
-    }
+    } # further processing handled by multiwmc if undefined
+    
     #print STDERR Dumper \$dslist;
     $c->stash( datasets => $dslist );
 

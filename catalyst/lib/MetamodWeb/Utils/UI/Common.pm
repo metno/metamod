@@ -54,6 +54,7 @@ text to display and the value is the link for the item.
 sub app_menu {
     my $self = shift;
 
+    # rewrite to use config->split() FIXME
     my $menu_items = $self->config->get('APP_MENU');
     my @items = split '\n', $menu_items;
 

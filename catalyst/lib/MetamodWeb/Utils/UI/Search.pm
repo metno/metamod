@@ -446,6 +446,8 @@ information about one metadata type that can be displayed in the search result.
 sub search_app_show_columns {
     my $self = shift;
 
+    # rewrite to use config->split() FIXME
+
     my $search_columns = $self->config->get('SEARCH_APP_SHOW_COLUMNS');
     $search_columns =~ s|^\n||; # skip initial blank line
     my @search_columns = split "\n", $search_columns;

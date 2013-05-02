@@ -303,6 +303,68 @@ sub setup2wmc {
 
 }
 
+=head2 calculate_bounds
+
+Calculate a common bounding box for a set of layers on a given projection
+
+=cut
+
+sub calculate_bounds {
+    my ($self, $areas, $newcrs) = @_;
+
+    my (@x, @y); # coords of all points
+
+    my $to = Geo::Proj4->new( init => lc($newcrs) ) # stupid proj doesn't like upper case proj names
+        or die Geo::Proj4->error . " for $newcrs";
+    #my $to = _newProj( $newcrs ); # obsolete
+
+    foreach (@$areas) {
+        $logger->debug("WMS: Transforming bounds from $_->{'crs'} to $newcrs");
+        my $from = Geo::Proj4->new( init => lc($_->{'crs'}) ) or die Geo::Proj4->error;
+        #my $from = _newProj( $_->{'crs'} ); # obsolete
+
+        my @corners = ( # end points of bounding box
+            [ $_->{'left' }, $_->{'bottom'} ],
+            [ $_->{'left' }, $_->{'top'   } ],
+            [ $_->{'right'}, $_->{'bottom'} ],
+            [ $_->{'right'}, $_->{'top'   } ],
+        );
+
+        my @points;
+        while (@corners) { # compute mid points between all corners
+            my $p = shift @corners;
+            push @points, $p;
+            foreach (@corners) {
+                my $x = ( $p->[0] + $_->[0] ) / 2;
+                my $y = ( $p->[1] + $_->[1] ) / 2;
+                #print STDERR "++++++ x=$x y=$y +++++++++++++\n";
+                push @points, [$x, $y];
+            }
+        }
+
+        # call proj transformation
+        my $pr = $from->transform($to, \@points);
+        #print STDERR Dumper \@points, $pr;
+
+        # store all x's and y's so we later can find max and min
+        foreach (@$pr) {
+            push @x, $_->[0];
+            push @y, $_->[1];
+        }
+    }
+
+    my $setopts = {
+        crs    => $newcrs,
+        left   => min(@x),
+        right  => max(@x),
+        bottom => min(@y),
+        top    => max(@y),
+    };
+
+    return $setopts;
+
+}
+
 =head1 LICENSE
 
 GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>

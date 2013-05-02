@@ -70,6 +70,7 @@ our @EXPORT = qw(logger param abandon getXML getMapURL getSetup outputXML defaul
 my $q = CGI->new;
 my $parser = XML::LibXML->new( load_ext_dtd => 0 );
 my $logger = get_logger('metamod.search');
+my $config = Metamod::Config->instance();
 #my $config = Metamod::Config->instance(); # can't use config since Metamod::DBIxSchema::Metabase::Result::Dataset fails... FIXME
 
 #sub new {
@@ -176,17 +177,21 @@ sub getMapURL {
     my $crs = shift or croak "Missing parameter 'crs'";
 
     ## impossible to use Metamod::Config here... SNAFU, giving up.... (copied from catalyst)
-    #my $config = Metamod::Config->instance();
+    my $config = Metamod::Config->instance();
     #my $mapurl = $config->get('WMS_BACKGROUND_MAPSERVER') . $config->get($mapconf);
 
-    my %coastlinemaps = ( # TODO: read from master_config... FIXME
-        "EPSG:4326"  => "http://wms.met.no/maps/world.map",
-        "EPSG:32661" => "http://wms.met.no/maps/northpole.map",
-        "EPSG:32761" => "http://wms.met.no/maps/southpole.map",
-		'EPSG:3995'  => "http://dev-vm070/backgroundmaps/northpole.map", # FIXME update with production servers
-		'EPSG:3031'  => "http://dev-vm070/backgroundmaps/southpole.map",
-    );
-    return $coastlinemaps{ $crs }; # yeah, it's a cop out...
+	my $proj = $config->split('WMS_PROJECTIONS');
+	print STDERR Dumper \$proj;
+
+    my $coastlinemaps = $config->split('WMS_MAPS');
+#	( # TODO: read from master_config... FIXME
+#        "EPSG:4326"  => "http://wms.met.no/maps/world.map",
+#        "EPSG:32661" => "http://wms.met.no/maps/northpole.map",
+#        "EPSG:32761" => "http://wms.met.no/maps/southpole.map",
+#		'EPSG:3995'  => "http://dev-vm070/backgroundmaps/northpole.map", # FIXME update with production servers
+#		'EPSG:3031'  => "http://dev-vm070/backgroundmaps/southpole.map",
+#    );
+    return $$coastlinemaps{ $crs }; # yeah, it's a cop out...
 }
 
 =head2 defaultWMC()
@@ -198,14 +203,15 @@ Dummy WMCsetup document - used when using GetCapabilities instead of setup file
 sub defaultWMC {
     my $p = shift; # probably should require CRS param
 
-    my %bbox = ( # WESN
-        'EPSG:4326'  => [ '-180', '180', '-90', '90' ],
-        'EPSG:32661' => [ '-3000000', '7000000', '-3000000', '7000000' ],
-        #'EPSG:32761' => [ "-1.99038e+08", "1.66053e+08", "-9.12659e+07", "1.97215e+08" ],
-        'EPSG:32761' => [ "-3000000", "7000000", "-3000000", "7000000" ],
-        'EPSG:3995'  => [ '-5000000', '5000000', '-5000000', '5000000' ],
-        'EPSG:3031'  => [ "-5000000", "5000000", "-5000000", "5000000" ],
-    );
+    my %bbox = $config->split('WMS_BOUNDING_BOXES');
+#	( # WESN
+#        'EPSG:4326'  => [ '-180', '180', '-90', '90' ],
+#        'EPSG:32661' => [ '-3000000', '7000000', '-3000000', '7000000' ],
+#        #'EPSG:32761' => [ "-1.99038e+08", "1.66053e+08", "-9.12659e+07", "1.97215e+08" ],
+#        'EPSG:32761' => [ "-3000000", "7000000", "-3000000", "7000000" ],
+#        'EPSG:3995'  => [ '-5000000', '5000000', '-5000000', '5000000' ],
+#        'EPSG:3031'  => [ "-5000000", "5000000", "-5000000", "5000000" ],
+#    );
 
     my $layername = 'world'; # that's how it's called on wms.met.no... FIXME
 
