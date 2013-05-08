@@ -270,6 +270,23 @@ sub get {
     return $self->_substituteVariable($var); # OK, where is the warning triggered?
 }
 
+=head2 getall
+
+returns all configuration variables as a hash
+
+=cut
+
+sub getall {
+    my ($self) = @_;
+
+    $self->_checkFile();
+    my %vars;
+    foreach (keys $self->{vars}) {
+        $vars{$_} = $self->_substituteVariable($_)
+    }
+    return \%vars;
+}
+
 =head2 has("configVar")
 
 return true if the configuration variable configVar is currently set. This will reread the
