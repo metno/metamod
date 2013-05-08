@@ -61,6 +61,7 @@ my $vars;
 my $mm_config = Metamod::Config->new($config_file_or_dir, { nolog => 1 } );
 
 if (defined $var) {
+    missing($var) unless $mm_config->has($var);
     if ($split) {
         $vars = $mm_config->split($var);
     } else {
@@ -80,6 +81,12 @@ foreach (sort keys %$vars) {
 
 sub usage {
     print STDERR "Usage: $0 [--config <config file or dir>] [--split] [<variable>]\n";
+    exit (1);
+}
+
+sub missing {
+    my $var = shift or die;
+    print STDERR "Variable $var is not defined\n";
     exit (1);
 }
 
