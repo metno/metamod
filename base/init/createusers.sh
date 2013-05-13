@@ -22,7 +22,7 @@ check "PG_ADMIN_USER"
 check "PG_WEB_USER"
 
 echo "Creating admin user $PG_ADMIN_USER"
-createuser -e --username=postgres --adduser --createrole --createdb $PG_ADMIN_USER
+createuser -e --username=postgres --adduser --createrole --createdb --superuser $PG_ADMIN_USER
 ordie "Couldn't create user $PG_ADMIN_USER"
 
 echo "Creating web user $PG_WEB_USER"
