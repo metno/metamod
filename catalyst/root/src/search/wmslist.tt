@@ -25,7 +25,7 @@
                 [%  # get list from Metamod::WMS
                     jslines = [];
                     FOR p IN projections.keys.sort;
-                        jslines.push("'" _ p _"': '" _ projections.$p.0 _ "'");
+                        jslines.push("'" _ p _"': '" _ p _ ' - '_ projections.$p _ "'");
                     END;
                     jslines.join(",\n");
                 %]
@@ -54,7 +54,7 @@
                 // add all projections common to all layers into selector
                 for (pc in projCount) {
                     //log.debug('** ' + pc + ' = ' + projCount[pc] + ' of ' + allLayers.length);
-                    if (pc == "CRS:84"){ 
+                    if (pc == "CRS:84"){
                         continue;  // not a proper projection
                     }
                     if ( projCount[pc] == allLayers.length ) {

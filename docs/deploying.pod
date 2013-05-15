@@ -102,9 +102,9 @@ required for the base application must be done after the initial steps
 
 =head3 Authentication (FIXME)
 
-Change local ident to trust in pg_hba.conf:
+Change local ident to trust in pg_hba.conf (replace 9.1 with correct version):
 
-    $ $EDITOR /etc/postgresql/8.4/main/pg_hba.conf
+    $ $EDITOR /etc/postgresql/9.1/main/pg_hba.conf
     change local ident to trust
 
     # Database administrative login by UNIX sockets
@@ -147,7 +147,7 @@ environment.
 
 The first SQL database initialization script will create the Meta database.
 
-	create_and_load_all.sh
+	base/init/create_and_load_all.sh
 
 This script will create the database, and load the static content of the database (taken from
 C<staticdata/searchdata.xml>). You may check the output of this script in the
@@ -155,7 +155,7 @@ C<create_and_load_all.out> file in the directory where you are running the comma
 
 The next SQL database initialization script will create the User database.
 
-	run_createuserdb.sh
+	base/init/run_createuserdb.sh
 
 Note that I<this script must only be used during setup of a completely new
 METAMOD cluster>. If a User database already exists, all data in the database

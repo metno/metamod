@@ -1,7 +1,10 @@
 #!/bin/bash
 
+IMP=import
+echo Changing to `dirname $0`
 cd `dirname $0`
 SCRIPT_PATH=`pwd`
+echo SCRIPT_PATH=\"$SCRIPT_PATH\"
 
 CONFIG=$1
 # config must be set in $METAMOD_MASTER_CONFIG envvar if not given as command line param
@@ -24,7 +27,7 @@ fi
 SRUSCHEMA="$SCRIPT_PATH/sruSchema.sql"
 
 # tsearch removed from Postgresql 8.3 onwards, won't work under 9.1
-check "PG_TSEARCH2_SCRIPT" 1
+#check "PG_TSEARCH2_SCRIPT" 1
 check "PG_POSTGIS_SCRIPT" 1
 check "PG_POSTGIS_SYSREF_SCRIPT" 1
 check "SRUSCHEMA" 1
@@ -71,12 +74,12 @@ DROP FUNCTION IF EXISTS to_mmDefault_tsquery(text);
 DROP LANGUAGE IF EXISTS plpgsql;
 
 -- allow full-text search
--- pg < 8.2
-GRANT SELECT ON pg_ts_cfg TO $PG_WEB_USER;
-GRANT SELECT ON pg_ts_cfgmap TO $PG_WEB_USER;
--- pg >= 8.3
 GRANT SELECT ON pg_ts_config TO $PG_WEB_USER;
 GRANT SELECT ON pg_ts_config_map TO $PG_WEB_USER;
+-- for use with PostgreSQL 8.2 and earlier, replace lines above with the following:
+-- GRANT SELECT ON pg_ts_cfg TO $PG_WEB_USER;
+-- GRANT SELECT ON pg_ts_cfgmap TO $PG_WEB_USER;
+
 -- all pg
 GRANT SELECT ON pg_ts_parser TO $PG_WEB_USER;
 GRANT SELECT ON pg_ts_dict TO $PG_WEB_USER;

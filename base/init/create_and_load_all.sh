@@ -1,11 +1,14 @@
 #!/bin/bash
 
 IMP=import
+echo Changing to `dirname $0`
 cd `dirname $0`
 SCRIPT_PATH=`pwd`
+echo SCRIPT_PATH=\"$SCRIPT_PATH\"
+
 if [ $# -eq 1 ]
 then
-	CONFIG=$1
+    CONFIG=$1
 elif [ $# -eq 2 ]
 then
     CONFIG=$1
@@ -25,7 +28,9 @@ fi
 cd $CONFIG
 
 SHELL_CONF=/tmp/metamod_tmp_bash_config.sh
-perl "$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
+PERLCONF="$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl"
+echo Running $PERLCONF
+perl $PERLCONF ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
 source $SHELL_CONF
 rm $SHELL_CONF
 
@@ -39,10 +44,11 @@ DROPDB=dropdb
 #
 exec >create_and_load_all.out 2>&1
 echo "------------ Reinitialize the database, create dynamic tables:"
-. $SCRIPT_PATH/createdb.sh $CONFIG
+# createdb must be run and not sourced otherwise paths will be screwed up
+$SCRIPT_PATH/createdb.sh $CONFIG
 echo ""
 echo "------------ Importing searchdata:"
-PERL5LIB=$PERL5LIB:/opt/metno-perl-webdev-ver1/lib/perl5
+#PERL5LIB=$PERL5LIB:/opt/metno-perl-webdev-ver1/lib/perl5
 
 $SCRIPT_PATH/import_searchdata.pl ${CONFIG:+"--config"} $CONFIG
 

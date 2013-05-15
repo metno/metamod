@@ -130,11 +130,6 @@ PG_PORT = 5432
 # database:
 PG_CONNECTSTRING_SHELL = --host [==PG_HOST==] --port [==PG_PORT==]
 
-#OBSOLETE
-## String used in PHP db_Connect function to connect to the
-## database:
-#PG_CONNECTSTRING_PHP = host=[==PG_HOST==] port=[==PG_PORT==]
-
 # String used in Perl DBI->connect function to connect to the
 # database:
 PG_CONNECTSTRING_PERL = ;host=[==PG_HOST==];port=[==PG_PORT==]
@@ -145,19 +140,30 @@ PG_CONNECTSTRING_PERL = ;host=[==PG_HOST==];port=[==PG_PORT==]
 #PG_CONTRIB = /usr/share/postgresql/8.3/contrib
 # For Lucid:
 #PG_CONTRIB = /usr/share/postgresql/8.4/contrib
+# For Precise:
+#PG_CONTRIB = /usr/share/postgresql/9.1/contrib
 
 # the location of the initialization sql-script for the full-text facilities
-PG_TSEARCH2_SCRIPT = [==PG_CONTRIB==]/tsearch2.sql
+# For Hardy and Lucid:
+#PG_TSEARCH2_SCRIPT = [==PG_CONTRIB==]/tsearch2.sql
+# For Precise it no longer exists and must be blank:
+#PG_TSEARCH2_SCRIPT =
 
 # the location of the initialization sql-script for postGIS
+# For Hardy:
 #PG_POSTGIS_SCRIPT = /usr/share/postgresql-8.3-postgis/lwpostgis.sql
-#PG_POSTGIS_SCRIPT = /usr/share/postgresql/8.4/contrib/postgis.sql
+# For Lucid:
+#PG_POSTGIS_SCRIPT = [==PG_CONTRIB==]/postgis.sql
+# For Precise:
+#PG_POSTGIS_SCRIPT = [==PG_CONTRIB==]/postgis-1.5/postgis.sql
 
 # the Coordinate System References
 # For Hardy:
 #PG_POSTGIS_SYSREF_SCRIPT = /usr/share/postgresql-8.3-postgis/spatial_ref_sys.sql
 # For Lucid:
-#PG_POSTGIS_SYSREF_SCRIPT = /usr/share/postgresql/8.4/contrib/spatial_ref_sys.sql
+#PG_POSTGIS_SYSREF_SCRIPT = [==PG_CONTRIB==]/postgis-2.0/spatial_ref_sys.sql
+# For Precise:
+#PG_POSTGIS_SYSREF_SCRIPT = [==PG_CONTRIB==]/postgis-1.5/spatial_ref_sys.sql
 
 # additional coordinate systems, retrieve from e.g. : http://spatialreference.org
 PG_POSTGIS_ADDITIONAL_SYSREF =
@@ -250,7 +256,11 @@ FIMEX_PROGRAM = fimex
 #WMS_SOUTHPOLE_MAP = southpole.map
 #WMS_WORLD_MAP     = world.map
 
-# list of supported projections
+# enable these to use WMS dynamic maps in search interface
+#SEARCH_NORTHPOLE_MAP = http://wms.example.com/maps/northpole.map
+#SEARCH_SOUTHPOLE_MAP = http://wms.example.com/maps/southpole.map
+
+# list of supported projections (with names from spatialreference.org)
 WMS_PROJECTIONS =
     'EPSG:32661' 'WGS 84 / UPS North'
     'EPSG:32761' 'WGS 84 / UPS South'
@@ -263,13 +273,13 @@ WMS_PROJECTIONS =
     'EPSG:3995'  'WGS 84 / Arctic Polar Stereographic'
     'EPSG:3031'  'WGS 84 / Antarctic Polar Stereographic'
 
-# urls to WMS background maps (update with production servers... FIXME)
-WMS_MAPS =
-    'EPSG:32661' 'http://wms.met.no/maps/northpole.map'
-    'EPSG:32761' 'http://wms.met.no/maps/southpole.map'
-    'EPSG:4326'  'http://wms.met.no/maps/world.map'
-    'EPSG:3995'  "http://dev-vm070/backgroundmaps/northpole.map"
-    'EPSG:3031'  "http://dev-vm070/backgroundmaps/southpole.map"
+# urls to WMS background maps
+#WMS_MAPS =
+#    'EPSG:32661' 'http://wms.example.com/maps/northpole.map'
+#    'EPSG:32761' 'http://wms.example.com/maps/southpole.map'
+#    'EPSG:4326'  'http://wms.example.com/maps/world.map'
+#    'EPSG:3995'  "http://wms.example.com/maps/northpole.map"
+#    'EPSG:3031'  "http://wms.example.com/maps/southpole.map"
 
 # bounding boxes for each projection
 WMS_BOUNDING_BOXES =

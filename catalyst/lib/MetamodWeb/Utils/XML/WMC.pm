@@ -27,7 +27,6 @@ use namespace::autoclean;
 use XML::LibXML::XPathContext;
 use Metamod::WMS;
 use Log::Log4perl qw(get_logger);
-#use Metamod::Config qw(getProjMap);
 use List::Util qw(min max sum);
 use Carp;
 use Data::Dumper;
@@ -210,10 +209,8 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
     #
     # copy background map layers to wmc
     #
-    if ( $nobaselayer and (my $mapconf = getProjMap( $bbox{'crs'} )) ) {
+    if ( $nobaselayer and (my $mapurl = getMapURL( $bbox{'crs'} )) ) {
         $logger->debug("*** Getting map for " . $bbox{'crs'});
-
-        my $mapurl = getMapURL( $bbox{'crs'} );
 
         my $mapdoc = $self->_gen_wmc($mapurl, \%bbox);
         my $mapxc = XML::LibXML::XPathContext->new( $mapdoc ); # getcapabilities xpath context

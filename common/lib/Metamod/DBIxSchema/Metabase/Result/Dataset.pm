@@ -9,7 +9,7 @@ use Data::Dumper;
 use Metamod::Config;
 use Log::Log4perl qw();
 use Metamod::FimexProjections;
-use Metamod::WMS qw(getProjMap getXML); # remove this FIXME
+use Metamod::WMS qw(getXML getMapURL); # remove this FIXME
 
 my $logger = Log::Log4perl::get_logger(__PACKAGE__);
 
@@ -552,8 +552,9 @@ sub wmsthumb { # TODO - move this somewhere else so we can use config runtime in
             . ($time ? "&TIME=$time" : '');
 
         # get map url's according to projection
-        my $mapconf = getProjMap( $area{crs} ); # get map name in config
-        my $mapurl = $mapconf ? $config->get('WMS_BACKGROUND_MAPSERVER') . $config->get($mapconf) : undef;
+        #my $mapconf = getProjMap( $area{crs} ); # get map name in config
+        #my $mapurl = $mapconf ? $config->get('WMS_BACKGROUND_MAPSERVER') . $config->get($mapconf) : undef;
+        my $mapurl = getMapURL( $area{crs} );
 
         #print STDERR Dumper($wms_url, \%area, \%layer, \$mapurl); #$metadata
 

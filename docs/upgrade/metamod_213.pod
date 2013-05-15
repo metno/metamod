@@ -1,23 +1,65 @@
 =head1 Upgrading to METAMOD 2.13 from 2.12
 
+=head2 PostgreSQL 9.1
+
+METAMOD now supports creating databases on servers running PostgreSQL 9.1.
+Previous versions only supported running v.9 clients against v.8 servers.
+
+Support for PostgreSQL 8.2 and earlier have been disabled to avoid unneccessary errors,
+but may be reenabled by editing F<base/init/createdb.sh> (ca. line 80).
+
 =head2 Dependency libraries
 
 Metamod now contains all necessary Perl dependencies either in the Debian package,
 or for building via Carton.
 
-  $ carton install
+  $ carton install --deployment
 
-You must set your PERL5LIB to point to metamod/local/lib
+You must also set your PERL5LIB to point to F<metamod/local/lib> in master_config:
 
-=head2 Configuration settings
+  CATALYST_LIB = /opt/metno-metamod-2.12/local/lib
 
-
-=head3 PERL5LIB
-
-Setting CATALYST_LIB to metamod/local/lib
+=head2 WMS configuration settings
 
 =head3 Dynamic map search
 
-SEARCH_NORTHPOLE_MAP = http://dev-vm070/backgroundmaps/northpole.map
-SEARCH_SOUTHPOLE_MAP = http://dev-vm070/backgroundmaps/southpole.map
+The static maps in the search interface have now been (optionally) replaced with
+dynamic WMS maps. To enable these, add the WMS URLS to master_config:
 
+  SEARCH_NORTHPOLE_MAP = http://wms.example.com/maps/northpole.map
+  SEARCH_SOUTHPOLE_MAP = http://wms.example.com/maps/southpole.map
+
+This feature may be changed when other projections become available.
+
+=head3 WMS background map configuration
+
+The WMS background map configuration, which due to technical difficulties was hardcoded in earlier versions
+have now been moved to master_config.
+
+The following directives have been deprecated:
+
+=over 4
+
+=item WMS_BACKGROUND_MAPSERVER
+
+=item WMS_NORTHPOLE_MAP
+
+=item WMS_SOUTHPOLE_MAP
+
+=item WMS_WORLD_MAP
+
+=back
+
+Instead the URLs must now be specified in master_config under WMS_MAPS for each desired projection:
+
+  WMS_MAPS =
+      'EPSG:32661' 'http://wms.example.com/maps/northpole.map'
+      'EPSG:32761' 'http://wms.example.com/maps/southpole.map'
+      'EPSG:4326'  'http://wms.example.com/maps/world.map'
+      'EPSG:3995'  "http://wms.example.com/maps/northpole.map"
+      'EPSG:3031'  "http://wms.example.com/maps/southpole.map"
+
+If WMS_MAPS is not defined, it will fall back to using the deprecated directives listed previously.
+
+Names and bounding boxes are defined in default_config.txt under WMS_PROJECTIONS and WMS_BOUNDING_BOXES,
+but may be overridden in master_config.
