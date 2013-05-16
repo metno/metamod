@@ -163,21 +163,27 @@ Run tests from command line
 
 sub run {
     my $self = shift;
-    test();
+    my $file = shift @ARGV;
+    if ($file) {
+        test($file);
+    } else {
+        print STDERR "Usage: perl $0 <xmlfile>\n";
+    }
 }
 
 sub test {
+    my $file = shift or die;
     #my $config = Metamod::Config->new();
 
     my $editor = Metamod::MetadataEditor->new('met-master');
 
-    my $xml = $editor->download_mmd('topaz-operational');
+    my $xml = $editor->download_mmd('osisaf_ice_drift_north');
     my $doc2 = Metamod::MMD->new($xml)->mm2;
     print $doc2->toString(1);
 
-    my $doc = Metamod::MMD->new('/home/geira/metamod/webrun/XML/catnip/proff.xml')->mmd;
+    my $doc = Metamod::MMD->new($file)->mmd;
     #print "****\n" . $doc->toString(1);
-    my $GUI_url = $editor->upload_mmd('proff-test', $doc->toString);
+    my $GUI_url = $editor->upload_mmd(`basename $file`, $doc->toString);
     print STDERR $GUI_url;
 
 }
