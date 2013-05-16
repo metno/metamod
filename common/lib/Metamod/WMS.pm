@@ -232,7 +232,7 @@ sub defaultWMC {
     my $bgurl = getMapURL($crs); # 'http://wms.met.no/maps/world.map';
     my $baselayer = $bgurl ? qq|<w:baselayer url="$bgurl" name="$layername" />| : ''; #
 
-    print STDERR "*** $crs *** $bgurl ***\n" . Dumper $$bbox{$crs};
+    #print STDERR "*** $crs *** $bgurl ***\n" . Dumper $$bbox{$crs};
 
     my $default_wmc = <<EOT;
 <?xml version="1.0"?>
