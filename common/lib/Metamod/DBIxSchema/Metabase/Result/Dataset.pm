@@ -277,7 +277,7 @@ sub xmlfile {
         # FIXME write correct path to metabase TODO
     }
     $path .= '.xml';
-    $logger->debug("Reading XML file for dataset " . $self->ds_id() . " in $path ...");
+    #$logger->debug("Reading XML file for dataset " . $self->ds_id() . " in $path ...");
     return $path if -r $path;
 }
 
@@ -440,7 +440,7 @@ sub wmsurl {
 
                 my $dataref = $metadata->{dataref}[0];
                 # %THREDDS_DATAREF% translates OSISAF-like THREDDS URLs into WMS URLs... DEPRECATED
-                $logger->debug("*** dataref: $dataref");
+                #$logger->debug("*** dataref: $dataref");
                 unless ( $dataref =~ m|(.*/thredds)/catalog/.*\?dataset=(.*)| ) {
                     $logger->warn("Missing dataset ID in dataref $dataref");
                     return;

@@ -125,7 +125,8 @@ sub display_search_criteria : Path('/search') : Args(1) {
     }
 
     $c->stash( template => 'search/search_criteria.tt',
-               active_criteria => $active_criteria
+               active_criteria => $active_criteria,
+               mapURLs => Metamod::WMS::bgmapURLs(),
     );
 }
 
@@ -310,7 +311,7 @@ sub wms :Path('/search/wms') :Args {
         my $ds = $c->model('Metabase::Dataset')->find($para);
         push @$dslist, $ds;
     } # further processing handled by multiwmc if undefined
-    
+
     #print STDERR Dumper \$dslist;
     $c->stash( datasets => $dslist );
 

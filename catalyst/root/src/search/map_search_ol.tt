@@ -62,12 +62,22 @@ var currentProj = "[% c.req().param('selected_map') || 3995 %]";
 log.debug("Current projection is " + currentProj);
 
 var maps = {
-    "EPSG:32661": "http://wms.met.no/maps/northpole.map",
-    "EPSG:32761": "http://wms.met.no/maps/southpole.map",
-    "EPSG:4326" : "http://wms.met.no/maps/world.map",
-    "EPSG:3995": "[% mm_config.get('SEARCH_NORTHPOLE_MAP') %]",
-    "EPSG:3031": "[% mm_config.get('SEARCH_SOUTHPOLE_MAP') %]"
+    //"EPSG:32661": "http://wms.met.no/maps/northpole.map",
+    //"EPSG:32761": "http://wms.met.no/maps/southpole.map",
+    //"EPSG:4326" : "http://wms.met.no/maps/world.map",
+    //"EPSG:3995": "[% mm_config.get('SEARCH_NORTHPOLE_MAP') %]",
+    //"EPSG:3031": "[% mm_config.get('SEARCH_SOUTHPOLE_MAP') %]"
+
+    [%  # get list from Metamod::WMS
+        jslines = [];
+        FOR p IN mapURLs.keys.sort;
+            jslines.push("'" _ p _"': '" _ mapURLs.$p _ "'");
+        END;
+        jslines.join(",\n");
+    %]
 }
+
+log.debug(maps);
 
 jQuery(function() {
     loadMap(currentProj);

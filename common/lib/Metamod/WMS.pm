@@ -61,7 +61,7 @@ use Metamod::Config;
 use Data::Dumper;
 use Hash::Util qw{ lock_hash  unlock_hash };
 
-our @EXPORT = qw(logger param abandon getXML getMapURL getSetup outputXML defaultWMC getProjName getProjString);
+our @EXPORT = qw(logger param abandon getXML getMapURL getSetup outputXML defaultWMC getProjName getProjString bgmapURLs);
 
 ####################
 # init
@@ -180,23 +180,23 @@ TODO: read from master_config (not working... FIXME)
 sub getMapURL {
     my $crs = shift or croak "Missing parameter 'crs'";
 
-	my %mapconfig = (
+    my %mapconfig = (
         "EPSG:4326"  => "WMS_WORLD_MAP",
         "EPSG:32661" => "WMS_NORTHPOLE_MAP",
         "EPSG:32761" => "WMS_SOUTHPOLE_MAP",
-	);
-	
+    );
+
     #my $config = Metamod::Config->instance();
     my $mapurl = $$coastlinemaps{ $crs } ||
-		$config->get('WMS_BACKGROUND_MAPSERVER') . $config->get( $mapconfig{$crs} );
+        $config->get('WMS_BACKGROUND_MAPSERVER') . $config->get( $mapconfig{$crs} );
 
     #my $coastlinemaps = $config->split('WMS_MAPS');
-#	( # TODO: read from master_config... FIXME
+#    ( # TODO: read from master_config... FIXME
 #        "EPSG:4326"  => "http://wms.met.no/maps/world.map",
 #        "EPSG:32661" => "http://wms.met.no/maps/northpole.map",
 #        "EPSG:32761" => "http://wms.met.no/maps/southpole.map",
-#		'EPSG:3995'  => "http://dev-vm070/backgroundmaps/northpole.map", # FIXME update with production servers
-#		'EPSG:3031'  => "http://dev-vm070/backgroundmaps/southpole.map",
+#        'EPSG:3995'  => "http://dev-vm070/backgroundmaps/northpole.map", # FIXME update with production servers
+#        'EPSG:3031'  => "http://dev-vm070/backgroundmaps/southpole.map",
 #    );
     return $mapurl;
 }
@@ -211,7 +211,7 @@ sub defaultWMC {
     my $p = shift; # probably should require CRS param
 
     #my %bbox = $config->split('WMS_BOUNDING_BOXES');
-#	( # WESN
+#    ( # WESN
 #        'EPSG:4326'  => [ '-180', '180', '-90', '90' ],
 #        'EPSG:32661' => [ '-3000000', '7000000', '-3000000', '7000000' ],
 #        #'EPSG:32761' => [ "-1.99038e+08", "1.66053e+08", "-9.12659e+07", "1.97215e+08" ],
@@ -245,27 +245,27 @@ sub defaultWMC {
 </w:ncWmsSetup>
 EOT
 
-	#print STDERR $default_wmc;
+    #print STDERR $default_wmc;
 
     return $parser->parse_string($default_wmc) or die "Error in parsing default WMC";
 }
 
 #my %projections = (
-#	# in future, use WMS_PROJECTIONS in master_config instead of this hardcoded list
-#	# currently not possible to access master_config at compile time
+#    # in future, use WMS_PROJECTIONS in master_config instead of this hardcoded list
+#    # currently not possible to access master_config at compile time
 #
 #    # supported since 2.5.0
-#	'EPSG:32661' => ['WGS 84 / UPS North', 'WMS_NORTHPOLE_MAP'],
+#    'EPSG:32661' => ['WGS 84 / UPS North', 'WMS_NORTHPOLE_MAP'],
 #    'EPSG:32761' => ['WGS 84 / UPS South', 'WMS_SOUTHPOLE_MAP'],
 #    'EPSG:4326'  => ['WGS 84', 'WMS_WORLD_MAP'],
 #
-#	'EPSG:3995' => ['WGS 84 / Arctic Polar Stereographic', 'WMS_NORTHPOLE_MAP'],
+#    'EPSG:3995' => ['WGS 84 / Arctic Polar Stereographic', 'WMS_NORTHPOLE_MAP'],
 #    'EPSG:3031' => ['WGS 84 / Antarctic Polar Stereographic', 'WMS_SOUTHPOLE_MAP'],
 #
-#	# (hopefully) supported in 2.12.2
-#	'EPSG:3408'  => ['NSIDC EASE-Grid North'],
-#	'EPSG:3409'  => ['NSIDC EASE-Grid South'],
-#	'EPSG:3410'  => ['NSIDC EASE-Grid Global'],
+#    # (hopefully) supported in 2.12.2
+#    'EPSG:3408'  => ['NSIDC EASE-Grid North'],
+#    'EPSG:3409'  => ['NSIDC EASE-Grid South'],
+#    'EPSG:3410'  => ['NSIDC EASE-Grid Global'],
 #    'EPSG:3411'  => ['NSIDC Sea Ice Polar Stereographic North'],
 #    'EPSG:3412'  => ['NSIDC Sea Ice Polar Stereographic South'],
 #    'EPSG:3413'  => ['WGS 84 / NSIDC Sea Ice Polar Stereographic North'],
@@ -286,7 +286,7 @@ Look up a descriptive name for a given EPSG code
 sub getProjName {
     my $code = shift or die;
     #return $projections{$code}->[0];
-	return $$proj{$code};
+    return $$proj{$code};
 }
 
 =head2 getProjMap()
@@ -312,7 +312,18 @@ sub projList {
     #print STDERR Dumper \%projections;
     use Clone qw(clone); # TT seems to mess up data structure, so best copy it
     #return clone \%projections;
-	return clone $proj;
+    return clone $proj;
+}
+
+=head2 bgmapURLs
+
+Return the list of defined WMS background map URLs
+
+=cut
+
+sub bgmapURLs {
+    use Clone qw(clone); # TT seems to mess up data structure, so best copy it
+    return clone $coastlinemaps;
 }
 
 1;
