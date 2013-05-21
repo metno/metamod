@@ -180,24 +180,19 @@ TODO: read from master_config (not working... FIXME)
 sub getMapURL {
     my $crs = shift or croak "Missing parameter 'crs'";
 
+    $logger->debug("Getting map URL for $crs");
+
+    return $$coastlinemaps{ $crs }  if defined $$coastlinemaps{ $crs };
+
+    # fallback to deprecated method if WMS_MAPS is not defined
     my %mapconfig = (
         "EPSG:4326"  => "WMS_WORLD_MAP",
         "EPSG:32661" => "WMS_NORTHPOLE_MAP",
         "EPSG:32761" => "WMS_SOUTHPOLE_MAP",
     );
+    return unless defined $mapconfig{$crs}; # some projections will always lack background maps
 
-    #my $config = Metamod::Config->instance();
-    my $mapurl = $$coastlinemaps{ $crs } ||
-        $config->get('WMS_BACKGROUND_MAPSERVER') . $config->get( $mapconfig{$crs} );
-
-    #my $coastlinemaps = $config->split('WMS_MAPS');
-#    ( # TODO: read from master_config... FIXME
-#        "EPSG:4326"  => "http://wms.met.no/maps/world.map",
-#        "EPSG:32661" => "http://wms.met.no/maps/northpole.map",
-#        "EPSG:32761" => "http://wms.met.no/maps/southpole.map",
-#        'EPSG:3995'  => "http://dev-vm070/backgroundmaps/northpole.map", # FIXME update with production servers
-#        'EPSG:3031'  => "http://dev-vm070/backgroundmaps/southpole.map",
-#    );
+    my $mapurl = $config->get('WMS_BACKGROUND_MAPSERVER') . $config->get( $mapconfig{$crs} );
     return $mapurl;
 }
 
@@ -209,16 +204,6 @@ Dummy WMCsetup document - used when using GetCapabilities instead of setup file
 
 sub defaultWMC {
     my $p = shift; # probably should require CRS param
-
-    #my %bbox = $config->split('WMS_BOUNDING_BOXES');
-#    ( # WESN
-#        'EPSG:4326'  => [ '-180', '180', '-90', '90' ],
-#        'EPSG:32661' => [ '-3000000', '7000000', '-3000000', '7000000' ],
-#        #'EPSG:32761' => [ "-1.99038e+08", "1.66053e+08", "-9.12659e+07", "1.97215e+08" ],
-#        'EPSG:32761' => [ "-3000000", "7000000", "-3000000", "7000000" ],
-#        'EPSG:3995'  => [ '-5000000', '5000000', '-5000000', '5000000' ],
-#        'EPSG:3031'  => [ "-5000000", "5000000", "-5000000", "5000000" ],
-#    );
 
     my $layername = 'world'; # that's how it's called on wms.met.no... FIXME
 
@@ -250,33 +235,6 @@ EOT
     return $parser->parse_string($default_wmc) or die "Error in parsing default WMC";
 }
 
-#my %projections = (
-#    # in future, use WMS_PROJECTIONS in master_config instead of this hardcoded list
-#    # currently not possible to access master_config at compile time
-#
-#    # supported since 2.5.0
-#    'EPSG:32661' => ['WGS 84 / UPS North', 'WMS_NORTHPOLE_MAP'],
-#    'EPSG:32761' => ['WGS 84 / UPS South', 'WMS_SOUTHPOLE_MAP'],
-#    'EPSG:4326'  => ['WGS 84', 'WMS_WORLD_MAP'],
-#
-#    'EPSG:3995' => ['WGS 84 / Arctic Polar Stereographic', 'WMS_NORTHPOLE_MAP'],
-#    'EPSG:3031' => ['WGS 84 / Antarctic Polar Stereographic', 'WMS_SOUTHPOLE_MAP'],
-#
-#    # (hopefully) supported in 2.12.2
-#    'EPSG:3408'  => ['NSIDC EASE-Grid North'],
-#    'EPSG:3409'  => ['NSIDC EASE-Grid South'],
-#    'EPSG:3410'  => ['NSIDC EASE-Grid Global'],
-#    'EPSG:3411'  => ['NSIDC Sea Ice Polar Stereographic North'],
-#    'EPSG:3412'  => ['NSIDC Sea Ice Polar Stereographic South'],
-#    'EPSG:3413'  => ['WGS 84 / NSIDC Sea Ice Polar Stereographic North'],
-#    'EPSG:3995'  => ['WGS 84 / Arctic Polar Stereographic'],
-#    'EPSG:32633' => ['WGS 84 / UTM zone 33N'],
-#
-#);
-
-# we don't want templates to mess up the list by adding junk which will persist to next request
-#lock_hash(%projections); # breaks in TT when projs.key is used as hash key instead of method
-
 =head2 getProjName()
 
 Look up a descriptive name for a given EPSG code
@@ -288,19 +246,6 @@ sub getProjName {
     #return $projections{$code}->[0];
     return $$proj{$code};
 }
-
-=head2 getProjMap()
-
-Look up a WMS url for any background map configured for a given EPSG code
-
-B<DISABLED> - use getMapURL() instead
-
-=cut
-
-#sub getProjMap {
-#    my $code = shift or die;
-#    return $projections{$code}->[1];
-#}
 
 =head2 projList()
 

@@ -552,8 +552,6 @@ sub wmsthumb { # TODO - move this somewhere else so we can use config runtime in
             . ($time ? "&TIME=$time" : '');
 
         # get map url's according to projection
-        #my $mapconf = getProjMap( $area{crs} ); # get map name in config
-        #my $mapurl = $mapconf ? $config->get('WMS_BACKGROUND_MAPSERVER') . $config->get($mapconf) : undef;
         my $mapurl = getMapURL( $area{crs} );
 
         #print STDERR Dumper($wms_url, \%area, \%layer, \$mapurl); #$metadata

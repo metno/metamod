@@ -147,7 +147,7 @@ sub transform_POST {
     $MetNo::Fimex::DEBUG = 0; # turn off debug or nothing will happen
 
     my $p = $c->request->params;
-    printf STDERR Dumper \$p;
+    #printf STDERR Dumper \$p;
 
     my %fiParams = (
         dapURL => $c->stash->{dapurl},

@@ -66,7 +66,7 @@ sub map : Path('/search/map') : Args(1) {
     # of using Imager. Read the image bytes and serve them.
     if ( !$x1 && !$y1 ) {
 
-        open my $IMAGE, '<', $c->path_to("/root/static/images/map_$image_srid.png") or die $!;
+        open my $IMAGE, '<', $c->path_to("/root/static/images/map_$image_srid.png") or $c->detach( 'Root', 'error', [404, $@] ); # die $!;
         my $image_bytes = do { local $/; <$IMAGE> };
 
         $c->response->body($image_bytes);
@@ -74,7 +74,7 @@ sub map : Path('/search/map') : Args(1) {
     }
 
     my $image = Imager->new();
-    $image->read( file => $c->path_to("/root/static/images/map_$image_srid.png") ) or die $image->errstr();
+    $image->read( file => $c->path_to("/root/static/images/map_$image_srid.png") ) or  $c->detach( 'Root', 'error', [404,  $image->errstr()] ); # die $image->errstr();
 
     # have only the first x,y pair so mark it on the map.
     if ( $x1 && $y1 && !( $x2 && $y2 ) ) {
