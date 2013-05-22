@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use DBIx::Class::QueryLog::Analyzer;
 use Moose::Role;
 use Try::Tiny;
+use Data::Dumper;
 use namespace::autoclean;
 
 =head1 NAME
@@ -56,7 +57,7 @@ after 'execute' => sub {
         require SQL::Beautify;
         $beautifier = SQL::Beautify->new();
     } catch {
-        $c->log->debug('SQL::Beautify is not installed. Cannot beautify SQL');
+        #$c->log->debug('SQL::Beautify is not installed. Cannot beautify SQL');
     };
 
     my $mb_query_log = $c->model('Metabase')->schema->storage->debugobj();
@@ -81,11 +82,12 @@ sub _print_query_log {
             $sql = $beautifier->beautify();
         }
 
+        my $values = join ', ', @{ $info->{'queries'}->[0]->{'params'} };
+        $sql .= "\n  " . $values if $values;
+
         my $log_msg = <<END_MSG;
-SQL:
-$sql
-count: $info->{ count }
-time_elapsed: $info->{ time_elapsed }
+SQL> $sql
+  count: $info->{ count }; time_elapsed: $info->{ time_elapsed }
 END_MSG
 
         $c->log->debug( $log_msg );

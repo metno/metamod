@@ -476,18 +476,18 @@ sub dataset_location_search {
 
     my $config = Metamod::Config->instance();
 
-    my %fake_srid = (
-        3995 => 93995,
-        3031 => 93031,
-    );
-
-    $srid = $fake_srid{$srid} if exists $fake_srid{$srid};
+    #my %fake_srid = (
+    #    3995 => 93995,
+    #    3031 => 93031,
+    #);
+    #
+    #$srid = $fake_srid{$srid} if exists $fake_srid{$srid};
 
     # default is no conversion (assuming client can calculate proper coordinates if not defined in master_config)
-    my $scale_factor_x = $config->get("SRID_MAP_SCALE_FACTOR_X_$srid") || 1;
-    my $scale_factor_y = $config->get("SRID_MAP_SCALE_FACTOR_Y_$srid") || 1;
-    my $offset_x = $config->get("SRID_MAP_OFFSET_X_$srid") || 0;
-    my $offset_y = $config->get("SRID_MAP_OFFSET_Y_$srid") || 0;
+    my $scale_factor_x = $config->has("SRID_MAP_SCALE_FACTOR_X_$srid") ? $config->has("SRID_MAP_SCALE_FACTOR_X_$srid") : 1;
+    my $scale_factor_y = $config->has("SRID_MAP_SCALE_FACTOR_Y_$srid") ? $config->has("SRID_MAP_SCALE_FACTOR_Y_$srid") : 1;
+    my $offset_x       = $config->has("SRID_MAP_OFFSET_X_$srid")       ? $config->has("SRID_MAP_OFFSET_X_$srid")       : 0;
+    my $offset_y       = $config->has("SRID_MAP_OFFSET_Y_$srid")       ? $config->get("SRID_MAP_OFFSET_Y_$srid")       : 0;
 
     my $x1m = ($x1 - $offset_x)*$scale_factor_x;
     my $x2m = ($x2 - $offset_x)*$scale_factor_x;
@@ -507,6 +507,7 @@ sub dataset_location_search {
         IN => \"( SELECT DISTINCT ds_id FROM dataset_location WHERE ST_DWITHIN( $bounding_box, $geom_column, 0.1))",
     };
     #print STDERR "*** coord search is " . Dumper \$search_cond;
+    Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__)->debug( 'PostGIS: ' . ${ $$search_cond{'IN'} });
     return $search_cond;
 
 }

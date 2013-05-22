@@ -211,16 +211,19 @@ IMPORTDIRS = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
 IMPORT_DATASET_WAIT_SECONDS = 600
 
 # List the supported geographical search environments
-SRID_ID_COLUMNS = 93995 93031
+SRID_ID_COLUMNS = 93995 93031 3995 3031 4326
 
 # Corresponding short names of SRID_ID in Web-Interface
-SRID_ID_NAMES = Artic Antarctic
+SRID_ID_NAMES = Artic Antarctic Northern Southern World
 
 # define a bounding box (north east south west) where each SRID is valid
 SRID_NESW_BOUNDING_BOX_93995 = 90 180 30 -180
 SRID_NESW_BOUNDING_BOX_93031 = -30 180 -90 -180
+SRID_NESW_BOUNDING_BOX_3995 = 90 180 30 -180
+SRID_NESW_BOUNDING_BOX_3031 = -30 180 -90 -180
+SRID_NESW_BOUNDING_BOX_4326 = 90 180 -90 -180
 
-# Translate the map-coordinates to the SRID-coordinates
+# Translate the map-coordinates to the SRID-coordinates (DEPRECATED)
 # srid_coord = (map_coord - offset) * scale_factor
 # SRID 93995
 # pole is x=280 y=240
@@ -240,7 +243,7 @@ SRID_MAP_OFFSET_X_93031 = 280
 SRID_MAP_SCALE_FACTOR_Y_93031 = -11120
 SRID_MAP_OFFSET_Y_93031 = 280
 
-# Basic latitude longitude earth (4035 = WGS84)
+# Basic latitude longitude earth (4035 = WGS84) # change to 4326?
 LONLAT_SRID = 4035
 
 # locate your fimex program for reprojection of data

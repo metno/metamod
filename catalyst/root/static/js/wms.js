@@ -207,16 +207,19 @@ function drawMap(response) {
             if (current !== undefined) { // starting style defined in wmc
                 if (sty[current].legend) {
                     leg_url = '<img id="layer' + i + '_legend" src="' + sty[current].legend.href + '&LAYERS=' + l.name + '"/>';
+                    log.debug('legend:', leg_url);
                 }
             } else {
                 if (sty[0].legend) {
                     leg_url = '<img id="layer' + i + '_legend" src="' + sty[0].legend.href + '&LAYERS=' + l.name + '"/>';
                     leg_url = leg_url.replace(/PALETTE=[^&]+[&]?/i, ''); // remove PALETTE param and let server decide default style
+                    log.debug('legend:', leg_url);
                 }
             }
-            $(lc).append(leg_url);
-            log.debug('legend:', leg_url);
-            $(lc + '_styles').change( styleHandlerFactory( l, $(lc + '_legend') ) );
+            if (typeof leg_url != 'undefined') {
+                $(lc).append(leg_url);
+                $(lc + '_styles').change( styleHandlerFactory( l, $(lc + '_legend') ) );
+            }
         }
 
     }

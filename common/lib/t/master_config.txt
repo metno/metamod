@@ -386,7 +386,8 @@ LOG4ALL_SYSTEM_LOG = system_log.log
 LOG4PERL_WATCH_TIME = 30
 
 # List the supported geographical search environments
-SRID_ID_COLUMNS = 93995 93031
+#SRID_ID_COLUMNS = 93995 93031
+SRID_ID_COLUMNS = 93995 93031 3995 3031 4326
 
 # define a bounding box (north east south west) where each SRID is valid
 SRID_NESW_BOUNDING_BOX_93995 = 90 180 30 -180

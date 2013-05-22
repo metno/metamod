@@ -28,11 +28,12 @@ dropdown list.
 
 <label for="selected_map">Select map</label>
 <select name="selected_map" id="selected_map" onchange="clearMap();loadMap(this[this.selectedIndex].value)">
-    <!--<option value="4326">World</option>
+    <!--
     <option value="32661">Arctic</option>
     <option value="32761">Antarctic</option>-->
     <option value="3995">Arctic</option>
     <option value="3031">Antarctic</option>
+    <option value="4326">World</option>
 </select>
 
 <!-- select name="selected_map2" id="selected_map2"

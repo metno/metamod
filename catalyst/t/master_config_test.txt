@@ -397,7 +397,8 @@ SRU2JDBC_TAGS = [==DATASET_TAGS==]
 LONLAT_SRID = 4035
 
 # List the supported geographical search environments
-SRID_ID_COLUMNS = 93995 93031
+#SRID_ID_COLUMNS = 93995 93031
+SRID_ID_COLUMNS = 93995 93031 3995 3031 4326
 
 # Corresponding short names of SRID_ID in Web-Interface
 SRID_ID_NAMES = Artic Antarctic

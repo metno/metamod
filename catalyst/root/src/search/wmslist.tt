@@ -118,9 +118,11 @@
                         style="position: absolute; height: [% thumbsize %]px; width: [% thumbsize %]px; z-index:12"
                         ><img src="[% wmsthumb.outline %]"/></div>
                 [% END %]
-                <div class="wmsthumb"
-                    style="height: [% thumbsize %]px; width: [% thumbsize %]px; z-index:10"
-                    ><img src="[% wmsthumb.datamap %]"/></div>
+                [% IF wmsthumb.datamap %]
+                    <div class="wmsthumb"
+                        style="height: [% thumbsize %]px; width: [% thumbsize %]px; z-index:10"
+                        ><img src="[% wmsthumb.datamap %]"/></div>
+                [% END %]
 
                 <div class="list">
                     [% FOREACH layer IN cap.findnodes('//*[local-name() = "Layer"]');
