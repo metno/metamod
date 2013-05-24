@@ -24,6 +24,7 @@ use Data::Dump qw( dump );
 use Moose;
 use namespace::autoclean;
 use Data::Dumper;
+use Metamod::WMS;
 
 use Memoize;
 
@@ -542,7 +543,7 @@ sub selected_map {
 
 }
 
-=head2 $self->available_maps()
+=head2 $self->available_maps() [DEPRECATED]
 
 =over
 
@@ -569,10 +570,10 @@ sub available_maps {
     my @available_maps = ();
     foreach my $srid_column (@srid_columns) {
         my $srid_name = shift @srid_names;
+        next if getMapURL("EPSG:$srid_column"); # dynamic WMS map available - ignoring
         my $map = { srid => $srid_column, name => $srid_name };
         $map->{selected} = 1 if ( $srid_column == $selected_map );
         push @available_maps, $map;
-
     }
 
     return \@available_maps;

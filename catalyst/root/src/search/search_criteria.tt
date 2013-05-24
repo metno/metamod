@@ -18,7 +18,7 @@
     [% ELSIF category.sc_type == 'fulltext' %]
         [% INCLUDE 'search/text_form.tt' category = category %]
     [% ELSIF category.sc_type == 'map_search' %]
-        [% IF  mm_config.get('SEARCH_NORTHPOLE_MAP')  %]
+        [% IF  searchmaps.size > 1  %]
             [% INCLUDE 'search/map_search_ol.tt' criteria_index = loop.index() # openlayers version %]
         [% ELSE %]
             [% INCLUDE 'search/map_search_form.tt' criteria_index = loop.index() # old static map %]

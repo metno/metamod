@@ -124,9 +124,25 @@ sub display_search_criteria : Path('/search') : Args(1) {
         $c->req->params->{ $ui_utils->html_id_for_map( 'y2' ) } = '';
     }
 
+    my @srid_cols = split ' ', $c->stash->{'mm_config'}->get("SRID_ID_COLUMNS");
+    my @srid_names = split ' ', $c->stash->{'mm_config'}->get("SRID_ID_NAMES");
+    #print STDERR Dumper \@srid_cols;
+
+    my %searchmaps;
+    foreach (@srid_cols) {
+        my $crs = "EPSG:$_";
+        my $name = shift @srid_names;
+        my $url = getMapURL($crs) or next;
+        $searchmaps{$_} = {
+            url => $url,
+            name => $name || getProjName($crs) || $crs,
+        };
+    }
+    print STDERR Dumper \%searchmaps;
+
     $c->stash( template => 'search/search_criteria.tt',
                active_criteria => $active_criteria,
-               mapURLs => Metamod::WMS::bgmapURLs(),
+               searchmaps =>\%searchmaps,
     );
 }
 

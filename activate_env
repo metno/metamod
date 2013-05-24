@@ -63,6 +63,7 @@ activate_mm() {
     if [ -e "$SCRIPT_PATH/local/lib/perl5" ] ; then
         export PERL5LIB=$PERL5LIB:"$SCRIPT_PATH/local/lib/perl5"
     else
+	# FIXME find a way to update version number automagically
 	export PERL5LIB=$PERL5LIB:"/opt/metno-metamod-2.13/local/lib/perl5"
     fi
 

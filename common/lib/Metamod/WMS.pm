@@ -67,6 +67,8 @@ our @EXPORT = qw(logger param abandon getXML getMapURL getSetup outputXML defaul
 # init
 #
 
+# FIXME rewrite as OO
+
 my $q = CGI->new;
 my $parser = XML::LibXML->new( load_ext_dtd => 0 );
 my $logger = get_logger('metamod.search');
@@ -74,8 +76,8 @@ my $config = Metamod::Config->instance();
 
 my $bbox = $config->split('WMS_BOUNDING_BOXES');
 my $coastlinemaps = $config->split('WMS_MAPS');
-my $proj = $config->split('WMS_PROJECTIONS');
-#print STDERR Dumper \$proj;
+my $projnames = $config->split('WMS_PROJECTIONS');
+#print STDERR Dumper \$projnames;
 
 #sub new {
 #    bless [$q, $parser, $config, $logger], shift;
@@ -244,7 +246,7 @@ Look up a descriptive name for a given EPSG code
 sub getProjName {
     my $code = shift or die;
     #return $projections{$code}->[0];
-    return $$proj{$code};
+    return $$projnames{$code};
 }
 
 =head2 projList()
@@ -257,7 +259,7 @@ sub projList {
     #print STDERR Dumper \%projections;
     use Clone qw(clone); # TT seems to mess up data structure, so best copy it
     #return clone \%projections;
-    return clone $proj;
+    return clone $projnames;
 }
 
 =head2 bgmapURLs

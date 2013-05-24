@@ -28,31 +28,32 @@ dropdown list.
 
 <label for="selected_map">Select map</label>
 <select name="selected_map" id="selected_map" onchange="clearMap();loadMap(this[this.selectedIndex].value)">
-    <!--
-    <option value="32661">Arctic</option>
-    <option value="32761">Antarctic</option>-->
-    <option value="3995">Arctic</option>
-    <option value="3031">Antarctic</option>
-    <option value="4326">World</option>
+[% FOREACH crs IN searchmaps.keys.sort %]
+    <option value="[% crs %]">[% searchmaps.$crs.name %]</option>
+[% END %]
 </select>
 
-<!-- select name="selected_map2" id="selected_map2"
-        onchange="jQuery('#[% x1_id %], #[% x2_id %], #[% y1_id %], #[% y2_id %]' ).val('');
-                  jQuery('#search_form').attr( 'action', '[% c.uri_for('/search', 'map_search' ) %]');
-                  jQuery('#search_form').submit()">
-[% FOREACH map IN search_ui_utils.available_maps %]
-    <option value="[% map.srid %]" [% map.selected ? 'selected="selected"' : ''%]>[% map.name %]</option>
-[% END %]
-</select-->
-
 <button type="button" onclick="clearMap();">Clear map</button>
+
+<input type="checkbox" name="allow-pan" value="allow-pan" id="allowPanCheckbox" onclick="allowPan(this);" />
+<label for="allowPanCheckbox">Pan</label>
+
+<div id="bbox_params" style="display: none">
+    <input type="text" size="10" name="[% x1_id %]" id="[% x1_id %]" value="[% c.req().param( x1_id ) %]" />
+    <input type="text" size="10" name="[% x2_id %]" id="[% x2_id %]" value="[% c.req().param( x2_id ) %]" />
+    <input type="text" size="10" name="[% y1_id %]" id="[% y1_id %]" value="[% c.req().param( y1_id ) %]" />
+    <input type="text" size="10" name="[% y2_id %]" id="[% y2_id %]" value="[% c.req().param( y2_id ) %]" />
+</div>
 
 <script>
 
 //alert( "starting...." );
 
 var log = log4javascript.getDefaultLogger();
-[% IF !debug %]
+[% IF debug %]
+    // show bounding box values
+    $('#bbox_params').show();
+[% ELSE %]
     // disable logging in production
     log = log4javascript.getNullLogger();
 [% END %]
@@ -62,21 +63,13 @@ var vectors;
 var currentProj = "[% c.req().param('selected_map') || 3995 %]";
 log.debug("Current projection is " + currentProj);
 
-var maps = {
-    //"EPSG:32661": "http://wms.met.no/maps/northpole.map",
-    //"EPSG:32761": "http://wms.met.no/maps/southpole.map",
-    //"EPSG:4326" : "http://wms.met.no/maps/world.map",
-    //"EPSG:3995": "[% mm_config.get('SEARCH_NORTHPOLE_MAP') %]",
-    //"EPSG:3031": "[% mm_config.get('SEARCH_SOUTHPOLE_MAP') %]"
-
-    [%  # get list from Metamod::WMS
-        jslines = [];
-        FOR p IN mapURLs.keys.sort;
-            jslines.push("'" _ p _"': '" _ mapURLs.$p _ "'");
-        END;
-        jslines.join(",\n");
-    %]
-}
+var maps = { [%
+    codelines = [];
+    FOR crs IN searchmaps.keys.sort;
+        codelines.push("'" _ crs _"': '" _ searchmaps.$crs.url _ "'");
+    END;
+    codelines.join(",\n    ");
+%] }
 
 log.debug(maps);
 
@@ -102,7 +95,7 @@ function updateCoords(xy) {
 function loadMap(proj) {
     if (map !== undefined) { map.destroy(); }
     //jQuery('#[% x1_id %], #[% x2_id %], #[% y1_id %], #[% y2_id %]' ).val('');
-    wms_url = maps["EPSG:" + proj];
+    wms_url = maps[proj];
     log.debug("WMS URL for EPSG:" + proj + " is " + wms_url);
     currentProj = proj;
     wmc_url = "[% c.uri_for('/gc2wmc') %]" + "?getcap=" + wms_url + "&crs=EPSG:" + proj;
@@ -203,15 +196,6 @@ function showError(response) {
 }
 
 </script>
-
-<input type="text" size="10" name="[% x1_id %]" id="[% x1_id %]" value="[% c.req().param( x1_id ) %]" />
-<input type="text" size="10" name="[% x2_id %]" id="[% x2_id %]" value="[% c.req().param( x2_id ) %]" />
-<input type="text" size="10" name="[% y1_id %]" id="[% y1_id %]" value="[% c.req().param( y1_id ) %]" />
-<input type="text" size="10" name="[% y2_id %]" id="[% y2_id %]" value="[% c.req().param( y2_id ) %]" />
-
-<input type="checkbox" name="allow-pan" value="allow-pan" id="allowPanCheckbox" onclick="allowPan(this);" />
-<label for="allowPanCheckbox">Pan</label>
-
 
 <div id="searchmap" style="height:540px; width:540; border: solid 1px; margin-bottom: 10px"
      xonclick="jQuery('#search_form').attr('action','[% c.uri_for('/search/map_search') %]');"></div>
