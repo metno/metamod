@@ -2,7 +2,7 @@
 
 =head2 PostgreSQL 9.1
 
-METAMOD now supports creating databases on servers running PostgreSQL 9.1.
+METAMOD now supports initializing databases on servers running PostgreSQL 9.1.
 Previous versions only supported running v.9 clients against v.8 servers.
 
 Support for PostgreSQL 8.2 and earlier have been disabled to avoid unneccessary errors,
@@ -10,14 +10,17 @@ but may be reenabled by editing F<base/init/createdb.sh> (ca. line 80).
 
 =head2 Dependency libraries
 
-Metamod now contains all necessary Perl dependencies either in the Debian package,
-or for building via Carton.
+Metamod now contains all necessary Perl dependencies in the Debian package.
 
+If installing from source, you must build the necessary Perl modulues using Carton:
+
+  $ cd ~/metamod/trunk
   $ carton install --deployment
 
-You must also set your PERL5LIB to point to F<metamod/local/lib> in master_config:
+You must also set your PERL5LIB to point to F<metamod/trunk/local/lib> in your environment,
+or change CATALYST_LIB in master_config (defaults to the Debian install directory):
 
-  CATALYST_LIB = /opt/metno-metamod-2.12/local/lib
+  CATALYST_LIB = /opt/metno-metamod-2.13/local/lib/perl5
 
 =head2 WMS configuration settings
 

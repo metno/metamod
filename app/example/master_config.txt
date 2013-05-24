@@ -62,9 +62,10 @@ SMTP_RELAY = smtp.example.com
 
 # ============== Catalyst configuration =================
 
-# lib for Catalyst and other dependencies
+# lib for Catalyst and other Perl dependencies
+# defaults to Debian install dir; change to local dir if installing from source
 # (set this to blank if you've installed everything from CPAN instead)
-#CATALYST_LIB =
+CATALYST_LIB = /home/user/metamod/trunk/local/lib
 
 # port used by the Catalyst server (default 3000)
 # must be unique if running several Catalyst installations per server
