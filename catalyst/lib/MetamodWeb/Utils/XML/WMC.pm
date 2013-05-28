@@ -31,7 +31,7 @@ use List::Util qw(min max sum);
 use Carp;
 use Data::Dumper;
 
-my $logger = get_logger('metamod.search');
+my $logger = get_logger('metamod.search.wms');
 
 =head1 NAME
 
@@ -121,7 +121,7 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
 
     }
 
-    #print STDERR Dumper \%bbox;
+    $logger->debug("old_gen_wmc: " . Dumper \%bbox);
 
     ####################################
     # transform data Capabilities to WMC
@@ -210,7 +210,7 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
     # copy background map layers to wmc
     #
     if ( $nobaselayer and (my $mapurl = getMapURL( $bbox{'crs'} )) ) {
-        $logger->debug("*** Getting map for " . $bbox{'crs'});
+        $logger->debug("old_gen_wmc: Getting map for " . $bbox{'crs'});
 
         my $mapdoc = $self->_gen_wmc($mapurl, \%bbox);
         my $mapxc = XML::LibXML::XPathContext->new( $mapdoc ); # getcapabilities xpath context
@@ -228,6 +228,8 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
             my $isoverlay = $mapxc->findvalue('v:Name', $mpl) eq 'borders' ? 'true' : 'false';
             $mpl->addNewChild( 'http://openlayers.org/context', 'ol:transparent' )->appendTextNode($isoverlay);
         }
+    } else {
+        $logger->warn("old_gen_wmc: No baselayer for " . $bbox{'crs'});
     }
 
     #print STDERR "\n\n------ WMC \n" . $results->toString(1);

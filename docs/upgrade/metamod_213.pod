@@ -12,7 +12,11 @@ but may be reenabled by editing F<base/init/createdb.sh> (ca. line 80).
 
 Metamod now contains all necessary Perl dependencies in the Debian package.
 
-If installing from source, you must build the necessary Perl modulues using Carton:
+If installing from source, you must build the necessary Perl modulues using Carton.
+Unfortunately Carton is currently in heavy development and not available on CPAN in
+a usable version. Instead download and install the latest version from
+L<http://search.cpan.org/dist/carton/> using F<cpanm> or whatever.
+Then install the dependencies like this:
 
   $ cd ~/metamod/trunk
   $ carton install --deployment
@@ -62,10 +66,21 @@ but may be overridden in master_config.
 The static maps in the search interface for the non-standard projections EPSG:93031 and 93995
 have now been deprecated, in favour of dynamic WMS maps. These will automatically be enabled
 if any of your search projections (defined in SRID_ID_COLUMNS) have a corresponding
-URL defined in WMS_MAPS as described above.
+URL defined in WMS_MAPS as described above. From 2.13 the default SRID_ID_COLUMNS is:
+
+  SRID_ID_COLUMNS = 93995 93031 3995 3031 4326
 
 B<NB:> To enable new SRIDs you need to re-initialize the metadata database and re-import all datasets
-(preferably by running F<create_and_load_all.sh>).
+(preferably by running F<create_and_load_all.sh>). Also make sure the new SRIDs are supported
+in your current version of PostGIS:
+
+  # select auth_srid from spatial_ref_sys where auth_name='EPSG' and auth_srid in(3995, 3031, 4326);
+   auth_srid
+  -----------
+        4326
+        3031
+        3995
+  (3 rows)
 
 Also note that since it is not possible to mix static and dynamic maps (and the previous projections
 (EPSG:93031 and 93995) are difficult to support in WMS) you must set up WMS maps for all the SRIDS you

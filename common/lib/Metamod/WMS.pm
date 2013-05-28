@@ -216,10 +216,10 @@ sub defaultWMC {
     my $top    = $$p{top}    || $$bbox{$crs}->[3];
     # TODO some validation?
 
-    my $bgurl = getMapURL($crs); # 'http://wms.met.no/maps/world.map';
+    my $bgurl = getMapURL($crs);
     my $baselayer = $bgurl ? qq|<w:baselayer url="$bgurl" name="$layername" />| : ''; #
 
-    #print STDERR "*** $crs *** $bgurl ***\n" . Dumper $$bbox{$crs};
+    $logger->debug("*** defaultWMC CRS = $crs; URL = $bgurl");
 
     my $default_wmc = <<EOT;
 <?xml version="1.0"?>

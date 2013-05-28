@@ -260,10 +260,6 @@ FIMEX_PROGRAM = fimex
 #WMS_SOUTHPOLE_MAP = southpole.map
 #WMS_WORLD_MAP     = world.map
 
-# enable these to use WMS dynamic maps in search interface
-#SEARCH_NORTHPOLE_MAP = http://wms.example.com/maps/northpole.map
-#SEARCH_SOUTHPOLE_MAP = http://wms.example.com/maps/southpole.map
-
 # list of supported projections (with names from spatialreference.org)
 WMS_PROJECTIONS =
     'EPSG:32661' 'WGS 84 / UPS North'
