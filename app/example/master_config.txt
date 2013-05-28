@@ -151,25 +151,13 @@ DATASET_TAGS = 'MM'
 
 # ============ WMS configuration =======================
 
-# URL to background map server delivering coastlines and reticules
-WMS_BACKGROUND_MAPSERVER = http://wms.met.no/maps/
-
-# map names for different projections
-WMS_NORTHPOLE_MAP = northpole.map
-WMS_SOUTHPOLE_MAP = southpole.map
-WMS_WORLD_MAP     = world.map
-
-# enable these to use WMS dynamic maps in search interface
-SEARCH_NORTHPOLE_MAP = http://wms.example.com/maps/northpole.map
-SEARCH_SOUTHPOLE_MAP = http://wms.example.com/maps/southpole.map
-
-# urls to WMS background maps
-WMS_MAPS =
-    'EPSG:32661' 'http://wms.example.com/maps/northpole.map'
-    'EPSG:32761' 'http://wms.example.com/maps/southpole.map'
-    'EPSG:4326'  'http://wms.example.com/maps/world.map'
-    'EPSG:3995'  "http://wms.example.com/maps/northpole.map"
-    'EPSG:3031'  "http://wms.example.com/maps/southpole.map"
+# urls to WMS background maps (if you do not want to use public met.no maps)
+#WMS_MAPS =
+#    'EPSG:32661' 'http://wms.example.com/maps/northpole.map'
+#    'EPSG:32761' 'http://wms.example.com/maps/southpole.map'
+#    'EPSG:4326'  'http://wms.example.com/maps/world.map'
+#    'EPSG:3995'  "http://wms.example.com/maps/northpole.map"
+#    'EPSG:3031'  "http://wms.example.com/maps/southpole.map"
 
 # ============ METAMODSEARCH configuration ==============
 

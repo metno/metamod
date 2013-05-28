@@ -31,9 +31,32 @@ or change CATALYST_LIB in master_config (defaults to the Debian install director
 =head3 WMS background map configuration
 
 The WMS background map configuration, which due to technical difficulties was hardcoded in earlier versions
-have now been moved to master_config.
+is now fully configurable. In addition, several WMS maps have been made available as a public service and
+are ready configured in default_config:
 
-The following directives have been deprecated:
+WMS_MAPS =
+    'EPSG:32661' 'http://public-wms.met.no/backgroundmaps/northpole.map'
+    'EPSG:32761' 'http://public-wms.met.no/backgroundmaps/southpole.map'
+    'EPSG:4326'  'http://public-wms.met.no/backgroundmaps/world.map'
+    'EPSG:3408'  "http://public-wms.met.no/backgroundmaps/northpole.map"
+    'EPSG:3409'  "http://public-wms.met.no/backgroundmaps/southpole.map"
+    'EPSG:3410'  'http://public-wms.met.no/backgroundmaps/world.map'
+    'EPSG:3411'  "http://public-wms.met.no/backgroundmaps/northpole.map"
+    'EPSG:3412'  "http://public-wms.met.no/backgroundmaps/southpole.map"
+    'EPSG:3413'  "http://public-wms.met.no/backgroundmaps/northpole.map"
+    'EPSG:3995'  "http://public-wms.met.no/backgroundmaps/northpole.map"
+    'EPSG:3031'  "http://public-wms.met.no/backgroundmaps/southpole.map"
+    'EPSG:32633' 'http://public-wms.met.no/backgroundmaps/world.map'
+
+To change this, copy the list to master_config and edit as desired.
+
+Names and bounding boxes are also defined in default_config.txt under WMS_PROJECTIONS and WMS_BOUNDING_BOXES,
+but may be overridden in master_config.
+
+=head4 Deprecated configuration settings
+
+The following directives have been deprecated and should be removed from master_config (they are
+now defined in default_config and only used in case WMS_MAPS should happen to be unset):
 
 =over 4
 
@@ -47,20 +70,6 @@ The following directives have been deprecated:
 
 =back
 
-Instead the URLs must now be specified in master_config under WMS_MAPS for each desired projection:
-
-  WMS_MAPS =
-      'EPSG:4326'  'http://wms.example.com/maps/world.map'
-      'EPSG:32661' 'http://wms.example.com/maps/northpole.map'
-      'EPSG:32761' 'http://wms.example.com/maps/southpole.map'
-      'EPSG:3995'  "http://wms.example.com/maps/northpole.map"
-      'EPSG:3031'  "http://wms.example.com/maps/southpole.map"
-
-If WMS_MAPS is not defined, it will fall back to using the deprecated directives listed previously.
-
-Names and bounding boxes are defined in default_config.txt under WMS_PROJECTIONS and WMS_BOUNDING_BOXES,
-but may be overridden in master_config.
-
 =head3 Dynamic map search
 
 The static maps in the search interface for the non-standard projections EPSG:93031 and 93995
@@ -70,9 +79,18 @@ URL defined in WMS_MAPS as described above. From 2.13 the default SRID_ID_COLUMN
 
   SRID_ID_COLUMNS = 93995 93031 3995 3031 4326
 
-B<NB:> To enable new SRIDs you need to re-initialize the metadata database and re-import all datasets
-(preferably by running F<create_and_load_all.sh>). Also make sure the new SRIDs are supported
-in your current version of PostGIS:
+B<NB:> To enable new SRIDs you need to re-initialize the metadata database and
+re-import all datasets (preferably by running F<create_and_load_all.sh>).
+
+Also note that since it is not possible to mix static and dynamic maps (and the
+previous projections EPSG:93031 and 93995 are difficult to support in WMS) you
+must set up WMS maps for all the additional SRIDS you want to support searching
+in. Existing stored searches (as in Subscriptions) will continue to run as long
+as the projections are included in SRID_ID_COLUMNS, but they cannot be edited.
+
+=head4 Running under older PostgreSQL version (8.x)
+
+Make sure the new SRIDs are supported in your current version of PostGIS:
 
   # select auth_srid from spatial_ref_sys where auth_name='EPSG' and auth_srid in(3995, 3031, 4326);
    auth_srid
@@ -82,8 +100,8 @@ in your current version of PostGIS:
         3995
   (3 rows)
 
-Also note that since it is not possible to mix static and dynamic maps (and the previous projections
-(EPSG:93031 and 93995) are difficult to support in WMS) you must set up WMS maps for all the SRIDS you
-want to support searching in. Existing stored searches (as in Subscriptions) will continue to run as long
-as the projections are included in SRID_ID_COLUMNS, but they cannot be edited.
+In case any of these projections are missing you must either install support for them using data from
+L<http://spatialreference.org/> or remove them from SRID_ID_COLUMNS.
+
+
 

@@ -252,13 +252,20 @@ FIMEX_PROGRAM = fimex
 
 # ============ WMS configuration =======================
 
-# URL to background map server delivering coastlines and reticules
-#WMS_BACKGROUND_MAPSERVER = http://wms.example.com/maps/
-
-# map names for different projections
-#WMS_NORTHPOLE_MAP = northpole.map
-#WMS_SOUTHPOLE_MAP = southpole.map
-#WMS_WORLD_MAP     = world.map
+# urls to WMS background maps
+WMS_MAPS =
+    'EPSG:32661' 'http://public-wms.met.no/backgroundmaps/northpole.map'
+    'EPSG:32761' 'http://public-wms.met.no/backgroundmaps/southpole.map'
+    'EPSG:4326'  'http://public-wms.met.no/backgroundmaps/world.map'
+    'EPSG:3408'  "http://public-wms.met.no/backgroundmaps/northpole.map"
+    'EPSG:3409'  "http://public-wms.met.no/backgroundmaps/southpole.map"
+    'EPSG:3410'  'http://public-wms.met.no/backgroundmaps/world.map'
+    'EPSG:3411'  "http://public-wms.met.no/backgroundmaps/northpole.map"
+    'EPSG:3412'  "http://public-wms.met.no/backgroundmaps/southpole.map"
+    'EPSG:3413'  "http://public-wms.met.no/backgroundmaps/northpole.map"
+    'EPSG:3995'  "http://public-wms.met.no/backgroundmaps/northpole.map"
+    'EPSG:3031'  "http://public-wms.met.no/backgroundmaps/southpole.map"
+    'EPSG:32633' 'http://public-wms.met.no/backgroundmaps/world.map'
 
 # list of supported projections (with names from spatialreference.org)
 WMS_PROJECTIONS =
@@ -274,12 +281,19 @@ WMS_PROJECTIONS =
     'EPSG:3031'  'WGS 84 / Antarctic Polar Stereographic'
 
 # urls to WMS background maps
-#WMS_MAPS =
-#    'EPSG:32661' 'http://wms.example.com/maps/northpole.map'
-#    'EPSG:32761' 'http://wms.example.com/maps/southpole.map'
-#    'EPSG:4326'  'http://wms.example.com/maps/world.map'
-#    'EPSG:3995'  "http://wms.example.com/maps/northpole.map"
-#    'EPSG:3031'  "http://wms.example.com/maps/southpole.map"
+WMS_MAPS =
+    'EPSG:32661' 'http://public-wms.met.no/backgroundmaps/northpole.map'
+    'EPSG:32761' 'http://public-wms.met.no/backgroundmaps/southpole.map'
+    'EPSG:4326'  'http://public-wms.met.no/backgroundmaps/world.map'
+    'EPSG:3408'  "http://public-wms.met.no/backgroundmaps/northpole.map"
+    'EPSG:3409'  "http://public-wms.met.no/backgroundmaps/southpole.map"
+    'EPSG:3410'  'http://public-wms.met.no/backgroundmaps/world.map'
+    'EPSG:3411'  "http://public-wms.met.no/backgroundmaps/northpole.map"
+    'EPSG:3412'  "http://public-wms.met.no/backgroundmaps/southpole.map"
+    'EPSG:3413'  "http://public-wms.met.no/backgroundmaps/northpole.map"
+    'EPSG:3995'  "http://public-wms.met.no/backgroundmaps/northpole.map"
+    'EPSG:3031'  "http://public-wms.met.no/backgroundmaps/southpole.map"
+    'EPSG:32633' 'http://public-wms.met.no/backgroundmaps/world.map'
 
 # bounding boxes for each projection
 WMS_BOUNDING_BOXES =
@@ -288,6 +302,14 @@ WMS_BOUNDING_BOXES =
     'EPSG:32761'   "-3000000" "7000000" "-3000000" "7000000"
     'EPSG:3995'    '-5000000' '5000000' '-5000000' '5000000'
     'EPSG:3031'    "-5000000" "5000000" "-5000000" "5000000"
+
+# URL to background map server delivering coastlines and reticules [DEPRECATED]
+WMS_BACKGROUND_MAPSERVER = http://wms.met.no/maps/
+
+# map names for different projections [DEPRECATED]
+WMS_NORTHPOLE_MAP = northpole.map
+WMS_SOUTHPOLE_MAP = southpole.map
+WMS_WORLD_MAP     = world.map
 
 # ============ METAMODSEARCH configuration ==============
 
