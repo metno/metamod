@@ -75,14 +75,21 @@ now defined in default_config and only used in case WMS_MAPS should happen to be
 The static maps in the search interface for the non-standard projections EPSG:93031 and 93995
 have now been deprecated, in favour of dynamic WMS maps. These will automatically be enabled
 if any of your search projections (defined in SRID_ID_COLUMNS) have a corresponding
-URL defined in WMS_MAPS as described above. From 2.13 the default SRID_ID_COLUMNS is:
+URL defined in WMS_MAPS as described above.
+
+From 2.13 the default SRID_ID_COLUMNS are:
 
   SRID_ID_COLUMNS = 93995 93031 3995 3031 4326
 
-B<NB:> To enable new SRIDs you need to re-initialize the metadata database and
-re-import all datasets (preferably by running F<create_and_load_all.sh>).
+The first two are only used for stored searches. The last three
+are available for dynamic map search using the maps at public-wms.met.no.
 
-Also note that since it is not possible to mix static and dynamic maps (and the
+To enable new SRIDs you need to re-initialize the metadata database and
+re-import all datasets (preferably by running F<create_and_load_all.sh>).
+B<Make sure to remove/edit any SRID_ID_COLUMNS in master_config so it doesn't
+override the default configuration.>
+
+Since it is not possible to mix static and dynamic maps (and the
 previous projections EPSG:93031 and 93995 are difficult to support in WMS) you
 must set up WMS maps for all the additional SRIDS you want to support searching
 in. Existing stored searches (as in Subscriptions) will continue to run as long
@@ -90,7 +97,8 @@ as the projections are included in SRID_ID_COLUMNS, but they cannot be edited.
 
 =head4 Running under older PostgreSQL version (8.x)
 
-Make sure the new SRIDs are supported in your current version of PostGIS:
+WMS map search is officially only supported using PostgreSQL 9.x. For older versions,
+make sure the new SRIDs are supported in your current version of PostGIS:
 
   # select auth_srid from spatial_ref_sys where auth_name='EPSG' and auth_srid in(3995, 3031, 4326);
    auth_srid
@@ -100,8 +108,10 @@ Make sure the new SRIDs are supported in your current version of PostGIS:
         3995
   (3 rows)
 
-In case any of these projections are missing you must either install support for them using data from
-L<http://spatialreference.org/> or remove them from SRID_ID_COLUMNS.
+In case any of these projections are missing you must either install support for
+them using data from L<http://spatialreference.org/> or remove them from
+SRID_ID_COLUMNS, otherwise F<createdb.sh> will probably fail.
+
 
 
 
