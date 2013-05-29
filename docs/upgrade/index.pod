@@ -24,6 +24,10 @@ Upgrading METAMOD 2.10 to 2.11
 
 Upgrading METAMOD 2.11 to 2.12
 
+=item L<Version 2.13|metamod_213>
+
+Upgrading METAMOD 2.12 to 2.13
+
 =back
 
 L<Main menu|../index>

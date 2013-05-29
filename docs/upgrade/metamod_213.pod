@@ -13,44 +13,44 @@ but may be reenabled by editing F<base/init/createdb.sh> (ca. line 80).
 Metamod now contains all necessary Perl dependencies in the Debian package.
 
 If installing from source, you must build the necessary Perl modules using Carton,
-see L<../configuration> for details.
+see L<Installation|../installation> for details.
 
-You must also set your PERL5LIB to point to F<metamod/trunk/local/lib> in your environment,
-or change CATALYST_LIB in master_config (defaults to the Debian install directory):
+You must also set your C<PERL5LIB> to point to F<metamod/trunk/local/lib> in your environment,
+or change C<CATALYST_LIB> in F<master_config.txt> (defaults to the Debian install directory):
 
   CATALYST_LIB = /opt/metno-metamod-2.13/local/lib/perl5
 
-=head2 WMS configuration settings
+=head2 New WMS features
 
-=head3 WMS background map configuration
+=head3 WMS background maps
 
 The WMS background map configuration, which due to technical difficulties was hardcoded in earlier versions
 is now fully configurable. In addition, several WMS maps have been made available as a public service and
-are ready configured in default_config:
+are ready configured in F<default_config.txt>:
 
-WMS_MAPS =
-    'EPSG:32661' 'http://public-wms.met.no/backgroundmaps/northpole.map'
-    'EPSG:32761' 'http://public-wms.met.no/backgroundmaps/southpole.map'
-    'EPSG:4326'  'http://public-wms.met.no/backgroundmaps/world.map'
-    'EPSG:3408'  "http://public-wms.met.no/backgroundmaps/northpole.map"
-    'EPSG:3409'  "http://public-wms.met.no/backgroundmaps/southpole.map"
-    'EPSG:3410'  'http://public-wms.met.no/backgroundmaps/world.map'
-    'EPSG:3411'  "http://public-wms.met.no/backgroundmaps/northpole.map"
-    'EPSG:3412'  "http://public-wms.met.no/backgroundmaps/southpole.map"
-    'EPSG:3413'  "http://public-wms.met.no/backgroundmaps/northpole.map"
-    'EPSG:3995'  "http://public-wms.met.no/backgroundmaps/northpole.map"
-    'EPSG:3031'  "http://public-wms.met.no/backgroundmaps/southpole.map"
-    'EPSG:32633' 'http://public-wms.met.no/backgroundmaps/world.map'
+  WMS_MAPS =
+      'EPSG:32661' 'http://public-wms.met.no/backgroundmaps/northpole.map'
+      'EPSG:32761' 'http://public-wms.met.no/backgroundmaps/southpole.map'
+      'EPSG:4326'  'http://public-wms.met.no/backgroundmaps/world.map'
+      'EPSG:3408'  "http://public-wms.met.no/backgroundmaps/northpole.map"
+      'EPSG:3409'  "http://public-wms.met.no/backgroundmaps/southpole.map"
+      'EPSG:3410'  'http://public-wms.met.no/backgroundmaps/world.map'
+      'EPSG:3411'  "http://public-wms.met.no/backgroundmaps/northpole.map"
+      'EPSG:3412'  "http://public-wms.met.no/backgroundmaps/southpole.map"
+      'EPSG:3413'  "http://public-wms.met.no/backgroundmaps/northpole.map"
+      'EPSG:3995'  "http://public-wms.met.no/backgroundmaps/northpole.map"
+      'EPSG:3031'  "http://public-wms.met.no/backgroundmaps/southpole.map"
+      'EPSG:32633' 'http://public-wms.met.no/backgroundmaps/world.map'
 
-To change this, copy the list to master_config and edit as desired.
+To replace or extend this list, copy the whole directive to F<master_config.txt> and edit as desired.
 
-Names and bounding boxes are also defined in default_config.txt under WMS_PROJECTIONS and WMS_BOUNDING_BOXES,
-but may be overridden in master_config.
+Names and bounding boxes are also defined in F<default_config.txt> under C<WMS_PROJECTIONS> and C<WMS_BOUNDING_BOXES>,
+but may be overridden in F<master_config.txt>.
 
 =head4 Deprecated configuration settings
 
-The following directives have been deprecated and should be removed from master_config (they are
-now defined in default_config and only used in case WMS_MAPS should happen to be unset):
+The following directives have been deprecated and should be removed from F<master_config.txt> (they are
+now defined in F<default_config.txt> and only used in case C<WMS_MAPS> should happen to be unset):
 
 =over 4
 
@@ -68,10 +68,10 @@ now defined in default_config and only used in case WMS_MAPS should happen to be
 
 The static maps in the search interface for the non-standard projections EPSG:93031 and 93995
 have now been deprecated, in favour of dynamic WMS maps. These will automatically be enabled
-if any of your search projections (defined in SRID_ID_COLUMNS) have a corresponding
-URL defined in WMS_MAPS as described above.
+if any of your search projections (defined in C<SRID_ID_COLUMNS>) have a corresponding
+URL defined in C<WMS_MAPS> as described above.
 
-From 2.13 the default SRID_ID_COLUMNS are:
+From 2.13 the default C<SRID_ID_COLUMNS> are:
 
   SRID_ID_COLUMNS = 93995 93031 3995 3031 4326
 
@@ -79,15 +79,15 @@ The first two are only used for stored searches. The last three
 are available for dynamic map search using the maps at public-wms.met.no.
 
 To enable new SRIDs you need to re-initialize the metadata database and
-re-import all datasets (preferably by running F<create_and_load_all.sh>).
-B<Make sure to remove/edit any SRID_ID_COLUMNS in master_config so it doesn't
+re-import all datasets (preferably by running C<base/init/create_and_load_all.sh>).
+B<Make sure to remove/edit any C<SRID_ID_COLUMNS> in F<master_config.txt> so it doesn't
 override the default configuration.>
 
 Since it is not possible to mix static and dynamic maps (and the
 previous projections EPSG:93031 and 93995 are difficult to support in WMS) you
 must set up WMS maps for all the additional SRIDS you want to support searching
 in. Existing stored searches (as in Subscriptions) will continue to run as long
-as the projections are included in SRID_ID_COLUMNS, but they cannot be edited.
+as the projections are included in C<SRID_ID_COLUMNS>, but they cannot be edited.
 
 =head4 Running under older PostgreSQL version (8.x)
 
@@ -103,9 +103,5 @@ make sure the new SRIDs are supported in your current version of PostGIS:
   (3 rows)
 
 In case any of these projections are missing you must either install support for
-them using data from L<http://spatialreference.org/> or remove them from
-SRID_ID_COLUMNS, otherwise F<createdb.sh> will probably fail.
-
-
-
-
+them using data from L<spatialreference.org|http://spatialreference.org/> or remove them from
+C<SRID_ID_COLUMNS>, otherwise C<create_and_load_all.sh> will probably fail.

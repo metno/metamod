@@ -18,7 +18,7 @@ Installation from source is also possible, but somewhat more time-consuming.
 
 =item PostgreSQL database system
 
-The current version requires PostgreSQL 9.1 or later. 
+The current version requires PostgreSQL 9.1 or later.
 It has also been tested on version 8.3 and 8.4, but some
 features may not work (in particular some PostGIS projections
 required for dynamic map search may be missing).
@@ -96,11 +96,17 @@ on the following sites:
 
 =over 4
 
-=item L<https://wiki.met.no/metamod/download>
+=item *
 
-=item L<http://repo.met.no/devel/dists/precise/main/binary-amd64/web/>
+L<https://wiki.met.no/metamod/download>
 
-=item L<http://repo.met.no/devel/dists/lucid/main/binary-all/web/>
+=item *
+
+L<http://repo.met.no/devel/dists/precise/main/binary-amd64/web/>
+
+=item *
+
+L<http://repo.met.no/devel/dists/lucid/main/binary-all/web/>
 
 =back
 
@@ -128,32 +134,42 @@ METAMOD depends on several non-Perl compiled utilities and libraries which must 
 
 =over 4
 
-=item PostgreSQL client and optionally server (preferrable 9.1 or later), as well as the DBD driver for Perl DBI
+=item *
 
-=item the GNOME LibXML2 and LibXSLT libraries
+PostgreSQL client and optionally server (preferrable 9.1 or later), as well as the DBD driver for Perl DBI
 
-=item the Expat XML library
+=item *
 
-=item the PROJ.4 Cartographic Projections library from osgeo.org
+the GNOME LibXML2 and LibXSLT libraries
 
-=item the OpenSSL Library
+=item *
+
+the Expat XML library
+
+=item *
+
+the PROJ.4 Cartographic Projections library from osgeo.org
+
+=item *
+
+the OpenSSL Library
 
 =back
 
-Installing these via Debial packages using apt-get is recommended if possible.
+Installing these via Debial packages using C<apt-get> is recommended if possible.
 A complete list of the required Debian packages can be found in F<debian/control>.
 
 =head2 Installing Perl dependency libraries
 
 If installing from source, you must download and build the necessary Perl modules from CPAN.
-This used to be a major headache, but is now possible to do with a single command using 
+This used to be a major headache, but is now possible to do with a single command using
 the new Perl module dependency manager Carton.
 
 =head3 cpanminus
 
-First, you need to be able to install Perl modules from CPAN. 
+First, you need to be able to install Perl modules from CPAN.
 There are several tools available for this, but we recommend using B<cpanminus>
-which can be installed using either of the following commands: 
+which can be installed using either of the following commands:
 
   $ apt-get install cpanminus                               # for Debian systems
   $ curl -L http://cpanmin.us | sudo perl - App::cpanminus  # from source
@@ -166,7 +182,7 @@ conflicts and making sure you have the same environment as have been tested.
 
 Carton is currently in beta development, and a regular install from CPAN may not
 give you the latest version. We recommend checking the latest version
-on L<the CPAN page|http://search.cpan.org/dist/carton/> and installing it 
+on L<the CPAN page|http://search.cpan.org/dist/carton/> and installing it
 explicitly:
 
   $ cpanm -S MIYAGAWA/carton-v0.9.15.tar.gz  # or whichever version is the latest
