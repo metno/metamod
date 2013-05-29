@@ -12,14 +12,8 @@ but may be reenabled by editing F<base/init/createdb.sh> (ca. line 80).
 
 Metamod now contains all necessary Perl dependencies in the Debian package.
 
-If installing from source, you must build the necessary Perl modulues using Carton.
-Unfortunately Carton is currently in heavy development and not available on CPAN in
-a usable version. Instead download and install the latest version from
-L<http://search.cpan.org/dist/carton/> using F<cpanm> or whatever.
-Then install the dependencies like this:
-
-  $ cd ~/metamod/trunk
-  $ carton install --deployment
+If installing from source, you must build the necessary Perl modules using Carton,
+see L<../configuration> for details.
 
 You must also set your PERL5LIB to point to F<metamod/trunk/local/lib> in your environment,
 or change CATALYST_LIB in master_config (defaults to the Debian install directory):

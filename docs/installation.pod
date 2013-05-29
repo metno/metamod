@@ -4,14 +4,13 @@ Back to L<Index|index>
 
 =head2 Introduction
 
-This describes how to install the METAMOD base software on a Linux server.
+This describes how to install the METAMOD software on a Linux server.
 No services will be available until you configure and set up a METAMOD instance
 (see L<Deploying a METAMOD application|deploying>).
 
-METAMOD is developed, tested and used on Ubuntu LTS servers (Hardy, Lucid).
+METAMOD is developed, tested and used on Ubuntu LTS servers (Hardy, Lucid, Precise).
 Debian packages are provided regularly for easy installation and upgrading.
-Installation from source is also possible, but requires much more work (at
-least for dependency libraries).
+Installation from source is also possible, but somewhat more time-consuming.
 
 =head2 Required software
 
@@ -19,15 +18,16 @@ least for dependency libraries).
 
 =item PostgreSQL database system
 
-Tested on version 8.3 and 8.4. If running a local database you need the PostgreSQL
+The current version requires PostgreSQL 9.1 or later. 
+It has also been tested on version 8.3 and 8.4, but some
+features may not work (in particular some PostGIS projections
+required for dynamic map search may be missing).
+If running a local database you need the PostgreSQL
 server, otherwise only the client is required.
-
-Note that version 9.x is currently B<not supported> since the init scripts are not
-compatible, although you should be able to use it to connect to an existing database.
 
 =item Apache 2.x web server
 
-With mod_proxy installed (sudo a2enmod proxy)
+With mod_proxy installed (C<sudo a2enmod proxy>)
 
 =item libxml and libxslt library
 
@@ -56,6 +56,10 @@ download and install packages manually as described below.>
 Add the corresponding lines to your /etc/apt/sources.list depending on your
 version of Ubuntu:
 
+  # for precise
+  deb http://repo.met.no/met.no precise main contrib
+  deb-src http://repo.met.no/met.no precise main contrib
+
   # for lucid
   deb http://repo.met.no/met.no lucid main contrib
   deb-src http://repo.met.no/met.no lucid main contrib
@@ -66,6 +70,10 @@ version of Ubuntu:
 
 If you want to run development versions (recommended), also add:
 
+  # for precise
+  deb http://repo.met.no/devel precise main contrib
+  deb-src http://repo.met.no/devel precise main contrib
+
   # for lucid
   deb http://repo.met.no/devel lucid main contrib
   deb-src http://repo.met.no/devel lucid main contrib
@@ -74,10 +82,12 @@ If you want to run development versions (recommended), also add:
   deb http://repo.met.no/devel hardy main contrib
   deb-src http://repo.met.no/devel hardy main contrib
 
-=head3 Installing METAMOD and dependencies via apt
+=head3 Installing METAMOD via apt
 
-  $ sudo apt-get install metno-perl-webdev-ver1
-  $ sudo apt-get install metno-metamod-2.12
+  $ sudo apt-get install metno-metamod-2.13
+
+Note that the Perl dependencies package metno-perl-webdev-ver1 has been obsoleted from 2.13 onwards.
+Instead all Perl dependency libraries are now included in the Metamod package.
 
 =head3 Installing packages manually
 
@@ -88,17 +98,91 @@ on the following sites:
 
 =item L<https://wiki.met.no/metamod/download>
 
+=item L<http://repo.met.no/devel/dists/precise/main/binary-amd64/web/>
+
 =item L<http://repo.met.no/devel/dists/lucid/main/binary-all/web/>
 
 =back
 
 Installation is done using a GUI packet manager or via command line:
 
-  $ sudo dpkg -i metno-metamod-2.12_2.12.0-2_all.deb
+  $ sudo dpkg -i metno-metamod-2.13_2.13.0-1_amd64.deb
 
-where 2.12.0-2 is the latest version in the repository.
+where 2.13.0-1 is the latest version in the repository.
 
 =head2 Installation from source
+
+=head3 Download the METAMOD source code
+
+Check out the METAMOD source code from Subversion into a suitable directory:
+
+  $ mkdir metamod
+  $ cd metamod
+  $ svn co https://svn.met.no/metamod/trunk
+
+A tar.gz file may also be available at a later date.
+
+=head3 Installing binary dependencies
+
+METAMOD depends on several non-Perl compiled utilities and libraries which must be installed separately, including:
+
+=over 4
+
+=item PostgreSQL client and optionally server (preferrable 9.1 or later), as well as the DBD driver for Perl DBI
+
+=item the GNOME LibXML2 and LibXSLT libraries
+
+=item the Expat XML library
+
+=item the PROJ.4 Cartographic Projections library from osgeo.org
+
+=item the OpenSSL Library
+
+=back
+
+Installing these via Debial packages using apt-get is recommended if possible.
+A complete list of the required Debian packages can be found in F<debian/control>.
+
+=head2 Installing Perl dependency libraries
+
+If installing from source, you must download and build the necessary Perl modules from CPAN.
+This used to be a major headache, but is now possible to do with a single command using 
+the new Perl module dependency manager Carton.
+
+=head3 cpanminus
+
+First, you need to be able to install Perl modules from CPAN. 
+There are several tools available for this, but we recommend using B<cpanminus>
+which can be installed using either of the following commands: 
+
+  $ apt-get install cpanminus                               # for Debian systems
+  $ curl -L http://cpanmin.us | sudo perl - App::cpanminus  # from source
+
+=head3 Carton
+
+Carton automatically downloads and builds the required METAMOD Perl dependency modules.
+Unlike C<cpan> it will install the exact same module versions every time, avoiding upgrade
+conflicts and making sure you have the same environment as have been tested.
+
+Carton is currently in beta development, and a regular install from CPAN may not
+give you the latest version. We recommend checking the latest version
+on L<the CPAN page|http://search.cpan.org/dist/carton/> and installing it 
+explicitly:
+
+  $ cpanm -S MIYAGAWA/carton-v0.9.15.tar.gz  # or whichever version is the latest
+
+=head3 METAMOD dependencies
+
+You are now ready to install the Perl dependencies from CPAN:
+
+  $ cd ~/metamod/trunk
+  $ carton install --deployment
+
+Carton will then install the modules listed in F<carton.lock> into F<~/metamod/trunk/local/lib>.
+This should not generate any errors as long as you have installed all the necessary binary libraries
+as listed above.
+
+=begin OLD
 
 =head3 Perl module dependencies
 
@@ -125,18 +209,10 @@ installed; this includes but is not limited to the following CPAN modules:
 
 =back
 
-=head3 Checking out the METAMOD source
+=end OLD
 
-Assuming you have the dependencies sorted out, installing METAMOD from source
-is a piece of cake. All you need is to check out the code from Subversion
-into a suitable directory. No special privileges are required (yet).
+=head2 Conclusion
 
-  $ mkdir metamod
-  $ cd metamod
-  $ svn co https://svn.met.no/metamod/trunk
-
-=head3 Conclusion
-
-You will now have the necessary software installed, however it will not do anything
+You will now have the necessary software installed, however it will not run
 until you configure and set up a METAMOD application. See L<configuration> and
 L<deploying> for further instructions.
