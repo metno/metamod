@@ -50,7 +50,7 @@ this. Copy the app/example directory to somewhere local, preferably renaming it
 to whatever your METAMOD application is called. Then you are ready to edit
 the master configuration file.
 
-  $ cp -r /opt/metno-metamod-2.11/app/example .
+  $ cp -r /opt/metno-metamod-2.13/app/example .
   $ mv example myapp
 
 Then edit F<myapp/master_config.txt> as needed.
@@ -142,36 +142,47 @@ of the application.
 =head2 Configuration defaults
 
 A complete inventory of the variables that could be part of the
-master_config.txt file is found in the F<app/default/default_config.txt> file in
+F<master_config.txt> file is found in the F<app/default/default_config.txt> file in
 the installation directory. This also lists default values wherever applicable.
 
 =head3 Config file format
 
-The master_config.txt file (and the default and example versions of this file)
+The F<master_config.txt> file (and the default and example versions of this file)
 contain lines as follows:
 
     VARNAME = VALUE
 
 C<VARNAME> must start from the first character on the line, and be all uppercase
-letters [A-Z], underscore or digits. Any number
-of white space characters may separate C<VARNAME> and '=', and also '=' and
-C<VALUE>. C<VALUE> starts with the first non-whitespace character and ends with
-the last non-whitespace character on the line. Additional lines may be
-appended to C<VALUE> immideately after the initial C<"VARNAME = ..."> line. Such
-lines must start with a space character. No whitespace are removed from such
-appended lines.
+letters [A-Z], underscore or digits. Any number of white space characters may
+separate C<VARNAME> and '=', and also '=' and C<VALUE>. C<VALUE> starts with the
+first non-whitespace character and ends with the last non-whitespace character
+on the line.
+
+Additional lines may be appended to C<VALUE> immediately after the
+initial C<"VARNAME = ..."> line. Such lines must start with a space character.
+No whitespace are removed from such appended lines.
+
+Multi-line directives may also be used to construct key-value-pair lists.
+In this case the first column contains the key and the rest a value (or list of value).
+Value containing spaces can be inclosed in quotes (single or double):
+
+  WMS_PROJECTIONS =
+      EPSG:32661      'WGS 84 / UPS North'
+      EPSG:32761      'WGS 84 / UPS South'
 
 C<VALUEs> may be empty, which sometimes indicate that some aspect of the software
 is turned off. An empty value is indicated by having no characters (or only
 whitespace characters) after the '=' character.
 
 In addition, comment lines, starting with C<'#'>, may be found. Blank lines are
-ignored.
+ignored (apart from terminating a multi-line directive).
 
 In the source files, all text strings like C<[==VARNAME==]> will be substituted
 with the corresponding value at runtime when the variable is accessed. Such text
 strings may also be found within C<VALUE> strings, and they will be substituted
 as appropriate.
+
+To check current configuration settings, use the C<lsconf> utility, or login to the Admin web interface.
 
 =head2 Metadata sources
 

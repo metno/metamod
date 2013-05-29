@@ -254,54 +254,39 @@ FIMEX_PROGRAM = fimex
 
 # urls to WMS background maps
 WMS_MAPS =
-    'EPSG:32661' 'http://public-wms.met.no/backgroundmaps/northpole.map'
-    'EPSG:32761' 'http://public-wms.met.no/backgroundmaps/southpole.map'
-    'EPSG:4326'  'http://public-wms.met.no/backgroundmaps/world.map'
-    'EPSG:3408'  "http://public-wms.met.no/backgroundmaps/northpole.map"
-    'EPSG:3409'  "http://public-wms.met.no/backgroundmaps/southpole.map"
-    'EPSG:3410'  'http://public-wms.met.no/backgroundmaps/world.map'
-    'EPSG:3411'  "http://public-wms.met.no/backgroundmaps/northpole.map"
-    'EPSG:3412'  "http://public-wms.met.no/backgroundmaps/southpole.map"
-    'EPSG:3413'  "http://public-wms.met.no/backgroundmaps/northpole.map"
-    'EPSG:3995'  "http://public-wms.met.no/backgroundmaps/northpole.map"
-    'EPSG:3031'  "http://public-wms.met.no/backgroundmaps/southpole.map"
-    'EPSG:32633' 'http://public-wms.met.no/backgroundmaps/world.map'
+    EPSG:32661  http://public-wms.met.no/backgroundmaps/northpole.map
+    EPSG:32761  http://public-wms.met.no/backgroundmaps/southpole.map
+    EPSG:4326   http://public-wms.met.no/backgroundmaps/world.map
+    EPSG:3408   http://public-wms.met.no/backgroundmaps/northpole.map
+    EPSG:3409   http://public-wms.met.no/backgroundmaps/southpole.map
+    EPSG:3410   http://public-wms.met.no/backgroundmaps/world.map
+    EPSG:3411   http://public-wms.met.no/backgroundmaps/northpole.map
+    EPSG:3412   http://public-wms.met.no/backgroundmaps/southpole.map
+    EPSG:3413   http://public-wms.met.no/backgroundmaps/northpole.map
+    EPSG:3995   http://public-wms.met.no/backgroundmaps/northpole.map
+    EPSG:3031   http://public-wms.met.no/backgroundmaps/southpole.map
+    EPSG:32633  http://public-wms.met.no/backgroundmaps/world.map
 
 # list of supported projections (with names from spatialreference.org)
 WMS_PROJECTIONS =
-    'EPSG:32661' 'WGS 84 / UPS North'
-    'EPSG:32761' 'WGS 84 / UPS South'
-    'EPSG:3411'  'NSIDC Sea Ice Polar Stereographic North'
-    'EPSG:3412'  'NSIDC Sea Ice Polar Stereographic South'
-    'EPSG:3413'  'WGS 84 / NSIDC Sea Ice Polar Stereographic North'
-    'EPSG:3995'  'WGS 84 / Arctic Polar Stereographic'
-    'EPSG:32633' 'WGS 84 / UTM zone 33N'
-    'EPSG:4326'  'WGS 84'
-    'EPSG:3995'  'WGS 84 / Arctic Polar Stereographic'
-    'EPSG:3031'  'WGS 84 / Antarctic Polar Stereographic'
+    EPSG:32661      'WGS 84 / UPS North'
+    EPSG:32761      'WGS 84 / UPS South'
+    EPSG:3411       'NSIDC Sea Ice Polar Stereographic North'
+    EPSG:3412       'NSIDC Sea Ice Polar Stereographic South'
+    EPSG:3413       'WGS 84 / NSIDC Sea Ice Polar Stereographic North'
+    EPSG:3995       'WGS 84 / Arctic Polar Stereographic'
+    EPSG:32633      'WGS 84 / UTM zone 33N'
+    EPSG:4326       'WGS 84'
+    EPSG:3995       'WGS 84 / Arctic Polar Stereographic'
+    EPSG:3031       'WGS 84 / Antarctic Polar Stereographic'
 
-# urls to WMS background maps
-WMS_MAPS =
-    'EPSG:32661' 'http://public-wms.met.no/backgroundmaps/northpole.map'
-    'EPSG:32761' 'http://public-wms.met.no/backgroundmaps/southpole.map'
-    'EPSG:4326'  'http://public-wms.met.no/backgroundmaps/world.map'
-    'EPSG:3408'  "http://public-wms.met.no/backgroundmaps/northpole.map"
-    'EPSG:3409'  "http://public-wms.met.no/backgroundmaps/southpole.map"
-    'EPSG:3410'  'http://public-wms.met.no/backgroundmaps/world.map'
-    'EPSG:3411'  "http://public-wms.met.no/backgroundmaps/northpole.map"
-    'EPSG:3412'  "http://public-wms.met.no/backgroundmaps/southpole.map"
-    'EPSG:3413'  "http://public-wms.met.no/backgroundmaps/northpole.map"
-    'EPSG:3995'  "http://public-wms.met.no/backgroundmaps/northpole.map"
-    'EPSG:3031'  "http://public-wms.met.no/backgroundmaps/southpole.map"
-    'EPSG:32633' 'http://public-wms.met.no/backgroundmaps/world.map'
-
-# bounding boxes for each projection
+# bounding boxes for each projection (currently used only for dynamic map search)
 WMS_BOUNDING_BOXES =
-    'EPSG:4326'    '-180'     '180'     '-90'      '90'
-    'EPSG:32661'   '-3000000' '7000000' '-3000000' '7000000'
-    'EPSG:32761'   "-3000000" "7000000" "-3000000" "7000000"
-    'EPSG:3995'    '-5000000' '5000000' '-5000000' '5000000'
-    'EPSG:3031'    "-5000000" "5000000" "-5000000" "5000000"
+    EPSG:4326    -180         180         -90         90
+    EPSG:32661   -3000000     7000000     -3000000    7000000
+    EPSG:32761   -3000000     7000000     -3000000    7000000
+    EPSG:3995    -5000000     5000000     -5000000    5000000
+    EPSG:3031    -5000000     5000000     -5000000    5000000
 
 # URL to background map server delivering coastlines and reticules [DEPRECATED]
 WMS_BACKGROUND_MAPSERVER = http://wms.met.no/maps/
