@@ -89,37 +89,7 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
     #################################
     # reproject coords in setup
     #
-    if ( defined $crs and $crs ne $bbox{crs} ) {
-
-        # stupid proj doesn't like upper case proj names
-        my $to   = Geo::Proj4->new( init => lc($crs) )       or die Geo::Proj4->error . " for $crs";
-        my $from = Geo::Proj4->new( init => lc($bbox{crs}) ) or die Geo::Proj4->error;
-        my @corners = (
-            [ $bbox{'left' }, $bbox{'bottom'} ],
-            [ $bbox{'left' }, $bbox{'top'   } ],
-            [ $bbox{'right'}, $bbox{'bottom'} ],
-            [ $bbox{'right'}, $bbox{'top'   } ],
-            # this could possibly extended with more points to avoid cropping of the bounding box
-        );
-        my $pr = $from->transform($to, \@corners);
-        #print STDERR Dumper \@corners, $pr;
-
-        my (@x, @y); # x resp y coord for each corner
-        foreach (@$pr) {
-            push @x, $_->[0];
-            push @y, $_->[1];
-        }
-
-        #print STDERR 'x = ' . Dumper \@x;
-        #print STDERR 'y = ' . Dumper \@y;
-
-        $bbox{ crs    } = $crs;
-        $bbox{ left   } = min(@x);
-        $bbox{ right  } = max(@x);
-        $bbox{ bottom } = min(@y);
-        $bbox{ top    } = max(@y);
-
-    }
+    _reproject($crs, \%bbox);
 
     $logger->debug("old_gen_wmc: " . Dumper \%bbox);
 
@@ -240,13 +210,52 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
 
 }
 
+#
+# reproject bounding box
+#
 
-=head2 _gen_wmc
+sub _reproject { # doesn't this do the same as calculate_bounds() ? FIXME
 
-Download Capabilities and transform to WMC
+    my ($crs, $bbox) = @_;
 
-=cut
+    if ( defined $crs and $crs ne $$bbox{crs} ) {
 
+        # stupid proj doesn't like upper case proj names
+        my $to   = Geo::Proj4->new( init => lc($crs) )       or die Geo::Proj4->error . " for $crs";
+        my $from = Geo::Proj4->new( init => lc($$bbox{crs}) ) or die Geo::Proj4->error;
+        my @corners = (
+            [ $$bbox{'left' }, $$bbox{'bottom'} ],
+            [ $$bbox{'left' }, $$bbox{'top'   } ],
+            [ $$bbox{'right'}, $$bbox{'bottom'} ],
+            [ $$bbox{'right'}, $$bbox{'top'   } ],
+            # this could possibly extended with more points to avoid cropping of the bounding box
+        );
+        my $pr = $from->transform($to, \@corners);
+        #print STDERR Dumper \@corners, $pr;
+
+        my (@x, @y); # x resp y coord for each corner
+        foreach (@$pr) {
+            push @x, $_->[0];
+            push @y, $_->[1];
+        }
+
+        #print STDERR 'x = ' . Dumper \@x;
+        #print STDERR 'y = ' . Dumper \@y;
+
+        $$bbox{ crs    } = $crs;
+        $$bbox{ left   } = min(@x);
+        $$bbox{ right  } = max(@x);
+        $$bbox{ bottom } = min(@y);
+        $$bbox{ top    } = max(@y);
+
+    }
+
+    return $bbox;
+}
+
+#
+# Download Capabilities and transform to WMC
+#
 sub _gen_wmc {
     my ($self, $wmsurl, $params) = @_;
     my $gcquery = '?service=WMS&version=1.3.0&request=GetCapabilities'; # can sometimes return 1.1.1

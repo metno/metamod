@@ -225,12 +225,11 @@ function drawMap(response) {
     }
 
     for (var key in projs) {
-        log.debug(key, projs[key]);
+        log.debug(key, 'supported by', projs[key], 'layers');
         if (key == "CRS:84") continue;
-        var opt = (key == args.crs) ? '<option selected="selected">' : '<option>';
-        $('#crs').append( opt + key + '</option>');
+        $('#crs').append( '<option value="' + key + '">' + key + '</option>');
     }
-
+    $('#crs').val(map.projection);
 
     $("#accordion").accordion("destroy");
     $("#accordion").accordion({
