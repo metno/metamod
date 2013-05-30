@@ -125,13 +125,13 @@ function drawMap(response) {
     var projs = {};
 
     for (var i=0; i < map.layers.length; i++) {
-        var l = map.layers[i];
+        var layer = map.layers[i];
         var lc = '#layer' + i;
         //log.debug(lc);
 
         // store # of uses of all projs for later (needed by crs selector)
-        for (var key in l.srs) {
-            if ( l.srs.hasOwnProperty(key) ) {
+        for (var key in layer.srs) {
+            if ( layer.isBaseLayer && layer.srs.hasOwnProperty(key) ) {
                 //log.debug(i, key);
                 if (projs[key] == undefined) {
                     projs[key] = 1;
@@ -141,23 +141,23 @@ function drawMap(response) {
             }
         }
 
-        var led_index = ( map.layers[i].isBaseLayer ? 2 : 0 );
+        var led_index = ( layer.isBaseLayer ? 2 : 0 );
         if ( i == 0 ) { // first layer starts open
             led_index++; // turn on led
             //map.layers[0].setVisibility(true); // trigger event so timeslider works on default layer (fixed somewhere else - try removing this later. FIXME)
             //log.debug('Setting layer 0 visible');
         };
 
-        //var lvis = l.isBaseLayer ?
+        //var lvis = layer.isBaseLayer ?
         //    '<input name="baselayer_visible" id="' + lc + '_show" type="radio"/>' :
         //    '';
         $("#accordion").append('<h3 layer="' + i + '"><a href="#"><img class="onoff" src="'
-                               + leds[led_index] + '"/> ' + l.name + '</a></h3>');
+                               + leds[led_index] + '"/> ' + layer.name + '</a></h3>');
         $("#accordion").append('<div id="layer' + i + '"></div>');
-        if (l.metadata.abstract !== undefined) {
-            $(lc).append('<p>' + l.metadata.abstract + '</p>');
+        if (layer.metadata.abstract !== undefined) {
+            $(lc).append('<p>' + layer.metadata.abstract + '</p>');
         }
-        if (! l.isBaseLayer) {
+        if (! layer.isBaseLayer) {
             $(lc).append('<label><input name="' + lc + '_visible" id="' + lc + '_show" type="checkbox" '
             + 'onchange="map.layers[' + i + '].sticky = this.checked;"/>stay visible</label>');
             //+ '/>stay visible</label>'); // not working
@@ -165,34 +165,23 @@ function drawMap(response) {
 
         }
 
-        if (l.dimensions !== undefined && l.dimensions.time !== undefined) {
+        if (layer.dimensions !== undefined && layer.dimensions.time !== undefined) {
 
-            var times = l.dimensions.time.values;
-            var deft = l.dimensions.time.default || times[0];
-            //log.debug(i + ' >>> ' + typeof times);
-            //log.debug("layer " + map.layers[i].name + " has " + times.length + " timestamps")
-            //log.debug(map.layers[i].name + " time: " + times[0] + ", default: " + deft);
+            var times = layer.dimensions.time.values;
+            var deft = layer.dimensions.time.default || times[0];
 
             // initialize time for all layers (needed for wmsdiana)
-            l.mergeNewParams( {time: deft} );
+            layer.mergeNewParams( {time: deft} );
 
             // build time selector... DEPRECATED - time selector now handled by timeslider plugin
             $(lc).append('<p>Timeseries points: ' + times.length + '</p>');
-            // DISABLED
-            //$(lc).append('<p>Time:<br/><select id="layer' + i + '_time"/></p>');
-            //for (t in times) {
-            //    //log.debug(times[t]);
-            //    $(lc + '_time').append("<option>" + times[t] + "</option>");
-            //}
-            //
-            //$(lc + '_time').change( timeHandlerFactory(l) );
         }
 
-        if (l.metadata.styles !== undefined && l.metadata.styles.length > 0) {
+        if (layer.metadata.styles !== undefined && layer.metadata.styles.length > 0) {
 
             // build style selector
             $(lc).append('<p>Style:<br/><select id="layer' + i + '_styles"/></p>\n');
-            var sty = l.metadata.styles;
+            var sty = layer.metadata.styles;
             var current = undefined;
             for (s in sty) {
                 //log.debug(st);
@@ -206,26 +195,26 @@ function drawMap(response) {
             log.debug('Current style for layer', i, 'is', current);
             if (current !== undefined) { // starting style defined in wmc
                 if (sty[current].legend) {
-                    leg_url = '<img id="layer' + i + '_legend" src="' + sty[current].legend.href + '&LAYERS=' + l.name + '"/>';
+                    leg_url = '<img id="layer' + i + '_legend" src="' + sty[current].legend.href + '&LAYERS=' + layer.name + '"/>';
                     log.debug('legend:', leg_url);
                 }
             } else {
                 if (sty[0].legend) {
-                    leg_url = '<img id="layer' + i + '_legend" src="' + sty[0].legend.href + '&LAYERS=' + l.name + '"/>';
+                    leg_url = '<img id="layer' + i + '_legend" src="' + sty[0].legend.href + '&LAYERS=' + layer.name + '"/>';
                     leg_url = leg_url.replace(/PALETTE=[^&]+[&]?/i, ''); // remove PALETTE param and let server decide default style
                     log.debug('legend:', leg_url);
                 }
             }
             if (typeof leg_url != 'undefined') {
                 $(lc).append(leg_url);
-                $(lc + '_styles').change( styleHandlerFactory( l, $(lc + '_legend') ) );
+                $(lc + '_styles').change( styleHandlerFactory( layer, $(lc + '_legend') ) );
             }
         }
 
     }
 
     for (var key in projs) {
-        log.debug(key, 'supported by', projs[key], 'layers');
+        //log.debug(key, 'supported by', projs[key], 'layers');
         if (key == "CRS:84") continue;
         $('#crs').append( '<option value="' + key + '">' + key + '</option>');
     }

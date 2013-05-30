@@ -31,7 +31,7 @@ use List::Util qw(min max sum);
 use Carp;
 use Data::Dumper;
 
-my $logger = get_logger('metamod.search.wms');
+my $logger = get_logger(); # 'metamod.search.wms'
 
 =head1 NAME
 
@@ -114,7 +114,7 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
     #
     my $newlayers = $results->createElementNS($wmcns, 'LayerList');
     my $hidden = 0;
-    my $nobaselayer = 1;
+    my @baselayers = ();
 
     # loop thru layers in setup file
     foreach my $setuplayer ( $setupxc->findnodes('/*/s:layer|/*/s:baselayer') ) {
@@ -137,7 +137,7 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
         #printf STDERR "####### found %d layers named %s\n", scalar @$matching_layers, $lname;
         foreach my $gclayer (@$matching_layers) {
             # should only loop once
-            #printf STDERR "*WMC* $layertype getcap: %s\n", $gclayer->serialize;
+            #printf STDERR "**** WMC **** $layertype getcap ************\n%s\n", $gclayer->serialize(1);
             foreach my $gcstyle ( $gcxc->findnodes("v:StyleList/v:Style[v:Name = '$style']", $gclayer) ) { # FIXME: wrong namespace
                 #printf STDERR "*WMC* stylelist: %s\n", $gcstyle->serialize;
                 $gcstyle->setAttribute('current', 1);
@@ -148,7 +148,7 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
 
             if ($layertype eq 'baselayer') {
                 $gclayer->addNewChild( 'http://openlayers.org/context', 'ol:transparent' )->appendTextNode('false');
-                $nobaselayer = 0;
+                push @baselayers, $lname;
                 $logger->debug("*** $layertype $lname is opaque");
             } else { # overlay
                 $gclayer->addNewChild( 'http://openlayers.org/context', 'ol:transparent' )->appendTextNode('true');
@@ -156,6 +156,10 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
                 $logger->debug("*** $layertype $lname is transparent");
             }
             $gclayer->setAttribute('hidden', $hidden++&&1); # sets all layers in wmsinfo visible
+
+            foreach ( $gcxc->findnodes("v:SRS", $gclayer) ) {
+                $logger->debug( "*** SRS for $layertype $lname:", $_->textContent);
+            }
 
             # move priority layer to new list
             $newlayers->appendChild( $layerlist->removeChild($gclayer) );
@@ -179,7 +183,9 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
     #
     # copy background map layers to wmc
     #
-    if ( $nobaselayer and (my $mapurl = getMapURL( $bbox{'crs'} )) ) {
+    if (@baselayers) {
+        $logger->debug("old_gen_wmc: bundled baselayers: ", join(' ', @baselayers) );
+    } elsif ( my $mapurl = getMapURL($bbox{'crs'}) ) {
         $logger->debug("old_gen_wmc: Getting map for " . $bbox{'crs'});
 
         my $mapdoc = $self->_gen_wmc($mapurl, \%bbox);
@@ -189,14 +195,32 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
 
         # copy layer node from map wmc to output wmc
         foreach ( $mapxc->findnodes("/*/v:LayerList/v:Layer") ) { # find map layers
+
+            # copy background map layer node to wmc
             #printf STDERR "\n*** copying map layer %s\n", $mapxc->findvalue('v:Name', $_);
-            # after lots of experimatation, this seems to be the only method that works
             my $mpl = $_->cloneNode(1);
             $results->importNode($mpl);
+            my $lname = $mapxc->findvalue('v:Name', $mpl);
+            #next if $lname eq 'borders'; # fake - FIXME
             $newlayers->appendChild($mpl);
-            # add transparency element
-            my $isoverlay = $mapxc->findvalue('v:Name', $mpl) eq 'borders' ? 'true' : 'false';
-            $mpl->addNewChild( 'http://openlayers.org/context', 'ol:transparent' )->appendTextNode($isoverlay);
+            # after lots of experimatation, this seems to be the only method that works
+
+            foreach ( $mapxc->findnodes("v:SRS", $mpl) ) {
+                $logger->debug( "*** deleting SRS for layer $lname: ", $_->textContent);
+                $_->unbindNode;
+            }
+
+            foreach ( sort keys %{bgmapURLs()} ) {
+                $logger->debug("*** adding SRS $_ to layer $lname");
+                $mpl->appendTextChild( 'SRS' , $_ );
+            }
+
+            # set transparency based on layer name (false if baselayer)
+            my $isoverlay = $lname eq 'borders' ? 'true' : 'false'; # met.no specific - FIXME
+            $mpl->addNewChild( 'http://openlayers.org/context', 'ol:transparent' )->appendTextNode('false'); # $isoverlay
+
+            #printf STDERR $mpl->serialize(1);
+
         }
     } else {
         $logger->warn("old_gen_wmc: No baselayer for " . $bbox{'crs'});
