@@ -8,8 +8,8 @@ This document gives an overall description of METAMOD2. Installation of basic ME
 and deployment of new METAMOD2 applications are described in separate documents: L<Installation|installation>
 and L<Deployment|deployment>.
 
-The METAMOD2 software installed on a server can be used to run one or more METAMOD2 B<applications> 
-(or METAMOD2 instances). A METAMOD2 application is a web portal connected to a data base with metadata. 
+The METAMOD2 software installed on a server can be used to run one or more METAMOD2 B<applications>
+(or METAMOD2 instances). A METAMOD2 application is a web portal connected to a data base with metadata.
 The metadata will typically describe geoscience data files, and the web portal will offer a search interface
 that can display lists of files that meet user-supplied search criteria.
 
@@ -20,9 +20,9 @@ entered using a web form or inserted manually in the XML archive (see below).
 
 The METAMOD2 applications sharing a metadata data base is called a B<cluster>. In its simplest form, a cluster
 comprise just one application, and this is often how METAMOD2 is used. However, by using several applications
-in a cluster, a major strength of METAMOD2 can be utilized: The ability to 
-expose different parts of the metadata data base through different METAMOD2 applications. 
-All metadata in the common data base are available for all the applications in a cluster. An application 
+in a cluster, a major strength of METAMOD2 can be utilized: The ability to
+expose different parts of the metadata data base through different METAMOD2 applications.
+All metadata in the common data base are available for all the applications in a cluster. An application
 need not expose all metadata. Each application may be configured differently, so that only those metadata that
 are in agreement with the intended use of the application will be exposed through the web portal.
 
@@ -62,7 +62,7 @@ in a cluster:
 
 =item B<The data repository>
 
-A directory tree where METAMOD2 stores the data files uploaded to METAMOD2 through the upload module 
+A directory tree where METAMOD2 stores the data files uploaded to METAMOD2 through the upload module
 (see below). For the time being, only netCDF files are handled through the upload module, but the data repository
 may also comprise files with other formats.
 
@@ -128,7 +128,7 @@ access the data repository.
 =head2 Directory structure
 
 On each server where METAMOD should run, the generic METAMOD software must be available in some directory.
-If you installed METAMOD using a met.no Debian package it will be located in F</opt/metamod-2.x>
+If you installed METAMOD using a met.no Debian package it will be located in F</opt/metno-metamod-2.x>
 (where x denotes the minor version).
 In the description below, this directory is called the B<installation> directory.
 

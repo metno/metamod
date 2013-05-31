@@ -4,10 +4,13 @@ METAMOD 2.x is a portal solution providing Discovery, Access and Retrieve
 functionality for scientific datasets along with tools for metadata handling
 etc. It allows for automatical and manual DAR Metadata creation. The Metadata
 can be converted to different formats and exposed using different
-search-interfaces, i.e. ISO23950 and OAI-PM. METAMOD 2.x has been designed to be
-easily integratable with L<OpENDAP|http://opendap.org/> or ftp data-servers,
-i.e. L<THREDDS|http://www.unidata.ucar.edu/projects/THREDDS/> and allows
-data-upload through FTP and HTTP interfaces.
+search-interfaces, i.e. L<ISO 23950|http://en.wikipedia.org/wiki/Z39.50>
+and L<OAI-PMH|http://www.openarchives.org/pmh/>.
+
+METAMOD 2.x has been designed to be easily integratable with
+L<OPeNDAP|http://opendap.org/> or ftp data-servers, i.e.
+L<THREDDS|http://www.unidata.ucar.edu/projects/THREDDS/> and allows data-upload
+through FTP and HTTP interfaces.
 
 =over 4
 
@@ -46,4 +49,5 @@ Import and upload description
 =back
 
 METAMOD is copyright L<The Norwegian Meteorological Institute|http://met.no>.
+
 METAMOD is free software, released under the L<GNU General Public License, version 2|http://www.gnu.org/licenses/gpl-2.0.html>.
