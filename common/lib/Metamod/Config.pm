@@ -281,7 +281,7 @@ sub getall {
 
     $self->_checkFile();
     my %vars;
-    foreach (keys $self->{vars}) {
+    foreach (keys %{ $self->{vars} } ) {
         $vars{$_} = $self->_substituteVariable($_)
     }
     return \%vars;
@@ -340,8 +340,8 @@ sub split {
         s/^\s+//; # remove leading spaces
         #print STDERR "> $_\n";
         my $list =_splitval($_);
-        my $key = shift $list; # treat first item as the key
-        $items{$key} = (scalar @$list > 1) ? $list : shift $list; # string or list if > 1
+        my $key = shift @$list; # treat first item as the key
+        $items{$key} = (scalar @$list > 1) ? $list : shift @$list; # string or list if > 1
     }
 
     #print STDERR Dumper \%items;
