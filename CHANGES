@@ -5,7 +5,8 @@
 
 2.13
     - dynamic search map using WMS
-    - automatic building of Perl dependencies using Carton
+    - improved support for background maps in different projections
+    - automatic building and installation of Perl dependencies using Carton
     - support for Ubuntu 12.4 Precise Pangolin and PostgreSQL 9.1
 
 2.12   Mon Jan 14 2013

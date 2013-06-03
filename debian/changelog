@@ -1,9 +1,11 @@
-metno-metamod-2.12 (2.12.1~a3) unstable; urgency=low
+metno-metamod-2.13 (2.13.0) unstable; urgency=low
 
-  * carton alpha test for precise
-  * a3: updated with fixes from 2.12.0-7
+  * dynamic search map using WMS
+  * improved support for background maps in different projections
+  * automatic building and installation of Perl dependencies using Carton
+  * support for Ubuntu 12.4 Precise Pangolin and PostgreSQL 9.1
 
- -- Geir Aalberg <geira@met.no>  Tue, 26 Feb 2013 15:32:30 +0100
+ -- Geir Aalberg <geira@met.no>  Mon, 03 Jun 2013 11:32:06 +0200
 
 metno-metamod-2.12 (2.12.0-7) lucid; urgency=low
 

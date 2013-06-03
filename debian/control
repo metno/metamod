@@ -1,11 +1,11 @@
-Source: metno-metamod-2.12
+Source: metno-metamod-2.13
 Priority: extra
 Maintainer: Geir Aalberg <geira@met.no>
 Build-Depends: debhelper (>=5), perl
 Standards-Version: 3.7.3
 Section: web
 
-Package: metno-metamod-2.12
+Package: metno-metamod-2.13
 Section: web
 Priority: optional
 Architecture: amd64
