@@ -13696,49 +13696,7 @@
       },
       "Digest::HMAC" : {
          "dist" : "Digest-HMAC-1.03",
-         "mymeta" : {
-            "abstract" : "Keyed-Hashing for Message Authentication",
-            "author" : [
-               "Gisle Aas <gisle@activestate.com>"
-            ],
-            "dynamic_config" : 0,
-            "generated_by" : "ExtUtils::MakeMaker version 6.57_05, CPAN::Meta::Converter version 2.120921",
-            "license" : [
-               "perl_5"
-            ],
-            "meta-spec" : {
-               "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-               "version" : "2"
-            },
-            "name" : "Digest-HMAC",
-            "no_index" : {
-               "directory" : [
-                  "t",
-                  "inc"
-               ]
-            },
-            "prereqs" : {
-               "build" : {
-                  "requires" : {
-                     "ExtUtils::MakeMaker" : "0"
-                  }
-               },
-               "configure" : {
-                  "requires" : {
-                     "ExtUtils::MakeMaker" : "0"
-                  }
-               },
-               "runtime" : {
-                  "requires" : {
-                     "Digest::MD5" : "2",
-                     "Digest::SHA" : "1",
-                     "perl" : "5.004"
-                  }
-               }
-            },
-            "release_status" : "stable",
-            "version" : "1.03"
-         },
+         "mymeta" : {},
          "name" : "Digest::HMAC",
          "pathname" : "G/GA/GAAS/Digest-HMAC-1.03.tar.gz",
          "provides" : {
@@ -14889,6 +14847,58 @@
          },
          "target" : "Filesys::Notify::Simple",
          "version" : "0.10"
+      },
+      "Geo::Proj4" : {
+         "dist" : "Geo-Proj4-1.04",
+         "mymeta" : {
+            "abstract" : "Proj4 library for carthographic projections",
+            "author" : [
+               "Mark Overmeer"
+            ],
+            "dynamic_config" : 0,
+            "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+            "license" : [
+               "perl_5"
+            ],
+            "meta-spec" : {
+               "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+               "version" : "2"
+            },
+            "name" : "Geo-Proj4",
+            "no_index" : {
+               "directory" : [
+                  "t",
+                  "inc"
+               ]
+            },
+            "prereqs" : {
+               "build" : {
+                  "requires" : {
+                     "ExtUtils::MakeMaker" : "0"
+                  }
+               },
+               "configure" : {
+                  "requires" : {
+                     "ExtUtils::MakeMaker" : "0"
+                  }
+               },
+               "runtime" : {
+                  "requires" : {}
+               }
+            },
+            "release_status" : "stable",
+            "version" : "1.04"
+         },
+         "name" : "Geo::Proj4",
+         "pathname" : "M/MA/MARKOV/Geo-Proj4-1.04.tar.gz",
+         "provides" : {
+            "Geo::Proj4" : {
+               "file" : "Geo/Proj4.pm",
+               "version" : "1.04"
+            }
+         },
+         "target" : "Geo::Proj4",
+         "version" : "1.04"
       },
       "Getopt::Long::Descriptive" : {
          "dist" : "Getopt-Long-Descriptive-0.093",
@@ -21940,6 +21950,289 @@
          },
          "target" : "MooseX::Types::Path::Class",
          "version" : "0.06"
+      },
+      "Net::DNS" : {
+         "dist" : "Net-DNS-0.72",
+         "mymeta" : {},
+         "name" : "Net::DNS",
+         "pathname" : "N/NL/NLNETLABS/Net-DNS-0.72.tar.gz",
+         "provides" : {
+            "Net::DNS" : {
+               "file" : "Net/DNS.pm",
+               "version" : "0.72"
+            },
+            "Net::DNS::Domain" : {
+               "file" : "Net/DNS/Domain.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::DomainName" : {
+               "file" : "Net/DNS/DomainName.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::DomainName1035" : {
+               "file" : "Net/DNS/DomainName.pm"
+            },
+            "Net::DNS::DomainName2535" : {
+               "file" : "Net/DNS/DomainName.pm"
+            },
+            "Net::DNS::Header" : {
+               "file" : "Net/DNS/Header.pm",
+               "version" : "1086"
+            },
+            "Net::DNS::Mailbox" : {
+               "file" : "Net/DNS/Mailbox.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::Mailbox1035" : {
+               "file" : "Net/DNS/Mailbox.pm"
+            },
+            "Net::DNS::Mailbox2535" : {
+               "file" : "Net/DNS/Mailbox.pm"
+            },
+            "Net::DNS::Nameserver" : {
+               "file" : "Net/DNS/Nameserver.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::Packet" : {
+               "file" : "Net/DNS/Packet.pm",
+               "version" : "1086"
+            },
+            "Net::DNS::Parameters" : {
+               "file" : "Net/DNS/Parameters.pm",
+               "version" : "1074"
+            },
+            "Net::DNS::Question" : {
+               "file" : "Net/DNS/Question.pm",
+               "version" : "1074"
+            },
+            "Net::DNS::RR" : {
+               "file" : "Net/DNS/RR.pm",
+               "version" : "1094"
+            },
+            "Net::DNS::RR::A" : {
+               "file" : "Net/DNS/RR/A.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::AAAA" : {
+               "file" : "Net/DNS/RR/AAAA.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::AFSDB" : {
+               "file" : "Net/DNS/RR/AFSDB.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::APL" : {
+               "file" : "Net/DNS/RR/APL.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::APL::Item" : {
+               "file" : "Net/DNS/RR/APL.pm"
+            },
+            "Net::DNS::RR::CERT" : {
+               "file" : "Net/DNS/RR/CERT.pm",
+               "version" : "1073"
+            },
+            "Net::DNS::RR::CNAME" : {
+               "file" : "Net/DNS/RR/CNAME.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::DHCID" : {
+               "file" : "Net/DNS/RR/DHCID.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::DNAME" : {
+               "file" : "Net/DNS/RR/DNAME.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::EID" : {
+               "file" : "Net/DNS/RR/EID.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::HINFO" : {
+               "file" : "Net/DNS/RR/HINFO.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::HIP" : {
+               "file" : "Net/DNS/RR/HIP.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::IPSECKEY" : {
+               "file" : "Net/DNS/RR/IPSECKEY.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::ISDN" : {
+               "file" : "Net/DNS/RR/ISDN.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::KX" : {
+               "file" : "Net/DNS/RR/KX.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::L32" : {
+               "file" : "Net/DNS/RR/L32.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::L64" : {
+               "file" : "Net/DNS/RR/L64.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::LOC" : {
+               "file" : "Net/DNS/RR/LOC.pm",
+               "version" : "1075"
+            },
+            "Net::DNS::RR::LP" : {
+               "file" : "Net/DNS/RR/LP.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::MB" : {
+               "file" : "Net/DNS/RR/MB.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::MG" : {
+               "file" : "Net/DNS/RR/MG.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::MINFO" : {
+               "file" : "Net/DNS/RR/MINFO.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::MR" : {
+               "file" : "Net/DNS/RR/MR.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::MX" : {
+               "file" : "Net/DNS/RR/MX.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::NAPTR" : {
+               "file" : "Net/DNS/RR/NAPTR.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::NID" : {
+               "file" : "Net/DNS/RR/NID.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::NIMLOC" : {
+               "file" : "Net/DNS/RR/NIMLOC.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::NS" : {
+               "file" : "Net/DNS/RR/NS.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::NSAP" : {
+               "file" : "Net/DNS/RR/NSAP.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::NULL" : {
+               "file" : "Net/DNS/RR/NULL.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::OPT" : {
+               "file" : "Net/DNS/RR/OPT.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::PTR" : {
+               "file" : "Net/DNS/RR/PTR.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::PX" : {
+               "file" : "Net/DNS/RR/PX.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::RP" : {
+               "file" : "Net/DNS/RR/RP.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::RT" : {
+               "file" : "Net/DNS/RR/RT.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::SOA" : {
+               "file" : "Net/DNS/RR/SOA.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::SPF" : {
+               "file" : "Net/DNS/RR/SPF.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::SRV" : {
+               "file" : "Net/DNS/RR/SRV.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::SSHFP" : {
+               "file" : "Net/DNS/RR/SSHFP.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::TKEY" : {
+               "file" : "Net/DNS/RR/TKEY.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::TLSA" : {
+               "file" : "Net/DNS/RR/TLSA.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::RR::TSIG" : {
+               "file" : "Net/DNS/RR/TSIG.pm",
+               "version" : "1090"
+            },
+            "Net::DNS::RR::TXT" : {
+               "file" : "Net/DNS/RR/TXT.pm",
+               "version" : "1079"
+            },
+            "Net::DNS::RR::X25" : {
+               "file" : "Net/DNS/RR/X25.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::Resolver" : {
+               "file" : "Net/DNS/Resolver.pm",
+               "version" : "1088"
+            },
+            "Net::DNS::Resolver::Base" : {
+               "file" : "Net/DNS/Resolver/Base.pm",
+               "version" : "1094"
+            },
+            "Net::DNS::Resolver::MSWin32" : {
+               "file" : "Net/DNS/Resolver/MSWin32.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::Resolver::Recurse" : {
+               "file" : "Net/DNS/Resolver/Recurse.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::Resolver::UNIX" : {
+               "file" : "Net/DNS/Resolver/UNIX.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::Resolver::cygwin" : {
+               "file" : "Net/DNS/Resolver/cygwin.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::Resolver::os2" : {
+               "file" : "Net/DNS/Resolver/os2.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::Text" : {
+               "file" : "Net/DNS/Text.pm",
+               "version" : "1070"
+            },
+            "Net::DNS::Update" : {
+               "file" : "Net/DNS/Update.pm",
+               "version" : "1096"
+            },
+            "Net::DNS::ZoneFile" : {
+               "file" : "Net/DNS/ZoneFile.pm",
+               "version" : "1094"
+            },
+            "Net::DNS::ZoneFile::Generator" : {
+               "file" : "Net/DNS/ZoneFile.pm"
+            },
+            "Net::DNS::ZoneFile::Text" : {
+               "file" : "Net/DNS/ZoneFile.pm"
+            }
+         },
+         "target" : "Net::DNS",
+         "version" : "0.72"
       },
       "Net::HTTP" : {
          "dist" : "Net-HTTP-6.05",

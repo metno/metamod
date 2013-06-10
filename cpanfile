@@ -24,6 +24,7 @@ requires 'Data::FormValidator', 4.66;
 requires 'DBI', 1.615;
 requires 'DBIx::Class', 0.08124;
 requires 'DBIx::Class::QueryLog', 1.003000;
+requires 'Geo::Proj4', 1.04;
 requires 'HTML::FormHandler::Model::DBIC', 0.14;
 requires 'HTTP::OAI', 3.27;
 requires 'JSON::Any', 1.29;
