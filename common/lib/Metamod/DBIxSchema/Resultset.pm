@@ -55,10 +55,14 @@ For instance
 
 =item $search_text
 
-The search text that will be used for searching. The text will be split on
+The search text that will be used for searching. In simple mode, the text will be split on
 spaces and then search expression that is created will AND them together in
 PostgreSQL syntax. For instance if searching for "hirlam ice" we get the search
 text "hirlam & ice" sent to PostgreSQL.
+
+In advanced mode, all words must be separated by one of the operators AND, OR or NOT, optionally with parenthesis.
+Complete phrases can be used enclosed in <i>single</i> quotes (not double).
+Wildcards (*) are allowed at the end of a word, but not elsewhere.
 
 =item return
 
@@ -74,10 +78,12 @@ sub fulltext_search {
 
     my ($_) = @_;
 
-    if (/AND|OR|NOT|[&|!()]/) { # allow mnemonic operators
+    if (/ AND | OR | NOT | [&|!()*] /x) { # allow mnemonic operators
+        s/[^:]\K[*]/:*/g; # allow * wildcard w/o preceding colon
         s/\bAND\b/&/g;
         s/\bOR\b/|/g;
         s/\bNOT\b/!/g;
+        #print STDERR "++++++++++++++REGEX: $_\n";
     } else {
         s/^\s+//; # remove leading and trailing spaces
         s/\s+$//; # to avoid malformed SQL

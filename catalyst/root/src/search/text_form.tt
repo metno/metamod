@@ -8,6 +8,7 @@ that match all words.
 <p class="help">
 <b>Advanced search:</b>Enter search words separated by one of the operators AND, OR or NOT, optionally with parenthesis.
 Complete phrases can be used enclosed in <i>single</i> quotes (not double).
+Wildcards (*) are allowed at the end of a word, but not elsewhere.
 </p>
 
 <label for="[% html_id %]">Matching text</label>
