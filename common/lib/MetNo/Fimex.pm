@@ -65,6 +65,7 @@ use strict;
 use warnings;
 use Params::Validate qw();
 use Moose;
+use Geo::Proj4;
 use LWP::Simple qw();
 use LWP::UserAgent;
 use File::Copy qw(copy);
@@ -73,9 +74,9 @@ use File::Temp qw();
 use Data::Dumper;
 use Carp;
 
-# never used since only projectioninfo in Dataset has all fimex needs
+# never used since only projectioninfo in Dataset has all fimex needs (REALLY?)
+# replace with Geo::Proj4 - DONE, remove after testing
 my %projstrings = (
-
     'EPSG:32661' => '+proj=stere +lat_0=90 +lat_ts=90 +lon_0=0 +k=0.994 +x_0=2000000 +y_0=2000000 +datum=WGS84 +units=m +no_defs',
     'EPSG:32761' => '+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +k=0.994 +x_0=2000000 +y_0=2000000 +datum=WGS84 +units=m +no_defs',
     'EPSG:3411'  => '+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs',
@@ -338,7 +339,11 @@ Set projection params by EPSG code
 
 sub setProjString {
     my ($self, $epsgcode, $interpolate, $xAxisValues, $yAxisValues) = @_;
-    my $projstr = $projstrings{$epsgcode} or die;
+
+    my $proj = Geo::Proj4->new( init => lc($epsgcode) ) or die;
+    #my $projstr = $projstrings{$epsgcode} or die;
+    my $projstr = $proj->normalized();
+    printf STDERR "+++ getting projstring for %s...\n%s\n%s\n", $epsgcode, $projstr, $projstrings{$epsgcode};
     $self->projString( $projstr );
     $self->interpolateMethod($interpolate);
     $self->xAxisValues($xAxisValues);
@@ -520,6 +525,7 @@ sub projectFile {
         'extract.reduceToBoundingBox.east' => 0,
         'extract.reduceToBoundingBox.west' => 0,
         'extract.reduceToBoundingBox.south' => 0,
+        # what is the allowed time format in FIMEX?
         'extract.reduceTime.start' => 0,
         'extract.reduceTime.end' => 0,
         # the following are currently ignored
@@ -552,25 +558,30 @@ sub projectFile {
         }
     }
 
+    my $errorfile = $p{'output.file'} . '.error';
+    push @args, "2>$errorfile";
+
     #print STDERR Dumper \@args;
-    # NOTE that $command does not quote arguments and so is not identical to system(@args) !!
-    my $command = join ' ', @args;
+    # quote arguments since cannot use system(@args)
+    my $command = join ' ', map( / / ? "'$_'" : $_, @args ); # consider using String::ShellQuote
     if ($DEBUG > 0) {
         # simulate running command
         print STDERR $command, "\n" if $DEBUG == 1;
     } else {
         # really execute fimex
-        system(@args) == 0
-            or die "system @args failed: $?";
+        if ( system($command) != 0 ) { # can't use array since we need redirection of STDERR
+            open(FILE, $errorfile) or die "Can't open file $errorfile";
+            my $errmsg = do {local $/; <FILE> };
+            die "$errmsg\n$command";
+        }
     }
     #print STDERR "++++++++++++++++++ \n$command\n";
     return $command; # usually not used, just for debugging
 }
 
-
 1;
-__END__
 
+__END__
 
 =head1 AUTHOR
 

@@ -162,6 +162,7 @@ sub transform_POST {
     }
 
     # we should probably do some timestamp validation here, but seems to work for the moment... FIXME
+    # note that validation must be against FIMEX allowed format, not Perl or ISO
     $fiParams{'startTime'} = $$p{start_date};
     $fiParams{'endTime'}  = $$p{stop_date};
 
