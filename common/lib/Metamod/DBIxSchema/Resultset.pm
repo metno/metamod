@@ -72,12 +72,20 @@ to a scalar is so that C<DBIx::Class> interprets it as a raw SQL.
 sub fulltext_search {
     my $self = shift;
 
-    my ($search_text) = @_;
+    my ($_) = @_;
 
-    my @search_words = split /\s+/, $search_text;
-    $search_text = join ' & ', @search_words;
+    if (/AND|OR|NOT|[&|!()]/) { # allow mnemonic operators
+        s/\bAND\b/&/g;
+        s/\bOR\b/|/g;
+        s/\bNOT\b/!/g;
+    } else {
+        s/^\s+//; # remove leading and trailing spaces
+        s/\s+$//; # to avoid malformed SQL
+        my @search_words = split /\s+/;
+        $_ = join ' & ', @search_words;
+    }
 
-    my $quoted_text = $self->quote_sql_value($search_text);
+    my $quoted_text = $self->quote_sql_value($_);
 
     return \"@@ to_tsquery( 'english', $quoted_text )";
 

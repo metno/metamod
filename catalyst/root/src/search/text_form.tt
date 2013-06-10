@@ -5,5 +5,10 @@ Enter a list of search words separated by spaces. If more than one search word i
 that match all words.
 </p>
 
+<p class="help">
+<b>Advanced search:</b>Enter search words separated by one of the operators AND, OR or NOT, optionally with parenthesis.
+Complete phrases can be used enclosed in <i>single</i> quotes (not double).
+</p>
+
 <label for="[% html_id %]">Matching text</label>
 <input type="text" size="50" id="[% html_id %]" name="[% html_id %]" value="[% c.req().param( html_id ) %]" />
