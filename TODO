@@ -27,7 +27,9 @@ remove download from basket unless has data_file_location
 default catalyst port to master_config, not 3000
 
 postgres preparation (postgis, pgcrypto, tsearch2) should be separate from
-database/table generation
+database/table generation, and should be run on the server where the postgis
+sql files are installed (so you get the correct version and won't have to install
+postgis/pg-server on the webserver)
 
 catalyst/lib/MetamodWeb.pm#92: Deprecated 'static' config key used, please use the key 'Plugin::Static::Simple' instead
 

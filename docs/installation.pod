@@ -6,7 +6,7 @@ Back to L<Index|index>
 
 This describes how to install the METAMOD software on a Linux server.
 No services will be available until you configure and set up a METAMOD instance
-(see L<Deploying a METAMOD application|deploying>).
+(see L<Deploying a METAMOD application|deploying>) as well as a database instance.
 
 METAMOD is developed, tested and used on Ubuntu LTS servers (Hardy, Lucid, Precise).
 Debian packages are provided regularly for easy installation and upgrading.
@@ -198,34 +198,76 @@ Carton will then install the modules listed in F<carton.lock> into F<~/metamod/t
 This should not generate any errors as long as you have installed all the necessary binary libraries
 as listed above.
 
-=begin OLD
+=head2 Installing the PostgreSQL database
 
-=head3 Perl module dependencies
+METAMOD requires two databases, one for metadata (which is just an index and can be recreated from the XML files)
+and one for user credentials (which is authorative and must be backed up).
 
-We really do not recommend installing the 350 required Perl modules (plus an
-additional baker's dozen of compiled C libraries) from CPAN unless you're really
-hardcore (or desperate). If you can, install the metno-perl-webdev-ver1 Debian
-package as specified above.
+=head3 Required software
 
-A complete list of Perl module dependencies (as per 2012-01-31) can be found in
-F<metamod-deps.txt>; this can be used as a source for scripting.
-At some point there might be a METAMOD::Bundle module, but don't hold your breath.
-Note however that some modules will not pass all tests and must be force
-installed; this includes but is not limited to the following CPAN modules:
+The following Debian packets must be installed on the server:
 
 =over 4
 
-=item Taint
+=item * postgresql
 
-=item Class::MOP
+(Defaults to the current version)
 
-=item Module::Install
+=item * postgresql-9.1-postgis
 
-=item DBIx::Class
+(Replace the version number with the current version)
 
 =back
 
-=end OLD
+In addition, the following files must be copied to the METAMOD application server and configured in
+C<PG_POSTGIS_SCRIPT> and C<PG_POSTGIS_SYSREF_SCRIPT> so that createdb.sh can read them:
+
+  /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
+  /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
+
+This will hopefully be resolved more elegantly in a later version.
+
+=head3 Authentication (FIXME)
+
+If running PostgreSQL on the same server as METAMOD, password authentication is not necessary
+for local connections. Instead you can configure PostgreSQL to automatically accept connections
+using sockets instead of TCP/IP by editing pg_hba.conf (replace 9.1 with correct version):
+
+  $ sudo $EDITOR /etc/postgresql/9.1/main/pg_hba.conf
+
+Then change C<local> from "peer" to "trust" at the end of the file:
+
+  # DO NOT DISABLE!
+  # If you change this first entry you will need to make sure that the
+  # database superuser can access the database using some other method.
+  # Noninteractive access to all databases is required during automatic
+  # maintenance (custom daily cronjobs, replication, and similar tasks).
+  #
+  # Database administrative login by Unix domain socket
+  #local   all             postgres                                peer
+  local   all             postgres                                trust
+
+  # TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+  # "local" is for Unix domain socket connections only
+  #local   all             all                                     peer
+  local   all             all                                     trust
+  # IPv4 local connections:
+  host    all             all             127.0.0.1/32            md5
+  # IPv6 local connections:
+  host    all             all             ::1/128                 md5
+  # Allow replication connections from localhost, by a user with the
+  # replication privilege.
+  #local   replication     postgres                                peer
+  #host    replication     postgres        127.0.0.1/32            md5
+  #host    replication     postgres        ::1/128                 md5
+
+Then restart PostgreSQL:
+
+  /etc/init.d/postgresql stop
+  /etc/init.d/postgresql start
+
+Alternatively, use .pgpass (FIXME)
 
 =head2 Conclusion
 

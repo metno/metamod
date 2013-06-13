@@ -99,38 +99,6 @@ must use the BASE module, and no other. The last steps (described below)
 required for the base application must be done after the initial steps
 (described above), for all applications in the cluster, are completed.
 
-
-=head3 Authentication (FIXME)
-
-Change local ident to trust in pg_hba.conf (replace 9.1 with correct version):
-
-  $ $EDITOR /etc/postgresql/9.1/main/pg_hba.conf
-  change local ident to trust
-
-  # Database administrative login by UNIX sockets
-  local   all         postgres                          ident sameuser
-
-  # TYPE  DATABASE    USER        CIDR-ADDRESS          METHOD
-
-  # "local" is for Unix domain socket connections only
-  #local   all         all                              ident sameuser
-  local   all         all                               trust
-  # IPv4 local connections:
-  host    all         all         127.0.0.1/32          trust
-  host    all         all         157.249.0.1/16        trust
-  # IPv6 local connections:
-  host    all         all         ::1/128               md5
-
-Then restart PostgreSQL:
-
-  /etc/init.d/postgresql stop
-  /etc/init.d/postgresql start
-
-Alternatively, use .pgpass (FIXME)
-
-Do not use PG_CONNECTSTRING_SHELL for shell connections to localhost (use sockets instead).
-
-
 =head3 Creating databases
 
 The two PostgreSQL databases used by the cluster must be initialized. Note that
