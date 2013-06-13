@@ -1,3 +1,5 @@
 <h1 class="std">[% app.search.title %]</h1>
 
 <p>[% app.search.description %]</p>
+
+[% INCLUDE 'user_msgs.tt' # FIXME: currently showing double - move this to whatever template is used when search fails %]

@@ -28,7 +28,9 @@ use Data::Dumper;
 
 use MetamodWeb::Utils::UI::Search;
 use MetamodWeb::Utils::SearchUtils;
+use MetamodWeb::Utils::Exception qw(error_from_exception);
 use Metamod::WMS;
+use Try::Tiny;
 
 BEGIN {extends 'MetamodWeb::BaseController::Base'; }
 
@@ -188,12 +190,17 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
     my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $c, config => $c->stash->{ mm_config } } );
     my $search_criteria = $search_utils->selected_criteria( $c->req->params() );
     my $ownertags = $search_utils->get_ownertags();
-    my $datasets = $dataset->metadata_search( {
-        curr_page => $curr_page,
-        ownertags => $ownertags,
-        rows_per_page => $datasets_per_page,
-        search_criteria => $search_criteria,
-    } );
+    my $search_params = {
+            curr_page => $curr_page,
+            ownertags => $ownertags,
+            rows_per_page => $datasets_per_page,
+            search_criteria => $search_criteria,
+    };
+    my $datasets = try {
+        $dataset->metadata_search($search_params);
+    } catch {
+        $c->detach( 'Root', 'error', [400, $@] ); # maybe something less drastic - FIXME
+    };
 
     my $num_search_cols = $c->req->param('num_mt_columns') || $c->stash->{ search_ui_utils }->num_search_cols();
     my @md_cols = ();
@@ -207,11 +214,19 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
 
     }
 
-    $c->stash( metadata_columns => \@md_cols );
-    $c->stash( datasets => [ $datasets->all() ] );
-    $c->stash( datasets_pager => $datasets->pager() );
-    $c->stash( dataset_count => $datasets->count() );
-
+    try {
+        $c->stash( datasets => [ $datasets->all() ] );
+        $c->stash( metadata_columns => \@md_cols );
+        $c->stash( datasets_pager => $datasets->pager() );
+        $c->stash( dataset_count => $datasets->count() );
+    } catch {
+        $self->logger->debug("*** SEARCH ERROR: $_");
+        $self->add_error_msgs( $c, "<h4>Invalid search parameters</h4>$_" );
+        my $para = $c->request->params;
+        my $path = "/" . $c->req->match;
+        $c->response->redirect( $c->uri_for($path, $para ) );
+        #$c->detach( 'Root', 'error', [400, $_] );
+    }
 }
 
 =head2 two_way_table

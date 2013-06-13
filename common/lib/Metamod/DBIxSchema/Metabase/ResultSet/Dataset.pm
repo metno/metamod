@@ -85,7 +85,10 @@ sub metadata_search {
         $search_attrs->{ rows } = $rows_per_page;
     }
 
-    my $matching_datasets = $self->search( $search_conds, $search_attrs );
+    #print STDERR Dumper $search_attrs;
+
+    my $matching_datasets = eval { $self->search( $search_conds, $search_attrs ) } or warn $@;
+    #print STDERR "========== $@\n" if $@;
 
     return $matching_datasets;
 
@@ -187,7 +190,7 @@ sub metadata_search_params {
             my $condition = {
                 -or => {
                     'md_id.md_content_vector' => $self->fulltext_search($term),
-                    'me.ds_name'              => { LIKE => '%' . $term . '%' }
+                    'me.ds_name'              => { LIKE => '%' . $term . '%' } # FIXME - remove wildcards in user input
                 }
             };
             push @fulltext_conds, $condition;

@@ -84,17 +84,16 @@ sub fulltext_search {
         s/\bOR\b/|/g;
         s/\bNOT\b/!/g;
         #print STDERR "++++++++++++++REGEX: $_\n";
+        my $quoted_text = $self->quote_sql_value($_);
+        return \"@@ to_tsquery( 'english', $quoted_text )";
     } else {
-        s/^\s+//; # remove leading and trailing spaces
-        s/\s+$//; # to avoid malformed SQL
-        my @search_words = split /\s+/;
-        $_ = join ' & ', @search_words;
+        #s/^\s+//; # remove leading and trailing spaces
+        #s/\s+$//; # to avoid malformed SQL
+        #my @search_words = split /\s+/;
+        #$_ = join ' & ', @search_words;
+        my $quoted_text = $self->quote_sql_value($_);
+        return \"@@ plainto_tsquery( 'english', $quoted_text )";
     }
-
-    my $quoted_text = $self->quote_sql_value($_);
-
-    return \"@@ to_tsquery( 'english', $quoted_text )";
-
 }
 
 
