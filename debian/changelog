@@ -4,6 +4,7 @@ metno-metamod-2.13 (2.13.0) unstable; urgency=low
   * improved support for background maps in different projections
   * automatic building and installation of Perl dependencies using Carton
   * support for Ubuntu 12.4 Precise Pangolin and PostgreSQL 9.1
+  * support for boolean operators, phrases and wildcards in text search
 
  -- Geir Aalberg <geira@met.no>  Mon, 03 Jun 2013 11:32:06 +0200
 
