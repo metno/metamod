@@ -58,7 +58,8 @@ package Metamod::MetadataEditor;
 use strict;
 use warnings;
 
-use LWP::UserAgent;
+use LWP::UserAgent; # rewrite to use HTTP::Request - FIXME
+use HTTP::Request;
 
 use Metamod::Config;
 use Metamod::MMD;
@@ -99,7 +100,7 @@ sub url {
     my $docname = shift or die "Missing document name";
     my $url = $self->{'editor_url'};
     $url =~ s/\[DATASET\]/$docname/;
-    print STDERR "*** EDITOR URL = $url\n";
+    #print STDERR "*** EDITOR URL = $url\n";
     return $url;
 }
 
@@ -122,14 +123,18 @@ sub upload_mmd {
 
     my $ua = LWP::UserAgent->new;
     $ua->timeout(180);
-    my $response = $ua->post($url, 'metadata' => $mmd);
+
+    #my $response = $ua->post($url, 'metadata' => $mmd);
+    my $req = HTTP::Request->new( 'POST', $url );
+    $req->content( $mmd );
+    my $response = $ua->request($req);
 
     unless ($response->is_success) {
         die "cannot upload to $url: ". $response->message;
-    } else {
+    #} else {
         #print STDERR $response->decoded_content . "\n";
     }
-    return;
+    return $response->decoded_content;
 }
 
 =head2 $editor->download_mmd($datasetname)
@@ -174,17 +179,19 @@ sub run {
 sub test {
     my $file = shift or die;
     #my $config = Metamod::Config->new();
+    my $dataset = `basename $file .xml`;
 
-    my $editor = Metamod::MetadataEditor->new('met-master');
-
-    my $xml = $editor->download_mmd('osisaf_ice_drift_north');
-    my $doc2 = Metamod::MMD->new($xml)->mm2;
-    print $doc2->toString(1);
+    my $editor = Metamod::MetadataEditor->new('metamodtest'); # move to master_config - FIXME
 
     my $doc = Metamod::MMD->new($file)->mmd;
     #print "****\n" . $doc->toString(1);
-    my $GUI_url = $editor->upload_mmd(`basename $file`, $doc->toString);
-    print STDERR $GUI_url;
+    my $GUI_url = $editor->upload_mmd($dataset, $doc->toString);
+    print STDERR "Edit at $GUI_url\n";
+
+    my $xml = $editor->download_mmd($dataset);
+    my $doc2 = Metamod::MMD->new($xml)->mm2;
+    print $doc2->toString(1);
+
 
 }
 

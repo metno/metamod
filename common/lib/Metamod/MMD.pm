@@ -146,7 +146,7 @@ Transform document to new MMD format
 sub mmd {
     my $self = shift or die;
     return $$self{'dom'} if $$self{'format'} eq $mmdns;
-    my $mmd_xsl = Metamod::DatasetTransformer::xslt_dir() . 'mm2mmd.xslt';
+    my $mmd_xsl = Metamod::DatasetTransformer::xslt_dir() . 'mm2-to-mmd.xsl';
     my $style_doc = XML::LibXML->load_xml(location=>$mmd_xsl, no_cdata=>1) or die "Missing or invalid XSL stylesheet";
     my $stylesheet = $xslt->parse_stylesheet($style_doc);
     my $result = $stylesheet->transform( $$self{'dom'} );
@@ -163,7 +163,7 @@ Transform document to old MM2 format
 sub mm2 {
     my $self = shift or die;
     return $$self{'dom'} if $$self{'format'} eq $mm2ns;
-    my $mmd_xsl = Metamod::DatasetTransformer::xslt_dir() . 'mmd2mm2.xslt';
+    my $mmd_xsl = Metamod::DatasetTransformer::xslt_dir() . 'mmd-to-mm2.xsl';
     my $style_doc = XML::LibXML->load_xml(location=>$mmd_xsl, no_cdata=>1) or die "Missing or invalid XSL stylesheet";
     my $stylesheet = $xslt->parse_stylesheet($style_doc);
     my $result = $stylesheet->transform( $$self{'dom'} );
@@ -173,18 +173,24 @@ sub mm2 {
 
 =head2 run
 
-Run test from command line
+Run tests from command line
 
 =cut
 
 sub run {
     my $self = shift;
-    test();
+    my $file = shift @ARGV;
+    if ($file) {
+        test($file);
+    } else {
+        print STDERR "Usage: perl $0 <xmlfile>\n";
+    }
 }
 
 sub test {
+    my $file = shift or die;
     my $config = Metamod::Config->new(); # to avoid "you must call new() once before you can call instance()"
-    my $doc = Metamod::MMD->new('/home/geira/metamod/webrun/XML/catnip/proff.xml');
+    my $doc = Metamod::MMD->new($file);
     my $mmd = $doc->mmd;
     print $mmd->toString(1);
     my $doc2 = Metamod::MMD->new($mmd);
