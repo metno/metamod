@@ -374,8 +374,11 @@ sub wmslist :Path('/search/wmslist') :Args {
         push @$dslist, $ds;
     }
     #print STDERR Dumper \$dslist;
-    $c->stash( datasets => $dslist, projections => Metamod::WMS::projList() );
-
+    $c->stash(
+        datasets    => $dslist,
+        projections => Metamod::WMS::projList(),
+        bgmaps      => Metamod::WMS::bgmapURLs(),
+    );
 }
 
 =head2 timeseries

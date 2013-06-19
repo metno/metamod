@@ -98,7 +98,7 @@ function loadMap(proj) {
     wms_url = maps[proj];
     log.debug("WMS URL for EPSG:" + proj + " is " + wms_url);
     currentProj = proj;
-    wmc_url = "[% c.uri_for('/gc2wmc') %]" + "?getcap=" + wms_url + "&crs=EPSG:" + proj;
+    wmc_url = "[% c.uri_for('/gc2wmc') %]" + "?crs=EPSG:" + proj + "&getcap=" + wms_url; // is crs really used?
     log.debug("WMC: " + wmc_url);
     OpenLayers.loadURL(wmc_url, "", this, drawMap, showError);
     $('#selected_map').val(proj);

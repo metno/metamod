@@ -100,7 +100,7 @@ sub url {
     my $docname = shift or die "Missing document name";
     my $url = $self->{'editor_url'};
     $url =~ s/\[DATASET\]/$docname/;
-    #print STDERR "*** EDITOR URL = $url\n";
+    #print STDERR "*** EDITOR webservice URL = $url\n";
     return $url;
 }
 
@@ -184,7 +184,7 @@ sub test {
     my $editor = Metamod::MetadataEditor->new('metamodtest'); # move to master_config - FIXME
 
     my $doc = Metamod::MMD->new($file)->mmd;
-    #print "****\n" . $doc->toString(1);
+    print "****\n" . $doc->toString(1);
     my $GUI_url = $editor->upload_mmd($dataset, $doc->toString);
     print STDERR "Edit at $GUI_url\n";
 

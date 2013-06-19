@@ -133,6 +133,7 @@ sub new {
     }
 
     $$self{'format'} = $$self{'dom'}->documentElement->namespaceURI;
+    $$self{'schemadir'} = Metamod::DatasetTransformer::xslt_dir();
     print STDERR "Format is $$self{'format'}\n";
     return $self;
 }
@@ -146,11 +147,12 @@ Transform document to new MMD format
 sub mmd {
     my $self = shift or die;
     return $$self{'dom'} if $$self{'format'} eq $mmdns;
-    my $mmd_xsl = Metamod::DatasetTransformer::xslt_dir() . 'mm2-to-mmd.xsl';
-    my $style_doc = XML::LibXML->load_xml(location=>$mmd_xsl, no_cdata=>1) or die "Missing or invalid XSL stylesheet";
+    my $style_doc = XML::LibXML->load_xml( location => $$self{'schemadir'}.'mm2-to-mmd.xsl', no_cdata => 1 ) or die "Missing or invalid XSL stylesheet";
     my $stylesheet = $xslt->parse_stylesheet($style_doc);
     my $result = $stylesheet->transform( $$self{'dom'} );
     #print STDERR $result->toString(1);
+    my $xmlschema = XML::LibXML::Schema->new( location => $$self{'schemadir'}.'mmd.xsd' );
+    eval { $xmlschema->validate($result); } or die $@;
     return $result;
 }
 
@@ -163,8 +165,7 @@ Transform document to old MM2 format
 sub mm2 {
     my $self = shift or die;
     return $$self{'dom'} if $$self{'format'} eq $mm2ns;
-    my $mmd_xsl = Metamod::DatasetTransformer::xslt_dir() . 'mmd-to-mm2.xsl';
-    my $style_doc = XML::LibXML->load_xml(location=>$mmd_xsl, no_cdata=>1) or die "Missing or invalid XSL stylesheet";
+    my $style_doc = XML::LibXML->load_xml( location => $$self{'schemadir'}.'mmd-to-mm2.xsl', no_cdata => 1) or die "Missing or invalid XSL stylesheet";
     my $stylesheet = $xslt->parse_stylesheet($style_doc);
     my $result = $stylesheet->transform( $$self{'dom'} );
     #print STDERR $result->toString(1);

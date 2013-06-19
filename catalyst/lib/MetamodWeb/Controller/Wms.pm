@@ -78,6 +78,7 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
     my ( $self, $c ) = @_;
 
     my $p = $c->request->params;
+    #print STDERR "/gc2wmc ", Dumper $p;
     my ($setup, $wms);
 
     if ( $$p{ds_id} ) {

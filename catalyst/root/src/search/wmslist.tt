@@ -18,6 +18,9 @@
         <script type="text/javascript">
 
             var log = log4javascript.getDefaultLogger();
+            [% IF ! debug # disable logging in production %]
+                log = log4javascript.getNullLogger();
+            [% END %]
 
             var layerProjs = {};
 
@@ -25,6 +28,7 @@
                 [%  # get list from Metamod::WMS
                     jslines = [];
                     FOR p IN projections.keys.sort;
+                        # TODO check against bgmaps to see iff we have the necessary background map - FIXME
                         jslines.push("'" _ p _"': '" _ p _ ' - '_ projections.$p _ "'");
                     END;
                     jslines.join(",\n");
@@ -57,6 +61,7 @@
                     if (pc == "CRS:84"){
                         continue;  // not a proper projection
                     }
+                    // check if background map is available - FIXME
                     if ( projCount[pc] == allLayers.length ) {
                         $('<option/>').attr('value', pc).text( projNames[pc]||pc ).appendTo('#crs');
                     }

@@ -630,3 +630,8 @@ NEW_USER_GREETING =
  Password: [RANDOM_PASS]
 
  [==EMAIL_SIGNATURE==]
+
+# =============== Metadataeditor configuration ================
+
+#METAEDIT_WS_URL = http://metaedit.met.no/metadataeditor/service/metaedit_api/[PROJECT]/[DATASET]
+
