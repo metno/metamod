@@ -2,65 +2,66 @@
 <xs:schema elementFormDefault="qualified" targetNamespace="http://www.met.no/schema/mmd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:mmd="http://www.met.no/schema/mmd">
 
     <xs:import schemaLocation="http://www.w3.org/2001/xml.xsd" namespace="http://www.w3.org/XML/1998/namespace"/>
-    
+
     <xs:element name="mmd" type="mmd:mmd_type"></xs:element>
-        
-    <xs:complexType name="personell_type">
-    	<xs:choice maxOccurs="5">
-    		<xs:element name="role" type="mmd:role_type"></xs:element>
-    		<xs:element name="name" type="xs:string"></xs:element>
-    		<xs:element name="email" type="xs:string"></xs:element>
-    		<xs:element name="phone" type="xs:string"></xs:element>
-    		<xs:element name="fax" type="xs:string"></xs:element>
-            <xs:element name="contact_address" type="mmd:contact_address"></xs:element>
-    	</xs:choice>
+
+    <xs:complexType name="personnel_type">
+        <xs:all>
+            <xs:element name="role" type="mmd:role_type"></xs:element>
+            <xs:element name="name" type="xs:string"></xs:element>
+            <xs:element name="organisation" type="xs:string" minOccurs="0"></xs:element>
+            <xs:element name="email" type="xs:string"></xs:element>
+            <xs:element name="phone" type="xs:string"></xs:element>
+            <xs:element name="fax" type="xs:string"></xs:element>
+            <xs:element name="contact_address" type="mmd:contact_address" minOccurs="0"></xs:element>
+        </xs:all>
     </xs:complexType>
-    
+
     <xs:complexType name="contact_address">
-        <xs:sequence>
-            <xs:element name="address" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-            <xs:element name="city" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-            <xs:element name="province_or_state" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-            <xs:element name="postal_code" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-            <xs:element name="country" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>        
-        </xs:sequence>
+        <xs:all>
+            <xs:element name="address" type="xs:string"></xs:element>
+            <xs:element name="city" type="xs:string"></xs:element>
+            <xs:element name="province_or_state" type="xs:string"></xs:element>
+            <xs:element name="postal_code" type="xs:string"></xs:element>
+            <xs:element name="country" type="xs:string"></xs:element>
+        </xs:all>
     </xs:complexType>
 
     <xs:complexType name="mmd_type">
-    	<xs:choice maxOccurs="unbounded">
-    	    <xs:element name="metadata_version" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
-    	    <xs:element name="metadata_identifier" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
-    	    <xs:element name="title" type="mmd:multilang_string" maxOccurs="unbounded" minOccurs="1"></xs:element>
-    	    <xs:element name="abstract" type="mmd:multilang_string" maxOccurs="unbounded" minOccurs="1"></xs:element>
-    	    <xs:element name="last_metadata_update" type="xs:dateTime" maxOccurs="1" minOccurs="1"></xs:element>
-    	    <xs:element name="dataset_production_status" type="mmd:dataset_production_status_type" maxOccurs="1"
-    	        minOccurs="1">
-    	    </xs:element>
-    	    <xs:element name="dataset_language" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    	    <xs:element name="iso_topic_category" type="mmd:iso_topic_category_type" maxOccurs="unbounded" minOccurs="1">
-    	    </xs:element>
-    	    <xs:element name="temporal_extent" type="mmd:temporal_extent_type" maxOccurs="1" minOccurs="0"></xs:element>
-    	    <xs:element name="geographic_extent" type="mmd:geographic_extent_type" maxOccurs="1" minOccurs="0"></xs:element>
-    	    <xs:element name="access_constraint" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    	    <xs:element name="use_constraint" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    	    <xs:element name="project" type="mmd:project_type" maxOccurs="1" minOccurs="0"></xs:element>
-    	    <xs:element name="instrument" type="mmd:instrument_type" maxOccurs="unbounded" minOccurs="0"></xs:element>
-    	    <xs:element name="platform" type="mmd:platform_type" maxOccurs="unbounded" minOccurs="0"></xs:element>
-    	    <xs:element name="keywords" type="mmd:keywords_type" maxOccurs="unbounded" minOccurs="0"></xs:element>
-    	    <xs:element name="personell" type="mmd:personell_type" maxOccurs="unbounded" minOccurs="0"></xs:element>
-    	    <xs:element name="dataset_citation" type="mmd:dataset_citation_type" maxOccurs="unbounded" minOccurs="0">
-    	    </xs:element>
-    	    <xs:element name="data_access" type="mmd:data_access_type" maxOccurs="unbounded" minOccurs="0"></xs:element>
-    	    <xs:element name="reference" type="mmd:reference_type" maxOccurs="unbounded" minOccurs="0"></xs:element>
-    	    <xs:element name="data_center" type="mmd:data_center_type" maxOccurs="1" minOccurs="0"></xs:element>
-    	</xs:choice>
+        <xs:choice maxOccurs="unbounded">
+            <xs:element name="metadata_version" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
+            <xs:element name="metadata_identifier" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
+            <xs:element name="title" type="mmd:multilang_string" maxOccurs="unbounded" minOccurs="1"></xs:element>
+            <xs:element name="abstract" type="mmd:multilang_string" maxOccurs="unbounded" minOccurs="1"></xs:element>
+            <xs:element name="last_metadata_update" type="xs:dateTime" maxOccurs="1" minOccurs="1"></xs:element>
+            <xs:element name="dataset_production_status" type="mmd:dataset_production_status_type" maxOccurs="1"
+                minOccurs="1">
+            </xs:element>
+            <xs:element name="dataset_language" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="iso_topic_category" type="mmd:iso_topic_category_type" maxOccurs="unbounded" minOccurs="1">
+            </xs:element>
+            <xs:element name="temporal_extent" type="mmd:temporal_extent_type" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="geographic_extent" type="mmd:geographic_extent_type" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="access_constraint" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="use_constraint" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="project" type="mmd:project_type" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="instrument" type="mmd:instrument_type" maxOccurs="unbounded" minOccurs="0"></xs:element>
+            <xs:element name="platform" type="mmd:platform_type" maxOccurs="unbounded" minOccurs="0"></xs:element>
+            <xs:element name="keywords" type="mmd:keywords_type" maxOccurs="unbounded" minOccurs="0"></xs:element>
+            <xs:element name="personnel" type="mmd:personnel_type" maxOccurs="unbounded" minOccurs="0"></xs:element>
+            <xs:element name="dataset_citation" type="mmd:dataset_citation_type" maxOccurs="unbounded" minOccurs="0">
+            </xs:element>
+            <xs:element name="data_access" type="mmd:data_access_type" maxOccurs="unbounded" minOccurs="0"></xs:element>
+            <xs:element name="reference" type="mmd:reference_type" maxOccurs="unbounded" minOccurs="0"></xs:element>
+            <xs:element name="data_center" type="mmd:data_center_type" maxOccurs="1" minOccurs="0"></xs:element>
+        </xs:choice>
     </xs:complexType>
 
     <xs:complexType name="temporal_extent_type">
-    	<xs:sequence>
-    		<xs:element name="start_date" type="xs:date"></xs:element>
-    		<xs:element name="end_date" type="xs:date"></xs:element>
-    	</xs:sequence>
+        <xs:sequence>
+            <xs:element name="start_date" type="xs:date"></xs:element>
+            <xs:element name="end_date" type="xs:date"></xs:element>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="multilang_string">
@@ -72,162 +73,156 @@
     </xs:complexType>
 
     <xs:complexType name="geographic_rectangle_type">
-    	<xs:sequence>
-    		<xs:element name="north" type="xs:double" maxOccurs="1"
-    			minOccurs="1">
-    		</xs:element>
-    		<xs:element name="south" type="xs:double" maxOccurs="1"
-    			minOccurs="1">
-    		</xs:element>
-    		<xs:element name="east" type="xs:double" maxOccurs="1"
-    			minOccurs="1">
-    		</xs:element>
-    		<xs:element name="west" type="xs:double" maxOccurs="1" minOccurs="1"></xs:element>
-    	</xs:sequence>
+        <xs:all>
+            <xs:element name="north" type="xs:double"></xs:element>
+            <xs:element name="south" type="xs:double"></xs:element>
+            <xs:element name="east"  type="xs:double"></xs:element>
+            <xs:element name="west"  type="xs:double"></xs:element>
+        </xs:all>
     </xs:complexType>
 
     <xs:complexType name="geographic_extent_type">
-    	<xs:sequence>
-    		<xs:element name="rectangle" type="mmd:geographic_rectangle_type"
-    			maxOccurs="1" minOccurs="0">
-    		</xs:element>
-    		<xs:element name="polygon" type="mmd:geographic_polygon_type" maxOccurs="1" minOccurs="0"></xs:element>
-    	</xs:sequence>
+        <xs:sequence>
+            <xs:element name="rectangle" type="mmd:geographic_rectangle_type"
+                maxOccurs="1" minOccurs="0">
+            </xs:element>
+            <xs:element name="polygon" type="mmd:geographic_polygon_type" maxOccurs="1" minOccurs="0"></xs:element>
+        </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="geographic_polygon_type"></xs:complexType>
 
     <xs:complexType name="project_type">
-    	<xs:sequence>
-    		<xs:element name="short_name" type="xs:string" maxOccurs="1"
-    			minOccurs="1">
-    		</xs:element>
-    		<xs:element name="long_name" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
-    	</xs:sequence>
+        <xs:sequence>
+            <xs:element name="short_name" type="xs:string" maxOccurs="1"
+                minOccurs="1">
+            </xs:element>
+            <xs:element name="long_name" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="instrument_type">
-    	<xs:sequence>
-    		<xs:element name="short_name" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
-    		<xs:element name="long_name" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
-    	</xs:sequence>
+        <xs:sequence>
+            <xs:element name="short_name" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
+            <xs:element name="long_name" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
+        </xs:sequence>
     </xs:complexType>
 
 
     <xs:simpleType name="role_type">
-    	<xs:restriction base="xs:string">
-    		<xs:enumeration value="Investigator"></xs:enumeration>
-    		<xs:enumeration value="Metadata author"></xs:enumeration>
-    		<xs:enumeration value="Technical contact"></xs:enumeration>
-    	</xs:restriction>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Investigator"></xs:enumeration>
+            <xs:enumeration value="Metadata author"></xs:enumeration>
+            <xs:enumeration value="Technical contact"></xs:enumeration>
+        </xs:restriction>
     </xs:simpleType>
 
     <xs:simpleType name="dataset_production_status_type">
-    	<xs:restriction base="xs:string">
-    		<xs:enumeration value="value"></xs:enumeration>
-    	</xs:restriction>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="value"></xs:enumeration>
+        </xs:restriction>
     </xs:simpleType>
 
 
     <xs:simpleType name="iso_topic_category_type">
-    	<xs:restriction base="xs:string">
-    		<xs:enumeration value="farming"></xs:enumeration>
-    		<xs:enumeration value="biota"></xs:enumeration>
-    		<xs:enumeration value="boundaries"></xs:enumeration>
-    		<xs:enumeration value="climatologyMeteorologyAtmosphere"></xs:enumeration>
-    		<xs:enumeration value="economy"></xs:enumeration>
-    		<xs:enumeration value="elevation"></xs:enumeration>
-    		<xs:enumeration value="environment"></xs:enumeration>
-    		<xs:enumeration value="geoscientificinformation"></xs:enumeration>
-    		<xs:enumeration value="health"></xs:enumeration>
-    		<xs:enumeration value="imageryBaseMapsEarthCover"></xs:enumeration>
-    		<xs:enumeration value="intelligenceMilitary"></xs:enumeration>
-    		<xs:enumeration value="inlandWaters"></xs:enumeration>
-    		<xs:enumeration value="location"></xs:enumeration>
-    		<xs:enumeration value="oceans"></xs:enumeration>
-    		<xs:enumeration value="planningCadastre"></xs:enumeration>
-    		<xs:enumeration value="society"></xs:enumeration>
-    		<xs:enumeration value="structure"></xs:enumeration>
-    		<xs:enumeration value="transportation"></xs:enumeration>
-    		<xs:enumeration value="utilitiesCommunications"></xs:enumeration>
-    	</xs:restriction>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="farming"></xs:enumeration>
+            <xs:enumeration value="biota"></xs:enumeration>
+            <xs:enumeration value="boundaries"></xs:enumeration>
+            <xs:enumeration value="climatologyMeteorologyAtmosphere"></xs:enumeration>
+            <xs:enumeration value="economy"></xs:enumeration>
+            <xs:enumeration value="elevation"></xs:enumeration>
+            <xs:enumeration value="environment"></xs:enumeration>
+            <xs:enumeration value="geoscientificinformation"></xs:enumeration>
+            <xs:enumeration value="health"></xs:enumeration>
+            <xs:enumeration value="imageryBaseMapsEarthCover"></xs:enumeration>
+            <xs:enumeration value="intelligenceMilitary"></xs:enumeration>
+            <xs:enumeration value="inlandWaters"></xs:enumeration>
+            <xs:enumeration value="location"></xs:enumeration>
+            <xs:enumeration value="oceans"></xs:enumeration>
+            <xs:enumeration value="planningCadastre"></xs:enumeration>
+            <xs:enumeration value="society"></xs:enumeration>
+            <xs:enumeration value="structure"></xs:enumeration>
+            <xs:enumeration value="transportation"></xs:enumeration>
+            <xs:enumeration value="utilitiesCommunications"></xs:enumeration>
+        </xs:restriction>
     </xs:simpleType>
 
     <xs:complexType name="platform_type">
-    	<xs:sequence>
-    		<xs:element name="short_name" type="xs:string" maxOccurs="1"
-    			minOccurs="1">
-    		</xs:element>
-    		<xs:element name="long_name" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
-    	</xs:sequence>
+        <xs:sequence>
+            <xs:element name="short_name" type="xs:string" maxOccurs="1"
+                minOccurs="1">
+            </xs:element>
+            <xs:element name="long_name" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="keywords_type">
-    	<xs:sequence>
-    		<xs:element name="keyword" type="xs:string" maxOccurs="unbounded" minOccurs="0"></xs:element>
-    	</xs:sequence>
+        <xs:sequence>
+            <xs:element name="keyword" type="xs:string" maxOccurs="unbounded" minOccurs="0"></xs:element>
+        </xs:sequence>
         <xs:attribute name="vocabulary" type="xs:string"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="data_access_type">
-    	<xs:choice maxOccurs="1">
-    		<xs:element name="name" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="type" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
-    		<xs:element name="description" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="resource" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
-    	</xs:choice>
+        <xs:all>
+        <xs:element name="name" type="xs:string" minOccurs="0"></xs:element>
+        <xs:element name="type" type="xs:string"></xs:element>
+        <xs:element name="description" type="xs:string" minOccurs="0"></xs:element>
+        <xs:element name="resource" type="xs:string"></xs:element>
+        </xs:all>
     </xs:complexType>
 
     <xs:complexType name="dataset_citation_type">
-    	<xs:choice maxOccurs="unbounded">
-    		<xs:element name="dataset_creator" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="dataset_editor" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="dataset_title" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="dataset_series_name" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="dataset_release_date" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="dataset_release_place" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="dataset_publisher" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="version" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="data_presentation_form" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="other_citation_details" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+        <xs:choice maxOccurs="unbounded">
+            <xs:element name="dataset_creator" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="dataset_editor" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="dataset_title" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="dataset_series_name" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="dataset_release_date" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="dataset_release_place" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="dataset_publisher" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="version" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="data_presentation_form" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="other_citation_details" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
             <xs:element name="dataset_doi" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
             <xs:element name="online_resource" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    	</xs:choice>
+        </xs:choice>
     </xs:complexType>
 
     <xs:complexType name="data_center_type">
-    	<xs:sequence>
-    		<xs:element name="data_center_name"
-    			type="mmd:data_center_name_type" maxOccurs="1" minOccurs="1">
-    		</xs:element>
-    		<xs:element name="data_center_url" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="dataset_id" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    	</xs:sequence>
+        <xs:sequence>
+            <xs:element name="data_center_name"
+                type="mmd:data_center_name_type" maxOccurs="1" minOccurs="1">
+            </xs:element>
+            <xs:element name="data_center_url" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="dataset_id" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+        </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="reference_type">
-    	<xs:choice maxOccurs="unbounded">
+        <xs:choice maxOccurs="unbounded">
             <xs:element name="title" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
             <xs:element name="author" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
-    		<xs:element name="publication_date" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="series" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="edition" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="volume" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="issue" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="report_number" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="publication_place" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="pages" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="isbn" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="doi" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="online_resource" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    		<xs:element name="other_reference_details" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
-    	</xs:choice>
+            <xs:element name="publication_date" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="series" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="edition" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="volume" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="issue" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="report_number" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="publication_place" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="pages" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="isbn" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="doi" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="online_resource" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+            <xs:element name="other_reference_details" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
+        </xs:choice>
     </xs:complexType>
-    
+
     <xs:complexType name="data_center_name_type">
-    	<xs:sequence>
-    		<xs:element name="short_name" type="xs:string"></xs:element>
-    		<xs:element name="long_name" type="xs:string"></xs:element>
-    	</xs:sequence>
+        <xs:sequence>
+            <xs:element name="short_name" type="xs:string"></xs:element>
+            <xs:element name="long_name" type="xs:string"></xs:element>
+        </xs:sequence>
     </xs:complexType>
 </xs:schema>

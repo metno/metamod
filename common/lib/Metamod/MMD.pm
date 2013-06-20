@@ -150,9 +150,11 @@ sub mmd {
     my $style_doc = XML::LibXML->load_xml( location => $$self{'schemadir'}.'mm2-to-mmd.xsl', no_cdata => 1 ) or die "Missing or invalid XSL stylesheet";
     my $stylesheet = $xslt->parse_stylesheet($style_doc);
     my $result = $stylesheet->transform( $$self{'dom'} );
-    #print STDERR $result->toString(1);
+    print STDERR $result->toString(1);
     my $xmlschema = XML::LibXML::Schema->new( location => $$self{'schemadir'}.'mmd.xsd' );
-    eval { $xmlschema->validate($result); } or die $@;
+    #$xmlschema->load_catalog(  $$self{'schemadir'}.'catalog.xml' );
+    print STDERR "Starting validation...\n";
+    eval { $xmlschema->validate($result) == 0 } or die $@;
     return $result;
 }
 

@@ -181,7 +181,7 @@ sub test {
     #my $config = Metamod::Config->new();
     my $dataset = `basename $file .xml`;
 
-    my $editor = Metamod::MetadataEditor->new('metamodtest'); # move to master_config - FIXME
+    my $editor = Metamod::MetadataEditor->new(); # for testing put project into METAEDIT_WS_URL in config
 
     my $doc = Metamod::MMD->new($file)->mmd;
     print "****\n" . $doc->toString(1);
