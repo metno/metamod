@@ -17,8 +17,8 @@ metamodweb_test.pl [options] uri
    --help    display this help and exits
 
  Examples:
-   metamod_test.pl http://localhost/some_action
-   metamod_test.pl /some_action
+   metamodweb_test.pl http://localhost/some_action
+   metamodweb_test.pl /some_action
 
  See also:
    perldoc Catalyst::Manual
