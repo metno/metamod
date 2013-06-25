@@ -86,6 +86,7 @@ sub new {
     my $project = shift || $config->get('APPLICATION_ID') or die "Missing project for metadata editor";
     $self->{'editor_url'} = shift || $config->get('METAEDIT_WS_URL') or die "Missing metadata editor URL";
     $self->{'editor_url'} =~ s/\[PROJECT\]/$project/;
+    $self->{'DEBUG'} = 1 unless caller();
     return $self;
 }
 
@@ -179,7 +180,7 @@ sub run {
 sub test {
     my $file = shift or die;
     #my $config = Metamod::Config->new();
-    my $dataset = `basename $file .xml`;
+    my $dataset = `basename $file .xml`; # rewrite to use some File::* method
 
     my $editor = Metamod::MetadataEditor->new(); # for testing put project into METAEDIT_WS_URL in config
 
@@ -189,8 +190,9 @@ sub test {
     print STDERR "Edit at $GUI_url\n";
 
     my $xml = $editor->download_mmd($dataset);
+    print STDERR "$xml\n\n";
     my $doc2 = Metamod::MMD->new($xml)->mm2;
-    print $doc2->toString(1);
+    print STDERR $doc2->toString(2);
 
 
 }
