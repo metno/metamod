@@ -2,15 +2,28 @@
 # IMPORTANT: if you delete this file your app will not work as
 # expected.  You have been warned.
 
-
-use inc::Module::Install;
+use inc::Module::Install 1.02;
+use Module::Install::Catalyst; # Complain loudly if you don't have
+                               # Catalyst::Devel installed or haven't said
+                               # 'make dist' to create a standalone tarball.
 
 name 'MetamodWeb';
 all_from 'lib/MetamodWeb.pm';
 
+
+
+requires 'Catalyst::Plugin::ConfigLoader';
+requires 'Catalyst::Plugin::Static::Simple';
+requires 'Catalyst::Action::RenderView';
+requires 'Moose';
+requires 'namespace::autoclean';
+requires 'Config::General'; # This should reflect the config file format you've chosen
+                 # See Catalyst::Plugin::ConfigLoader for supported formats
+
+
 # Dependencies that are handled by the internal Catalyst .deb package
-requires 'Catalyst::Devel' => '1.27';
-requires 'Catalyst::Runtime' => '5.80022';
+requires 'Catalyst::Devel' => '1.37';
+requires 'Catalyst::Runtime' => '5.90019';
 requires 'Catalyst::Plugin::Authentication';
 requires 'Catalyst::Action::REST';
 requires 'Catalyst::Authentication::Store::DBIx::Class';
@@ -23,10 +36,11 @@ requires 'Catalyst::Plugin::Session::Store::FastMmap';
 requires 'Catalyst::Plugin::ConfigLoader';
 requires 'Catalyst::Plugin::Static::Simple';
 requires 'Catalyst::Action::RenderView';
-requires 'Catalyst::View::TT' => '0.35';
+requires 'Catalyst::View::TT' => '0.40';
 #requires 'Catalyst::Log::Log4perl' => '1.04'; # DEPRECATED use Log::Log4perl::Catalyst instead
 requires 'Log::Log4perl' => '1.31';
 requires 'Catalyst::Controller::ActionRole' => '0.15';
+
 requires 'Moose' => '1.14';
 requires 'DBIx::Class' => '0.08123';
 requires 'DBIx::Class::QueryLog' => '1.3.0';
@@ -42,9 +56,6 @@ requires 'Archive::Zip';
 requires 'HTTP::OAI';
 requires 'XML::SAX::Writer';
 
-# Dependencies that are not handled by the Catalyst .deb package. These should
-# be using the standard Ubuntu repository (or similar on other platforms). If the package
-# is not available in the repository install it from CPAN.
 requires 'Imager'; # If installing from CPAN you need libpng-dev (Ubuntu)
 requires 'XML::LibXML';
 requires 'XML::LibXSLT';
