@@ -63,6 +63,13 @@ PIDSUFFIX=[==APPLICATION_ID==]
 PIDDIR=[==WEBRUN_DIRECTORY==]
 PIDFILE=$PIDDIR/$UNIXNAME${PIDSUFFIX:+"-$PIDSUFFIX"}.pid
 
+if [ -d "[==CONFIG_DIR==]" ]; then
+    echo "Using config in [==CONFIG_DIR==]"
+else
+    echo "Missing config directory"
+    exit 1
+fi
+
 # -------------
 
 check_running() {
@@ -97,6 +104,7 @@ _start() {
     start-stop-daemon --start --verbose --pidfile $PIDFILE -m --chdir $APPDIR \
         ${USER:+"--chuid"} $USER ${GROUP:+"--group"} $GROUP --background \
         --startas $BINDIR/${UNIXNAME}_server.pl -- --port $port \
+        --config [==CONFIG_DIR==] \
         --min_servers=2 --max_servers=5 --min_spare_servers=1 --max_spare_servers=3
 
     for i in 1 2 3 4 5 ; do
