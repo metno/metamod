@@ -10,8 +10,6 @@ use Module::Install::Catalyst; # Complain loudly if you don't have
 name 'MetamodWeb';
 all_from 'lib/MetamodWeb.pm';
 
-
-
 requires 'Catalyst::Plugin::ConfigLoader';
 requires 'Catalyst::Plugin::Static::Simple';
 requires 'Catalyst::Action::RenderView';
@@ -21,9 +19,10 @@ requires 'Config::General'; # This should reflect the config file format you've 
                  # See Catalyst::Plugin::ConfigLoader for supported formats
 
 
-# Dependencies that are handled by the internal Catalyst .deb package
+# Dependencies that once were handled by the internal Catalyst .deb package (now carton)
 requires 'Catalyst::Devel' => '1.37';
 requires 'Catalyst::Runtime' => '5.90019';
+requires 'Starman' => '0.3006';
 requires 'Catalyst::Plugin::Authentication';
 requires 'Catalyst::Action::REST';
 requires 'Catalyst::Authentication::Store::DBIx::Class';

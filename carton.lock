@@ -601,64 +601,6 @@
          "target" : "Bit::Vector",
          "version" : "7.2"
       },
-      "CGI::Cookie::XS" : {
-         "dist" : "CGI-Cookie-XS-0.18",
-         "mymeta" : {
-            "abstract" : "HTTP Cookie parser in pure C",
-            "author" : [
-               "Agent Zhang <agentzh@yahoo.cn>"
-            ],
-            "dynamic_config" : 0,
-            "generated_by" : "Module::Install version 0.77, CPAN::Meta::Converter version 2.120921",
-            "license" : [
-               "perl_5"
-            ],
-            "meta-spec" : {
-               "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-               "version" : "2"
-            },
-            "name" : "CGI-Cookie-XS",
-            "no_index" : {
-               "directory" : [
-                  "inc",
-                  "t"
-               ]
-            },
-            "prereqs" : {
-               "build" : {
-                  "requires" : {
-                     "ExtUtils::MakeMaker" : "0"
-                  }
-               },
-               "runtime" : {
-                  "requires" : {
-                     "ExtUtils::MakeMaker" : "6.64",
-                     "Filter::Util::Call" : "0"
-                  }
-               }
-            },
-            "release_status" : "stable",
-            "resources" : {
-               "license" : [
-                  "http://dev.perl.org/licenses/"
-               ],
-               "repository" : {
-                  "url" : "http://github.com/agentzh/cookiexs/tree/master"
-               }
-            },
-            "version" : "0.18"
-         },
-         "name" : "CGI::Cookie::XS",
-         "pathname" : "A/AG/AGENT/CGI-Cookie-XS-0.18.tar.gz",
-         "provides" : {
-            "CGI::Cookie::XS" : {
-               "file" : "CGI/Cookie/XS.pm",
-               "version" : "0.18"
-            }
-         },
-         "target" : "CGI::Cookie::XS",
-         "version" : "0.18"
-      },
       "CGI::Simple" : {
          "dist" : "CGI-Simple-1.113",
          "mymeta" : {
@@ -1942,79 +1884,6 @@
          },
          "target" : "Catalyst::Devel",
          "version" : "1.37"
-      },
-      "Catalyst::Engine::HTTP::Prefork" : {
-         "dist" : "Catalyst-Engine-HTTP-Prefork-0.51",
-         "mymeta" : {
-            "abstract" : "High-performance pre-forking Catalyst engine",
-            "author" : [
-               "Andy Grundman, <andy@hybridized.org>"
-            ],
-            "dynamic_config" : 0,
-            "generated_by" : "Module::Install version 0.91, CPAN::Meta::Converter version 2.120921",
-            "license" : [
-               "perl_5"
-            ],
-            "meta-spec" : {
-               "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-               "version" : "2"
-            },
-            "name" : "Catalyst-Engine-HTTP-Prefork",
-            "no_index" : {
-               "directory" : [
-                  "inc",
-                  "t"
-               ]
-            },
-            "prereqs" : {
-               "build" : {
-                  "requires" : {
-                     "ExtUtils::MakeMaker" : "0"
-                  }
-               },
-               "configure" : {
-                  "requires" : {
-                     "ExtUtils::MakeMaker" : "6.42"
-                  }
-               },
-               "runtime" : {
-                  "requires" : {
-                     "Catalyst::Runtime" : "5.7012",
-                     "Cookie::XS" : "0.08",
-                     "ExtUtils::MakeMaker" : "6.42",
-                     "HTTP::Body" : "1.01",
-                     "HTTP::HeaderParser::XS" : "0.20",
-                     "Net::Server" : "0.97"
-                  }
-               }
-            },
-            "release_status" : "stable",
-            "resources" : {
-               "license" : [
-                  "http://dev.perl.org/licenses/"
-               ],
-               "repository" : {
-                  "url" : "http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Engine-HTTP-Prefork/"
-               }
-            },
-            "version" : "0.51"
-         },
-         "name" : "Catalyst::Engine::HTTP::Prefork",
-         "pathname" : "A/AG/AGRUNDMA/Catalyst-Engine-HTTP-Prefork-0.51.tar.gz",
-         "provides" : {
-            "Catalyst::Engine::HTTP::Prefork" : {
-               "file" : "Catalyst/Engine/HTTP/Prefork.pm",
-               "version" : "0.51"
-            },
-            "Catalyst::Engine::HTTP::Prefork::Handler" : {
-               "file" : "Catalyst/Engine/HTTP/Prefork/Handler.pm"
-            },
-            "Catalyst::Engine::HTTP::Prefork::Restarter" : {
-               "file" : "Catalyst/Engine/HTTP/Prefork/Restarter.pm"
-            }
-         },
-         "target" : "Catalyst::Engine::HTTP::Prefork",
-         "version" : "0.51"
       },
       "Catalyst::Log::Log4perl" : {
          "dist" : "Catalyst-Log-Log4perl-1.06",
@@ -4759,62 +4628,6 @@
          },
          "target" : "Convert::ASN1",
          "version" : "0.26"
-      },
-      "Cookie::XS" : {
-         "dist" : "Cookie-XS-0.11",
-         "mymeta" : {
-            "abstract" : "HTTP Cookie parser in C (Please use CGI::Cookie::XS instead)",
-            "author" : [
-               "Agent Zhang <agentzh@yahoo.cn>"
-            ],
-            "dynamic_config" : 0,
-            "generated_by" : "Module::Install version 0.77, CPAN::Meta::Converter version 2.120921",
-            "license" : [
-               "perl_5"
-            ],
-            "meta-spec" : {
-               "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-               "version" : "2"
-            },
-            "name" : "Cookie-XS",
-            "no_index" : {
-               "directory" : [
-                  "inc",
-                  "t"
-               ]
-            },
-            "prereqs" : {
-               "build" : {
-                  "requires" : {
-                     "ExtUtils::MakeMaker" : "0"
-                  }
-               },
-               "runtime" : {
-                  "requires" : {
-                     "CGI::Cookie::XS" : "0.15",
-                     "ExtUtils::MakeMaker" : "6.64",
-                     "Test::More" : "0"
-                  }
-               }
-            },
-            "release_status" : "stable",
-            "resources" : {
-               "license" : [
-                  "http://dev.perl.org/licenses/"
-               ]
-            },
-            "version" : "0.11"
-         },
-         "name" : "Cookie::XS",
-         "pathname" : "A/AG/AGENT/Cookie-XS-0.11.tar.gz",
-         "provides" : {
-            "Cookie::XS" : {
-               "file" : "Cookie/XS.pm",
-               "version" : "0.11"
-            }
-         },
-         "target" : "Cookie::XS",
-         "version" : "0.11"
       },
       "Cwd" : {
          "dist" : "PathTools-3.40",
@@ -16375,49 +16188,6 @@
          },
          "target" : "HTTP::Date",
          "version" : "6.02"
-      },
-      "HTTP::HeaderParser::XS" : {
-         "dist" : "HTTP-HeaderParser-XS-0.20",
-         "mymeta" : {
-            "abstract" : "unknown",
-            "author" : [
-               "unknown"
-            ],
-            "dynamic_config" : 0,
-            "generated_by" : "ExtUtils::MakeMaker version 6.30, CPAN::Meta::Converter version 2.120921",
-            "license" : [
-               "unknown"
-            ],
-            "meta-spec" : {
-               "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-               "version" : "2"
-            },
-            "name" : "HTTP-HeaderParser-XS",
-            "prereqs" : {
-               "build" : {
-                  "requires" : {
-                     "ExtUtils::MakeMaker" : "0"
-                  }
-               },
-               "runtime" : {
-                  "requires" : {}
-               }
-            },
-            "release_status" : "stable",
-            "version" : "0.20",
-            "x_installdirs" : "site",
-            "x_version_from" : "lib/HTTP/HeaderParser/XS.pm"
-         },
-         "name" : "HTTP::HeaderParser::XS",
-         "pathname" : "M/MA/MARKSMITH/HTTP-HeaderParser-XS-0.20.tar.gz",
-         "provides" : {
-            "HTTP::HeaderParser::XS" : {
-               "file" : "HTTP/HeaderParser/XS.pm",
-               "version" : "0.20"
-            }
-         },
-         "target" : "HTTP::HeaderParser::XS",
-         "version" : "0.20"
       },
       "HTTP::Message" : {
          "dist" : "HTTP-Message-6.06",
