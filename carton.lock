@@ -3176,6 +3176,74 @@
          "target" : "CatalystX::Component::Traits",
          "version" : "0.16"
       },
+      "CatalystX::Script::Server::Starman" : {
+         "dist" : "CatalystX-Script-Server-Starman-0.02",
+         "mymeta" : {
+            "abstract" : "Replace the development server with Starman",
+            "author" : [
+               "Tomas Doran (t0m) C<< <bobtfish@bobtfish.net> >>"
+            ],
+            "dynamic_config" : 0,
+            "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120921",
+            "license" : [
+               "perl_5"
+            ],
+            "meta-spec" : {
+               "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+               "version" : "2"
+            },
+            "name" : "CatalystX-Script-Server-Starman",
+            "no_index" : {
+               "directory" : [
+                  "inc",
+                  "t"
+               ]
+            },
+            "prereqs" : {
+               "build" : {
+                  "requires" : {
+                     "ExtUtils::MakeMaker" : "6.36",
+                     "Test::More" : "0.88",
+                     "Test::WWW::Mechanize::Catalyst" : "0"
+                  }
+               },
+               "configure" : {
+                  "requires" : {
+                     "ExtUtils::MakeMaker" : "6.36"
+                  }
+               },
+               "runtime" : {
+                  "requires" : {
+                     "Catalyst::Runtime" : "5.89",
+                     "Moose" : "0",
+                     "Starman" : "0",
+                     "namespace::autoclean" : "0"
+                  }
+               }
+            },
+            "release_status" : "stable",
+            "resources" : {
+               "license" : [
+                  "http://dev.perl.org/licenses/"
+               ],
+               "repository" : {
+                  "type" : "git",
+                  "url" : "git://git.shadowcat.co.uk/catagits/CatalystX-Script-Server-Starman.git"
+               }
+            },
+            "version" : "0.02"
+         },
+         "name" : "CatalystX::Script::Server::Starman",
+         "pathname" : "A/AB/ABRAXXA/CatalystX-Script-Server-Starman-0.02.tar.gz",
+         "provides" : {
+            "CatalystX::Script::Server::Starman" : {
+               "file" : "CatalystX/Script/Server/Starman.pm",
+               "version" : "0.02"
+            }
+         },
+         "target" : "CatalystX::Script::Server::Starman",
+         "version" : "0.02"
+      },
       "Class::Accessor" : {
          "dist" : "Class-Accessor-0.34",
          "mymeta" : {

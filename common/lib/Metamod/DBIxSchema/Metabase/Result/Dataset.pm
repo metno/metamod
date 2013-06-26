@@ -345,8 +345,7 @@ sub wmsinfo {
     my $wmsinfo_row = $self->selfwmsinfos()->first() || $self->parentwmsinfos()->first()
         or return; # this dataset doesn't have any wmsinfo
 
-    my $parser = new XML::LibXML;
-    my $dom = $parser->parse_string( $wmsinfo_row->wi_content() );
+    my $dom = XML::LibXML->load_xml( string => $wmsinfo_row->wi_content );
     my $root = $dom->documentElement;
     # check if correct wmsinfo format
     if ($root->namespaceURI ne 'http://www.met.no/schema/metamod/ncWmsSetup') {

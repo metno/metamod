@@ -84,6 +84,8 @@ use File::Spec qw();
 use Cwd qw();
 # read ABS_PATH early, in case somebody uses a chdir
 use constant ABS_PATH => Cwd::abs_path(__FILE__);
+printf STDERR "ABS_PATH = %s\n", ABS_PATH;
+
 BEGIN {
     die "cannot get abs_path from ".__FILE__ unless ABS_PATH;
 }
@@ -120,6 +122,7 @@ Skip logging initialization
 
 sub new {
     my ($class, $file_or_dir, $options) = @_;
+    #printf STDERR "Config dir is %s: %d\n", $ENV{METAMOD_MASTER_CONFIG}, defined $_config;
 
     # we already have an object so use that instead.
     return $_config if defined $_config;
@@ -127,6 +130,7 @@ sub new {
     # The environment is only used if the parameter is not supplied.
     if( !$file_or_dir && exists $ENV{METAMOD_MASTER_CONFIG} && $ENV{METAMOD_MASTER_CONFIG} ){
         $file_or_dir = $ENV{METAMOD_MASTER_CONFIG};
+        print STDERR "Using config in $file_or_dir\n";
     }
 
     confess "You must supply the path to the configuration directory or the master_config.txt file" if !$file_or_dir;
@@ -137,7 +141,6 @@ sub new {
     } else {
         $config_file = $file_or_dir;
     }
-
 
     # check file is readable
     if ((! -f $config_file) and (! -r $config_file)) {
@@ -162,7 +165,7 @@ sub instance {
 
     confess "You must call new() once before you can call instance()" if !defined $_config;
 
-    return $_config;
+    return $_config; # || $class->new;
 
 }
 
@@ -652,18 +655,25 @@ sub installation_dir {
     my $self = shift;
 
     my $tries_counter = 0;
-    my $curr_dir = $FindBin::Bin;
+    my $curr_dir = $FindBin::Bin; # not working under init.d - thinks Bin is in config dir
+    printf STDERR "FindBin::Bin thinks Metamod::Config is installed in %s, but is actually in %s\n", $curr_dir, ABS_PATH;
+
+    my ($volume,$directories,$file) = File::Spec->splitpath( ABS_PATH );
+    $curr_dir = $directories;
 
     while( !(-d File::Spec->catdir( $curr_dir, 'common'))){
 
         # try one level up
         $curr_dir = File::Spec->catdir($curr_dir, '..');
+        #printf STDERR "Looking in %s\n", $curr_dir;
         $tries_counter++;
 
         if( $tries_counter > 10 ){
-            die 'Could not determine installation dir';
+            confess 'Could not determine installation dir';
         }
     }
+
+    printf STDERR "INSTALLATION_DIR = %s\n", Cwd::abs_path($curr_dir);
 
     return Cwd::abs_path($curr_dir);
 }

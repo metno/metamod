@@ -37,3 +37,4 @@ requires 'XML::RSS::LibXML', 0.3102;
 requires 'XML::SAX::Writer', 0.53;
 requires 'XML::Simple', 2.18;
 requires 'Starman', 0.3006;
+requires 'CatalystX::Script::Server::Starman';

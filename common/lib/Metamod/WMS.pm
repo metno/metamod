@@ -70,7 +70,6 @@ our @EXPORT = qw(logger param abandon getXML getMapURL getSetup outputXML defaul
 # FIXME rewrite as OO
 
 my $q = CGI->new;
-my $parser = XML::LibXML->new( load_ext_dtd => 0 );
 my $logger = get_logger('metamod.search');
 my $config = Metamod::Config->instance();
 
@@ -78,10 +77,6 @@ my $bbox = $config->split('WMS_BOUNDING_BOXES');
 my $coastlinemaps = $config->split('WMS_MAPS');
 my $projnames = $config->split('WMS_PROJECTIONS');
 #print STDERR Dumper \$projnames;
-
-#sub new {
-#    bless [$q, $parser, $config, $logger], shift;
-#}
 
 sub logger {
     return $logger;
@@ -134,8 +129,8 @@ sub getXML {
     if ($response->is_success) {
         #print STDERR $response->content;
         my $dom;
-        #eval { $dom = $parser->parse_string($response->content) } or abandon($@, 502);
-        eval { $dom = $parser->parse_string($response->content) } or croak($@);
+        eval { $dom = XML::LibXML->load_xml( string => $response->content ) }
+            or croak($@);
         return $dom;
     }
     else {
@@ -234,7 +229,8 @@ EOT
 
     #print STDERR $default_wmc;
 
-    return $parser->parse_string($default_wmc) or die "Error in parsing default WMC";
+    eval { return XML::LibXML->load_xml( string => $default_wmc ) }
+        or die "Error in parsing default WMC";
 }
 
 =head2 getProjName()
@@ -272,5 +268,6 @@ sub bgmapURLs {
     use Clone qw(clone); # TT seems to mess up data structure, so best copy it
     return clone $coastlinemaps;
 }
+
 
 1;

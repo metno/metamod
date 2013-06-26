@@ -20,7 +20,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
-use 5.008008;
 use Moose;
 use namespace::autoclean;
 
@@ -29,6 +28,7 @@ use Catalyst::Runtime 5.80;
 use Log::Log4perl::Catalyst;
 use FindBin;
 use Log::Log4perl qw(get_logger);
+use Data::Dumper;
 
 use Metamod::Config;
 use MetamodWeb::Utils::GenCatalystConf;
@@ -67,7 +67,9 @@ $VERSION = eval $VERSION;
 # with an external configuration file acting as an override for
 # local deployment.
 
-my $mm_config = Metamod::Config->instance();
+#print STDERR "MetamodWeb ", Dumper \%ENV;
+
+my $mm_config = Metamod::Config->new(); # instance(); # why is this suddenly run compile time?
 $mm_config->initLogger();
 
 my $custdir = path_to_custom();
@@ -158,6 +160,8 @@ sub path_to_custom {
     return File::Spec->catdir($mm_config->config_dir, 'custom');
 
 }
+
+__END__
 
 =head1 NAME
 

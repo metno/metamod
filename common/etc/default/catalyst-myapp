@@ -1,7 +1,7 @@
 ### edit & copy this file to /etc/default/catalyst-[==APPLICATION_ID==]
 
 export METAMOD_MASTER_CONFIG=[==CONFIG_DIR==]/master_config.txt
-export CATALYST_ENGINE=HTTP::Prefork
+#export CATALYST_ENGINE=HTTP::Prefork # deprecated in favour of Starman
 
 port=[==CATALYST_PORT==]
 #min_servers=x
