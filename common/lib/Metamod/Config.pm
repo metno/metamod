@@ -66,6 +66,7 @@ This module can be used to read the configuration file.
 package Metamod::Config;
 
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
+# works poorly since only detects change of current file
 our $DEBUG = 0;
 
 use strict;
@@ -84,7 +85,7 @@ use File::Spec qw();
 use Cwd qw();
 # read ABS_PATH early, in case somebody uses a chdir
 use constant ABS_PATH => Cwd::abs_path(__FILE__);
-printf STDERR "ABS_PATH = %s\n", ABS_PATH;
+#printf STDERR "ABS_PATH = %s\n", ABS_PATH;
 
 BEGIN {
     die "cannot get abs_path from ".__FILE__ unless ABS_PATH;
@@ -130,7 +131,7 @@ sub new {
     # The environment is only used if the parameter is not supplied.
     if( !$file_or_dir && exists $ENV{METAMOD_MASTER_CONFIG} && $ENV{METAMOD_MASTER_CONFIG} ){
         $file_or_dir = $ENV{METAMOD_MASTER_CONFIG};
-        print STDERR "Using config in $file_or_dir\n";
+        #print STDERR "Using config in $file_or_dir\n";
     }
 
     confess "You must supply the path to the configuration directory or the master_config.txt file" if !$file_or_dir;
@@ -451,6 +452,13 @@ sub _readConfig {
         close $fh;
     }
 
+    $conf{'INSTALLATION_DIR'} = $self->installation_dir();
+    $conf{'CONFIG_DIR'}       = $self->config_dir();
+
+    for (keys %ENV) {
+        next unless /^METAMOD_(\w+)/;
+        $conf{$1} = $ENV{$_};
+    }
 
     $self->{vars} = \%conf;
 }
@@ -458,16 +466,6 @@ sub _readConfig {
 # get a variable from env or the internal hash, without substitution
 sub _getVar {
     my ($self, $var) = @_;
-
-    if (exists $ENV{"METAMOD_".$var}) {
-        return $ENV{"METAMOD_".$var};
-    }
-
-    if( $var eq 'CONFIG_DIR' ){
-        return $self->config_dir();
-    } elsif( $var eq 'INSTALLATION_DIR') {
-        return $self->installation_dir();
-    }
 
     if (!exists $self->{vars}{$var}) {
         if ($_logger_initialised) {
@@ -656,7 +654,7 @@ sub installation_dir {
 
     my $tries_counter = 0;
     my $curr_dir = $FindBin::Bin; # not working under init.d - thinks Bin is in config dir
-    printf STDERR "FindBin::Bin thinks Metamod::Config is installed in %s, but is actually in %s\n", $curr_dir, ABS_PATH;
+    #printf STDERR "FindBin::Bin thinks Metamod::Config is installed in %s, but is actually in %s\n", $curr_dir, ABS_PATH;
 
     my ($volume,$directories,$file) = File::Spec->splitpath( ABS_PATH );
     $curr_dir = $directories;
@@ -673,7 +671,7 @@ sub installation_dir {
         }
     }
 
-    printf STDERR "INSTALLATION_DIR = %s\n", Cwd::abs_path($curr_dir);
+    #printf STDERR "INSTALLATION_DIR = %s\n", Cwd::abs_path($curr_dir);
 
     return Cwd::abs_path($curr_dir);
 }
