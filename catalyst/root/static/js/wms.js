@@ -204,7 +204,7 @@ function drawMap(response) {
                     log.debug('legend:', legend_elem);
                 }
             } else {
-                if (sty[0].legend) { // why?
+                if (sty[0].legend) { // what's this for?
                     legend_elem = '<img id="layer' + i + '_legend" src="' + fixThreddsURL( sty[0].legend.href ) + '"/>';
                     legend_elem = legend_elem.replace(/PALETTE=[^&]+[&]?/i, ''); // remove PALETTE param and let server decide default style
                     log.debug('legend:', legend_elem);

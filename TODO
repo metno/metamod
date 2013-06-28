@@ -15,9 +15,6 @@ just as an electronic Post-It note for developers to quickly note action
 points for later.
 
 --------------------
-
-put projstrings in separate list instead of hardcoded in Metno::Fimex
-
 clean up multiwmc controller, moving processing to utils
 
 clean up ds_filepath in database to exclude extension whenever found
@@ -69,6 +66,10 @@ reset password should send a link to reset instead of resetting directly to avoi
 - must use POST
 
 ++++++++ DONE ++++++++++++++
+
+remove LAYERS from GetLegendGraphics when calling latest thredds
+
+put projstrings in separate list instead of hardcoded in Metno::Fimex
 
 projection selector in wms client
 - fix selector to show current projection

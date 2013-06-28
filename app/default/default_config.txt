@@ -89,10 +89,8 @@ LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
 
 # ============== Catalyst configuration =================
 
-# lib for Catalyst and other dependencies
-# (disable this if you've installed everything from CPAN instead)
-CATALYST_LIB = /opt/metno-metamod-2.13/local/lib/perl5
-# FIXME find a way to update version number automagically
+# lib for Catalyst and other dependencies NOT handled by Carton or Debian
+#CATALYST_LIB = /opt/metno-metamod-2.13/local/lib/perl5
 
 # port used by the Catalyst server
 CATALYST_PORT = 3000

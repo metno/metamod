@@ -65,6 +65,7 @@ activate_mm() {
     else
 	# FIXME find a way to update version number automagically
 	export PERL5LIB=$PERL5LIB:"/opt/metno-metamod-2.13/local/lib/perl5"
+	# should ideally use CATALYST_LIB, but config params not available
     fi
 
     _OLD_VIRTUAL_PS1="$PS1"
@@ -85,9 +86,9 @@ activate_mm() {
 
 if [ $# != 1 ]
 then
-    echo "You must supply the config dir as a parameter"
+    echo "You must supply the config dir as a parameter, or -d (deactivate)"
 else
-    if [ $1 == 'deactivate' ] ; then
+    if [[ $1 == 'deactivate' || $1 == '-d' ]] ; then
     	deactivate_mm
     else
         activate_mm $1

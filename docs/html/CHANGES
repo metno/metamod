@@ -8,6 +8,8 @@
     - improved support for background maps in different projections
     - automatic building and installation of Perl dependencies using Carton
     - support for Ubuntu 12.4 Precise Pangolin and PostgreSQL 9.1
+    - fix for old GetLegendGraphics bug to work with new version of THREDDS
+    - upgraded to latest Catalyst version (5.9)
 
 2.12   Mon Jan 14 2013
     - projection selector and timeslider in wms client

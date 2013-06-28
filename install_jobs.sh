@@ -16,6 +16,25 @@ OPTIONS:
 EOF
 }
 
+ordie () {
+    if [ $? != 0 ]
+    then
+        echo "$*"
+        exit 1
+    fi
+}
+
+psudo () { # hack to allow both sudo and non-sudo running of perl scripts
+    if [ "$PERLSUDO" ]
+    then
+        sudo PERL5LIB="$CATALYST_LIB" ${*}
+    else
+        PERL5LIB="$CATALYST_LIB" $*
+    fi
+}
+
+###########
+
 # unset this later in the script for users with restricted sudo privileges
 PERLSUDO=sudo
 
@@ -42,17 +61,8 @@ do
     shift $((OPTIND-1)); OPTIND=1
 done
 
-psudo () { # hack to allow both sudo and non-sudo running of perl scripts
-    if [ "$PERLSUDO" ]
-    then
-        sudo PERL5LIB="$CATALYST_LIB" ${*}
-    else
-        PERL5LIB="$CATALYST_LIB" $*
-    fi
-}
-
 #
-# calculate config path
+# calculate master_config path
 #
 
 if [ ! -z "$1" ]
@@ -64,7 +74,7 @@ else
     then
         CONFIG=$METAMOD_MASTER_CONFIG
     else
-        echo "No configuration specified (param or envvar)" 1>&2
+        echo "No master configuration specified (param or envvar)" 1>&2
         exit 1
     fi
 fi
@@ -81,7 +91,7 @@ fi
 # read configuration and store in env
 #
 
-SCRIPT_PATH="`dirname \"$0\"`/common"
+SCRIPT_PATH="`dirname \"$0\"`/common" # INSTALLATION_DIR not available yet
 SHELL_CONF=/tmp/metamod_tmp_bash_config.sh
 perl "$SCRIPT_PATH/scripts/gen_bash_conf.pl" ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
 
@@ -107,16 +117,9 @@ fi
 CATALYST_APP="catalyst-$APPLICATION_ID"
 COMMON_LIB=`readlink -f $SCRIPT_PATH/lib` # make path absolute before using in PERL5LIB
 
-ordie () {
-    if [ $? != 0 ]
-    then
-        echo "$*"
-        exit 1
-    fi
-}
-
 # make sure perl scripts can find dependencies
-export PERL5LIB="$CATALYST_LIB:$PERL5LIB"
+# [ should this really be here? FIXME ]
+#export PERL5LIB="$CATALYST_LIB:$PERL5LIB"
 
 # write Apache conf and init.d scripts to applic dir
 

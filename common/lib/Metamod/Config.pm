@@ -452,9 +452,12 @@ sub _readConfig {
         close $fh;
     }
 
+    # add computed values
     $conf{'INSTALLATION_DIR'} = $self->installation_dir();
     $conf{'CONFIG_DIR'}       = $self->config_dir();
+    $conf{'CATALYST_LIB'}     = $conf{'INSTALLATION_DIR'} . "/local/lib/perl5" unless exists $conf{'CATALYST_LIB'};
 
+    # add environment variables (currently no keyword substitution)
     for (keys %ENV) {
         next unless /^METAMOD_(\w+)/;
         $conf{$1} = $ENV{$_};

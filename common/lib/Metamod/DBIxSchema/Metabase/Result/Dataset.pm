@@ -504,9 +504,13 @@ Make sure to check if wmsinfo exist before calling this method.
 
 =cut
 
-sub wmsthumb { # TODO - move this somewhere else so we can use config runtime instead of compile time
+sub wmsthumb { # TODO - move this somewhere else so we can use config runtime instead of compile time (seems to work now in 2.13)
     my $self = shift;
     my ($size) = @_;
+
+    # this method needs some serious rework, including
+    # - find a better procedure for calculating timestamps
+    # - remove hardcoded LAYER borders
 
     try {
         my $config = Metamod::Config->instance();
@@ -558,7 +562,7 @@ sub wmsthumb { # TODO - move this somewhere else so we can use config runtime in
         my $out = {
             xysize  => $size,
             datamap => "$layer{url}?$wmsparams&LAYERS=$layer{name}&STYLES=$layer{style}",
-            outline => $mapurl ? "$mapurl?$wmsparams&TRANSPARENT=true&LAYERS=borders&STYLES=" : undef,
+            outline => $mapurl ? "$mapurl?$wmsparams&TRANSPARENT=true&LAYERS=borders&STYLES=" : undef, # FIXME remove hardcoded LAYERS
             wms_url => $wms_url,
         };
 

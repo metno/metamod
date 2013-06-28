@@ -27,6 +27,7 @@ debian_package:
 	fakeroot rsync -aC $(CURDIR)/README $(DESTDIR)/
 	fakeroot rsync -aC $(CURDIR)/VERSION $(DESTDIR)/
 	fakeroot rsync -aC $(CURDIR)/install_jobs.sh $(DESTDIR)/
+	fakeroot rsync -aC $(CURDIR)/lsconf $(DESTDIR)/
 
 	fakeroot dh_fixperms
 	fakeroot dh_gencontrol

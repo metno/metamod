@@ -2,6 +2,8 @@
 
 Back to L<Index|index>
 
+########################
+
 =head2 Introduction
 
 This describes how to install the METAMOD software on a Linux server.
@@ -11,6 +13,8 @@ No services will be available until you configure and set up a METAMOD instance
 METAMOD is developed, tested and used on Ubuntu LTS servers (Hardy, Lucid, Precise).
 Debian packages are provided regularly for easy installation and upgrading.
 Installation from source is also possible, but somewhat more time-consuming.
+
+########################
 
 =head2 Required software
 
@@ -42,6 +46,8 @@ L<http://proj.maptools.org>
 libnetcdf, ncdump and ncgen
 
 =back
+
+########################
 
 =head2 Installation from Debian packages
 
@@ -116,6 +122,8 @@ Installation is done using a GUI packet manager or via command line:
 
 where 2.13.0-1 is the latest version in the repository.
 
+########################
+
 =head2 Installation from source
 
 =head3 Download the METAMOD source code
@@ -159,10 +167,16 @@ the OpenSSL Library
 Installing these via Debial packages using C<apt-get> is recommended if possible.
 A complete list of the required Debian packages can be found in F<debian/control>.
 
+########################
+
 =head2 Installing Perl dependency libraries
 
+The METAMOD Debian package already includes all necessary Perl dependencies, and pulls in
+any required binary libries automatically. All you need to do is make sure C<CATALYST_LIB>
+is unset in F<master_config.txt>.
+
 If installing from source, you must download and build the necessary Perl modules from CPAN.
-This used to be a major headache, but is now possible to do with a single command using
+This used to be a major chore, but is now possible to do with a single command using
 the new Perl module dependency manager Carton.
 
 =head3 cpanminus
@@ -189,7 +203,7 @@ explicitly:
 
 =head3 METAMOD dependencies
 
-You are now ready to install the Perl dependencies from CPAN:
+You are now ready to install the Perl dependency libraries:
 
   $ cd ~/metamod/trunk
   $ carton install --deployment
@@ -197,6 +211,22 @@ You are now ready to install the Perl dependencies from CPAN:
 Carton will then install the modules listed in F<carton.lock> into F<~/metamod/trunk/local/lib>.
 This should not generate any errors as long as you have installed all the necessary binary libraries
 as listed above.
+
+=head3 PERL5LIB
+
+Make sure that  C<CATALYST_LIB> is not set in F<master_config.txt>, and
+your C<PERL5LIB> environment variable is set to point to your local/lib/perl5 directory.
+This is handled automatically by C<activate_env> and F<init.d> scripts.
+
+=head3 Alternate installation methods
+
+As usual you could always install the required modules directly from CPAN.
+However, if you decided to install them outside your normal @INC path you need
+to specify the location in C<CATALYST_LIB> in master_config.txt, as well as in
+PERL5LIB when running from the command line (activate_env doesn't handle this special case yet).
+
+
+########################
 
 =head2 Installing the PostgreSQL database
 
@@ -268,6 +298,8 @@ Then restart PostgreSQL:
   /etc/init.d/postgresql start
 
 Alternatively, use .pgpass (FIXME)
+
+########################
 
 =head2 Conclusion
 

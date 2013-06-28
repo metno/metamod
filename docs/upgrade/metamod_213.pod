@@ -10,15 +10,42 @@ but may be reenabled by editing F<base/init/createdb.sh> (ca. line 80).
 
 =head2 Dependency libraries
 
-Metamod now contains all necessary Perl dependencies in the Debian package.
+Metamod now contains all necessary Perl dependencies included in the Debian package.
+The previous F<metno-perl-webdev-ver1> package will no longer work since METAMOD 2.13
+now requires Catalyst 5.9.
 
-If installing from source, you must build the necessary Perl modules using Carton,
-see L<Installation|../installation> for details.
+If installing from source, you must build the necessary Perl modules yourself,
+preferably in a local lib using Carton. See L<Installation|../installation> for details.
 
-You must also set your C<PERL5LIB> to point to F<metamod/trunk/local/lib> in your environment,
-or change C<CATALYST_LIB> in F<master_config.txt> (defaults to the Debian install directory):
+=head2 Configuration
 
-  CATALYST_LIB = /opt/metno-metamod-2.13/local/lib/perl5
+=head3 lsconf
+
+A new utility C<lsconf> has been added to check current configuration settings:
+
+  $ ./lsconf [--config <config file or dir>] [--split] [<variable>]
+
+The following
+
+=head4 Deprecated configuration settings
+
+The following directives have been deprecated and should be removed from F<master_config.txt> (they are
+now defined in F<default_config.txt> and only used in case C<WMS_MAPS> should happen to be unset):
+
+=over 4
+
+=item WMS_BACKGROUND_MAPSERVER
+
+=item WMS_NORTHPOLE_MAP
+
+=item WMS_SOUTHPOLE_MAP
+
+=item WMS_WORLD_MAP
+
+=back
+
+In addition, C<CATALYST_LIB> is now automatically computed and should be unset in F<master_config.txt>,
+unless your dependencies are located somewhere else than in the METAMOD tree.
 
 =head2 New WMS features
 
@@ -46,23 +73,6 @@ To replace or extend this list, copy the whole directive to F<master_config.txt>
 
 Names and bounding boxes are also defined in F<default_config.txt> under C<WMS_PROJECTIONS> and C<WMS_BOUNDING_BOXES>,
 but may be overridden in F<master_config.txt>.
-
-=head4 Deprecated configuration settings
-
-The following directives have been deprecated and should be removed from F<master_config.txt> (they are
-now defined in F<default_config.txt> and only used in case C<WMS_MAPS> should happen to be unset):
-
-=over 4
-
-=item WMS_BACKGROUND_MAPSERVER
-
-=item WMS_NORTHPOLE_MAP
-
-=item WMS_SOUTHPOLE_MAP
-
-=item WMS_WORLD_MAP
-
-=back
 
 =head3 Dynamic map search
 

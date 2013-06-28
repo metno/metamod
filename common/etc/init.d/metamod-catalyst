@@ -28,9 +28,7 @@ APPID=[==APPLICATION_ID==]
 APPDIR=[==CONFIG_DIR==]
 COMMON_LIB=[==INSTALLATION_DIR==]/common/lib:[==INSTALLATION_DIR==]/catalyst/lib
 BINDIR=[==INSTALLATION_DIR==]/catalyst/script
-
-LOCAL_LIB=[==CATALYST_LIB==]
-export PERL5LIB=$COMMON_LIB:$LOCAL_LIB
+export PERL5LIB="$COMMON_LIB:[==CATALYST_LIB==]"
 
 # -------------
 
@@ -106,6 +104,7 @@ _start() {
         --startas $BINDIR/${UNIXNAME}_server.pl -- --port $port \
         --config [==CONFIG_DIR==] \
         --min_servers=2 --max_servers=5 --min_spare_servers=1 --max_spare_servers=3
+    # --config should not be necessary since METAMOD_MASTER_CONFIG is set in /etc/default
 
     for i in 1 2 3 4 5 ; do
         sleep 1
