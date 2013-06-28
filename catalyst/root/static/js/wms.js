@@ -71,6 +71,7 @@ function styleHandlerFactory(layer, l_image) {
         log.debug('Style changed for ' + layer.id + ' to ' + style);
         var legend = layer.metadata.styles[this.selectedIndex].legend;
         if ( legend !== undefined ) {
+            alert(legend.href);
             l_image.attr('src', legend.href + '&LAYERS=' + layer.name); // ncwms fix
         }
     }
@@ -79,6 +80,10 @@ function styleHandlerFactory(layer, l_image) {
 function toggleSticky(layer, box) {
     log.debug('Setting layer ' + later + ' to ' + box.checked);
     map.layers[' + layer + '].sticky = box.checked;
+}
+
+function fixThreddsURL(url) {
+    return url.replace(/LAYER=([^&]*)/, "$&&LAYERS=$1");
 }
 
 function drawMap(response) {
@@ -195,18 +200,18 @@ function drawMap(response) {
             log.debug('Current style for layer', i, 'is', current);
             if (current !== undefined) { // starting style defined in wmc
                 if (sty[current].legend) {
-                    leg_url = '<img id="layer' + i + '_legend" src="' + sty[current].legend.href + '&LAYERS=' + layer.name + '"/>';
-                    log.debug('legend:', leg_url);
+                    legend_elem = '<img id="layer' + i + '_legend" src="' + fixThreddsURL( sty[current].legend.href ) + '"/>';
+                    log.debug('legend:', legend_elem);
                 }
             } else {
-                if (sty[0].legend) {
-                    leg_url = '<img id="layer' + i + '_legend" src="' + sty[0].legend.href + '&LAYERS=' + layer.name + '"/>';
-                    leg_url = leg_url.replace(/PALETTE=[^&]+[&]?/i, ''); // remove PALETTE param and let server decide default style
-                    log.debug('legend:', leg_url);
+                if (sty[0].legend) { // why?
+                    legend_elem = '<img id="layer' + i + '_legend" src="' + fixThreddsURL( sty[0].legend.href ) + '"/>';
+                    legend_elem = legend_elem.replace(/PALETTE=[^&]+[&]?/i, ''); // remove PALETTE param and let server decide default style
+                    log.debug('legend:', legend_elem);
                 }
             }
-            if (typeof leg_url != 'undefined') {
-                $(lc).append(leg_url);
+            if (typeof legend_elem != 'undefined') {
+                $(lc).append(legend_elem);
                 $(lc + '_styles').change( styleHandlerFactory( layer, $(lc + '_legend') ) );
             }
         }
