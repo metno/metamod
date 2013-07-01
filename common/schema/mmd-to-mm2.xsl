@@ -22,7 +22,7 @@
             <xsl:apply-templates select="mmd:geographic_extent/mmd:rectangle" />
             <xsl:apply-templates select="mmd:data_access" />
             <xsl:apply-templates select="mmd:access_constraint" />
-            <xsl:apply-templates select="mmd:personell[mmd:role='Investigator']"/>
+            <xsl:apply-templates select="mmd:personnel[mmd:role='Investigator']"/>
 
         </xsl:element>
     </xsl:template>
@@ -115,7 +115,7 @@
         </xsl:element>                        
     </xsl:template>
     
-    <xsl:template match="mmd:personell[mmd:role='Investigator']">
+    <xsl:template match="mmd:personnel[mmd:role='Investigator']">
 
         <xsl:element name="mm2:metadata">
             <xsl:attribute name="name">PI_name</xsl:attribute>
