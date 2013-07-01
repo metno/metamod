@@ -151,10 +151,6 @@ sub mmd {
     my $stylesheet = $xslt->parse_stylesheet($style_doc);
     my $result = $stylesheet->transform( $$self{'dom'} );
     print STDERR $result->toString(1);
-    my $xmlschema = XML::LibXML::Schema->new( location => $$self{'schemadir'}.'mmd.xsd' );
-    #$xmlschema->load_catalog(  $$self{'schemadir'}.'catalog.xml' );
-    print STDERR "Starting validation...\n";
-    eval { $xmlschema->validate($result) == 0 } or die $@;
     return $result;
 }
 
@@ -172,6 +168,26 @@ sub mm2 {
     my $result = $stylesheet->transform( $$self{'dom'} );
     #print STDERR $result->toString(1);
     return $result;
+}
+
+=head2 $doc->validate
+
+Validate converted document
+
+=cut
+
+sub validate {
+    my $self = shift or die;
+    my %schemas = (
+        $mm2ns => $$self{'schemadir'}.'MM2.xsd',
+        $mmdns => $$self{'schemadir'}.'mmd.xsd',
+    );
+    my $xsd = $schemas{ $$self{'format'} } or die "No XML Schema for " . $$self{'format'};
+
+    my $xmlschema = XML::LibXML::Schema->new( $xsd );
+    #$xmlschema->load_catalog(  $$self{'schemadir'}.'catalog.xml' );
+    print STDERR "Starting validation...\n";
+    eval { $xmlschema->validate($$self{'dom'}) == 0 } or die $@;
 }
 
 =head2 run
@@ -194,9 +210,11 @@ sub test {
     my $file = shift or die;
     my $config = Metamod::Config->new(); # to avoid "you must call new() once before you can call instance()"
     my $doc = Metamod::MMD->new($file);
+    $doc->validate;
     my $mmd = $doc->mmd;
     print $mmd->toString(1);
     my $doc2 = Metamod::MMD->new($mmd);
+    $doc2->validate;
     my $mm2 = $doc2->mm2;
     print $mm2->toString(1);
 }

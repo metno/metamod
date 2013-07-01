@@ -192,7 +192,7 @@ sub test {
     my $xml = $editor->download_mmd($dataset);
     print STDERR "$xml\n\n";
     my $doc2 = Metamod::MMD->new($xml)->mm2;
-    print STDERR $doc2->toString(2);
+    print STDERR $doc2->toString(1);
 
 
 }
