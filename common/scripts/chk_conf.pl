@@ -102,6 +102,11 @@ Given two parameters, it checks that all the directives in the former file
 directives are prefixed with '-', while directives not in the authorative file
 is prefixed with '+'.
 
+B<NB:> Note that this script only reads master_config files directly and does
+not take into account variables defined in default_config nor computed values.
+For a correct picture of the actual configuration used by a deployed instance
+of METAMOD, use C<lsconf> instead.
+
 =head1 USAGE
 
  chk_conf.pl [-v] [-c] file1 [file2]

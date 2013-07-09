@@ -65,27 +65,30 @@ This module can be used to read the configuration file.
 
 package Metamod::Config;
 
-our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
-# works poorly since only detects change of current file
-our $DEBUG = 0;
-
 use strict;
 use warnings;
 
+# WARNING: use ONLY Perl Core modules in this module since we need
+# to read config in order to configure dependencies.
+# See http://perldoc.perl.org/index-modules-A.html for list
+#
+use Carp qw(cluck croak carp confess);
+use Cwd qw();
+use Data::Dumper;
 use Exporter;
+use File::Basename;
+use File::Spec qw();
+use FindBin;
+
 our %EXPORT_TAGS = ( init_logger => [] ); # hack for old scipts using Metamod::Config qw(:init_logger)
 
-use Carp qw(cluck croak carp confess);
-use Data::Dumper;
-
-#use Data::Dumper;
-use File::Basename;
-use FindBin;
-use File::Spec qw();
-use Cwd qw();
 # read ABS_PATH early, in case somebody uses a chdir
 use constant ABS_PATH => Cwd::abs_path(__FILE__);
 #printf STDERR "ABS_PATH = %s\n", ABS_PATH;
+
+our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
+# works poorly since only detects change of current file
+our $DEBUG = 0;
 
 BEGIN {
     die "cannot get abs_path from ".__FILE__ unless ABS_PATH;
@@ -352,6 +355,7 @@ sub split {
     return \%items;
 }
 
+# recursive function splitting a string separated by spaces or quotes
 sub _splitval {
     my $_ = shift or return;
     my @vals = ();

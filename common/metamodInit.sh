@@ -26,6 +26,7 @@ system_log="$LOG4ALL_SYSTEM_LOG"
 COMMON_LIB=$SCRIPT_PATH/lib
 export PERL5LIB="$PERL5LIB:$CATALYST_LIB:$COMMON_LIB"
 
+# PIDfiles should be moved to /var/run ASAP - FIXME
 upload_monitor_pid=$webrun_directory/upload_monitor.pid
 upload_monitor_script=$SCRIPT_PATH/../upload/scripts/upload_monitor.pl
 ftp_monitor_pid=$webrun_directory/ftp_monitor.pid

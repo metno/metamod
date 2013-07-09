@@ -36,10 +36,10 @@ deactivate_mm () {
         unset _OLD_VIRTUAL_PATH
     fi
 
-    unset VIRTUAL_ENV
-    if [ ! "$1" = "nondestructive" ] ; then
+    if [ ! "$1" = "nondestructive" ]
+    then
     # Self destruct!
-        unset -f deactivate
+        unset -f deactivate_mm
     fi
 }
 
@@ -84,12 +84,15 @@ activate_mm() {
     fi
 }
 
+echo "This script has been deprecated. Use common/script/virtualenv.pl to generate $METAMOD_MASTER_CONFIG/bin/activate instead."
+
 if [ $# != 1 ]
 then
     echo "You must supply the config dir as a parameter, or -d (deactivate)"
 else
     if [[ $1 == 'deactivate' || $1 == '-d' ]] ; then
     	deactivate_mm
+	# or you could just type "deactivate_mm" instead of running this script
     else
         activate_mm $1
     fi

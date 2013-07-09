@@ -59,6 +59,8 @@ fi
 # them to step on each other's pidfile.
 PIDSUFFIX=[==APPLICATION_ID==]
 PIDDIR=[==WEBRUN_DIRECTORY==]
+# must put PIDs where they will be deleted during reboot - FIXME
+#PIDDIR=/var/run
 PIDFILE=$PIDDIR/$UNIXNAME${PIDSUFFIX:+"-$PIDSUFFIX"}.pid
 
 if [ -d "[==CONFIG_DIR==]" ]; then

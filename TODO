@@ -1,4 +1,3 @@
-
 =================================================
 This is Geir's internal refactoring scratchpad.
 If you name is not Geir, you should stop reading.
@@ -15,6 +14,10 @@ just as an electronic Post-It note for developers to quickly note action
 points for later.
 
 --------------------
+install uwsgi files from install_jobs
+
+drop starman in favour of uwsgi as application server
+
 clean up multiwmc controller, moving processing to utils
 
 clean up ds_filepath in database to exclude extension whenever found
