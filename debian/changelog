@@ -1,4 +1,4 @@
-metno-metamod-2.13 (2.13.1-rc2) unstable; urgency=low
+metno-metamod-2.13 (2.13.1-rc3) unstable; urgency=low
 
   * dynamic search map using WMS
   * improved support for background maps in different projections
@@ -7,6 +7,7 @@ metno-metamod-2.13 (2.13.1-rc2) unstable; urgency=low
   * fix for old GetLegendGraphics bug to work with new version of THREDDS
   * upgraded to latest Catalyst version (5.9)
   * support for boolean operators, phrases and wildcards in text search
+  * easier configuration (lsconf, virtualenv, sanity checker)
 
  -- Geir Aalberg <geira@met.no>  Mon, 03 Jun 2013 11:32:06 +0200
 

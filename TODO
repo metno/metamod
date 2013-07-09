@@ -14,7 +14,9 @@ just as an electronic Post-It note for developers to quickly note action
 points for later.
 
 --------------------
-install uwsgi files from install_jobs
+remove php pmh from apache config
+
+(install uwsgi files from install_jobs)
 
 drop starman in favour of uwsgi as application server
 

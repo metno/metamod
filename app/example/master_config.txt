@@ -73,7 +73,7 @@ SMTP_RELAY = smtp.example.com
 # ============== PostgreSQL configuration =================
 
 # Hostname used for connecting to the PostgreSQL database:
-PG_HOST = localhost
+# leave unset if using localhost, so will use sockets instead of tcp/ip
 #PG_HOST = somedatabaseserver
 
 # Name of the PostgreSQL databases (metadata and userbase):
@@ -106,7 +106,7 @@ PG_CONNECTSTRING_SHELL =
 # String used in Perl DBI->connect function to connect to the
 # database:
 #PG_CONNECTSTRING_PERL = ;host=[==PG_HOST==];port=[==PG_PORT==];password=something
-PG_CONNECTSTRING_PERL = ;host=[==PG_HOST==];port=[==PG_PORT==]
+#PG_CONNECTSTRING_PERL = ;host=[==PG_HOST==];port=[==PG_PORT==]
 
 # Directory for PostgreSQL contrib libs (e.g. tsearch2.sql, pgcrypto.sql and lwpostgis.sql)
 # Note that installing the Debian packet for this will also pull in PostgreSQL server.
@@ -116,20 +116,21 @@ PG_CONNECTSTRING_PERL = ;host=[==PG_HOST==];port=[==PG_PORT==]
 # For Hardy:
 #PG_CONTRIB = /usr/share/postgresql/8.3/contrib
 # For Lucid:
-PG_CONTRIB = /usr/share/postgresql/8.4/contrib
+#PG_CONTRIB = /usr/share/postgresql/8.4/contrib
+# For Precise
+PG_CONTRIB = /usr/share/postgresql/9.1/contrib
 
 # the location of the initialization sql-script for the full-text facilities
+# NOTE: no longer exists in PostgreSQL 9.x
 #PG_TSEARCH2_SCRIPT = [==PG_CONTRIB==]/tsearch2.sql
 
 # the location of the initialization sql-script for postGIS
 #PG_POSTGIS_SCRIPT = /usr/share/postgresql-8.3-postgis/lwpostgis.sql
-PG_POSTGIS_SCRIPT = /usr/share/postgresql/8.4/contrib/postgis.sql
+PG_POSTGIS_SCRIPT = [==PG_CONTRIB==]/contrib/postgis.sql
 
 # the Coordinate System References
-# For Hardy:
 #PG_POSTGIS_SYSREF_SCRIPT = /usr/share/postgresql-8.3-postgis/spatial_ref_sys.sql
-# For Lucid:
-PG_POSTGIS_SYSREF_SCRIPT = /usr/share/postgresql/8.4/contrib/spatial_ref_sys.sql
+PG_POSTGIS_SYSREF_SCRIPT = [==PG_CONTRIB==]/spatial_ref_sys.sql
 
 # ============== Other configuration =================
 

@@ -98,7 +98,8 @@ CATALYST_PORT = 3000
 # ============== PostgreSQL configuration =================
 
 # Hostname used for connecting to the PostgreSQL database:
-#PG_HOST = localhost
+# leave unset if using localhost, so will use sockets instead of tcp/ip
+#PG_HOST = mydbserver.example.com
 
 # Name of the PostgreSQL databases (metadata and userbase):
 #DATABASE_NAME = metamod_example
@@ -127,11 +128,11 @@ PG_PORT = 5432
 #
 # String used in shell commands psql, createdb and dropdb to connect to the
 # database:
-PG_CONNECTSTRING_SHELL = --host [==PG_HOST==] --port [==PG_PORT==]
+#PG_CONNECTSTRING_SHELL = --host [==PG_HOST==] --port [==PG_PORT==]
 
 # String used in Perl DBI->connect function to connect to the
 # database:
-PG_CONNECTSTRING_PERL = ;host=[==PG_HOST==];port=[==PG_PORT==]
+#PG_CONNECTSTRING_PERL = ;host=[==PG_HOST==];port=[==PG_PORT==]
 
 # Directory for PostgreSQL contrib libs
 # i.e. tsearch2.sql, pgcrypto.sql and lwpostgis.sql

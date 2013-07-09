@@ -46,7 +46,7 @@ Metamod::Config - get runtime configuration environment
   }
 
   my $config = Metamod::Config->new($config_file_or_dir);
-  my $var = $config->get("configVar");
+  my $var = $config->get($varname);
 
 =begin OBSOLETE?
 
@@ -100,7 +100,9 @@ our $_config; #_config{file} => $config
 # files cannot have their own logger config.
 our $_logger_initialised;
 
-=head2 new([configfilename], [options]) (is this up to date?)
+=head2 Metamod::Config->new([configfilename], [options])
+
+B<is this up to date? FIXME)>
 
 Initialize the configuration with a config-file. If no config-file is given,
 the environment-variable METAMOD_MASTER_CONFIG will be used (useful for testing),
@@ -126,9 +128,9 @@ Skip logging initialization
 
 sub new {
     my ($class, $file_or_dir, $options) = @_;
-    #printf STDERR "Config dir is %s: %d\n", $ENV{METAMOD_MASTER_CONFIG}, defined $_config;
+    #printf STDERR "new is %s, env is %s (%s)\n", $file_or_dir||'-', $ENV{METAMOD_MASTER_CONFIG}||'-', defined $_config ? 'old' : 'new';
 
-    # we already have an object so use that instead.
+    # if we already have an object, use that instead.
     return $_config if defined $_config;
 
     # The environment is only used if the parameter is not supplied.
@@ -164,6 +166,12 @@ sub new {
     return $_config;
 }
 
+=head2 Metamod::Config->instance()
+
+Get the current config instance (which MUST be set with new() previously).
+
+=cut
+
 sub instance {
     my $class = shift;
 
@@ -173,10 +181,10 @@ sub instance {
 
 }
 
-=head2 _reset_singleton()
+=head2 Metamod::Config->_reset_singleton()
 
 Undefs the current singleton object. The B<ONLY> reason to use this is for testing of
-the class it self.
+the class itself.
 
 =cut
 
@@ -186,7 +194,7 @@ sub _reset_singleton {
     $_config = undef
 }
 
-=head2 $class->config_found($file_or_dir)
+=head2 Metamod::Config->config_found($file_or_dir)
 
 Check if the class can find a config either in the supplied parameter or the
 enviroment. Dies if the found config does not actually exist.
@@ -261,7 +269,7 @@ sub _normalizeFile {
     return Cwd::abs_path($file);
 }
 
-=head2 get("configVar")
+=head2 $self->get($varname)
 
 return the configuration variable configVar as currently set. This will reread the
 config-file each time it has been changed. Gives a warning if not specified in
@@ -277,7 +285,7 @@ sub get {
     return $self->_substituteVariable($var); # OK, where is the warning triggered?
 }
 
-=head2 getall
+=head2 $self->getall()
 
 returns all configuration variables as a hash
 
@@ -294,7 +302,7 @@ sub getall {
     return \%vars;
 }
 
-=head2 has("configVar")
+=head2 $self->has($varname)
 
 return true if the configuration variable configVar is currently set. This will reread the
 config-file each time it has been changed. Does not give any warnings.
@@ -309,7 +317,7 @@ sub has {
     return exists $self->{vars}{$var};
 }
 
-=head2 is("configVar")
+=head2 $self->is($varname)
 
 return true if the configuration variable has been set and is not among a list of
 false values (0, false, empty string). Does not give any warnings.
@@ -327,7 +335,7 @@ sub is {
     return ($val && lc($val) ne 'false') ? 1 : 0;
 }
 
-=head2 split
+=head2 $self->split($varname)
 
 Splits a config variable table into a hash of key/value pairs.
 Value is either a string or a list of strings.
@@ -504,7 +512,7 @@ sub _substituteVariable {
     return $textline;
 }
 
-=head2 getDSN()
+=head2 $self->getDSN()
 
 Return the database source name of the metadata database,
 i.e. "dbi:Pg:dbname=damocles;host=localhost;port=5432"
@@ -522,7 +530,7 @@ sub getDSN {
     return $dsn;
 }
 
-=head2 getDSN_Userbase
+=head2 $self->getDSN_Userbase()
 
 Return the database source name of the user-database,
 i.e. "dbi:Pg:dbname=userbase;host=localhost;port=5432"
@@ -540,7 +548,7 @@ sub getDSN_Userbase {
     return $dsn;
 }
 
-=head2 getDBH()
+=head2 $self->getDBH()
 
 Return a cached/pooled DBI-handler to the default database of metamod. The handler is in
 AutoCommit = 0 and RaiseError = 1, FetchHash mode. This function will die on error. (DBI-connect error)
@@ -566,7 +574,7 @@ sub getDBH {
 }
 
 
-=head2 initLogger()
+=head2 $self->initLogger()
 
 Initialise a Log::Log4perl logger.
 
@@ -697,13 +705,8 @@ A list of all the variables names in the configuration file.
 
 sub getVarNames {
     my $self = shift;
-
     $self->_checkFile();
     my @var_names = keys %{ $self->{vars} };
-
-    push @var_names, 'CONFIG_DIR';
-    push @var_names, 'INSTALLATION_DIR';
-
     return @var_names;
 }
 
