@@ -25,7 +25,8 @@ my $xml = <<'EOT';
    -10 0,-8 0, -6 0 
    </lonLatPoints>
    <lonLatPolygon>
-   0 0, 0 1, 0 2, 0 3, 0 4, 0 5, 1 5, 2 5, 2 4, 2 3, 2 2, 2 1, 2 0, 1 0, 0 0 
+   0 0, 0 1, 0 2, 0 3, 0 4, 0 5, 1 5, 2 5, 2 
+   4, 2 3, 2 2, 2 1, 2 0, 1 0, 0 0 
    </lonLatPolygon>
 </datasetRegion>
 EOT

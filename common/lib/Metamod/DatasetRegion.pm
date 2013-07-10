@@ -35,6 +35,7 @@ our $DEBUG = 0;
 use strict;
 use warnings;
 use Carp qw(croak);
+use Data::Dumper;
 use Hash::Util;
 use XML::LibXML;
 use XML::LibXML::XPathContext;
@@ -77,7 +78,7 @@ sub overlapsBoundingBox {
         croak("need south east north west elements for bounding-box in reference to withinBoundingBox, got ".keys %$bbRef);
     }
 
-    my %boundingBox = $self->getBoundingBox; 
+    my %boundingBox = $self->getBoundingBox;
     if (exists $boundingBox{north} and $boundingBox{north} < $bbRef->{south}) {
         return 0;
     }
@@ -90,7 +91,7 @@ sub overlapsBoundingBox {
     if (exists $boundingBox{west} and $boundingBox{west} > $bbRef->{east}) {
         return 0;
     }
-    
+
     return 1;
 }
 
@@ -137,13 +138,13 @@ sub extendBoundingBox {
                 # largest value
                 if ($self->{boundingBox}{$dir} < $bb->{$dir}) {
                     $self->{boundingBox}{$dir} = $bb->{$dir};
-                }   
+                }
             }
             foreach my $dir (qw(south west)) {
                 # smallest value
                 if ($self->{boundingBox}{$dir} > $bb->{$dir}) {
                     $self->{boundingBox}{$dir} = $bb->{$dir};
-                }   
+                }
             }
         }
     }
@@ -166,14 +167,14 @@ sub addPoint {
             push @{ $self->{points} }, new Metamod::LonLatPoint(@$point);
         } else {
             croak shift(@_)."::addPoint(@_) wrong arguments";
-        } 
+        }
         if (scalar @{ $self->{points} } > MAX_POINTS) {
             $self->setInvalid;
         }
     }
 }
 
-# make sure all points are unique 
+# make sure all points are unique
 sub uniquePoints {
     my $self = shift;
     @{ $self->{points} } = Metamod::LonLatPoint::unique(@{ $self->{points} });
@@ -233,7 +234,7 @@ sub addXML {
         $doc->setDocumentElement($datasetRegions[0]->cloneNode(1));
     } else {
         $doc = $Parser->parse_string($xml);
-        # TODO: validate?    
+        # TODO: validate?
     }
 
     # valid, defaults to true
@@ -254,10 +255,10 @@ sub addXML {
         }
         $self->extendBoundingBox(\%bb);
     }
-    
+
     # nothing needs to be done with points/polygons if dataset invalid
     return if not $self->valid;
-    
+
     # points
     my ($pointNode) = $Xpc->findnodes('/d:datasetRegion/d:lonLatPoints', $doc);
     if ($pointNode) {
@@ -275,16 +276,20 @@ sub addXML {
             $self->setInvalid;
         }
     }
-    
+
     # polygons
     foreach my $polyNode ($Xpc->findnodes('/d:datasetRegion/d:lonLatPolygon', $doc)) {
-        my $polyTxt = "";
+        #my $polyTxt = "";
+        my $polyTxt = $polyNode->textContent;
+        $polyTxt =~ s/^\s+|\s+$//sg; # trim whitespace
         if (length($polyTxt) < MAX_STRING) {
-            foreach my $child ($polyNode->childNodes) {
-                $polyTxt = $child->nodeValue if $child->nodeType == XML::LibXML::XML_TEXT_NODE;
-            }
+            #foreach my $child ($polyNode->childNodes) { # why not use textContent instead?
+            #    $polyTxt = $child->nodeValue if $child->nodeType == XML::LibXML::XML_TEXT_NODE;
+            #    # this can't be right... surely it must be concatinated? FIXME
+            #}
             my @polygon = split /\s*,\s*/, $polyTxt;
-            @polygon = map {[split ' ', $_]} @polygon;
+            @polygon = map {[split /\s+/, $_]} @polygon; # allow newlines etc so string can be reformatted
+            print STDERR Dumper \@polygon;
             $self->addPolygon(\@polygon);
         } else {
             $self->setInvalid;
@@ -331,7 +336,7 @@ EOT
         }
     }
     $xml .= '</datasetRegion>'."\n";
-    return $xml;    
+    return $xml;
 }
 
 sub equals {
@@ -341,7 +346,7 @@ sub equals {
     while (my ($dir, $v) = each %sbb) {
         if (abs($v - $obb{$dir}) > Metamod::LonLatPoint::FLOAT_ACCURACY) {
             return 0;
-        }        
+        }
     }
     my @sPoints = sort map {"$_"} Metamod::LonLatPoint::unique($self->getPoints);
     my @oPoints = sort map {"$_"} Metamod::LonLatPoint::unique($other->getPoints);
@@ -353,7 +358,7 @@ sub equals {
             return 0;
         }
     }
-    
+
     my %sPolygons = map {("$_" => 1)} $self->getPolygons;
     my %oPolygons = map {("$_" => 1)} $other->getPolygons;
     if (scalar keys %sPolygons != scalar keys %oPolygons) {
@@ -378,22 +383,22 @@ Metamod::DatasetRegion - Describe geographical regions of datasets
 
  # create the object (with an optional $xmlString)
  my $region = new Metamod::DatasetRegion([$xmlString]);
- 
+
  # retrieve information
  my @polygons = $region->getPolygons(); # ([[lon1,lat1],[lon2,lat2],...,[lon1,lat1]], [[same for polygon2]])
  my @points = $region->getPoints();     # ([lon1,lat1],[lon2,lat2]...)
  my %bb = $region->getBoundingBox();    # $bb{north} $bb{south} $bb{east} $bb{west}
- 
+
  # add information (extending existing information
  $region->addPolygon([[lon1,lat1],[lon2,lat2], ..., [lon1, lat1]]);
  $region->addPoint([lon1,lat1]);
  $region->extendBoundingBox(\%bb);
  $region->addXML();
- 
+
  # remove duplicates in the region
  $region->uniquePoints;
  $region->uniquePolygons;
- 
+
  # convert to xml-representation
  my $xmlStr = $region->toString;
 
@@ -415,7 +420,7 @@ Dies on invalid xml
 A region is assumed to be invalid if the points and polygons are not
 reasonable, i.e. to many points to process have been added. In those cases,
 only the boundingbox contains useful information. Invalidity propagates to all
-other regions, i.e. by addXML or by addRegion. 
+other regions, i.e. by addXML or by addRegion.
 
 Returns 1 (valid) or 0 (invalid)
 
