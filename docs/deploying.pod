@@ -49,7 +49,27 @@ users are administering the system.
 
 =head2 Setting the environment
 
-Before running any other scripts you must tell METAMOD where to find its libraries:
+Before running any other scripts you must tell METAMOD where to find its libraries.
+
+=head3 Using virtualenv.pl
+
+For simplicity you may use virtualenv.pl to generate a bash script F<./bin/activate>
+which sets the relevant environment variables. This can then be sourced in all
+your scripts without the need to supply the config dir parameter.
+
+From anywhere execute the following command:
+
+  $ cd <PATH TO CONFIGURATION DIR>
+  $ /opt/metno-metamod-2.13/virtualenv.pl .
+  $ source ./bin/activate
+
+This will enable the correct environment. To disable the environment again type:
+
+  $ deactivate
+
+./bin/activate replaces the bash script F<activate_env>, which is now deprecated.
+
+=head3 Setting the environment manually
 
   $ export PERL5LIB="/opt/metno-metamod-2.13/local/lib/perl5"
 
@@ -59,20 +79,8 @@ to specify the <config> parameter for each script.
   $ export METAMOD_MASTER_CONFIG="/path/to/applic/config"
 
 All commands also run without these variables, but you must then specify the
-correct executable paths, configuration directory and PERL5LIB for all commands.
-
-=head3 Using activate_env (optional)
-
-For simplicity you may instead use the bash script F<activate_env> that sets the
-relevant environment variables.
-
-From anywhere execute the following command:
-
-  $ source /opt/metno-metamod-<version>/activate_env <PATH TO CONFIGURATION DIR>
-
-This will enable the correct environment. To disable the environment again execute
-
-  $ source /opt/metno-metamod-<version>/activate_env deactivate
+correct executable paths, configuration directory and PERL5LIB for every command,
+which is rather cumbersome.
 
 =head2 Creating the webrun directory
 

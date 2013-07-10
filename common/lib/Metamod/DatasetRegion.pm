@@ -289,7 +289,7 @@ sub addXML {
             #}
             my @polygon = split /\s*,\s*/, $polyTxt;
             @polygon = map {[split /\s+/, $_]} @polygon; # allow newlines etc so string can be reformatted
-            print STDERR Dumper \@polygon;
+            #print STDERR Dumper \@polygon;
             $self->addPolygon(\@polygon);
         } else {
             $self->setInvalid;

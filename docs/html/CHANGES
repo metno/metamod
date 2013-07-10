@@ -10,6 +10,7 @@
     - support for Ubuntu 12.4 Precise Pangolin and PostgreSQL 9.1
     - fix for old GetLegendGraphics bug to work with new version of THREDDS
     - upgraded to latest Catalyst version (5.9)
+    - support for boolean operators, phrases and wildcards in text search
 
 2.12   Mon Jan 14 2013
     - projection selector and timeslider in wms client

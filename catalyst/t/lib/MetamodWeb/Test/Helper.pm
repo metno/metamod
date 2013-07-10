@@ -13,8 +13,8 @@ use Metamod::DBIxSchema::Userbase;
 
 extends 'Metamod::Test::Setup';
 
-#has 'master_config_file' => ( is => 'ro', default => 'master_config_test.txt' );
-has 'master_config_file' => ( is => 'ro' ); # the default is seriously obsolete and cannot be used as is
+has 'master_config_file' => ( is => 'ro', default => 'master_config_test.txt' );
+#has 'master_config_file' => ( is => 'ro' ); # the default is seriously obsolete and cannot be used as is
 
 has 'master_config_dir' => ( is => 'ro', builder => '_build_master_config_dir' );
 
