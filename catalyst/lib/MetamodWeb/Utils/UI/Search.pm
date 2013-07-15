@@ -682,7 +682,7 @@ sub _related_basickeys {
     my $related_bks = $bk_rs->search(
         {},
         {
-            select     => [ 'me.bk_id', 'bk_name', 'sc_id', 'hk_id' ],
+            select     => [ 'me.bk_id', 'bk_name', 'sc_id', 'hk_represents_bks_inner.hk_id' ],
             join       => 'hk_represents_bks_inner',
             '+columns' => 'hk_represents_bks_inner.hk_id'
         }
