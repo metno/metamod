@@ -27,6 +27,7 @@ use Data::Dump qw( dump );
 use Data::Dumper;
 
 use MetamodWeb::Utils::UI::Search;
+use MetamodWeb::Utils::UI::WMS;
 use MetamodWeb::Utils::SearchUtils;
 use MetamodWeb::Utils::Exception qw(error_from_exception);
 use Metamod::WMS;
@@ -56,13 +57,15 @@ sub auto :Private {
     my ( $self, $c ) = @_;
 
     my $mm_config = $c->stash->{ mm_config };
-    my $ui_utils = MetamodWeb::Utils::UI::Search->new( { config => $mm_config, c => $c } );
+    my $ui_utils  = MetamodWeb::Utils::UI::Search->new( { config => $mm_config, c => $c } );
+    my $wms_utils = MetamodWeb::Utils::UI::WMS->new(    { config => $mm_config, c => $c } );
     my $collection_basket = MetamodWeb::Utils::CollectionBasket->new( c => $c );
-    $c->stash( search_ui_utils => $ui_utils,
-               in_search_app => 1, #used to control which header to show
-               section => 'search',
+    $c->stash( search_ui_utils   => $ui_utils,
+               wms_utils         => $wms_utils,
+               in_search_app     => 1, #used to control which header to show
+               section           => 'search',
                collection_basket => $collection_basket,
-               ext_ts => $mm_config->has("TIMESERIES_URL"),
+               ext_ts            => $mm_config->has("TIMESERIES_URL"),
     );
     $c->stash( debug => $self->logger->is_debug() || $c->req->params->{ debug } );
     push @{ $c->stash->{ css_files } }, $c->uri_for( '/static/css/search.css' );

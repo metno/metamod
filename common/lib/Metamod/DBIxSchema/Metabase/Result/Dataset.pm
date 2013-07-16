@@ -4,14 +4,6 @@ use strict;
 use warnings;
 
 use base 'DBIx::Class';
-use XML::LibXML;
-use Data::Dumper;
-use Metamod::Config;
-use Log::Log4perl qw();
-use Metamod::FimexProjections;
-use Metamod::WMS qw(getXML getMapURL); # remove this FIXME
-
-my $logger = Log::Log4perl::get_logger(__PACKAGE__);
 
 __PACKAGE__->load_components("InflateColumn::DateTime", "Core");
 __PACKAGE__->table("dataset");
@@ -176,6 +168,13 @@ DBIx::Class Dataset class in the metadata database
 
 use Carp;
 use Try::Tiny;
+use XML::LibXML;
+use Data::Dumper;
+use Metamod::Config;
+use Log::Log4perl qw();
+use Metamod::FimexProjections;
+
+my $logger = Log::Log4perl::get_logger(__PACKAGE__);
 
 =head2 $self->unqualified_ds_name()
 
@@ -466,115 +465,6 @@ sub wmsurl {
 
 }
 
-=head2 $self->wmscap()
-
-=over
-
-=item return
-
-Returns the GetCapabilities XML DOM for the dataset if it has any Wmsinfo. Returns undef otherwise.
-
-=back
-
-=cut
-
-sub wmscap {
-    my $self = shift;
-
-    my $url = $self->wmsurl or return;
-    $logger->debug("Getting WMS Capabilities at $url");
-    my $cap = eval { getXML($url . '?service=WMS&version=1.3.0&request=GetCapabilities') };
-    croak " error: $@" if $@;
-    return $cap;
-
-}
-
-
-=head2 $self->wmsthumb()
-
-=over
-
-=item return
-
-Returns hash with URLs to WMS thumbnail based on wmsinfo setup.
-
-Make sure to check if wmsinfo exist before calling this method.
-
-=back
-
-=cut
-
-sub wmsthumb { # TODO - move this somewhere else so we can use config runtime instead of compile time (seems to work now in 2.13)
-    my $self = shift;
-    my ($size) = @_;
-
-    # this method needs some serious rework, including
-    # - find a better procedure for calculating timestamps
-    # - remove hardcoded LAYER borders
-
-    try {
-        my $config = Metamod::Config->instance();
-
-        my $setup = $self->wmsinfo or die "Error: Missing wmsSetup for dataset " . $self->ds_name;
-
-        #printf STDERR "* Setup (%s) = %s\n", ref $setup, $setup->toString;
-        my $sxc = XML::LibXML::XPathContext->new( $setup->documentElement() );
-        $sxc->registerNs('s', "http://www.met.no/schema/metamod/ncWmsSetup");
-
-        my (%area, %layer);
-
-        # find base WMS URL from wmsurl (NOT wmsinfo!)
-        my $wms_url = $self->wmsurl or return;
-        my ($thumbnail) = $sxc->findnodes('/*/s:thumbnail'); # TODO - support multiple thumbs (map + data) - FIXME
-
-        # use first layer found if not specified
-        foreach ( $thumbnail ? $sxc->findnodes('/*/s:thumbnail[1]/@*') : $sxc->findnodes('/*/s:layer[1]/@*') ) {
-            $layer{$_->nodeName} = $_->getValue;
-        }
-        $layer{url} = $wms_url unless exists $layer{url};
-        $layer{style} = '' unless exists $layer{style};
-
-        #print STDERR "*******************************\n" . Dumper \%layer;
-
-        # find area info (dimensions, projection)
-        foreach ( $sxc->findnodes('/*/s:displayArea[1]/@*') ) {
-            $area{$_->nodeName} = $_->getValue;
-        }
-
-        # build WMS params for maps
-        my @t = gmtime(time); my ($year, $day, $month, $hour) = ($t[5]+1900, $t[3], $t[4]+1, $t[2]+1); # HACK HACK HACK
-        my $time = $layer{time}; # || "[yyyy]-[mm]-[dd]T[hh]:00"; # too simplistic to work...
-        #$time =~ s|\[yyyy\]|$year|g;
-        #$time =~ s|\[mm\]|$month|g;
-        #$time =~ s|\[dd\]|$day|g;
-        #$time =~ s|\[hh\]|$hour|g;
-        #print STDERR Dumper \$time;
-        my $wmsparams = "SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&FORMAT=image%2Fpng"
-            . "&SRS=$area{crs}&BBOX=$area{left},$area{bottom},$area{right},$area{top}&WIDTH=$size&HEIGHT=$size"
-            . "&EXCEPTIONS=application%2Fvnd.ogc.se_inimage"
-            . ($time ? "&TIME=$time" : '');
-
-        # get map url's according to projection
-        my $mapurl = getMapURL( $area{crs} );
-
-        #print STDERR Dumper($wms_url, \%area, \%layer, \$mapurl); #$metadata
-
-        my $out = {
-            xysize  => $size,
-            datamap => "$layer{url}?$wmsparams&LAYERS=$layer{name}&STYLES=$layer{style}",
-            outline => $mapurl ? "$mapurl?$wmsparams&TRANSPARENT=true&LAYERS=borders&STYLES=" : undef, # FIXME remove hardcoded LAYERS
-            wms_url => $wms_url,
-        };
-
-        #print STDERR Dumper($out);
-
-        return $out;
-
-    } catch {
-        carp $_; # use logger - FIXME
-        return;
-    }
-}
 
 =head2 $self->is_level1_dataset()
 

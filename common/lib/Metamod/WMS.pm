@@ -61,7 +61,7 @@ use Metamod::Config;
 use Data::Dumper;
 use Hash::Util qw{ lock_hash  unlock_hash };
 
-our @EXPORT = qw(logger param abandon getXML getMapURL getSetup outputXML defaultWMC getProjName getProjString bgmapURLs);
+our @EXPORT = qw(logger param getXML getMapURL getSetup outputXML defaultWMC getProjName getProjString bgmapURLs);
 
 ####################
 # init
@@ -84,31 +84,6 @@ sub logger {
 
 sub param {
     return $q->param(shift);
-}
-
-=head2 abandon()
-
-Report error as HTML and die
-
-=cut
-
-sub abandon { # deprecated - use catalyst controllers instead
-    my $text = shift || 'Something went wrong';
-    my $status = shift || 500;
-    print $q->header('text/html', $status); # doesn't work under catalyst which already has sent headers ...
-    print <<EOT;
-<html>
-<head>
-    <title>WMC generator error</title>
-</head>
-<body>
-    <h1>WMC generator error</h1>
-    <p>$text</p>
-</body>
-</html>
-EOT
-    $logger->logcarp($text);
-    croak $text;
 }
 
 =head2 getXML()
@@ -134,7 +109,6 @@ sub getXML {
         return $dom;
     }
     else {
-        #abandon($response->status_line . ': ' . $url, 502);
         $logger->info("getXML failed for for $url: " . $response->status_line);
         die("getXML failed for for $url: " . $response->status_line);
     }
@@ -258,7 +232,7 @@ sub projList {
     return clone $projnames;
 }
 
-=head2 bgmapURLs
+=head2 bgmapURLs()
 
 Return the list of defined WMS background map URLs
 
@@ -268,6 +242,5 @@ sub bgmapURLs {
     use Clone qw(clone); # TT seems to mess up data structure, so best copy it
     return clone $coastlinemaps;
 }
-
 
 1;

@@ -57,14 +57,12 @@ sub getXML {
     my $response = $ua->get($url);
 
     if (!$response->is_success) {
-        #abandon($response->status_line . ': ' . $url, 502);
-		$self->logger->info("getXML failed for for $url: " . $response->status_line);
-		croak($response->status_line);
+        $self->logger->info("getXML failed for for $url: " . $response->status_line);
+        croak($response->status_line);
     }
 
     #print STDERR $response->content;
     my $dom;
-    #eval { $dom = $parser->parse_string($response->content) } or abandon($@, 502);
     eval { $dom = $self->parser->parse_string($response->content) } or croak($@);
     return $dom;
 

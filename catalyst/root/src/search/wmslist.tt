@@ -114,9 +114,9 @@
 
             <div class="layers">
 
-                [%  cap = ds.wmscap; # read in wms capabilities
+                [%  cap = wms_utils.wmscap(ds.wmsurl); # read in wms capabilities
                     SET thumbsize = 64;
-                    SET wmsthumb = ds.wmsthumb(thumbsize);
+                    SET wmsthumb = wms_utils.wmsthumb(ds, thumbsize);
                 %]
                 [% IF wmsthumb.outline # map countours as transparent overlay %]
                     <div class="wmsthumb"

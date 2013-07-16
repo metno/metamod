@@ -128,7 +128,7 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
         #printf STDERR "***** WMC setup %s: %s (%s)\n", $layertype, $lname, $style||'-';
 
         if ( $setuplayer->getAttribute('url') ) {
-            #do later (do what??? FIXME)
+            # implement custom url later (FIXME)
             #next; # why? this means it'll skip sorting and baselayers won't show up
         }
 
