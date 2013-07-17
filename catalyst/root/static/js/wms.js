@@ -71,8 +71,9 @@ function styleHandlerFactory(layer, l_image) {
         log.debug('Style changed for ' + layer.id + ' to ' + style);
         var legend = layer.metadata.styles[this.selectedIndex].legend;
         if ( legend !== undefined ) {
-            alert(legend.href);
-            l_image.attr('src', legend.href + '&LAYERS=' + layer.name); // ncwms fix
+            var src = fixThreddsURL( legend.href );
+            log.debug('Legend: ', src);
+            l_image.attr('src', src); // ncwms fix
         }
     }
 }
@@ -231,7 +232,7 @@ function drawMap(response) {
         clearStyle: true, // needed when more layers than can fit in window
         icons: false,
         create: function(event, ui) {
-            alert('accordion!');
+            //alert('accordion!');
             log.debug('accordion created!');
         },
         change: function(event, ui) {
