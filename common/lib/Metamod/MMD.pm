@@ -150,7 +150,7 @@ sub mmd {
     my $style_doc = XML::LibXML->load_xml( location => $$self{'schemadir'}.'mm2-to-mmd.xsl', no_cdata => 1 ) or die "Missing or invalid XSL stylesheet";
     my $stylesheet = $xslt->parse_stylesheet($style_doc);
     my $result = $stylesheet->transform( $$self{'dom'} );
-    print STDERR $result->toString(1);
+    #print STDERR $result->toString(1);
     return $result;
 }
 
@@ -210,11 +210,11 @@ sub test {
     my $file = shift or die;
     my $config = Metamod::Config->new(); # to avoid "you must call new() once before you can call instance()"
     my $doc = Metamod::MMD->new($file);
-    $doc->validate;
+    #$doc->validate;
     my $mmd = $doc->mmd;
-    print $mmd->toString(1);
+    #print $mmd->toString(1);
     my $doc2 = Metamod::MMD->new($mmd);
-    $doc2->validate;
+    #$doc2->validate;
     my $mm2 = $doc2->mm2;
     print $mm2->toString(1);
 }

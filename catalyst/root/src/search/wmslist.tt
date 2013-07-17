@@ -13,7 +13,6 @@
         <script type="text/javascript" src="[% c.uri_for('/static/js/jquery-ui.min.js') %]"></script>
 
         <script type="text/javascript" src="[% c.uri_for('/static/js/log4javascript-1.4.2/js/log4javascript.js') %]"></script>
-        <script type="text/javascript" src="[% c.uri_for('/static/lib/Firebug/firebug.js') %]"></script>
 
         <script type="text/javascript">
 
