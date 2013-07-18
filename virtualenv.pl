@@ -55,7 +55,7 @@ if (!Metamod::Config->config_found($config_dir)){
   die "Could not find the configuration on the command line or the in the environment\n";
 }
 
-my $config = Metamod::Config->new($config_dir);
+my $config = Metamod::Config->new($config_dir, { nolog => 1 });
 
 if (-f $config_dir) {
     $config_dir = `dirname $config_dir`;
@@ -140,7 +140,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-export METAMOD_MASTER_CONFIG=[==MASTER_CONFIG==]
+export METAMOD_MASTER_CONFIG=[==CONFIG_DIR==]
 
 _OLD_VIRTUAL_PATH="$PATH"
 ROOT=[==INSTALLATION_DIR==]
@@ -153,7 +153,7 @@ fi
 
 if [ -z "$VIRTUAL_ENV_DISABLE_PROMPT" ] ; then
     _OLD_VIRTUAL_PS1="$PS1"
-    export PS1="([==MASTER_CONFIG==])$PS1"
+    export PS1="([==CONFIG_DIR==])$PS1"
 fi
 
 # This should detect bash and zsh, which have a hash command that must
