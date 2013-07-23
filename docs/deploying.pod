@@ -16,6 +16,113 @@ scripts is the same as the user running Apache>.
 
 =end obsolete
 
+=head2 Setting the environment
+
+Before running any other scripts you must tell METAMOD where to find its libraries.
+
+=head3 Method A: Using virtualenv.pl
+
+For simplicity you may use virtualenv.pl to generate a bash script F<./bin/activate>
+which sets the relevant environment variables. This can then be sourced in all
+your scripts without the need to supply the config dir parameter.
+
+From anywhere execute the following command:
+
+  $ cd <PATH TO CONFIGURATION DIR>
+  $ /opt/metno-metamod-2.13/virtualenv.pl .
+  $ source ./bin/activate
+
+This will enable the correct environment. To disable the environment again type:
+
+  $ deactivate
+
+./bin/activate replaces the bash script F<activate_env>, which is now deprecated.
+
+=head3 Method B: Setting the environment manually
+
+  $ export PERL5LIB="/opt/metno-metamod-2.13/local/lib/perl5"
+
+If desired you may also predefine the application config path. Then you won't have
+to specify the <config> parameter for each script.
+
+  $ export METAMOD_MASTER_CONFIG="/path/to/applic/config"
+
+All commands also run without these variables, but you must then specify the
+correct executable paths, configuration directory and PERL5LIB for every command,
+which is rather cumbersome.
+
+=head2 Creating the webrun directory
+
+The application also needs several directories to store files during operation.
+Run the script
+
+  $ common/prepare_runtime_env.sh <config>
+
+which will initialize a runtime directory used by the application for
+logging, temporary files etc. owned by the APPLICATION_USER user. If already
+existing nothing will be deleted, although file ownership may be updated to the
+current configuration. (Note that if your current user does not have write
+privileges to WEBRUN_DIRECTORY this script will fail.)
+
+=head2 Initializing the BASE module
+
+At this point, the deployment of the application is complete for all instances
+not using the BASE module. For an application using the BASE module, a few steps
+remains:
+
+As explained in the B<Data base> paragraph, several METAMOD applications may
+co-operate in a cluster, and share a common data base. One of these applications
+must use the BASE module, and no other. The last steps (described below)
+required for the base application must be done after the initial steps
+(described above), for all applications in the cluster, are completed.
+
+=head3 Creating databases
+
+The two PostgreSQL databases used by the cluster must be initialized. Note that
+the two databases are operated through two database users. The name of these
+users are found in the C<master_config.txt> file as the value of PG_ADMIN_USER
+and PG_WEB_USER configuration variables. These users must be defined in the
+PostgreSQL database environment before the database initialization scripts can
+be run:
+
+  $ base/init/createusers.sh
+
+It is only necessary to run this script once for a PostgreSQL database
+environment.
+
+The first SQL database initialization script will create the Meta database.
+
+  $ base/init/create_and_load_all.sh
+
+This script will create the database, and load the static content of the database (taken from
+C<staticdata/searchdata.xml>). You may check the output of this script in the
+C<create_and_load_all.out> file in the directory where you are running the command.
+
+The next SQL database initialization script will create the User database.
+
+  $ base/init/run_createuserdb.sh
+
+Note that I<this script must only be used during setup of a completely new
+METAMOD cluster>. If a User database already exists, all data in the database
+will be lost. If this should happen, you must recreate the database from a
+backup copy you hopefully have. But METAMOD will not by itself ensure that such
+a backup exists.
+
+This warning is only adequate for the C<run_createuserdb.sh> script. The other
+scripts in this paragraph (C<prepare_runtime_env.sh>, C<create_and_load_all.sh>)
+may all be used on an existing installation, without harming existing data. The
+C<create_and_load_all.sh> script will take some time to complete, though. On an
+existing installation, all metadata in the database will be loaded from the XML
+archive.
+
+=head3 Email configuration (FIXME)
+
+To configure exim, run:
+
+  $ sudo dpkg-reconfigure exim4-config
+
+See the Exim documentation for more information.
+
 =head2 Installing services
 
 After installation of the software and one or more configurations, you should
@@ -47,113 +154,6 @@ all files will be owned by yourself instead of root:
 Note that this is not recommended in production environments where several login
 users are administering the system.
 
-=head2 Setting the environment
-
-Before running any other scripts you must tell METAMOD where to find its libraries.
-
-=head3 Using virtualenv.pl
-
-For simplicity you may use virtualenv.pl to generate a bash script F<./bin/activate>
-which sets the relevant environment variables. This can then be sourced in all
-your scripts without the need to supply the config dir parameter.
-
-From anywhere execute the following command:
-
-  $ cd <PATH TO CONFIGURATION DIR>
-  $ /opt/metno-metamod-2.13/virtualenv.pl .
-  $ source ./bin/activate
-
-This will enable the correct environment. To disable the environment again type:
-
-  $ deactivate
-
-./bin/activate replaces the bash script F<activate_env>, which is now deprecated.
-
-=head3 Setting the environment manually
-
-  $ export PERL5LIB="/opt/metno-metamod-2.13/local/lib/perl5"
-
-If desired you may also predefine the application config path. Then you won't have
-to specify the <config> parameter for each script.
-
-  $ export METAMOD_MASTER_CONFIG="/path/to/applic/config"
-
-All commands also run without these variables, but you must then specify the
-correct executable paths, configuration directory and PERL5LIB for every command,
-which is rather cumbersome.
-
-=head2 Creating the webrun directory
-
-The application also needs several directories to store files during operation.
-Run the script
-
-  prepare_runtime_env.sh <config>
-
-which will initialize a runtime directory used by the application for
-logging, temporary files etc. owned by the APPLICATION_USER user. If already
-existing nothing will be deleted, although file ownership may be updated to the
-current configuration. (Note that if your current user does not have write
-privileges to WEBRUN_DIRECTORY this script will fail.)
-
-=head2 Initializing the BASE module
-
-At this point, the deployment of the application is complete for all instances
-not using the BASE module. For an application using the BASE module, a few steps
-remains:
-
-As explained in the B<Data base> paragraph, several METAMOD applications may
-co-operate in a cluster, and share a common data base. One of these applications
-must use the BASE module, and no other. The last steps (described below)
-required for the base application must be done after the initial steps
-(described above), for all applications in the cluster, are completed.
-
-=head3 Creating databases
-
-The two PostgreSQL databases used by the cluster must be initialized. Note that
-the two databases are operated through two database users. The name of these
-users are found in the C<master_config.txt> file as the value of PG_ADMIN_USER
-and PG_WEB_USER configuration variables. These users must be defined in the
-PostgreSQL database environment before the database initialization scripts can
-be run:
-
-  base/init/createusers.sh
-
-It is only necessary to run this script once for a PostgreSQL database
-environment.
-
-The first SQL database initialization script will create the Meta database.
-
-  base/init/create_and_load_all.sh
-
-This script will create the database, and load the static content of the database (taken from
-C<staticdata/searchdata.xml>). You may check the output of this script in the
-C<create_and_load_all.out> file in the directory where you are running the command.
-
-The next SQL database initialization script will create the User database.
-
-  base/init/run_createuserdb.sh
-
-Note that I<this script must only be used during setup of a completely new
-METAMOD cluster>. If a User database already exists, all data in the database
-will be lost. If this should happen, you must recreate the database from a
-backup copy you hopefully have. But METAMOD will not by itself ensure that such
-a backup exists.
-
-This warning is only adequate for the C<run_createuserdb.sh> script. The other
-scripts in this paragraph (C<prepare_runtime_env.sh>, C<create_and_load_all.sh>)
-may all be used on an existing installation, without harming existing data. The
-C<create_and_load_all.sh> script will take some time to complete, though. On an
-existing installation, all metadata in the database will be loaded from the XML
-archive.
-
-=head3 Email configuration (FIXME)
-
-To configure exim, run:
-
-  $ sudo dpkg-reconfigure exim4-config
-
-See the Exim documentation for more information.
-
 =head2 Starting METAMOD
 
 There are two ways of starting METAMOD; either as a system service (recommended
@@ -177,7 +177,7 @@ Stop with ctrl-c.
 
 If that worked, you may then try to start it as a service:
 
-  sudo /etc/init.d/catalyst-APPLICATION_ID start
+  $ sudo /etc/init.d/catalyst-APPLICATION_ID start
 
 =head3 Apache
 
@@ -188,16 +188,16 @@ automatically generates the necessary Apache setup files for you.
 If this has not already been done you need to enable the Apache proxy modules.
 Look in /etc/apache2/mods-enabled to see if they have already been enabled.
 
-  sudo a2enmod proxy
-  sudo a2enmod proxy_http
+  $ sudo a2enmod proxy
+  $ sudo a2enmod proxy_http
 
 Restart Apache:
 
-  sudo apache2ctl restart
+  $ sudo apache2ctl restart
 
 or if the site is busy:
 
-  sudo apache2ctl graceful
+  $ sudo apache2ctl graceful
 
 which will wait until all connections are terminated before restarting.
 
@@ -205,12 +205,11 @@ The site should now hopefully be available on
 
   http://localhost/APPLICATION_ID
 
-
 =head3 METAMOD services
 
 Start METAMOD:
 
-  sudo /etc/init.d/metamodServices-APPLICATION_ID start
+  $ sudo /etc/init.d/metamodServices-APPLICATION_ID start
 
 This should start the required services daemons.
 
@@ -218,7 +217,6 @@ This should start the required services daemons.
 =begin OBSOLETE
 
 =head2 TESTING (FIXME)
-
 
 2. To copy the software to the target directory and make the substitutions
 prescribed by the master_config.txt file, do the following:
