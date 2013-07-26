@@ -3,6 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <title>[% title %]</title>
+<link rel="shortcut icon" href="[% c.uri_for('/favicon.ico') %]" />
 <link rel="stylesheet" href="[% c.uri_for('/static/css/reset.css') %]" />
 <link rel="stylesheet" href="[% c.uri_for('/static/css/base.css') %]" />
 <link rel="stylesheet" href="[% c.uri_for('/static/css/golden.css') %]" />

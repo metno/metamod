@@ -76,7 +76,7 @@ if ( $mm_config->has('OLD_REDIRECT') ) {
     my $prefix =  $mm_config->get('OLD_REDIRECT');
 
     foreach ( keys %obsolete ) {
-        $old_redirect .= "RedirectMatch   301     /$prefix/$_     $base$local$obsolete{$_}\n";
+        $old_redirect .= "\nRedirectMatch   301     /$prefix/$_     $base$local$obsolete{$_}\n\n";
     }
 }
 
@@ -86,7 +86,10 @@ $site .= " on $virtualhost" if $virtualhost;
 my $apache_config_dir = $virtualhost ? "/etc/apache/sites-available" : "/etc/apache2/conf.d";
 
 my $installation_dir = $mm_config->get('INSTALLATION_DIR') or die "Missing INSTALLATION_DIR in config";
-my %paths = ( root => "$installation_dir/catalyst/root" );
+my %paths = (
+    root    => "$installation_dir/catalyst/root",
+    custom  => "$config_dir/custom",
+);
 
 my $conf_text = <<EOT;
 #
@@ -95,6 +98,8 @@ my $conf_text = <<EOT;
 
 # NOTE: use EITHER sites-available (if using virtual hostnames in DNS) OR conf.d (with path prefix).
 # DO NOT PUT PARTIAL METAMOD CONFIGURATION IN BOTH!!!!!
+# Note ESPECIALLY that mod_rewrite will NOT work in ANY virtualhost if defined in conf.d
+# That means you must disable ALL files in sites-enabled (including 000-default) for custom files to work!!!
 
 # --------------
 # Catalyst proxy settings
@@ -104,9 +109,7 @@ my $conf_text = <<EOT;
     Allow from all
 </Proxy>
 
-# static doesn't work due to the way custom files is implemented in metamod 2.8
-#ProxyPass           $local/static   !
-
+ProxyPass           $local/static   !
 ProxyPass           $local/upl      !
 ProxyPass           $local/docs     !
 
@@ -118,29 +121,30 @@ ProxyPassReverse    $local/         http://127.0.0.1:$port/
 
 # -----------
 # Plain Apache settings
-
 $old_redirect
-
 # static files should be served directly from Apache
-#Alias               $local/static      $paths{root}/static
 
-# ditto for error reports (which has a hardcoded url)
+# including error reports (which has a hardcoded url)
 Alias               $local/upl/uerr     $webrun/upl/uerr
-
 # as well as system documentation
 Alias               $local/docs         $installation_dir/docs/html
 
-# if you don't want the default favicon, put custom file in applic-dir and update filelist.txt
-# FIXME: make custom icon per app
-#Alias               favicon.ico        $paths{root}/favicon.ico
+# first look for static files in application directory
+#Alias               $local/static      $paths{root}/static
+Alias               $local/static      $paths{custom}/static
 
-<Directory $installation_dir/pmh/htdocs>
-    Options Indexes FollowSymLinks MultiViews
-    AddDefaultCharset UTF-8
-    #AllowOverride None
-    Order allow,deny
-    allow from all
-</Directory>
+# if files not found in application dir, default to installation dir
+<IfModule mod_rewrite.c>
+    RewriteEngine  on
+    #RewriteOptions Inherit
+    #RewriteLog "/var/log/apache2/error.log"
+    #RewriteLogLevel 6
+    #LogLevel debug
+
+    # redirect (internal) to installation dir if not exists in custom dir
+    RewriteCond         $paths{custom}/static/\$1   !-s
+    RewriteRule         ^$local/static(.*)          $paths{root}/static\$1
+</IfModule>
 
 <Directory $installation_dir/docs/html>
     Options Indexes FollowSymLinks MultiViews
@@ -194,17 +198,9 @@ The generated file is written to $target/etc/httpd.conf, or stdout if using -p.
 
 =head1 USAGE
 
-=head2 Running script from source
+=head2 Running script
 
- trunk/gen_httpd_conf.pl application_directory
-
-This will assume you want to proxy Apache against Catalyst running from trunk
-
-=head2 Running script from target
-
- target/gen_httpd_conf.pl .
-
-This will assume you want to proxy Apache against Catalyst running from target
+ ./common/scripts/gen_httpd_conf.pl [-p] <application_directory>
 
 =head1 OPTIONS
 

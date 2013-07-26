@@ -14,11 +14,7 @@ just as an electronic Post-It note for developers to quickly note action
 points for later.
 
 --------------------
-remove php pmh from apache config
-
-(install uwsgi files from install_jobs)
-
-drop starman in favour of uwsgi as application server
+add animation of current wms layer
 
 clean up multiwmc controller, moving processing to utils
 
@@ -71,6 +67,10 @@ reset password should send a link to reset instead of resetting directly to avoi
 - must use POST
 
 ++++++++ DONE ++++++++++++++
+
+add mod_rewrite to required apache mods in doc
+
+remove php pmh from apache config
 
 remove LAYERS from GetLegendGraphics when calling latest thredds
 

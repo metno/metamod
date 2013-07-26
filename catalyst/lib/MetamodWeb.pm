@@ -95,7 +95,7 @@ my %default_config = (
 
     'default_view' => 'TT',
 
-    static => { # Deprecated 'static' config key used, please use the key 'Plugin::Static::Simple' instead
+    'Plugin::Static::Simple' => {
         include_path => [
             path_to_custom(),
             $mm_config->get('WEBRUN_DIRECTORY'),
