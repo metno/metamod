@@ -31,7 +31,7 @@ server, otherwise only the client is required.
 
 =item Apache 2.x web server
 
-With mod_proxy installed (C<sudo a2enmod proxy>)
+With mod_proxy, mod_proxy_http and mod_rewrite installed
 
 =item libxml and libxslt library
 

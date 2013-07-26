@@ -17,6 +17,15 @@ now requires Catalyst 5.9.
 If installing from source, you must build the necessary Perl modules yourself,
 preferably in a local lib using Carton. See L<Installation|../installation> for details.
 
+=head2 Static files
+
+Serving of static files via Apache has been re-enabled. Apache now looks for each file
+first in the custom/static application directory, defaulting if not present to the installation directory.
+B<Note that mod_rewrite now must be enabled in Apache for METAMOD to function correctly.>
+
+  $ sudo a2enmod rewrite
+  $ sudo service apache restart
+
 =head2 Configuration
 
 =head3 lsconf
@@ -25,9 +34,7 @@ A new utility C<lsconf> has been added to check current configuration settings:
 
   $ ./lsconf [--config <config file or dir>] [--split] [<variable>]
 
-The following
-
-=head4 Deprecated configuration settings
+=head3 Deprecated configuration settings
 
 The following directives have been deprecated and should be removed from F<master_config.txt> (they are
 now defined in F<default_config.txt> and only used in case C<WMS_MAPS> should happen to be unset):

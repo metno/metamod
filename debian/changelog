@@ -1,4 +1,4 @@
-metno-metamod-2.13 (2.13.1-rc4) unstable; urgency=low
+metno-metamod-2.13 (2.13.1-final) unstable; urgency=low
 
   * dynamic search map using WMS
   * improved support for background maps in different projections
@@ -8,6 +8,7 @@ metno-metamod-2.13 (2.13.1-rc4) unstable; urgency=low
   * upgraded to latest Catalyst version (5.9)
   * support for boolean operators, phrases and wildcards in text search
   * easier configuration (lsconf, virtualenv, sanity checker)
+  * re-enabled serving static files via Apache
 
  -- Geir Aalberg <geira@met.no>  Mon, 03 Jun 2013 11:32:06 +0200
 

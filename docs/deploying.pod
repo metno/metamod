@@ -185,11 +185,12 @@ Accessing METAMOD directly from Catalyst is not recommended in production;
 instead a proxy server like Apache is recommended. C<./install_jobs.sh>
 automatically generates the necessary Apache setup files for you.
 
-If this has not already been done you need to enable the Apache proxy modules.
+If this has not already been done you need to enable the Apache proxy and rewrite modules.
 Look in /etc/apache2/mods-enabled to see if they have already been enabled.
 
   $ sudo a2enmod proxy
   $ sudo a2enmod proxy_http
+  $ sudo a2enmod rewrite
 
 Restart Apache:
 
