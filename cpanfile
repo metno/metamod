@@ -26,6 +26,7 @@ requires 'Geo::Proj4', 1.04;
 requires 'HTML::FormHandler::Model::DBIC', 0.14;
 requires 'HTTP::OAI', 3.27;
 requires 'JSON::Any', 1.29;
+requires 'local::lib', '1.008010';
 requires 'Moose', 2.0604;
 requires 'Moose', 2.0604;
 requires 'POE::Component::Cron', 0.021;
