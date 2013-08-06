@@ -123,28 +123,32 @@ ProxyPassReverse    $local/         http://127.0.0.1:$port/
 # Plain Apache settings
 $old_redirect
 # static files should be served directly from Apache
-
-# including error reports (which has a hardcoded url)
-Alias               $local/upl/uerr     $webrun/upl/uerr
-# as well as system documentation
-Alias               $local/docs         $installation_dir/docs/html
-
-# first look for static files in application directory
-#Alias               $local/static      $paths{root}/static
-Alias               $local/static      $paths{custom}/static
-
-# if files not found in application dir, default to installation dir
 <IfModule mod_rewrite.c>
+    # using mod_rewrite to enable custom static files
     RewriteEngine  on
     #RewriteOptions Inherit
-    #RewriteLog "/var/log/apache2/error.log"
-    #RewriteLogLevel 6
-    #LogLevel debug
+    RewriteLog "/var/log/apache2/error.log"
+    RewriteLogLevel 6
+    LogLevel debug
 
-    # redirect (internal) to installation dir if not exists in custom dir
+    # redefine to first look for static files in application directory
+    Alias               $local/static      $paths{custom}/static
+
+    # internal redirect to installation dir if not exists in custom dir
     RewriteCond         $paths{custom}/static/\$1   !-s
     RewriteRule         ^$local/static(.*)          $paths{root}/static\$1
 </IfModule>
+<IfModule !mod_rewrite.c>
+    # fallback to default settings if mod_rewrite not installed (i.e. no custom files)
+    Alias               $local/static      $paths{root}/static
+</IfModule>
+
+# also serving error reports (which has a hardcoded url)
+Alias               $local/upl/uerr     $webrun/upl/uerr
+
+# as well as system documentation
+Alias               $local/docs         $installation_dir/docs/html
+
 
 <Directory $installation_dir/docs/html>
     Options Indexes FollowSymLinks MultiViews
