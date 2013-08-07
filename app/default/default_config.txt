@@ -33,6 +33,9 @@ BASE_PART_OF_EXTERNAL_URL = http://[==SERVER==]
 # Set this directive to enable Apache virtualhosts (requires separate DNS hostname)
 VIRTUAL_HOST =
 
+# Optional extra Apache config file to be included in virtualhost site
+EXTRA_APACHE_CONF =
+
 # Initial part of local URLs:
 LOCAL_URL = /metamod
 

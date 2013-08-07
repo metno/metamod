@@ -2,6 +2,9 @@
 
 cd `dirname $0`
 SCRIPT_PATH=`pwd`
+# the problem with this is that relative path arguments (e.g. "prepare_runtime_env.sh .") no longer work
+# so we must make sure to change back afterwards
+cd -
 
 CONFIG=$1
 # config must be set in $METAMOD_MASTER_CONFIG envvar if not given as command line param

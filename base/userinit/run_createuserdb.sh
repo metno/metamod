@@ -4,6 +4,9 @@
 #
 cd `dirname $0`
 SCRIPT_PATH=`pwd`
+# the problem with this is that relative path arguments (e.g. "prepare_runtime_env.sh .") no longer work
+# so we must make sure to change back afterwards
+cd -
 
 if [ $# -eq 1 ]; then
     CONFIG=`readlink -f $1`

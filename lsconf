@@ -50,15 +50,11 @@ GetOptions('split' => \$split,
            'config=s' => \$config_file_or_dir,
 ) or usage();
 
-if(!Metamod::Config->config_found($config_file_or_dir)){
-    usage();
-}
+Metamod::Config->config_found($config_file_or_dir) or usage();
+my $mm_config = Metamod::Config->new($config_file_or_dir, { nolog => 1 } );
 
 my $var = shift @ARGV;
-
 my $vars;
-
-my $mm_config = Metamod::Config->new($config_file_or_dir, { nolog => 1 } );
 
 if ( !defined($var) || $var =~ /(.+)\*$/ ) {
     $vars = $mm_config->getall();

@@ -63,6 +63,7 @@ my $local = $mm_config->get('LOCAL_URL');
 my $base = $mm_config->get('BASE_PART_OF_EXTERNAL_URL');
 my $port = $mm_config->get('CATALYST_PORT');
 my $operator_email = $mm_config->get('OPERATOR_EMAIL');
+my $extra_apache_conf = $mm_config->has('EXTRA_APACHE_CONF') ? 'Include ' . $mm_config->get('EXTRA_APACHE_CONF') : '';
 
 my %obsolete = (
     sch => '/search',
@@ -169,6 +170,7 @@ ServerName $virtualhost
 $serveralias
 ServerAdmin $operator_email
 $conf_text
+$extra_apache_conf
 
 </VirtualHost>
 EOT2
