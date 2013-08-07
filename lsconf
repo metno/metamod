@@ -60,15 +60,22 @@ my $vars;
 
 my $mm_config = Metamod::Config->new($config_file_or_dir, { nolog => 1 } );
 
-if (defined $var) {
+if ( !defined($var) || $var =~ /(.+)\*$/ ) {
+    $vars = $mm_config->getall();
+    if ($var) { # wildcard
+        foreach (keys $vars) {
+            #printf "- $1 in $_? %d\n",  index( $_, $1);
+            delete $vars->{$_} unless index( $_, $1) == 0;
+        }
+        #print Dumper $vars;
+    }
+} else {
     missing($var) unless $mm_config->has($var);
     if ($split) {
         $vars = $mm_config->split($var);
     } else {
-        printf "%s=\"%s\"\n", $var, $mm_config->get($var);
+        $vars = { $var => $mm_config->get($var) };
     }
-} else {
-    $vars = $mm_config->getall();
 }
 
 foreach (sort keys %$vars) {
@@ -80,7 +87,7 @@ foreach (sort keys %$vars) {
 }
 
 sub usage {
-    print STDERR "Usage: $0 [--config <config file or dir>] [--split] [<variable>]\n";
+    print STDERR "Usage: $0 [--config <config file or dir>] [--split] [<variable>]\n  Variable may end in '*' wildcard.\n  --spilt can only be used with a single variable.\n";
     exit (1);
 }
 
