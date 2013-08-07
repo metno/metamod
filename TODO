@@ -14,6 +14,7 @@ just as an electronic Post-It note for developers to quickly note action
 points for later.
 
 --------------------
+
 add animation of current wms layer
 
 clean up multiwmc controller, moving processing to utils
@@ -67,6 +68,8 @@ reset password should send a link to reset instead of resetting directly to avoi
 - must use POST
 
 ++++++++ DONE ++++++++++++++
+
+fix userinit crypto (needs "CREATE EXTENSION pgcrypto" in 9.1)
 
 add mod_rewrite to required apache mods in doc
 

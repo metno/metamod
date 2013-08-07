@@ -151,6 +151,14 @@ PG_PORT = 5432
 
 # the location of the initialization sql-script for postGIS
 # For Hardy:
+#PG_CRYPTO_SCRIPT = [==PG_CONTRIB==]/pgcrypto.sql
+# For Lucid:--1.0
+#PG_CRYPTO_SCRIPT = [==PG_CONTRIB==]/pgcrypto.sql
+# For Precise: (leave blank since it is installed differently)
+#PG_CRYPTO_SCRIPT =
+
+# the location of the initialization sql-script for postGIS
+# For Hardy:
 #PG_POSTGIS_SCRIPT = /usr/share/postgresql-8.3-postgis/lwpostgis.sql
 # For Lucid:
 #PG_POSTGIS_SCRIPT = [==PG_CONTRIB==]/postgis.sql

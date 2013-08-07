@@ -21,15 +21,19 @@ else
 fi
 
 check "USERBASE_NAME"
-# changed to extension/pgcrypto--1.0.sql in 9.1
-PG_CRYPTO=$PG_CONTRIB"/pgcrypto.sql"
-check "PG_CRYPTO" 1
 
 $DROPDB -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $USERBASE_NAME
 $CREATEDB -E UTF-8 -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $USERBASE_NAME
 echo "----------------- Database $USERBASE_NAME created ------------------"
-$PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $USERBASE_NAME < $PG_CRYPTO
-# won't work in 9.1 which requires "CREATE EXTENSION pgcrypto" to load this file
+
+if [ "$PG_CRYPTO_SCRIPT" ]
+then
+    $PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $USERBASE_NAME < $PG_CRYPTO_SCRIPT
+else
+    $PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $USERBASE_NAME <<EOF
+CREATE EXTENSION pgcrypto;
+EOF
+fi
 
 $PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $USERBASE_NAME <<EOF
 
