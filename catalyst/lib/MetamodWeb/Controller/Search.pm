@@ -106,6 +106,7 @@ sub display_search_criteria : Path('/search') : Args(1) {
 
     # update the x,y coordinates. x1,y1 are set for the first request. x2, y2 for the second
     # later updates are ignored. The coordinates should be cleared first
+    # NOTE: This only applies for SRID 93995 and 93031 - all others are handled by OpenLayers
     if( $x_coord && $y_coord && !( $x1 || $y1 ) ){
         $x1 = $x_coord;
         $y1 = $y_coord;

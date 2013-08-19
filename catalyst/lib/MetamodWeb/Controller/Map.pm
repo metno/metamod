@@ -27,6 +27,7 @@ use Imager::Fill;
 use Moose;
 use namespace::autoclean;
 use POSIX qw(strftime);
+use Metamod::WMS;
 
 BEGIN { extends 'MetamodWeb::BaseController::Base'; }
 
@@ -52,25 +53,33 @@ sub map : Path('/search/map') : Args(1) {
         'Expires'       => strftime( "%a %d %b %Y %H:%M:%S GMT", localtime( time + $time_to_live ) ),
     );
 
+    my $image_srid = $c->req->args->[0];
+
     my $ui_utils = $c->stash->{ui_utils};
     my $x1       = $c->req->params->{x1};
     my $x2       = $c->req->params->{x2};
     my $y1       = $c->req->params->{y1};
     my $y2       = $c->req->params->{y2};
 
-    $self->logger->debug("Coordinates: ($x1,$y1) ($x2,$y2)");
+    $self->logger->debug("Coordinates: ($x1,$y1) ($x2,$y2), SRID $image_srid");
 
-    my $image_srid = $c->req->args->[0];
+    if ( $image_srid != 93995 and $image_srid != 93031) {
+        my $map = getMapURL("EPSG:$image_srid") or $c->detach( 'Root', 'error', [404, $@] );
+        my $thumburl = "$map?"
+        ."LAYERS=world&TRANSPARENT=false&VERSION=1.1.1&FORMAT=image%2Fpng&SERVICE=WMS&REQUEST=GetMap&STYLES="
+        ."&SRS=EPSG%3A$image_srid&BBOX=$x1,$y2,$x2,$y1&WIDTH=128&HEIGHT=128";
+        return $c->res->redirect($thumburl);
+    }
 
-    # The user has not set any points so there is no reason to get the additional overhead
-    # of using Imager. Read the image bytes and serve them.
     if ( !$x1 && !$y1 ) {
-
+        # The user has not set any points so there is no reason to get the additional overhead
+        # of using Imager. Read the image bytes and serve them.
         open my $IMAGE, '<', $c->path_to("/root/static/images/map_$image_srid.png") or $c->detach( 'Root', 'error', [404, $@] ); # die $!;
         my $image_bytes = do { local $/; <$IMAGE> };
 
         $c->response->body($image_bytes);
         return;
+        # consider using $c->serve_static_file() here instead
     }
 
     my $image = Imager->new();
