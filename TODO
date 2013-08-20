@@ -30,8 +30,6 @@ database/table generation, and should be run on the server where the postgis
 sql files are installed (so you get the correct version and won't have to install
 postgis/pg-server on the webserver)
 
-catalyst/lib/MetamodWeb.pm#92: Deprecated 'static' config key used, please use the key 'Plugin::Static::Simple' instead
-
 make services status run without sudo
 
 check if user exists before saying password change has been effected
@@ -49,7 +47,7 @@ mailtest script
 add packagees, update download docs in https://wiki.met.no/metamod/download
 
 find out how to move index link in html docs to left col (js)
-
+[MaG
 DBIx::Class::Storage::DBI::Pg: DBD::Pg 2.9.2 or greater is strongly recommended
 
 upgrade List::MoreUtils to 0.30 Thu 16 Dec 2010
@@ -68,6 +66,8 @@ reset password should send a link to reset instead of resetting directly to avoi
 - must use POST
 
 ++++++++ DONE ++++++++++++++
+
+catalyst/lib/MetamodWeb.pm#92: Deprecated 'static' config key used, please use the key 'Plugin::Static::Simple' instead
 
 fix userinit crypto (needs "CREATE EXTENSION pgcrypto" in 9.1)
 

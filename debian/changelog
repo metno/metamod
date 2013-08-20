@@ -1,4 +1,4 @@
-metno-metamod-2.13 (2.13.2) unstable; urgency=low
+metno-metamod-2.13 (2.13.3) stable; urgency=low
 
   * dynamic search map using WMS
   * improved support for background maps in different projections
@@ -9,6 +9,7 @@ metno-metamod-2.13 (2.13.2) unstable; urgency=low
   * support for boolean operators, phrases and wildcards in text search
   * easier configuration (lsconf, virtualenv, sanity checker)
   * re-enabled serving static files via Apache
+  * v3: fixes for WMS search map thumbnails, static files, pg_crypto, EXTRA_APACHE_CONF, missing local::lib
 
  -- Geir Aalberg <geira@met.no>  Mon, 03 Jun 2013 11:32:06 +0200
 

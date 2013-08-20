@@ -40,4 +40,28 @@ layer. Check that you have a background map available in the specified projectio
 
 A: Your FIMEX version is out of date. Use 0.41 or later which supports selectVariables.
 
+=head3 PostGIS
+
+=over 4
+
+=item Q: I'm getting the following error in the log:
+
+  SELECT AddGeometryColumn('public', 'dataset_location', 'geom_3995', 3995, 'GEOMETRY', 2);
+  ERROR:  AddGeometryColumns() - invalid SRID
+
+A: Check that the projections specified in SRID_ID_COLUMNS are available in the database:
+
+  test_metadata=# select auth_srid from spatial_ref_sys where auth_name='EPSG' and auth_srid in(93995, 93031, 3995, 3031, 4326);
+   auth_srid
+  -----------
+        4326
+        3031
+        3995
+  (3 rows)
+
+If some of them are missing, make sure PostGIS is correctly installed and restart the PostgreSQL service:
+
+  $ sudo apt-get install postgis postgresql-9.1-postgis
+  $ sudo service postgresql restart
+
 =back
