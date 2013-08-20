@@ -79,7 +79,7 @@ function submitSearchForm(actionUrl){
                 %]
                <div class="[% item_class %]">
                    [% INCLUDE 'search/remove_criteria.tt' html_ids = form_ids %]
-                   <img src="[% c.uri_for( '/search/map/' _ srid, map_coords ) %]" alt="Map search" height="150" width="150" />
+                   <img src="[% c.uri_for( '/search/map/' _ srid, map_coords ) %]" alt="Map search"/>
                </div>
             [% END %]
 
