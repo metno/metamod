@@ -58,7 +58,7 @@
             <select name="projection">
                 <option value="">(original)</option>
             [% FOREACH proj IN projections %]
-                <option value="[% proj.key %]">[% proj.value %]</option>
+                <option value="[% proj.key %]">[% proj.value %] ([% proj.key %])</option>
             [% END %]
             </select>
 
