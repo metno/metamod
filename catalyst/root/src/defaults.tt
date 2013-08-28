@@ -12,8 +12,10 @@ app = {
         header_html = "<img src='$mm_logo' style='clear:left;border: none;' />"
 
         # HTML code for a footer across the bottom of applications:
-        footer_html = ""
-
+        footer_html = '<div id="page-footer">
+            <a href="https://wiki.met.no/metamod/start">METAMOD</a> &#169;
+            <a href="http://met.no/">Norwegian Meteorological Institute</a>
+        </div>'
     }
 
     upload = {
@@ -120,7 +122,7 @@ Internal thredds can be set up with url="%THREDDS_DATAREF%" (is this implemented
 
 The layer/palette setup is optional.
 
-displayArea can be:
+displayArea can be (obsolete - FIXME):
     EPSG:32661 - north pole stereographic
     EPSG:32761 - south pole stereographic
     EPSG:4326  - lat/lon

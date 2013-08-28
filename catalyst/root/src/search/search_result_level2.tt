@@ -62,7 +62,7 @@
 
             [% IF child.xmlfile %]
                 <a class="visual" href="[% c.uri_for( '/dataset', child.ds_id, 'xml' ) %]" target="_blank"
-                   title="Show the raw XML metadata for this file in a separate windows"><span>Show xml</span></a><br clear="all"/>
+                   title="Show the raw XML metadata for this file in a separate windows"><span>Show metadata</span></a><br clear="all"/>
             [% END %]
 
             [% FOREACH projection IN child.fimex_projections.listProjections() # FIXME remove after transform tested %]

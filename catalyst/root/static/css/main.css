@@ -4,7 +4,7 @@ html, body {
 }
 
 body {
-   background: #d1e0e1;
+   background: #443355;
    font-family: arial, verdana, sans-serif;
 
    /* force a scrollbar even when one is not required. This prevents
@@ -22,10 +22,10 @@ div.info_msg {
 }
 
 div.error_msg {
-	border: 1px solid #ff1212;
+    border: 1px solid #ff1212;
     padding: 5px 5px 5px 5px;
     margin: 5px 5px 5px 5px;
-	background-color: #ffd7d7;
+    background-color: #ffd7d7;
 }
 
 div#page {
@@ -44,6 +44,19 @@ div#inner-content {
     padding-right: 10px;
 }
 
+div#page-footer {
+    background-color: #DC706A;
+    padding: 5px 5px 5px 5px;
+    text-align: right;
+    margin-top: 15px;
+    font-size: 10px;
+    color: white;
+}
+
+div#page-footer a {
+    color: white;
+}
+
 div#footer{
     padding-top: 10px;
 }
@@ -58,7 +71,7 @@ div#search-criteria-menu, div#my-metamod-menu {
 }
 
 div.sub-menu-item {
-	margin: 3px 3px 3px 15px;
+    margin: 3px 3px 3px 15px;
 }
 
 div.menu-item {
@@ -127,8 +140,8 @@ h1.info {
 }
 
 th, td {
-	border: 0;
-	padding: 0 0 0 0;
+    border: 0;
+    padding: 0 0 0 0;
 }
 
 td {
@@ -166,5 +179,5 @@ li {
 }
 
 textarea.wms_info textarea.projection_info {
-	white-space: pre;
+    white-space: pre;
 }
