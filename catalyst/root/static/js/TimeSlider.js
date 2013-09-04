@@ -190,6 +190,7 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
      */
     timesliderNext : function () {
         var val = this.slider.slider("value");
+        log.debug('next: ' + val);
         if( val < this.sortedTimes.length - 1 ){
             this.slider.slider("value", val + 1);
         } else {
@@ -202,6 +203,7 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
      */
     timesliderPrevious : function () {
         var val = this.slider.slider("value");
+        log.debug('prev: ' + val);
         if( val > 0 ){
             this.slider.slider("value", val - 1);
         } else {

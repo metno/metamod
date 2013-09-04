@@ -1,25 +1,37 @@
-package Metamod::OAI::DataProvider;
+=begin licence
 
-use strict;
-use warnings;
+----------------------------------------------------------------------------
+METAMOD - Web portal for metadata search and upload
 
-use Carp qw( confess );
-use DateTime;
-use DateTime::Format::Strptime;
-use File::Spec;
-use JSON;
-use Log::Log4perl qw( get_logger );
-use Moose;
-use Params::Validate qw(:all);
-use Try::Tiny;
-use XML::LibXML;
+Copyright (C) 2013 met.no
 
-use Metamod::Config;
-use Metamod::DatasetTransformer::ToOAIDublinCore;
-use Metamod::DBIxSchema::Metabase;
-use Metamod::ForeignDataset;
-use Metamod::Utils qw( random_string );
+Contact information:
+Norwegian Meteorological Institute
+Box 43 Blindern
+0313 OSLO
+NORWAY
+email: geira@met.no
 
+This file is part of METAMOD
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+METAMOD is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with METAMOD; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+----------------------------------------------------------------------------
+
+=end licence
+
+=cut
 
 =head1 NAME
 
@@ -33,6 +45,30 @@ repository.
 =head1 FUNCTIONS/METHODS
 
 =cut
+
+package Metamod::OAI::DataProvider;
+
+use strict;
+use warnings;
+
+use Carp qw( confess );
+use Data::Dumper;
+use DateTime;
+use DateTime::Format::Strptime;
+use File::Spec;
+use File::Temp qw();
+use JSON;
+use Log::Log4perl qw( get_logger );
+use Moose;
+use Params::Validate qw(:all);
+use Try::Tiny;
+use XML::LibXML;
+
+use Metamod::Config;
+use Metamod::DatasetTransformer::ToOAIDublinCore;
+use Metamod::DBIxSchema::Metabase;
+use Metamod::ForeignDataset;
+use Metamod::Utils qw( random_string );
 
 has 'config' => ( is => 'ro', isa => 'Metamod::Config', default => sub { Metamod::Config->instance() } );
 
@@ -477,7 +513,10 @@ sub _get_metadata {
     my $convert_func = $formats->{$format};
 
     my $converted = $convert_func->($ds);
-    return $converted->getMETA_DOC();
+    my $dom = $converted->getMETA_DOC();
+    $self->logger->debug( "DataProvider::_get_metadata( ", $dataset->ds_id(), ", $format ) ", substr $dom->toString(2), 0, 130 );
+
+    return $dom;
 }
 
 =head2 $self->_base_resultset()
@@ -640,25 +679,40 @@ sub _validate_metadata {
     my ( $format, $xml_dom, $dataset ) = @_;
 
     my %schema_for_format = (
-        dif    => '/schema/dif_v9.8.2.xsd',
-        oai_dc => '/schema/oai_dc.xsd',
+        dif      => '/schema/dif_v9.8.2.xsd',
+        oai_dc   => '/schema/oai_dc.xsd',
+        iso19115 => '/schema/iso19139/gmd/gmd.xsd',
+        iso19139 => '/schema/iso19139/gmd/gmd.xsd',
     );
 
     return 1 if !exists $schema_for_format{$format};
 
     my $schema = File::Spec->catfile( $self->config->get('INSTALLATION_DIR'), 'common', $schema_for_format{$format} );
-    my $xsd_validator = XML::LibXML::Schema->new( location => $schema );
 
-    my $success;
+    my $ext_validators = $self->config->split('PMH_LOCAL_VALIDATION');
+    my $ds_name = $dataset->ds_name();
+
     my $error = try {
-        $xsd_validator->validate($xml_dom);
-        $success = 1;
-    } catch {
-        my $ds_name = $dataset->ds_name();
-        $self->logger->warn("XML did not validate according to format '$format' for dataset '$ds_name': $_");
-    };
 
-    return $success;
+        if (my $cmd = $ext_validators->{$format}) { # use custom validator
+            return 1 if $cmd eq '-';
+            my $tmpfile = File::Temp->new(TEMPLATE => 'oaiXXXXXX', SUFFIX => '.xml');
+            $xml_dom->toFH($tmpfile) or die "Could not write temporary OAI file";
+            $cmd =~ s/\[SCHEMA\]/$schema/;
+            $cmd =~ s/\[FILE\]/$tmpfile/;
+            $self->logger->debug("Validating $cmd");
+            system($cmd) == 0 or die "External validator failed";
+        } else { # use ordinary schema
+            my $xsd_validator = XML::LibXML::Schema->new( location => $schema );
+            $xsd_validator->validate($xml_dom);
+        }
+        $self->logger->info("OAI XML document $ds_name in $format format validated successfully");
+        return 1;
+
+    } catch {
+        $self->logger->error("XML did not validate according to format '$format' for dataset '$ds_name': $_");
+        return;
+    };
 
 }
 
@@ -744,3 +798,13 @@ sub _token_file {
 }
 
 __PACKAGE__->meta->make_immutable();
+
+=head1 AUTHOR
+
+Øystein Torget, E<lt>oysteint@met.noE<gt>
+
+=head1 LICENSE
+
+GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
+
+=cut

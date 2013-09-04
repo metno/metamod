@@ -44,6 +44,8 @@ MetamodWeb::Controller::OAI - Controller that implements a OAI-PMH server.
 This module implements a OAI-PMH compatible server. For information on
 OAI-PMH please take a look at the protocol specification.
 
+FIXME: Move processing out of controller module
+
 =head1 METHODS
 
 =cut

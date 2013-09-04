@@ -1,35 +1,43 @@
-#----------------------------------------------------------------------------
-#  METAMOD - Web portal for metadata search and upload
-#
-#  Copyright (C) 2008 met.no
-#
-#  Contact information:
-#  Norwegian Meteorological Institute
-#  Box 43 Blindern
-#  0313 OSLO
-#  NORWAY
-#  email: Heiko.Klein@met.no
-#
-#  This file is part of METAMOD
-#
-#  METAMOD is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  METAMOD is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with METAMOD; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-#----------------------------------------------------------------------------
+=begin licence
+
+----------------------------------------------------------------------------
+METAMOD - Web portal for metadata search and upload
+
+Copyright (C) 2013 met.no
+
+Contact information:
+Norwegian Meteorological Institute
+Box 43 Blindern
+0313 OSLO
+NORWAY
+email: geira@met.no
+
+This file is part of METAMOD
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+METAMOD is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with METAMOD; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+----------------------------------------------------------------------------
+
+=end licence
+
+=cut
+
 package Metamod::ForeignDataset;
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 
 use strict;
+use Data::Dumper;
 use warnings;
 use encoding 'utf-8';
 use 5.6.0;
@@ -265,15 +273,13 @@ sub getXMD_DOC {
     return $out;
 }
 
-sub getMETA_DOC {
+sub getMETA_DOC { # may return any data format
     my ($self) = @_;
     my $doc = $self->{docMETA};
     my $out = new XML::LibXML::Document($doc->version, $doc->encoding);
     $out->setDocumentElement($doc->getDocumentElement->cloneNode(1));
     return $out;
 }
-
-
 
 sub getInfo {
     my ($self) = @_;
@@ -551,9 +557,11 @@ perl utf8-flag switched on. Please make sure to provide such data by:
 =over 4
 
 =begin deprecated
+
 =item isXMLCharacter($str)
 
 Check if the first character in $str is a valid xml-character as defined in http://www.w3.org/TR/REC-xml/#dt-character
+
 =end deprecated
 
 =item removeUndefinedXMLCharacters($str)
@@ -624,7 +632,6 @@ Get a clone of the internal metadata document.
 
 Return: XML::LibXML::Document of the metadata
 
-
 =item getInfo()
 
 read the info attributes (name, ownertag, status, metadataFormat, creationDate, datestamp) from the dataset
@@ -666,6 +673,7 @@ Return: @oldQuadtree_nodes
 =item getDatasetRegion()
 
 Return: a Metamod::DatasetRegion
+
 Warning: this is a copy of the region, when changing, a call to setDatasetRegion is required
 
 =item deleteDatasetRegion()
@@ -685,6 +693,7 @@ Return: raw-xml content of the WMSInfo node
 set/replace the raw-xml WMSInfo node.
 
 Return: old WMSInfo
+
 Throws: Exception if $wmsInfo is not valid
 
 =item getProjectionInfo()
@@ -696,8 +705,8 @@ Return: raw content of the ProjectionInfo node
 set/replace the raw ProjectionInfo node
 
 Return: old ProjectionInfo
-Throws: Exception if $projectionInfo is not valid
 
+Throws: Exception if $projectionInfo is not valid
 
 =back
 

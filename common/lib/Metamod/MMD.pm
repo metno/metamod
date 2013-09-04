@@ -219,6 +219,10 @@ sub test {
     print $mm2->toString(1);
 }
 
+=head1 AUTHOR
+
+Geir Aalberg, E<lt>geira@met.noE<gt>
+
 =head1 LICENSE
 
 GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>

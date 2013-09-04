@@ -33,10 +33,11 @@ our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", 
 
 use strict;
 use warnings;
+use Data::Dumper;
 use Metamod::ForeignDataset;
 use Metamod::DatasetTransformer;
 use Metamod::DatasetTransformer::ToDIF;
-use Carp qw(croak);
+use Carp qw(cluck);
 use Log::Log4perl;
 
 our @EXPORT_OK = qw(foreignDataset2iso19115);

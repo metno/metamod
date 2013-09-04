@@ -551,6 +551,17 @@ PMH_EXPORT_TAGS = [==DATASET_TAGS==]
 PMH_VALIDATION = on
 # please change this to true/false or 1/0 - FIXME
 
+# Custom local validator commands to run for specific data formats in OAI-PMH
+# (needed for ISO 19139 docs which require locally compiled version of libxml2 in precise)
+#PMH_LOCAL_VALIDATION =
+#    iso19115  '/opt/local/bin/xmllint --noout --schema [SCHEMA] [FILE]'
+#    iso19139  '/opt/local/bin/xmllint --noout --schema [SCHEMA] [FILE]'
+# otherwise validation is disabled by default for these formats
+# (NOTE: this restriction will be removed in a later version)
+PMH_LOCAL_VALIDATION =
+    iso19115  '-'
+    iso19139  '-'
+
 # optional set configuration, one set per row ownertag|name|description
 # the ownertag needs to be one of the export-tags
 PMH_SETCONFIG =
