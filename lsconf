@@ -43,23 +43,35 @@ use lib "$Bin/common/lib";
 use Metamod::Config;
 use Getopt::Long;
 use Data::Dumper;
+use Term::ANSIColor;
 
-my $config_file_or_dir;
-my $split;
-GetOptions('split' => \$split,
-           'config=s' => \$config_file_or_dir,
+#Getopt::Long::Configure ("bundling");
+my ($split, $config_file_or_dir, $default, $custom);
+my $color = -t STDOUT; # use IO::Interactive::Tiny instead - FIXME
+GetOptions(
+    'default!'  => \$default,   # set in default_config
+    'custom!'   => \$custom,    # set in master_config
+    'color!'    => \$color,     # use colors
+    'split'     => \$split,     # split var into key-value pairs
+    'config=s'  => \$config_file_or_dir,
 ) or usage();
+#print STDERR Dumper [ $split, $config_file_or_dir, $default, $custom ];
+
+if (defined $color) {
+    $ENV{ANSI_COLORS_DISABLED} = 1 unless $color;
+}
 
 Metamod::Config->config_found($config_file_or_dir) or usage();
 my $mm_config = Metamod::Config->new($config_file_or_dir, { nolog => 1 } );
 
 my $var = shift @ARGV;
 my $vars;
+my $flags = $mm_config->getallflags();
 
 if ( !defined($var) || $var =~ /(.+)\*$/ ) {
     $vars = $mm_config->getall();
     if ($var) { # wildcard
-        foreach (keys $vars) {
+        foreach (keys $vars) { # delete vars not starting with $var
             #printf "- $1 in $_? %d\n",  index( $_, $1);
             delete $vars->{$_} unless index( $_, $1) == 0;
         }
@@ -74,16 +86,35 @@ if ( !defined($var) || $var =~ /(.+)\*$/ ) {
     }
 }
 
+if (defined $default) { # default values
+    foreach (keys $vars) {
+        my $dflag = $flags->{$_} || 0;
+        delete $vars->{$_} unless ($dflag & 1) == $default;
+    }
+}
+
+if (defined $custom) { # custom values
+    $custom <<= 1;
+    foreach (keys $vars) {
+        my $dflag = $flags->{$_} || 0;
+        #print "$_ $dflag $custom\n";
+        delete $vars->{$_} unless ($dflag & 2) == $custom;
+    }
+}
+# print output
 foreach (sort keys %$vars) {
     my $val = $$vars{$_};
-    #print Dumper $val;
-    printf "$_=%s\n", ref $val ?
-        '[ ' . join(', ', @$val) . ' ]' :
-        "\"$val\"";
+    my $f = $flags->{$_} || 0;
+    print color $f & 1 ? 'bold green' : 'bold red'; # green if default
+    print $_, color 'reset';
+    print '=', color $f & 2 ? 'bright_yellow' : 'bright_blue'; # yellow if local
+    print ref $val ? '[ ' . join(', ', @$val) . ' ]' : "\"$val\"";
+    print "\n", color 'reset';
 }
 
 sub usage {
-    print STDERR "Usage: $0 [--config <config file or dir>] [--split] [<variable>]\n  Variable may end in '*' wildcard.\n  --spilt can only be used with a single variable.\n";
+    print STDERR "Usage: $0 [--config <config file or dir>] [--split] [--[no]default] [--[no]custom] [<variable>]\n"
+                ."  Variable may end in '*' wildcard.\n  --spilt can only be used with a single variable.\n";
     exit (1);
 }
 
@@ -105,7 +136,7 @@ With no arguments, list all variables alphabetically.
 
 =head1 USAGE
 
- chk_conf.pl [--config <file>] [--split] [variable]
+ lsconf.pl [--config <file>] [--split] [--[no]color] [--[no]default] [--[no]custom] [variable]
 
 =head1 LICENSE
 

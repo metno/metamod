@@ -159,6 +159,7 @@ sub new {
         mtime => '0',
         filename => $config_file,
         vars => {}, # lazy loading on first get
+        flags => {},
     };
     $_config = bless $config, $class;
     $_config->initLogger unless $$options{nolog};
@@ -302,6 +303,18 @@ sub getall {
     return \%vars;
 }
 
+=head2 $self->getallflags()
+
+returns all configuration flags as a hash
+
+=cut
+
+sub getallflags {
+    my ($self) = @_;
+    $self->_checkFile();
+    return $self->{flags};
+}
+
 =head2 $self->has($varname)
 
 return true if the configuration variable configVar is currently set. This will reread the
@@ -417,7 +430,8 @@ sub _readConfig {
 
     my $default_config = $self->path_to_config_file('default_config.txt');
 
-    my %conf;
+    my (%conf, %flags);
+    my $flagmask = 1;
     for my $filename (($default_config, $self->{filename})) {
 
         open my $fh, '<', $filename or confess "Cannot read file".$filename.": $!\n";
@@ -431,15 +445,18 @@ sub _readConfig {
         my $line = "";
         while (defined (my $line = <$fh>)) {
             chomp($line);
-            #
-            #     Check if expression matches RE:
-            #
+            # Check if expression matches RE:
             if ($line =~ /^[A-Z0-9_#!]/ && $varname ne "") {
                 if (length($origname) > 0) {
-                    $conf{$varname . ':' . $origname . ':' . $newname} = $value;
+                    # what is going on here?
+                    my $k = $varname . ':' . $origname . ':' . $newname;
+                    $conf{$k} = $value;
+                    $flags{$k} |= $flagmask | 8;
                     $newfilenames{$origname . ':' . $newname} = 1;
                 } else {
+                    # normal assignment
                     $conf{$varname} = $value;
+                    $flags{$varname} |= $flagmask;
                 }
                 $varname = "";
             }
@@ -458,10 +475,13 @@ sub _readConfig {
                 $value .= "\n" . $line;
             }
         }
+        # file finished, store last remaining variable
         if ($varname ne "") {
             $conf{$varname} = $value;
+            $flags{$varname} |= $flagmask;
         }
         close $fh;
+        $flagmask <<= 1;
     }
 
     # add computed values
@@ -473,9 +493,11 @@ sub _readConfig {
     for (keys %ENV) {
         next unless /^METAMOD_(\w+)/;
         $conf{$1} = $ENV{$_};
+        $flags{$1} |= $flagmask;
     }
 
     $self->{vars} = \%conf;
+    $self->{flags} = \%flags;
 }
 
 # get a variable from env or the internal hash, without substitution
