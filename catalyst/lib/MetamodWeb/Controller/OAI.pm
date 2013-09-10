@@ -158,8 +158,8 @@ sub _identify {
     my $config = Metamod::Config->instance();
 
     my $identify = new HTTP::OAI::Identify(
-        baseURL           => $c->req->base() . $c->req->path(),
-        adminEmail        => "mailto:" . $config->get('OPERATOR_EMAIL'),
+        baseURL           => $config->get('BASE_PART_OF_EXTERNAL_URL') . $config->get('LOCAL_URL') . '/oai',
+        adminEmail        => $config->get('OPERATOR_EMAIL'),
         repositoryName    => $config->get('PMH_REPOSITORY_NAME'),
         protocolVersion   => '2.0',
         earliestDatestamp => $config->get('PMH_EARLIEST_DATESTAMP'),
