@@ -279,6 +279,7 @@
     <xsl:param name="role"/>
     <Personnel>
       <Role><xsl:value-of select="$role"/></Role>
+      <!--FIXME this should be read from config-->
       <First_Name>Egil</First_Name>
       <Last_Name>Støren</Last_Name>
       <Email>Not Available</Email>

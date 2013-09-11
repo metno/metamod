@@ -28,6 +28,7 @@ use HTTP::OAI;
 use HTTP::OAI::Metadata::OAI_DC;
 use HTTP::OAI::Repository qw( validate_request );
 use XML::SAX::Writer;
+use DateTime;
 
 use Metamod::Config;
 use Metamod::OAI::DataProvider;
@@ -65,9 +66,9 @@ sub oai : Path('/oai') : Args {
     my ( $self, $c ) = @_;
 
     my $params = $c->req->params();
-
     my @errors = validate_request(%$params);
     my $config = Metamod::Config->instance(); # move to Moose attr
+    $self->logger->info("OAI ", $params->{verb}, " request started ", DateTime->now);
 
     my $response;
     if (@errors) {
@@ -105,6 +106,7 @@ sub oai : Path('/oai') : Args {
 
     $c->response->content_type('text/xml');
     $c->response->body($xml);
+    $self->logger->info("OAI ", $params->{verb}, " request finished ", DateTime->now);
 }
 
 sub _list_identifiers {

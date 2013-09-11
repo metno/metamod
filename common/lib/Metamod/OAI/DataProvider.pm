@@ -467,6 +467,7 @@ sub _oai_record_header {
         my $success = $self->_validate_metadata($format, $xml_dom, $dataset);
         if(!$success) {
             $record->{status} = 'deleted';
+            $self->logger->debug( $xml_dom->toString(1) );
         }
     }
 
