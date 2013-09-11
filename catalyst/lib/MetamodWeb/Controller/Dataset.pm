@@ -109,7 +109,9 @@ sub xml :Chained("ds_id") :PathPart("xml") :Args(0) {
         $c->response->content_type('text/xml');
         # return the document in utf encoding
         $c->response->body( '<?xml version="1.0" encoding="UTF-8"?>'."\n"
-                            . $mmDs->getMETA_DOC()->documentElement()->toString(1) );
+                           #. '<?xml-stylesheet type="text/css" href="../../static/css/'. $ds->ds_metadataformat .'.css"?>'."\n"
+                           #. $mmDs->getMETA_DOC()->documentElement()->toString(1) )
+                           ;
     };
 
     if( $@ ){
@@ -188,7 +190,7 @@ sub rss :Chained("ds_id") :PathPart("rss") : Args(0) {
         link      => $base_url . $local_url,
         generator => 'METAMOD',
     );
-    
+
      $rss->add_module(prefix => 'georss', uri => 'http://www.georss.org/georss');
 
     my @level2_datasets = $c->model('Metabase::Dataset')->level2_datasets( { ds_id => $ds_id } );
@@ -210,7 +212,7 @@ sub rss :Chained("ds_id") :PathPart("rss") : Args(0) {
 
             if( my $bbox = $md->{bounding_box}->[0] ) {
                 # convert bounding box from ESWN to SWNE
-                my ($e, $s, $w, $n) = split(',', $bbox);  
+                my ($e, $s, $w, $n) = split(',', $bbox);
                 $item{'georss'} = { box  => "$s $w $n $e" };
             }
 
