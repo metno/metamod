@@ -94,7 +94,7 @@ if (defined $default) { # default values
 }
 
 if (defined $custom) { # custom values
-    $custom <<= 1;
+    $custom <<= 1; # bitmask 00000010
     foreach (keys $vars) {
         my $dflag = $flags->{$_} || 0;
         #print "$_ $dflag $custom\n";

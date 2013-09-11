@@ -3,78 +3,82 @@
   METAMOD CHANGELOG
 ============================
 
-2.13
-    - dynamic search map using WMS
-    - improved support for background maps in different projections
-    - automatic building and installation of Perl dependencies using Carton
-    - support for Ubuntu 12.4 Precise Pangolin and PostgreSQL 9.1
-    - fix for old GetLegendGraphics bug to work with new version of THREDDS
-    - upgraded to latest Catalyst version (5.9)
-    - support for boolean operators, phrases and wildcards in text search
+2.13   Mon Jun 3 2013 
+  * dynamic search map using WMS
+  * improved support for background maps in different projections
+  * automatic building and installation of Perl dependencies using Carton
+  * support for Ubuntu 12.4 Precise Pangolin and PostgreSQL 9.1
+  * fix for old GetLegendGraphics bug to work with new version of THREDDS
+  * upgraded to latest Catalyst version (5.9)
+  * support for boolean operators, phrases and wildcards in text search
+  * easier configuration (lsconf, virtualenv, sanity checker)
+  * support for manual configuration and serving static files in Apache (again)
+  * WMS search map thumbnails
+  * support for custom validators in OAI-PMH
 
 2.12   Mon Jan 14 2013
-    - projection selector and timeslider in wms client
-    - visualization of non-gridded timeseries
-    - fimex support for reading via opendap
-    - subsetting and (experimental) reprojection via OPeNDAP
-    - bugfix for wgs84 map in basket
+  * projection selector and timeslider in wms client
+  * visualization of non-gridded timeseries
+  * fimex support for reading via opendap
+  * subsetting and (experimental) reprojection via OPeNDAP
+  * bugfix for wgs84 map in basket
 
-2.11    Thu, 31 Aug 2012
+2.11    Thu Aug 31 2012
     Improved WMS client with many new features:
-    - new advanced layer selector with separate legends and time axis
-    - multiple transparent daya layers can be displayed simultaneously
-    - layers from different datasets and sources can be combined in client using collection basket
-    - timeslider allows for animation of multiple layers simultaneously
-    - support for many more projections (depending on data source WMS server)
-    - added support for WMS 1.1.1 (in addition to 1.3.0)
+  * new advanced layer selector with separate legends and time axis
+  * multiple transparent daya layers can be displayed simultaneously
+  * layers from different datasets and sources can be combined in client using collection basket
+  * timeslider allows for animation of multiple layers simultaneously
+  * support for many more projections (depending on data source WMS server)
+  * added support for WMS 1.1.1 (in addition to 1.3.0)
 
-2.10    Tue, 24 Jan 2012
-    - Simplified installation - now running directly from source, Debian installer
-    - WMS visualization of time series, aggregated datasets, collection basket
-    - Final PHP module (OAI-PMH) rewritten in Perl
-    - Added config defaults, simplifying site administration
+2.10    Tue 24 Jan 2012
+  * Simplified installation - now running directly from source, Debian installer
+  * WMS visualization of time series, aggregated datasets, collection basket
+  * Final PHP module (OAI-PMH) rewritten in Perl
+  * Added config defaults, simplifying site administration
 
 2.9     Thu Sep 8 09:33:55 2011
-    - Allowing near-realtime web upload
-    - Queue system implemented for background jobs
-    - Cron scheduling for Harvester, FTP upload
-    - Improvements in the metadata backend
-    - Each site must now run separate userbase
+  * Allowing near-realtime web upload
+  * Queue system implemented for background jobs
+  * Cron scheduling for Harvester, FTP upload
+  * Improvements in the metadata backend
+  * Each site must now run separate userbase
 
 2.8     Wed May 18 10:50:41 2011
-    - Stable release using Catalyst/Perl web frontend
-    - Hashed passwords for improved security
+  * Stable release using Catalyst/Perl web frontend
+  * Hashed passwords for improved security
 
 2.7     Internal milestone, not released
-    - Technology preview using Catalyst/Perl for web interface instead of PHP
+  * Technology preview using Catalyst/Perl for web interface instead of PHP
 
 2.6     Thu Nov 25 08:00:00 2010
-    - Connecting to SRU2JDBC for ISO23950 support
-    - Dataset subscription via e-mail and RSS support
-    - Improved ISO19115/19139 support compatible with WIS and GeoNetworks
-    - WMS improvements
-    - User database added
+  * Connecting to SRU2JDBC for ISO23950 support
+  * Dataset subscription via e-mail and RSS support
+  * Improved ISO19115/19139 support compatible with WIS and GeoNetworks
+  * WMS improvements
+  * User database added
 
 2.5     Tue May 11 11:15:51 2010
-    - WMS presentation of data
-    - WMS preview in client
-    - Registration of files in existing repository
-    - Search in different world maps
+  * WMS presentation of data
+  * WMS preview in client
+  * Registration of files in existing repository
+  * Search in different world maps
 
 2.4     Fri Mar 12 13:11:59 2010
-    - Internal release number only
+  * Internal release number only
 
 2.3     Wed Nov 18 09:57:57 2009
-    - general text search
-    - methods for re-projecting 2D data (fimex)
-    - methods for connecting to WMS server
-    - module for automatic update of THREDDS catalog.
-    - improvements in PMH server and dataset administration.
+  * general text search
+  * methods for re-projecting 2D data (fimex)
+  * methods for connecting to WMS server
+  * module for automatic update of THREDDS catalog.
+  * improvements in PMH server and dataset administration.
 
 2.2     Wed Apr 1 13:54:53 2009
-    - Implementation of a two-level view of datasets. At the highest level,
-      datasets representing several files are described. Details of each file
-      are described at the second level
+  * Implementation of a two-level view of datasets. At the highest level,
+    datasets representing several files are described. Details of each file
+    are described at the second level
 
 2.1     Fri Dec 19 14:31:13 2008
 

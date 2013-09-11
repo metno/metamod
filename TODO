@@ -17,6 +17,10 @@ points for later.
 
 fix fakeroot in debian make
 
+set default ownertag to all in search
+
+add docs for custom oai validators
+
 add animation of current wms layer
 
 clean up multiwmc controller, moving processing to utils

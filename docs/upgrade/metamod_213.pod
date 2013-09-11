@@ -122,3 +122,22 @@ make sure the new SRIDs are supported in your current version of PostGIS:
 In case any of these projections are missing you must either install support for
 them using data from L<spatialreference.org|http://spatialreference.org/> or remove them from
 C<SRID_ID_COLUMNS>, otherwise C<create_and_load_all.sh> will probably fail.
+
+=head2 Validation of ISO 19139/19115 documents in OAI-PMH
+
+Due to a bug in libxml2 2.7.8 and earlier, validation of ISO files is not possible and has been disabled in METAMOD.
+To enable this under Precise you need to compile 2.9.1 from source and install in a custom location:
+
+  $ wget ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz
+  $ tar xfvz libxml2-2.9.1.tar.gz
+  $ cd libxml2-2.9.1/
+  $ ./configure --prefix=/opt/local --without-python
+  $ make && sudo make install
+
+After this is done you can add an external validation script in master_config:
+
+PMH_LOCAL_VALIDATION =
+    iso19115  '/opt/local/bin/xmllint --noout --schema [SCHEMA] [FILE]'
+    iso19139  '/opt/local/bin/xmllint --noout --schema [SCHEMA] [FILE]'
+
+From Ubuntu 14.4, ISO validation will be handled normally in METAMOD without the need for external validators.

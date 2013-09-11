@@ -20,6 +20,11 @@ A: You seem to be having restricted full sudo rights. See L<deploying> for more 
 
 =over 4
 
+=item Q: When I open the WMS client, no data layers are rendered on the map until I click on something in the layer selector
+
+A: You must specify at least one layer in wmsinfo, otherwise all layers will be set to hidden (collapsed).
+
+
 =item Q: The WMS client fails to show any images, and Log4JS reports the following error:
 
     FATAL - Invalid GetMapContext: TypeError: maxExtent is null
