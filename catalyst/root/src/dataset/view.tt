@@ -1,6 +1,11 @@
 <h1>Information about dataset</h1>
-<table>
 
+[% IF ds.xmlfile # FIXME formatting %]
+    <a class="btn" href="[% c.uri_for( '/dataset', ds_id, 'xml' ) %]"
+       title="Show raw XML metadata for this file"><span>Show XML</span></a>
+[% END %]
+
+<table>
 <tr>
     <td class="dataset_view"><label>Unqualified dataset name</label></td>
     <td class="dataset_view">[% ds.unqualified_ds_name() %]</td>

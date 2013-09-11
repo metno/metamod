@@ -60,10 +60,8 @@
 
         <div class="btns" _class="dataset_actions">
 
-            [% IF child.xmlfile %]
-                <a class="visual" href="[% c.uri_for( '/dataset', child.ds_id, 'xml' ) %]" target="_blank"
-                   title="Show the raw XML metadata for this file in a separate windows"><span>Show metadata</span></a><br clear="all"/>
-            [% END %]
+            <a class="visual" href="[% c.uri_for( '/dataset', child.ds_id, 'view' ) %]" target="_blank"
+               title="Show metadata for this file"><span>Show metadata</span></a><br clear="all"/>
 
             [% FOREACH projection IN child.fimex_projections.listProjections() # FIXME remove after transform tested %]
                 <a class="btn" href="[% c.uri_for( '/search/fimexdownload', { dataset_name => child.ds_name, projection => projection } ) %]" target="_blank"
