@@ -67,6 +67,7 @@ sub oai : Path('/oai') : Args {
     my $params = $c->req->params();
 
     my @errors = validate_request(%$params);
+    my $config = Metamod::Config->instance(); # move to Moose attr
 
     my $response;
     if (@errors) {
@@ -97,7 +98,8 @@ sub oai : Path('/oai') : Args {
 
     my $xml;
     my $writer = XML::SAX::Writer->new( Output => \$xml );
-    $response->requestURL( $c->req->uri() );
+    #$response->requestURL( $c->req->uri() );
+    $response->requestURL( $config->get('BASE_PART_OF_EXTERNAL_URL') . $config->get('LOCAL_URL') . '/oai' );
     $response->set_handler($writer);
     $response->generate();
 
@@ -372,7 +374,7 @@ sub _oai_header {
 sub old : Path('/pmh/oai2.php') : Args {
     # redirect old php version to new
     my ( $self, $c ) = @_;
-    return $c->res->redirect( $c->uri_for( '/oai', $c->req->params ) );
+    return $c->res->redirect( $c->uri_for( '/oai', $c->req->params ), 301 );
 }
 
 __PACKAGE__->meta->make_immutable;
