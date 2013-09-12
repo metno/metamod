@@ -110,8 +110,8 @@ sub xml :Chained("ds_id") :PathPart("xml") :Args(0) {
         # return the document in utf encoding
         $c->response->body( '<?xml version="1.0" encoding="UTF-8"?>'."\n"
                            #. '<?xml-stylesheet type="text/css" href="../../static/css/'. $ds->ds_metadataformat .'.css"?>'."\n"
-                           #. $mmDs->getMETA_DOC()->documentElement()->toString(1) )
-                           ;
+                           #. $mmDs->getMETA_DOC()->documentElement()->toString(1)
+                          );
     };
 
     if( $@ ){
