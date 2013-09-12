@@ -29,6 +29,8 @@ requires 'JSON::Any', 1.29;
 requires 'local::lib', '1.008010';
 requires 'Moose', 2.0604;
 requires 'Moose', 2.0604;
+requires 'PDL', '2.4.7';
+requires 'PDL::NetCDF', '4.07';
 requires 'POE::Component::Cron', 0.021;
 requires 'Starman', 0.3006;
 requires 'Template', 2.22;
