@@ -1,4 +1,4 @@
-metno-metamod-2.13 (2.13.4) stable; urgency=low
+metno-metamod-2.13 (2.13.5-1) stable; urgency=low
 
   * dynamic search map using WMS
   * improved support for background maps in different projections
@@ -11,6 +11,7 @@ metno-metamod-2.13 (2.13.4) stable; urgency=low
   * re-enabled serving static files via Apache
   * v3: fixes for WMS search map thumbnails, static files, pg_crypto, EXTRA_APACHE_CONF, missing local::lib
   * v4: support for custom validators in OAI-PMH
+  * v5: oai and wms fixes, added html view of xml files
 
  -- Geir Aalberg <geira@met.no>  Mon, 03 Jun 2013 11:32:06 +0200
 
