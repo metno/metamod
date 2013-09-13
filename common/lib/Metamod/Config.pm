@@ -487,6 +487,7 @@ sub _readConfig {
     # add computed values
     $conf{'INSTALLATION_DIR'} = $self->installation_dir();
     $conf{'CONFIG_DIR'}       = $self->config_dir();
+    $conf{'VERSION'}          = $self->version();
     $conf{'CATALYST_LIB'}     = $conf{'INSTALLATION_DIR'} . "/local/lib/perl5" unless exists $conf{'CATALYST_LIB'};
 
     # add environment variables (currently no keyword substitution)
@@ -821,6 +822,21 @@ sub path_to_config_file {
         die "The configuration file '$path' you requested is not in the installation dir or the config dir";
     }
 
+}
+
+=head2 $self->version()
+
+Return the METAMOD version number
+
+=cut
+
+sub version {
+    my $version = installation_dir() . "/VERSION";
+    open my $file, '<', $version or die "Can't locate VERSION file in $version";
+    my $top = <$file>;
+    close $file;
+    $top =~ /^This is version ([0-9.]+) of METAMOD/;
+    return $1;
 }
 
 1;

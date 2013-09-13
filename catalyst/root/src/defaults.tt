@@ -3,6 +3,7 @@
 # Default texts for Template Toolkit. Supply your own custom.tt to override specific values
 
 mm_logo = c.uri_for('/static/images/metamod_logo.png')
+version = mm_config.get('VERSION')
 
 app = {
 
@@ -13,7 +14,7 @@ app = {
 
         # HTML code for a footer across the bottom of applications:
         footer_html = '<div id="page-footer">
-            <a href="https://wiki.met.no/metamod/start">METAMOD</a> &#169;
+            <a href="https://wiki.met.no/metamod/start">METAMOD</a> ' _ version _ ' &#169;
             <a href="http://met.no/">Norwegian Meteorological Institute</a>
         </div>'
     }
