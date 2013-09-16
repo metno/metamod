@@ -71,6 +71,7 @@ use XML::LibXML;
 use XML::LibXML::XPathContext;
 use XML::LibXSLT;
 use Const::Fast;
+use Data::Dumper;
 
 const my $mm2ns => 'http://www.met.no/schema/metamod/MM2';
 const my $mmdns => 'http://www.met.no/schema/mmd';
@@ -184,7 +185,7 @@ sub validate {
     );
     my $xsd = $schemas{ $$self{'format'} } or die "No XML Schema for " . $$self{'format'};
 
-    my $xmlschema = XML::LibXML::Schema->new( $xsd );
+    my $xmlschema = XML::LibXML::Schema->new( location => $xsd ) or die "Bad schema $xsd";
     #$xmlschema->load_catalog(  $$self{'schemadir'}.'catalog.xml' );
     print STDERR "Starting validation...\n";
     eval { $xmlschema->validate($$self{'dom'}) == 0 } or die $@;
@@ -209,12 +210,13 @@ sub run {
 sub test {
     my $file = shift or die;
     my $config = Metamod::Config->new(); # to avoid "you must call new() once before you can call instance()"
-    my $doc = Metamod::MMD->new($file);
-    #$doc->validate;
+    my $doc = Metamod::MMD->new($file) or die;
+    #print $doc->{'dom'}->toString(1);
+    $doc->validate;
     my $mmd = $doc->mmd;
-    #print $mmd->toString(1);
+    print $mmd->toString(1);
     my $doc2 = Metamod::MMD->new($mmd);
-    #$doc2->validate;
+    $doc2->validate;
     my $mm2 = $doc2->mm2;
     print $mm2->toString(1);
 }

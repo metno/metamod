@@ -46,7 +46,7 @@
             <xsl:apply-templates select="mmd:last_metadata_update" />
         
             <xsl:element name="gmd:contact">
-                <xsl:apply-templates select="mmd:personell[mmd:role = 'Metadata author']" />
+                <xsl:apply-templates select="mmd:personnel[mmd:role = 'Metadata author']" />
             </xsl:element>
        
         
@@ -98,7 +98,7 @@
                     <xsl:apply-templates select="mmd:iso_topic_category" />
                     
                     <xsl:element name="gmd:pointOfContact">
-                        <xsl:apply-templates select="mmd:personell[mmd:role != 'Metadata author']" />
+                        <xsl:apply-templates select="mmd:personnel[mmd:role != 'Metadata author']" />
                     </xsl:element>
                     
                     <xsl:element name="gmd:extent">
@@ -330,7 +330,7 @@
     </xsl:template>
     
     
-    <xsl:template match="mmd:personell">
+    <xsl:template match="mmd:personnel">
     
         <xsl:element name="gmd:CI_ResponsibleParty">
             <xsl:element name="gmd:individualName">
@@ -338,6 +338,12 @@
                     <xsl:value-of select="mmd:name" />
                 </xsl:element>
             </xsl:element>
+            
+            <xsl:element name="gmd:organisationName">
+                <xsl:element name="gco:CharacterString">
+                    <xsl:value-of select="mmd:organisation" />
+                </xsl:element>
+            </xsl:element>            
             
             <xsl:element name="gmd:contactInfo">
                 <xsl:element name="gmd:CI_Contact">

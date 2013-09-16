@@ -30,7 +30,7 @@
 				CEOS IDN DIF
 			</xsl:element>
 			<xsl:element name="dif:Metadata_Version">
-				9.7
+				9.7 <!--this should rather be 9.8.2-->
 			</xsl:element>
 		</xsl:element>
 	</xsl:template>
@@ -196,36 +196,36 @@
 			</xsl:element>
 			<xsl:element name="dif:Personel">
 				<xsl:element name="dif:Role">
-					<xsl:value-of select="mmd:personell/mmd:role"></xsl:value-of>
+					<xsl:value-of select="mmd:personnel/mmd:role"></xsl:value-of>
 				</xsl:element>
 				<xsl:element name="dif:First_Name" />
 				<xsl:element name="dif:Middle_Name" />
 				<xsl:element name="dif:Last_Name">
-					<xsl:value-of select="mmd:personell/mmd:name"></xsl:value-of>
+					<xsl:value-of select="mmd:personnel/mmd:name"></xsl:value-of>
 				</xsl:element>
 				<xsl:element name="dif:Phone">
-					<xsl:value-of select="mmd:personell/mmd:phone"></xsl:value-of>
+					<xsl:value-of select="mmd:personnel/mmd:phone"></xsl:value-of>
 				</xsl:element>
 				<xsl:element name="dif:Fax">
-					<xsl:value-of select="mmd:personell/mmd:fax"></xsl:value-of>
+					<xsl:value-of select="mmd:personnel/mmd:fax"></xsl:value-of>
 				</xsl:element>
 
 				<xsl:element name="dif:Contact_Address">
 					<xsl:element name="dif:Address">
-						<xsl:value-of select="mmd:personell/mmd:contact_address/mmd:address" />
+						<xsl:value-of select="mmd:personnel/mmd:contact_address/mmd:address" />
 					</xsl:element>
 					<xsl:element name="dif:City">
-						<xsl:value-of select="mmd:personell/mmd:contact_address/mmd:city" />
+						<xsl:value-of select="mmd:personnel/mmd:contact_address/mmd:city" />
 					</xsl:element>
 					<xsl:element name="dif:Province_or_State">
 						<xsl:value-of
-							select="mmd:personell/mmd:contact_address/mmd:province_or_state" />
+							select="mmd:personnel/mmd:contact_address/mmd:province_or_state" />
 					</xsl:element>
 					<xsl:element name="dif:Postal_Code">
-						<xsl:value-of select="mmd:personell/mmd:contact_address/mmd:postal_code" />
+						<xsl:value-of select="mmd:personnel/mmd:contact_address/mmd:postal_code" />
 					</xsl:element>
 					<xsl:element name="dif:country">
-						<xsl:value-of select="mmd:personell/mmd:contact_address/mmd:country" />
+						<xsl:value-of select="mmd:personnel/mmd:contact_address/mmd:country" />
 					</xsl:element>
 				</xsl:element>
 			</xsl:element>
@@ -234,7 +234,7 @@
 
 
     <xsl:template match="mmd:dataset_citation">
-    
+
         <xsl:element name="dif:Data_Set_Citation">
             <xsl:element name="dif:Dataset_Creator">
                 <xsl:value-of select="mmd:dataset_creator" />
@@ -266,9 +266,9 @@
             <xsl:element name="dif:Online_Resource">
                 <xsl:value-of select="mmd:online_resource" />
             </xsl:element>
-        
+
         </xsl:element>
-    
+
     </xsl:template>
 
 </xsl:stylesheet>

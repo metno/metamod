@@ -185,15 +185,14 @@ sub test {
     my $editor = Metamod::MetadataEditor->new(); # for testing put project into METAEDIT_WS_URL in config
 
     my $doc = Metamod::MMD->new($file)->mmd;
-    print "****\n" . $doc->toString(1);
+    print "****\n" . $doc->toString(2);
     my $GUI_url = $editor->upload_mmd($dataset, $doc->toString);
     print STDERR "Edit at $GUI_url\n";
 
     my $xml = $editor->download_mmd($dataset);
-    print STDERR "$xml\n\n";
-    my $doc2 = Metamod::MMD->new($xml)->mm2;
-    print STDERR $doc2->toString(1);
-
+    #print STDERR "$xml\n\n";
+    my $doc2 = Metamod::MMD->new($xml);
+    printf STDERR "*** Returned MMD: ***\n%s\n\n*** Converted MM2: ***\n%s\n", $doc2->{'dom'}->toString(2), $doc2->mm2->toString(2);
 
 }
 

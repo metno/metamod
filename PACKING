@@ -11,3 +11,8 @@ Updating the Carton bundle so can install from source w/o network access:
   $ carton bundle
   $ svn add --force local/cache
 
+Then install via
+
+  $ carton install --cached
+ 
+ 
