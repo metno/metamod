@@ -114,15 +114,15 @@ sub ts :Path("/ts") :Args(3) {
 
     my $ncfile = $f->outputPath;
     # parse netcdf resulting file
-    my $nc = PDL::NetCDF->new ( $ncfile, {MODE => O_RDONLY} );
+    #my $nc = PDL::NetCDF->new ( $ncfile, {MODE => O_RDONLY} );
     my $nc2 = MetNo::NcFind->new($ncfile);
     if (! $nc2) {
         $self->logger->warn("Can not parse NetCDF file $ncfile");
         $c->detach( 'Root', 'error', [ 500, "Can not parse NetCDF file $ncfile"] );
     }
 
-    my $title = $nc->getatt('title');
-    my $title2 = $nc2->globatt_value('title');
+    #my $title = $nc->getatt('title');
+    #my $title2 = $nc2->globatt_value('title');
 
     ## PDL version
     #my (%data, %units);
@@ -192,7 +192,7 @@ sub ts :Path("/ts") :Args(3) {
 
     # cleanup (should probably also be done when detaching... FIXME)
     $self->logger->debug("Deleting temp fimex file $ncfile");
-    $nc->close;
+    #$nc->close;
     unlink($ncfile) or $self->logger->error("Could not delete temp file $ncfile");
 
 }

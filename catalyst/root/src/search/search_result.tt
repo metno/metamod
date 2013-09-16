@@ -91,6 +91,19 @@ jQuery(document).ready( function () {
                    title="Show metadata for this file"><span>Show metadata</span></a><br clear="all"/>
 
                 [% IF opendap %]
+                    [% IF metadata.timeseries.0 %]
+                        [% IF ext_ts %]
+                            <a class="visualimg" href="[% dataset.external_ts_url %]"><span>Time series</span></a><br clear="all"/>
+                        [% ELSE %]
+                            <a class="visual" href="[% c.uri_for('/search/ts', { ds_id => dataset.ds_id, vars => metadata.timeseries.0 } ) %]"><span>Time series</span></a><br clear="all"/>
+                        [% END %]
+                        <a class="btn" target="_blank" href="[% c.uri_for('/ts', dataset.ds_id, metadata.timeseries.0, 'csv') %]"><span>ASCII</span></a><br clear="all"/>
+                    [% ELSE %]
+                        <a class="visual" href="[% c.uri_for('/search/transform', { ds_id => dataset.ds_id }) %]"><span>Transform</span></a><br clear="all"/>
+                    [% END %]
+                [% END %]
+
+                [% IF opendap %]
                     <a class="visual" href="[% c.uri_for('/search/transform', { ds_id => dataset.ds_id }) %]"><span>Transform</span></a><br clear="all"/>
                 [% END %]
 
