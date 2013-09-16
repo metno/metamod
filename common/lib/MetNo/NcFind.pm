@@ -29,6 +29,7 @@ our $DEBUG = 0;
 use Fcntl qw(:DEFAULT);
 use Encode qw();
 use PDL::NetCDF;
+use PDL::Char;
 use PDL::Lite qw();
 use UNIVERSAL qw();
 
