@@ -397,20 +397,20 @@ sub timeseries :Path('/search/ts') :Args {
     $c->stash( template => 'search/ts.tt', 'current_view' => 'Raw' );
 
     my $ds_id = $c->req->params->{ ds_id };
+    my $vars = $c->req->params->{ vars };
     if ( ref $ds_id ) { # more than one ds_id... TODO?
         $self->logger->debug("Only one ds_id currently allowed");
         $c->detach( 'Root', 'error', [ 400, "Only one ds_id currently allowed"] );
     }
     my $ds = $c->model('Metabase::Dataset')->find($ds_id) or $c->detach('Root', 'default');
-    my $parent = $ds->parent_dataset();
-        #or $c->detach( 'Root', 'error', [ 400, "Not a level 2 dataset"] );
-    my $ts = $ds->metadata(['timeseries']) || $parent->metadata(['timeseries'])
-        or $c->detach( 'Root', 'error', [ 404, "Missing timeseries"] );
-    print STDERR Dumper $ts;
+    #my $ts = $ds->metadata(['timeseries']) || $ds->parent_dataset()->metadata(['timeseries'])
+    #    or $c->detach( 'Root', 'error', [ 404, "Missing timeseries"] );
+    #print STDERR Dumper $ts;
 
     my ($title) = @{ $ds->metadata(['title'])->{'title'} };
     #print STDERR Dumper \$timeseries;
-    $c->stash( dataset => $ds, title => $title, timeseries => $ts->{'timeseries'} );
+    #$c->stash( dataset => $ds, title => $title, timeseries => $ts->{'timeseries'} );
+    $c->stash( dataset => $ds, title => $title, timeseries => $vars );
 
 }
 

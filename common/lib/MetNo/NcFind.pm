@@ -252,7 +252,26 @@ sub get_values {
     my $pdl1  = $ncref->get ($varname);
 
     # Return the values as an array:
-    return $pdl1->list;
+    return $pdl1->list; # note list() is deprecated - use get_struct() instead
+}
+
+=head3 get_struct($varName)
+
+get a multi-dimensional list of all values of $varName
+
+=cut
+
+sub get_struct {
+    my ($self, $varname) = @_;
+
+    my $ncref = $self->{NCOBJ};
+    # Get the values of a  netCDF variable as PDL object
+    # Resulting PDL object: $pdl1. NetCDF object: $ncref,
+    # variable name: $varname.
+    my $pdl1  = $ncref->get ($varname);
+
+    # Return the values as an data structure (eg. list of lists):
+    return $pdl1->unpdl;
 }
 
 =head3 get_lonlats('longitude', 'latitude')

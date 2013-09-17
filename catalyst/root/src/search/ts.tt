@@ -25,12 +25,13 @@
             function onLoad() {
                 graph = new Dygraph(
                     document.getElementById("graphdiv"), // containing div
-                    "[% c.uri_for('/ts', dataset.ds_id, timeseries.0, 'csv') %]", // CSV or path to a CSV file.
-                    // TODO: add support for more than one timeseries ... FIXME
+                    "[% c.uri_for('/ts', dataset.ds_id, timeseries, 'csv') %]", // CSV or path to a CSV file.
+                    // TODO: add support for more than one timeseries ... DONE
                     {
                         title: '[% title %]',
                         labelsDivStyles: { border: '1px solid #d1e0e1' },
-                        fillGraph: true
+                        legend: 'always',
+                        fillGraph: false //true
                         //xlabel: 'Date',
                         //ylabel: 'Temperature (F)'
                     }

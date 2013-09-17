@@ -583,7 +583,7 @@ sub external_ts_url {
 
     my $metadata = $self->metadata( ['dataref_OPENDAP', 'timeseries'] );
     my $opendap = $metadata->{dataref_OPENDAP}->[0] or return;
-    my $tsvars  = $metadata->{timeseries}->[0];
+    my $tsvars  = $metadata->{timeseries}->[0] || $self->parent_dataset->metadata->{timeseries}->[0];
 
     $tsurl =~ s/\[OPENDAP\]/$opendap/;
     $tsurl =~ s/\[TIMESERIES\]/$tsvars/ if $tsvars;

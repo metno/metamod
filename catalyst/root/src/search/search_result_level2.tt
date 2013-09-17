@@ -67,14 +67,14 @@
                 <a class="btn" href="[% c.uri_for( '/search/fimexdownload', { dataset_name => child.ds_name, projection => projection } ) %]" target="_blank"
                     title="Download file in [% projection %]"><span>[% projection %] Downl.</span></a><br clear="all"/>
             [% END %]
-            [% IF opendap %]
-                [% IF metadata.timeseries.0 %]
+            [% IF opendap; tsvars = metadata.timeseries.0 %]
+                [% IF tsvars %]
                     [% IF ext_ts %]
                         <a class="visualimg" href="[% child.external_ts_url %]"><span>Time series</span></a><br clear="all"/>
                     [% ELSE %]
-                        <a class="visual" href="[% c.uri_for('/search/ts', { ds_id => child.ds_id, vars => metadata.timeseries.0 } ) %]"><span>Time series</span></a><br clear="all"/>
+                        <a class="visual" href="[% c.uri_for('/search/ts', { ds_id => child.ds_id, vars => tsvars } ) %]"><span>Time series</span></a><br clear="all"/>
                     [% END %]
-                    <a class="btn" target="_blank" href="[% c.uri_for('/ts', child.ds_id, metadata.timeseries.0, 'csv') %]"><span>ASCII</span></a><br clear="all"/>
+                    <a class="btn" target="_blank" href="[% c.uri_for('/ts', child.ds_id, tsvars, 'csv') %]"><span>ASCII</span></a><br clear="all"/>
                 [% ELSE %]
                     <a class="visual" href="[% c.uri_for('/search/transform', { ds_id => child.ds_id }) %]"><span>Transform</span></a><br clear="all"/>
                 [% END %]
