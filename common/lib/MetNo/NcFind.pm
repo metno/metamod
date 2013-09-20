@@ -84,7 +84,7 @@ sub new {
         $self->{NCOBJ} = $ncfile;
     } else {
         # Open netCDF-file for reading
-        $self->{NCOBJ} = PDL::NetCDF->new ($ncfile, {MODE => O_RDONLY, REVERSE_DIMS => 1});
+        $self->{NCOBJ} = PDL::NetCDF->new ($ncfile, { MODE => O_RDONLY, REVERSE_DIMS => 1, SLOW_CHAR_FETCH => 1 });
     }
     unless (defined $self->{NCOBJ}) {
         return undef;
@@ -238,11 +238,11 @@ sub get_bordervalues {
 
 =head3 get_values($varName)
 
-get a one-dimensional list of all values of $varName
+B<DEPRECATED> get a one-dimensional list of all values of $varName
 
 =cut
 
-sub get_values {
+sub get_values { # DEPRECATED - use $self->get_struct()
     my ($self, $varname) = @_;
 
     my $ncref = $self->{NCOBJ};
@@ -252,7 +252,7 @@ sub get_values {
     my $pdl1  = $ncref->get ($varname);
 
     # Return the values as an array:
-    return $pdl1->list; # note list() is deprecated - use get_struct() instead
+    return $pdl1->list; # note list() is deprecated - use $pdl1->unpdl() instead
 }
 
 =head3 get_struct($varName)
@@ -271,7 +271,22 @@ sub get_struct {
     my $pdl1  = $ncref->get ($varname);
 
     # Return the values as an data structure (eg. list of lists):
-    return $pdl1->unpdl;
+    #printf STDERR "PDL|$varname [%d]: %s\n%s\n", $pdl1->get_datatype, $pdl1->dims, $pdl1;
+    printf STDERR "PDL|$varname [%d]: %s\n", $pdl1->get_datatype, $pdl1;
+    if ($pdl1->get_datatype == 0) {
+	#printf STDERR "<< %s\n", $ncref->gettext($varname); # not working
+	#printf STDERR ">> %s\n", $pdl1;
+	my $str = sprintf $pdl1; # $ncref->gettext($varname);
+	chomp $str;
+	#print STDERR "*** <$str>\n";
+	$str =~ s/(^\s*\[ ')|(' \]\s*$)//g; # trim junk at start and end
+	my @strings = split "' '", $str;
+	#map s/'//g, @strings;
+	#return \@strings;
+	return \@strings;
+    } else {
+	return $pdl1->unpdl;
+    }
 }
 
 =head3 get_lonlats('longitude', 'latitude')

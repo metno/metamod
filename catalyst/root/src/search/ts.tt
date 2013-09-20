@@ -20,6 +20,10 @@
             [% END %]
         </script>
 
+        <style type="text/css">
+            div.dygraph-legend > span { display: block; }
+        </style>
+
         <script type="text/javascript">
 
             function onLoad() {

@@ -32,6 +32,8 @@ The latter must be installed and compiled with DAP support in libnetcdf
 
 =cut
 
+#use warnings FATAL => qw( all ); # remove FIXME
+
 use Moose;
 use namespace::autoclean;
 use Data::Dumper;
@@ -76,13 +78,18 @@ Numerical id of dataset
 
 =head3 vars
 
-Comma separated list of variables (the first is the X axis and should normally be time)
+Comma separated list of variables (the first is the X axis and should normally be time).
+
+B<New:> Multi-dimensional variables now supported. Use foo[0],foo[1]... or just foo for all columns.
 
 =head3 format
 
 Either "json" or "csv" (comma separated with header row)
 
-Example: /ts/5435/time,ice_concentration/json
+=head3 Examples
+
+  /ts/5435/time,ice_concentration/json
+  /ts/1020/time,gsl[1],gsl[4],gsl[11]/csv
 
 =cut
 
@@ -95,17 +102,20 @@ sub ts :Path("/ts") :Args(3) {
 
     my @params = split ',', $varlist;
     my $x_axis = $params[0];
-    my @vars; # we need this to remember the column order
-    my %cols;
+    my @vars; # use this to remember the column order
+    my %cols; # requested cols with name and optionally col index (if 2D)
+    my %data; # this is where all the good stuff from NetCDF is stored
+    my %indexes; # any arrays used for labeling other vars
+
     foreach (@params) {
         /^(\w+)(\[(\d+)\])?$/ or die; # pick out name and optionally index
         unless (exists $cols{$1}) {
             $cols{$1} = [];
             push @vars, $1; # store only once if multicol
         }
-        push @{ $cols{$1} }, $3 if $3; # empty if single array
+        push @{ $cols{$1} }, $3 if defined $3; # empty if single array
     }
-    #print STDERR "vars: ", Dumper \@vars, \@params, \%cols;
+    #printf STDERR "vars: %sparams: %scols: %s", Dumper \@vars, \@params, \%cols;
 
     $MetNo::Fimex::DEBUG = 0; # turn off debug or nothing will happen
 
@@ -125,106 +135,131 @@ sub ts :Path("/ts") :Args(3) {
 
     my $ncfile = $f->outputPath;
     # parse netcdf resulting file
-    #my $nc = PDL::NetCDF->new ( $ncfile, {MODE => O_RDONLY} ); # PDF method has been deprecated
     my $nc2 = MetNo::NcFind->new($ncfile);
     if (! $nc2) {
         $self->logger->warn("Can not parse NetCDF file $ncfile");
         $c->detach( 'Root', 'error', [ 500, "Can not parse NetCDF file $ncfile"] );
     }
 
-    #my $title = $nc->getatt('title');
-    #my $title2 = $nc2->globatt_value('title'); # doesn't seem to be in use anywhere
+    # first fetch all variables from db since we need to lookup names
+    foreach my $v ($nc2->variables) {
+        #print STDERR "+++ $v\n";
 
-    ## PDL version
-    #my (%data, %units);
-    #foreach (@{ $nc->getvariablenames }) { # fetch data from db
-    #    print STDERR "+++ $_\n";
-    #    my @v = list( $nc->get($_) );
-    #    my $name = $nc->getatt('standard_name', $_); # TODO also check long_name, short_name
-    #    next unless grep /^$name$/, @vars; # skip vars not in request
-    #    $units{$name} = $nc->getatt('units', $_);
-    #    $data{$name} = \@v;
-    #}
-    ##print STDERR Dumper \%data, \%units;
+        my $name = $nc2->att_value($v, 'standard_name'); # TODO also check long_name, short_name
+        $name = $v if $name eq 'Not available';
+        my $role = $nc2->att_value($v, 'cf_role');
 
-    # Metno::NcFind version
-    my (%data2, %units2);
-    foreach ($nc2->variables) { # fetch all variables from db since need to lookup names
-        #print STDERR "+++ $_\n";
-        my @dim = $nc2->dimensions($_);
-        my $name = $nc2->att_value($_, 'standard_name'); # TODO also check long_name, short_name
-        $name = $_ if $name eq 'Not available';
-        next unless exists $cols{$name}; # skip vars not in request
-        #print STDERR "name = $name [", join(', ', @dim), "]\n";
-        $data2{$name} = {};
-        foreach my $d (@dim) {
-            #my @v = $nc2->get_values($_);
-            #$data2{$name}{$d} = \@v;
-            next unless $d eq $x_axis;
-            $data2{$name} = $nc2->get_struct($_);
+        if (exists $cols{$name} || $role eq 'timeseries_id') { # skip vars not in request
+            my @dim = $nc2->dimensions($v);
+            @dim = grep !/^string$/, @dim;
+            $self->logger->debug("name = $name [", join(', ', @dim), "]\n", Dumper $cols{$name});
+
+            foreach my $d (@dim) { # check if should be put in indexes
+                if (@dim == 1 and $d ne $x_axis) { # i believe we have a label array, Watson
+                    $indexes{$d} = [] unless exists $indexes{$d};
+                    push @{ $indexes{$d} }, $name;
+                    $self->logger->debug("* adding $name to index of $d");
+                    #printf STDERR "* d = $d; cols = %s", Dumper \%cols;
+                }
+                die if ($d eq 'string'); # string dimensions are automatically collapsed in get_struct()
+                #die unless defined $role && $role eq 'timeseries_id'; # have no idea what this column might be
+            }
+            # now store all the relevant data
+            $data{$name} = $nc2->get_struct($v); # read in data array(s)
+            $data{'dimensions'}{$name} = \@dim;
+            $data{'units'}{$name} = $nc2->att_value($v, 'units');
         }
-        $units2{$name} = $nc2->att_value($_, 'units');
     }
-    #print STDERR Dumper \%data2, \%units2;
 
-    foreach (keys %cols) { # check that all variables actually exist
-        $c->detach( 'Root', 'error', [ 400, "No such variable '$_'"] )
-            unless $data2{$_};
+    # loop through request and discard unwanted stuff
+    foreach my $k (keys %cols) {
+        # check that all variables actually exist
+        $c->detach( 'Root', 'error', [ 400, "No such variable '$k'"] )
+            unless $data{$k};
+        # any subcols to extract?
+        my @subcols = exists $cols{$k} ? @{ $cols{$k} } : (); # any foo[..] in URL
+        if (@subcols) {
+            #printf STDERR "* subcols for $k = %s\n", Dumper \@subcols;
+            $data{$k} = [ map { @{$data{$k}}[$_] } @subcols ]; # extract selected cols and replace
+            foreach my $d (@{ $data{'dimensions'}->{$k} } ) {
+                next if $d eq $x_axis;
+                my ($index) = @{ $indexes{$d} };
+                $self->logger->debug("** index $d of $k: $index");
+                $data{$index} = [ map { @{$data{$index}}[$_] } @subcols ]; # extract selected col headings and replace
+            }
+        }
     }
 
     if (exists $cols{'time'}) { # convert times to ISO
         my @isotime;
-        foreach (@{ $data2{'time'} }) {
-            #print STDERR "++++++++++++++++ $_\n";
-            my $dt = DateTime->from_epoch( epoch => $_ );
-            push @isotime, $dt->ymd . 'T' . $dt->hms;;
+        foreach my $t (@{ $data{'time'} }) { # FIXME read units2
+            #print STDERR "++++++++++++++++ $t\n";
+            if ($t < 3000) { # assume years instead of epoch seconds
+                push @isotime, $t; # use just year instead of full timestamp
+            } else {
+                my $dt = DateTime->from_epoch( epoch => $t );
+                push @isotime, $dt->ymd . 'T' . $dt->hms;
+            }
         }
-        $data2{'time'} = \@isotime;
+        #print STDERR "time: ", Dumper \@isotime;
+        $data{'time'} = \@isotime;
     }
 
-    # output stuff
+    #printf STDERR "Data: %sIndexes: %s", Dumper \%data, \%indexes;
+
+    # now output stuff
     if ($format eq 'json') {
 
         my $j = JSON->new->utf8;
         #$j->pretty(1);
         $j->indent(1);
-        my $json = $j->encode( \%data2 );
+        my $json = $j->encode( \%data );
         $c->response->content_type('application/json');
         $c->response->body( $json );
 
     } elsif ($format eq 'csv') {
 
-        my @table = ([]);
+        my (@tablecols, @tablerows, @tablehead);
 
-        # push column headings first on list
-        foreach (@params) {
-            #unshift @{ $data2{$_} }, /^time$/ ? $_ : "$_ ($units2{$_})";
-            my ($name) = /^(\w+)/;
-            push $table[0], /^time$/ ? $_ : "$_ ($units2{$name})";
-        }
-        print STDERR "table1 = ", Dumper \@table;
-
-        # rearrange from hash of arrays into table of rows
-        my $rows = $nc2->dimensionSize($x_axis); #$nc->dimsize('time');
-        for (my $i = 0; $i < $rows; $i++) {
-            my @cells = ();
-            foreach my $v (@vars) {
-                #map $data2{$_}->[$i], @vars;
-                my @cols = @{ $cols{$v} };
-                #print STDERR "v = $v i = $i\n", Dumper \@cols;
-                if (@cols) {
-                    map  { push @cells, $data2{$v}->[$_]->[$i] } @cols;
+        # figure out column headings
+        foreach my $v (@vars) {
+            my $dims = $data{'dimensions'}{$v};
+            my $cols = $cols{$v}; # selected cols in 2-dim matrix
+            #printf STDERR "col=$v dims=%s cols=%s\n", join(',',  @$dims), join(',', @$cols);
+            my $array = $data{$v};
+            foreach my $d (@$dims) {
+                if ($d eq $x_axis) {
+                    if (ref @$array[0]) { # it's a 2D array
+                        push @tablecols, @$array; # push all cols
+                    } else {
+                        push @tablecols, $array; # push simple col
+                        push @tablehead, $v; # add col header
+                    }
                 } else {
-                    push @cells, $data2{$v}->[$i];
+                    if ( my $legends = $indexes{$d} ) {
+                        my $index = shift @{ $legends };
+                        $self->logger->debug("*** index of $v = $index");
+                        push @tablehead, @{ $data{$index} };
+                    } else {
+
+                    }
                 }
             }
-            push @table, \@cells;
         }
 
-        print STDERR "table2 = ", Dumper \@table;
+        # transpose cols
+        push @tablerows, [ @tablehead ];
+        my $col = scalar(@{ $tablecols[0] }) || 0;
+        foreach my $col (0 .. $col-1) {
+            push @tablerows, [ map {$_->[$col]} @tablecols ];
+        }
+
+        #print STDERR "tablecols: ", Dumper \@tablecols;
+        #print STDERR "tablerows: ", Dumper \@tablerows;
+        #print STDERR "tablehead: ", Dumper \@tablehead;
 
         my $out;
-        foreach (@table) {
+        foreach (@tablerows) {
             $out .= join("\t", @$_) . "\n";
         }
         $c->response->content_type('text/plain');
@@ -238,6 +273,14 @@ sub ts :Path("/ts") :Args(3) {
     unlink($ncfile) or $self->logger->error("Could not delete temp file $ncfile");
 
 }
+
+=head1 AUTHOR
+
+Geir Aalberg, E<lt>geira\@met.noE<gt>
+
+=head1 SEE ALSO
+
+L<MetNo::NcFind;>
 
 =head1 LICENSE
 

@@ -19,7 +19,8 @@
         </script>
 
         <style type="text/css">
-            body { padding: 12 12 12 12 }
+            body { padding: 12 12 12 12; background-color: #ccc0cf; }
+            div.main { padding: 12 12 12 12; background-color: white; }
             td.label { font-weight: bold; font-size: 12px; }
             td.fields { text-align: center; padding-left: 20px; }
             table.dapform tr { background-color: white; }
@@ -30,6 +31,8 @@
 
     </head>
     <body>
+
+    <div class="main">
 
     <h1 class="std">Transform</h1>
 
@@ -96,6 +99,7 @@
 
     [%# END %]
 
+    </div>
     </body>
 
 </html>
