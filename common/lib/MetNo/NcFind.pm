@@ -637,4 +637,8 @@ Heiko Klein, E<lt>heiko.klein\@met.noE<gt>
 
 L<PDL::NetCDF>
 
+=head1 LICENSE
+
+GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
+
 =cut

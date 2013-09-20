@@ -1,20 +1,6 @@
 #!/usr/bin/perl -w
 
-=begin licence
-
---------------------------------------------------------------------------
-METAMOD - Web portal for metadata search and upload
-
-Copyright (C) 2008 met.no
-
-Contact information:
-Norwegian Meteorological Institute
-Box 43 Blindern
-0313 OSLO
-NORWAY
-email: egil.storen@met.no
-
-This file is part of METAMOD
+=begin LICENSE
 
 METAMOD is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -29,9 +15,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with METAMOD; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
---------------------------------------------------------------------------
 
-=end licence
+=end LICENSE
 
 =cut
 
@@ -205,3 +190,13 @@ sub start_cronjob { # not yet in use - will continue media july 2011 -ga
     POE::Kernel->run();
 
 }
+
+=head1 AUTHORS
+
+Geir Aalberg, E<lt>geira\@met.noE<gt>,
+
+=head1 LICENSE
+
+GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
+
+=cut
