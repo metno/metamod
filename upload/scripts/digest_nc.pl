@@ -20,24 +20,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
-use strict;
-use warnings;
-use File::Spec;
-
-# small routine to get lib-directories relative to the installed file
-sub getTargetDir {
-    my ($finalDir) = @_;
-    my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
-    $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
-    $dir = File::Spec->catdir($dir, $finalDir);
-    return File::Spec->catpath($vol, $dir, "");
-}
-
-use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
-use encoding 'utf-8';
-use Metamod::Config qw( :init_logger );
-use MetNo::NcDigest qw( digest );
-
 =head1 NAME
 
 digest_nc.pl
@@ -50,7 +32,7 @@ which metadata are expected.
 
 =head1 USAGE
 
-  digest_nc.pl <config> <inputfile> <ownertag> <xmlfile>
+  digest_nc.pl <config> <inputfile> <ownertag> <xmlfile> [<ischild>]
 
 =head1 ARGUMENTS
 
@@ -58,7 +40,7 @@ which metadata are expected.
 
 =item config
 
-Path to etc directory containing configuration files
+Path to etc directory containing configuration files [NOTE: Seems to be ignored?]
 
 =item inputfile
 
@@ -80,9 +62,33 @@ file already exists, it will contain  the metadata for a previous version
 of the dataset. In this case, a new version of the file will be created,
 comprising a merge of the old and new metadata.
 
+=item ischild
+
+(Optional) If true denotes is a child dataset
+
 =back
 
 =cut
+
+use strict;
+use warnings;
+use File::Spec;
+
+# small routine to get lib-directories relative to the installed file
+sub getTargetDir {
+    my ($finalDir) = @_;
+    my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
+    $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
+    $dir = File::Spec->catdir($dir, $finalDir);
+    return File::Spec->catpath($vol, $dir, "");
+}
+
+use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
+use encoding 'utf-8';
+use Metamod::Config qw( :init_logger );
+use MetNo::NcDigest qw( digest );
+
+
 
 if (@ARGV < 4 or @ARGV > 5) {
    die "\nUsage:\n\n     $0\n" .
@@ -97,6 +103,8 @@ my $pathfilename = $ARGV[1];
 my $ownertag = $ARGV[2];
 my $xml_metadata_path = $ARGV[3];
 my $is_child = $ARGV[4];
+
+my $config = Metamod::Config->new( $etcdirectory );
 
 digest($pathfilename, $ownertag, $xml_metadata_path, $is_child );
 
