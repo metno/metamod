@@ -15,6 +15,7 @@
   * support for manual configuration and serving static files in Apache (again)
   * WMS search map thumbnails
   * support for custom validators in OAI-PMH
+  * support for two-dimensional arrays in timeseries plots and ascii/json download
 
 2.12   Mon Jan 14 2013
   * projection selector and timeslider in wms client
