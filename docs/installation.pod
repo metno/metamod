@@ -196,16 +196,17 @@ conflicts and making sure you have the same environment as have been tested.
 
   $ cpanm -S Carton
 
-This should install version 1.0.10 or later. Versions below 1.0.0 are not supported (they cannot read the cpanfile.snapshot file).
+This should install version 1.0.12 or later. Versions below 1.0.0 are not supported (they cannot read the cpanfile.snapshot file).
 
 =head3 METAMOD dependencies
 
 You are now ready to install the Perl dependency libraries:
 
   $ cd ~/metamod/trunk
-  $ carton install --deployment
+  $ carton install --deployment --cached
 
-Carton will then install the modules listed in F<carton.lock> into F<~/metamod/trunk/local/lib>.
+Carton will then install the modules listed in F<cpanfile.snapshot> into F<~/metamod/trunk/local/lib>.
+No network connection is needed when using --cached as this uses the modules supplied in F<~/metamod/trunk/vendor/cache>.
 This should not generate any errors as long as you have installed all the necessary binary libraries
 as listed above.
 

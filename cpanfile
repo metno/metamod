@@ -1,7 +1,7 @@
 requires 'Archive::Zip', 1.30;
 requires 'Catalyst::Action::REST', 0.87;
 requires 'Catalyst::Authentication::Store::DBIx::Class', 0.1400;
-requires 'Catalyst::Authentication::Store::LDAP', 1.012;
+#requires 'Catalyst::Authentication::Store::LDAP', 1.012;
 requires 'Catalyst::Controller::ActionRole', 0.15;
 requires 'Catalyst::Devel', 1.28;
 requires 'Catalyst::Log::Log4perl', 1.04;
@@ -41,3 +41,4 @@ requires 'XML::LibXSLT', 1.71;
 requires 'XML::RSS::LibXML', 0.3102;
 requires 'XML::SAX::Writer', 0.53;
 requires 'XML::Simple', 2.18;
+requires 'Module::Install', 1.06;
