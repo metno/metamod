@@ -11,8 +11,10 @@ DISTRIBUTIONS
     pathname: T/TY/TYEMQ/Algorithm-Diff-1.1902.tar.gz
     provides:
       Algorithm::Diff 1.1902
+      Algorithm::Diff::_impl 1.1902
       Algorithm::DiffOld 1.1
     requirements:
+      ExtUtils::MakeMaker 0
   AppConfig-1.66
     pathname: A/AB/ABW/AppConfig-1.66.tar.gz
     provides:
@@ -65,7 +67,6 @@ DISTRIBUTIONS
       Astro::FITS::Header::GSD 3.01
       Astro::FITS::Header::Item 3.02
       Astro::FITS::Header::NDF 3.02
-      Astro::FITS::HeaderCollection 3.01
     requirements:
       Module::Build 0.3
       Test::More 0
@@ -83,12 +84,12 @@ DISTRIBUTIONS
       Sub::Exporter::Progressive 0.001006
       Test::More 0.88
       Variable::Magic 0.48
-  Bit-Vector-7.2
-    pathname: S/ST/STBEY/Bit-Vector-7.2.tar.gz
+  Bit-Vector-7.3
+    pathname: S/ST/STBEY/Bit-Vector-7.3.tar.gz
     provides:
-      Bit::Vector 7.2
-      Bit::Vector::Overload 7.2
-      Bit::Vector::String 7.2
+      Bit::Vector 7.3
+      Bit::Vector::Overload 7.3
+      Bit::Vector::String 7.3
     requirements:
       Carp::Clan 5.3
       ExtUtils::MakeMaker 0
@@ -104,37 +105,75 @@ DISTRIBUTIONS
       IO::Scalar 0
       Module::Build 0.36
       Test::More 0
-  CPAN-Meta-2.120921
-    pathname: D/DA/DAGOLDEN/CPAN-Meta-2.120921.tar.gz
+  CPAN-Meta-2.132661
+    pathname: D/DA/DAGOLDEN/CPAN-Meta-2.132661.tar.gz
     provides:
-      CPAN::Meta 2.120921
-      CPAN::Meta::Converter 2.120921
-      CPAN::Meta::Feature 2.120921
-      CPAN::Meta::History 2.120921
-      CPAN::Meta::Prereqs 2.120921
-      CPAN::Meta::Spec 2.120921
-      CPAN::Meta::Validator 2.120921
+      CPAN::Meta 2.132661
+      CPAN::Meta::Converter 2.132661
+      CPAN::Meta::Feature 2.132661
+      CPAN::Meta::History 2.132661
+      CPAN::Meta::Prereqs 2.132661
+      CPAN::Meta::Spec 2.132661
+      CPAN::Meta::Validator 2.132661
     requirements:
-  CPAN-Meta-Check-0.004
-    pathname: L/LE/LEONT/CPAN-Meta-Check-0.004.tar.gz
+      CPAN::Meta::Requirements 2.121
+      CPAN::Meta::YAML 0.008
+      Carp 0
+      ExtUtils::MakeMaker 6.17
+      JSON::PP 2.27200
+      Parse::CPAN::Meta 1.4403
+      Scalar::Util 0
+      strict 0
+      version 0.88
+      warnings 0
+  CPAN-Meta-Check-0.007
+    pathname: L/LE/LEONT/CPAN-Meta-Check-0.007.tar.gz
     provides:
-      CPAN::Meta::Check 0.004
+      CPAN::Meta::Check 0.007
     requirements:
+      CPAN::Meta 2.120920
+      CPAN::Meta::Requirements 2.120920
+      Exporter 5.57
+      ExtUtils::MakeMaker 6.30
+      Module::Metadata 0
+      strict 0
+      warnings 0
   CPAN-Meta-Requirements-2.122
     pathname: D/DA/DAGOLDEN/CPAN-Meta-Requirements-2.122.tar.gz
     provides:
       CPAN::Meta::Requirements 2.122
     requirements:
+      Carp 0
+      ExtUtils::MakeMaker 6.17
+      File::Find 0
+      File::Temp 0
+      Scalar::Util 0
+      Test::More 0.88
+      strict 0
+      version 0.77
+      warnings 0
   CPAN-Meta-YAML-0.008
     pathname: D/DA/DAGOLDEN/CPAN-Meta-YAML-0.008.tar.gz
     provides:
       CPAN::Meta::YAML 0.008
     requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.17
+      File::Find 0
+      File::Spec 0
+      File::Spec::Functions 0
+      File::Temp 0
+      Scalar::Util 0
+      Test::More 0
+      strict 0
+      vars 0
+      warnings 0
   Cache-FastMmap-1.40
     pathname: R/RO/ROBM/Cache-FastMmap-1.40.tar.gz
     provides:
       Cache::FastMmap 1.40
-      Cache::FastMmap::OnLeave undef
+      Cache::FastMmap::OnLeave 1.40
     requirements:
       ExtUtils::MakeMaker 0
       Storable 0
@@ -176,41 +215,38 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 0
       Test::Exception 0
-  Catalyst-Action-REST-1.06
-    pathname: B/BO/BOBTFISH/Catalyst-Action-REST-1.06.tar.gz
+  Catalyst-Action-REST-1.12
+    pathname: J/JJ/JJNAPIORK/Catalyst-Action-REST-1.12.tar.gz
     provides:
-      Catalyst::Action::Deserialize 1.06
-      Catalyst::Action::Deserialize::Callback 1.06
-      Catalyst::Action::Deserialize::Data::Serializer 1.06
-      Catalyst::Action::Deserialize::JSON 1.06
-      Catalyst::Action::Deserialize::JSON::XS 1.06
-      Catalyst::Action::Deserialize::View 1.06
-      Catalyst::Action::Deserialize::XML::Simple 1.06
-      Catalyst::Action::Deserialize::YAML 1.06
-      Catalyst::Action::DeserializeMultiPart 1.06
-      Catalyst::Action::REST 1.06
-      Catalyst::Action::REST::ForBrowsers 1.06
-      Catalyst::Action::Serialize 1.06
-      Catalyst::Action::Serialize::Callback 1.06
-      Catalyst::Action::Serialize::Data::Serializer 1.06
-      Catalyst::Action::Serialize::JSON 1.06
-      Catalyst::Action::Serialize::JSON::XS 1.06
-      Catalyst::Action::Serialize::JSONP 1.06
-      Catalyst::Action::Serialize::View 1.06
-      Catalyst::Action::Serialize::XML::Simple 1.06
-      Catalyst::Action::Serialize::YAML 1.06
-      Catalyst::Action::Serialize::YAML::HTML 1.06
-      Catalyst::Action::SerializeBase 1.06
-      Catalyst::Controller::REST 1.06
-      Catalyst::Request::REST 1.06
-      Catalyst::Request::REST::ForBrowsers 1.06
-      Catalyst::TraitFor::Request::REST 1.06
-      Catalyst::TraitFor::Request::REST::ForBrowsers 1.06
+      Catalyst::Action::Deserialize 1.12
+      Catalyst::Action::Deserialize::Callback 1.12
+      Catalyst::Action::Deserialize::JSON 1.12
+      Catalyst::Action::Deserialize::JSON::XS 1.12
+      Catalyst::Action::Deserialize::View 1.12
+      Catalyst::Action::Deserialize::XML::Simple 1.12
+      Catalyst::Action::Deserialize::YAML 1.12
+      Catalyst::Action::DeserializeMultiPart 1.12
+      Catalyst::Action::REST 1.12
+      Catalyst::Action::REST::ForBrowsers 1.12
+      Catalyst::Action::Serialize 1.12
+      Catalyst::Action::Serialize::Callback 1.12
+      Catalyst::Action::Serialize::JSON 1.12
+      Catalyst::Action::Serialize::JSON::XS 1.12
+      Catalyst::Action::Serialize::JSONP 1.12
+      Catalyst::Action::Serialize::View 1.12
+      Catalyst::Action::Serialize::XML::Simple 1.12
+      Catalyst::Action::Serialize::YAML 1.12
+      Catalyst::Action::Serialize::YAML::HTML 1.12
+      Catalyst::Action::SerializeBase 1.12
+      Catalyst::Controller::REST 1.12
+      Catalyst::Request::REST 1.12
+      Catalyst::Request::REST::ForBrowsers 1.12
+      Catalyst::TraitFor::Request::REST 1.12
+      Catalyst::TraitFor::Request::REST::ForBrowsers 1.12
     requirements:
       Catalyst::Runtime 5.80030
       Class::Inspector 1.13
       Config::General 0
-      Data::Serializer 0.36
       ExtUtils::MakeMaker 6.59
       HTML::Parser 0
       JSON 2.12
@@ -223,7 +259,6 @@ DISTRIBUTIONS
       Test::More 0.88
       URI::Find 0
       XML::Simple 0
-      YAML::Syck 0.67
       namespace::autoclean 0
       perl 5.008001
   Catalyst-Action-RenderView-0.16
@@ -237,30 +272,30 @@ DISTRIBUTIONS
       HTTP::Request::AsCGI 0
       MRO::Compat 0
       Test::More 0.88
-  Catalyst-Authentication-Store-DBIx-Class-0.1503
-    pathname: B/BO/BOBTFISH/Catalyst-Authentication-Store-DBIx-Class-0.1503.tar.gz
+  Catalyst-Authentication-Store-DBIx-Class-0.1505
+    pathname: B/BO/BOBTFISH/Catalyst-Authentication-Store-DBIx-Class-0.1505.tar.gz
     provides:
       Catalyst::Authentication::Realm::SimpleDB undef
-      Catalyst::Authentication::Store::DBIx::Class 0.1503
+      Catalyst::Authentication::Store::DBIx::Class 0.1505
       Catalyst::Authentication::Store::DBIx::Class::User undef
     requirements:
       Catalyst::Model::DBIC::Schema 0.18
       Catalyst::Plugin::Authentication 0.10008
       Catalyst::Runtime 5.8
       DBIx::Class 0.08
-      ExtUtils::MakeMaker 6.42
+      ExtUtils::MakeMaker 6.59
       List::MoreUtils 0
       Moose 0
       Test::More 0
       Try::Tiny 0
       namespace::autoclean 0
       perl 5.008001
-  Catalyst-Authentication-Store-LDAP-1.013
-    pathname: K/KA/KARMAN/Catalyst-Authentication-Store-LDAP-1.013.tar.gz
+  Catalyst-Authentication-Store-LDAP-1.014
+    pathname: B/BO/BOBTFISH/Catalyst-Authentication-Store-LDAP-1.014.tar.gz
     provides:
-      Catalyst::Authentication::Store::LDAP 1.013
-      Catalyst::Authentication::Store::LDAP::Backend 1.013
-      Catalyst::Authentication::Store::LDAP::User 1.013
+      Catalyst::Authentication::Store::LDAP 1.014
+      Catalyst::Authentication::Store::LDAP::Backend 1.014
+      Catalyst::Authentication::Store::LDAP::User 1.014
     requirements:
       Catalyst::Plugin::Authentication 0.10003
       ExtUtils::MakeMaker 6.36
@@ -268,7 +303,7 @@ DISTRIBUTIONS
       Net::LDAP::Server::Test 0.07
       Test::Exception 0
       Test::MockObject 0
-      Test::More 0
+      Test::More 0.88
   Catalyst-Component-InstancePerContext-0.001001
     pathname: G/GR/GRODITI/Catalyst-Component-InstancePerContext-0.001001.tar.gz
     provides:
@@ -282,7 +317,27 @@ DISTRIBUTIONS
   Catalyst-Controller-ActionRole-0.15
     pathname: F/FL/FLORA/Catalyst-Controller-ActionRole-0.15.tar.gz
     provides:
+      Catalyst::Action::TestActionClass undef
+      Catalyst::ActionRole::Moo undef
+      Catalyst::ActionRole::Zoo undef
       Catalyst::Controller::ActionRole 0.15
+      Moo undef
+      TestApp undef
+      TestApp::ActionRole::Boo undef
+      TestApp::ActionRole::First undef
+      TestApp::ActionRole::Kooh undef
+      TestApp::ActionRole::Moo undef
+      TestApp::ActionRole::Second undef
+      TestApp::ActionRole::Shared undef
+      TestApp::Controller::ActionClass undef
+      TestApp::Controller::Bar undef
+      TestApp::Controller::Boo undef
+      TestApp::Controller::ExecutionViaConfig undef
+      TestApp::Controller::ExecutionViaDoes undef
+      TestApp::Controller::Foo undef
+      TestAppREST undef
+      TestAppREST::ActionRole::Moo undef
+      TestAppREST::Controller::Foo undef
     requirements:
       Catalyst 0
       Catalyst::Action 0
@@ -303,12 +358,11 @@ DISTRIBUTIONS
       Test::More 0
       namespace::clean 0
       parent 0
-  Catalyst-Devel-1.37
-    pathname: B/BO/BOBTFISH/Catalyst-Devel-1.37.tar.gz
+  Catalyst-Devel-1.39
+    pathname: I/IL/ILMARI/Catalyst-Devel-1.39.tar.gz
     provides:
-      Catalyst::Devel 1.37
-      Catalyst::Helper 1.37
-      Catalyst::Module::Install undef
+      Catalyst::Devel 1.39
+      Catalyst::Helper 1.39
       Catalyst::Restarter undef
       Catalyst::Restarter::Forking undef
       Catalyst::Restarter::Win32 undef
@@ -334,6 +388,18 @@ DISTRIBUTIONS
       Test::More 0.94
       namespace::autoclean 0
       namespace::clean 0
+  Catalyst-DispatchType-Regex-5.90033
+    pathname: M/MG/MGRIMES/Catalyst-DispatchType-Regex-5.90033.tar.gz
+    provides:
+      Catalyst::DispatchType::LocalRegex undef
+      Catalyst::DispatchType::LocalRegexp undef
+      Catalyst::DispatchType::Regex 5.90033
+      Catalyst::DispatchType::Regexp undef
+    requirements:
+      Module::Build 0.4004
+      Moose 0
+      Text::Balanced 0
+      Text::SimpleTable 0
   Catalyst-Log-Log4perl-1.06
     pathname: B/BO/BOBTFISH/Catalyst-Log-Log4perl-1.06.tar.gz
     provides:
@@ -346,11 +412,11 @@ DISTRIBUTIONS
       MRO::Compat 0
       Params::Validate 0
       Test::More 0
-  Catalyst-Model-DBIC-Schema-0.60
-    pathname: R/RK/RKITOVER/Catalyst-Model-DBIC-Schema-0.60.tar.gz
+  Catalyst-Model-DBIC-Schema-0.61
+    pathname: I/IL/ILMARI/Catalyst-Model-DBIC-Schema-0.61.tar.gz
     provides:
-      Catalyst::Helper::Model::DBIC::Schema 0.60
-      Catalyst::Model::DBIC::Schema 0.60
+      Catalyst::Helper::Model::DBIC::Schema 0.61
+      Catalyst::Model::DBIC::Schema 0.61
       Catalyst::TraitFor::Model::DBIC::Schema::Caching undef
       Catalyst::TraitFor::Model::DBIC::Schema::PerRequestSchema undef
       Catalyst::TraitFor::Model::DBIC::Schema::Replicated undef
@@ -377,8 +443,8 @@ DISTRIBUTIONS
       namespace::autoclean 0.09
       namespace::clean 0
       perl 5.008001
-  Catalyst-Plugin-Authentication-0.10022
-    pathname: B/BO/BOBTFISH/Catalyst-Plugin-Authentication-0.10022.tar.gz
+  Catalyst-Plugin-Authentication-0.10023
+    pathname: B/BO/BOBTFISH/Catalyst-Plugin-Authentication-0.10023.tar.gz
     provides:
       Catalyst::Authentication::Credential::NoPassword undef
       Catalyst::Authentication::Credential::Password undef
@@ -390,7 +456,7 @@ DISTRIBUTIONS
       Catalyst::Authentication::Store::Null undef
       Catalyst::Authentication::User undef
       Catalyst::Authentication::User::Hash undef
-      Catalyst::Plugin::Authentication 0.10022
+      Catalyst::Plugin::Authentication 0.10023
       Catalyst::Plugin::Authentication::Credential::Password undef
       Catalyst::Plugin::Authentication::Store::Minimal undef
       Catalyst::Plugin::Authentication::User undef
@@ -423,22 +489,22 @@ DISTRIBUTIONS
       Test::More 0
       UNIVERSAL::isa 0.05
       perl 5.008
-  Catalyst-Plugin-ConfigLoader-0.30
-    pathname: B/BR/BRICAS/Catalyst-Plugin-ConfigLoader-0.30.tar.gz
+  Catalyst-Plugin-ConfigLoader-0.32
+    pathname: B/BO/BOBTFISH/Catalyst-Plugin-ConfigLoader-0.32.tar.gz
     provides:
-      Catalyst::Plugin::ConfigLoader 0.30
+      Catalyst::Plugin::ConfigLoader 0.32
     requirements:
       Catalyst::Runtime 5.7008
       Config::Any 0.20
       Data::Visitor 0.24
-      ExtUtils::MakeMaker 6.42
+      ExtUtils::MakeMaker 6.59
       MRO::Compat 0.09
       Test::More 0
       perl 5.008
-  Catalyst-Plugin-Session-0.36
-    pathname: B/BO/BOBTFISH/Catalyst-Plugin-Session-0.36.tar.gz
+  Catalyst-Plugin-Session-0.38
+    pathname: J/JJ/JJNAPIORK/Catalyst-Plugin-Session-0.38.tar.gz
     provides:
-      Catalyst::Plugin::Session 0.36
+      Catalyst::Plugin::Session 0.38
       Catalyst::Plugin::Session::State undef
       Catalyst::Plugin::Session::Store undef
       Catalyst::Plugin::Session::Store::Dummy undef
@@ -449,6 +515,7 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 6.59
       File::Spec 0
       File::Temp 0
+      List::Util 0
       MRO::Compat 0
       Moose 0.76
       MooseX::Emulate::Class::Accessor::Fast 0.00801
@@ -487,55 +554,40 @@ DISTRIBUTIONS
       MRO::Compat 0
       MooseX::Emulate::Class::Accessor::Fast 0
       Path::Class 0
-  Catalyst-Plugin-SmartURI-0.036
-    pathname: R/RK/RKITOVER/Catalyst-Plugin-SmartURI-0.036.tar.gz
+  Catalyst-Plugin-SmartURI-0.037
+    pathname: R/RK/RKITOVER/Catalyst-Plugin-SmartURI-0.037.tar.gz
     provides:
-      Catalyst::Plugin::SmartURI 0.036
-      Catalyst::Request::SmartURI undef
+      Catalyst::Plugin::SmartURI 0.037
+      Catalyst::Request::SmartURI 0.037
     requirements:
-      Catalyst 5.80002
+      Catalyst::Exception 0
+      Catalyst::Request 0
       Class::C3::Componentised 0
-      ExtUtils::MakeMaker 6.42
+      ExtUtils::MakeMaker 6.30
       Moose 0
-      Task::Weaken 0
-      Test::More 0
-      URI::SmartURI 0
+      Scalar::Util 0
+      mro 0
       namespace::clean 0
-      parent 0
-  Catalyst-Plugin-Static-Simple-0.30
-    pathname: A/AB/ABRAXXA/Catalyst-Plugin-Static-Simple-0.30.tar.gz
+  Catalyst-Plugin-Static-Simple-0.31
+    pathname: A/AB/ABRAXXA/Catalyst-Plugin-Static-Simple-0.31.tar.gz
     provides:
-      Catalyst::Plugin::Static::Simple 0.30
+      Catalyst::Plugin::Static::Simple 0.31
     requirements:
       Catalyst::Runtime 5.80008
       ExtUtils::MakeMaker 6.36
-      MIME::Types 1.25
+      MIME::Types 2.03
       Moose 0
       MooseX::Types 0
       Test::More 0
       namespace::autoclean 0
-  Catalyst-Plugin-Unicode-Encoding-1.8
-    pathname: B/BO/BOBTFISH/Catalyst-Plugin-Unicode-Encoding-1.8.tar.gz
+  Catalyst-Runtime-5.90042
+    pathname: J/JJ/JJNAPIORK/Catalyst-Runtime-5.90042.tar.gz
     provides:
-      Catalyst::Plugin::Unicode::Encoding 1.8
-    requirements:
-      Catalyst 5.90015
-      Class::Data::Inheritable 0
-      Encode 2.21
-      ExtUtils::MakeMaker 6.36
-      HTTP::Status 0
-      IO::Scalar 0
-      LWP 5.837
-      Test::More 0.88
-      Try::Tiny 0
-      URI 1.36
-  Catalyst-Runtime-5.90019
-    pathname: B/BO/BOBTFISH/Catalyst-Runtime-5.90019.tar.gz
-    provides:
-      Catalyst 5.90019
+      Catalyst 5.90042
       Catalyst::Action undef
       Catalyst::ActionChain undef
       Catalyst::ActionContainer undef
+      Catalyst::ActionRole::HTTPMethods undef
       Catalyst::Base undef
       Catalyst::ClassData undef
       Catalyst::Component undef
@@ -547,7 +599,6 @@ DISTRIBUTIONS
       Catalyst::DispatchType::Default undef
       Catalyst::DispatchType::Index undef
       Catalyst::DispatchType::Path undef
-      Catalyst::DispatchType::Regex undef
       Catalyst::Dispatcher undef
       Catalyst::Engine undef
       Catalyst::EngineLoader undef
@@ -559,10 +610,11 @@ DISTRIBUTIONS
       Catalyst::Exception::Interface undef
       Catalyst::Log undef
       Catalyst::Model undef
+      Catalyst::Plugin::Unicode::Encoding 2.1
       Catalyst::Request undef
       Catalyst::Request::Upload undef
       Catalyst::Response undef
-      Catalyst::Runtime 5.90019
+      Catalyst::Runtime 5.90042
       Catalyst::Script::CGI undef
       Catalyst::Script::Create undef
       Catalyst::Script::FastCGI undef
@@ -571,18 +623,21 @@ DISTRIBUTIONS
       Catalyst::ScriptRole undef
       Catalyst::ScriptRunner undef
       Catalyst::Stats undef
-      Catalyst::Test undef
+      Catalyst::Test 3.4
       Catalyst::Utils undef
       Catalyst::View undef
     requirements:
       CGI::Simple::Cookie 1.109
       Carp 0
+      Catalyst::DispatchType::Regex 5.90021
       Class::C3::Adopt::NEXT 0.07
       Class::Data::Inheritable 0
       Class::Load 0.12
       Class::MOP 0.95
       Data::Dump 0
       Data::OptList 0
+      Devel::InnerPackage 0
+      Encode 2.49
       ExtUtils::MakeMaker 6.59
       HTML::Entities 0
       HTML::HeadParser 0
@@ -592,13 +647,15 @@ DISTRIBUTIONS
       HTTP::Request::AsCGI 1.0
       HTTP::Request::Common 0
       HTTP::Response 5.813
-      LWP::UserAgent 0
+      HTTP::Status 0
+      IO::Scalar 0
+      LWP 5.837
       List::MoreUtils 0
       MRO::Compat 0
       Module::Pluggable 3.9
       Moose 1.03
       MooseX::Emulate::Class::Accessor::Fast 0.00903
-      MooseX::Getopt 0.30
+      MooseX::Getopt 0.48
       MooseX::MethodAttributes::Inheritable 0.24
       MooseX::Role::WithOverloading 0.09
       Path::Class 0.09
@@ -618,16 +675,16 @@ DISTRIBUTIONS
       Tree::Simple 1.15
       Tree::Simple::Visitor::FindByPath 0
       Try::Tiny 0
-      URI 1.35
+      URI 1.36
       namespace::autoclean 0.09
       namespace::clean 0.23
       perl 5.008003
-  Catalyst-View-TT-0.40
-    pathname: I/IL/ILMARI/Catalyst-View-TT-0.40.tar.gz
+  Catalyst-View-TT-0.41
+    pathname: J/JJ/JJNAPIORK/Catalyst-View-TT-0.41.tar.gz
     provides:
       Catalyst::Helper::View::TT undef
       Catalyst::Helper::View::TTSite undef
-      Catalyst::View::TT 0.40
+      Catalyst::View::TT 0.41
     requirements:
       Catalyst 5.7
       Class::Accessor 0
@@ -680,10 +737,10 @@ DISTRIBUTIONS
     requirements:
       Class::Accessor 0
       Test::More 0
-  Class-Accessor-Grouped-0.10009
-    pathname: R/RI/RIBASUSHI/Class-Accessor-Grouped-0.10009.tar.gz
+  Class-Accessor-Grouped-0.10010
+    pathname: R/RI/RIBASUSHI/Class-Accessor-Grouped-0.10010.tar.gz
     provides:
-      Class::Accessor::Grouped 0.10009
+      Class::Accessor::Grouped 0.10010
     requirements:
       Carp 0
       Class::XSAccessor 1.15
@@ -693,7 +750,7 @@ DISTRIBUTIONS
       Scalar::Util 0
       Sub::Name 0.05
       Test::Exception 0.31
-      Test::More 0.94
+      Test::More 0.88
       perl 5.006
   Class-C3-0.24
     pathname: F/FL/FLORA/Class-C3-0.24.tar.gz
@@ -709,6 +766,13 @@ DISTRIBUTIONS
   Class-C3-Adopt-NEXT-0.13
     pathname: F/FL/FLORA/Class-C3-Adopt-NEXT-0.13.tar.gz
     provides:
+      C3NT undef
+      C3NT::Bar undef
+      C3NT::Baz undef
+      C3NT::Child undef
+      C3NT::Foo undef
+      C3NT::Quux undef
+      C3NT_nowarn undef
       Class::C3::Adopt::NEXT 0.13
     requirements:
       ExtUtils::MakeMaker 6.31
@@ -758,11 +822,46 @@ DISTRIBUTIONS
     pathname: D/DR/DROLSKY/Class-Load-0.20.tar.gz
     provides:
       Class::Load 0.20
+      Class::Load::Error::DieAfterBeginIsa undef
+      Class::Load::Error::DieAfterIsa undef
+      Class::Load::Error::SyntaxErrorAfterIsa undef
+      Class::Load::OK undef
       Class::Load::PP 0.20
+      Class::Load::Stash undef
+      Class::Load::Stash::Sub undef
+      Class::Load::SyntaxError undef
+      Class::Load::VersionCheck 42
+      Class::Load::VersionCheck2 42
     requirements:
+      Carp 0
+      Data::OptList 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.30
+      Module::Implementation 0.04
+      Module::Runtime 0.012
+      Package::Stash 0.14
+      Scalar::Util 0
+      Test::Fatal 0
+      Test::More 0.88
+      Test::Requires 0
+      Try::Tiny 0
+      base 0
+      constant 0
+      strict 0
+      version 0
+      warnings 0
   Class-Load-XS-0.06
     pathname: D/DR/DROLSKY/Class-Load-XS-0.06.tar.gz
     provides:
+      Class::Load::Error::DieAfterBeginIsa undef
+      Class::Load::Error::DieAfterIsa undef
+      Class::Load::Error::SyntaxErrorAfterIsa undef
+      Class::Load::OK undef
+      Class::Load::Stash undef
+      Class::Load::Stash::Sub undef
+      Class::Load::SyntaxError undef
+      Class::Load::VersionCheck 42
+      Class::Load::VersionCheck2 42
       Class::Load::XS 0.06
     requirements:
       Class::Load 0.20
@@ -791,6 +890,7 @@ DISTRIBUTIONS
     provides:
       Class::Singleton 1.4
     requirements:
+      ExtUtils::MakeMaker 0
   Class-Trigger-0.14
     pathname: M/MI/MIYAGAWA/Class-Trigger-0.14.tar.gz
     provides:
@@ -846,30 +946,31 @@ DISTRIBUTIONS
       File::Spec::Functions 0
       FileHandle 0
       IO::File 0
-  Config-Tiny-2.14
-    pathname: A/AD/ADAMK/Config-Tiny-2.14.tar.gz
+  Config-Tiny-2.19
+    pathname: R/RS/RSAVAGE/Config-Tiny-2.19.tgz
     provides:
-      Config::Tiny 2.14
+      Config::Tiny 2.19
     requirements:
-      ExtUtils::MakeMaker 0
+      File::Spec 3.4
+      File::Temp 0.2301
+      Module::Build 0.38
       Test::More 0.47
-      perl 5.004
-  Const-Fast-0.013
-    pathname: L/LE/LEONT/Const-Fast-0.013.tar.gz
+      UNIVERSAL 0
+      perl v5.8.1
+      strict 0
+      utf8 0
+      vars 0
+  Const-Fast-0.014
+    pathname: L/LE/LEONT/Const-Fast-0.014.tar.gz
     provides:
-      Const::Fast 0.013
+      Const::Fast 0.014
     requirements:
       Carp 0
-      Data::Dumper 0
-      ExtUtils::MakeMaker 6.30
-      File::Find 0
-      File::Temp 0
+      Module::Build::Tiny 0.021
       Scalar::Util 0
       Storable 0
-      Sub::Exporter 0
-      Sub::Exporter::Progressive 0
-      Test::Exception 0.29
-      Test::More 0.88
+      Sub::Exporter::Progressive 0.001007
+      perl 5.008
       strict 0
       warnings 0
   Context-Preserve-0.01
@@ -886,7 +987,6 @@ DISTRIBUTIONS
     pathname: G/GB/GBARR/Convert-ASN1-0.26.tar.gz
     provides:
       Convert::ASN1 0.26
-      Convert::ASN1::parser 0.26
     requirements:
       ExtUtils::MakeMaker 6.30
       Math::BigInt 1.997
@@ -901,8 +1001,9 @@ DISTRIBUTIONS
     pathname: A/AD/ADAMK/DBD-SQLite-1.37.tar.gz
     provides:
       DBD::SQLite 1.37
-      DBD::SQLite::db undef
-      DBD::SQLite::dr undef
+      DBD::SQLite::_WriteOnceHash 1.37
+      DBD::SQLite::db 1.37
+      DBD::SQLite::dr 1.37
     requirements:
       DBI 1.57
       ExtUtils::MakeMaker 6.48
@@ -916,24 +1017,24 @@ DISTRIBUTIONS
     provides:
       Bundle::DBI 12.008695
       DBD::DBM 0.08
-      DBD::DBM::Statement undef
-      DBD::DBM::Table undef
-      DBD::DBM::db undef
-      DBD::DBM::dr undef
-      DBD::DBM::st undef
+      DBD::DBM::Statement 0.08
+      DBD::DBM::Table 0.08
+      DBD::DBM::db 0.08
+      DBD::DBM::dr 0.08
+      DBD::DBM::st 0.08
       DBD::ExampleP 12.014310
-      DBD::ExampleP::db undef
-      DBD::ExampleP::dr undef
-      DBD::ExampleP::st undef
+      DBD::ExampleP::db 12.014310
+      DBD::ExampleP::dr 12.014310
+      DBD::ExampleP::st 12.014310
       DBD::File 0.41
-      DBD::File::DataSource::File undef
-      DBD::File::DataSource::Stream undef
-      DBD::File::Statement undef
-      DBD::File::Table undef
-      DBD::File::TableSource::FileSystem undef
-      DBD::File::db undef
-      DBD::File::dr undef
-      DBD::File::st undef
+      DBD::File::DataSource::File 0.41
+      DBD::File::DataSource::Stream 0.41
+      DBD::File::Statement 0.41
+      DBD::File::Table 0.41
+      DBD::File::TableSource::FileSystem 0.41
+      DBD::File::db 0.41
+      DBD::File::dr 0.41
+      DBD::File::st 0.41
       DBD::Gofer 0.015326
       DBD::Gofer::Policy::Base 0.010087
       DBD::Gofer::Policy::classic 0.010087
@@ -944,23 +1045,23 @@ DISTRIBUTIONS
       DBD::Gofer::Transport::null 0.010087
       DBD::Gofer::Transport::pipeone 0.010087
       DBD::Gofer::Transport::stream 0.014598
-      DBD::Gofer::db undef
-      DBD::Gofer::dr undef
-      DBD::Gofer::st undef
+      DBD::Gofer::db 0.015326
+      DBD::Gofer::dr 0.015326
+      DBD::Gofer::st 0.015326
       DBD::NullP 12.014714
-      DBD::NullP::db undef
-      DBD::NullP::dr undef
-      DBD::NullP::st undef
+      DBD::NullP::db 12.014714
+      DBD::NullP::dr 12.014714
+      DBD::NullP::st 12.014714
       DBD::Proxy 0.2004
-      DBD::Proxy::RPC::PlClient undef
-      DBD::Proxy::db undef
-      DBD::Proxy::dr undef
-      DBD::Proxy::st undef
+      DBD::Proxy::RPC::PlClient 0.2004
+      DBD::Proxy::db 0.2004
+      DBD::Proxy::dr 0.2004
+      DBD::Proxy::st 0.2004
       DBD::Sponge 12.010002
-      DBD::Sponge::db undef
-      DBD::Sponge::dr undef
-      DBD::Sponge::st undef
-      DBDI undef
+      DBD::Sponge::db 12.010002
+      DBD::Sponge::dr 12.010002
+      DBD::Sponge::st 12.010002
+      DBDI 12.015128
       DBI 1.623
       DBI::Const::GetInfo::ANSI 2.008696
       DBI::Const::GetInfo::ODBC 2.011373
@@ -969,15 +1070,15 @@ DISTRIBUTIONS
       DBI::DBD 12.015128
       DBI::DBD::Metadata 2.014213
       DBI::DBD::SqlEngine 0.05
-      DBI::DBD::SqlEngine::DataSource undef
-      DBI::DBD::SqlEngine::Statement undef
-      DBI::DBD::SqlEngine::Table undef
-      DBI::DBD::SqlEngine::TableSource undef
-      DBI::DBD::SqlEngine::TieMeta undef
-      DBI::DBD::SqlEngine::TieTables undef
-      DBI::DBD::SqlEngine::db undef
-      DBI::DBD::SqlEngine::dr undef
-      DBI::DBD::SqlEngine::st undef
+      DBI::DBD::SqlEngine::DataSource 0.05
+      DBI::DBD::SqlEngine::Statement 0.05
+      DBI::DBD::SqlEngine::Table 0.05
+      DBI::DBD::SqlEngine::TableSource 0.05
+      DBI::DBD::SqlEngine::TieMeta 0.05
+      DBI::DBD::SqlEngine::TieTables 0.05
+      DBI::DBD::SqlEngine::db 0.05
+      DBI::DBD::SqlEngine::dr 0.05
+      DBI::DBD::SqlEngine::st 0.05
       DBI::FAQ 1.014934
       DBI::Gofer::Execute 0.014282
       DBI::Gofer::Request 0.012536
@@ -994,15 +1095,15 @@ DISTRIBUTIONS
       DBI::ProfileDumper::Apache 2.014120
       DBI::ProfileSubs 0.009395
       DBI::ProxyServer 0.3005
-      DBI::ProxyServer::db undef
-      DBI::ProxyServer::dr undef
-      DBI::ProxyServer::st undef
-      DBI::PurePerl 2.014285
+      DBI::ProxyServer::db 0.3005
+      DBI::ProxyServer::dr 0.3005
+      DBI::ProxyServer::st 0.3005
       DBI::SQL::Nano 1.015542
-      DBI::SQL::Nano::Statement_ undef
-      DBI::SQL::Nano::Table_ undef
+      DBI::SQL::Nano::Statement_ 1.015542
+      DBI::SQL::Nano::Table_ 1.015542
       DBI::Util::CacheMemory 0.010314
-      DBI::common undef
+      DBI::Util::_accessor 0.009478
+      DBI::common 1.623
     requirements:
       ExtUtils::MakeMaker 6.48
       Test::Simple 0.90
@@ -1020,17 +1121,13 @@ DISTRIBUTIONS
       SQL::Translator 0
       Test::More 0
       ok 0
-  DBIx-Class-0.08206
-    pathname: A/AB/ABRAXXA/DBIx-Class-0.08206.tar.gz
+  DBIx-Class-0.08250
+    pathname: R/RI/RIBASUSHI/DBIx-Class-0.08250.tar.gz
     provides:
-      DBIx::Class 0.08206
+      DBIx::Class 0.08250
       DBIx::Class::AccessorGroup undef
       DBIx::Class::Admin undef
       DBIx::Class::CDBICompat undef
-      DBIx::Class::CDBICompat::Iterator undef
-      DBIx::Class::CDBICompat::Iterator::ResultSet undef
-      DBIx::Class::CDBICompat::SQLTransformer undef
-      DBIx::Class::CDBICompat::Tied::ColumnValue undef
       DBIx::Class::Core undef
       DBIx::Class::Cursor undef
       DBIx::Class::DB undef
@@ -1115,7 +1212,7 @@ DISTRIBUTIONS
       SQL::Translator::Parser::DBIx::Class 1.10
       SQL::Translator::Producer::DBIx::Class::File 0.1
     requirements:
-      Class::Accessor::Grouped 0.10009
+      Class::Accessor::Grouped 0.10010
       Class::C3::Componentised 1.0009
       Class::Inspector 1.24
       Config::Any 0.20
@@ -1140,6 +1237,7 @@ DISTRIBUTIONS
       Scope::Guard 0.03
       Sub::Name 0.04
       Test::Builder 0.94
+      Test::Deep 0.101
       Test::Exception 0.31
       Test::More 0.94
       Test::Warn 0.21
@@ -1172,7 +1270,7 @@ DISTRIBUTIONS
   DBIx-Class-QueryLog-1.3.3
     pathname: G/GP/GPHAT/DBIx-Class-QueryLog-1.3.3.tar.gz
     provides:
-      DBIx::Class::QueryLog v1.3.3
+      DBIx::Class::QueryLog 1.003003
       DBIx::Class::QueryLog::Analyzer undef
       DBIx::Class::QueryLog::Query undef
       DBIx::Class::QueryLog::Transaction undef
@@ -1186,6 +1284,19 @@ DISTRIBUTIONS
   DBIx-Class-ResultSet-RecursiveUpdate-0.26
     pathname: G/GS/GSHANK/DBIx-Class-ResultSet-RecursiveUpdate-0.26.tar.gz
     provides:
+      DBICErrorTest::SyntaxError undef
+      DBICTest::Cursor undef
+      DBICTest::Schema::Event undef
+      DBICTest::Schema::EventSmallDT undef
+      DBICTest::Schema::EventTZ undef
+      DBICTest::Schema::EventTZDeprecated undef
+      DBICTest::Schema::EventTZPg undef
+      DBICTest::Schema::Genre undef
+      DBICTest::Schema::NoSuchClass undef
+      DBICTest::Stats undef
+      DBICTest::Util undef
+      DBICTest::Util::OverrideRequire undef
+      DBICTest::Util::UmaskGuard undef
       DBIx::Class::ResultSet::RecursiveUpdate 0.26
       DBIx::Class::ResultSet::RecursiveUpdate::Functions 0.26
     requirements:
@@ -1250,9 +1361,13 @@ DISTRIBUTIONS
       Data::Dump::FilterContext undef
       Data::Dump::Filtered undef
       Data::Dump::Trace 0.02
-      Data::Dump::Trace::Call undef
-      Data::Dump::Trace::Wrapper undef
+      Data::Dump::Trace::Call 0.02
+      Data::Dump::Trace::Wrapper 0.02
     requirements:
+      ExtUtils::MakeMaker 0
+      Symbol 0
+      Test 0
+      perl 5.006
   Data-Dumper-Concise-2.020
     pathname: F/FR/FREW/Data-Dumper-Concise-2.020.tar.gz
     provides:
@@ -1262,17 +1377,17 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 6.42
       perl 5.006
-  Data-FormValidator-4.80
-    pathname: M/MA/MARKSTOS/Data-FormValidator-4.80.tar.gz
+  Data-FormValidator-4.81
+    pathname: M/MA/MARKSTOS/Data-FormValidator-4.81.tar.gz
     provides:
-      Data::FormValidator 4.80
-      Data::FormValidator::Constraints 4.8
-      Data::FormValidator::Constraints::Dates 4.65
+      Data::FormValidator 4.81
+      Data::FormValidator::Constraints 4.81
+      Data::FormValidator::Constraints::Dates 4.81
       Data::FormValidator::Constraints::RegexpCommon undef
-      Data::FormValidator::Constraints::Upload 4.65
-      Data::FormValidator::ConstraintsFactory 1.7
-      Data::FormValidator::Filters 4.65
-      Data::FormValidator::Results 4.71
+      Data::FormValidator::Constraints::Upload 4.81
+      Data::FormValidator::ConstraintsFactory 4.81
+      Data::FormValidator::Filters 4.81
+      Data::FormValidator::Results 4.81
     requirements:
       CGI 3.48
       Date::Calc 5
@@ -1330,6 +1445,11 @@ DISTRIBUTIONS
     provides:
       Data::OptList 0.107
     requirements:
+      ExtUtils::MakeMaker 6.30
+      List::Util 0
+      Params::Util 0
+      Sub::Install 0.921
+      Test::More 0.96
   Data-Page-2.02
     pathname: L/LB/LBROCARD/Data-Page-2.02.tar.gz
     provides:
@@ -1338,38 +1458,6 @@ DISTRIBUTIONS
       Class::Accessor::Chained::Fast 0
       Module::Build 0.35
       Test::Exception 0
-      Test::More 0
-  Data-Serializer-0.59
-    pathname: N/NE/NEELY/Data-Serializer-0.59.tar.gz
-    provides:
-      Data::Serializer 0.59
-      Data::Serializer::Bencode 0.03
-      Data::Serializer::Config::General 0.02
-      Data::Serializer::Convert::Bencode 0.03
-      Data::Serializer::Convert::Bencode_XS 0.03
-      Data::Serializer::Cookbook 0.05
-      Data::Serializer::Data::Denter 0.02
-      Data::Serializer::Data::Dumper 0.05
-      Data::Serializer::Data::Taxi 0.02
-      Data::Serializer::FreezeThaw 0.02
-      Data::Serializer::JSON 0.04
-      Data::Serializer::JSON::Syck 0.02
-      Data::Serializer::PHP::Serialization 0.02
-      Data::Serializer::Persistent 0.01
-      Data::Serializer::Raw 0.02
-      Data::Serializer::Storable 0.03
-      Data::Serializer::XML::Dumper 0.02
-      Data::Serializer::XML::Simple 0.03
-      Data::Serializer::YAML 0.02
-      Data::Serializer::YAML::Syck 0.02
-    requirements:
-      AutoLoader 0
-      Data::Dumper 2.08
-      Digest::SHA 0
-      Exporter 0
-      File::Spec 0
-      IO::File 0
-      Module::Build 0.36
       Test::More 0
   Data-Visitor-0.28
     pathname: D/DO/DOY/Data-Visitor-0.28.tar.gz
@@ -1408,6 +1496,7 @@ DISTRIBUTIONS
       DateTime::Infinite::Future 0.78
       DateTime::Infinite::Past 0.78
       DateTime::LeapSecond 0.78
+      inc::MyModuleBuild undef
     requirements:
       Carp 0
       DateTime::Locale 0.41
@@ -1434,8 +1523,8 @@ DISTRIBUTIONS
     pathname: M/MS/MSISK/DateTime-Event-Cron-0.08.tar.gz
     provides:
       DateTime::Event::Cron 0.08
-      DateTime::Event::Cron::IntegratedSet undef
-      DateTime::Event::Cron::OrderedSet undef
+      DateTime::Event::Cron::IntegratedSet 0.08
+      DateTime::Event::Cron::OrderedSet 0.08
     requirements:
       DateTime 0.21
       DateTime::Set 0.1406
@@ -1487,16 +1576,32 @@ DISTRIBUTIONS
     provides:
       DateTime::Format::SQLite 0.11
     requirements:
+      DateTime 0.1
+      DateTime::Format::Builder 0.6
+      ExtUtils::MakeMaker 0
   DateTime-Format-Strptime-1.52
     pathname: D/DR/DROLSKY/DateTime-Format-Strptime-1.52.tar.gz
     provides:
       DateTime::Format::Strptime 1.52
     requirements:
+      Carp 0
+      DateTime 0.44
+      DateTime::Locale 0.45
+      DateTime::TimeZone 0.79
+      Exporter 0
+      ExtUtils::MakeMaker 6.30
+      Params::Validate 0.64
+      Test::More 0.88
+      strict 0
+      vars 0
   DateTime-Format-W3CDTF-0.06
     pathname: G/GW/GWILLIAMS/DateTime-Format-W3CDTF-0.06.tar.gz
     provides:
       DateTime::Format::W3CDTF 0.06
     requirements:
+      DateTime 0
+      ExtUtils::MakeMaker 6.42
+      Test::More 0.61
   DateTime-Locale-0.45
     pathname: D/DR/DROLSKY/DateTime-Locale-0.45.tar.gz
     provides:
@@ -1974,12 +2079,13 @@ DISTRIBUTIONS
       Module::Build 0.36
       Params::Validate 0.91
       perl 5.006
-  DateTime-Set-0.31
-    pathname: F/FG/FGLOCK/DateTime-Set-0.31.tar.gz
+  DateTime-Set-0.32
+    pathname: F/FG/FGLOCK/DateTime-Set-0.32.tar.gz
     provides:
-      DateTime::Set 0.31
+      DateTime::Set 0.32
       DateTime::Span undef
       DateTime::SpanSet undef
+      Set::Infinite::_recurrence undef
     requirements:
       DateTime 0.12
       ExtUtils::MakeMaker 0
@@ -2411,6 +2517,28 @@ DISTRIBUTIONS
       DateTime::TimeZone::UTC 1.56
       DateTime::TimeZone::WET 1.56
     requirements:
+      Class::Load 0
+      Class::Singleton 1.03
+      Cwd 3
+      ExtUtils::MakeMaker 6.30
+      File::Basename 0
+      File::Compare 0
+      File::Copy 0
+      File::Find 0
+      File::Spec 0
+      List::Util 0
+      Params::Validate 0.72
+      Storable 0
+      Sys::Hostname 0
+      Test::More 0.88
+      Test::Output 0
+      base 0
+      constant 0
+      overload 0
+      parent 0
+      strict 0
+      vars 0
+      warnings 0
   Devel-Caller-2.06
     pathname: R/RC/RCLAMP/Devel-Caller-2.06.tar.gz
     provides:
@@ -2424,6 +2552,9 @@ DISTRIBUTIONS
     provides:
       Devel::Cycle 1.11
     requirements:
+      ExtUtils::MakeMaker 0
+      Scalar::Util 0
+      Test::More 0
   Devel-GlobalDestruction-0.09
     pathname: R/RI/RIBASUSHI/Devel-GlobalDestruction-0.09.tar.gz
     provides:
@@ -2433,13 +2564,6 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       Sub::Exporter::Progressive 0.001002
       perl 5.008001
-  Devel-Hide-0.0009
-    pathname: F/FE/FERREIRA/Devel-Hide-0.0009.tar.gz
-    provides:
-      Devel::Hide 0.0009
-    requirements:
-      ExtUtils::MakeMaker 0
-      Test::More 0
   Devel-StackTrace-1.30
     pathname: D/DR/DROLSKY/Devel-StackTrace-1.30.tar.gz
     provides:
@@ -2472,6 +2596,10 @@ DISTRIBUTIONS
       Digest::HMAC_MD5 1.01
       Digest::HMAC_SHA1 1.03
     requirements:
+      Digest::MD5 2
+      Digest::SHA 1
+      ExtUtils::MakeMaker 0
+      perl 5.004
   Digest-SHA1-2.13
     pathname: G/GA/GAAS/Digest-SHA1-2.13.tar.gz
     provides:
@@ -2483,13 +2611,78 @@ DISTRIBUTIONS
   Dist-CheckConflicts-0.02
     pathname: D/DO/DOY/Dist-CheckConflicts-0.02.tar.gz
     provides:
+      Bar 0.02
+      Bar::Conflicts undef
+      Bar::Conflicts2 undef
+      Bar::Conflicts3 undef
+      Bar::Conflicts::Bad undef
+      Bar::Conflicts::Bad2 undef
+      Bar::Conflicts::Bad3 undef
+      Bar::Conflicts::Good undef
+      Bar::Conflicts::Good2 undef
+      Bar::Conflicts::Good3 undef
+      Bar::Three 0.02
+      Bar::Two 0.02
       Dist::CheckConflicts 0.02
+      Foo 0.02
+      Foo::Conflicts undef
+      Foo::Conflicts2 undef
+      Foo::Conflicts::Bad undef
+      Foo::Conflicts::Good undef
+      Foo::Three 0.02
+      Foo::Two 0.02
     requirements:
+      ExtUtils::MakeMaker 6.31
+      List::MoreUtils 0.12
+      Sub::Exporter 0
+      Test::Fatal 0
+      Test::More 0.88
   Email-Valid-0.190
     pathname: R/RJ/RJBS/Email-Valid-0.190.tar.gz
     provides:
       Email::Valid 0.190
     requirements:
+      ExtUtils::MakeMaker 0
+      Mail::Address 0
+      Net::DNS 0
+      Scalar::Util 0
+      Test::More 0
+      perl 5.006
+  Encode-2.55
+    pathname: D/DA/DANKOGAI/Encode-2.55.tar.gz
+    provides:
+      Encode 2.55
+      Encode::Alias 2.18
+      Encode::Byte 2.04
+      Encode::CJKConstants 2.02
+      Encode::CN 2.03
+      Encode::CN::HZ 2.07
+      Encode::Config 2.05
+      Encode::EBCDIC 2.02
+      Encode::Encoder 2.03
+      Encode::Encoding 2.07
+      Encode::GSM0338 2.05
+      Encode::Guess 2.06
+      Encode::Internal 2.55
+      Encode::JP 2.04
+      Encode::JP::H2Z 2.02
+      Encode::JP::JIS7 2.05
+      Encode::KR 2.03
+      Encode::KR::2022_KR 2.03
+      Encode::MIME::Header 2.15
+      Encode::MIME::Header::ISO_2022_JP 1.04
+      Encode::MIME::Name 1.01
+      Encode::Symbol 2.02
+      Encode::TW 2.03
+      Encode::UTF_EBCDIC 2.55
+      Encode::Unicode 2.09
+      Encode::Unicode::UTF7 2.08
+      Encode::utf8 2.55
+      encoding 2.12
+    requirements:
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      parent 0.221
   Encode-Locale-1.03
     pathname: G/GA/GAAS/Encode-Locale-1.03.tar.gz
     provides:
@@ -2512,6 +2705,14 @@ DISTRIBUTIONS
       Test::More 0.88
       Test::Requires 0
       Try::Tiny 0
+  Exporter-5.68
+    pathname: T/TO/TODDR/Exporter-5.68.tar.gz
+    provides:
+      Exporter 5.68
+      Exporter::Heavy 5.68
+    requirements:
+      Carp 1.05
+      ExtUtils::MakeMaker 0
   ExtUtils-Config-0.007
     pathname: L/LE/LEONT/ExtUtils-Config-0.007.tar.gz
     provides:
@@ -2563,7 +2764,7 @@ DISTRIBUTIONS
   ExtUtils-MakeMaker-6.64
     pathname: M/MS/MSCHWERN/ExtUtils-MakeMaker-6.64.tar.gz
     provides:
-      DynaLoader undef
+      DynaLoader 6.64
       ExtUtils::Command::MM 6.64
       ExtUtils::Liblist 6.64
       ExtUtils::Liblist::Kid 6.64
@@ -2587,12 +2788,13 @@ DISTRIBUTIONS
       ExtUtils::MY 6.64
       ExtUtils::MakeMaker 6.64
       ExtUtils::MakeMaker::Config 6.64
-      ExtUtils::Manifest 1.60
+      ExtUtils::MakeMaker::_version 6.64
       ExtUtils::Mkbootstrap 6.64
       ExtUtils::Mksymlists 6.64
       ExtUtils::testlib 6.64
-      MM undef
-      MY undef
+      MM 6.64
+      MY 6.64
+      in 6.64
     requirements:
       Data::Dumper 0
       DirHandle 0
@@ -2604,12 +2806,13 @@ DISTRIBUTIONS
     pathname: D/DR/DROLSKY/File-ChangeNotify-0.23.tar.gz
     provides:
       File::ChangeNotify 0.23
-      File::ChangeNotify::ConfigData undef
       File::ChangeNotify::Event 0.23
+      File::ChangeNotify::TestHelper undef
       File::ChangeNotify::Watcher 0.23
       File::ChangeNotify::Watcher::Default 0.23
       File::ChangeNotify::Watcher::Inotify 0.23
       File::ChangeNotify::Watcher::KQueue 0.23
+      inc::MyModuleBuild undef
     requirements:
       Carp 0
       Class::Load 0
@@ -2646,6 +2849,7 @@ DISTRIBUTIONS
     pathname: R/RC/RCLAMP/File-Find-Rule-0.33.tar.gz
     provides:
       File::Find::Rule 0.33
+      File::Find::Rule::Test::ATeam undef
     requirements:
       ExtUtils::MakeMaker 0
       File::Find 0
@@ -2657,19 +2861,19 @@ DISTRIBUTIONS
     pathname: G/GA/GAAS/File-Listing-6.04.tar.gz
     provides:
       File::Listing 6.04
-      File::Listing::apache undef
-      File::Listing::dosftp undef
-      File::Listing::netware undef
-      File::Listing::unix undef
-      File::Listing::vms undef
+      File::Listing::apache 6.04
+      File::Listing::dosftp 6.04
+      File::Listing::netware 6.04
+      File::Listing::unix 6.04
+      File::Listing::vms 6.04
     requirements:
       ExtUtils::MakeMaker 0
       HTTP::Date 6
       perl 5.006002
-  File-MMagic-1.29
-    pathname: K/KN/KNOK/File-MMagic-1.29.tar.gz
+  File-MMagic-1.30
+    pathname: K/KN/KNOK/File-MMagic-1.30.tar.gz
     provides:
-      File::MMagic 1.29
+      File::MMagic 1.30
     requirements:
       ExtUtils::MakeMaker 0
   File-Map-0.60
@@ -2679,25 +2883,13 @@ DISTRIBUTIONS
     requirements:
       Carp 0
       ExtUtils::CBuilder 0
-      File::Find 0
-      File::Temp 0
-      IO::Handle 0
-      IO::Socket::INET 0
       Module::Build 0.3601
       PerlIO::Layers 0
-      Scalar::Util 0
       Sub::Exporter::Progressive 0.001005
-      Test::Fatal 0
-      Test::More 0
-      Test::Warnings 0.005
-      Time::HiRes 0
       XSLoader 0
-      if 0
-      open 0
       perl 5.008
       strict 0
       subs 0
-      utf8 0
       warnings 0
   File-Remove-1.52
     pathname: A/AD/ADAMK/File-Remove-1.52.tar.gz
@@ -2725,6 +2917,18 @@ DISTRIBUTIONS
     provides:
       File::ShareDir::Install 0.04
     requirements:
+      ExtUtils::MakeMaker 6.11
+      File::Spec 0
+      IO::Dir 0
+  File-Temp-0.2301
+    pathname: D/DA/DAGOLDEN/File-Temp-0.2301.tar.gz
+    provides:
+      File::Temp 0.2301
+    requirements:
+      ExtUtils::MakeMaker 6.30
+      Fcntl 1.03
+      File::Path 2.06
+      File::Spec 0.8
   Filesys-Notify-Simple-0.10
     pathname: M/MI/MIYAGAWA/Filesys-Notify-Simple-0.10.tar.gz
     provides:
@@ -2737,6 +2941,18 @@ DISTRIBUTIONS
   Filter-Simple-0.88
     pathname: S/SM/SMUELLER/Filter-Simple-0.88.tar.gz
     provides:
+      Demo1 0.01
+      Demo2a 0.01
+      Demo2b 0.01
+      DemoData 0.01
+      DemoRevCat 0.01
+      DemoSwear 0.01
+      DemoUnPod 0.01
+      Demo_Data 0.01
+      Demo_Exporter 0.01
+      Demo_Importer 0.01
+      Demo_REM 0.01
+      DotsForArrows undef
       Filter::Simple 0.88
     requirements:
       ExtUtils::MakeMaker 0
@@ -2774,14 +2990,14 @@ DISTRIBUTIONS
     pathname: G/GA/GAAS/HTML-Form-6.03.tar.gz
     provides:
       HTML::Form 6.03
-      HTML::Form::FileInput undef
-      HTML::Form::IgnoreInput undef
-      HTML::Form::ImageInput undef
-      HTML::Form::Input undef
-      HTML::Form::KeygenInput undef
-      HTML::Form::ListInput undef
-      HTML::Form::SubmitInput undef
-      HTML::Form::TextInput undef
+      HTML::Form::FileInput 6.03
+      HTML::Form::IgnoreInput 6.03
+      HTML::Form::ImageInput 6.03
+      HTML::Form::Input 6.03
+      HTML::Form::KeygenInput 6.03
+      HTML::Form::ListInput 6.03
+      HTML::Form::SubmitInput 6.03
+      HTML::Form::TextInput 6.03
     requirements:
       Encode 2
       ExtUtils::MakeMaker 0
@@ -2790,10 +3006,22 @@ DISTRIBUTIONS
       HTTP::Request::Common 6.03
       URI 1.10
       perl 5.008001
-  HTML-FormHandler-0.40020
-    pathname: G/GS/GSHANK/HTML-FormHandler-0.40020.tar.gz
+  HTML-FormHandler-0.40028
+    pathname: G/GS/GSHANK/HTML-FormHandler-0.40028.tar.gz
     provides:
-      HTML::FormHandler 0.40020
+      BookDB::Form::Upload undef
+      Field::Address undef
+      Field::AltText undef
+      Field::MyField undef
+      Form::Address undef
+      Form::AddressRole undef
+      Form::Multiple undef
+      Form::MultipleRole undef
+      Form::Person undef
+      Form::PersonRole undef
+      Form::Test undef
+      Form::Two undef
+      HTML::FormHandler 0.40028
       HTML::FormHandler::Base undef
       HTML::FormHandler::Blocks undef
       HTML::FormHandler::BuildFields undef
@@ -2816,7 +3044,6 @@ DISTRIBUTIONS
       HTML::FormHandler::Field::Float 0.02
       HTML::FormHandler::Field::Hidden 0.01
       HTML::FormHandler::Field::Hour 0.03
-      HTML::FormHandler::Field::HtmlArea 0.01
       HTML::FormHandler::Field::IntRange 0.01
       HTML::FormHandler::Field::Integer 0.02
       HTML::FormHandler::Field::Minute 0.01
@@ -2842,6 +3069,7 @@ DISTRIBUTIONS
       HTML::FormHandler::Field::Submit undef
       HTML::FormHandler::Field::Text 0.01
       HTML::FormHandler::Field::TextArea 0.02
+      HTML::FormHandler::Field::TextCSV undef
       HTML::FormHandler::Field::Upload 0.02
       HTML::FormHandler::Field::Weekday 0.01
       HTML::FormHandler::Field::Year 0.01
@@ -2852,7 +3080,9 @@ DISTRIBUTIONS
       HTML::FormHandler::I18N::de_de undef
       HTML::FormHandler::I18N::en_us undef
       HTML::FormHandler::I18N::hu_hu undef
+      HTML::FormHandler::I18N::it_it 0.01
       HTML::FormHandler::I18N::ja_jp undef
+      HTML::FormHandler::I18N::pt_br undef
       HTML::FormHandler::I18N::ru_ru undef
       HTML::FormHandler::I18N::sv_se undef
       HTML::FormHandler::I18N::tr_tr undef
@@ -2917,17 +3147,103 @@ DISTRIBUTIONS
       HTML::FormHandler::Widget::Wrapper::Table undef
       HTML::FormHandler::Widget::Wrapper::TableInline undef
       HTML::FormHandler::Wizard undef
+      MyApp::Component::Section undef
+      MyApp::I18N::abc_de undef
+      MyCatalystApp 0.01
+      MyCatalystApp::Controller::Captcha undef
+      MyCatalystApp::Controller::Captcha::Form undef
+      MyCatalystApp::Controller::Root undef
+      Test::NoExtForm undef
+      Widget::Block::Test undef
+      Widget::Field::Omega undef
+      Widget::Field::TestWidget undef
     requirements:
-  HTML-FormHandler-Model-DBIC-0.23
-    pathname: G/GS/GSHANK/HTML-FormHandler-Model-DBIC-0.23.tar.gz
+      Carp 0
+      Class::Load 0.06
+      Data::Clone 0
+      DateTime 0
+      DateTime::Format::Strptime 0
+      Email::Valid 0
+      ExtUtils::MakeMaker 6.30
+      File::ShareDir 0
+      File::ShareDir::Install 0.03
+      File::Spec 0
+      HTML::TreeBuilder 3.23
+      JSON 0
+      Locale::Maketext 1.09
+      Moose 2.0007
+      MooseX::Getopt 0.16
+      MooseX::Types 0.20
+      MooseX::Types::Common 0
+      MooseX::Types::LoadableClass 0.006
+      PadWalker 0
+      Sub::Exporter 0
+      Sub::Name 0
+      Test::Differences 0
+      Test::Exception 0
+      Test::Memory::Cycle 1.04
+      Test::More 0.94
+      Try::Tiny 0
+      aliased 0
+      namespace::autoclean 0.09
+  HTML-FormHandler-Model-DBIC-0.28
+    pathname: G/GS/GSHANK/HTML-FormHandler-Model-DBIC-0.28.tar.gz
     provides:
+      BookDB 0.02
+      BookDB::Field::BookOwnerAlt undef
+      BookDB::Form::Author undef
+      BookDB::Form::AuthorOld undef
+      BookDB::Form::Book undef
+      BookDB::Form::Book2PK undef
+      BookDB::Form::BookHTML undef
+      BookDB::Form::BookM2M undef
+      BookDB::Form::BookOwner undef
+      BookDB::Form::BookOwnerAlt undef
+      BookDB::Form::BookView undef
+      BookDB::Form::BookWithOwner undef
+      BookDB::Form::BookWithOwnerAlt undef
+      BookDB::Form::Borrower undef
+      BookDB::Form::BorrowerX undef
+      BookDB::Form::Field::AltText undef
+      BookDB::Form::Field::Book undef
+      BookDB::Form::Profile undef
+      BookDB::Form::User undef
+      BookDB::Form::Widget::Wrapper::Para undef
+      BookDB::Schema undef
+      BookDB::Schema::Result::Address undef
+      BookDB::Schema::Result::Author undef
+      BookDB::Schema::Result::AuthorBooks undef
+      BookDB::Schema::Result::AuthorOld undef
+      BookDB::Schema::Result::Book undef
+      BookDB::Schema::Result::Book2PK undef
+      BookDB::Schema::Result::BooksGenres undef
+      BookDB::Schema::Result::Borrower undef
+      BookDB::Schema::Result::Country undef
+      BookDB::Schema::Result::Employer undef
+      BookDB::Schema::Result::Format undef
+      BookDB::Schema::Result::Genre undef
+      BookDB::Schema::Result::License undef
+      BookDB::Schema::Result::Options undef
+      BookDB::Schema::Result::User undef
+      BookDB::Schema::Result::UserEmployer undef
       HTML::FormHandler::Generator::DBIC 0.04
-      HTML::FormHandler::Generator::DBIC::Cmd undef
-      HTML::FormHandler::Model::DBIC 0.23
+      HTML::FormHandler::Generator::DBIC::Cmd 0.04
+      HTML::FormHandler::Model::DBIC 0.28
       HTML::FormHandler::Model::DBIC::TypeMap undef
       HTML::FormHandler::TraitFor::DBICFields undef
-      HTML::FormHandler::TraitFor::Model::DBIC 0.14
+      HTML::FormHandler::TraitFor::Model::DBIC 0.26
     requirements:
+      DBIx::Class 0.08250
+      DBIx::Class::ResultSet::RecursiveUpdate 0.25
+      DateTime::Format::MySQL 0
+      DateTime::Format::SQLite 0
+      DateTime::Format::W3CDTF 0
+      ExtUtils::MakeMaker 6.30
+      HTML::FormHandler 0.40016
+      Moose 2.0007
+      Test::Exception 0
+      Test::More 0.94
+      namespace::autoclean 0.09
   HTML-Parser-3.69
     pathname: G/GA/GAAS/HTML-Parser-3.69.tar.gz
     provides:
@@ -2939,11 +3255,16 @@ DISTRIBUTIONS
       HTML::PullParser 3.57
       HTML::TokeParser 3.69
     requirements:
+      ExtUtils::MakeMaker 0
+      HTML::Tagset 3
+      XSLoader 0
+      perl 5.008
   HTML-Tagset-3.20
     pathname: P/PE/PETDANCE/HTML-Tagset-3.20.tar.gz
     provides:
       HTML::Tagset 3.20
     requirements:
+      ExtUtils::MakeMaker 0
   HTML-Tree-5.03
     pathname: C/CJ/CJM/HTML-Tree-5.03.tar.gz
     provides:
@@ -2976,6 +3297,7 @@ DISTRIBUTIONS
       HTTP::Body::UrlEncoded 1.17
       HTTP::Body::XForms 1.17
       HTTP::Body::XFormsMultipart 1.17
+      PAML undef
     requirements:
       Carp 0
       Digest::MD5 0
@@ -3001,7 +3323,7 @@ DISTRIBUTIONS
     pathname: G/GA/GAAS/HTTP-Daemon-6.01.tar.gz
     provides:
       HTTP::Daemon 6.01
-      HTTP::Daemon::ClientConn undef
+      HTTP::Daemon::ClientConn 6.01
     requirements:
       ExtUtils::MakeMaker 0
       HTTP::Date 6
@@ -3167,10 +3489,23 @@ DISTRIBUTIONS
       File::Temp 0
       Scalar::Util 0
       Test::More 0.88
-  IO-Socket-INET6-2.69
-    pathname: S/SH/SHLOMIF/IO-Socket-INET6-2.69.tar.gz
+  IO-Pipely-0.005
+    pathname: R/RC/RCAPUTO/IO-Pipely-0.005.tar.gz
     provides:
-      IO::Socket::INET6 2.69
+      IO::Pipely 0.005
+    requirements:
+      Exporter 5.68
+      ExtUtils::MakeMaker 6.30
+      Fcntl 1.06
+      IO::Socket 1.31
+      Symbol 1.06
+      base 2.18
+      strict 0
+      warnings 0
+  IO-Socket-INET6-2.71
+    pathname: S/SH/SHLOMIF/IO-Socket-INET6-2.71.tar.gz
+    provides:
+      IO::Socket::INET6 2.71
     requirements:
       Carp 0
       Errno 0
@@ -3182,16 +3517,18 @@ DISTRIBUTIONS
       Test::More 0
       strict 0
       warnings 0
-  IO-Socket-SSL-1.84
-    pathname: S/SU/SULLR/IO-Socket-SSL-1.84.tar.gz
+  IO-Socket-SSL-1.954
+    pathname: S/SU/SULLR/IO-Socket-SSL-1.954.tar.gz
     provides:
-      IO::Socket::SSL 1.84
-      IO::Socket::SSL::SSL_Context undef
-      IO::Socket::SSL::SSL_HANDLE undef
-      IO::Socket::SSL::Session_Cache undef
+      IO::Socket::SSL 1.954
+      IO::Socket::SSL::Intercept 1.93
+      IO::Socket::SSL::SSL_Context 1.954
+      IO::Socket::SSL::SSL_HANDLE 1.954
+      IO::Socket::SSL::Session_Cache 1.954
+      IO::Socket::SSL::Utils 0.01
     requirements:
       ExtUtils::MakeMaker 0
-      Net::SSLeay 1.21
+      Net::SSLeay 1.46
       Scalar::Util 0
   IO-Tty-1.10
     pathname: T/TO/TODDR/IO-Tty-1.10.tar.gz
@@ -3205,7 +3542,10 @@ DISTRIBUTIONS
   IO-stringy-2.110
     pathname: D/DS/DSKOLL/IO-stringy-2.110.tar.gz
     provides:
+      Common undef
+      ExtUtils::TBone 1.1
       IO::AtomicFile 2.110
+      IO::Clever 1.01
       IO::InnerFile 2.110
       IO::Lines 2.110
       IO::Scalar 2.110
@@ -3213,8 +3553,8 @@ DISTRIBUTIONS
       IO::Stringy 2.110
       IO::Wrap 2.110
       IO::WrapTie 2.110
-      IO::WrapTie::Master undef
-      IO::WrapTie::Slave undef
+      IO::WrapTie::Master 2.110
+      IO::WrapTie::Slave 2.110
     requirements:
       ExtUtils::MakeMaker 0
   Image-Size-3.232
@@ -3235,7 +3575,7 @@ DISTRIBUTIONS
   Inline-0.53
     pathname: S/SI/SISYPHUS/Inline-0.53.tar.gz
     provides:
-      Foo::Tester undef
+      Foo::Tester 0.01
       Inline 0.53
       Inline::C 0.53
       Inline::C::ParseRecDescent undef
@@ -3243,6 +3583,7 @@ DISTRIBUTIONS
       Inline::Foo 0.01
       Inline::MakeMaker 0.53
       Inline::denter undef
+      Math::Simple 1.23
     requirements:
       Data::Dumper 2.09
       Digest::MD5 2.09
@@ -3254,30 +3595,35 @@ DISTRIBUTIONS
     pathname: M/MA/MAKAMAKA/JSON-2.53.tar.gz
     provides:
       JSON 2.53
-      JSON::Backend::PP undef
-      JSON::Boolean undef
+      JSON::Backend::PP 2.53
+      JSON::Boolean 2.53
       JSON::PP 2.27200
-      JSON::PP5005 1.10
-      JSON::PP56 1.08
-      JSON::PP::IncrParser 1.01
-      JSON::backportPP::Boolean undef
+      JSON::backportPP::Boolean 2.27200
     requirements:
-  JSON-Any-1.29
-    pathname: P/PE/PERIGRIN/JSON-Any-1.29.tar.gz
+      ExtUtils::MakeMaker 0
+      Test::More 0
+  JSON-Any-1.30
+    pathname: P/PE/PERIGRIN/JSON-Any-1.30.tar.gz
     provides:
-      JSON::Any 1.29
+      JSON::Any 1.30
+      inc::MakeMaker undef
     requirements:
-      Carp 0
-      ExtUtils::MakeMaker 6.42
-      JSON 2.02
-      JSON::Syck 0
-      JSON::XS 2.3
-      Test::More 0.42
-  JSON-XS-2.33
-    pathname: M/ML/MLEHMANN/JSON-XS-2.33.tar.gz
+      ExtUtils::MakeMaker 6.30
+      perl 5.008
+  JSON-PP-2.27202
+    pathname: M/MA/MAKAMAKA/JSON-PP-2.27202.tar.gz
     provides:
-      JSON::XS 2.33
-      JSON::XS::Boolean undef
+      JSON::PP 2.27202
+      JSON::PP::Boolean 2.27202
+      JSON::PP::IncrParser 2.27202
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0
+  JSON-XS-2.34
+    pathname: M/ML/MLEHMANN/JSON-XS-2.34.tar.gz
+    provides:
+      JSON::XS 2.34
+      JSON::XS::Boolean 2.34
     requirements:
       ExtUtils::MakeMaker 0
       common::sense 0
@@ -3293,21 +3639,23 @@ DISTRIBUTIONS
     provides:
       List::MoreUtils 0.33
     requirements:
-  Log-Log4perl-1.40
-    pathname: M/MS/MSCHILLI/Log-Log4perl-1.40.tar.gz
+      ExtUtils::CBuilder 0.27
+      ExtUtils::MakeMaker 6.52
+      Test::More 0.82
+      perl 5.00503
+  Log-Log4perl-1.42
+    pathname: M/MS/MSCHILLI/Log-Log4perl-1.42.tar.gz
     provides:
-      Log::Log4perl 1.40
+      L4pResurrectable 0.01
+      Log::Log4perl 1.42
       Log::Log4perl::Appender undef
-      Log::Log4perl::Appender::Buffer undef
       Log::Log4perl::Appender::DBI undef
       Log::Log4perl::Appender::File undef
-      Log::Log4perl::Appender::Limit undef
       Log::Log4perl::Appender::RRDs undef
       Log::Log4perl::Appender::Screen undef
       Log::Log4perl::Appender::ScreenColoredLevels undef
       Log::Log4perl::Appender::Socket undef
       Log::Log4perl::Appender::String undef
-      Log::Log4perl::Appender::Synchronized undef
       Log::Log4perl::Appender::TestArrayBuffer undef
       Log::Log4perl::Appender::TestBuffer undef
       Log::Log4perl::Appender::TestFileCreeper undef
@@ -3322,6 +3670,7 @@ DISTRIBUTIONS
       Log::Log4perl::Filter::Boolean undef
       Log::Log4perl::Filter::LevelMatch undef
       Log::Log4perl::Filter::LevelRange undef
+      Log::Log4perl::Filter::MDC undef
       Log::Log4perl::Filter::StringMatch undef
       Log::Log4perl::InternalDebug undef
       Log::Log4perl::JavaMap undef
@@ -3349,13 +3698,15 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       File::Spec 0.82
       Test::More 0.45
-  MIME-Types-1.38
-    pathname: M/MA/MARKOV/MIME-Types-1.38.tar.gz
+  MIME-Types-2.04
+    pathname: M/MA/MARKOV/MIME-Types-2.04.tar.gz
     provides:
-      MIME::Type 1.38
-      MIME::Types 1.38
+      MIME::Type 2.04
+      MIME::Types 2.04
     requirements:
       ExtUtils::MakeMaker 0
+      File::Basename 0
+      File::Spec 0
       Test::More 0.47
   MRO-Compat-0.12
     pathname: B/BO/BOBTFISH/MRO-Compat-0.12.tar.gz
@@ -3391,6 +3742,13 @@ DISTRIBUTIONS
       Mail::Send 2.12
       Mail::Util 2.12
     requirements:
+      Date::Format 0
+      Date::Parse 0
+      ExtUtils::MakeMaker 0
+      IO::Handle 0
+      Net::Domain 1.05
+      Net::SMTP 1.03
+      Test::More 0
   Math-BigInt-1.997
     pathname: P/PJ/PJACKLAM/Math-BigInt-1.997.tar.gz
     provides:
@@ -3402,38 +3760,33 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 6.42
       Test::More 0.62
       perl 5.006002
-  Module-Build-0.4003
-    pathname: L/LE/LEONT/Module-Build-0.4003.tar.gz
+  Module-Build-0.4007
+    pathname: L/LE/LEONT/Module-Build-0.4007.tar.gz
     provides:
-      Module::Build 0.4003
-      Module::Build::Base 0.4003
-      Module::Build::Compat 0.4003
-      Module::Build::Config 0.4003
-      Module::Build::ConfigData undef
-      Module::Build::Cookbook 0.4003
-      Module::Build::Dumper 0.4003
-      Module::Build::ModuleInfo 0.4003
-      Module::Build::Notes 0.4003
-      Module::Build::PPMMaker 0.4003
-      Module::Build::Platform::Amiga 0.4003
-      Module::Build::Platform::Default 0.4003
-      Module::Build::Platform::EBCDIC 0.4003
-      Module::Build::Platform::MPEiX 0.4003
-      Module::Build::Platform::MacOS 0.4003
-      Module::Build::Platform::RiscOS 0.4003
-      Module::Build::Platform::Unix 0.4003
-      Module::Build::Platform::VMS 0.4003
-      Module::Build::Platform::VOS 0.4003
-      Module::Build::Platform::Windows 0.4003
-      Module::Build::Platform::aix 0.4003
-      Module::Build::Platform::cygwin 0.4003
-      Module::Build::Platform::darwin 0.4003
-      Module::Build::Platform::os2 0.4003
-      Module::Build::PodParser 0.4003
+      Module::Build 0.4007
+      Module::Build::Base 0.4007
+      Module::Build::Compat 0.4007
+      Module::Build::Config 0.4007
+      Module::Build::Cookbook 0.4007
+      Module::Build::Dumper 0.4007
+      Module::Build::ModuleInfo 0.4007
+      Module::Build::Notes 0.4007
+      Module::Build::PPMMaker 0.4007
+      Module::Build::Platform::Default 0.4007
+      Module::Build::Platform::MacOS 0.4007
+      Module::Build::Platform::Unix 0.4007
+      Module::Build::Platform::VMS 0.4007
+      Module::Build::Platform::VOS 0.4007
+      Module::Build::Platform::Windows 0.4007
+      Module::Build::Platform::aix 0.4007
+      Module::Build::Platform::cygwin 0.4007
+      Module::Build::Platform::darwin 0.4007
+      Module::Build::Platform::os2 0.4007
+      Module::Build::PodParser 0.4007
       Module::Build::Version 0.87
       Module::Build::YAML 1.41
-      inc::latest 0.4003
-      inc::latest::private 0.4003
+      inc::latest 0.4007
+      inc::latest::private 0.4007
     requirements:
       CPAN::Meta 2.110420
       CPAN::Meta::YAML 0.003
@@ -3452,10 +3805,10 @@ DISTRIBUTIONS
       File::Spec 0.82
       File::Temp 0.15
       Getopt::Long 0
-      IO::File 0
       Module::Metadata 1.000002
       Parse::CPAN::Meta 1.4401
       Perl::OSType 1
+      Pod::Man 2.17
       Test::Harness 3.16
       Test::More 0.49
       Text::Abbrev 0
@@ -3465,6 +3818,7 @@ DISTRIBUTIONS
   Module-Build-Tiny-0.027
     pathname: L/LE/LEONT/Module-Build-Tiny-0.027.tar.gz
     provides:
+      DistGen 0.01
       Module::Build::Tiny 0.027
     requirements:
       CPAN::Meta 0
@@ -3502,6 +3856,9 @@ DISTRIBUTIONS
     pathname: C/CR/CRENZ/Module-Find-0.11.tar.gz
     provides:
       Module::Find 0.11
+      ModuleFindTest undef
+      ModuleFindTest::SubMod undef
+      ModuleFindTest::SubMod::SubSubMod undef
     requirements:
       ExtUtils::MakeMaker 0
       File::Find 0
@@ -3512,7 +3869,20 @@ DISTRIBUTIONS
     pathname: D/DR/DROLSKY/Module-Implementation-0.06.tar.gz
     provides:
       Module::Implementation 0.06
+      T::Impl1 undef
+      T::Impl2 undef
+      T::ImplFails1 undef
+      T::ImplFails2 undef
     requirements:
+      Carp 0
+      ExtUtils::MakeMaker 6.30
+      Module::Runtime 0.012
+      Test::Fatal 0
+      Test::More 0.88
+      Test::Requires 0
+      Try::Tiny 0
+      strict 0
+      warnings 0
   Module-Install-1.06
     pathname: A/AD/ADAMK/Module-Install-1.06.tar.gz
     provides:
@@ -3530,7 +3900,7 @@ DISTRIBUTIONS
       Module::Install::Admin::WriteAll 1.06
       Module::Install::AutoInstall 1.06
       Module::Install::Base 1.06
-      Module::Install::Base::FakeAdmin undef
+      Module::Install::Base::FakeAdmin 1.06
       Module::Install::Bundle 1.06
       Module::Install::Can 1.06
       Module::Install::Compiler 1.06
@@ -3609,6 +3979,8 @@ DISTRIBUTIONS
       Moo::HandleMoose::FakeMetaClass undef
       Moo::Object undef
       Moo::Role undef
+      Moo::_Utils undef
+      Moo::_mro undef
       Moo::sification undef
       Sub::Defer undef
       Sub::Quote undef
@@ -3625,6 +3997,10 @@ DISTRIBUTIONS
   Moose-2.0604
     pathname: D/DO/DOY/Moose-2.0604.tar.gz
     provides:
+      Bar undef
+      Bar7::Meta::Trait undef
+      Bar7::Meta::Trait2 undef
+      BinaryTree 0.02
       Class::MOP 2.0604
       Class::MOP::Attribute 2.0604
       Class::MOP::Class 2.0604
@@ -3647,6 +4023,9 @@ DISTRIBUTIONS
       Class::MOP::Module 2.0604
       Class::MOP::Object 2.0604
       Class::MOP::Package 2.0604
+      Foo undef
+      MMHelper undef
+      MY undef
       Moose 2.0604
       Moose::Cookbook::Legacy::Debugging_BaseClassReplacement 2.0604
       Moose::Cookbook::Meta::Labeled_AttributeMetaclass 2.0604
@@ -3656,7 +4035,11 @@ DISTRIBUTIONS
       Moose::Error::Default 2.0604
       Moose::Exporter 2.0604
       Moose::Meta::Attribute 2.0604
+      Moose::Meta::Attribute::Custom::Bar undef
+      Moose::Meta::Attribute::Custom::Foo undef
       Moose::Meta::Attribute::Custom::Moose 2.0604
+      Moose::Meta::Attribute::Custom::Trait::Bar undef
+      Moose::Meta::Attribute::Custom::Trait::Foo undef
       Moose::Meta::Attribute::Native 2.0604
       Moose::Meta::Attribute::Native::Trait 2.0604
       Moose::Meta::Attribute::Native::Trait::Array 2.0604
@@ -3783,27 +4166,79 @@ DISTRIBUTIONS
       Moose::Util::MetaRole 2.0604
       Moose::Util::TypeConstraints 2.0604
       Moose::Util::TypeConstraints::Builtins 2.0604
+      My::Bar undef
+      My::Content undef
+      My::Extract undef
+      My::Output undef
+      My::Trait::Bar undef
+      MyExporter undef
+      MyInline undef
+      MyMetaClass undef
+      MyMetaClass::Attribute undef
+      MyMetaClass::Instance undef
+      MyMetaClass::Method undef
+      MyMetaClass::Random undef
+      MyMetaclassRole undef
+      MyMooseA undef
+      MyMooseB undef
+      MyMooseObject undef
+      NoInlineAccessor undef
+      NoInlineAttribute undef
+      Role::Child undef
+      Role::Interface undef
+      Role::Parent undef
+      SyntaxError undef
       Test::Moose 2.0604
+      inc::CheckDelta undef
+      inc::Clean undef
+      inc::ExtractInlineTests undef
+      inc::GatherDir undef
+      inc::GitUpToDate undef
+      inc::MakeMaker undef
+      inc::RequireAuthorDeps undef
+      inc::TestRelease undef
       metaclass 2.0604
       oose 2.0604
     requirements:
-  MooseX-Daemonize-0.15
-    pathname: M/MI/MICHAELR/MooseX-Daemonize-0.15.tar.gz
+      Carp 1.22
+      Class::Load 0.09
+      Class::Load::XS 0.01
+      Data::OptList 0.107
+      Devel::GlobalDestruction 0
+      Dist::CheckConflicts 0.02
+      Eval::Closure 0.04
+      ExtUtils::MakeMaker 6.30
+      List::MoreUtils 0.28
+      MRO::Compat 0.05
+      Package::DeprecationManager 0.11
+      Package::Stash 0.32
+      Package::Stash::XS 0.24
+      Params::Util 1.00
+      Scalar::Util 1.19
+      Sub::Exporter 0.980
+      Sub::Name 0.05
+      Task::Weaken 0
+      Test::Fatal 0.001
+      Test::More 0.88
+      Test::Requires 0.05
+      Try::Tiny 0.02
+  MooseX-Daemonize-0.18
+    pathname: E/ET/ETHER/MooseX-Daemonize-0.18.tar.gz
     provides:
-      MooseX::Daemonize 0.15
-      MooseX::Daemonize::Core 0.15
-      MooseX::Daemonize::Pid 0.15
+      MooseX::Daemonize 0.18
+      MooseX::Daemonize::Core 0.18
+      MooseX::Daemonize::Pid 0.18
       MooseX::Daemonize::Pid::File 0.15
-      MooseX::Daemonize::WithPidFile 0.15
-      Test::MooseX::Daemonize 0.15
-      Test::MooseX::Daemonize::Testable undef
+      MooseX::Daemonize::WithPidFile 0.18
+      Test::MooseX::Daemonize 0.18
+      Test::MooseX::Daemonize::Testable 0.18
     requirements:
-      ExtUtils::MakeMaker 6.36
+      ExtUtils::MakeMaker 6.30
+      File::Path 2.08
       Moose 0.33
       MooseX::Getopt 0.07
       MooseX::Types::Path::Class 0
-      Test::Moose 0
-      Test::More 0
+      Sub::Exporter 0
   MooseX-Emulate-Class-Accessor-Fast-0.00903
     pathname: F/FL/FLORA/MooseX-Emulate-Class-Accessor-Fast-0.00903.tar.gz
     provides:
@@ -3817,21 +4252,34 @@ DISTRIBUTIONS
       Test::Exception 0
       Test::More 0
       namespace::clean 0
-  MooseX-Getopt-0.56
-    pathname: E/ET/ETHER/MooseX-Getopt-0.56.tar.gz
+  MooseX-Getopt-0.58
+    pathname: E/ET/ETHER/MooseX-Getopt-0.58.tar.gz
     provides:
-      MooseX::Getopt 0.56
-      MooseX::Getopt::Basic 0.56
-      MooseX::Getopt::Dashes 0.56
-      MooseX::Getopt::GLD 0.56
-      MooseX::Getopt::Meta::Attribute 0.56
-      MooseX::Getopt::Meta::Attribute::NoGetopt 0.56
-      MooseX::Getopt::Meta::Attribute::Trait 0.56
-      MooseX::Getopt::Meta::Attribute::Trait::NoGetopt 0.56
-      MooseX::Getopt::OptionTypeMap 0.56
-      MooseX::Getopt::ProcessedArgv 0.56
-      MooseX::Getopt::Strict 0.56
+      MooseX::Getopt 0.58
+      MooseX::Getopt::Basic 0.58
+      MooseX::Getopt::Dashes 0.58
+      MooseX::Getopt::GLD 0.58
+      MooseX::Getopt::Meta::Attribute 0.58
+      MooseX::Getopt::Meta::Attribute::NoGetopt 0.58
+      MooseX::Getopt::Meta::Attribute::Trait 0.58
+      MooseX::Getopt::Meta::Attribute::Trait::NoGetopt 0.58
+      MooseX::Getopt::OptionTypeMap 0.58
+      MooseX::Getopt::ProcessedArgv 0.58
+      MooseX::Getopt::Strict 0.58
     requirements:
+      Carp 0
+      Getopt::Long 2.37
+      Getopt::Long::Descriptive 0.081
+      Module::Build::Tiny 0.027
+      Moose 0
+      Moose::Meta::Attribute 0
+      Moose::Role 0.56
+      Moose::Util::TypeConstraints 0
+      MooseX::Role::Parameterized 0
+      Try::Tiny 0
+      perl 5.006
+      strict 0
+      warnings 0
   MooseX-MethodAttributes-0.28
     pathname: E/ET/ETHER/MooseX-MethodAttributes-0.28.tar.gz
     provides:
@@ -3942,6 +4390,10 @@ DISTRIBUTIONS
   MooseX-Types-0.35
     pathname: D/DR/DROLSKY/MooseX-Types-0.35.tar.gz
     provides:
+      Combined undef
+      DecoratorLibrary undef
+      Empty undef
+      IntrospectTypeExports undef
       MooseX::Types 0.35
       MooseX::Types::Base 0.35
       MooseX::Types::CheckedUtilExports 0.35
@@ -3951,6 +4403,11 @@ DISTRIBUTIONS
       MooseX::Types::UndefinedType 0.35
       MooseX::Types::Util 0.35
       MooseX::Types::Wrapper 0.35
+      SubExporterCompatibility undef
+      TestLibrary undef
+      TestLibrary2 undef
+      TestNamespaceSep undef
+      TestWrapper undef
     requirements:
       Carp 0
       Carp::Clan 6.00
@@ -4005,12 +4462,12 @@ DISTRIBUTIONS
       Net::DNS 0.72
       Net::DNS::Domain 1096
       Net::DNS::DomainName 1096
-      Net::DNS::DomainName1035 undef
-      Net::DNS::DomainName2535 undef
+      Net::DNS::DomainName1035 1096
+      Net::DNS::DomainName2535 1096
       Net::DNS::Header 1086
       Net::DNS::Mailbox 1096
-      Net::DNS::Mailbox1035 undef
-      Net::DNS::Mailbox2535 undef
+      Net::DNS::Mailbox1035 1096
+      Net::DNS::Mailbox2535 1096
       Net::DNS::Nameserver 1096
       Net::DNS::Packet 1086
       Net::DNS::Parameters 1074
@@ -4020,7 +4477,7 @@ DISTRIBUTIONS
       Net::DNS::RR::AAAA 1096
       Net::DNS::RR::AFSDB 1096
       Net::DNS::RR::APL 1096
-      Net::DNS::RR::APL::Item undef
+      Net::DNS::RR::APL::Item 1096
       Net::DNS::RR::CERT 1073
       Net::DNS::RR::CNAME 1096
       Net::DNS::RR::DHCID 1096
@@ -4067,12 +4524,19 @@ DISTRIBUTIONS
       Net::DNS::Resolver::UNIX 1096
       Net::DNS::Resolver::cygwin 1096
       Net::DNS::Resolver::os2 1096
-      Net::DNS::Text 1070
+      Net::DNS::Text 1079
       Net::DNS::Update 1096
       Net::DNS::ZoneFile 1094
-      Net::DNS::ZoneFile::Generator undef
-      Net::DNS::ZoneFile::Text undef
+      Net::DNS::ZoneFile::Generator 1094
+      Net::DNS::ZoneFile::Text 1094
     requirements:
+      Digest::HMAC_MD5 1
+      Digest::MD5 2.12
+      Digest::SHA 5.23
+      ExtUtils::MakeMaker 0
+      IO::Socket 0
+      MIME::Base64 2.11
+      Test::More 0.18
   Net-HTTP-6.05
     pathname: G/GA/GAAS/Net-HTTP-6.05.tar.gz
     provides:
@@ -4090,15 +4554,16 @@ DISTRIBUTIONS
   Net-LDAP-Server-0.43
     pathname: A/AA/AAR/Net-LDAP-Server-0.43.tar.gz
     provides:
+      MyDemoServer undef
       Net::LDAP::Server 0.43
     requirements:
       Convert::ASN1 0
       ExtUtils::MakeMaker 0
       Net::LDAP 0
-  Net-LDAP-Server-Test-0.17
-    pathname: K/KA/KARMAN/Net-LDAP-Server-Test-0.17.tar.gz
+  Net-LDAP-Server-Test-0.19
+    pathname: K/KA/KARMAN/Net-LDAP-Server-Test-0.19.tar.gz
     provides:
-      Net::LDAP::Server::Test 0.17
+      Net::LDAP::Server::Test 0.19
     requirements:
       Data::Dump 0
       ExtUtils::MakeMaker 0
@@ -4108,10 +4573,10 @@ DISTRIBUTIONS
       Net::LDAP::Server 0.3
       Test::More 0
       perl 5.008003
-  Net-SSLeay-1.52
-    pathname: M/MI/MIKEM/Net-SSLeay-1.52.tar.gz
+  Net-SSLeay-1.55
+    pathname: M/MI/MIKEM/Net-SSLeay-1.55.tar.gz
     provides:
-      Net::SSLeay 1.52
+      Net::SSLeay 1.55
       Net::SSLeay::Handle 0.61
     requirements:
       ExtUtils::MakeMaker 6.36
@@ -4144,7 +4609,7 @@ DISTRIBUTIONS
       Net::Server::Proto::UNIXDGRAM undef
       Net::Server::SIG 0.03
       Net::Server::Single undef
-      Net::Server::TiedHandle undef
+      Net::Server::TiedHandle 2.007
     requirements:
       ExtUtils::MakeMaker 0
       IO::Socket 0
@@ -4178,357 +4643,56 @@ DISTRIBUTIONS
       File::Path 0
       File::Spec 0
       File::Temp 0
-  PDL-2.006
-    pathname: C/CH/CHM/PDL-2.006.tar.gz
+  POE-1.356
+    pathname: R/RC/RCAPUTO/POE-1.356.tar.gz
     provides:
-      C::StructObj undef
-      C::StructType undef
-      C::Type undef
-      C::Var undef
-      Inline::MakePdlppInstallable undef
-      Inline::Pdlpp 0.2
-      PDL 2.006
-      PDL::Bad undef
-      PDL::Basic undef
-      PDL::CallExt undef
-      PDL::Char undef
-      PDL::Complex undef
-      PDL::Compression undef
-      PDL::Constants 0.02
-      PDL::Core undef
-      PDL::Core::Dev undef
-      PDL::Core::FOO_FOO_ 1.56
-      PDL::Dbg undef
-      PDL::Demos::BAD2_demo undef
-      PDL::Demos::BAD_demo undef
-      PDL::Demos::Cartography_demo undef
-      PDL::Demos::General undef
-      PDL::Demos::Gnuplot_demo undef
-      PDL::Demos::PGPLOT_OO_demo undef
-      PDL::Demos::PGPLOT_demo undef
-      PDL::Demos::Prima undef
-      PDL::Demos::Routines undef
-      PDL::Demos::Transform_demo undef
-      PDL::Demos::TriD1 undef
-      PDL::Demos::TriD2 undef
-      PDL::Demos::TriDGallery undef
-      PDL::DiskCache 1.1
-      PDL::Doc undef
-      PDL::Doc::Config undef
-      PDL::Doc::Perldl undef
-      PDL::Exporter undef
-      PDL::FFT undef
-      PDL::Filter::Gaussian undef
-      PDL::Filter::LinPred undef
-      PDL::Filter::LinSmooth undef
-      PDL::Filter::Linear undef
-      PDL::Filter::SavGol undef
-      PDL::Fit::Gaussian undef
-      PDL::Fit::LM undef
-      PDL::Fit::Linfit undef
-      PDL::Fit::Polynomial undef
-      PDL::Func undef
-      PDL::GIS::Proj undef
-      PDL::Graphics2D undef
-      PDL::Graphics::IIS undef
-      PDL::Graphics::LUT undef
-      PDL::Graphics::Limits 0.01
-      PDL::Graphics::Limits::DSet undef
-      PDL::Graphics::PGPLOT undef
-      PDL::Graphics::PGPLOT::Window undef
-      PDL::Graphics::PGPLOTOptions undef
-      PDL::Graphics::State undef
-      PDL::IO::Dicom undef
-      PDL::IO::Dumper v1.3.2
-      PDL::IO::FITS 0.92
-      PDL::IO::FastRaw 0.000003
-      PDL::IO::FlexRaw undef
-      PDL::IO::HDF 2.0
-      PDL::IO::HDF::SD undef
-      PDL::IO::HDF::VS undef
-      PDL::IO::IDL 0.5
-      PDL::IO::Misc undef
-      PDL::IO::Pic undef
-      PDL::IO::Pnm undef
-      PDL::IO::Storable undef
-      PDL::Image2D undef
-      PDL::ImageND undef
-      PDL::ImageRGB undef
-      PDL::Lite undef
-      PDL::LiteF undef
-      PDL::Lvalue undef
-      PDL::Math undef
-      PDL::Matrix 0.5
-      PDL::MatrixOps undef
-      PDL::NiceSlice 1.000_003
-      PDL::Ops undef
-      PDL::Opt::Simplex undef
-      PDL::Options 0.92
-      PDL::PP 2.2
-      PDL::PP::Access undef
-      PDL::PP::BackCodeThreadLoop undef
-      PDL::PP::BadAccess undef
-      PDL::PP::BadSwitch undef
-      PDL::PP::BadVarAccess undef
-      PDL::PP::Block undef
-      PDL::PP::Code undef
-      PDL::PP::ComplexThreadLoop undef
-      PDL::PP::Dump undef
-      PDL::PP::GenericLoop undef
-      PDL::PP::GentypeAccess undef
-      PDL::PP::Ind undef
-      PDL::PP::Loop undef
-      PDL::PP::MacroAccess undef
-      PDL::PP::NaNSupport undef
-      PDL::PP::OtherAccess undef
-      PDL::PP::PDLStateBadAccess undef
-      PDL::PP::PPBadAccess undef
-      PDL::PP::PdlAccess undef
-      PDL::PP::PdlDimsObj undef
-      PDL::PP::PdlParObj undef
-      PDL::PP::PhysPointerAccess undef
-      PDL::PP::PointerAccess undef
-      PDL::PP::ReSizeAccess undef
-      PDL::PP::Rule undef
-      PDL::PP::Rule::Croak undef
-      PDL::PP::Rule::InsertName undef
-      PDL::PP::Rule::MakeComp undef
-      PDL::PP::Rule::Returns undef
-      PDL::PP::Rule::Returns::EmptyString undef
-      PDL::PP::Rule::Returns::NULL undef
-      PDL::PP::Rule::Returns::One undef
-      PDL::PP::Rule::Returns::Zero undef
-      PDL::PP::Rule::Substitute undef
-      PDL::PP::Rule::Substitute::Usual undef
-      PDL::PP::Signature undef
-      PDL::PP::SimpleThreadLoop undef
-      PDL::PP::SizeAccess undef
-      PDL::PP::ThreadLoop undef
-      PDL::PP::TypeConv undef
-      PDL::PP::Types undef
-      PDL::Perldl2::Plugin::CleanErrors undef
-      PDL::Perldl2::Plugin::NiceSlice undef
-      PDL::Perldl2::Plugin::PDLCommands undef
-      PDL::Perldl2::Plugin::PrintControl undef
-      PDL::Perldl2::Profile::Perldl2 0.008
-      PDL::Perldl2::Script undef
-      PDL::PodParser undef
-      PDL::Primitive undef
-      PDL::Reduce undef
-      PDL::Slices undef
-      PDL::Tests undef
-      PDL::Transform undef
-      PDL::Transform::Cartography 0.6
-      PDL::Transform::Composition undef
-      PDL::Transform::Linear undef
-      PDL::Transform::Proj4 undef
-      PDL::Transform::Proj4::aea undef
-      PDL::Transform::Proj4::aeqd undef
-      PDL::Transform::Proj4::airy undef
-      PDL::Transform::Proj4::aitoff undef
-      PDL::Transform::Proj4::alsk undef
-      PDL::Transform::Proj4::apian undef
-      PDL::Transform::Proj4::august undef
-      PDL::Transform::Proj4::bacon undef
-      PDL::Transform::Proj4::bipc undef
-      PDL::Transform::Proj4::boggs undef
-      PDL::Transform::Proj4::bonne undef
-      PDL::Transform::Proj4::cass undef
-      PDL::Transform::Proj4::cc undef
-      PDL::Transform::Proj4::cea undef
-      PDL::Transform::Proj4::chamb undef
-      PDL::Transform::Proj4::collg undef
-      PDL::Transform::Proj4::crast undef
-      PDL::Transform::Proj4::denoy undef
-      PDL::Transform::Proj4::eck1 undef
-      PDL::Transform::Proj4::eck2 undef
-      PDL::Transform::Proj4::eck3 undef
-      PDL::Transform::Proj4::eck4 undef
-      PDL::Transform::Proj4::eck5 undef
-      PDL::Transform::Proj4::eck6 undef
-      PDL::Transform::Proj4::eqc undef
-      PDL::Transform::Proj4::eqdc undef
-      PDL::Transform::Proj4::euler undef
-      PDL::Transform::Proj4::fahey undef
-      PDL::Transform::Proj4::fouc undef
-      PDL::Transform::Proj4::fouc_s undef
-      PDL::Transform::Proj4::gall undef
-      PDL::Transform::Proj4::geocent undef
-      PDL::Transform::Proj4::geos undef
-      PDL::Transform::Proj4::gins8 undef
-      PDL::Transform::Proj4::gn_sinu undef
-      PDL::Transform::Proj4::gnom undef
-      PDL::Transform::Proj4::goode undef
-      PDL::Transform::Proj4::gs48 undef
-      PDL::Transform::Proj4::gs50 undef
-      PDL::Transform::Proj4::gstmerc undef
-      PDL::Transform::Proj4::hammer undef
-      PDL::Transform::Proj4::hatano undef
-      PDL::Transform::Proj4::imw_p undef
-      PDL::Transform::Proj4::kav5 undef
-      PDL::Transform::Proj4::kav7 undef
-      PDL::Transform::Proj4::krovak undef
-      PDL::Transform::Proj4::labrd undef
-      PDL::Transform::Proj4::laea undef
-      PDL::Transform::Proj4::lagrng undef
-      PDL::Transform::Proj4::larr undef
-      PDL::Transform::Proj4::lask undef
-      PDL::Transform::Proj4::latlon undef
-      PDL::Transform::Proj4::latlong undef
-      PDL::Transform::Proj4::lcc undef
-      PDL::Transform::Proj4::lcca undef
-      PDL::Transform::Proj4::leac undef
-      PDL::Transform::Proj4::lee_os undef
-      PDL::Transform::Proj4::longlat undef
-      PDL::Transform::Proj4::lonlat undef
-      PDL::Transform::Proj4::loxim undef
-      PDL::Transform::Proj4::lsat undef
-      PDL::Transform::Proj4::mbt_fps undef
-      PDL::Transform::Proj4::mbt_s undef
-      PDL::Transform::Proj4::mbtfpp undef
-      PDL::Transform::Proj4::mbtfpq undef
-      PDL::Transform::Proj4::mbtfps undef
-      PDL::Transform::Proj4::merc undef
-      PDL::Transform::Proj4::mil_os undef
-      PDL::Transform::Proj4::mill undef
-      PDL::Transform::Proj4::moll undef
-      PDL::Transform::Proj4::murd1 undef
-      PDL::Transform::Proj4::murd2 undef
-      PDL::Transform::Proj4::murd3 undef
-      PDL::Transform::Proj4::nell undef
-      PDL::Transform::Proj4::nell_h undef
-      PDL::Transform::Proj4::nicol undef
-      PDL::Transform::Proj4::nsper undef
-      PDL::Transform::Proj4::nzmg undef
-      PDL::Transform::Proj4::ob_tran undef
-      PDL::Transform::Proj4::ocea undef
-      PDL::Transform::Proj4::oea undef
-      PDL::Transform::Proj4::omerc undef
-      PDL::Transform::Proj4::ortel undef
-      PDL::Transform::Proj4::ortho undef
-      PDL::Transform::Proj4::pconic undef
-      PDL::Transform::Proj4::poly undef
-      PDL::Transform::Proj4::putp1 undef
-      PDL::Transform::Proj4::putp2 undef
-      PDL::Transform::Proj4::putp3 undef
-      PDL::Transform::Proj4::putp3p undef
-      PDL::Transform::Proj4::putp4p undef
-      PDL::Transform::Proj4::putp5 undef
-      PDL::Transform::Proj4::putp5p undef
-      PDL::Transform::Proj4::putp6 undef
-      PDL::Transform::Proj4::putp6p undef
-      PDL::Transform::Proj4::qua_aut undef
-      PDL::Transform::Proj4::robin undef
-      PDL::Transform::Proj4::rouss undef
-      PDL::Transform::Proj4::rpoly undef
-      PDL::Transform::Proj4::sinu undef
-      PDL::Transform::Proj4::somerc undef
-      PDL::Transform::Proj4::stere undef
-      PDL::Transform::Proj4::sterea undef
-      PDL::Transform::Proj4::tcc undef
-      PDL::Transform::Proj4::tcea undef
-      PDL::Transform::Proj4::tissot undef
-      PDL::Transform::Proj4::tmerc undef
-      PDL::Transform::Proj4::tpeqd undef
-      PDL::Transform::Proj4::tpers undef
-      PDL::Transform::Proj4::ups undef
-      PDL::Transform::Proj4::urm5 undef
-      PDL::Transform::Proj4::urmfps undef
-      PDL::Transform::Proj4::utm undef
-      PDL::Transform::Proj4::vandg undef
-      PDL::Transform::Proj4::vandg2 undef
-      PDL::Transform::Proj4::vandg3 undef
-      PDL::Transform::Proj4::vandg4 undef
-      PDL::Transform::Proj4::vitk1 undef
-      PDL::Transform::Proj4::wag1 undef
-      PDL::Transform::Proj4::wag2 undef
-      PDL::Transform::Proj4::wag3 undef
-      PDL::Transform::Proj4::wag4 undef
-      PDL::Transform::Proj4::wag5 undef
-      PDL::Transform::Proj4::wag6 undef
-      PDL::Transform::Proj4::wag7 undef
-      PDL::Transform::Proj4::weren undef
-      PDL::Transform::Proj4::wink1 undef
-      PDL::Transform::Proj4::wink2 undef
-      PDL::Transform::Proj4::wintri undef
-      PDL::Type undef
-      PDL::Types undef
-      PDL::Ufunc undef
-      PDL::Version 2.006
-      SymTab undef
-      XS undef
-    requirements:
-      Astro::FITS::Header 0
-      Convert::UU 0
-      Data::Dumper 2.121
-      ExtUtils::MakeMaker 6.31
-      File::Map 0.47
-      File::Spec 0.6
-      File::Temp 0
-      Filter::Simple 0.88
-      Filter::Util::Call 0
-      Inline 0.43
-      Module::Compile 0.23
-      Pod::Parser 0
-      Pod::Select 0
-      Storable 1.03
-      Text::Balanced 1.89
-  PDL-NetCDF-4.17
-    pathname: D/DH/DHUNT/PDL-NetCDF-4.17.tar.gz
-    provides:
-      PDL::NetCDF 4.17
-    requirements:
-      ExtUtils::MakeMaker 0
-      PDL 2.2
-  POE-1.354
-    pathname: R/RC/RCAPUTO/POE-1.354.tar.gz
-    provides:
-      POE 1.354
-      POE::Component 1.354
-      POE::Component::Client::TCP 1.354
-      POE::Component::Server::TCP 1.354
-      POE::Driver 1.354
-      POE::Driver::SysRW 1.354
-      POE::Filter 1.354
-      POE::Filter::Block 1.354
-      POE::Filter::Grep 1.354
-      POE::Filter::HTTPD 1.354
-      POE::Filter::Line 1.354
-      POE::Filter::Map 1.354
-      POE::Filter::RecordBlock 1.354
-      POE::Filter::Reference 1.354
-      POE::Filter::Stackable 1.354
-      POE::Filter::Stream 1.354
-      POE::Kernel 1.354
-      POE::Loop 1.354
-      POE::Loop::IO_Poll 1.354
-      POE::Loop::PerlSignals 1.354
-      POE::Loop::Select 1.354
-      POE::NFA 1.354
-      POE::Pipe 1.354
-      POE::Pipe::OneWay 1.354
-      POE::Pipe::TwoWay 1.354
-      POE::Queue 1.354
-      POE::Queue::Array 1.354
-      POE::Resource 1.354
-      POE::Resource::Aliases 1.354
-      POE::Resource::Events 1.354
-      POE::Resource::Extrefs 1.354
-      POE::Resource::FileHandles 1.354
-      POE::Resource::SIDs 1.354
-      POE::Resource::Sessions 1.354
-      POE::Resource::Signals 1.354
-      POE::Resources 1.354
-      POE::Session 1.354
-      POE::Wheel 1.354
-      POE::Wheel::Curses 1.354
-      POE::Wheel::FollowTail 1.354
-      POE::Wheel::ListenAccept 1.354
-      POE::Wheel::ReadLine 1.354
-      POE::Wheel::ReadLine::Keymap undef
-      POE::Wheel::ReadWrite 1.354
-      POE::Wheel::Run 1.354
-      POE::Wheel::SocketFactory 1.354
+      POE 1.356
+      POE::Component 1.356
+      POE::Component::Client::TCP 1.356
+      POE::Component::Server::TCP 1.356
+      POE::Driver 1.356
+      POE::Driver::SysRW 1.356
+      POE::Filter 1.356
+      POE::Filter::Block 1.356
+      POE::Filter::Grep 1.356
+      POE::Filter::HTTPD 1.356
+      POE::Filter::Line 1.356
+      POE::Filter::Map 1.356
+      POE::Filter::RecordBlock 1.356
+      POE::Filter::Reference 1.356
+      POE::Filter::Stackable 1.356
+      POE::Filter::Stream 1.356
+      POE::Kernel 1.356
+      POE::Loop 1.356
+      POE::Loop::IO_Poll 1.356
+      POE::Loop::PerlSignals 1.356
+      POE::Loop::Select 1.356
+      POE::NFA 1.356
+      POE::Pipe 1.356
+      POE::Pipe::OneWay 1.356
+      POE::Pipe::TwoWay 1.356
+      POE::Queue 1.356
+      POE::Queue::Array 1.356
+      POE::Resource 1.356
+      POE::Resource::Aliases 1.356
+      POE::Resource::Clock 1.356
+      POE::Resource::Events 1.356
+      POE::Resource::Extrefs 1.356
+      POE::Resource::FileHandles 1.356
+      POE::Resource::SIDs 1.356
+      POE::Resource::Sessions 1.356
+      POE::Resource::Signals 1.356
+      POE::Resources 1.356
+      POE::Session 1.356
+      POE::Wheel 1.356
+      POE::Wheel::Curses 1.356
+      POE::Wheel::FollowTail 1.356
+      POE::Wheel::ListenAccept 1.356
+      POE::Wheel::ReadLine 1.356
+      POE::Wheel::ReadLine::Keymap 1.356
+      POE::Wheel::ReadWrite 1.356
+      POE::Wheel::Run 1.356
+      POE::Wheel::SocketFactory 1.356
     requirements:
       Carp 0
       Errno 1.09
@@ -4536,8 +4700,9 @@ DISTRIBUTIONS
       File::Spec 0.87
       IO 1.24
       IO::Handle 1.27
+      IO::Pipely 0.005
       IO::Tty 1.08
-      POE::Test::Loops 1.351
+      POE::Test::Loops 1.352
       POSIX 1.02
       Socket 1.7
       Storable 2.16
@@ -4565,49 +4730,95 @@ DISTRIBUTIONS
       Module::Build 0.36
       POE 1.287
       Test::More 0
-  POE-Test-Loops-1.351
-    pathname: R/RC/RCAPUTO/POE-Test-Loops-1.351.tar.gz
+  POE-Test-Loops-1.353
+    pathname: R/RC/RCAPUTO/POE-Test-Loops-1.353.tar.gz
     provides:
-      DynamicStates 1.351
-      FibClient 1.351
-      FibServer 1.351
-      MappedObject 1.351
-      MappedPackage 1.351
-      MockDriver 1.351
-      My::LineFilter 1.351
-      MyObject 1.351
-      Operator 1.351
-      POE::Kernel 1.351
-      POE::MySession 1.351
-      POE::Test::DondeEstan 1.351
-      POE::Test::Loops 1.351
-      PoeTestWorker 1.351
-      Switch 1.351
-      UnmappedObject 1.351
-      UnmappedPackage 1.351
+      DynamicStates 1.353
+      FibClient 1.353
+      FibServer 1.353
+      MappedObject 1.353
+      MappedPackage 1.353
+      MockDriver 1.353
+      My::LineFilter 1.353
+      MyObject 1.353
+      Operator 1.353
+      POE::Kernel 1.353
+      POE::MySession 1.353
+      POE::Test::DondeEstan 1.353
+      POE::Test::Loops 1.353
+      PoeTestWorker 1.353
+      Switch 1.353
+      UnmappedObject 1.353
+      UnmappedPackage 1.353
     requirements:
       ExtUtils::MakeMaker 6.30
-      Test::More 0.94
   Package-DeprecationManager-0.13
     pathname: D/DR/DROLSKY/Package-DeprecationManager-0.13.tar.gz
     provides:
       Package::DeprecationManager 0.13
     requirements:
+      Carp 0
+      ExtUtils::MakeMaker 6.30
+      List::MoreUtils 0
+      Params::Util 0
+      Sub::Install 0
+      Test::Fatal 0
+      Test::More 0.88
+      Test::Requires 0
+      strict 0
+      warnings 0
   Package-Stash-0.34
     pathname: D/DO/DOY/Package-Stash-0.34.tar.gz
     provides:
+      CompileTime undef
       Package::Stash 0.34
       Package::Stash::PP 0.34
+      inc::DistMeta undef
+      inc::MMPackageStash undef
     requirements:
+      B 0
+      Carp 0
+      Dist::CheckConflicts 0.02
+      ExtUtils::MakeMaker 6.30
+      File::Find 0
+      File::Temp 0
+      Module::Implementation 0.06
+      Package::DeprecationManager 0
+      Package::Stash::XS 0.26
+      Scalar::Util 0
+      Symbol 0
+      Test::Fatal 0
+      Test::More 0.88
+      Test::Requires 0
+      base 0
+      constant 0
+      strict 0
+      warnings 0
   Package-Stash-XS-0.26
     pathname: D/DO/DOY/Package-Stash-XS-0.26.tar.gz
     provides:
+      CompileTime undef
       Package::Stash::XS 0.26
     requirements:
+      B 0
+      ExtUtils::MakeMaker 6.30
+      File::Find 0
+      File::Temp 0
+      Scalar::Util 0
+      Symbol 0
+      Test::Fatal 0
+      Test::More 0.88
+      Test::Requires 0
+      XSLoader 0
+      base 0
+      constant 0
+      strict 0
+      warnings 0
   Package-Variant-1.001002
     pathname: P/PH/PHAYLON/Package-Variant-1.001002.tar.gz
     provides:
       Package::Variant 1.001002
+      string 1.001002
     requirements:
       Carp 0
       ExtUtils::MakeMaker 6.55_01
@@ -4620,6 +4831,8 @@ DISTRIBUTIONS
     provides:
       PadWalker 1.96
     requirements:
+      ExtUtils::MakeMaker 0
+      perl 5.008001
   Params-Util-1.07
     pathname: A/AD/ADAMK/Params-Util-1.07.tar.gz
     provides:
@@ -4635,10 +4848,23 @@ DISTRIBUTIONS
     pathname: D/DR/DROLSKY/Params-Validate-1.07.tar.gz
     provides:
       Attribute::Params::Validate 1.07
+      Bar undef
+      Baz undef
+      Foo undef
+      PVTests undef
+      PVTests::Callbacks undef
+      PVTests::Defaults undef
+      PVTests::Regex undef
+      PVTests::Standard undef
+      PVTests::With undef
       Params::Validate 1.07
       Params::Validate::Constants 1.07
       Params::Validate::PP 1.07
       Params::Validate::XS 1.07
+      Quux undef
+      Testing::X undef
+      Yadda undef
+      inc::MyModuleBuild undef
     requirements:
       Attribute::Handlers 0.79
       Carp 0
@@ -4662,37 +4888,22 @@ DISTRIBUTIONS
       strict 0
       vars 0
       warnings 0
-  Parse-CPAN-Meta-1.4404
-    pathname: D/DA/DAGOLDEN/Parse-CPAN-Meta-1.4404.tar.gz
+  Parse-CPAN-Meta-1.4409
+    pathname: D/DA/DAGOLDEN/Parse-CPAN-Meta-1.4409.tar.gz
     provides:
-      Parse::CPAN::Meta 1.4404
+      Parse::CPAN::Meta 1.4409
     requirements:
       CPAN::Meta::YAML 0.008
-      ExtUtils::MakeMaker 0
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.30
       File::Spec 0.80
       JSON::PP 2.27200
-      Test::More 0.47
+      strict 0
   Parse-RecDescent-1.967009
     pathname: J/JT/JTBRAUN/Parse-RecDescent-1.967009.tar.gz
     provides:
       Parse::RecDescent 1.967009
-      Parse::RecDescent::Action undef
-      Parse::RecDescent::ColCounter undef
-      Parse::RecDescent::Directive undef
-      Parse::RecDescent::Error undef
-      Parse::RecDescent::Expectation undef
-      Parse::RecDescent::InterpLit undef
-      Parse::RecDescent::LineCounter undef
-      Parse::RecDescent::Literal undef
-      Parse::RecDescent::OffsetCounter undef
-      Parse::RecDescent::Operator undef
-      Parse::RecDescent::Production undef
-      Parse::RecDescent::Repetition undef
-      Parse::RecDescent::Result undef
-      Parse::RecDescent::Rule undef
-      Parse::RecDescent::Subrule undef
-      Parse::RecDescent::Token undef
-      Parse::RecDescent::UncondReject undef
     requirements:
       ExtUtils::MakeMaker 6.5702
       Test::More 0
@@ -4723,33 +4934,6 @@ DISTRIBUTIONS
       overload 0
       strict 0
       warnings 0
-  Path-Tiny-0.010
-    pathname: D/DA/DAGOLDEN/Path-Tiny-0.010.tar.gz
-    provides:
-      Path::Tiny 0.010
-    requirements:
-      Cwd 0
-      Devel::Hide 0
-      Exporter 0
-      ExtUtils::MakeMaker 6.30
-      Fcntl 0
-      File::Copy 0
-      File::Find 0
-      File::Path 2.07
-      File::Spec 3.40
-      File::Spec::Functions 0
-      File::Spec::Unix 0
-      File::Temp 0.18
-      File::stat 0
-      List::Util 0
-      Test::Deep 0
-      Test::Fatal 0
-      Test::More 0.96
-      autodie 2.00
-      constant 0
-      overload 0
-      strict 0
-      warnings 0
   PathTools-3.40
     pathname: S/SM/SMUELLER/PathTools-3.40.tar.gz
     provides:
@@ -4769,15 +4953,15 @@ DISTRIBUTIONS
       File::Basename 0
       Scalar::Util 0
       Test 0
-  Perl6-Junction-1.50000
-    pathname: C/CF/CFRANKS/Perl6-Junction-1.50000.tar.gz
+  Perl6-Junction-1.60000
+    pathname: C/CF/CFRANKS/Perl6-Junction-1.60000.tar.gz
     provides:
-      Perl6::Junction 1.50000
-      Perl6::Junction::All 1.50000
-      Perl6::Junction::Any 1.50000
-      Perl6::Junction::Base 1.50000
-      Perl6::Junction::None 1.50000
-      Perl6::Junction::One 1.50000
+      Perl6::Junction 1.60000
+      Perl6::Junction::All 1.60000
+      Perl6::Junction::Any 1.60000
+      Perl6::Junction::Base 1.60000
+      Perl6::Junction::None 1.60000
+      Perl6::Junction::One 1.60000
     requirements:
       Carp 0
       ExtUtils::MakeMaker 0
@@ -4928,17 +5112,17 @@ DISTRIBUTIONS
     pathname: R/RO/ROODE/Readonly-1.03.tar.gz
     provides:
       Readonly 1.03
-      Readonly::Array undef
-      Readonly::Hash undef
-      Readonly::Scalar undef
+      Readonly::Array 1.03
+      Readonly::Hash 1.03
+      Readonly::Scalar 1.03
     requirements:
       ExtUtils::MakeMaker 0
-  Regexp-Common-2011121001
-    pathname: A/AB/ABIGAIL/Regexp-Common-2011121001.tar.gz
+  Regexp-Common-2013031301
+    pathname: A/AB/ABIGAIL/Regexp-Common-2013031301.tar.gz
     provides:
-      Regexp::Common 2011121001
+      Regexp::Common 2013031301
       Regexp::Common::CC 2010010201
-      Regexp::Common::Entry undef
+      Regexp::Common::Entry 2013031301
       Regexp::Common::SEN 2010010201
       Regexp::Common::URI 2010010201
       Regexp::Common::URI::RFC1035 2010010201
@@ -4959,13 +5143,14 @@ DISTRIBUTIONS
       Regexp::Common::URI::telnet 2010010201
       Regexp::Common::URI::tv 2010010201
       Regexp::Common::URI::wais 2010010201
-      Regexp::Common::balanced 2010010201
+      Regexp::Common::_support 2010010201
+      Regexp::Common::balanced 2013030901
       Regexp::Common::comment 2010010201
       Regexp::Common::delimited 2010010201
       Regexp::Common::lingua 2010010201
       Regexp::Common::list 2010010201
-      Regexp::Common::net 2010010201
-      Regexp::Common::number 2010010201
+      Regexp::Common::net 2013031301
+      Regexp::Common::number 2013031101
       Regexp::Common::profanity 2010010201
       Regexp::Common::whitespace 2010010201
       Regexp::Common::zip 2010010201
@@ -5081,7 +5266,7 @@ DISTRIBUTIONS
       SQL::Translator::Schema::View 1.59
       SQL::Translator::Types undef
       SQL::Translator::Utils 1.59
-      SQL::Translator::Utils::Error undef
+      SQL::Translator::Utils::Error 1.59
       Test::SQL::Translator 1.59
     requirements:
       Carp::Clan 0
@@ -5131,16 +5316,17 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       Test::More 0
       Time::Local 0
-  Set-Object-1.29
-    pathname: S/SA/SAMV/Set-Object-1.29.tar.gz
+  Set-Object-1.31
+    pathname: R/RU/RURBAN/Set-Object-1.31.tar.gz
     provides:
-      Set::Object 1.29
-      Set::Object::TieArray undef
-      Set::Object::TieHash undef
+      Set::Object 1.31
+      Set::Object::TieArray 1.31
+      Set::Object::TieHash 1.31
       Set::Object::Weak undef
     requirements:
       ExtUtils::MakeMaker 0
       Scalar::Util 0
+      Test::More 0
   Socket6-0.23
     pathname: U/UM/UMEMOTO/Socket6-0.23.tar.gz
     provides:
@@ -5190,7 +5376,26 @@ DISTRIBUTIONS
     provides:
       Sub::Exporter 0.984
       Sub::Exporter::Util 0.984
+      Test::SubExporter::DashSetup undef
+      Test::SubExporter::Faux undef
+      Test::SubExporter::GroupGen undef
+      Test::SubExporter::GroupGenSubclass undef
+      Test::SubExporter::ObjGen undef
+      Test::SubExporter::ObjGen::Obj undef
+      Test::SubExporter::s_e undef
     requirements:
+      Carp 0
+      Data::OptList 0.100
+      Exporter 0
+      ExtUtils::MakeMaker 6.30
+      Params::Util 0.14
+      Sub::Install 0.92
+      Test::More 0.96
+      base 0
+      overload 0
+      strict 0
+      subs 0
+      warnings 0
   Sub-Exporter-Progressive-0.001008
     pathname: L/LE/LEONT/Sub-Exporter-Progressive-0.001008.tar.gz
     provides:
@@ -5218,11 +5423,25 @@ DISTRIBUTIONS
     provides:
       Sub::Uplevel 0.24
     requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.30
+      File::Find 0
+      File::Temp 0
+      Test::More 0
+      constant 0
+      strict 0
+      warnings 0
   Task-Weaken-1.04
     pathname: A/AD/ADAMK/Task-Weaken-1.04.tar.gz
     provides:
       Task::Weaken 1.04
     requirements:
+      ExtUtils::MakeMaker 6.42
+      File::Spec 0.80
+      Scalar::Util 1.14
+      Test::More 0.42
+      perl 5.005
   Template-Timer-1.00
     pathname: P/PE/PETDANCE/Template-Timer-1.00.tar.gz
     provides:
@@ -5246,18 +5465,18 @@ DISTRIBUTIONS
       Template::Filters 2.87
       Template::Grammar 2.25
       Template::Iterator 2.68
-      Template::Monad::Assert undef
-      Template::Monad::Scalar undef
+      Template::Monad::Assert 1
+      Template::Monad::Scalar 1
       Template::Namespace::Constants 1.27
       Template::Parser 2.89
-      Template::Perl undef
+      Template::Perl 2.2
       Template::Plugin 2.7
       Template::Plugin::Assert 1
       Template::Plugin::CGI 2.7
       Template::Plugin::Datafile 2.72
       Template::Plugin::Date 2.78
-      Template::Plugin::Date::Calc undef
-      Template::Plugin::Date::Manip undef
+      Template::Plugin::Date::Calc 2.78
+      Template::Plugin::Date::Manip 2.78
       Template::Plugin::Directory 2.7
       Template::Plugin::Dumper 2.7
       Template::Plugin::File 2.71
@@ -5282,21 +5501,30 @@ DISTRIBUTIONS
       Template::Stash::Context 1.63
       Template::Stash::XS undef
       Template::Test 2.75
-      Template::TieString undef
+      Template::TieString 2.75
       Template::VMethods 2.16
       Template::View 2.91
-      bytes undef
+      bytes 2.94
     requirements:
       AppConfig 1.56
       ExtUtils::MakeMaker 0
       File::Spec 0.8
       File::Temp 0.12
       Scalar::Util 0
-  Test-CheckDeps-0.002
-    pathname: L/LE/LEONT/Test-CheckDeps-0.002.tar.gz
+  Test-CheckDeps-0.007
+    pathname: L/LE/LEONT/Test-CheckDeps-0.007.tar.gz
     provides:
-      Test::CheckDeps 0.002
+      Test::CheckDeps 0.007
     requirements:
+      CPAN::Meta 2.120920
+      CPAN::Meta::Check 0.007
+      Exporter 5.57
+      List::Util 0
+      Module::Build::Tiny 0.027
+      Test::Builder 0
+      perl 5.006
+      strict 0
+      warnings 0
   Test-Deep-0.110
     pathname: R/RJ/RJBS/Test-Deep-0.110.tar.gz
     provides:
@@ -5381,17 +5609,16 @@ DISTRIBUTIONS
     provides:
       Test::Fatal 0.010
     requirements:
-  Test-Files-0.14
-    pathname: P/PH/PHILCROW/Test-Files-0.14.tar.gz
-    provides:
-      Test::Files 0.14
-    requirements:
-      Algorithm::Diff 0
-      ExtUtils::MakeMaker 0
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 6.30
       Test::Builder 0
       Test::Builder::Tester 0
-      Test::More 0
-      Text::Diff 0
+      Test::More 0.47
+      Try::Tiny 0.07
+      overload 0
+      strict 0
+      warnings 0
   Test-LongString-0.15
     pathname: R/RG/RGARCIA/Test-LongString-0.15.tar.gz
     provides:
@@ -5405,6 +5632,14 @@ DISTRIBUTIONS
     provides:
       Test::Memory::Cycle 1.04
     requirements:
+      Devel::Cycle 1.07
+      ExtUtils::MakeMaker 0
+      Getopt::Long 0
+      PadWalker 0
+      Test::Builder 0
+      Test::Builder::Tester 0
+      Test::More 0
+      Test::Simple 0.62
   Test-MockObject-1.20120301
     pathname: C/CH/CHROMATIC/Test-MockObject-1.20120301.tar.gz
     provides:
@@ -5444,11 +5679,20 @@ DISTRIBUTIONS
       Test::Output 1.01
       Test::Output::Tie 1.01
     requirements:
+      ExtUtils::MakeMaker 0
+      File::Temp 0.17
+      Sub::Exporter 0
+      Test::More 0
+      Test::Tester 0.107
+      perl 5.006
   Test-Requires-0.06
     pathname: T/TO/TOKUHIROM/Test-Requires-0.06.tar.gz
     provides:
       Test::Requires 0.06
     requirements:
+      ExtUtils::MakeMaker 6.42
+      Test::More 0.61
+      perl 5.006
   Test-SharedFork-0.21
     pathname: T/TO/TOKUHIROM/Test-SharedFork-0.21.tar.gz
     provides:
@@ -5477,19 +5721,23 @@ DISTRIBUTIONS
   Test-Tester-0.108
     pathname: F/FD/FDALY/Test-Tester-0.108.tar.gz
     provides:
+      MyTest undef
+      SmallTest undef
       Test::Tester 0.108
       Test::Tester::Capture undef
       Test::Tester::CaptureRunner undef
       Test::Tester::Delegate undef
     requirements:
+      ExtUtils::MakeMaker 0
+      Test::Builder 0
   Test-Trap-v0.2.2
     pathname: E/EB/EBHANSSEN/Test-Trap-v0.2.2.tar.gz
     provides:
-      Test::Trap v0.2.2
-      Test::Trap::Builder v0.2.2
-      Test::Trap::Builder::PerlIO v0.2.2
-      Test::Trap::Builder::SystemSafe v0.2.2
-      Test::Trap::Builder::TempFile v0.2.2
+      Test::Trap 0.002002
+      Test::Trap::Builder 0.002002
+      Test::Trap::Builder::PerlIO 0.002002
+      Test::Trap::Builder::SystemSafe 0.002002
+      Test::Trap::Builder::TempFile 0.002002
     requirements:
       Carp 0
       Data::Dump 0
@@ -5556,8 +5804,8 @@ DISTRIBUTIONS
     pathname: C/CH/CHORNY/Test-Warn-0.24.tar.gz
     provides:
       Test::Warn 0.24
-      Test::Warn::Categorization undef
-      Test::Warn::DAG_Node_Tree undef
+      Test::Warn::Categorization 0.24
+      Test::Warn::DAG_Node_Tree 0.24
     requirements:
       Carp 1.22
       ExtUtils::MakeMaker 0
@@ -5568,18 +5816,6 @@ DISTRIBUTIONS
       Test::More 0
       Tree::DAG_Node 1.02
       perl 5.006
-  Test-Warnings-0.009
-    pathname: E/ET/ETHER/Test-Warnings-0.009.tar.gz
-    provides:
-      Test::Warnings 0.009
-    requirements:
-      Exporter 0
-      Module::Build::Tiny 0.027
-      Test::Builder 0
-      parent 0
-      perl 5.006
-      strict 0
-      warnings 0
   Test-use-ok-0.11
     pathname: A/AU/AUDREYT/Test-use-ok-0.11.tar.gz
     provides:
@@ -5601,10 +5837,13 @@ DISTRIBUTIONS
     pathname: O/OV/OVID/Text-Diff-1.41.tar.gz
     provides:
       Text::Diff 1.41
-      Text::Diff::Base undef
+      Text::Diff::Base 1.41
       Text::Diff::Config 1.41
       Text::Diff::Table 1.41
     requirements:
+      Algorithm::Diff 1.19
+      Exporter 0
+      ExtUtils::MakeMaker 0
   Text-Glob-0.09
     pathname: R/RC/RCLAMP/Text-Glob-0.09.tar.gz
     provides:
@@ -5635,12 +5874,13 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 6.42
       Storable 0
       Test::More 0.88
-  Tie-IxHash-1.22
-    pathname: C/CH/CHORNY/Tie-IxHash-1.22.tar.gz
+  Tie-IxHash-1.23
+    pathname: C/CH/CHORNY/Tie-IxHash-1.23.tar.gz
     provides:
-      Tie::IxHash 1.22
+      Tie::IxHash 1.23
     requirements:
-      perl 5.003
+      Test::More 0
+      perl 5.005
   Tie-ToObject-0.03
     pathname: N/NU/NUFFIN/Tie-ToObject-0.03.tar.gz
     provides:
@@ -5655,7 +5895,7 @@ DISTRIBUTIONS
     pathname: G/GB/GBARR/TimeDate-2.30.tar.gz
     provides:
       Date::Format 2.24
-      Date::Format::Generic undef
+      Date::Format::Generic 2.24
       Date::Language 1.10
       Date::Language::Afar 0.99
       Date::Language::Amharic 1.00
@@ -5693,6 +5933,7 @@ DISTRIBUTIONS
       Date::Parse 2.30
       Time::Zone 2.24
     requirements:
+      ExtUtils::MakeMaker 0
   Tree-DAG_Node-1.11
     pathname: R/RS/RSAVAGE/Tree-DAG_Node-1.11.tgz
     provides:
@@ -5745,9 +5986,12 @@ DISTRIBUTIONS
     provides:
       Try::Tiny 0.12
     requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0
   UNIVERSAL-can-1.20120726
     pathname: C/CH/CHROMATIC/UNIVERSAL-can-1.20120726.tar.gz
     provides:
+      Test::SmallWarn undef
       UNIVERSAL::can 1.20120726
     requirements:
       ExtUtils::MakeMaker 6.30
@@ -5776,7 +6020,7 @@ DISTRIBUTIONS
   UNIVERSAL-require-0.13
     pathname: M/MS/MSCHWERN/UNIVERSAL-require-0.13.tar.gz
     provides:
-      UNIVERSAL undef
+      UNIVERSAL 0.13
       UNIVERSAL::require 0.13
     requirements:
       ExtUtils::MakeMaker 0
@@ -5792,6 +6036,16 @@ DISTRIBUTIONS
       URI::Split undef
       URI::URL 5.04
       URI::WithBase 2.20
+      URI::_foreign undef
+      URI::_generic undef
+      URI::_idna undef
+      URI::_ldap 1.12
+      URI::_login undef
+      URI::_punycode 0.04
+      URI::_query undef
+      URI::_segment undef
+      URI::_server undef
+      URI::_userpass undef
       URI::data undef
       URI::file 4.21
       URI::file::Base undef
@@ -5843,24 +6097,6 @@ DISTRIBUTIONS
       URI 1.00
       URI::URL 5.00
       perl v5.6.0
-  URI-SmartURI-0.032
-    pathname: R/RK/RKITOVER/URI-SmartURI-0.032.tar.gz
-    provides:
-      URI::SmartURI 0.032
-    requirements:
-      Class::C3::Componentised 0
-      ExtUtils::MakeMaker 6.59
-      File::Find::Rule 0
-      List::MoreUtils 0
-      List::Util 0
-      Moose 0
-      Scalar::Util 0
-      Test::Fatal 0
-      Test::More 0.94
-      Test::NoWarnings 0
-      URI 1.51
-      namespace::clean 0
-      perl 5.008001
   Variable-Magic-0.52
     pathname: V/VP/VPIT/Variable-Magic-0.52.tar.gz
     provides:
@@ -5874,10 +6110,10 @@ DISTRIBUTIONS
       XSLoader 0
       base 0
       perl 5.008
-  WWW-Mechanize-1.72
-    pathname: J/JE/JESSE/WWW-Mechanize-1.72.tar.gz
+  WWW-Mechanize-1.73
+    pathname: E/ET/ETHER/WWW-Mechanize-1.73.tar.gz
     provides:
-      WWW::Mechanize 1.72
+      WWW::Mechanize 1.73
       WWW::Mechanize::Image undef
       WWW::Mechanize::Link undef
     requirements:
@@ -5910,7 +6146,7 @@ DISTRIBUTIONS
     provides:
       WWW::RobotRules 6.02
       WWW::RobotRules::AnyDBM_File 6.00
-      WWW::RobotRules::InCore undef
+      WWW::RobotRules::InCore 6.02
     requirements:
       AnyDBM_File 0
       ExtUtils::MakeMaker 0
@@ -5930,40 +6166,41 @@ DISTRIBUTIONS
     pathname: S/SH/SHLOMIF/XML-LibXML-2.0014.tar.gz
     provides:
       XML::LibXML 2.0014
-      XML::LibXML::Attr undef
+      XML::LibXML::Attr 2.0014
       XML::LibXML::AttributeHash 2.0014
       XML::LibXML::Boolean 2.0014
-      XML::LibXML::CDATASection undef
-      XML::LibXML::Comment undef
+      XML::LibXML::CDATASection 2.0014
+      XML::LibXML::Comment 2.0014
       XML::LibXML::Common 2.0014
       XML::LibXML::Devel 2.0014
-      XML::LibXML::Document undef
-      XML::LibXML::DocumentFragment undef
-      XML::LibXML::Dtd undef
-      XML::LibXML::Element undef
+      XML::LibXML::Document 2.0014
+      XML::LibXML::DocumentFragment 2.0014
+      XML::LibXML::Dtd 2.0014
+      XML::LibXML::Element 2.0014
       XML::LibXML::ErrNo 2.0014
       XML::LibXML::Error 2.0014
-      XML::LibXML::InputCallback undef
+      XML::LibXML::InputCallback 2.0014
       XML::LibXML::Literal 2.0014
-      XML::LibXML::NamedNodeMap undef
-      XML::LibXML::Namespace undef
-      XML::LibXML::Node undef
+      XML::LibXML::NamedNodeMap 2.0014
+      XML::LibXML::Namespace 2.0014
+      XML::LibXML::Node 2.0014
       XML::LibXML::NodeList 2.0014
       XML::LibXML::Number 2.0014
-      XML::LibXML::PI undef
-      XML::LibXML::Pattern undef
+      XML::LibXML::PI 2.0014
+      XML::LibXML::Pattern 2.0014
       XML::LibXML::Reader 2.0014
-      XML::LibXML::RegExp undef
-      XML::LibXML::RelaxNG undef
+      XML::LibXML::RegExp 2.0014
+      XML::LibXML::RelaxNG 2.0014
       XML::LibXML::SAX 2.0014
-      XML::LibXML::SAX::AttributeNode undef
+      XML::LibXML::SAX::AttributeNode 2.0014
       XML::LibXML::SAX::Builder 2.0014
       XML::LibXML::SAX::Generator 2.0014
       XML::LibXML::SAX::Parser 2.0014
-      XML::LibXML::Schema undef
-      XML::LibXML::Text undef
+      XML::LibXML::Schema 2.0014
+      XML::LibXML::Text 2.0014
       XML::LibXML::XPathContext 2.0014
-      XML::LibXML::XPathExpression undef
+      XML::LibXML::XPathExpression 2.0014
+      XML::LibXML::_SAXParser 2.0014
     requirements:
       ExtUtils::MakeMaker 6.56
       Test::More 0
@@ -5976,9 +6213,13 @@ DISTRIBUTIONS
   XML-LibXSLT-1.80
     pathname: S/SH/SHLOMIF/XML-LibXSLT-1.80.tar.gz
     provides:
+      Driver::BaseClass undef
+      Driver::LibXSLT undef
+      Driver::Sablotron undef
+      Driver::Sablotron::Handler undef
       XML::LibXSLT 1.80
-      XML::LibXSLT::Security undef
-      XML::LibXSLT::StylesheetWrapper undef
+      XML::LibXSLT::Security 1.80
+      XML::LibXSLT::StylesheetWrapper 1.80
     requirements:
       Encode 0
       ExtUtils::MakeMaker 0
@@ -6056,10 +6297,10 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 6.31
       Test::More 0.88
-  XML-SAX-Expat-0.40
-    pathname: B/BJ/BJOERN/XML-SAX-Expat-0.40.tar.gz
+  XML-SAX-Expat-0.50
+    pathname: B/BJ/BJOERN/XML-SAX-Expat-0.50.tar.gz
     provides:
-      XML::SAX::Expat 0.40
+      XML::SAX::Expat 0.50
     requirements:
       ExtUtils::MakeMaker 0
       XML::NamespaceSupport 0.03
@@ -6070,14 +6311,14 @@ DISTRIBUTIONS
     pathname: P/PE/PERIGRIN/XML-SAX-Writer-0.53.tar.gz
     provides:
       XML::SAX::Writer 0.53
-      XML::SAX::Writer::ArrayConsumer undef
-      XML::SAX::Writer::CodeConsumer undef
-      XML::SAX::Writer::ConsumerInterface undef
-      XML::SAX::Writer::Encode undef
-      XML::SAX::Writer::FileConsumer undef
-      XML::SAX::Writer::HandleConsumer undef
-      XML::SAX::Writer::NullConverter undef
-      XML::SAX::Writer::StringConsumer undef
+      XML::SAX::Writer::ArrayConsumer 0.53
+      XML::SAX::Writer::CodeConsumer 0.53
+      XML::SAX::Writer::ConsumerInterface 0.53
+      XML::SAX::Writer::Encode 0.53
+      XML::SAX::Writer::FileConsumer 0.53
+      XML::SAX::Writer::HandleConsumer 0.53
+      XML::SAX::Writer::NullConverter 0.53
+      XML::SAX::Writer::StringConsumer 0.53
       XML::SAX::Writer::XML undef
     requirements:
       Encode 2.12
@@ -6089,6 +6330,7 @@ DISTRIBUTIONS
   XML-Simple-2.20
     pathname: G/GR/GRANTM/XML-Simple-2.20.tar.gz
     provides:
+      TagsToUpper undef
       XML::Simple 2.20
     requirements:
       ExtUtils::MakeMaker 6.31
@@ -6100,14 +6342,16 @@ DISTRIBUTIONS
     pathname: J/JO/JOSEPHW/XML-Writer-0.615.tar.gz
     provides:
       XML::Writer 0.615
-      XML::Writer::Namespaces undef
+      XML::Writer::Namespaces 0.615
+      XML::Writer::_PrintChecker 0.615
+      XML::Writer::_String 0.615
     requirements:
       ExtUtils::MakeMaker 0
   YAML-0.84
     pathname: M/MS/MSTROUT/YAML-0.84.tar.gz
     provides:
       Test::YAML 0.84
-      Test::YAML::Filter undef
+      Test::YAML::Filter 0.84
       YAML 0.84
       YAML::Any 0.84
       YAML::Dumper 0.84
@@ -6116,33 +6360,23 @@ DISTRIBUTIONS
       YAML::Loader 0.84
       YAML::Loader::Base 0.84
       YAML::Marshall 0.84
-      YAML::Mo undef
+      YAML::Mo 0.84
       YAML::Node 0.84
       YAML::Tag 0.84
-      YAML::Type::blessed undef
-      YAML::Type::code undef
-      YAML::Type::glob undef
-      YAML::Type::ref undef
-      YAML::Type::regexp undef
-      YAML::Type::undef undef
+      YAML::Type::blessed 0.84
+      YAML::Type::code 0.84
+      YAML::Type::glob 0.84
+      YAML::Type::ref 0.84
+      YAML::Type::regexp 0.84
+      YAML::Type::undef 0.84
       YAML::Types 0.84
-      YAML::Warning undef
-      yaml_mapping undef
-      yaml_scalar undef
-      yaml_sequence undef
+      YAML::Warning 0.84
+      yaml_mapping 0.84
+      yaml_scalar 0.84
+      yaml_sequence 0.84
     requirements:
       ExtUtils::MakeMaker 6.59
       perl 5.008001
-  YAML-Syck-1.22
-    pathname: T/TO/TODDR/YAML-Syck-1.22.tar.gz
-    provides:
-      JSON::Syck 1.22
-      YAML::Dumper::Syck undef
-      YAML::Loader::Syck undef
-      YAML::Syck 1.22
-    requirements:
-      ExtUtils::MakeMaker 6.59
-      perl 5.006
   YAML-Tiny-1.51
     pathname: A/AD/ADAMK/YAML-Tiny-1.51.tar.gz
     provides:
@@ -6159,10 +6393,18 @@ DISTRIBUTIONS
     requirements:
       Module::Build 0.40
       Test::More 0
-  common-sense-3.6
-    pathname: M/ML/MLEHMANN/common-sense-3.6.tar.gz
+  base-2.18
+    pathname: R/RG/RGARCIA/base-2.18.tar.gz
     provides:
-      common::sense 3.6
+      base 2.18
+      fields 2.16
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0.4
+  common-sense-3.72
+    pathname: M/ML/MLEHMANN/common-sense-3.72.tar.gz
+    provides:
+      common::sense 3.72
     requirements:
       ExtUtils::MakeMaker 0
   libwww-perl-6.04
@@ -6220,11 +6462,11 @@ DISTRIBUTIONS
       URI::Escape 0
       WWW::RobotRules 6
       perl 5.008001
-  local-lib-1.008011
-    pathname: E/ET/ETHER/local-lib-1.008011.tar.gz
+  local-lib-1.008018
+    pathname: E/ET/ETHER/local-lib-1.008018.tar.gz
     provides:
       lib::core::only undef
-      local::lib 1.008011
+      local::lib 1.008018
     requirements:
       ExtUtils::Install 1.43
       ExtUtils::MakeMaker 6.59
@@ -6254,59 +6496,73 @@ DISTRIBUTIONS
       ExtUtils::CBuilder 0.27
       Package::Stash 0.23
       Test::More 0.88
-  perl-ldap-0.53
-    pathname: M/MA/MARSCHAP/perl-ldap-0.53.tar.gz
+  perl-ldap-0.57
+    pathname: M/MA/MARSCHAP/perl-ldap-0.57.tar.gz
     provides:
       Bundle::Net::LDAP 0.03
-      LWP::Protocol::ldap 1.23
+      LWP::Protocol::ldap 1.24
       LWP::Protocol::ldapi undef
       LWP::Protocol::ldaps undef
-      Net::LDAP 0.53
+      Module::AutoInstall 1.03
+      Module::Install 0.95
+      Module::Install::AutoInstall 0.95
+      Module::Install::Base 0.95
+      Module::Install::Base::FakeAdmin 0.95
+      Module::Install::Can 0.95
+      Module::Install::Fetch 0.95
+      Module::Install::Include 0.95
+      Module::Install::Makefile 0.95
+      Module::Install::Metadata 0.95
+      Module::Install::Win32 0.95
+      Module::Install::WriteAll 0.95
+      Net::LDAP 0.57
       Net::LDAP::ASN 0.11
       Net::LDAP::Bind 1.04
-      Net::LDAP::Constant 0.18
-      Net::LDAP::Control 0.13
+      Net::LDAP::Constant 0.21
+      Net::LDAP::Control 0.15
       Net::LDAP::Control::Assertion 0.02
       Net::LDAP::Control::EntryChange 0.02
-      Net::LDAP::Control::ManageDsaIT 0.02
+      Net::LDAP::Control::ManageDsaIT 0.03
       Net::LDAP::Control::MatchedValues 0.02
       Net::LDAP::Control::Paged 0.03
-      Net::LDAP::Control::PasswordPolicy 0.03
-      Net::LDAP::Control::PersistentSearch 0.02
-      Net::LDAP::Control::PostRead 0.02
-      Net::LDAP::Control::PreRead 0.03
+      Net::LDAP::Control::PasswordPolicy 0.04
+      Net::LDAP::Control::PersistentSearch 0.04
+      Net::LDAP::Control::PostRead 0.03
+      Net::LDAP::Control::PreRead 0.04
       Net::LDAP::Control::ProxyAuth 1.07
-      Net::LDAP::Control::Sort 0.03
-      Net::LDAP::Control::SortResult 0.02
+      Net::LDAP::Control::Relax 0.02
+      Net::LDAP::Control::Sort 0.04
+      Net::LDAP::Control::SortResult 0.03
       Net::LDAP::Control::SyncDone 0.03
       Net::LDAP::Control::SyncRequest 0.03
-      Net::LDAP::Control::SyncState 0.03
-      Net::LDAP::Control::VLV 0.04
+      Net::LDAP::Control::SyncState 0.04
+      Net::LDAP::Control::VLV 0.05
       Net::LDAP::Control::VLVResponse 0.04
-      Net::LDAP::DSML 0.14
-      Net::LDAP::DSML::output undef
-      Net::LDAP::DSML::pp undef
-      Net::LDAP::Entry 0.25
+      Net::LDAP::DSML 0.15
+      Net::LDAP::DSML::output 0.15
+      Net::LDAP::DSML::pp 0.15
+      Net::LDAP::Entry 0.26
       Net::LDAP::Extension 1.03
       Net::LDAP::Extension::Cancel 0.02
       Net::LDAP::Extension::Refresh 0.03
-      Net::LDAP::Extension::SetPassword 0.05
+      Net::LDAP::Extension::SetPassword 0.06
       Net::LDAP::Extension::WhoAmI 0.02
       Net::LDAP::Extra 0.02
       Net::LDAP::Extra::AD 0.03
+      Net::LDAP::Extra::eDirectory 0.03
       Net::LDAP::Filter 0.19
-      Net::LDAP::FilterList 0.03
+      Net::LDAP::FilterList 0.02
       Net::LDAP::FilterMatch 0.27
-      Net::LDAP::Intermediate 0.03
+      Net::LDAP::Intermediate 0.04
       Net::LDAP::Intermediate::SyncInfo 0.03
-      Net::LDAP::LDIF 0.19
+      Net::LDAP::LDIF 0.21
       Net::LDAP::Message 1.12
-      Net::LDAP::Message::Dummy undef
-      Net::LDAP::Reference undef
+      Net::LDAP::Message::Dummy 1.12
+      Net::LDAP::Reference 0.14
       Net::LDAP::RootDSE 0.02
-      Net::LDAP::Schema 0.9906
+      Net::LDAP::Schema 0.9907
       Net::LDAP::Search 0.14
-      Net::LDAP::Util 0.15
+      Net::LDAP::Util 0.17
       Net::LDAPI 0.04
       Net::LDAPS 0.06
     requirements:
@@ -6328,6 +6584,7 @@ DISTRIBUTIONS
       LWP::Protocol 0
       MIME::Base64 0
       Test::More 0
+      Time::Local 0
       URI::ldap 1.1
       XML::SAX::Base 0
       XML::SAX::Writer 0
