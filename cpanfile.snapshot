@@ -290,20 +290,6 @@ DISTRIBUTIONS
       Try::Tiny 0
       namespace::autoclean 0
       perl 5.008001
-  Catalyst-Authentication-Store-LDAP-1.014
-    pathname: B/BO/BOBTFISH/Catalyst-Authentication-Store-LDAP-1.014.tar.gz
-    provides:
-      Catalyst::Authentication::Store::LDAP 1.014
-      Catalyst::Authentication::Store::LDAP::Backend 1.014
-      Catalyst::Authentication::Store::LDAP::User 1.014
-    requirements:
-      Catalyst::Plugin::Authentication 0.10003
-      ExtUtils::MakeMaker 6.36
-      Net::LDAP 0
-      Net::LDAP::Server::Test 0.07
-      Test::Exception 0
-      Test::MockObject 0
-      Test::More 0.88
   Catalyst-Component-InstancePerContext-0.001001
     pathname: G/GR/GRODITI/Catalyst-Component-InstancePerContext-0.001001.tar.gz
     provides:
@@ -424,7 +410,6 @@ DISTRIBUTIONS
     requirements:
       Carp::Clan 0
       Catalyst::Component::InstancePerContext 0
-      Catalyst::Devel 1.0
       Catalyst::Runtime 5.80005
       CatalystX::Component::Traits 0.14
       DBD::SQLite 0
@@ -3502,34 +3487,6 @@ DISTRIBUTIONS
       base 2.18
       strict 0
       warnings 0
-  IO-Socket-INET6-2.71
-    pathname: S/SH/SHLOMIF/IO-Socket-INET6-2.71.tar.gz
-    provides:
-      IO::Socket::INET6 2.71
-    requirements:
-      Carp 0
-      Errno 0
-      Exporter 0
-      IO::Socket 0
-      Module::Build 0.36
-      Socket 0
-      Socket6 0.12
-      Test::More 0
-      strict 0
-      warnings 0
-  IO-Socket-SSL-1.954
-    pathname: S/SU/SULLR/IO-Socket-SSL-1.954.tar.gz
-    provides:
-      IO::Socket::SSL 1.954
-      IO::Socket::SSL::Intercept 1.93
-      IO::Socket::SSL::SSL_Context 1.954
-      IO::Socket::SSL::SSL_HANDLE 1.954
-      IO::Socket::SSL::Session_Cache 1.954
-      IO::Socket::SSL::Utils 0.01
-    requirements:
-      ExtUtils::MakeMaker 0
-      Net::SSLeay 1.46
-      Scalar::Util 0
   IO-Tty-1.10
     pathname: T/TO/TODDR/IO-Tty-1.10.tar.gz
     provides:
@@ -4551,38 +4508,6 @@ DISTRIBUTIONS
       IO::Select 0
       IO::Socket::INET 0
       perl 5.006002
-  Net-LDAP-Server-0.43
-    pathname: A/AA/AAR/Net-LDAP-Server-0.43.tar.gz
-    provides:
-      MyDemoServer undef
-      Net::LDAP::Server 0.43
-    requirements:
-      Convert::ASN1 0
-      ExtUtils::MakeMaker 0
-      Net::LDAP 0
-  Net-LDAP-Server-Test-0.19
-    pathname: K/KA/KARMAN/Net-LDAP-Server-Test-0.19.tar.gz
-    provides:
-      Net::LDAP::Server::Test 0.19
-    requirements:
-      Data::Dump 0
-      ExtUtils::MakeMaker 0
-      IO::Select 0
-      IO::Socket 0
-      Net::LDAP 0
-      Net::LDAP::Server 0.3
-      Test::More 0
-      perl 5.008003
-  Net-SSLeay-1.55
-    pathname: M/MI/MIKEM/Net-SSLeay-1.55.tar.gz
-    provides:
-      Net::SSLeay 1.55
-      Net::SSLeay::Handle 0.61
-    requirements:
-      ExtUtils::MakeMaker 6.36
-      MIME::Base64 0
-      Test::More 0.60_01
-      perl 5.005
   Net-Server-2.007
     pathname: R/RH/RHANDOM/Net-Server-2.007.tar.gz
     provides:
@@ -5327,12 +5252,6 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       Scalar::Util 0
       Test::More 0
-  Socket6-0.23
-    pathname: U/UM/UMEMOTO/Socket6-0.23.tar.gz
-    provides:
-      Socket6 0.23
-    requirements:
-      ExtUtils::MakeMaker 0
   Starman-0.3006
     pathname: M/MI/MIYAGAWA/Starman-0.3006.tar.gz
     provides:
@@ -6496,99 +6415,6 @@ DISTRIBUTIONS
       ExtUtils::CBuilder 0.27
       Package::Stash 0.23
       Test::More 0.88
-  perl-ldap-0.57
-    pathname: M/MA/MARSCHAP/perl-ldap-0.57.tar.gz
-    provides:
-      Bundle::Net::LDAP 0.03
-      LWP::Protocol::ldap 1.24
-      LWP::Protocol::ldapi undef
-      LWP::Protocol::ldaps undef
-      Module::AutoInstall 1.03
-      Module::Install 0.95
-      Module::Install::AutoInstall 0.95
-      Module::Install::Base 0.95
-      Module::Install::Base::FakeAdmin 0.95
-      Module::Install::Can 0.95
-      Module::Install::Fetch 0.95
-      Module::Install::Include 0.95
-      Module::Install::Makefile 0.95
-      Module::Install::Metadata 0.95
-      Module::Install::Win32 0.95
-      Module::Install::WriteAll 0.95
-      Net::LDAP 0.57
-      Net::LDAP::ASN 0.11
-      Net::LDAP::Bind 1.04
-      Net::LDAP::Constant 0.21
-      Net::LDAP::Control 0.15
-      Net::LDAP::Control::Assertion 0.02
-      Net::LDAP::Control::EntryChange 0.02
-      Net::LDAP::Control::ManageDsaIT 0.03
-      Net::LDAP::Control::MatchedValues 0.02
-      Net::LDAP::Control::Paged 0.03
-      Net::LDAP::Control::PasswordPolicy 0.04
-      Net::LDAP::Control::PersistentSearch 0.04
-      Net::LDAP::Control::PostRead 0.03
-      Net::LDAP::Control::PreRead 0.04
-      Net::LDAP::Control::ProxyAuth 1.07
-      Net::LDAP::Control::Relax 0.02
-      Net::LDAP::Control::Sort 0.04
-      Net::LDAP::Control::SortResult 0.03
-      Net::LDAP::Control::SyncDone 0.03
-      Net::LDAP::Control::SyncRequest 0.03
-      Net::LDAP::Control::SyncState 0.04
-      Net::LDAP::Control::VLV 0.05
-      Net::LDAP::Control::VLVResponse 0.04
-      Net::LDAP::DSML 0.15
-      Net::LDAP::DSML::output 0.15
-      Net::LDAP::DSML::pp 0.15
-      Net::LDAP::Entry 0.26
-      Net::LDAP::Extension 1.03
-      Net::LDAP::Extension::Cancel 0.02
-      Net::LDAP::Extension::Refresh 0.03
-      Net::LDAP::Extension::SetPassword 0.06
-      Net::LDAP::Extension::WhoAmI 0.02
-      Net::LDAP::Extra 0.02
-      Net::LDAP::Extra::AD 0.03
-      Net::LDAP::Extra::eDirectory 0.03
-      Net::LDAP::Filter 0.19
-      Net::LDAP::FilterList 0.02
-      Net::LDAP::FilterMatch 0.27
-      Net::LDAP::Intermediate 0.04
-      Net::LDAP::Intermediate::SyncInfo 0.03
-      Net::LDAP::LDIF 0.21
-      Net::LDAP::Message 1.12
-      Net::LDAP::Message::Dummy 1.12
-      Net::LDAP::Reference 0.14
-      Net::LDAP::RootDSE 0.02
-      Net::LDAP::Schema 0.9907
-      Net::LDAP::Search 0.14
-      Net::LDAP::Util 0.17
-      Net::LDAPI 0.04
-      Net::LDAPS 0.06
-    requirements:
-      Convert::ASN1 0.2
-      Digest::HMAC_MD5 0
-      Digest::MD5 0
-      ExtUtils::MakeMaker 6.42
-      File::Basename 0
-      File::Compare 0
-      File::Path 0
-      HTTP::Negotiate 0
-      HTTP::Response 0
-      HTTP::Status 0
-      IO::File 0
-      IO::Socket::INET6 0
-      IO::Socket::SSL 1.26
-      JSON 0
-      LWP::MediaTypes 0
-      LWP::Protocol 0
-      MIME::Base64 0
-      Test::More 0
-      Time::Local 0
-      URI::ldap 1.1
-      XML::SAX::Base 0
-      XML::SAX::Writer 0
-      perl 5.008001
   strictures-1.004004
     pathname: E/ET/ETHER/strictures-1.004004.tar.gz
     provides:
