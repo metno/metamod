@@ -10,8 +10,12 @@ DESTDIR = $(DEBIANDIR)/opt/$(PACKAGENAME)
 
 BUILDDIR = $(CURDIR)/lib-build
 
+deployment:
+	carton install --deployment --cached
+
 # Build the actual debian package
-debian_package:
+# It is a requirement that this should not produce any svn diffs
+debian_package: deployment
 	fakeroot mkdir -p $(DESTDIR)
 
 	fakeroot rsync -aC $(CURDIR)/app/* $(DESTDIR)/app
