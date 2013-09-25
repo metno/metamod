@@ -130,6 +130,12 @@ deactivate () {
         unset _OLD_VIRTUAL_PS1
     fi
 
+    if [ -n "$_OLD_VIRTUAL_PATH" ] ; then
+        PATH="$_OLD_VIRTUAL_PATH"
+        export PATH
+        unset _OLD_VIRTUAL_PATH
+    fi
+
     unset VIRTUAL_ENV
     if [ ! "$1" = "nondestructive" ] ; then
     # Self destruct!
@@ -142,7 +148,7 @@ deactivate nondestructive
 
 export METAMOD_MASTER_CONFIG=[==CONFIG_DIR==]
 
-_OLD_VIRTUAL_PATH="$PATH"
+export _OLD_VIRTUAL_PATH="$PATH"
 ROOT=[==INSTALLATION_DIR==]
 export PATH=$PATH:"$ROOT:$ROOT/base/init":"$ROOT/base/userinit":"$ROOT/base/scripts":"$ROOT/common":"$ROOT/common/scripts":"$ROOT/catalyst/script"
 
