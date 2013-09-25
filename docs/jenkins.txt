@@ -6,4 +6,12 @@
   # apt-get install apache2 postgresql-client-common postgresql-client libdbd-pg-perl pdl proj libgeo-proj4-perl libpdl-netcdf-perl libconfig-tiny-perl libimager-perl libxml2 libxslt1.1 libxml2-dev libxslt1-dev libssl-dev libexpat1 libexpat1-dev pkg-config libgdbm3 libgdbm-dev libpng-dev libnetcdf-dev
   # apt-get install make cpanminus
   # cpanm Carton
+  
+cd $WORKSPACE/metamod
+carton install --cached --deployment
 
+# install config
+# install db 
+# config/bin/activate
+# cd common/lib
+# prove

@@ -6178,6 +6178,24 @@ DISTRIBUTIONS
       URI 1.00
       URI::URL 5.00
       perl v5.6.0
+  URI-SmartURI-0.032
+    pathname: R/RK/RKITOVER/URI-SmartURI-0.032.tar.gz
+    provides:
+      URI::SmartURI 0.032
+    requirements:
+      Class::C3::Componentised 0
+      ExtUtils::MakeMaker 6.59
+      File::Find::Rule 0
+      List::MoreUtils 0
+      List::Util 0
+      Moose 0
+      Scalar::Util 0
+      Test::Fatal 0
+      Test::More 0.94
+      Test::NoWarnings 0
+      URI 1.51
+      namespace::clean 0
+      perl 5.008001
   Variable-Magic-0.52
     pathname: V/VP/VPIT/Variable-Magic-0.52.tar.gz
     provides:

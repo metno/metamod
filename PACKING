@@ -2,17 +2,23 @@
 
 The authorative list of Perl dependency modules is in ./cpanfile.
 
-Running "carton install" will update the dependency graph in carton.lock.
+Running "carton install" will read the requirements from cpanfile and update the
+dependency list in cpanfile.snapshot.
+
+  $ carton install
+  $ svn ci cpanfile.snapshot
 
 -----------
 
-Updating the Carton bundle so can install from source w/o network access:
+Updating the Carton bundle in SVN:
 
-  $ carton bundle
-  $ svn add --force local/cache
+  $ carton bundle --no-fatpack
+  $ svn add --force vendor/cache
 
 Then install via
 
-  $ carton install --cached
- 
- 
+  $ carton install --cached --deployment
+  $ make debian_package
+  $ dupload --to precise-devel
+
+
