@@ -410,6 +410,7 @@ DISTRIBUTIONS
     requirements:
       Carp::Clan 0
       Catalyst::Component::InstancePerContext 0
+      Catalyst::Devel 1.0
       Catalyst::Runtime 5.80005
       CatalystX::Component::Traits 0.14
       DBD::SQLite 0
@@ -968,14 +969,6 @@ DISTRIBUTIONS
       Test::Exception 0
       Test::More 0
       ok 0
-  Convert-ASN1-0.26
-    pathname: G/GB/GBARR/Convert-ASN1-0.26.tar.gz
-    provides:
-      Convert::ASN1 0.26
-    requirements:
-      ExtUtils::MakeMaker 6.30
-      Math::BigInt 1.997
-      Test::More 0.90
   Convert-UU-0.5201
     pathname: A/AN/ANDK/Convert-UU-0.5201.tar.gz
     provides:
@@ -3713,17 +3706,6 @@ DISTRIBUTIONS
       Net::Domain 1.05
       Net::SMTP 1.03
       Test::More 0
-  Math-BigInt-1.997
-    pathname: P/PJ/PJACKLAM/Math-BigInt-1.997.tar.gz
-    provides:
-      Math::BigFloat 1.997
-      Math::BigInt 1.997
-      Math::BigInt::Calc 1.997
-      Math::BigInt::CalcEmu 1.997
-    requirements:
-      ExtUtils::MakeMaker 6.42
-      Test::More 0.62
-      perl 5.006002
   Module-Build-0.4007
     pathname: L/LE/LEONT/Module-Build-0.4007.tar.gz
     provides:
@@ -4575,6 +4557,215 @@ DISTRIBUTIONS
       File::Path 0
       File::Spec 0
       File::Temp 0
+  PDL-2.006
+    pathname: C/CH/CHM/PDL-2.006.tar.gz
+    provides:
+      C::StructObj undef
+      C::StructType undef
+      C::Type undef
+      C::Var undef
+      Inline::MakePdlppInstallable undef
+      Inline::Pdlpp 0.2
+      PDL undef
+      PDL::Basic undef
+      PDL::Bench undef
+      PDL::CallExt undef
+      PDL::Char undef
+      PDL::Constants 0.02
+      PDL::Core 1.56
+      PDL::Dbg undef
+      PDL::Demos::BAD2_demo undef
+      PDL::Demos::BAD_demo undef
+      PDL::Demos::Cartography_demo undef
+      PDL::Demos::General undef
+      PDL::Demos::Gnuplot_demo undef
+      PDL::Demos::PGPLOT_OO_demo undef
+      PDL::Demos::PGPLOT_demo undef
+      PDL::Demos::Prima undef
+      PDL::Demos::Routines undef
+      PDL::Demos::Transform_demo undef
+      PDL::Demos::TriD1 undef
+      PDL::Demos::TriD2 undef
+      PDL::Demos::TriDGallery undef
+      PDL::Doc undef
+      PDL::Doc::Config undef
+      PDL::Doc::Perldl undef
+      PDL::Exporter undef
+      PDL::Filter::Gaussian undef
+      PDL::Filter::LinPred undef
+      PDL::Filter::LinSmooth undef
+      PDL::Filter::Linear undef
+      PDL::Filter::SavGol undef
+      PDL::Fit::LM undef
+      PDL::Fit::Linfit undef
+      PDL::Fit::Polynomial undef
+      PDL::Func undef
+      PDL::GraphEvolver undef
+      PDL::GraphEvolverOLD undef
+      PDL::Graphics2D undef
+      PDL::Graphics::LUT undef
+      PDL::Graphics::Limits 0.01
+      PDL::Graphics::Limits::DSet 0.01
+      PDL::Graphics::PGPLOT undef
+      PDL::Graphics::PGPLOT::Window undef
+      PDL::Graphics::PGPLOTOptions undef
+      PDL::Graphics::State undef
+      PDL::Graphics::TriD undef
+      PDL::Graphics::TriD::ArcBall undef
+      PDL::Graphics::TriD::ArcBowl undef
+      PDL::Graphics::TriD::ArcCone undef
+      PDL::Graphics::TriD::Basic undef
+      PDL::Graphics::TriD::BoundingBox undef
+      PDL::Graphics::TriD::ButtonControl undef
+      PDL::Graphics::TriD::ContourPolygonize undef
+      PDL::Graphics::TriD::Contours undef
+      PDL::Graphics::TriD::Control3D undef
+      PDL::Graphics::TriD::CylindricalEquidistantAxes undef
+      PDL::Graphics::TriD::Description undef
+      PDL::Graphics::TriD::EuclidAxes undef
+      PDL::Graphics::TriD::EventHandler undef
+      PDL::Graphics::TriD::GL::Window undef
+      PDL::Graphics::TriD::GObject undef
+      PDL::Graphics::TriD::GObject_Lattice undef
+      PDL::Graphics::TriD::GPObject undef
+      PDL::Graphics::TriD::GoBoard undef
+      PDL::Graphics::TriD::Graph undef
+      PDL::Graphics::TriD::Image undef
+      PDL::Graphics::TriD::Labels undef
+      PDL::Graphics::TriD::Lattice undef
+      PDL::Graphics::TriD::LineStrip undef
+      PDL::Graphics::TriD::Lines undef
+      PDL::Graphics::TriD::LinesFOOOLD undef
+      PDL::Graphics::TriD::Logo undef
+      PDL::Graphics::TriD::Material undef
+      PDL::Graphics::TriD::MathGraph undef
+      PDL::Graphics::TriD::Mesh undef
+      PDL::Graphics::TriD::OOGL undef
+      PDL::Graphics::TriD::Object undef
+      PDL::Graphics::TriD::OneTransformation undef
+      PDL::Graphics::TriD::Points undef
+      PDL::Graphics::TriD::PolarStereoAxes undef
+      PDL::Graphics::TriD::Polygonize undef
+      PDL::Graphics::TriD::QuaterController undef
+      PDL::Graphics::TriD::Quaternion undef
+      PDL::Graphics::TriD::SCLattice undef
+      PDL::Graphics::TriD::SLattice undef
+      PDL::Graphics::TriD::SLattice_S undef
+      PDL::Graphics::TriD::STrigrid undef
+      PDL::Graphics::TriD::STrigrid_S undef
+      PDL::Graphics::TriD::Scale undef
+      PDL::Graphics::TriD::ScaleController undef
+      PDL::Graphics::TriD::SimpleController undef
+      PDL::Graphics::TriD::SimpleScaler undef
+      PDL::Graphics::TriD::Spheres undef
+      PDL::Graphics::TriD::StupidPolygonize undef
+      PDL::Graphics::TriD::Surface undef
+      PDL::Graphics::TriD::Transformation undef
+      PDL::Graphics::TriD::Translation undef
+      PDL::Graphics::TriD::VRML undef
+      PDL::Graphics::TriD::VRML::Parameter undef
+      PDL::Graphics::TriD::VRML::URL undef
+      PDL::Graphics::TriD::VRMLObject undef
+      PDL::Graphics::TriD::ViewPort undef
+      PDL::Graphics::TriD::Window undef
+      PDL::Graphics::VRML undef
+      PDL::Graphics::VRML::Protos undef
+      PDL::Graphics::VRMLNode undef
+      PDL::Graphics::VRMLPdlNode undef
+      PDL::Graphics::VRMLProto undef
+      PDL::IO::Dicom undef
+      PDL::IO::Dumper 1.003002
+      PDL::IO::FITS 0.92
+      PDL::IO::FastRaw 0.000003
+      PDL::IO::FlexRaw undef
+      PDL::IO::HDF 2.0
+      PDL::IO::IDL 0.5
+      PDL::IO::Pic undef
+      PDL::Interpolate undef
+      PDL::Interpolate::Slatec undef
+      PDL::Lvalue undef
+      PDL::Matrix 0.5
+      PDL::MyInlineMod 0.60
+      PDL::Opt::Simplex undef
+      PDL::Options 0.92
+      PDL::PP 2.2
+      PDL::PP::Access undef
+      PDL::PP::BackCodeThreadLoop undef
+      PDL::PP::BadAccess undef
+      PDL::PP::BadSwitch undef
+      PDL::PP::BadVarAccess undef
+      PDL::PP::Block undef
+      PDL::PP::Code undef
+      PDL::PP::ComplexThreadLoop undef
+      PDL::PP::GenericLoop undef
+      PDL::PP::GentypeAccess undef
+      PDL::PP::Ind undef
+      PDL::PP::Loop undef
+      PDL::PP::MacroAccess undef
+      PDL::PP::NaNSupport undef
+      PDL::PP::OtherAccess undef
+      PDL::PP::PDLStateBadAccess undef
+      PDL::PP::PPBadAccess undef
+      PDL::PP::PdlAccess undef
+      PDL::PP::PdlDimsObj undef
+      PDL::PP::PdlParObj undef
+      PDL::PP::PhysPointerAccess undef
+      PDL::PP::PointerAccess undef
+      PDL::PP::ReSizeAccess undef
+      PDL::PP::Rule 2.2
+      PDL::PP::Rule::Croak 2.2
+      PDL::PP::Rule::InsertName 2.2
+      PDL::PP::Rule::MakeComp 2.2
+      PDL::PP::Rule::Returns 2.2
+      PDL::PP::Rule::Returns::EmptyString 2.2
+      PDL::PP::Rule::Returns::NULL 2.2
+      PDL::PP::Rule::Returns::One 2.2
+      PDL::PP::Rule::Returns::Zero 2.2
+      PDL::PP::Rule::Substitute 2.2
+      PDL::PP::Rule::Substitute::Usual 2.2
+      PDL::PP::Signature undef
+      PDL::PP::SimpleThreadLoop undef
+      PDL::PP::SizeAccess undef
+      PDL::PP::ThreadLoop undef
+      PDL::PP::TypeConv undef
+      PDL::PP::Types undef
+      PDL::Perldl2::Plugin::CleanErrors undef
+      PDL::Perldl2::Plugin::NiceSlice undef
+      PDL::Perldl2::Plugin::PDLCommands undef
+      PDL::Perldl2::Plugin::PrintControl undef
+      PDL::Perldl2::Profile::Perldl2 0.008
+      PDL::Perldl2::Script undef
+      PDL::PodParser undef
+      PDL::Reduce undef
+      PDL::Transform::Cartography 0.6
+      PDL::Type undef
+      PDL::Types undef
+      PDL::Version 2.006
+      SymTab undef
+      Win32::DDE::Netscape undef
+      XS undef
+    requirements:
+      Astro::FITS::Header 0
+      Convert::UU 0
+      Data::Dumper 2.121
+      ExtUtils::MakeMaker 6.31
+      File::Map 0.47
+      File::Spec 0.6
+      File::Temp 0
+      Filter::Simple 0.88
+      Filter::Util::Call 0
+      Inline 0.43
+      Module::Compile 0.23
+      Pod::Parser 0
+      Pod::Select 0
+      Storable 1.03
+      Text::Balanced 1.89
+  PDL-NetCDF-4.19
+    pathname: D/DH/DHUNT/PDL-NetCDF-4.19.tar.gz
+    provides:
+      PDL::NetCDF undef
+    requirements:
+      ExtUtils::MakeMaker 0
   POE-1.356
     pathname: R/RC/RCAPUTO/POE-1.356.tar.gz
     provides:
@@ -5566,28 +5757,6 @@ DISTRIBUTIONS
       Test::Builder::Tester 0
       Test::More 0
       Test::Simple 0.62
-  Test-MockObject-1.20120301
-    pathname: C/CH/CHROMATIC/Test-MockObject-1.20120301.tar.gz
-    provides:
-      Test::MockObject 1.20120301
-      Test::MockObject::Extends 1.20120301
-    requirements:
-      CGI 0
-      Carp 0
-      Devel::Peek 0
-      ExtUtils::MakeMaker 6.30
-      Scalar::Util 0
-      Test::Builder 0
-      Test::Exception 0.31
-      Test::More 0.98
-      Test::Warn 0.23
-      UNIVERSAL::can 1.20110617
-      UNIVERSAL::isa 1.20110614
-      base 0
-      overload 0
-      strict 0
-      vars 0
-      warnings 0
   Test-NoWarnings-1.04
     pathname: A/AD/ADAMK/Test-NoWarnings-1.04.tar.gz
     provides:
@@ -5914,20 +6083,6 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 0
       Test::More 0
-  UNIVERSAL-can-1.20120726
-    pathname: C/CH/CHROMATIC/UNIVERSAL-can-1.20120726.tar.gz
-    provides:
-      Test::SmallWarn undef
-      UNIVERSAL::can 1.20120726
-    requirements:
-      ExtUtils::MakeMaker 6.30
-      Scalar::Util 0
-      Test::More 0
-      overload 0
-      strict 0
-      vars 0
-      warnings 0
-      warnings::register 0
   UNIVERSAL-isa-1.20120726
     pathname: C/CH/CHROMATIC/UNIVERSAL-isa-1.20120726.tar.gz
     provides:
