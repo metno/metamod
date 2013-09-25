@@ -110,12 +110,38 @@ sub xml :Chained("ds_id") :PathPart("xml") :Args(0) {
         # return the document in utf encoding
         $c->response->body( '<?xml version="1.0" encoding="UTF-8"?>'."\n"
                            #. '<?xml-stylesheet type="text/css" href="../../static/css/'. $ds->ds_metadataformat .'.css"?>'."\n"
-                           #. $mmDs->getMETA_DOC()->documentElement()->toString(1)
+                           . $mmDs->getMETA_DOC()->documentElement()->toString(1)
                           );
     };
 
     if( $@ ){
         $self->logger->warn("Error in dataset xml output: $@");
+        #print STDERR ("Error in dataset xml output: $@\n");
+        $c->detach( 'Root', 'error', [404, $@] );
+    }
+
+}
+
+=head2 wmsinfo
+
+A chained action for displaying the wmsinfo XML for a dataset.
+
+=cut
+
+sub xml :Chained("ds_id") :PathPart("wmsinfo") :Args(0) {
+    my ( $self, $c ) = @_;
+
+    eval {
+        my $ds_id = $c->stash->{ ds_id };
+        my $meta_db = $c->model('Metabase');
+        my $ds = $meta_db->resultset('Dataset')->find( $ds_id ) or die "Dataset $ds_id not found";
+        my $wmsinfo =  $ds->wmsinfo() or die "No wmsinfo not found for dataset $ds_id";
+        $c->response->content_type('text/xml');
+        $c->response->body( $wmsinfo->toString(1) );
+    };
+
+    if( $@ ){
+        $self->logger->warn("Error in dataset wmsinfo output: $@");
         #print STDERR ("Error in dataset xml output: $@\n");
         $c->detach( 'Root', 'error', [404, $@] );
     }
