@@ -219,6 +219,8 @@ generated through the UPLOAD module (by parsing netCDF files), METAMOD has
 defined its own XML format, called MM2. This format has a similar structure as
 Dublin core; it is a flat structure with freely selected metadata keywords. For
 each keyword one or more values may be found.
+(B<Note:> This is currently being superceded by a new format named MMD which
+is currently under implementation.)
 
 Other metadata frameworks, like
 DIF or ISO19115, are also accepted, and such frameworks will typically emerge

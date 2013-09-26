@@ -10,12 +10,15 @@ DESTDIR = $(DEBIANDIR)/opt/$(PACKAGENAME)
 
 BUILDDIR = $(CURDIR)/lib-build
 
+VERSION: debian/changelog
+	debian/checkVersion.pl -u
+
 deployment:
 	carton install --deployment --cached
 
 # Build the actual debian package
 # It is a requirement that this should not produce any svn diffs
-debian_package: deployment
+debian_package: deployment VERSION
 	fakeroot mkdir -p $(DESTDIR)
 
 	fakeroot rsync -aC $(CURDIR)/app/* $(DESTDIR)/app

@@ -43,13 +43,14 @@ use File::Path qw(mkpath);
 use FindBin qw($Bin);
 use lib "$Bin/common/lib";
 use Metamod::Config; # this depends only on core modules
+use Pod::Usage;
 
-sub usage {
-    printf "Usage:$0 <config_dir>\n";
-    exit 1;
-}
+#sub usage {
+#    printf "Usage:$0 <config_dir>\n";
+#    exit 1;
+#}
 
-my $config_dir = $ARGV[0] or usage();
+my $config_dir = $ARGV[0] or pod2usage(1);
 
 if (!Metamod::Config->config_found($config_dir)){
   die "Could not find the configuration on the command line or the in the environment\n";
@@ -84,6 +85,13 @@ Perl version of Python's virtualenv, modified to METAMOD environment
 
  virtualenv.pl <path_to_config_dir>
 
+=head1 AUTHOR
+
+Geir Aalberg, E<lt>geira@met.noE<gt>
+
+Based on penv.pl (C) 2010 Joe Topjian. Used by permission.
+L<http://terrarum.net/development/perl-virtual-environments.html>
+
 =head1 LICENSE
 
 Copyright (C) 2013 The Norwegian Meteorological Institute.
@@ -92,9 +100,6 @@ METAMOD is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
-
-Based on penv.pl (C) 2010 Joe Topjian. Used by permission.
-L<http://terrarum.net/development/perl-virtual-environments.html>
 
 =cut
 

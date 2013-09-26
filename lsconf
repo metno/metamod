@@ -44,6 +44,7 @@ use Metamod::Config;
 use Getopt::Long;
 use Data::Dumper;
 use Term::ANSIColor;
+use Pod::Usage;
 
 #Getopt::Long::Configure ("bundling");
 my ($split, $config_file_or_dir, $default, $custom);
@@ -54,7 +55,7 @@ GetOptions(
     'color!'    => \$color,     # use colors
     'split'     => \$split,     # split var into key-value pairs
     'config=s'  => \$config_file_or_dir,
-) or usage();
+) or pod2usage(1);
 #print STDERR Dumper [ $split, $config_file_or_dir, $default, $custom ];
 
 if (defined $color) {
@@ -71,7 +72,7 @@ my $flags = $mm_config->getallflags();
 if ( !defined($var) || $var =~ /(.+)\*$/ ) {
     $vars = $mm_config->getall();
     if ($var) { # wildcard
-        foreach (keys $vars) { # delete vars not starting with $var
+        foreach (keys %$vars) { # delete vars not starting with $var
             #printf "- $1 in $_? %d\n",  index( $_, $1);
             delete $vars->{$_} unless index( $_, $1) == 0;
         }
@@ -87,7 +88,7 @@ if ( !defined($var) || $var =~ /(.+)\*$/ ) {
 }
 
 if (defined $default) { # default values
-    foreach (keys $vars) {
+    foreach (keys %$vars) {
         my $dflag = $flags->{$_} || 0;
         delete $vars->{$_} unless ($dflag & 1) == $default;
     }
@@ -95,9 +96,13 @@ if (defined $default) { # default values
 
 if (defined $custom) { # custom values
     $custom <<= 1; # bitmask 00000010
-    foreach (keys $vars) {
+    foreach (keys %$vars) {
         my $dflag = $flags->{$_} || 0;
-        #print "$_ $dflag $custom\n";
+sub usage {
+    print STDERR "Usage: $0 [--config <config file or dir>] [--split] [--[no]default] [--[no]custom] [<variable>]\n"
+                ."  Variable may end in '*' wildcard.\n  --spilt can only be used with a single variable.\n";
+    exit (1);
+}        #print "$_ $dflag $custom\n";
         delete $vars->{$_} unless ($dflag & 2) == $custom;
     }
 }
@@ -110,12 +115,6 @@ foreach (sort keys %$vars) {
     print '=', color $f & 2 ? 'bright_yellow' : 'bright_blue'; # yellow if local
     print ref $val ? '[ ' . join(', ', @$val) . ' ]' : "\"$val\"";
     print "\n", color 'reset';
-}
-
-sub usage {
-    print STDERR "Usage: $0 [--config <config file or dir>] [--split] [--[no]default] [--[no]custom] [<variable>]\n"
-                ."  Variable may end in '*' wildcard.\n  --spilt can only be used with a single variable.\n";
-    exit (1);
 }
 
 sub missing {
