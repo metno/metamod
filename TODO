@@ -14,6 +14,8 @@ just as an electronic Post-It note for developers to quickly note action
 points for later.
 
 --------------------
+fix "get basket url"
+
 add search option for wmsinfo and projectioninfo
 
 fix fakeroot in debian make
@@ -73,6 +75,9 @@ reset password should send a link to reset instead of resetting directly to avoi
 - must use POST
 
 ++++++++ DONE ++++++++++++++
+fixed fatal error in basket visualization on wms server error
+
+fixed bug in basket size
 
 catalyst/lib/MetamodWeb.pm#92: Deprecated 'static' config key used, please use the key 'Plugin::Static::Simple' instead
 

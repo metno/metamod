@@ -63,7 +63,8 @@ sub wmscap {
     print STDERR "Getting WMS Capabilities at $url\n";
     $logger->debug("Getting WMS Capabilities at $url");
     my $cap = eval { getXML($url . '?service=WMS&version=1.3.0&request=GetCapabilities') };
-    croak " error: $@" if $@;
+    warn "WMS Capabilities error: $@" if $@;
+    $logger->error("WMS Capabilities at $url failed: $@") if $@;
     return $cap;
 }
 

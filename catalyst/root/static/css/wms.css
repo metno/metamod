@@ -1,5 +1,17 @@
-#warning {font-size: x-large; padding:22 22 22 22; text-decoration: blink; color: red;}
-#form1, .olControlPermalink {font-size: x-small; font-family: sans-serif}
+
+#warning {
+    font-size: x-large;
+    padding:22 22 22 22;
+    text-decoration: blink;
+    color: red;
+}
+
+#form1, .olControlPermalink {
+    font-size: x-small;
+    font-family: sans-serif
+}
+
+
 /* crappy css selectors below don't work... have to use inline styles instead :( */
 /*#timebox { visibility: hidden };*/
 /*img#legend { float: right; position: relative; top: 200px; z-index: 1000 };*/

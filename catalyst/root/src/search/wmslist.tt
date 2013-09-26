@@ -129,36 +129,40 @@
                 [% END %]
 
                 <div class="list">
-                    [% FOREACH layer IN cap.findnodes('//*[local-name() = "Layer"]');
-                        names = layer.getChildrenByLocalName('Name');
-                        NEXT UNLESS names; # skip wrapping layers w/o data (maybe better to check child layers? FIXME)
-                        name = names.first.textContent;
-                        title = layer.getChildrenByLocalName('Title').first.textContent;
+                    [% IF cap %]
+                        [% FOREACH layer IN cap.findnodes('//*[local-name() = "Layer"]');
+                            names = layer.getChildrenByLocalName('Name');
+                            NEXT UNLESS names; # skip wrapping layers w/o data (maybe better to check child layers? FIXME)
+                            name = names.first.textContent;
+                            title = layer.getChildrenByLocalName('Title').first.textContent;
 
-                        projs = []; # get all projections for layer
-                        FOREACH pl IN layer.findnodes('ancestor-or-self::*[local-name() = "Layer"]');
-                            FOREACH crs IN pl.getChildrenByLocalName('CRS');
-                                projs.push(crs.textContent); # assuming union of all sets
+                            projs = []; # get all projections for layer
+                            FOREACH pl IN layer.findnodes('ancestor-or-self::*[local-name() = "Layer"]');
+                                FOREACH crs IN pl.getChildrenByLocalName('CRS');
+                                    projs.push(crs.textContent); # assuming union of all sets
+                                END;
+                                bbox = pl.findnodes('ancestor-or-self::*[local-name() = "Layer"]/*[local-name() = "BoundingBox"][1]');
                             END;
-                            bbox = pl.findnodes('ancestor-or-self::*[local-name() = "Layer"]/*[local-name() = "BoundingBox"][1]');
-                        END;
 
-                        projs = projs.sort.unique;
-                    %]
+                            projs = projs.sort.unique;
+                        %]
 
-                    [% IF ds.wmsinfo.findnodes('//*[local-name() = "baselayer" and @name="' _ name _ '"]') # listed as baselayer in wmsinfo %]
-                        <input type="checkbox" class="layer" id="input[% inputs %]" name="baselayer_[% ds.ds_id %]" value="[% name %]"/><b>[% title %]</b>
-                    [% ELSE %]
-                        <input type="checkbox" class="layer" id="input[% inputs %]" name="layer_[% ds.ds_id %]" value="[% name %]"/>[% title %]
+                        [% IF ds.wmsinfo.findnodes('//*[local-name() = "baselayer" and @name="' _ name _ '"]') # listed as baselayer in wmsinfo %]
+                            <input type="checkbox" class="layer" id="input[% inputs %]" name="baselayer_[% ds.ds_id %]" value="[% name %]"/><b>[% title %]</b>
+                        [% ELSE %]
+                            <input type="checkbox" class="layer" id="input[% inputs %]" name="layer_[% ds.ds_id %]" value="[% name %]"/>[% title %]
+                        [% END %]
+
+                        <script type="text/javascript">
+                            layerProjs.input[% inputs %] = [ [% '"' _ projs.join('","') _ '"' %] ];
+                        </script>
+
+                        <br/>
+                        [% inputs = inputs + 1 %]
                     [% END %]
-
-                    <script type="text/javascript">
-                        layerProjs.input[% inputs %] = [ [% '"' _ projs.join('","') _ '"' %] ];
-                    </script>
-
-                    <br/>
-                    [% inputs = inputs + 1 %]
-                [% END %]
+                    [% ELSE %]
+                        <div class="error_msg"><a href="[% ds.wmsurl %]">WMS server failure </a></div>
+                    [% END %]
                 </div>
 
             </div>
