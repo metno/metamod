@@ -163,7 +163,8 @@ sub version :Path('/version') :Args(0) {
     my ($self, $c) = @_;
 
     $c->response->content_type('text/plain');
-    $c->serve_static_file( './VERSION' );
+    my $dir = $c->stash->{mm_config}->get('INSTALLATION_DIR');
+    $c->serve_static_file( "$dir/VERSION" );
 }
 
 __PACKAGE__->meta->make_immutable;

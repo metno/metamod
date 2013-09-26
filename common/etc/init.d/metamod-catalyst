@@ -1,5 +1,6 @@
 #!/bin/sh
-# Start a Catalyst app under Engine::HTTP(::Prefork)
+# Start a Catalyst app under Starman
+# (no longer using Engine::HTTP::Prefork)
 
 # *** INSTALLATION ***
 #
