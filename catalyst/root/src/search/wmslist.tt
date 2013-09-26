@@ -161,7 +161,7 @@
                         [% inputs = inputs + 1 %]
                     [% END %]
                     [% ELSE %]
-                        <div class="error_msg"><a href="[% ds.wmsurl %]">WMS server failure </a></div>
+                        <div class="error_msg"><a href="[% ds.wmsurl %]?service=WMS&version=1.3.0&request=GetCapabilities">WMS server failure </a></div>
                     [% END %]
                 </div>
 
