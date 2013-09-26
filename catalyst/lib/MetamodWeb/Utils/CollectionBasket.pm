@@ -138,7 +138,7 @@ sub add_dataset {
 
     if ( $max_additional <= 0 ) {
         # basket is full, go away
-        my $msg = 'Could not add the file to the basket since the basket would then exceed the allowed number of files ($max_files).';
+        my $msg = "Could not add the file to the basket since the basket would then exceed the allowed number of files ($max_files).";
         $self->add_user_msg($msg);
         $self->logger->info("Could not add file to collection basket as it exceeds the max count of $max_files");
         return;
@@ -156,7 +156,7 @@ sub add_dataset {
             my $child_datasets = $dataset->child_datasets($search_conds, $search_attrs);
 
             if ($child_datasets->count() > $max_additional) {
-                my $msg = 'Could not add all files to the basket since the basket would then exceed the allowed number of files ($max_files).';
+                my $msg = "Could not add all files to the basket since the basket would then exceed the allowed number of files ($max_files).";
                 $self->add_user_msg($msg);
                 $self->logger->info("Could not add file to collection basket as it exceeds the max count of $max_files");
                 return;
@@ -172,7 +172,7 @@ sub add_dataset {
                         # This probably will seem like less random behaviour.
                         if( $file_info->{data_file_size} + $current_size > $max_size ){
                             my $msg = 'Could not add all files to the basket since the basket would then exceed the ';
-                            $msg .= 'allowed maximum size ($max_size bytes).';
+                            $msg .= "allowed maximum size ($max_size bytes).";
                             $self->add_user_msg($msg);
                             $self->logger->info("Could not add file to collection basket as it exceeds the max size of $max_size");
                             #last;
@@ -591,7 +591,7 @@ sub max_files {
 
     my $default = 100;
 
-    my $maxfiles = $self->config->has('COLLECTION_BASKET_MAX_FILES') || $default;
+    my $maxfiles = $self->config->get('COLLECTION_BASKET_MAX_FILES') || $default;
     if ($self->c->user) {
         return $maxfiles;
     } else {
