@@ -487,8 +487,11 @@ sub _readConfig {
     # add computed values
     $conf{'INSTALLATION_DIR'} = $self->installation_dir();
     $conf{'CONFIG_DIR'}       = $self->config_dir();
-    $conf{'VERSION'}          = $self->version();
     $conf{'CATALYST_LIB'}     = $conf{'INSTALLATION_DIR'} . "/local/lib/perl5" unless exists $conf{'CATALYST_LIB'};
+
+    my $ver = $self->version();
+    $conf{'VERSION'}   = $ver->{number};
+    $conf{'BUILDDATE'} = $ver->{date};
 
     # add environment variables (currently no keyword substitution)
     for (keys %ENV) {
@@ -826,7 +829,7 @@ sub path_to_config_file {
 
 =head2 $self->version()
 
-Return the METAMOD version number
+Return the METAMOD version number and build date
 
 =cut
 
@@ -834,9 +837,11 @@ sub version {
     my $version = installation_dir() . "/VERSION";
     open my $file, '<', $version or die "Can't locate VERSION file in $version";
     my $top = <$file>;
+    chomp $top;
     close $file;
-    $top =~ /^This is version ([0-9.]+) of METAMOD/;
-    return $1;
+    $top =~ /^This is version ([0-9.\-]+) of METAMOD released ([0-9\-]+)/;
+    die "Format error in VERSION file:\n  '$top'" unless $1 && $2;
+    return { number => $1, date => $2 };
 }
 
 1;
