@@ -13,6 +13,12 @@ BUILDDIR = $(CURDIR)/lib-build
 VERSION: debian/changelog
 	debian/checkVersion.pl -u
 
+deps:
+	carton install
+
+bundle:
+	carton bundle --no-fatpack
+
 deployment:
 	carton install --deployment --cached
 

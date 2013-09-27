@@ -42,3 +42,4 @@ requires 'XML::SAX::Writer', 0.53;
 requires 'XML::Simple', 2.18;
 requires 'Data::UUID', 1.217;
 requires 'URI::SmartURI', 0.032;
+requires 'Template::Plugin::JSON::Escape', 0.02;

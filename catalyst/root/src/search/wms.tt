@@ -28,13 +28,15 @@
             var ds_id = [% datasets.0.ds_id || 'undefined' %];
             var wmcpath      = "[% c.uri_for( '/gc2wmc',   c.req.params ) %]";
             var wmcstub      = "[% c.uri_for( '/gc2wmc' ) %]";
-            var multiwmcpath = "[% c.uri_for( '/multiwmc', c.req.params ) %]" ;
+            var multiwmcpath = "[% c.uri_for( '/multiwmc', c.req.params ) %]";
         </script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/wms.js') %]"></script>
         <script type="text/javascript">
             [% IF ! debug # disable logging in production %]
                 log = log4javascript.getNullLogger();
             [% END %]
+            [% USE JSON.Escape( pretty => 1 ) %]
+            var projnames    = [% projections.json %];
         </script>
 
     </head>

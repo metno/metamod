@@ -348,8 +348,10 @@ sub wms :Path('/search/wms') :Args {
     } # further processing handled by multiwmc if undefined
 
     #print STDERR Dumper \$dslist;
-    $c->stash( datasets => $dslist );
-
+    $c->stash(
+        datasets => $dslist,
+        projections => Metamod::WMS::projList()
+    );
 }
 
 =head2 wms

@@ -224,7 +224,8 @@ function drawMap(response) {
         log.debug(key, 'supported by', projs[key], 'layers');
         if (key == "CRS:84") continue;
         if (projs[key] === map.layers.length) {
-            $('#crs').append( '<option value="' + key + '">' + key + '</option>');
+            var ptext = (projnames[key] !== undefined) ? key + ' (' + projnames[key] + ')': key;
+            $('#crs').append( '<option value="' + key + '">' + ptext + '</option>');
         }
     }
     $('#crs').val(map.projection);

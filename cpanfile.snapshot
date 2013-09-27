@@ -5559,6 +5559,15 @@ DISTRIBUTIONS
       Scalar::Util 1.14
       Test::More 0.42
       perl 5.005
+  Template-Plugin-JSON-Escape-0.02
+    pathname: N/NA/NANTO/Template-Plugin-JSON-Escape-0.02.tar.gz
+    provides:
+      Template::Plugin::JSON::Escape 0.02
+    requirements:
+      ExtUtils::MakeMaker 0
+      JSON 2.12
+      Template 2.20
+      Test::More 0
   Template-Timer-1.00
     pathname: P/PE/PETDANCE/Template-Timer-1.00.tar.gz
     provides:

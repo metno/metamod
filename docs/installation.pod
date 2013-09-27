@@ -165,7 +165,8 @@ the OpenSSL Library
 =back
 
 Installing these via Debial packages using C<apt-get> is recommended if possible.
-A complete list of the required Debian packages can be found in F<debian/control>.
+A complete list of the required Debian packages can be found in F<debian/control>
+under 'Depends' and 'Build-Depends'.
 
 ########################
 
@@ -190,9 +191,10 @@ which can be installed using either of the following commands:
 
 =head3 Carton
 
-Carton automatically downloads and builds the required METAMOD Perl dependency modules.
+Carton can download and build the required METAMOD Perl dependency modules automatically.
 Unlike C<cpan> it will install the exact same module versions every time, avoiding upgrade
-conflicts and making sure you have the same environment as have been tested.
+conflicts and making sure you have the same environment as have been tested. It even bundles
+all the source tarballs into the local source repo so you don't even need online access to deploy.
 
   $ cpanm -S Carton
 
@@ -203,12 +205,22 @@ This should install version 1.0.12 or later. Versions below 1.0.0 are not suppor
 You are now ready to install the Perl dependency libraries:
 
   $ cd ~/metamod/trunk
-  $ carton install --deployment --cached
+  $ make deployment
 
 Carton will then install the modules listed in F<cpanfile.snapshot> into F<~/metamod/trunk/local/lib>.
 No network connection is needed when using --cached as this uses the modules supplied in F<~/metamod/trunk/vendor/cache>.
 This should not generate any errors as long as you have installed all the necessary binary libraries
 as listed above.
+
+=head4 Development
+
+If you are editing METAMOD and want to add more Perl modules, add the required name and version to F<cpanfile>,
+then run
+
+  $ make deps
+  $ make bundle
+
+This will download and compile the necessary modules, and put the source into the vendor/cache directory.
 
 =head3 PERL5LIB
 
