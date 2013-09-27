@@ -1,7 +1,7 @@
 Source: metno-metamod-2.13
 Priority: extra
 Maintainer: Geir Aalberg <geira@met.no>
-Build-Depends: debhelper (>=5), perl
+Build-Depends: debhelper (>=5), perl, make, fakeroot
 Standards-Version: 3.7.3
 Section: web
 
@@ -14,7 +14,6 @@ Depends: apache2, postgresql-client-common, postgresql-client, libdbd-pg-perl, p
 Pre-Depends: perl
 Recommends: exim4 | postfix | sendmail, libxml2-utils, mailx, postgresql, postgresql-contrib, postgis, postgresql-9.1-postgis
 #Suggests: metamod2-database
-Build-Depends: make, fakeroot, debhelper
 Conflicts:
 Replaces:
 Provides: metamod-2

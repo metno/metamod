@@ -1,4 +1,4 @@
-metno-metamod-2.13 (2.13.6-2) stable; urgency=low
+metno-metamod-2.13 (2.13.7) stable; urgency=low
 
   * dynamic search map using WMS
   * improved support for background maps in different projections
@@ -13,6 +13,7 @@ metno-metamod-2.13 (2.13.6-2) stable; urgency=low
   * v4: support for custom validators in OAI-PMH
   * v5: oai and wms fixes, added html view of xml files
   * v6: support for two-dimensional arrays in timeseries plots and ascii/json download
+  * v7: bugfixes in basket visualization and file count, proj list, version page 
 
  -- Geir Aalberg <geira@met.no>  Mon, 03 Jun 2013 11:32:06 +0200
 

@@ -71,7 +71,7 @@ my ($mmMajorVersion, $mmMinorVersion, $out);
 my $date = strftime("%Y-%m-%d", localtime);
 open (my $mh, $mmVersion) or die "Cannot read $mmVersion: $!";
 while (defined (my $line = <$mh>)) {
-    if ($line =~ /version (\d+\.\w+)(\.\w+) of METAMOD/) {
+    if ($line =~ /version (\d+\.\w+)(\.[^ ]+) of METAMOD/) {
         $mmMajorVersion = $1;
         $mmMinorVersion = "$1$2";
         if ($update) {
