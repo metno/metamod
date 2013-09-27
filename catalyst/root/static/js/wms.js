@@ -137,7 +137,8 @@ function drawMap(response) {
 
         // store # of uses of all projs for later (needed by crs selector)
         for (var key in layer.srs) {
-            if ( layer.isBaseLayer && layer.srs.hasOwnProperty(key) ) {
+            //if ( layer.isBaseLayer && layer.srs.hasOwnProperty(key) ) { // why baselayer?
+            if ( layer.srs.hasOwnProperty(key) ) {
                 //log.debug(i, key);
                 if (projs[key] == undefined) {
                     projs[key] = 1;
@@ -220,9 +221,11 @@ function drawMap(response) {
     }
 
     for (var key in projs) {
-        //log.debug(key, 'supported by', projs[key], 'layers');
+        log.debug(key, 'supported by', projs[key], 'layers');
         if (key == "CRS:84") continue;
-        $('#crs').append( '<option value="' + key + '">' + key + '</option>');
+        if (projs[key] === map.layers.length) {
+            $('#crs').append( '<option value="' + key + '">' + key + '</option>');
+        }
     }
     $('#crs').val(map.projection);
 
