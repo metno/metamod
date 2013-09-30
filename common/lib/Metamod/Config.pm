@@ -360,29 +360,32 @@ sub split {
     return undef unless $var;
 
     my $input = $self->get($var) or return;
-    $input =~ s|^\n||; # skip initial blank line
-    my @lines = split '\n', $input;
+    if ($input =~ s|^\n||) { # skip initial blank line
+        my @lines = split '\n', $input;
 
-    my %items = ();
-    foreach (@lines) {
-        s/^\s+//; # remove leading spaces
-        #print STDERR "> $_\n";
-        my $list =_splitval($_);
-        my $key = shift @$list; # treat first item as the key
-        $items{$key} = (scalar @$list > 1) ? $list : shift @$list; # string or list if > 1
+        my %items = ();
+        foreach (@lines) {
+            s/^\s+//; # remove leading spaces
+            #print STDERR "> $_\n";
+            my $list =_splitval($_);
+            my $key = shift @$list; # treat first item as the key
+            $items{$key} = (scalar @$list > 1) ? $list : shift @$list; # string or list if > 1
+        }
+
+        #print STDERR Dumper \%items;
+        return \%items;
+    } else {
+        return _splitval($input);
     }
-
-    #print STDERR Dumper \%items;
-    return \%items;
 }
 
-# recursive function splitting a string separated by spaces or quotes
+# recursive function splitting a string separated by spaces, commas and/or quotes
 sub _splitval {
     my $_ = shift or return;
     my @vals = ();
     s/^\s+//; # remove leading spaces
-    #print STDERR " '$_'\n";
-    if ( /^["](.+?)["](.*)$/ or /^['](.+?)['](.*)$/ or /^(\S+)(\s+(.*))?$/ ) {
+    #print STDERR " [$_]\n";
+    if ( /^["](.+?)["],?+(.*)$/ or /^['](.+?)['],?(.*)$/ or /^(\S+)(\s+(.*))?$/ ) {
         return $1 unless $2;
         #print STDERR " |$1|$2|\n";
         push @vals, $1;
@@ -392,26 +395,6 @@ sub _splitval {
     #print STDERR Dumper \@vals;
     return \@vals;
 }
-
-    ## check if there are any single quotes, if so we use them to split. Otherwise we just split by space
-    #if ( index( $value, "'" ) ) {
-    #    my $extra_params;
-    #    ( $mt_name, $shown_name, $extra_params ) = map { $self->trim($_) } split "'", $column;
-    #    @extra_params = split " ", $extra_params if $extra_params;
-    #} else {
-    #    ( $mt_name, $shown_name, @extra_params ) = map { $self->trim($_) } split " ", $column;
-    #}
-    #
-    #my %column_info = ( mt_name => $mt_name, shown_name => $shown_name );
-    #
-    ## add each extra parameter as its own key/value pair
-    #foreach my $param (@extra_params) {
-    #    my ( $param_type, $param_value ) = split '=', $param;
-    #    $column_info{$param_type} = $param_value;
-    #}
-    #
-    #$items{$key} = $value;
-    #
 
 # check for updates of config and reread
 sub _checkFile {

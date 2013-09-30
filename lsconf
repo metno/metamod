@@ -47,16 +47,19 @@ use Term::ANSIColor;
 use Pod::Usage;
 
 #Getopt::Long::Configure ("bundling");
-my ($split, $config_file_or_dir, $default, $custom);
+my ($help, $split, $config_file_or_dir, $default, $custom);
 my $color = -t STDOUT; # use IO::Interactive::Tiny instead - FIXME
 GetOptions(
+    'help'      => \$help,      # for dummies
     'default!'  => \$default,   # set in default_config
     'custom!'   => \$custom,    # set in master_config
     'color!'    => \$color,     # use colors
     'split'     => \$split,     # split var into key-value pairs
     'config=s'  => \$config_file_or_dir,
-) or pod2usage(1);
-#print STDERR Dumper [ $split, $config_file_or_dir, $default, $custom ];
+) or pod2usage(2);
+#print STDERR Dumper [ $help, $split, $config_file_or_dir, $default, $custom ];
+
+pod2usage(1) if $help;
 
 if (defined $color) {
     $ENV{ANSI_COLORS_DISABLED} = 1 unless $color;
@@ -81,8 +84,9 @@ if ( !defined($var) || $var =~ /(.+)\*$/ ) {
 } else {
     missing($var) unless $mm_config->has($var);
     if ($split) {
-        $vars = $mm_config->split($var);
-    } else {
+        $vars = $mm_config->split($var); # hashes get separated into one var per key
+        $vars = { $var => $vars } if ref $vars eq 'ARRAY'; # arrays are just a list
+        } else {
         $vars = { $var => $mm_config->get($var) };
     }
 }
@@ -135,7 +139,7 @@ With no arguments, list all variables alphabetically.
 
 =head1 USAGE
 
- lsconf.pl [--config <file>] [--split] [--[no]color] [--[no]default] [--[no]custom] [variable]
+ lsconf.pl [--help] [--config <file>] [--split] [--[no]color] [--[no]default] [--[no]custom] [variable]
 
 =head1 LICENSE
 

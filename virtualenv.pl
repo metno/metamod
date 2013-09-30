@@ -164,7 +164,7 @@ fi
 
 if [ -z "$VIRTUAL_ENV_DISABLE_PROMPT" ] ; then
     _OLD_VIRTUAL_PS1="$PS1"
-    export PS1="([==CONFIG_DIR==])$PS1"
+    export PS1="\033[1;44m([==CONFIG_DIR==])\033[1;m $PS1"
 fi
 
 # This should detect bash and zsh, which have a hash command that must
