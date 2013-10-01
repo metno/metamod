@@ -5549,6 +5549,22 @@ DISTRIBUTIONS
       constant 0
       strict 0
       warnings 0
+  TAP-Harness-Archive-0.15
+    pathname: S/SC/SCHWIGON/TAP-Harness-Archive-0.15.tar.gz
+    provides:
+      TAP::Harness::Archive 0.15
+    requirements:
+      Archive::Tar 0
+      Cwd 0
+      File::Basename 0
+      File::Find 0
+      File::Path 0
+      File::Spec 0
+      File::Temp 0.19
+      Module::Build 0.40
+      TAP::Harness 3.05
+      Test::More 0
+      YAML::Tiny 0
   Task-Weaken-1.04
     pathname: A/AD/ADAMK/Task-Weaken-1.04.tar.gz
     provides:
