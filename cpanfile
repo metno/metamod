@@ -44,3 +44,5 @@ requires 'Data::UUID', 1.217;
 requires 'URI::SmartURI', 0.032;
 requires 'Template::Plugin::JSON::Escape', 0.02;
 requires 'TAP::Harness::Archive', 0.15;
+requires 'Benchmark::Timer', 0.7102;
+requires 'Test::DatabaseRow', 2.03;
