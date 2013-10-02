@@ -23,6 +23,7 @@ use Getopt::Long;
 use Pod::Usage;
 
 my $send_to_smolder = '';
+my $send_to_jenkins = '';
 my $verbose         = '';
 my $coverage        = '';
 my $performance     = '';
@@ -30,11 +31,12 @@ my $pod             = 1;
 
 GetOptions(
     'smolder'     => \$send_to_smolder,
+    'jenkins'     => \$send_to_jenkins,
     'verbose'     => \$verbose,
     'coverage'    => \$coverage,
     'performance' => \$performance,
     'pod!'        => \$pod,
-) or pod2usage(1);
+) or pod2usage(2);
 
 if( !$pod ){
     $ENV{NO_TEST_POD} = 1;
@@ -44,7 +46,8 @@ if( !$performance ){
     $ENV{NO_PERF_TESTS} = 1;
 }
 
-my $output_file = 'auto_test_result.tar.gz';
+my $output_file = $send_to_jenkins ? 'test_results' : 'auto_test_result.tar.gz';
+mkdir $output_file if $send_to_jenkins && ! -d $output_file;
 
 # run Devel::Cover to get some information about the test coverage
 if ($coverage) {
