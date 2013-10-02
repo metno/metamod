@@ -60,7 +60,7 @@ sub wmscap {
     my $self = shift;
     my $url = shift or return; # expecting $ds->wmsurl
 
-    print STDERR "Getting WMS Capabilities at $url\n";
+    #print STDERR "Getting WMS Capabilities at $url\n";
     $logger->debug("Getting WMS Capabilities at $url");
     my $cap = eval { getXML($url . '?service=WMS&version=1.3.0&request=GetCapabilities') };
     warn "WMS Capabilities error: $@" if $@;

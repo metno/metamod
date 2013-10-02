@@ -202,7 +202,7 @@ sub multiwmc :Path("/multiwmc") :Args(0) {
         $root->appendChild($_);
     }
 
-    print STDERR $setup->toString(1);
+    #print STDERR $setup->toString(1);
 
     my $wmc = eval { $c->stash->{wmc}->setup2wmc($setup) };
     $wmc->documentElement->appendChild(

@@ -144,7 +144,7 @@ sub display_search_criteria : Path('/search') : Args(1) {
             name => $name || getProjName($crs) || $crs,
         };
     }
-    print STDERR Dumper \%searchmaps;
+    #print STDERR Dumper \%searchmaps;
 
     $c->stash( template => 'search/search_criteria.tt',
                active_criteria => $active_criteria,

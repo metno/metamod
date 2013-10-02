@@ -30,7 +30,7 @@ if( !( -e $out_dir ) ){
 
 my $path_to_data = abs_path($baseline_dir);
 
-my $digest_content = <<"END_DIGEST_CONTENT";
+my $digest_content = <<"END_DIGEST_CONTENT"; # this dataset requires a password to access - to be fixed?
 http://thredds.met.no/thredds/catalog/data/met.no/ecmwf/catalog.html?dataset=met.no/ecmwf/ecmwf_atmo0_5_2010-08-09_00.nc
 ${path_to_data}/ecmwf_atmo0_5_2010-08-09_00.nc
 END_DIGEST_CONTENT

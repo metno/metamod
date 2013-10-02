@@ -23,7 +23,7 @@ my %args = (
 );
 
 my $command = MetNo::Fimex::projectFile(%args);
-my $expected = 'fimex --input.file input.nc --input.type nc --interpolate.method nearestneighbor --interpolate.projString proj=stere lat_0=90 lon_0=-32 lat_ts=60 --interpolate.xAxisUnit m --interpolate.xAxisValues 300000,350000,...,700000 --interpolate.yAxisUnit m --interpolate.yAxisValues 300000,350000,...,700000 --output.file output.nc --output.type nc';
+my $expected = "fimex --input.file input.nc --input.type nc --interpolate.method nearestneighbor --interpolate.projString 'proj=stere lat_0=90 lon_0=-32 lat_ts=60' --interpolate.xAxisUnit m --interpolate.xAxisValues 300000,350000,...,700000 --interpolate.yAxisUnit m --interpolate.yAxisValues 300000,350000,...,700000 --output.file output.nc --output.type nc 2>output.nc.error";
 is($command, $expected, 'call projectFile');
 
 my $obj = new MetNo::Fimex();
