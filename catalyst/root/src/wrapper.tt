@@ -22,6 +22,7 @@
 <script type="text/javascript" src="[% c.uri_for('/static/js/jquery.min.js') %]"></script>
 <script type="text/javascript" src="[% c.uri_for('/static/js/jquery-ui.min.js') %]"></script>
 <script type="text/javascript" src="[% c.uri_for('/static/js/metamod.js') %]"></script>
+<script type="text/javascript" src="[% c.uri_for('/static/js/console.js') %]"></script>
 
 <!-- below is needed for fancybox  -->
 <!--<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.min.js"></script>-->

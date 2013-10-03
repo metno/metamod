@@ -11,12 +11,7 @@
         <link rel="stylesheet" href="[% c.uri_for('/static/css/metamod_theme/jquery-ui.css') %]" />
         <script type="text/javascript" src="[% c.uri_for('/static/js/jquery.min.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/jquery-ui.min.js') %]"></script>
-
-        <script type="text/javascript" src="[% c.uri_for('/static/js/log4javascript-1.4.2/js/log4javascript.js') %]"></script>
-
-        <script type="text/javascript">
-            var log = log4javascript.getDefaultLogger();
-        </script>
+        <script type="text/javascript" src="[% c.uri_for('/static/js/console.js') %]"></script>
 
         <style type="text/css">
             body { padding: 12 12 12 12; background-color: #ccc0cf; }

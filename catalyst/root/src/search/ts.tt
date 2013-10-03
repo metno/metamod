@@ -8,17 +8,10 @@
         <link rel="stylesheet" href="[% c.uri_for('/static/css/main.css') %]" />
 
         <link rel="stylesheet" href="[% c.uri_for('/static/css/metamod_theme/jquery-ui.css') %]" />
-        <script type="text/javascript" src="[% c.uri_for('/static/js/log4javascript-1.4.2/js/log4javascript.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/jquery.min.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/jquery-ui.min.js') %]"></script>
 
         <script src="[% c.uri_for('/static/js/dygraph-combined.js') %]" type="text/javascript"></script>
-
-        <script type="text/javascript">
-            [% IF ! debug # disable logging in production %]
-                log = log4javascript.getNullLogger();
-            [% END %]
-        </script>
 
         <style type="text/css">
             div.dygraph-legend > span { display: block; }

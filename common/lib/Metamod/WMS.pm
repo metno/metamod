@@ -110,7 +110,7 @@ sub getXML {
     }
     else {
         $logger->info("getXML failed for for $url: " . $response->status_line);
-        die("getXML failed for for $url: " . $response->status_line);
+        confess("getXML failed for for $url: " . $response->status_line);
     }
 }
 
@@ -165,6 +165,8 @@ sub getMapURL {
 
     my $mapurl = $config->get('WMS_BACKGROUND_MAPSERVER') . $config->get( $mapconfig{$crs} );
     return $mapurl;
+    return $mapurl if $mapurl =~ /\?&$/; # ok if ends with ? or &
+    return ($mapurl =~ /\?/) ? "$mapurl&" : "$mapurl?"; # else add whatever is needed
 }
 
 =head2 defaultWMC()

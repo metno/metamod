@@ -461,7 +461,8 @@ sub wmsurl {
     }
 
     #$logger->debug("*** WMS URL after substitution: $url");
-    return $url;
+    return $url if $url =~ /\?&$/; # ok if ends with ? or &
+    return ($url =~ /\?/) ? "$url&" : "$url?"; # else add whatever is needed
 
 }
 

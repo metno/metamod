@@ -282,12 +282,15 @@ sub _reproject { # doesn't this do the same as calculate_bounds() ? FIXME
 #
 sub _gen_wmc {
     my ($self, $wmsurl, $params) = @_;
-    my $gcquery = '?service=WMS&version=1.3.0&request=GetCapabilities'; # can sometimes return 1.1.1
+    my $gcquery = 'service=WMS&version=1.3.0&request=GetCapabilities'; # can sometimes return 1.1.1
     my %stylesheets = (
         '1.3.0' => '/root/xsl/gc2wmc.xsl',
         '1.1.1' => '/root/xsl/gc111_2wmc.xsl'
     );
 
+    if ($wmsurl !~ /\?&/) {
+        $wmsurl .= ($wmsurl =~ /\?/) ? '&' : '?';
+    }
     my $xslt = XML::LibXSLT->new();
     # get capabilities xml
     my $dom = eval {

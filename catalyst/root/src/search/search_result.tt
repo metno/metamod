@@ -141,7 +141,7 @@ jQuery(document).ready( function () {
                     <hr/>
                     [% IF dataset.wmsurl != '' %]
                         <a class="visual" href="[% c.uri_for('/gc2wmc') %]?ds_id=[% dataset.ds_id %]"><span>WMC data</span></a><br clear="all"/>
-                        <a class="visual" href="[% thumbnail.wms_url %]?service=WMS&version=1.3.0&request=GetCapabilities"><span>WMS data</span></a><br clear="all"/>
+                        <a class="visual" href="[% thumbnail.wms_url %]service=WMS&version=1.3.0&request=GetCapabilities"><span>WMS data</span></a><br clear="all"/>
                         <a class="visual" href="[% c.uri_for('/dataset', dataset.ds_id, 'wmsinfo' ) %]"><span>WMSinfo</span></a><br clear="all"/>
                     [% END %]
                     [% IF opendap %]

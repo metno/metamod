@@ -1,5 +1,4 @@
 
-var log = log4javascript.getDefaultLogger();
 var info;
 
 //read CGI args

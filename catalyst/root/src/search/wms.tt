@@ -16,7 +16,7 @@
         </style>
 
         <link rel="stylesheet" href="[% c.uri_for('/static/css/metamod_theme/jquery-ui.css') %]" />
-        <script type="text/javascript" src="[% c.uri_for('/static/js/log4javascript-1.4.2/js/log4javascript.js') %]"></script>
+        <script type="text/javascript" src="[% c.uri_for('/static/js/console.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/jquery.min.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/jquery-ui.min.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/lib/OpenLayers.js') %]"></script>
@@ -32,9 +32,6 @@
         </script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/wms.js') %]"></script>
         <script type="text/javascript">
-            [% IF ! debug # disable logging in production %]
-                log = log4javascript.getNullLogger();
-            [% END %]
             [% USE JSON.Escape( pretty => 1 ) %]
             var projnames    = [% projections.json %];
         </script>

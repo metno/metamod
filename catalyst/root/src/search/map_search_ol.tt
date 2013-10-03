@@ -1,7 +1,6 @@
 
 <link rel="stylesheet" href="[% c.uri_for('/static/css/openlayers_theme/default/style.css') %]" type="text/css" />
 <script type="text/javascript" src="[% c.uri_for('/static/lib/OpenLayers.js') %]"></script>
-<script type="text/javascript" src="[% c.uri_for('/static/js/log4javascript-1.4.2/js/log4javascript.js') %]"></script>
 
 [% SET map_srid = search_ui_utils.selected_map() %]
 [% SET x1_id = search_ui_utils.html_id_for_map('x1') %]
@@ -49,13 +48,9 @@ dropdown list.
 
 //alert( "starting...." );
 
-var log = log4javascript.getDefaultLogger();
 [% IF debug %]
     // show bounding box values
     $('#bbox_params').show();
-[% ELSE %]
-    // disable logging in production
-    log = log4javascript.getNullLogger();
 [% END %]
 
 var map;
