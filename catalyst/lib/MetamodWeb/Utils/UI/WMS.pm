@@ -27,6 +27,7 @@ use Metamod::WMS;
 use Log::Log4perl qw(get_logger);
 use Carp;
 use Data::Dumper;
+use Try::Tiny;
 
 extends 'MetamodWeb::Utils::UI::Base';
 
@@ -59,10 +60,12 @@ Returns the GetCapabilities XML DOM for the dataset if it has any Wmsinfo. Retur
 sub wmscap {
     my $self = shift;
     my $url = shift or return; # expecting $ds->wmsurl
+    #die "Missing ? or & in WMS URL" unless $url =~ /[\?&]$/;
 
     #print STDERR "Getting WMS Capabilities at $url\n";
     $logger->debug("Getting WMS Capabilities at $url");
-    my $cap = eval { getXML($url . 'service=WMS&version=1.3.0&request=GetCapabilities') };
+    my $capurl = $self->getcap_url($url) or return;
+    my $cap = eval { getXML( $capurl ) };
     warn "WMS Capabilities error: $@" if $@;
     $logger->error("WMS Capabilities at $url failed: $@") if $@;
     return $cap;
@@ -154,6 +157,38 @@ sub wmsthumb {
         carp $_; # use logger - FIXME
         return;
     }
+}
+
+=head2 sanitize_wmsurl($url)
+
+Make sure $url ends in either '?' or '&' as defined in spec
+
+=cut
+
+sub sanitize_wmsurl {
+    my $self = shift;
+    my $url = shift or die "Missing parameter";
+    die "UGLY HACK URL is not allowed here" if $url =~ /%(THREDDS_|UGLY_HACK)/;
+    return $url if $url =~ /\?&$/;              # ok if ends with ? or &
+    return ($url =~ /\?/) ? "$url&" : "$url?";  # else add whatever is needed
+}
+
+=head2 getcap_url($url)
+
+Construct GetCapabilities URL
+
+=cut
+
+sub getcap_url {
+    my $self = shift;
+    my $url = shift or confess "Missing parameter";
+    $url = try {
+        $self->sanitize_wmsurl($url);
+    } catch {
+        $logger->error($_);
+        return;
+    };
+    return "${url}service=WMS&version=1.3.0&request=GetCapabilities";
 }
 
 =head1 LICENSE

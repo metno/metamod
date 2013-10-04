@@ -356,6 +356,13 @@ sub wmsinfo {
 
     #printf STDERR " ******** RAW WMSINFO: %s\n", $dom->toString(1);
 
+    my $xpc = XML::LibXML::XPathContext->new($root);
+    $xpc->registerNs('setup', "http://www.met.no/schema/metamod/ncWmsSetup");
+
+    foreach ( $xpc->findnodes('/*/setup:layer[@url]|/*/setup:baselayer[@url]') ) {
+        printf STDERR "--- Sanitize me! %s\n", sanitize_url( $_->getAttribute('name') );
+    }
+
     return $dom;
 
 }
@@ -592,6 +599,18 @@ sub external_ts_url {
     $logger->debug('Timeseries URL = ' . $tsurl);
 
     return $tsurl;
+}
+
+=head2 sanitize_wmsurl($url)
+
+Make sure $url ends in either '?' or '&' as defined in spec
+
+=cut
+
+sub sanitize_wmsurl {
+    my $url = shift or die "Missing parameter";
+    return $url if $url =~ /\?&$/;              # ok if ends with ? or &
+    return ($url =~ /\?/) ? "$url&" : "$url?";  # else add whatever is needed
 }
 
 =head1 LICENSE

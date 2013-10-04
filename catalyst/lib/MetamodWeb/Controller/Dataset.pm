@@ -128,7 +128,7 @@ A chained action for displaying the wmsinfo XML for a dataset.
 
 =cut
 
-sub xml :Chained("ds_id") :PathPart("wmsinfo") :Args(0) {
+sub wmsinfo :Chained("ds_id") :PathPart("wmsinfo") :Args(0) {
     my ( $self, $c ) = @_;
 
     eval {

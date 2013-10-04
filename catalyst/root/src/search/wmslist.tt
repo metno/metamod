@@ -93,12 +93,11 @@
         [% inputs = 0; %]
 
         [% FOREACH ds IN datasets %]
-            [% url = ds.wmsinfo.documentElement.getAttribute('url') _ '?service=WMS&version=1.3.0&request=GetCapabilities' # FIXME - must check if valid %]
 
             <h3>
                 [% IF 0 # debug %]
                     <a href="#" onclick="$(setup_[% ds.ds_id %]).toggle(800)">*</a>
-                    <a href="[% url %]">[% ds.ds_id %]</a>:
+                    <a href="[% wms_utils.getcap_url( ds.wmsurl ) %]">[% ds.ds_id %]</a>:
                 [% END %]
                 [% ds.ds_name %]
             </h3>
@@ -155,7 +154,7 @@
                         [% inputs = inputs + 1 %]
                     [% END %]
                     [% ELSE %]
-                        <div class="error_msg"><a href="[% ds.wmsurl %]?service=WMS&version=1.3.0&request=GetCapabilities">WMS server failure </a></div>
+                        <div class="error_msg"><a href="[% wms_utils.getcap_url(ds.wmsurl) %]">WMS server failure </a></div>
                     [% END %]
                 </div>
 

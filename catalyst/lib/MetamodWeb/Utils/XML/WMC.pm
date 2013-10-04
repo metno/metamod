@@ -287,9 +287,10 @@ sub _gen_wmc {
         '1.3.0' => '/root/xsl/gc2wmc.xsl',
         '1.1.1' => '/root/xsl/gc111_2wmc.xsl'
     );
+    $logger->warn("Rewrite _gen_wmc to sanitize $wmsurl");
 
     if ($wmsurl !~ /\?&/) {
-        $wmsurl .= ($wmsurl =~ /\?/) ? '&' : '?';
+        $wmsurl .= ($wmsurl =~ /\?/) ? '&' : '?'; # use WMS Utils sanitize_url instead
     }
     my $xslt = XML::LibXSLT->new();
     # get capabilities xml
@@ -306,11 +307,15 @@ sub _gen_wmc {
     $logger->debug("WMS Capabilities version $version");
 
     my $stylesheet = $xslt->parse_stylesheet_file( $self->c->path_to( $stylesheets{$version} ) );
+    $params = {} unless defined $params;
+    $$params{debug} = 1 if $logger->is_debug();
+    #print STDERR "_gen_wmc: ", Dumper $params;
     # generate wmc from capab
     my $wmcdoc = eval {
         $stylesheet->transform( $dom, XML::LibXSLT::xpath_to_string( %{$params} ) );
     } or die $@;
 
+    $logger->debug( 'WMC: ', $wmcdoc->toString(1) );
     return $wmcdoc;
 
 }
@@ -323,16 +328,18 @@ Generate WMC directly from wmsinfo setup document (can merge several Capabilitie
 
 sub setup2wmc {
     my ($self, $setup, $params) = @_;
+    #print STDERR "setup2wmc", $setup->toString(1);
 
     my $xslt = XML::LibXSLT->new();
 
     my $stylesheet = $xslt->parse_stylesheet_file( $self->c->path_to( '/root/xsl/setup2wmc.xsl' ) );
+    $params = {} unless defined $params;
+    $$params{debug} = 1 if $logger->is_debug();
+    #print STDERR "setup2wmc: ", Dumper $params;
     my $wmcdoc = eval {
         $stylesheet->transform( $setup, XML::LibXSLT::xpath_to_string( %{$params} ) );
     };
     croak " error: $@" if $@;
-
-    #print STDERR $wmcdoc->serialize;
 
     return $wmcdoc;
 

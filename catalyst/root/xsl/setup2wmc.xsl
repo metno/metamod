@@ -14,6 +14,8 @@
   <!--supports both WMS 1.1.1 and 1.3.0-->
   <!--does not currently handle wildcards in layer names in ncWmsSetup-->
 
+  <xsl:param name="debug">0</xsl:param>
+
   <xsl:output indent="yes"/>
 
   <xsl:template match="/">
@@ -44,7 +46,10 @@
   <xsl:template match="/*/setup:layer|/*/setup:baselayer">
     <xsl:variable name="name" select="@name"/>
     <xsl:variable name="proj" select="/*/setup:displayArea/@crs"/>
-    <xsl:variable name="url" select="concat(@url, '?service=WMS&amp;request=GetCapabilities&amp;version=1.3.0')"/>
+    <xsl:variable name="url" select="concat(@url, 'service=WMS&amp;request=GetCapabilities&amp;version=1.3.0')"/>
+    <xsl:if test="$debug">
+      <xsl:message>WMS URL = <xsl:value-of select="$url"/></xsl:message>
+    </xsl:if>
     <xsl:variable name="capab" select="document($url)"/>
     <xsl:variable name="version" select="$capab/*/@version"/>
     <xsl:comment><xsl:value-of select="concat($name,' - wms ',$version)"/></xsl:comment>

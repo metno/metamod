@@ -88,12 +88,13 @@ sub param {
 
 =head2 getXML()
 
-Fetch XML document from URL and parse as libxml DOM object
+Fetch XML document from URL and parse as libxml DOM object. Must be eval'ed
 
 =cut
 
 sub getXML {
     my $url = shift or die "Missing URL";
+    croak "getXML: Malformed URL in '$url'" unless $url =~ /^http:/;
     $logger->debug('GET ' . $url);
     my $ua = LWP::UserAgent->new;
     $ua->timeout(100);
@@ -109,8 +110,8 @@ sub getXML {
         return $dom;
     }
     else {
-        $logger->info("getXML failed for for $url: " . $response->status_line);
-        confess("getXML failed for for $url: " . $response->status_line);
+        $logger->warn("getXML failed for for $url: " . $response->status_line);
+        croak "getXML failed for for $url: " . $response->status_line;
     }
 }
 
@@ -144,7 +145,7 @@ sub outputXML { # move this stuff to a Catalyst controller
 
 Lookup WMS URL to background map for given CRS code
 
-TODO: read from master_config (not working... FIXME)
+TODO: read from master_config (not working... FIXME? are you sure this is not fixed???)
 
 =cut
 
@@ -153,18 +154,19 @@ sub getMapURL {
 
     $logger->debug("Getting map URL for $crs");
 
-    return $$coastlinemaps{ $crs }  if defined $$coastlinemaps{ $crs };
+    my $mapurl = $$coastlinemaps{ $crs };
+    if (! defined $$coastlinemaps{ $crs } ) {
+        # fallback to deprecated method if WMS_MAPS is not defined
+        my %mapconfig = (
+            "EPSG:4326"  => "WMS_WORLD_MAP",
+            "EPSG:32661" => "WMS_NORTHPOLE_MAP",
+            "EPSG:32761" => "WMS_SOUTHPOLE_MAP",
+        );
+        return unless defined $mapconfig{$crs}; # some projections will always lack background maps
 
-    # fallback to deprecated method if WMS_MAPS is not defined
-    my %mapconfig = (
-        "EPSG:4326"  => "WMS_WORLD_MAP",
-        "EPSG:32661" => "WMS_NORTHPOLE_MAP",
-        "EPSG:32761" => "WMS_SOUTHPOLE_MAP",
-    );
-    return unless defined $mapconfig{$crs}; # some projections will always lack background maps
+        my $mapurl = $config->get('WMS_BACKGROUND_MAPSERVER') . $config->get( $mapconfig{$crs} );
+    }
 
-    my $mapurl = $config->get('WMS_BACKGROUND_MAPSERVER') . $config->get( $mapconfig{$crs} );
-    return $mapurl;
     return $mapurl if $mapurl =~ /\?&$/; # ok if ends with ? or &
     return ($mapurl =~ /\?/) ? "$mapurl&" : "$mapurl?"; # else add whatever is needed
 }
