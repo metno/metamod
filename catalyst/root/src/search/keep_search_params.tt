@@ -30,7 +30,7 @@
     [% ELSIF param.key.search('date_to_') && category_type != 'date_interval' %]
         <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
     [% ELSIF param.key.search('freetext_') && category_type != 'fulltext' %]
-        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
+        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value | xml %]" />
     [% ELSIF ( param.key.search('map_coord_') || param.key == 'selected_map' ) && category_type != 'map_search' %]
         <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
     [% ELSIF ( param.key.search('shown_mt_name_')

@@ -225,7 +225,7 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
         $c->stash( dataset_count => $datasets->count() );
     } catch {
         $self->logger->debug("*** SEARCH ERROR: $_");
-        $self->add_error_msgs( $c, "<h4>Invalid search parameters</h4>$_" );
+        $self->add_error_msgs( $c, "Invalid search parameters: $_" );
         my $para = $c->request->params;
         my $path = "/" . $c->req->match;
         $c->response->redirect( $c->uri_for($path, $para ) );

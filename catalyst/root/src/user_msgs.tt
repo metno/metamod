@@ -31,7 +31,7 @@ function markFormErrors(fieldNames){
 [% IF c.flash.info_msgs %]
     <div class="info_msg">
         [% FOREACH msg IN c.flash.info_msgs %]
-            [% msg %] <br />
+            [% msg | xml %] <br />
         [% END %]
     </div>
 [% END %]
@@ -39,7 +39,7 @@ function markFormErrors(fieldNames){
 [% IF c.flash.error_msgs || c.flash.form_errors %]
     <div class="error_msg">
         [% FOREACH msg IN c.flash.error_msgs %]
-            [% msg %] <br />
+            [% msg | xml %] <br />
         [% END %]
 
         [% IF c.flash.form_errors %]
@@ -49,8 +49,8 @@ function markFormErrors(fieldNames){
             [% SET error_fields = [] %]
             [% FOREACH error IN c.flash.form_errors %]
                 <li>
-                [% error.value.label %] - [% error.value.msg %]
-                [% error_fields.push('"' _ error.key _ '"' ) %]
+                [% error.value.label %] - [% error.value.msg | xml %]
+                [% error_fields.push('"' _ error.key _ '"' ) | xml %]
                 </li>
             [% END %]
 
