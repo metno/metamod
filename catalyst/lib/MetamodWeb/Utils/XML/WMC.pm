@@ -71,11 +71,15 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
 
     #print STDERR "** SETUP = " . $setup->toString(1) . "\n\n";
 
+    my $config = $self->{ c }->stash->{ mm_config };
+
     my $setupxc = XML::LibXML::XPathContext->new( $setup->documentElement() );
     $setupxc->registerNs('s', "http://www.met.no/schema/metamod/ncWmsSetup");
 
     my $time = localtime();
     my %bbox = ( time => $time ); # currently only used for debug
+    my $maxlayers = $setup->documentElement->getAttribute('maxlayers');
+    $maxlayers = $config->get('MAX_WMS_LAYERS') unless defined $maxlayers;
 
     foreach ( $setupxc->findnodes('/*/s:displayArea/@*') ) {
         my ($k, $v) = ($_->localname, $_->getValue);
@@ -163,17 +167,20 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
 
             # move priority layer to new list
             $newlayers->appendChild( $layerlist->removeChild($gclayer) );
+            $maxlayers--;
         }
     }
 
     # move rest of layers to new list
     foreach ($gcxc->findnodes("v:Layer[not(child::v:Layer)]", $layerlist)) {
+        last unless $maxlayers > 0;
         #$_->setAttribute('hidden', 1) if $gcxc->findvalue('v:Name', $_) eq 'diana'; # FIXME
 
         $_->addNewChild( 'http://openlayers.org/context', 'ol:transparent' )->appendTextNode('true');
         $_->addNewChild( 'http://openlayers.org/context', 'ol:opacity' )->appendTextNode('0.6');
 
         $newlayers->appendChild( $layerlist->removeChild($_));
+        $maxlayers--;
     }
 
     # replace old (empty) layer list with new sorted
@@ -315,7 +322,7 @@ sub _gen_wmc {
         $stylesheet->transform( $dom, XML::LibXSLT::xpath_to_string( %{$params} ) );
     } or die $@;
 
-    $logger->debug( 'WMC: ', $wmcdoc->toString(1) );
+    #$logger->debug( 'WMC: ', $wmcdoc->toString(1) );
     return $wmcdoc;
 
 }

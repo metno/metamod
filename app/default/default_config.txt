@@ -306,6 +306,10 @@ WMS_NORTHPOLE_MAP = northpole.map
 WMS_SOUTHPOLE_MAP = southpole.map
 WMS_WORLD_MAP     = world.map
 
+# Max number of layers shown automatically in WMS client
+# Actual number may be higher or lower if specified explicitly in wmsinfo
+MAX_WMS_LAYERS = 30
+
 # ============ METAMODSEARCH configuration ==============
 
 # Max number of columns allowed in the search result page (obsolete?):

@@ -23,6 +23,7 @@
         <!-- the following attributes allow for substitution (%DATASET%, %DATASET_PARENT% etc) -->
         <attribute name="url" type="string" use="optional"/>
         <attribute name="aggregate_url" type="string" use="optional"/>
+        <attribute name="maxlayers" type="integer" use="optional"/>
     </complexType>
 
     <complexType name='DisplayArea'>

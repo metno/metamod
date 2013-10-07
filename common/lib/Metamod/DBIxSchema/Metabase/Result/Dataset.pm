@@ -175,6 +175,7 @@ use Log::Log4perl qw();
 use Metamod::FimexProjections;
 
 my $logger = Log::Log4perl::get_logger(__PACKAGE__);
+my $config = Metamod::Config->instance();
 
 =head2 $self->unqualified_ds_name()
 
@@ -293,19 +294,13 @@ sub projectioninfos {
 
 =head2 $self->fimex_projections()
 
-=over
-
-=item return
-
 Returns a Metamod::FimexProjections object (never null)
-
-=back
 
 =cut
 
 sub fimex_projections {
     my ($self) = @_;
-    my $config = Metamod::Config->instance();
+
     return new Metamod::FimexProjections() unless $config->get('FIMEX_PROGRAM');
 
     my $projinfo_row = $self->projectioninfos()->first();
@@ -325,16 +320,10 @@ sub fimex_projections {
 
 =head2 $self->wmsinfo()
 
-=over
-
-=item return
-
 Returns the C<wi_content> XML DOM for the dataset if it has any Wmsinfo. Returns undef otherwise.
 
 From 2.11 wmsinfo is delivered "as is" - variable substituion (%DATASET% etc) is
 now done in $self->wmsurl which should be called insteadd of wmsinfo() where appropriate.
-
-=back
 
 =cut
 
@@ -359,9 +348,9 @@ sub wmsinfo {
     my $xpc = XML::LibXML::XPathContext->new($root);
     $xpc->registerNs('setup', "http://www.met.no/schema/metamod/ncWmsSetup");
 
-    foreach ( $xpc->findnodes('/*/setup:layer[@url]|/*/setup:baselayer[@url]') ) {
-        printf STDERR "--- Sanitize me! %s\n", sanitize_url( $_->getAttribute('name') );
-    }
+    #foreach ( $xpc->findnodes('/*/setup:layer[@url]|/*/setup:baselayer[@url]') ) {
+        #printf STDERR "--- Sanitize me! %s\n", sanitize_url( $_->getAttribute('name') ); # sanitize_url seems to be removed
+    #}
 
     return $dom;
 
@@ -551,7 +540,6 @@ sub file_location {
 
     my $metadata = $self->metadata( ['dataref'] );
 
-    my $config = Metamod::Config->instance();
     my $opendap_basedir = $config->get('OPENDAP_BASEDIR') || '';
     my $thredds_dataset_prefix = $config->get('THREDDS_DATASET_PREFIX') || '';
 
@@ -586,7 +574,6 @@ Returns an URL to the image file. Returns C<undef> if the URL cannot be calculat
 sub external_ts_url {
     my $self = shift;
 
-    my $config = Metamod::Config->instance();
     my $tsurl = $config->get('TIMESERIES_URL') or return;
 
     my $metadata = $self->metadata( ['dataref_OPENDAP', 'timeseries'] );
@@ -601,17 +588,19 @@ sub external_ts_url {
     return $tsurl;
 }
 
-=head2 sanitize_wmsurl($url)
-
-Make sure $url ends in either '?' or '&' as defined in spec
-
-=cut
-
-sub sanitize_wmsurl {
-    my $url = shift or die "Missing parameter";
-    return $url if $url =~ /\?&$/;              # ok if ends with ? or &
-    return ($url =~ /\?/) ? "$url&" : "$url?";  # else add whatever is needed
-}
+## seems like this has been moved to MetamodWeb::Utils::UI::WMS
+#
+#=head2 sanitize_wmsurl($url)
+#
+#Make sure $url ends in either '?' or '&' as defined in spec
+#
+#=cut
+#
+#sub sanitize_wmsurl {
+#    my $url = shift or die "Missing parameter";
+#    return $url if $url =~ /\?&$/;              # ok if ends with ? or &
+#    return ($url =~ /\?/) ? "$url&" : "$url?";  # else add whatever is needed
+#}
 
 =head1 LICENSE
 
