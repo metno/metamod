@@ -144,8 +144,8 @@ sub wmsthumb {
 
         my $out = {
             xysize  => $size,
-            datamap => "$layer{url}?$wmsparams&LAYERS=$layer{name}&STYLES=$layer{style}",
-            outline => $mapurl ? "$mapurl?$wmsparams&TRANSPARENT=true&LAYERS=borders&STYLES=" : undef, # FIXME remove hardcoded LAYERS
+            datamap => "$layer{url}$wmsparams&LAYERS=$layer{name}&STYLES=$layer{style}",
+            outline => $mapurl ? "${mapurl}$wmsparams&TRANSPARENT=true&LAYERS=borders&STYLES=" : undef, # FIXME remove hardcoded LAYERS
             wms_url => $wms_url,
         };
 
