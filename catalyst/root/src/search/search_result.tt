@@ -77,9 +77,9 @@ jQuery(document).ready( function () {
             <strong class="dataset_name">
             [% IF search_ui_utils.looks_like_url( metadata.dataref.0 ) %]
                 <a name="ds[% dataset.ds_id %]" href="[% metadata.dataref.0 %]">
-                [% dataset.unqualified_ds_name %]</a>
+                [% search_ui_utils.wrap_text( dataset.unqualified_ds_name, 30 ) %]</a>
             [% ELSE %]
-                [% dataset.unqualified_ds_name %]
+                [% search_ui_utils.wrap_text( dataset.unqualified_ds_name, 30 ) %]
             [% END %]
             </strong>
 
@@ -111,7 +111,7 @@ jQuery(document).ready( function () {
                     <a class="btn" href="[% c.uri_for( '/dataset', dataset.ds_id, 'rss' ) %]" target="_blank" title="The RSS feed for this dataset. The RSS feed will notify you about any new datafiles associated with this dataset"><span>RSS Feed</span></a><br clear="all"/>
 
                     [% IF mm_config.get('SUBSCRIPTION_ENABLED') == 'ENABLED' and search_ui_utils.dataset_in_userbase(dataset) %]
-                        <a class="btn" href="[% c.uri_for( '/subscription', dataset.unqualified_ds_name() ) %]" title="Setup a subscription to get notified about new datafiles (requires login)"><span>Subscribe</span></a><br />
+                        <a class="btn" href="[% c.uri_for( '/subscription', dataset.unqualified_ds_name() ) %]" title="Setup a subscription to get notified about new datafiles (requires login)"><span>Subscribe</span></a><br clear="all"/>
                     [% END %]
 
                     [% c.req.params.return_path = c.uri_for(c.req.path) %]

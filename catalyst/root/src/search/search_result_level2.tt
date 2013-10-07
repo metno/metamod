@@ -52,10 +52,10 @@
     <td class="sub_result">
         [% IF search_ui_utils.looks_like_url(child_metadata.dataref.0) %]
             <a href="[% child_metadata.dataref.0 %]">
-            [% child.unqualified_ds_name %]</a>
+            [% search_ui_utils.wrap_text( child.unqualified_ds_name, 30 ) %]</a>
             <br />
         [% ELSE %]
-            [% child.unqualified_ds_name %]
+            [% search_ui_utils.wrap_text( child.unqualified_ds_name, 30 ) %]
         [% END %]
 
         <div class="btns" _class="dataset_actions">

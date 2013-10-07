@@ -1360,6 +1360,25 @@ sub trim {
     return $string;
 }
 
+=head2 $self->wrap_text($string, $len)
+
+Chop a string into fixed lenght lines w/ line breaks each $len chars
+
+=cut
+
+sub wrap_text {
+    my ($self, $string, $len) = @_;
+    return unless defined $string;
+    return $string unless $len;
+
+    my @lines;
+    while ( $_ = substr($string, 0, $len, '') ) {
+        push @lines, $_;
+        print STDERR "--- $_\n"
+    }
+    return join("\n", @lines);
+}
+
 __PACKAGE__->meta->make_immutable;
 
 =head1 LICENSE
