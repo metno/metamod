@@ -90,6 +90,7 @@ metamodweb_server.pl [options]
                         (defaults to false. this is a no-op on Win32)
    --background         run the process in the background
    --pidfile            specify filename for pid file
+   --config             where to look for master_config
 
  See also:
    perldoc Catalyst::Manual

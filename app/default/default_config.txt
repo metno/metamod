@@ -456,7 +456,7 @@ EMAIL_SUBJECT_WHEN_UPLOAD_ERROR = METAMOD file upload error
 FROM_ADDRESS = [==OPERATOR_EMAIL==]
 
 # Final greetings and signature included in E-mail to users:
-#EMAIL_SIGNATURE =
+EMAIL_SIGNATURE =
 # Best regards,
 # The project team for the EXAMPLE project
 

@@ -275,7 +275,7 @@ using sockets instead of TCP/IP by editing pg_hba.conf (replace 9.1 with correct
 
   $ sudo $EDITOR /etc/postgresql/9.1/main/pg_hba.conf
 
-Then change C<local> from "peer" to "trust" at the end of the file:
+Then go to the end of the file and change C<local> from "peer" to "trust" at the two places indicated below:
 
   # DO NOT DISABLE!
   # If you change this first entry you will need to make sure that the

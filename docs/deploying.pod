@@ -166,10 +166,8 @@ et al).
 
 First, try starting Catalyst by running
 
-  $ export PERL5LIB=/opt/metno-metamod-2.13/common/lib:/opt/metno-metamod-2.13/catalyst/lib:/opt/metno-metamod-2.13/local/lib/perl5
-  $ /opt/metno-metamod-2.13/catalyst/script/metamodweb_server.pl -d myapp
-
-replacing the path to METAMOD on line 2 if running from source.
+  $ ./bin/activate
+  $ metamodweb_server.pl
 
 MetamodWeb should now be available on L<http://localhost:3000/>.
 If all set you should see the METAMOD search interface.
