@@ -16,11 +16,17 @@
         </style>
 
         <link rel="stylesheet" href="[% c.uri_for('/static/css/metamod_theme/jquery-ui.css') %]" />
-        <script type="text/javascript" src="[% c.uri_for('/static/js/console.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/jquery.min.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/jquery-ui.min.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/lib/OpenLayers.js') %]"></script>
         <script type="text/javascript" src="[% c.uri_for('/static/js/TimeSlider.js') %]"></script>
+        <script type="text/javascript" src="[% c.uri_for('/static/lib/log4javascript-1.4.6/js/log4javascript.js') %]"></script>
+        <script type="text/javascript">
+            var log = log4javascript.getLogger();
+            log4javascript.logLog.setAlertAllErrors(true);
+            var appender = new log4javascript.BrowserConsoleAppender();
+            log.addAppender(appender);
+        </script>
 
         <script type="text/javascript">
             // making this a global variable so that it is accessible for debugging/inspecting in Firebug

@@ -20,26 +20,26 @@
 [% FOREACH param IN c.req.parameters %]
 
     [% IF param.key.search('hk_id_') && category_type != 'tree' %]
-        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
+        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value | xml %]" />
     [% ELSIF (matches = param.key.match('bk_id_(\d+)')) %]
         [% IF matches.0 != category_id %]
-            <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
+            <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value | xml %]" />
         [% END %]
     [% ELSIF param.key.search('date_from_') && category_type != 'date_interval' %]
-        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
+        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value | xml %]" />
     [% ELSIF param.key.search('date_to_') && category_type != 'date_interval' %]
-        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
+        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value | xml %]" />
     [% ELSIF param.key.search('freetext_') && category_type != 'fulltext' %]
         <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value | xml %]" />
     [% ELSIF ( param.key.search('map_coord_') || param.key == 'selected_map' ) && category_type != 'map_search' %]
-        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
+        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value | xml %]" />
     [% ELSIF ( param.key.search('shown_mt_name_')
                || param.key == 'vertical_mt_name'
                || param.key == 'horisontal_mt_name'
                || param.key == 'datasets_per_page'
                || param.key == 'files_per_page' )
              && category_type != 'search_options' %]
-        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value %]" />
+        <input type="hidden" name="[% param.key %]" id="[% param.key %]" value="[% param.value | xml %]" />
     [% END %]
 
 [% END %]
