@@ -1,0 +1,176 @@
+#!/usr/bin/perl -w
+
+=begin LICENSE
+
+METAMOD - Web portal for metadata search and upload
+
+Copyright (C) 2008 met.no
+
+Contact information:
+Norwegian Meteorological Institute
+Box 43 Blindern
+0313 OSLO
+NORWAY
+email: egil.storen@met.no
+
+This file is part of METAMOD
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+METAMOD is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with METAMOD; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=end LICENSE
+
+=cut
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib ("$FindBin::Bin/../../common/lib", '.');
+
+use Metamod::Config;
+use Getopt::Long;
+use Log::Log4perl qw();
+use Data::Dumper;
+use Pod::Usage;
+use Try::Tiny;
+use LWP::UserAgent;
+use HTTP::Status qw(:constants :is status_message);
+
+=head1 NAME
+
+B<lsds> - List datasets
+
+=head1 DESCRIPTION
+
+Work in progress... currently lists all sets with wmsinfo and checks the URL
+
+=head1 USAGE
+
+  lsds
+
+=cut
+
+my $config_file_or_dir = $ENV{METAMOD_MASTER_CONFIG};
+GetOptions('config=s' => \$config_file_or_dir); # don't fail in case set in ENV
+if(!Metamod::Config->config_found($config_file_or_dir)){
+    pod2usage(1);
+}
+my $config = Metamod::Config->new($config_file_or_dir);
+my $logger = Log::Log4perl->get_logger('metamod.search');
+
+use Metamod::DBIxSchema::Metabase;
+#use Metamod::DBIxSchema::Userbase;
+
+my $ownertags = $config->get('DATASET_TAGS');
+my $wmstest;
+GetOptions('ownertags=s' => \$ownertags.
+           'wmstest' => \$wmstest,
+           );
+
+#my %opts = ();
+#GetOptions (\%opts,
+#            'length=i',
+#
+#);
+
+my $ua = LWP::UserAgent->new;
+$ua->timeout(10);
+#$ua->env_proxy;
+
+my $db =_build_metabase();
+
+my $search_criteria = { @ARGV };
+print STDERR Dumper $search_criteria;
+my $search_params = {
+        ownertags => $ownertags,
+        search_criteria => $search_criteria,
+        rows_per_page   => 1000,
+};
+
+my $rs = $db->resultset('Dataset');
+#$rs->search();
+$rs->metadata_search($search_params);
+
+exit;
+
+while (my $ds = $rs->next) {
+    printf "[%d] %s ", $ds->ds_id, $ds->ds_name;
+    if ($wmstest && $ds->wmsinfo) {
+        if ($ds->wmsurl) {
+            my $rq = $ua->get($ds->wmsurl . 'service=WMS&version=1.3.0&request=GetCapabilities');
+            print $rq->code, ' ', status_message( $rq->code ), "\n";
+        } else {
+            print "*Missing URL*\n";
+        }
+    }
+}
+
+#my $datasets = try {
+#    $dataset->metadata_search($search_params);
+#} catch {
+#    die $@;
+#};
+
+#foreach my $parent( $db->level1_datasets($ownertags) ) {
+#    printf "- %d\n", $parent->ds_id;
+#}
+
+sub _build_metabase {
+
+    my $metabase = Metamod::DBIxSchema::Metabase->connect(
+        $config->getDSN(),
+        $config->get('PG_ADMIN_USER'),
+        $config->has('PG_ADMIN_USER_PASSWORD') ? $config->get('PG_ADMIN_USER_PASSWORD') : '',
+    ) or die "No connect";
+
+    #my $query_log = DBIx::Class::QueryLog->new;
+    #$metabase->storage->debugobj($query_log);
+
+    return $metabase;
+}
+
+sub getXML {
+    my $url = shift or die "Missing URL";
+    #$logger->debug('GET ' . $url);
+
+    my $response = $ua->get($url);
+
+    if ($response->is_success) {
+        #print STDERR $response->content;
+        my $dom;
+        eval { $dom = XML::LibXML->load_xml( string => $response->content ) }
+            or croak($@);
+        return $dom;
+    }
+    else {
+        $logger->info("getXML failed for for $url: " . $response->status_line);
+        die("getXML failed for for $url: " . $response->status_line);
+    }
+}
+
+=head1 AUTHOR
+
+Geir Aalberg, E<lt>geira@met.noE<gt>
+
+=head1 LICENSE
+
+Copyright (C) 2013 The Norwegian Meteorological Institute.
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+=cut
