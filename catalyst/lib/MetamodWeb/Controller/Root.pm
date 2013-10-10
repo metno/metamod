@@ -139,20 +139,6 @@ sub auto :Private {
     return 1;
 }
 
-=head2 end
-
-Default end action. Attempt to render a view, if needed.
-
-It is seldom necessary to override the end() action in a sub controller.
-
-=cut
-
-sub end : ActionClass('RenderView') :Does('DumpQueryLog') :Does('DeleteStash')  {
-    my ( $self, $c ) = @_;
-
-
-}
-
 =head2 version
 
 Displays version information
@@ -165,6 +151,51 @@ sub version :Path('/version') :Args(0) {
     $c->response->content_type('text/plain');
     my $dir = $c->stash->{mm_config}->get('INSTALLATION_DIR');
     $c->serve_static_file( "$dir/VERSION" );
+}
+
+=head2 end
+
+Default end action. Attempt to render a view, if needed.
+
+It is seldom necessary to override the end() action in a sub controller. [Well, actually we would like that...]
+
+=cut
+
+#sub end : ActionClass('RenderView') :Does('DumpQueryLog') :Does('DeleteStash')  {
+#    my ( $self, $c ) = @_;
+#}
+
+=head3 Custom error page
+
+This is used to avoid the dreaded "Come back later" screen
+
+=cut
+
+sub end : ActionClass('RenderView') :Does('DumpQueryLog') :Does('DeleteStash')  {
+    my ( $self, $c ) = @_;
+
+    $c->stash->{title} = 'METAMOD fatal error';
+    $c->stash->{URI} = $c->req->uri();
+    $c->response->status(500);
+
+    if ( scalar @{ $c->error } ) {
+        $c->stash->{errors}   = $c->error;
+        for my $error ( @{ $c->error } ) {
+            $c->log->error($error);
+        }
+        $c->stash->{template} = 'errors.tt';
+        $c->forward('MetamodWeb::View::TT');
+        $c->clear_errors;
+    }
+
+    return 1 if $c->response->status =~ /^3\d\d$/;
+    return 1 if $c->response->body;
+
+    unless ( $c->response->content_type ) {
+        $c->response->content_type('text/html; charset=utf-8');
+    }
+
+    $c->forward('MetamodWeb::View::TT');
 }
 
 __PACKAGE__->meta->make_immutable;

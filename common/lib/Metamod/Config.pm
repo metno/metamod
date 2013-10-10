@@ -270,11 +270,35 @@ sub _normalizeFile {
     return Cwd::abs_path($file);
 }
 
+=head2 $self->set($varname, $value)
+
+Set a configuration variable
+
+=cut
+
+sub set {
+    my ($self, $var, $value) = @_;
+    $self->{vars}->{$var} = $value;
+    return $self; # useful for chaining
+}
+
+=head2 $self->unset()
+
+Set a configuration variable
+
+=cut
+
+sub unset {
+    my ($self, $var, $value) = @_;
+    delete $self->{vars}->{$var};
+    return $self; # useful for chaining
+}
+
 =head2 $self->get($varname)
 
 return the configuration variable configVar as currently set. This will reread the
 config-file each time it has been changed. Gives a warning if not specified in
-master_config.
+master_config (mostly for historical reasons before sensible defaults were implemented).
 
 =cut
 

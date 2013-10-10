@@ -181,3 +181,11 @@ li {
 textarea.wms_info textarea.projection_info {
     white-space: pre;
 }
+
+.diagnostic {
+    background-color: #ccbbdd;
+    font-family: monospace;
+    font-size: small;
+    padding: 8px 8px 8px 8px;
+    overflow:scroll;
+}

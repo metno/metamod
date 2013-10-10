@@ -118,6 +118,7 @@ sub add_dataset {
 
     my @ds_ids = @{ $self->dataset_ids };
     my %ds_ids = map { $_ => 1 } @ds_ids;
+    my $user   = $self->c->user->u_loginname || '(none)';
 
     my $dataset = $self->meta_db->resultset('Dataset')->find($ds_id);
 
@@ -140,7 +141,7 @@ sub add_dataset {
         # basket is full, go away
         my $msg = "Could not add the file to the basket since the basket would then exceed the allowed number of files ($max_files).";
         $self->add_user_msg($msg);
-        $self->logger->info("Could not add file to collection basket as it exceeds the max count of $max_files");
+        $self->logger->info("Could not add file $ds_id to collection basket for $user as it exceeds the max count of $max_files");
         return;
     }
 
@@ -158,7 +159,7 @@ sub add_dataset {
             if ($child_datasets->count() > $max_additional) {
                 my $msg = "Could not add all files to the basket since the basket would then exceed the allowed number of files ($max_files).";
                 $self->add_user_msg($msg);
-                $self->logger->info("Could not add file to collection basket as it exceeds the max count of $max_files");
+                $self->logger->info("Could not add files under $ds_id to collection basket for $user as it exceeds the max count of $max_files");
                 return;
 
             } else {
@@ -174,7 +175,7 @@ sub add_dataset {
                             my $msg = 'Could not add all files to the basket since the basket would then exceed the ';
                             $msg .= "allowed maximum size ($max_size bytes).";
                             $self->add_user_msg($msg);
-                            $self->logger->info("Could not add file to collection basket as it exceeds the max size of $max_size");
+                            $self->logger->info("Could not add file $ds_id to collection basket for $user as it exceeds the max size of $max_size");
                             #last;
                             return; # better not to add any files at all if size is too big
                         }
@@ -206,11 +207,11 @@ sub add_dataset {
             } else {
                 my $msg = 'Could not add the file to the basket since the basket would then exceed the allowed maximum byte size.';
                 $self->add_user_msg($msg);
-                $self->logger->info("Could not add file to collection basket as it exceeds the max byte size");
+                $self->logger->info("Could not add file $ds_id to collection basket for $user as it exceeds the max byte size");
                 return;
             }
         } else {
-            $self->logger->warn("Tried to add level 2 dataset without data_file_location to basket. Error in UI");
+            $self->logger->warn("$user tried to add level 2 dataset without data_file_location to basket. Error in UI");
             return;
         }
     }

@@ -40,6 +40,8 @@ use FindBin;
 use lib ("$FindBin::Bin/../../common/lib", '.');
 
 use Metamod::Config;
+use Metamod::DBIxSchema::Metabase;
+#use Metamod::DBIxSchema::Userbase;
 use Getopt::Long;
 use Log::Log4perl qw();
 use Data::Dumper;
@@ -69,9 +71,6 @@ if(!Metamod::Config->config_found($config_file_or_dir)){
 }
 my $config = Metamod::Config->new($config_file_or_dir);
 my $logger = Log::Log4perl->get_logger('metamod.search');
-
-use Metamod::DBIxSchema::Metabase;
-#use Metamod::DBIxSchema::Userbase;
 
 my $ownertags = $config->get('DATASET_TAGS');
 my $wmstest;

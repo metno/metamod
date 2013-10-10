@@ -1,0 +1,12 @@
+
+
+<h1>Congratulations!</h1>
+
+<p>You have managed to break METAMOD in a new and mysterious way we have never seen before.
+There might be a prize for this. Please contact our <a href"mailto:[% mm_config.get('OPERATOR_EMAIL') %]">code monkeys</a> and include the
+diagnostic information below to see if you've won:</p>
+
+<pre class="diagnostic">
+URL: [% URI %]
+[% errors.join("\n") %]
+</pre>
