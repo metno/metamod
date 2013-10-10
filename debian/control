@@ -17,4 +17,4 @@ Recommends: exim4 | postfix | sendmail, libxml2-utils, mailx, postgresql, postgr
 Conflicts:
 Replaces:
 Provides: metamod-2
-Description: Installation packages for metamod instances, i.e. portals for geographical metadata handling.
+Description: portal solution providing Discovery, Access and Retrieve functionality for scientific datasets

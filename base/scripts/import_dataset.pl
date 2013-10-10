@@ -30,6 +30,7 @@ along with METAMOD; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =end LICENSE
+
 =cut
 
 use strict;
@@ -179,3 +180,18 @@ sub update_database {
 
     return;
 }
+
+=head1 AUTHOR
+
+Heiko Klein, E<lt>heikok@met.noE<gt>
+
+=head1 LICENSE
+
+Copyright (C) 2008 The Norwegian Meteorological Institute.
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+=cut

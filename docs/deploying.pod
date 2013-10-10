@@ -137,14 +137,14 @@ et al).
 
 =head3 Catalyst daemon
 
-First, try starting Catalyst by running
+Now try starting Catalyst by running
 
   $ ./bin/activate        # if not done already
   $ metamodweb_server.pl
 
 MetamodWeb should now be available on L<http://localhost:3000/>.
 If all set you should see the METAMOD search interface.
-Stop with ctrl-c.
+Stop it with ctrl-c.
 
 =head3 Other METAMOD daemons (FIXME)
 
@@ -161,160 +161,3 @@ functionality. You may start them if needed (add path if not included in PATH).
 
 Congratulations! You have now a working METAMOD installation!
 
-=head2 Installing services
-
-B<Note: The remaining instructions are only required in automated server environments.>
-For personal demo use you may safely skip the rest of this document.
-
-After installation of the software and one or more configurations, you should
-now install the application services where the operating system can find it.
-Currently only Debian-based Linux systems are supported.
-
-This script will create an Apache configuration file, as well as init.d scripts
-for automatic starting and stopping of Catalyst and the various METAMOD services
-for the specific application. These files are normally owned by root and will be
-placed in in F<E<lt>configuration dirE<gt>/etc>, and then symlinked into F</etc/apache2> and
-F</etc/init.d>.
-
-  $ cd /opt/metno-metamod-2.13 # or elsewhere if installed from source
-  $ ./install_jobs.sh <config>
-
-=head3 Users with restricted sudo privileges
-
-Some users may not have full sudo rights, and/or having PERL5LIB stripped out when
-running under sudo (see L<http://www.sudo.ws/sudo/alerts/perl_env.html>). You will
-then typically get the following error message:
-
-  sudo: sorry, you are not allowed to set the following environment variables: PERL5LIB
-
-If so you may run install_jobs with the -u option (for unprivileged), in which case
-all files will be owned by yourself instead of root:
-
-  $ ./install_jobs.sh -u <config>
-
-Note that this is not recommended in production environments where several login
-users are administering the system.
-
-You may then try to start it as a service:
-
-  $ sudo /etc/init.d/catalyst-APPLICATION_ID start
-
-=head3 Apache
-
-Accessing METAMOD directly from Catalyst is not recommended in production;
-instead a proxy server like Apache is recommended. C<./install_jobs.sh>
-automatically generates the necessary Apache setup files for you.
-
-If this has not already been done you need to enable the Apache proxy and rewrite modules.
-Look in /etc/apache2/mods-enabled to see if they have already been enabled.
-
-  $ sudo a2enmod proxy
-  $ sudo a2enmod proxy_http
-  $ sudo a2enmod rewrite
-
-Restart Apache:
-
-  $ sudo apache2ctl restart
-
-or if the site is busy:
-
-  $ sudo apache2ctl graceful
-
-which will wait until all connections are terminated before restarting.
-
-The site should now hopefully be available on
-
-  http://localhost/APPLICATION_ID
-
-=head3 METAMOD services
-
-Start METAMOD:
-
-  $ sudo /etc/init.d/metamodServices-APPLICATION_ID start
-
-This should start the required services daemons.
-
-
-=begin OBSOLETE
-
-=head2 TESTING (FIXME)
-
-2. To copy the software to the target directory and make the substitutions
-prescribed by the master_config.txt file, do the following:
-cd to the source directory (i.e. this directory)
-run:    ./update_target.pl app/example
-
-3. Assuming the PostgreSQL software is already installed, the PostgreSQL
-users (admin and webuser) that are to access the database must be created.
-This step is only needed one time. PostgreSQL users are for the whole
-PostgreSQL installation, and not connected to specific databases.
-cd to the target directory
-run:    scripts/createusers.sh
-
-4. Initialize the runtime environment:
-cd to the target directory
-run:    ./prepare_runtime_env.sh
-
-5. Initialize the database, and load static data:
-cd to the target directory
-cd init
-run:    ./create_and_load_all.sh
-You may check the output of this script in the create_and_load_all.out
-file in the same init directory.
-
-6. Ensure that you have a working Apache 2.x installation with mod_proxy.
-The httpd daemon should run as the same user as the METAMOD 2.x perl scripts.
-Otherwise problems with access rights to files in the webrun directory
-will arise. These problems could be solved by using 'umask'
-and similar tools, but the METAMOD 2.x software is not prepared for this.
-The Apache installation must allow .htaccess files and softlinks.
-
-7. Make the METAMOD 2.x URLs accessible through the Apache server. This can
-either be done by making the METAMOD 2.x htdocs directory the Apache 2.x
-DocumentRoot directory. Otherwise, this can be done by providing a symbolic
-link in the Apache 2.x DocumentRoot directory to the METAMOD 2.x htdocs
-directory. This symbolic link must agree with the LOCAL_URL set up in the
-master_config.txt file.
-
-8. At this time all the web applications should work. Confirm this by visiting
-the URLs for the two main web pages in the example application
-(METAMODSEARCH and METAMODUPLOAD) from a browser (the URLs are found in
-the master_config.txt file). Check also that the administration web
-page is working.
-
-9. Enter the METAMODUPLOAD web page from a browser and create a user
-account. The operator will recieve an E-mail with the user details and an URL.
-Activating this URL will admit the user into the system. After activating this
-URL, the user recieves an E-mail with a password. In the test environment,
-this E-mail will be sent to the operator instead.
-
-10. Start the perl scripts responsible for loading data into the database:
-cd to the target directory
-run:     ./metamodInit.sh start
-
-11. Enter the METAMODUPLOAD web page from a browser and log into the
-user account you have created. Enter the "Administration" page and create
-the directory 'test1' (this will also be the name of a new dataset that
-later will be loaded into the database). Go back to the "Upload files" page
-and upload the two files test1_arctic20.200611.cdl and test1_synop_99710.cdl
-found in the testdata directory.
-
-12. After a few minutes, check that metadata from the files have been
-loaded into the database. This can be done by looking at the system log
-(path defined by the LOG4ALL_SYSTEM_LOG variable in master_config.txt), and by
-entering the METAMODSEARCH web page and search for the data.
-
-13. Do a similar exercise with the files test2_arctic20.200611.cdl and
-test2_synop_99710.cdl. A new directory/dataset has to be created for these
-files in the administration page: 'test2'. These files do not satisfy the
-requirements specified in the etc/conf_digest_nc.xml file. The perl script
-digesting these files will generate an error report that will be accessible
-from the METAMODUPLOAD web page. Also, the data provider will be
-sent an E-mail with a reference to this error report. In the test environment,
-this E-mail will be sent to the operator instead.
-
-14. Stop the perl scripts responsible for loading data into the database:
-cd to the target directory
-run:     ./metamodInit.sh stop
-
-=end OBSOLETE

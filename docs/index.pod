@@ -30,6 +30,10 @@ Configuration details and custom templates
 
 Setting up a METAMOD application
 
+=item L<Server deployment|server>
+
+Additional setup for servers running METAMOD as an automated service
+
 =item L<Upgrading|upgrade/index>
 
 Upgrading from an older version of METAMOD
