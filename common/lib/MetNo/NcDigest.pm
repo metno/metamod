@@ -20,6 +20,24 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
+=head1 NAME
+
+
+=head1 SYNOPSIS
+
+
+
+=head1 DESCRIPTION
+
+=head1 TODO
+
+Rewrite as Object-oriented class
+
+
+=head1 FUNCTIONS
+
+=cut
+
 use strict;
 use warnings;
 
@@ -156,6 +174,14 @@ my %parse_actions = (
 );
 $parse_actions{ dimensions } = $parse_actions{"vocabulary"};
 
+
+
+=head2 digest
+
+...
+
+=cut
+
 sub digest {
     my ( $pathfilename, $ownertag, $xml_metadata_path, $is_child ) = @_;
 
@@ -230,10 +256,14 @@ sub digest {
 }
 
 
+
+=head2 global
+
+Add to the %globswitches and %globlists hashes.
+
+=cut
+
 sub global {
-#
-# Add to the %globswitches and %globlists hashes.
-#
    my ($refval,$path,$level) = @_;
    my @patharr = split(m:/:,$path);
    if (ref($refval) ne "ARRAY") {
@@ -267,13 +297,16 @@ sub global {
    }
 };
 
+=head2 att
+
+Add attributes to the %attributes hash using keys as:
+"<structure name>,<glob_or_var>,<attribute name>" where <structure name>
+is "default" or the name of another structure, and <glob_or_var> is either
+"global_attributes" or the name of a variable.
+
+=cut
+
 sub att {
-#
-#  Add attributes to the %attributes hash using keys as:
-#  "<structure name>,<glob_or_var>,<attribute name>" where <structure name>
-#  is "default" or the name of another structure, and <glob_or_var> is either
-#  "global_attributes" or the name of a variable.
-#
    my ($refval,$path,$level) = @_;
    my @patharr = split(m:/:,$path);
    if (ref($refval) eq "HASH") {
@@ -290,10 +323,13 @@ sub att {
    }
 };
 
+=head2 set
+
+Initialize global switch (in %globswitches) as set.
+
+=cut
+
 sub set {
-#
-# Initialize global switch (in %globswitches) as set.
-#
    my ($refval,$path,$level) = @_;
    my @patharr = split(m:/:,$path);
    if (ref($refval) eq "ARRAY") {
@@ -332,31 +368,35 @@ sub structure {
    }
 };
 
+=head2 vocabulary
+
+Add to the %vocabularies hash.
+
+The keys to this hash has the form: "<structname>,<glob_or_var>,<attributename>" where:
+
+    <structname> is "default" or the name of another structure.
+    <glob_or_var> is "global_attribute" or variable name.
+    <attributename> is name of the attribute.
+
+Each hash value is a reference to an array with five elements:
+
+    [0]:  Reference to the @content array containing the original lines
+          within the vocabulary. These are used to search for switches
+          that are to be set if a line matches an attribute value.
+    [1]:  Reference to the @rcontent array with regular expressions
+          corresponding to each @content line. NOTE: The original line
+          (in @content) must not contain any special characters used in
+          regular expressions (^ $ [ ] \ ( ) ? | ? * + { } ).
+    [2]:  Reference to the @mapcontent array (see below).
+    [3]:  String telling what to do if value not found in vocabulary.
+          Is one of: "use", "notuse" or "use_first_in_vocabulary".
+    [4]:  Error message key (string) to be used if value not found
+          in vocabulary. Could be an empty string.
+
+=cut
+
 sub vocabulary {
-#
-#     Add to the %vocabularies hash.
-#
-#     The keys to this hash has the form: "<structname>,<glob_or_var>,<attributename>"
-#
-#     where:     <structname> is "default" or the name of another structure.
-#                <glob_or_var> is "global_attribute" or variable name.
-#                <attributename> is name of the attribute.
-#
-#     Each hash value is a reference to an array with five elements:
-#
-#     [0]:  Reference to the @content array containing the original lines
-#           within the vocabulary. These are used to search for switches
-#           that are to be set if a line matches an attribute value.
-#     [1]:  Reference to the @rcontent array with regular expressions
-#           corresponding to each @content line. NOTE: The original line
-#           (in @content) must not contain any special characters used in
-#           regular expressions (^ $ [ ] \ ( ) ? | ? * + { } ).
-#     [2]:  Reference to the @mapcontent array (see below).
-#     [3]:  String telling what to do if value not found in vocabulary.
-#           Is one of: "use", "notuse" or "use_first_in_vocabulary".
-#     [4]:  Error message key (string) to be used if value not found
-#           in vocabulary. Could be an empty string.
-#
+
    my ($refcontent, $path, $level) = @_;
    my $ref = $refcontent->[0];
    if (ref($ref) ne "HASH") {
@@ -478,10 +518,13 @@ sub vocabulary {
    }
 };
 
+=head2 convert
+
+Add to the %conversions hash:
+
+=cut
+
 sub convert {
-#
-# Add to the %conversions hash:
-#
    my ($refval,$path,$level) = @_;
    my @patharr = split(m:/:,$path);
    my $ref = $refval->[0];
@@ -510,10 +553,13 @@ sub convert {
    }
 };
 
+=head2 variable
+
+Add to the %variables hash:
+
+=cut
+
 sub variable {
-#
-# Add to the %variables hash:
-#
    my ($refval,$path,$level) = @_;
    my @patharr = split(m:/:,$path);
    if (ref($refval) eq "HASH") {
@@ -526,10 +572,15 @@ sub variable {
    }
 };
 
+=head2 set_global_attribute_value
+
+...
+
+=cut
+
+
+
 sub set_global_attribute_value {
-#
-# Add to the %presetattributes hash:
-#
    my ($refval,$path,$level) = @_;
    my @patharr = split(m:/:,$path);
    if (ref($refval) eq "HASH") {

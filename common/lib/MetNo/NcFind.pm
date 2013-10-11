@@ -65,9 +65,9 @@ This module gives read-only access to nc-files. It hides all datatype and
 encoding issues. In contrast to the netcdf-user manual (since 3.6.3), netcdf-files
 are assumed to be in iso8859, only if that conversion fails, utf-8 is assumed.
 
-=head2 METHODS
+=head1 METHODS
 
-=head3 new(filename|PDL::NetCDF object)
+=head2 new(filename|PDL::NetCDF object)
 
 open the ncfile and generate a new object
 throws exception on errors
@@ -92,7 +92,7 @@ sub new {
     return bless($self,$class);
 }
 
-=head3 globalatt_names()
+=head2 globalatt_names()
 
 get a list of all global attributes
 
@@ -104,7 +104,7 @@ sub globatt_names {
     return _decode(@{$ncref->getattributenames()});
 }
 
-=head3 globatt_value($attName)
+=head2 globatt_value($attName)
 
 get the value of the global attribute named $attName
 Returns undef if variable or attribute don't exist.
@@ -129,7 +129,7 @@ sub globatt_value {
     return $retVal;
 }
 
-=head3 variables()
+=head2 variables()
 
 get a list of all variables
 
@@ -142,7 +142,7 @@ sub variables {
     return _decode(@{$ncref->getvariablenames()});
 }
 
-=head3 att_names($varName)
+=head2 att_names($varName)
 
 get a list of all the attributes for a variable
 
@@ -155,7 +155,7 @@ sub att_names {
     return _decode(@{$ncref->getattributenames($varname)});
 }
 
-=head3 att_value($varName, $attName)
+=head2 att_value($varName, $attName)
 
 get the value of the attribute named $attName belonging to $varName.
 Returns undef if variable or attribute don't exist.
@@ -179,7 +179,7 @@ sub att_value {
     }
 }
 
-=head3 dimensions($varName)
+=head2 dimensions($varName)
 
 get a list of dimension-names belonging to variable $varName. If varName is missing, lists
 alls dimensions of the file.
@@ -194,7 +194,7 @@ sub dimensions {
     return _decode(@{$ncref->getdimensionnames($varname)});
 }
 
-=head3 dimensionSize($dimName)
+=head2 dimensionSize($dimName)
 
 get the integer size of the dimension $dimName
 
@@ -205,7 +205,7 @@ sub dimensionSize {
     return $self->{NCOBJ}->dimsize($dimName);
 }
 
-=head3 get_bordervalues($varName)
+=head2 get_bordervalues($varName)
 
 get a list of all values on the border of the variable-array. It will
 repeat the corner values.
@@ -236,7 +236,7 @@ sub get_bordervalues {
     return ($upperrow->list,$rightcol->list, $bottomrow_reversed->list, $leftcol_reversed->list);
 }
 
-=head3 get_values($varName)
+=head2 get_values($varName)
 
 B<DEPRECATED> get a one-dimensional list of all values of $varName
 
@@ -255,7 +255,7 @@ sub get_values { # DEPRECATED - use $self->get_struct()
     return $pdl1->list; # note list() is deprecated - use $pdl1->unpdl() instead
 }
 
-=head3 get_struct($varName)
+=head2 get_struct($varName)
 
 get a multi-dimensional list of all values of $varName
 
@@ -289,7 +289,7 @@ sub get_struct {
     }
 }
 
-=head3 get_lonlats('longitude', 'latitude')
+=head2 get_lonlats('longitude', 'latitude')
 
 get lists of longitude and latitude values as array-reference of the variables
 longitude and latitude. Clean the data for eventually occuring invalid values (outside -180/180, -90/90
@@ -347,7 +347,7 @@ sub get_lonlats {
     return (\@rlon,\@rlat);
 }
 
-=head3 findVariablesByAttributeValue($attName, $pattern)
+=head2 findVariablesByAttributeValue($attName, $pattern)
 
 get a list of variables containing a attribute that matches $pattern. $pattern
 should be a compiled regex, i.e. qr//;
@@ -369,7 +369,7 @@ sub findVariablesByAttributeValue {
     return @outVars;
 }
 
-=head3 findVariablesByDimensions(\@dimNameList)
+=head2 findVariablesByDimensions(\@dimNameList)
 
 get a list of all variables containing at least the applied dimension-names. Gives all
 variables if @dimNameList is empty.
@@ -393,7 +393,7 @@ sub findVariablesByDimensions {
     return @outVars;
 }
 
-=head3 findBoundingBoxByGlobalAttributes($northAtt, $southAtt, $eastAtt, $westAtt)
+=head2 findBoundingBoxByGlobalAttributes($northAtt, $southAtt, $eastAtt, $westAtt)
 
 Find the geographical bounding box by global attributes, i.e. for damocles by
 qw(northernmost_latitude southernmost_latitude easternmost_longitude westernmost_longitude)
@@ -437,7 +437,7 @@ sub findBoundingBoxByGlobalAttributes {
     return %boundingBox;
 }
 
-=head3 extractCFLonLat
+=head2 extractCFLonLat
 
 Extract lat/lon information as polygons or points from the used latitude/longitude variables
 given as CF convention.

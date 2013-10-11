@@ -65,7 +65,7 @@ if (defined $color) {
     $ENV{ANSI_COLORS_DISABLED} = 1 unless $color;
 }
 
-Metamod::Config->config_found($config_file_or_dir) or usage();
+Metamod::Config->config_found($config_file_or_dir) or pod2usage(2);
 my $mm_config = Metamod::Config->new($config_file_or_dir, { nolog => 1 } );
 
 my $var = shift @ARGV;

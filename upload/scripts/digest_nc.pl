@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =head1 NAME
 
-digest_nc.pl
+digest_nc.pl - DEPRECATED - use ncdigest.pl
 
 =head1 DESCRIPTION
 
@@ -31,6 +31,8 @@ The metadata are checked against a configuration file that define
 which metadata are expected.
 
 =head1 USAGE
+
+DEPRECATED - use ncdigest.pl
 
   digest_nc.pl <config> <inputfile> <ownertag> <xmlfile> [<ischild>]
 
