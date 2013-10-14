@@ -33,8 +33,6 @@ This script replaces digest_nc.pl which has been deprecated.
 
 =head1 USAGE
 
-  digest_nc.pl <config> <inputfile> <ownertag> <xmlfile> [<ischild>]   # old format
-
   ncdigest.pl [--config=<config>] [--ischild] [--xmlfile=<xmlfile>] [--ownertag=<ownertag>] [--files ] <input>  # new format
 
 =head1 OPTIONS
@@ -92,20 +90,24 @@ use Getopt::Long;
 use Pod::Usage;
 use File::Temp qw(tempfile);
 
-# small routine to get lib-directories relative to the installed file
-sub getTargetDir {
-    my ($finalDir) = @_;
-    my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
-    $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
-    $dir = File::Spec->catdir($dir, $finalDir);
-    return File::Spec->catpath($vol, $dir, "");
-}
+## small routine to get lib-directories relative to the installed file [really needed?]
+#sub getTargetDir {
+#    my ($finalDir) = @_;
+#    my ($vol, $dir, $file) = File::Spec->splitpath(__FILE__);
+#    $dir = $dir ? File::Spec->catdir($dir, "..") : File::Spec->updir();
+#    $dir = File::Spec->catdir($dir, $finalDir);
+#    return File::Spec->catpath($vol, $dir, "");
+#}
+#
+#use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
 
-use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
-use encoding 'utf-8';
+use FindBin;
+use lib ("$FindBin::Bin/../../common/lib", '.');
+
+#use encoding 'utf-8'; # [why? only ascii in this file... suspect input file encoding is what is wanted]
+
 use Metamod::Config qw( :init_logger );
 use MetNo::NcDigest qw( digest );
-
 
 # Parse cmd line params
 my ($ownertag, $xml_metadata_path, $etcdirectory, $is_child, $pathfilename, $readfromfile);
@@ -114,19 +116,19 @@ GetOptions ('ownertag|o=s'  => \$ownertag,
             'xmlfile|x=s'   => \$xml_metadata_path,
             'config=s'      => \$etcdirectory,
             'ischild'       => \$is_child,
-            'files|f'        => \$readfromfile,
-) or pod2usage() && exit 1;
-
-my $TEMPFILE;
+            'files|f'       => \$readfromfile,
+) or pod2usage(2);
 
 pod2usage(2) unless @ARGV;
 
+my $TEMPFILE;
 if ($readfromfile) {
     $pathfilename = shift;
 } else {
     # construct a filelist textfile
     ($TEMPFILE, $pathfilename) = tempfile();
     foreach (@ARGV) {
+        print STDERR "$_\n";
         print $TEMPFILE "$_\n";
     }
 }
@@ -136,6 +138,8 @@ if(!Metamod::Config->config_found($etcdirectory)){
 }
 
 my $config = Metamod::Config->new( $etcdirectory );
+
+$ownertag = $config-get('UPLOAD_OWNERTAG') unless $ownertag;
 
 printf STDERR "pathfilename=%s, ownertag=%s, xml_metadata_path=%s, is_child=%s\n", $pathfilename, $ownertag, $xml_metadata_path, $is_child ? 'yes' : 'no';
 sleep 10;

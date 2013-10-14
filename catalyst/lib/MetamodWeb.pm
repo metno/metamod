@@ -20,6 +20,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
+use version; our $VERSION = qv('2.13'); # PBP 404
+
 use Moose;
 use namespace::autoclean;
 
@@ -50,13 +52,9 @@ use Catalyst qw/
     Session::State::Cookie
     Session::Store::FastMmap
     SmartURI
-    Unicode::Encoding
-/;
+/; # Unicode::Encoding # now autoloaded
 
 extends 'Catalyst';
-
-our $VERSION = '0.01';
-$VERSION = eval $VERSION;
 
 # Configure the application.
 #
@@ -74,6 +72,8 @@ $mm_config->initLogger();
 
 my $custdir = path_to_custom();
 my %default_config = (
+
+    encoding => 'UTF-8',
     disable_component_resolution_regex_fallback => 1,
 
     'View::TT' => {

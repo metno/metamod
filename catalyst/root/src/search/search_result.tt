@@ -103,10 +103,6 @@ jQuery(document).ready( function () {
                     [% END %]
                 [% END %]
 
-                [% IF opendap %]
-                    <a class="visual" href="[% c.uri_for('/search/transform', { ds_id => dataset.ds_id }) %]"><span>Transform</span></a><br clear="all"/>
-                [% END %]
-
                 [% IF dataset.num_children() != 0 %]
                     <a class="btn" href="[% c.uri_for( '/dataset', dataset.ds_id, 'rss' ) %]" target="_blank" title="The RSS feed for this dataset. The RSS feed will notify you about any new datafiles associated with this dataset"><span>RSS Feed</span></a><br clear="all"/>
 

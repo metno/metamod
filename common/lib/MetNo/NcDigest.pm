@@ -22,17 +22,383 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =head1 NAME
 
+MetNo::NcDigest
 
 =head1 SYNOPSIS
 
-
+  use MetNo::NcDigest qw( digest );
+  digest($pathfilename, $ownertag, $xml_metadata_path, $is_child );
 
 =head1 DESCRIPTION
+
+A netCDF file contains a set of global attributes and a set of variables. Each variable
+may also have attributes. The global attributes, variables and variable attributes
+comprise metadata that the program extracts.
+
+In the config directory there must be a conf_digest_nc.xml file defining the
+rules that complying netCDF files must obey. The extracted metadata are
+formatted as XML and written to the file given by $xml_metadata_path. In this
+process, some metadata may be modified and some metadata may be added. Such
+modifications are regulated by the config file.
+
+=head1 TECHNICAL DETAILS
+
+=head2 Variable types
+
+Variables in the netCDF files are classified into different types. Two main types
+exist: "%Data" and "%Coordinate". The "%Data" variables are supposed to contain
+physical entities that correspond to standard names in the CF standard names table.
+The "%Coordinate" variables are variables corresponding to one of the dimensions
+used by "%Data" variables, or auxilliary coordinate variables that should be
+declared as such using the "coordinates" attribute for at least one of the "%Data"
+variables. From these main types, various subtypes are constructed by appending
+strings to the type names. The following types are hardcoded into the program
+(additional types may be introduced in the config file):
+
+    %Data             - The variable represents a physical entity and is not used
+                        as a coordinate for other variables.
+    %Data_grid        - A data variable with dimensions indicating a 2D grid
+                        (usually combined with other dimensions).
+    %Coordinate       - The variable is used as a coordinate, but the coordinate
+                        type is undecided
+    %Coordinate_T     - The variable is used as a time coordinate
+    %Coordinate_X     - The variable is used as a coordinate for the X axis
+                        (usually having name longitude or Xc).
+    %Coordinate_Y     - The variable is used as a coordinate for the Y axis
+                        (usually having name latitude or Yc).
+    %Coordinate_Z     - Vertical coordinate
+
+Based on CF rules, the program will try to classify the encountered variables into
+one of these types. Types may also be set explicitly in the config file. The config
+file may also define new subtypes based on the dimension strings of the variables.
+
+
+=head2 Switches and lists
+
+While analysing a netCDF file, the program may set switches and add values to lists
+according to the content of the netCDF file and regulations in the config file.
+
+An important class of switches are those corresponding to variable type names. For
+each of the variable types, there exists a corresponding switch with the same name
+as the variable type. When at least one variable of a specific type is found, the
+corresponding switch is set.
+
+In addition to these switches, switches may expicitly be introduced in the config
+file, and conditions defined for when they should be set.
+
+Lists, and conditions for adding elements to them, are also introduced in the config
+file.
+
+
+=head2 The config file
+
+The topmost XML element in the config file is the <digest_nc> element, within which
+all other elements are contained.
+
+=head3 Structure elements
+
+On the next level is one <file_structures> element containing a sequence of <structure>
+elements. The structure elements are identified by a 'name' attribute. One of the
+structure elements is special. It has name="default". The structure elements contain
+rules that the netCDF files must obey. The default structure contains the default
+rules.
+
+The other structures contain rules that only pertain to selected datasets.
+Each of these other structures has a 'regex' attribute containing a regular expression
+that is matched against the xmlpath argument. If the regexp matches, then the rules
+in this structure applies.
+
+In addition, all netCDF-files must obey the default rules, if not superseded by
+structure specific rules.
+
+In addition to rules, the structure elements contain elements that have other
+functions:
+
+  - Classify the netCDF-files depending on file content
+  - Set switches depending on file content
+  - Extract information that are added to lists
+
+These elements are helper elements that are used when formulating rules.
+
+The non-default structure elements also may have elements that:
+
+  - Explisitly set metadata values
+  - Explisitly classify the netCDF-files independent of file content
+
+=head3 Content of structure elements
+
+    The following elements are allowed within structure elements:
+
+    <set switch="..." />
+
+       Set a global switch. "..." contains the name of the switch, which must start with
+       a '%' character. All switches must be declared in a <global> element within the
+       default structure element.
+
+    <set_global_attribute_value name="...">
+       ...
+    </set_global_attribute_value>
+
+       Set a netCDF global attribute. Used within file specific structure elements to set
+       global attributes that may be missing or contain wrong values. Name="..." gives the
+       name of the attribute, while its value comprise the content of the element.
+
+    <variables_of_type name="...">
+       ...
+    </variables_of_type>
+
+       Variables in the netCDF files are classified into various types. This XML element
+       is used within file specific structure elements to explicitly classify a set of
+       variables. The type name is given in name="...", and the set of variables is
+       given in the content of the element (each variable name on a separate line).
+
+    <global switches="..." />
+
+       This element is used within the default structure to declare a set of global
+       switches. A blank separated list of switch names is given by switches="...".
+       Each name must start with a '%' character. The switches will initally be unset
+       each time a new netCDF file is investigated. Other elements may set the switches
+       depending on the content of the netCDF file.
+
+       NOTE: It is not neccessary to declare switches with names equal to variable
+       type names.
+
+    <global lists="..." />
+
+       This element is used within the default structure to declare a set of global
+       lists. A blank separated list of list names is given by lists="...".
+       Each name must start with a '%' character. The lists will initally be empty
+       each time a new netCDF file is investigated.
+       Other elements may add entities to the lists, depending on the content of the
+       netCDF file.
+
+    <investigate_data_dimensions>
+       <dim rex="..." addmatches="..." extendtype="..." />
+       ...
+    </investigate_data_dimensions>
+
+       This element sets up rules for classifying netCDF variables according to the
+       dimensions used by the variables. Initially, the variables are already classified
+       into various types. The main types are '%Data' and '%Coordinate'. Subtypes of
+       these main types are also found: '%Data_grid', '%Coordinate_X', '%Coordinate_T'
+       etc. ("Type" will usually refer to both main types and subtypes).
+
+       The element contains one or more <dim> elements. The 'rex' attribute within a <dim>
+       element contains a regular expression that is checked against the
+       dimension string for each variable. If a match is found, the variable type is
+       extended with the string given in extendtype="...". If more than one <dim> element
+       matches, the first one is used. The optional attribute addmatches="..." specifies
+       a blank separated list of global list names. If this attribute is used, the regular
+       expression should contain one parantesised subexpression for each global list in
+       the addmatches attribute. The partial matches for the subexpressions are paired
+       with the global lists, and each match added to the corresponding global list.
+
+=head3 Global attributes
+
+    <global_attributes>
+       <att name="...">
+          <mandatory ... />
+          <breaklines value="..." />
+          <multivalue separator="..." />
+          <vocabulary ... >
+             ...
+          </vocabulary>
+          <convert>
+             ...
+          </convert>
+       </att>
+       ...
+    </global_attributes>
+
+       This element contains a sequence of <att> elements, each naming a global attribute
+       for which some rules apply, or for which some value conversion is performed.
+       All elements within an <att> element are optional. They are used as follows:
+
+       <mandatory errmsg="..." />
+
+          This element tells that the global attribute is mandatory, and gives an error
+          message to use if the attribute is not found.
+
+       <breaklines value="..." />
+
+          This element is used to reformat an attribute value so that no single line
+          in the attribute value is longer than the number given in value="...".
+
+       <multivalue separator="..." />
+
+          The global attribute should be interpreted as a set of values separated by
+          the given separator string.
+
+       <vocabulary ... >
+          ...
+       </vocabulary>
+
+          This element contains a vocabulary against which the attribute value(s) are
+          checked. Each line in the content represents one member of the vocabulary.
+
+          Members of the vocabulary may contain escapes, each of which represents a set
+          of character strings. An escape is identified by a '%' character followed by
+          some alfanumeric characters. All escape identifiers must be declared in an
+          "escapes" XML attribute within the <vocabulary ... > tag. This XML attribute
+          contains a blank-separated list of all escapes used within the vocabulary.
+          A global attribute value will match a member containing escapes if an exactly
+          matching sting can be constructed from the member string by substituting all
+          escapes by suitably selected character strings. For each of the escapes, this
+          character string must be taken from the set of character strings that the
+          escape represents.
+
+          Se below for a list of allowed escape identifiers. In addition to this set,
+          identifiers of global lists can be used as escapes. The set of character
+          strings represented by a global list escape, is equal to the set of character
+          strings within the list.
+
+          Vocabulary members may also contain special keywords which also are
+          identified by a '%' character followed by some alfanumeric characters. One
+          such keyword is currently defined:
+
+          %MANDATORY    This keyword marks the corresponding member as mandatory. Used
+                        when the global attribute may contain multiple values (i.e.
+                        when a <multivalue ...> tag is found within the <att> tag).
+                        Then, one of the values must match the mandatory vocabulary
+                        member.
+
+          All such keywords are removed from a vocabulary member before any match
+          against values are performed.
+
+       <convert>
+          ...
+       </convert>
+
+          This element is used for changing attribute values. Between the start and
+          end tags are lines of the form:
+
+          original_value :TO: new_value
+
+          All attribute values matching original_value are changed to new_value.
+
+=head3 Variables
+
+    <variable name="..." ...>
+       <mandatory ... />
+       <dimensions ...>
+          ...
+       </dimensions>
+       <att name="...">
+          <mandatory ... />
+          <breaklines value="..." />
+          <multivalue separator="..." />
+          <vocabulary ... >
+             ...
+          </vocabulary>
+          <convert>
+             ...
+          </convert>
+       </att>
+       ...
+    </variable>
+
+       The <variable> element describes one variable or variable type. The value of
+       the name="..." attribute is either a variable name or the name of a variable
+       type. In the latter case, the name starts with a '%' character. The element
+       contains one optional <mandatory> element, a <dimensions> element and any
+       number of <att> elements:
+
+       <mandatory ... />
+
+          If this option is present, the variable of the given name, or at least one
+          variable of the given type, is mandatory within the netCDF file. This rule
+          can be made conditional by using an only_if="..." attribute. The value of
+          the only_if attribute will contain the name of a global switch, which must
+          be set if the rule is to be applied.
+
+          This element should contain an errmsg="..." attribute giving an error message
+          to use if the rule is not obeyed.
+
+       <dimensions ...>
+          ...
+       </dimensions>
+
+          This element contains the set of alternative dimension strings that the
+          variable can use. A dimension string is the comma-separated list of
+          dimensions used by the variable, as shown in a CDL-file.
+
+          Dimension strings may contain escapes in the same manner as vocabulary
+          members (explained above). All escape identifiers must be declared in an
+          "escapes" XML attribute within the <dimension ... > tag. This XML attribute
+          contains a blank-separated list of all escapes used within the dimension
+          strings.
+
+          This element should contain an errmsg="..." attribute giving an error message
+          to use if the dimension string actually used do not match any of the
+          alternatives.
+
+          If the variable is allowed to have no dimensions (i.e. it can be a scalar),
+          this can be expressed by using the escape "%NONE" all by itself, as one of
+          the alternative dimension strings.
+
+       <att name="...">
+          <mandatory ... />
+          <breaklines value="..." />
+          <multivalue separator="..." />
+          <vocabulary ... >
+             ...
+          </vocabulary>
+          <convert>
+             ...
+          </convert>
+       </att>
+
+          This element defines rules and modifications applied to variable attributes.
+          Any number of <att> elements are allowed. The elements within an <att> element
+          are all optional, and their roles are the same as those explained for the
+          global attributes (see above).
+
+=head3 Escapes
+
+Escapes are used within <vocabulary ... > elements (both for global and variable
+attributes), and in <dimensions ... > elements.
+
+An escape is identified by a '%' character followed by some alfanumeric characters.
+Each escape represents a set of character strings. An escape having an identifier
+equal to a global list name, represents the character strings found in the list.
+All other escapes have fixed names, and the set of character strings they represent
+are hardcoded into the program.
+
+The following escapes with fixed names are found:
+
+   %ANYSTRING        - Any character string.
+
+   %ISODATE          - Date conforming to the ISO date standard, i.e.
+                      having the form YYYY-MM-DD.
+
+   %LATITUDE         - A number between -90.0 and 90.0
+
+   %LONGITUDE        - A number between -180.0 and 180.0
+
+   %hh               - Hour. An integer between 00 and 23
+
+   %mm               - Minute. An integer between 00 and 59
+
+   %ss               - Second. An integer between 00 and 59
+
+   %i                - Any integer >= 1
+
+   %EMAIL            - Any legal E-mail address
+
+   %NONE             - The empty string
+
+   %TIMEUNIT         - Any time unit accepted by the UDUNITS package. Example:
+                      "seconds since 1981-01-01 00:00:00"
+
+   %SINGLEWORD       - Any word composed of characters [a-zA-Z0-9_]
+
+   %CF_STANDARD_NAME - A name from the CF standard names table
+
+   %UDUNIT           - Any unit accepted by the UDUNITS package.
 
 =head1 TODO
 
 Rewrite as Object-oriented class
-
 
 =head1 FUNCTIONS
 
@@ -178,7 +544,47 @@ $parse_actions{ dimensions } = $parse_actions{"vocabulary"};
 
 =head2 digest
 
-...
+Checks the content of netCDF files. All the files must belong to the same
+dataset. Metadata are extracted from the files and saved into an XML file. The netCDF
+files are supposed to be CF compliant.
+
+=head3 Usage
+
+  digest($pathfilename, $ownertag, $xml_metadata_path, $is_child );
+
+=head3 Parameters
+
+=over 4
+
+=item $pathfilename
+
+Path to input file. The first line in this file is an URL that points to where
+the data will be found by users. This dataref URL will be included as metadata
+in the XML file to be produced. The rest of the lines comprise the files to be
+parsed, one file on each line. These files all belongs to one dataset.
+
+=item $ownertag
+
+Short keyword (e.g. "DAM") that will tag the data in the database as owned by a
+specific project/organisation.
+
+=item $xml_metadata_path
+
+Path to an XML file that will receive the result of the netCDF parsing. If this
+file already exists, it will contain the metadata for a previous version of the
+dataset. In this case, a new version of the file will be created, comprising a
+merge of the old and new metadata. The xmlpath will also define the
+dataset-name: last directory parts + filename for parents, last two directory
+parts + filename for children.
+
+=item $is_child
+
+if defined, creates a child xml-file, that is a xml-file which corresponds
+exactly to one file, rather than to a set/directory of files. The content of the
+old xmlpath will be ignored and just overwritten. The dataset-name will contain
+of an extra directory.
+
+=back
 
 =cut
 
@@ -254,8 +660,6 @@ sub digest {
     close ($USERERRORS);
 
 }
-
-
 
 =head2 global
 
@@ -704,25 +1108,45 @@ sub init_escapes {
     close (STNAMES);
 };
 
+=head3 hloop($refval,$level,$path,$subrhash)
+
+
+Recursively traverse the XML tree:
+
+Split argument array into the following variables:
+
+=over 4
+
+=item $refval
+
+Reference to subtree inside the larger XML tree. (can both be a HASH
+reference or ARRAY reference):
+
+=item $level
+
+Number representing the level where the subtree is rooted.
+The upmost (root) level corresponds to 0.
+
+=item $path
+
+String. Sequence of hash keys and array indices separated by "/"
+characters. Each key/index represents a key or index in the XML
+tree. The first key/index corresponds to one of the nodes identified
+by the topmost (root) node. Then follows the keys and indices down
+to, and including, the identifier of the current subtree.
+The $path is a unique identifier of the current subtree.
+
+=item $subrhash
+
+Reference to the %parse_actions hash of subroutines. These subroutines
+are identified by hash keywords used in the XML tree, and activated
+when hloop encounters these keywords in the XML tree.
+
+=back
+
+=cut
+
 sub hloop {
-#
-#     Recursively traverse the XML tree:
-#
-#     Split argument array into the following variables:
-#
-#     $refval   - Reference to subtree inside the larger XML tree. (can both be a HASH
-#                 reference or ARRAY reference):
-#     $level    - Number representing the level where the subtree is rooted.
-#                 The upmost (root) level corresponds to 0.
-#     $path     - String. Sequence of hash keys and array indices separated by "/"
-#                 characters. Each key/index represents a key or index in the XML
-#                 tree. The first key/index corresponds to one of the nodes identified
-#                 by the topmost (root) node. Then follows the keys and indices down
-#                 to, and including, the identifier of the current subtree.
-#                 The $path is a unique identifier of the current subtree.
-#     $subrhash - Reference to the %parse_actions hash of subroutines. These subroutines
-#                 are identified by hash keywords used in the XML tree, and activated
-#                 when hloop encounters these keywords in the XML tree.
 #
    my ($refval,$level,$path,$subrhash) = @_;
 #
@@ -782,24 +1206,34 @@ sub hloop {
    return;
 };
 
+=head2 parse_all($pathfilename, $ownertag, $xml_metadata_path, $isChild)
+
+Loop through all files found in the $pathfilename file. Parse each
+of these files. Construct two hashes. Both uses the file pathes in
+$pathfilename as keys:
+
+=over 4
+
+=item %all_variables
+
+References to variables found within each file.
+Each reference points to a hash describing the variables
+within the file.
+See the %foundvars hash described in the parse_file routine.
+
+=item %all_globatts
+
+References to global attributes found within each file.
+Each reference points to a hash describing the global
+attributes of the file.
+See the %foundglobatts hash described in the parse_file
+routine.
+
+=back
+
+=cut
 
 sub parse_all {
-#
-#  Loop through all files found in the $pathfilename file. Parse each
-#  of these files. Construct two hashes. Both uses the file pathes in
-#  $pathfilename as keys:
-#
-#  %all_variables    References to variables found within each file.
-#                    Each reference points to a hash describing the variables
-#                    within the file.
-#                    See the %foundvars hash described in the parse_file routine.
-#
-#  %all_globatts     References to global attributes found within each file.
-#                    Each reference points to a hash describing the global
-#                    attributes of the file.
-#                    See the %foundglobatts hash described in the parse_file
-#                    routine.
-#
    my ($pathfilename, $ownertag, $xml_metadata_path, $isChild) = @_;
    my %all_variables = ();
    my %all_globatts = ();
