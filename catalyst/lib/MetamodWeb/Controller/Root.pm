@@ -174,15 +174,16 @@ This is used to avoid the dreaded "Come back later" screen
 sub end : ActionClass('RenderView') :Does('DumpQueryLog') :Does('DeleteStash')  {
     my ( $self, $c ) = @_;
 
-    $c->stash->{title} = 'METAMOD fatal error';
-    $c->stash->{URI} = $c->req->uri();
-    $c->response->status(500);
-
     if ( scalar @{ $c->error } ) {
+
+        $c->stash->{title} = 'METAMOD fatal error';
+        $c->stash->{URI} = $c->req->uri();
+        $c->response->status(500);
         $c->stash->{errors}   = $c->error;
         for my $error ( @{ $c->error } ) {
             $c->log->error($error);
         }
+
         $c->stash->{template} = 'errors.tt';
         $c->forward('MetamodWeb::View::TT');
         $c->clear_errors;
