@@ -104,9 +104,10 @@ PG_WEB_USER_PASSWORD = changethisasap
 PG_CONNECTSTRING_SHELL =
 
 # String used in Perl DBI->connect function to connect to the
-# database:
+# database (set to empty for local socket connection):
 #PG_CONNECTSTRING_PERL = ;host=[==PG_HOST==];port=[==PG_PORT==];password=something
 #PG_CONNECTSTRING_PERL = ;host=[==PG_HOST==];port=[==PG_PORT==]
+PG_CONNECTSTRING_PERL =
 
 # Directory for PostgreSQL contrib libs (e.g. tsearch2.sql, pgcrypto.sql and lwpostgis.sql)
 # Note that installing the Debian packet for this will also pull in PostgreSQL server.

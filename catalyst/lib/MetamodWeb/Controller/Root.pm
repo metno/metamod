@@ -187,16 +187,13 @@ sub end : ActionClass('RenderView') :Does('DumpQueryLog') :Does('DeleteStash')  
         $c->stash->{template} = 'errors.tt';
         $c->forward('MetamodWeb::View::TT');
         $c->clear_errors;
+        return 1 if $c->response->status =~ /^3\d\d$/;
+        return 1 if $c->response->body;
+
+        unless ( $c->response->content_type ) {
+            $c->response->content_type('text/html; charset=utf-8');
+        }
     }
-
-    return 1 if $c->response->status =~ /^3\d\d$/;
-    return 1 if $c->response->body;
-
-    unless ( $c->response->content_type ) {
-        $c->response->content_type('text/html; charset=utf-8');
-    }
-
-    $c->forward('MetamodWeb::View::TT');
 }
 
 __PACKAGE__->meta->make_immutable;

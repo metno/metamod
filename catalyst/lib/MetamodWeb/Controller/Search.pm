@@ -429,6 +429,20 @@ sub display_help : Path('/search/help') : Args(0) {
 
 }
 
+=head2 error
+
+This always genereates an error (only for debugging)
+
+=cut
+
+sub error : Path('/search/error') : Args(0) {
+    my ($self, $c) = @_;
+
+    die "You want errors? You got errors!";
+}
+
+
+
 #sub wmsThumb :Path('/search/wmsthumb') :Args {
 #    my ($self, $c) = @_;
 #
