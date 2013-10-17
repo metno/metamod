@@ -20,9 +20,12 @@ scripts is the same as the user running Apache>.
 
 Before running any other scripts you must tell METAMOD where to find its libraries.
 
-For simplicity you may use F<virtualenv.pl> to generate a bash script F<./bin/activate>
-which sets the relevant environment variables. This can then be sourced in all
-your scripts without the need to supply the config dir parameter.
+For development/testing we strongly recommend you use F<virtualenv.pl> to generate a bash script F<./bin/activate>
+which sets the relevant environment variables. This can then be sourced in the shell
+so you don't need to supply the config dir parameter to every script.
+
+Note that F<activate> also will add most METAMOD scripts to your path, so you don't
+have to prefix every command with the path name.
 
 From anywhere execute the following command:
 
@@ -38,8 +41,8 @@ This will enable the correct environment. To disable the environment again type:
 
 =head3 Optional method: Setting the environment manually
 
-If for some reason you don't want to run F<activate>, you may instead set the necessary
-environment variables manually:
+If for some reason you cannot use F<activate> (e.g. sudo restrictions), you
+must instead set the necessary environment variables manually:
 
   $ export PERL5LIB="/opt/metno-metamod-2.13/local/lib/perl5"
 
@@ -50,10 +53,8 @@ to specify the <config> parameter for each script.
 
 All commands also run without these variables, but you must then specify the
 correct executable paths, configuration directory and PERL5LIB for every command,
-which is rather cumbersome.
-
-Note that F<activate> also will add most METAMOD scripts to your path, so you don't
-have to prefix every command with the path name.
+which is rather cumbersome. Unless running in production environments,
+use F<bin/activate> wherever possible.
 
 =head2 Creating the webrun directory
 
