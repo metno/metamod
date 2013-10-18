@@ -57,6 +57,11 @@
       will be seen immideately.</i></small></td>
    <td>&nbsp;</td>
 </tr>
+[% IF errors_encountered %]
+   <tr>
+      <td colspan="4"><div style="background: #FFAAAA;">[% errors_encountered %]</div></td>
+   </tr>
+[% END %]
 </table>
 <br />
 <table bgcolor="#ffffff" border="1" cellspacing="0" width="100%">

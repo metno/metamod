@@ -85,6 +85,7 @@ sub dataset_manager : Path("/admin/dsmanager") :Args(0) {
                        '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
     }
     $c->stash(select_html => $select_html);
+    my $errors_encountered = "";
     my @columns = qw/ds_id ds_name ds_status ds_ownertag ds_filepath/;
     my $resultset = $c->model('Metabase::Dataset')->search({ds_parent => 0}, {columns => \@columns, order_by => 'ds_id'});
     my $names_status_change = "";
@@ -139,25 +140,33 @@ sub dataset_manager : Path("/admin/dsmanager") :Args(0) {
        }
        if ($checked eq " checked" and ($params->{'mdel'} or $params->{'activate'} or $params->{'owner'})) {
           my $filepath = $vals{'ds_filepath'};
-          my $dsobj = Metamod::Dataset->newFromFile($filepath);
-          unless ($dsobj) {
-             die "cannot initialize dataset for $filepath";
+          my $dsobj;
+          eval {
+             $dsobj = Metamod::Dataset->newFromFile($filepath);
+          };
+          if ($@ or ! $dsobj) {
+             $errors_encountered .= "Cannot initialize dataset for $filepath" . "<br/>\n";
+             if ($@) {
+                $errors_encountered .= $@ .  "<br/>\n";
+             }
+             $errors_encountered .= "<br/>\n";
+          } else {
+             my %dset_values = $dsobj->getInfo;
+             if ($params->{'mdel'}) {
+                $dset_values{'status'} = "deleted";
+                $names_status_change .= " " . $vals{'ds_name'};
+             }
+             if ($params->{'activate'}) {
+                $dset_values{'status'} = "active";
+                $names_status_change .= " " . $vals{'ds_name'};
+             }
+             if ($params->{'owner'}) {
+                $dset_values{'ownertag'} = $newtag;
+                $names_ownertag_change .= " " . $vals{'ds_name'};
+             }
+             $dsobj->setInfo(\%dset_values);
+             $dsobj->writeToFile($filepath);
           }
-          my %dset_values = $dsobj->getInfo;
-          if ($params->{'mdel'}) {
-             $dset_values{'status'} = "deleted";
-             $names_status_change .= " " . $vals{'ds_name'};
-          }
-          if ($params->{'activate'}) {
-             $dset_values{'status'} = "active";
-             $names_status_change .= " " . $vals{'ds_name'};
-          }
-          if ($params->{'owner'}) {
-             $dset_values{'ownertag'} = $newtag;
-             $names_ownertag_change .= " " . $vals{'ds_name'};
-          }
-          $dsobj->setInfo(\%dset_values);
-          $dsobj->writeToFile($filepath);
        }
        push @wholetable, $rowstring;
     }
@@ -173,6 +182,7 @@ sub dataset_manager : Path("/admin/dsmanager") :Args(0) {
     if (length($names_ownertag_change) > 0) {
        $self->logger->info("Ownertag change to " . $newtag . " for datasets:" . $names_ownertag_change);
     }
+    $c->stash(errors_encountered => $errors_encountered);
     $c->stash(wholetable => \@wholetable);
 }
 
