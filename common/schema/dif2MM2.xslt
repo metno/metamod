@@ -352,6 +352,14 @@ version="1.0">
     </xsl:template>
 
 
+	<xsl:template match="dif:Related_URL/dif:URL">
+		<xsl:element name="metadata" xmlns="http://www.met.no/schema/metamod/MM2">
+            <xsl:attribute name="name">related_url</xsl:attribute>
+            <xsl:value-of select="." />
+        </xsl:element>
+	</xsl:template>
+
+
     <xsl:template match="dif:Metadata_Name">
         <!-- Currently unsupported item in Metamod -->
         <xsl:comment>Unsupported element <xsl:value-of select="local-name()"/> in Metamod</xsl:comment>
