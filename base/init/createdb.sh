@@ -249,6 +249,7 @@ CREATE TABLE HarvestStatus (
    HS_url             VARCHAR(99999) NOT NULL,
    HS_time            TIMESTAMP      NOT NULL
 );
+GRANT SELECT ON HarvestStatus TO $PG_WEB_USER;
 
 \q
 EOF
