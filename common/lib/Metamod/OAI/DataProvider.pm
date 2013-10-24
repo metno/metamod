@@ -680,7 +680,8 @@ sub _validate_metadata {
     my ( $format, $xml_dom, $dataset ) = @_;
 
     my %schema_for_format = (
-        dif      => '/schema/dif_v9.8.2.xsd',
+#        dif      => '/schema/dif_v9.8.2.xsd',
+        dif      => '/schema/dif_current.xsd',
         oai_dc   => '/schema/oai_dc.xsd',
         iso19115 => '/schema/iso19139/gmd/gmd.xsd',
         iso19139 => '/schema/iso19139/gmd/gmd.xsd',
