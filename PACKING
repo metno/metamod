@@ -8,17 +8,21 @@ dependency list in cpanfile.snapshot.
   $ carton install
   $ svn ci cpanfile.snapshot
 
+NOTE: The act of building a package MUST not generate any changes in SVN, since we
+plan on automating the package building process into the CI testing framework
+(where the changes would never be committed).
+
 -----------
 
 Updating the Carton bundle in SVN:
 
-  $ carton bundle --no-fatpack
+  $ #carton bundle --no-fatpack # deprecated
+  $ make bundle
   $ svn add --force vendor/cache
 
 Then install via
 
-  $ carton install --cached --deployment
+  $ #carton install --cached --deployment # deprecated
+  $ make deployment
   $ make debian_package
-  $ dupload --to precise-devel
-
-
+  $ dupload --to precise-devel # or whatever

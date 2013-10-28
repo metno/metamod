@@ -674,15 +674,17 @@ format. False if the format is not valid.
 
 =cut
 
-sub _validate_metadata {
+#sub _validate_metadata {
     my $self = shift;
 
     my ( $format, $xml_dom, $dataset ) = @_;
 
+    # consider using specific DIF schema version based on /DIF/Metadata_Version if not backwards compatible
+
     my %schema_for_format = (
 #        dif      => '/schema/dif_v9.8.2.xsd',
-        dif      => '/schema/dif_current.xsd',
-        oai_dc   => '/schema/oai_dc.xsd',
+        dif      => '/schema/dif.xsd', # always use latest version
+        oai_dc   => '/schema/oai_dc.xsd', # doesn't seem to have been updated since 2002
         iso19115 => '/schema/iso19139/gmd/gmd.xsd',
         iso19139 => '/schema/iso19139/gmd/gmd.xsd',
     );
