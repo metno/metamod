@@ -23,6 +23,8 @@ add search option for wmsinfo and projectioninfo
 
 fix fakeroot in debian make
 
+rework log appenders so services use metamod.log and terminal use stderr
+
 set default ownertag to all in search
 
 add docs for custom oai validators

@@ -183,7 +183,8 @@ sub ts :Path("/ts") :Args(3) {
             $data{$k} = [ map { @{$data{$k}}[$_] } @subcols ]; # extract selected cols and replace
             foreach my $d (@{ $data{'dimensions'}->{$k} } ) {
                 next if $d eq $x_axis;
-                my ($index) = @{ $indexes{$d} };
+                my ($index) = eval { @{ $indexes{$d} } };
+                next unless defined $index;
                 $self->logger->debug("** index $d of $k: $index");
                 $data{$index} = [ map { @{$data{$index}}[$_] } @subcols ]; # extract selected col headings and replace
             }

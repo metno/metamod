@@ -1,7 +1,7 @@
 Source: metno-metamod-2.13
 Priority: extra
 Maintainer: Geir Aalberg <geira@met.no>
-Build-Depends: debhelper (>=5), perl, make, fakeroot
+Build-Depends: debhelper (>=5), perl, make, fakeroot, cpanminus
 Standards-Version: 3.7.3
 Section: web
 

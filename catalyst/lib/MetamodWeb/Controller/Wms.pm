@@ -279,11 +279,11 @@ sub qtips :Path("/qtips") :Args(0) {
     $c->response->body( $dom->toString );
 }
 
-sub error {
-    my ($c, $status, $message) = @_;
-    $c->response->status($status);
-    $c->response->body( $message );
-}
+#sub error { # obsolete?
+#    my ($c, $status, $message) = @_;
+#    $c->response->status($status);
+#    $c->response->body( $message );
+#}
 
 =head1 LICENSE
 

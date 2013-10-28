@@ -162,7 +162,7 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
             $gclayer->setAttribute('hidden', $hidden++&&1); # sets all layers in wmsinfo visible
 
             foreach ( $gcxc->findnodes("v:SRS", $gclayer) ) {
-                $logger->debug( "*** SRS for $layertype $lname:", $_->textContent);
+                #$logger->debug( "*** SRS for $layertype $lname:", $_->textContent);
             }
 
             # move priority layer to new list
@@ -213,12 +213,12 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
             # after lots of experimatation, this seems to be the only method that works
 
             foreach ( $mapxc->findnodes("v:SRS", $mpl) ) {
-                $logger->debug( "*** deleting SRS for layer $lname: ", $_->textContent);
+                #$logger->debug( "*** deleting SRS for layer $lname: ", $_->textContent);
                 $_->unbindNode;
             }
 
             foreach ( sort keys %{bgmapURLs()} ) {
-                $logger->debug("*** adding SRS $_ to layer $lname");
+                #$logger->debug("*** adding SRS $_ to layer $lname");
                 $mpl->appendTextChild( 'SRS' , $_ );
             }
 
@@ -245,11 +245,13 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
 # reproject bounding box
 #
 
-sub _reproject { # doesn't this do the same as calculate_bounds() ? FIXME
+sub _reproject { # seems to do more or less the same as calculate_bounds() - merge? FIXME
 
     my ($crs, $bbox) = @_;
 
     if ( defined $crs and $crs ne $$bbox{crs} ) {
+
+        $logger->debug("WMS: Reprojecting from $$bbox{crs} to $crs:");
 
         # stupid proj doesn't like upper case proj names
         my $to   = Geo::Proj4->new( init => lc($crs) )       or die Geo::Proj4->error . " for $crs";
@@ -261,23 +263,55 @@ sub _reproject { # doesn't this do the same as calculate_bounds() ? FIXME
             [ $$bbox{'right'}, $$bbox{'top'   } ],
             # this could possibly extended with more points to avoid cropping of the bounding box
         );
-        my $pr = $from->transform($to, \@corners);
-        #print STDERR Dumper \@corners, $pr;
+
+        my @points;
+        # compute mid points between all corners
+        while (@corners) {
+            my ($x, $y) = @{ shift @corners }; # remove point as we go along
+            #print STDERR "+++ x=$x y=$y\n";
+            push @points, [$x, $y];
+            foreach (@corners) { # iterate over remaining points
+                #last; # uncomment to disable midpoint calculation
+
+                #foreach my $ratio (.2, .5, .8) { # does not seem to give any more benefit than simple midpoints
+                #    my $mx = ( $x - $_->[0] ) * $ratio + $_->[0];
+                #    my $my = ( $y - $_->[1] ) * $ratio + $_->[1];
+                #    print STDERR "++++++ x=$mx y=$my ($_->[0], $_->[1])\n";
+                #    push @points, [$mx, $my];
+                #}
+
+                # calculate midpoints
+                my $mx = ( $x + $_->[0] ) / 2;
+                my $my = ( $y + $_->[1] ) / 2;
+                #print STDERR "++++++ x=$mx y=$my ($_->[0], $_->[1])\n";
+                push @points, [$mx, $my];
+
+            }
+        }
+
+        local $Data::Dumper::Indent = 0;
+        local $Data::Dumper::Terse = 1;
+        #printf STDERR " In:  %s\n", Dumper \@points;
+        my $pr = $from->transform($to, \@points);
+        #printf STDERR " Out: %s\n", Dumper $pr; # can't use logger which never returns if proj4 hangs
 
         my (@x, @y); # x resp y coord for each corner
         foreach (@$pr) {
+            next if $_->[0] eq 'inf';
             push @x, $_->[0];
             push @y, $_->[1];
         }
 
-        #print STDERR 'x = ' . Dumper \@x;
-        #print STDERR 'y = ' . Dumper \@y;
+        #printf STDERR "x = %s\n", Dumper \@x;
+        #printf STDERR "y = %s\n", Dumper \@y;
 
         $$bbox{ crs    } = $crs;
         $$bbox{ left   } = min(@x);
         $$bbox{ right  } = max(@x);
         $$bbox{ bottom } = min(@y);
         $$bbox{ top    } = max(@y);
+
+        $logger->debug(Dumper $bbox);
 
     }
 
@@ -409,6 +443,7 @@ sub calculate_bounds {
         bottom => min(@y),
         top    => max(@y),
     };
+    $logger->debug(Dumper $setopts);
 
     return $setopts;
 
