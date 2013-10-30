@@ -405,8 +405,12 @@ sub _oai_record {
     # status is only set when the record is marked as deleted. For deleted datasets
     # we do not include metadata
     if( !exists $record->{status} ){
-        my $xml_dom = $self->_get_metadata( $dataset, $format );
-        $record->{metadata} = $xml_dom;
+        try {
+            my $xml_dom = $self->_get_metadata( $dataset, $format );
+            $record->{metadata} = $xml_dom;
+        } catch {
+            $self->logger->error("This should never have occured: $_");
+        };
     }
 
     return $record;
@@ -462,13 +466,17 @@ sub _oai_record_header {
 
     # If metadata validation is turned on we will mark all datasets with invalid
     # metadata as deleted.
-    if( $self->config->get('PMH_VALIDATION') eq 'on' && $dataset->ds_status() != 0 ){
-        my $xml_dom = $self->_get_metadata( $dataset, $format );
-        my $success = $self->_validate_metadata($format, $xml_dom, $dataset);
-        if(!$success) {
+    if( $self->config->get('PMH_VALIDATION') eq 'on' && $dataset->ds_status() != 0 ) {
+        my $xml;
+        try {
+            my $xml_dom = $self->_get_metadata( $dataset, $format );
+            $self->_validate_metadata($format, $xml_dom, $dataset);
+            $xml = $xml_dom->toString(1);
+        } catch {
             $record->{status} = 'deleted';
-            $self->logger->debug( $xml_dom->toString(1) );
-        }
+            $self->logger->error($_);
+            $self->logger->debug( $xml ) if defined $xml;
+        };
     }
 
     return $record;
@@ -476,7 +484,7 @@ sub _oai_record_header {
 
 =head2 $self->_get_metadata($dataset, $format)
 
-Get the metadata for a dataset in the correct format.
+Get the metadata for a dataset in the correct format. Must be eval-ed
 
 =over
 
@@ -503,11 +511,15 @@ sub _get_metadata {
 
     my ( $dataset, $format ) = @_;
 
+    my $file = $dataset->ds_filepath();
+
+    die "OAI: XML file $file not found" unless -e "$file.xml";
+
     my $ds = Metamod::ForeignDataset->newFromFile( $dataset->ds_filepath() );
 
     my $formats = $self->metadata_formats();
 
-    if( !exists $formats->{$format}){
+    if( ! exists $formats->{$format} ){
         die "Invalid format '$format'. This should have been validated by the server.";
     }
 
@@ -674,7 +686,7 @@ format. False if the format is not valid.
 
 =cut
 
-#sub _validate_metadata {
+sub _validate_metadata {
     my $self = shift;
 
     my ( $format, $xml_dom, $dataset ) = @_;
@@ -714,8 +726,8 @@ format. False if the format is not valid.
         return 1;
 
     } catch {
-        $self->logger->error("XML did not validate according to format '$format' for dataset '$ds_name': $_");
-        return;
+        die ("XML did not validate according to format '$format' for dataset '$ds_name': $_");
+        #return;
     };
 
 }
