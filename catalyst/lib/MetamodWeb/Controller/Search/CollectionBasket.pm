@@ -118,8 +118,6 @@ sub empty_basket_POST {
 
 Remove a list of selected datasets from the current collection basket.
 
-
-
 =cut
 
 sub remove_dataset : Path('/search/collectionbasket/remove_dataset') : Args(0) {
@@ -173,17 +171,19 @@ sub remove_selected : Path('/search/collectionbasket/remove_selected') : Args(0)
 
 =head2 link_basket()
 
-Does what? FIXME
+Makes a basket containing the datasets listed as params
 
 =cut
 
 sub link_basket : Path('/search/collectionbasket/link_basket' ) : Args(0) { # FIXME: should be a POST request
     my ($self, $c) = @_;
 
-    my $dataset_ids = $c->req->params->{'dataset_ids'} || [];
+    my $dataset_ids = $c->req->params->{'ds_id'} || [];
     if( ref( $dataset_ids ) ne 'ARRAY' ){
         $dataset_ids = [ $dataset_ids ];
     }
+
+    #print STDERR "dataset_ids: ", Dumper $dataset_ids;
 
     my $link_basket = MetamodWeb::Utils::CollectionBasket->new( c => $c, temp_basket => 1, dataset_ids => $dataset_ids );
 
@@ -229,7 +229,7 @@ sub merge_basket : Path('/search/collectionbasket/merge_basket' ) : Args(0) { # 
 sub _add_list_to_basket : Private { # FIXME: should be a POST request
     my ($self, $c ) = @_;
 
-    my $dataset_ids = $c->req->params->{'dataset_ids'} || [];
+    my $dataset_ids = $c->req->params->{'ds_id'} || [];
     if( ref( $dataset_ids ) ne 'ARRAY' ){
         $dataset_ids = [ $dataset_ids ];
     }

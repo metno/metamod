@@ -118,7 +118,7 @@ sub add_dataset {
 
     my @ds_ids = @{ $self->dataset_ids };
     my %ds_ids = map { $_ => 1 } @ds_ids;
-    my $user   = $self->c->user->u_loginname || '(none)';
+    my $user   = eval { $self->c->user->u_loginname } || '(none)';
 
     my $dataset = $self->meta_db->resultset('Dataset')->find($ds_id);
 
@@ -393,6 +393,7 @@ sub files {
 
     my @files       = ();
     my @dataset_ids = @{ $self->dataset_ids() };
+    #print STDERR Dumper \@dataset_ids;
 
     return [] if 0 == @dataset_ids;
 

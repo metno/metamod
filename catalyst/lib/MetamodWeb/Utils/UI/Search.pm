@@ -1374,7 +1374,7 @@ sub wrap_text {
     my @lines;
     while ( $_ = substr($string, 0, $len, '') ) {
         push @lines, $_;
-        print STDERR "--- $_\n"
+        #print STDERR "--- $_\n"
     }
     return join("\n", @lines);
 }

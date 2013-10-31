@@ -87,7 +87,7 @@ jQuery(document).ready( function () {
 <a class="button-link" href="[% c.uri_for( '/search/collectionbasket/empty_basket', c.req.params ) %]"><button type="button">Empty basket</button></a>
 
 [% SET basket_params = { ds_id => collection_basket.dataset_ids } %]
-<a class="button-link" target="_blank" href="[% c.uri_for( '/search/collectionbasket/link_basket', basket_params  ) %]"><button type="button">Get basket URL</button></a>
+<a class="button-link" href="[% c.uri_for( '/search/collectionbasket/link_basket', basket_params  ) %]"><button type="button">Get basket URL</button></a>
 <a class="visual" href="[% c.uri_for( '/search/wmslist', basket_params  ) %]"><button type="button">Visualize layers</button></a>
 [% IF 0 # multiple datasets no longer working %]
     <a class="visual" href="[% c.uri_for( '/search/wms', basket_params  ) %]"><button type="button">Visualize set</button></a>
