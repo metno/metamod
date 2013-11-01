@@ -34,6 +34,7 @@ debian_package: deployment VERSION
 	fakeroot rsync -aC $(CURDIR)/docs/* $(DESTDIR)/docs
 	fakeroot rsync -aC $(CURDIR)/harvest/* $(DESTDIR)/harvest
 	fakeroot rsync -aC $(CURDIR)/upload/* $(DESTDIR)/upload
+	fakeroot rsync -aC $(CURDIR)/thredds/* $(DESTDIR)/thredds
 	fakeroot rsync -a  $(CURDIR)/local/* $(DESTDIR)/local
 	fakeroot rsync -aC $(CURDIR)/activate_env $(DESTDIR)/
 	fakeroot rsync -aC $(CURDIR)/LICENCE $(DESTDIR)/
