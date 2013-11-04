@@ -27,6 +27,9 @@ use Log::Log4perl qw( get_logger ); # does this work?
 use Params::Validate qw( :all );
 use Time::localtime;
 
+my $logger = Log::Log4perl::get_logger(__PACKAGE__);
+# Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__); # or maybe should use this instead?
+
 =head2 $self->metadata_search(%PARAMS)
 
 Search for dataset by looking at the associated metadata for the datasets.
@@ -65,12 +68,14 @@ sub metadata_search {
         {
             curr_page       => { type => SCALAR, optional => 1 },
             ownertags       => { type => ARRAYREF },
-            #rows_per_page   => { type => SCALAR, optional => 10 }, # typo?
-            rows_per_page   => { type => SCALAR, default => 10 },
+            rows_per_page   => { type => SCALAR, optional => 10 },
+            #rows_per_page   => { type => SCALAR, default => 10 },  # typo in above?
             search_criteria => { type => HASHREF },
             all_levels      => { type => SCALAR, default => 0 },
         }
     );
+
+    #print STDERR 'params = ', Dumper \%params;
 
     my ( $all_levels, $curr_page, $ownertags, $rows_per_page, $search_criteria ) =
         @params{qw( all_levels curr_page ownertags rows_per_page search_criteria )};
@@ -85,10 +90,12 @@ sub metadata_search {
         $search_attrs->{ rows } = $rows_per_page;
     }
 
-    #print STDERR Dumper $search_attrs;
+    $logger->debug( 'metadata_search: ', Dumper $search_conds, $search_attrs ) if $logger->is_debug; # Dumper is expensive
 
-    my $matching_datasets = eval { $self->search( $search_conds, $search_attrs ) } or warn $@;
+    #my $matching_datasets = eval { $self->search( $search_conds, $search_attrs ) } or warn $@;
     #print STDERR "========== $@\n" if $@;
+    my $matching_datasets = $self->search( $search_conds, $search_attrs ); # better to die and let caller eval
+    $logger->debug( 'returned hits: ', $matching_datasets->count );
 
     return $matching_datasets;
 
@@ -171,8 +178,7 @@ sub metadata_search_params {
                 {
                     sc_id   => $sc_id,
                     ni_from => { '<=' => $date->{to}||scalar time },
-                    ni_to
-                    => { '>=' => $date->{from}||0 },
+                    ni_to   => { '>=' => $date->{from}||0 },
 
                 }
             );
@@ -510,7 +516,7 @@ sub dataset_location_search {
         IN => \"( SELECT DISTINCT ds_id FROM dataset_location WHERE ST_DWITHIN( $bounding_box, $geom_column, 0.1))",
     };
     #print STDERR "*** coord search is " . Dumper \$search_cond;
-    Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__)->debug( 'PostGIS: ' . ${ $$search_cond{'IN'} });
+    $logger->debug( 'PostGIS: ' . ${ $$search_cond{'IN'} });
     return $search_cond;
 
 }

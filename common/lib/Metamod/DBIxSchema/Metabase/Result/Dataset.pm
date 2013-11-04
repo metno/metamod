@@ -175,7 +175,8 @@ use Log::Log4perl qw();
 use Metamod::FimexProjections;
 
 my $logger = Log::Log4perl::get_logger(__PACKAGE__);
-my $config = Metamod::Config->instance();
+my $config = Metamod::Config->instance(); # problem - should be sent as parameter.
+# current fix for shell scripts is to run Metamod::Config->new() in BEGIN block
 
 =head2 $self->unqualified_ds_name()
 

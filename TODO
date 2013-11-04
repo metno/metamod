@@ -14,6 +14,13 @@ just as an electronic Post-It note for developers to quickly note action
 points for later.
 
 --------------------
+
+use setgid on webrun catalog for correct ownership of new files
+
+use mode 644 for files written to webrun
+
+fix bloody "You must call new() once before you can call instance()" bug that's been around forever
+
 copy bounding box for each layer from cap to wmc (nve)
 - what if > 1 projection?
 

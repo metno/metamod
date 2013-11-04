@@ -46,6 +46,11 @@ if [ ! -w "$WEBRUN_DIRECTORY" ]; then
     exit 1
 fi
 
+# 
+chmod g+s $WEBRUN_DIRECTORY
+# run following command to set sticky bits on existing webrun catalogs
+# find /path/to/directory -type d -exec chmod g+s {} \;
+
 #
 # Initialise the collection basket download directory
 #

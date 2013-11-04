@@ -27,6 +27,7 @@ requires 'HTML::FormHandler::Model::DBIC', 0.14;
 requires 'HTTP::OAI', 3.27;
 requires 'JSON::Any', 1.29;
 requires 'local::lib', '1.008010';
+requires 'Log::Log4perl::CommandLine', 0.07;
 requires 'Moose', 2.0604;
 requires 'PDL';
 requires 'PDL::NetCDF';

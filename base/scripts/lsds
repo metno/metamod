@@ -4,14 +4,14 @@
 
 METAMOD - Web portal for metadata search and upload
 
-Copyright (C) 2008 met.no
+Copyright (C) 2013 met.no
 
 Contact information:
 Norwegian Meteorological Institute
 Box 43 Blindern
 0313 OSLO
 NORWAY
-email: egil.storen@met.no
+email: geira@met.no
 
 This file is part of METAMOD
 
@@ -40,10 +40,9 @@ use FindBin;
 use lib ("$FindBin::Bin/../../common/lib", '.');
 
 use Metamod::Config;
-use Metamod::DBIxSchema::Metabase;
-#use Metamod::DBIxSchema::Userbase;
 use Getopt::Long;
-use Log::Log4perl qw();
+use Log::Log4perl qw(:levels);
+use Log::Log4perl::CommandLine qw(:all :noinit);
 use Data::Dumper;
 use Pod::Usage;
 use Try::Tiny;
@@ -64,25 +63,35 @@ Work in progress... currently lists all sets with wmsinfo and checks the URL
 
 =cut
 
-my $config_file_or_dir = $ENV{METAMOD_MASTER_CONFIG};
-GetOptions('config=s' => \$config_file_or_dir); # don't fail in case set in ENV
-if(!Metamod::Config->config_found($config_file_or_dir)){
-    pod2usage(1);
+local $Data::Dumper::Terse = 1;
+
+my ($config, $logger, %opt, $search_criteria);
+
+$logger = Log::Log4perl->get_logger('metamod.search');
+Log::Log4perl::CommandLine::handlelogoptions();
+#printf STDERR "level=%d\n", $logger->level;
+
+BEGIN { # run compile time to avoid nasty "You must call new() once before you can call instance()" bug
+    GetOptions(\%opt, 'config=s', 'count', 'ownertag=s@', 'wmstest', 'all_levels');
+
+    my $config_file_or_dir = $opt{config} || $ENV{METAMOD_MASTER_CONFIG};
+    if(! Metamod::Config->config_found($config_file_or_dir)){
+        pod2usage(1);
+    }
+    $config = Metamod::Config->new($config_file_or_dir);
 }
-my $config = Metamod::Config->new($config_file_or_dir);
-my $logger = Log::Log4perl->get_logger('metamod.search');
 
-my $ownertags = $config->get('DATASET_TAGS');
-my $wmstest;
-GetOptions('ownertags=s' => \$ownertags.
-           'wmstest' => \$wmstest,
-           );
+#if ($opt{debug}) {
+#    $logger->level($DEBUG);
+#} else {
+#    $logger->level($INFO); # not working
+#}
 
-#my %opts = ();
-#GetOptions (\%opts,
-#            'length=i',
-#
-#);
+use Metamod::DBIxSchema::Metabase;
+#use Metamod::DBIxSchema::Userbase;
+
+my $ownertags = $opt{ownertag} || $config->split('DATASET_TAGS');
+@$ownertags = split(/,/,join(',',@$ownertags)); # allow comma separated list
 
 my $ua = LWP::UserAgent->new;
 $ua->timeout(10);
@@ -90,23 +99,31 @@ $ua->timeout(10);
 
 my $db =_build_metabase();
 
-my $search_criteria = { @ARGV };
-print STDERR Dumper $search_criteria;
+$search_criteria = { @ARGV };
+#print STDERR 'search_criteria = ', Dumper $search_criteria;
+foreach (keys %$search_criteria) {
+    $$search_criteria{$_} = [ $$search_criteria{$_} ];
+}
 my $search_params = {
         ownertags => $ownertags,
         search_criteria => $search_criteria,
-        rows_per_page   => 1000,
+        #rows_per_page   => 30,
+        all_levels => $opt{all_levels}||0,
 };
 
 my $rs = $db->resultset('Dataset');
 #$rs->search();
-$rs->metadata_search($search_params);
 
-exit;
+my $result = $rs->metadata_search($search_params); # this might die, then just abort
 
-while (my $ds = $rs->next) {
-    printf "[%d] %s ", $ds->ds_id, $ds->ds_name;
-    if ($wmstest && $ds->wmsinfo) {
+if ( $opt{count} ) {
+    printf "Search returned %d hits.\n", $result->count;
+    exit 0;
+}
+
+while (my $ds = $result->next) {
+    printf "[%d] %s\n", $ds->ds_id, $ds->ds_name;
+    if ($opt{wmstest} && $ds->wmsinfo) {
         if ($ds->wmsurl) {
             my $rq = $ua->get($ds->wmsurl . 'service=WMS&version=1.3.0&request=GetCapabilities');
             print $rq->code, ' ', status_message( $rq->code ), "\n";
