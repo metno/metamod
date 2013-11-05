@@ -69,7 +69,7 @@ sub map : Path('/search/map') : Args(1) {
         my $aspect = ($x2 - $x1) / ($y1 - $y2);
         my ($height, $width) = ($aspect < 1) ? ( 150, int(150*$aspect) ) : ( int(150/$aspect), 150 );
         #$self->logger->debug("Size = $width, $height");
-        my $thumburl = "$map?LAYERS=world&TRANSPARENT=false&VERSION=1.1.1&FORMAT=image%2Fpng&SERVICE=WMS&REQUEST=GetMap"
+        my $thumburl = $map . "LAYERS=world&TRANSPARENT=false&VERSION=1.1.1&FORMAT=image%2Fpng&SERVICE=WMS&REQUEST=GetMap"
         . "&SRS=EPSG%3A$image_srid&BBOX=$x1,$y2,$x2,$y1&WIDTH=$width&HEIGHT=$height";
         return $c->res->redirect($thumburl);
     }
