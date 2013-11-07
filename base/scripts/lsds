@@ -60,9 +60,9 @@ Work in progress...
 
 =head1 USAGE
 
-  lsds [-q|-v|-d] [--config dir] [-a] [-c] [-f] [--[no]color] [-i ds_id] [-p key=value]... [-o tag]... [ --wms | --projectioninfo | --xmlfile | --metadata name ... ]
+  lsds [-q|-v|-d] [--config dir] [-a] [-c] [-f] [--[no]color] [-p key=value]... [-o tag]... [ --wms | --projectioninfo | --xmlfile | --metadata name ... ] [ ds_id | ds_name ]
 
-=head1 PARAMETERS
+=head1 OPTIONS
 
 =head2 -q|--quiet
 
@@ -78,6 +78,8 @@ Work in progress...
 
 Controls Log4perl loglevel
 
+B<Buggy - try using at end of command string>
+
 =head2 --config dir
 
 Path to master_config directory
@@ -90,24 +92,22 @@ Search from all levels (default is only level 1)
 
 Returns the number of hits instead of listing all names
 
-=head2 -f1--full
+=head2 -f | --[no]full
 
 If combined with C<--wms> or other options except C<--metadata>, expand info.
 Otherwise show all metadata in listing.
+
+Implicit if called with only one argument
 
 =head2 color
 
 Turn ANSI color output on/off
 
-=head2 -i|--id
+=head2 -i | --[no]id
 
 Show ds_id numbers
 
-=head2 --find
-
-Search by ds_id
-
-=head2 -p|--params key=value
+=head2 -p | --params key=value
 
 Search parameter for finding datasets (same as web interface... more or less).
 
@@ -136,17 +136,20 @@ Show XML file path
 
 Show specified metadata
 
+=head1 PARAMETERS
+
+ds_id or ds_name (assuming the former if numeric)
+
 =head1 EXAMPLES
 
-  $ lsds -q --find 4 -f
-  $ lsds -m area
-  $ lsds -q -p freetext=ice_conc
-  $ lsds -q -p 'freetext=ice AND arctic' -c
+  $ lsds  828 829 830 831
+  $ lsds --full NORMAP/metno-sstana05-V2
+  $ lsds -m dataref_OPENDAP
+  $ lsds -p freetext=ice_conc
+  $ lsds -c -p 'freetext=ice AND arctic'
   $ lsds --wms
   $ lsds --projectioninfo
   $ lsds --xmlfile
-  $ lsds -q -m timeseries
-  $ lsds -m dataref_OPENDAP
 
 =cut
 
@@ -156,7 +159,7 @@ my ($config, $logger, %opt, $search_criteria);
 
 BEGIN { # run compile time to avoid nasty "You must call new() once before you can call instance()" bug
 
-    GetOptions(\%opt, 'config=s', 'count|c', 'all_levels', 'find=s', 'full', 'params|p=s%',
+    GetOptions(\%opt, 'config=s', 'count|c', 'all_levels', 'find=s', 'full!', 'params|p=s%',
                'metadata=s@', 'ownertag=s@', 'wms', 'projectioninfo', 'xmlfile', 'color!', 'id!') or pod2usage(2);
 
     my $config_file_or_dir = $opt{config} || $ENV{METAMOD_MASTER_CONFIG};
@@ -174,7 +177,7 @@ if (defined $color) {
 $logger = Log::Log4perl->get_logger('metamod.tools');
 Log::Log4perl::CommandLine::handlelogoptions();
 #printf STDERR "loglevel=%d %d\n", $logger->level, $logger->is_info;
-#print STDERR Dumper \%opt;
+#print STDERR Dumper \%opt, \@ARGV;
 
 use Metamod::DBIxSchema::Metabase;
 #use Metamod::DBIxSchema::Userbase;
@@ -184,6 +187,8 @@ my $ownertags = $opt{ownertag} || $config->split('DATASET_TAGS');
 
 my $metadata = $opt{metadata} || [];
 @$metadata = split( /,/, join(',', @$metadata) ); # ditto
+
+$opt{full} = (@ARGV == 1) unless defined $opt{full}; # default to full view if only one dataset argument
 
 #print STDERR 'params = ', Dumper $opt{params};
 
@@ -212,8 +217,21 @@ my $ua = LWP::UserAgent->new;
 $ua->timeout(10);
 #$ua->env_proxy;
 
-if (defined $opt{find} ) {
-    listds( $rs->find($opt{find}) );
+if (@ARGV) {
+
+    foreach my $dataset (@ARGV) {
+        try {
+            if ($dataset =~ /^\d+$/) {
+                listds( $rs->find($dataset) );
+            } else {
+                listds( $rs->search( { ds_name => $dataset } ) ); # ->first ?
+            }
+        } catch {
+            print STDERR "Dataset not found: $dataset\n";
+            exit 1;
+        }
+    }
+
 } else {
     #$rs->search();
     my $result = $rs->metadata_search($search_params); # this might die, if so then just abort
@@ -230,7 +248,7 @@ if (defined $opt{find} ) {
 exit 0;
 
 sub listds {
-    my $ds = shift;
+    my $ds = shift or die "No such dataset";
 
     my ($id, $name) = ($ds->ds_id, $ds->ds_name);
     my $lead = colored($name, 'bold green');
@@ -263,13 +281,25 @@ sub listds {
 
     } elsif ($opt{full} || @$metadata) {
 
-        my $list = @$metadata > 1; # not compact format
+        my $list = $opt{full} || @$metadata > 1; # not compact format
         print "$lead:\n" if $list;
+        if ($opt{full}) {
+            my %row = $ds->get_columns;
+            #print STDERR Dumper \%row;
+            foreach my $c ( sort keys %row ) {
+                printf "  %s: %s\n", colored($c, 'bold blue'), $row{$c};
+            }
+            printf "  %s: %s (%s)\n", colored('children', 'bold blue'),
+                #ref $ds->child_datasets;
+                $ds->num_children,
+                join( ', ', map( $_->ds_id, $ds->child_datasets->all ) );
+        }
+
         my $md = $ds->metadata($metadata);
         foreach my $k (keys %$md) {
             foreach ( @{ $md->{$k} } ) {
                 if ($list) {
-                    print "  $k: $_\n";
+                    printf "  %s: $_\n", colored($k, 'bold yellow');
                 } else {
                     print "$lead: $_\n";
                 }
