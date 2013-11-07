@@ -230,7 +230,7 @@ specific mt_name.
 sub metadata {
     my $self = shift;
 
-    my ( $metadata_names ) = @_;
+    my ( $metadata_names ) = @_; # should maybe warn if name is not existing?
 
     $metadata_names = [] if !defined $metadata_names;
 
@@ -282,9 +282,24 @@ sub xmlfile {
     return $path if -r $path;
 }
 
-=head2 $self->projectioninfos()
+=head2 $self->projectioninfo()
 
-Returns projectioninfo of either self or parent
+Returns projectioninfo object of either self or parent
+
+=cut
+
+sub projectioninfo {
+    my ($self) = @_;
+    my $rs = $self->selfprojectioninfos() || $self->parentprojectioninfos() || return;
+    return unless $rs->count;
+    my $prow = $rs->first() or die "Unknown error";
+    my $dom = XML::LibXML->load_xml( string => $prow->pi_content );
+    return $dom;
+}
+
+=head2 $self->projectioninfos() [DEPRECATED]
+
+Returns projectioninfo resultset of either self or parent
 
 =cut
 
@@ -346,9 +361,9 @@ sub wmsinfo {
 
     #printf STDERR " ******** RAW WMSINFO: %s\n", $dom->toString(1);
 
-    my $xpc = XML::LibXML::XPathContext->new($root);
-    $xpc->registerNs('setup', "http://www.met.no/schema/metamod/ncWmsSetup");
-
+    #my $xpc = XML::LibXML::XPathContext->new($root);
+    #$xpc->registerNs('setup', "http://www.met.no/schema/metamod/ncWmsSetup");
+    #
     #foreach ( $xpc->findnodes('/*/setup:layer[@url]|/*/setup:baselayer[@url]') ) {
         #printf STDERR "--- Sanitize me! %s\n", sanitize_url( $_->getAttribute('name') ); # sanitize_url seems to be removed
     #}

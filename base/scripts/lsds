@@ -48,6 +48,7 @@ use Pod::Usage;
 use Try::Tiny;
 use LWP::UserAgent;
 use HTTP::Status qw(:constants :is status_message);
+use Term::ANSIColor;
 
 =head1 NAME
 
@@ -55,11 +56,97 @@ B<lsds> - List datasets
 
 =head1 DESCRIPTION
 
-Work in progress... currently lists all sets with wmsinfo and checks the URL
+Work in progress...
 
 =head1 USAGE
 
-  lsds
+  lsds [-q|-v|-d] [--config dir] [-a] [-c] [-f] [--[no]color] [-i ds_id] [-p key=value]... [-o tag]... [ --wms | --projectioninfo | --xmlfile | --metadata name ... ]
+
+=head1 PARAMETERS
+
+=head2 -q|--quiet
+
+=head2 --fatal
+
+=head2 --error
+
+=head2 --warn
+
+=head2 -v|--verbose
+
+=head2 -d|--debug
+
+Controls Log4perl loglevel
+
+=head2 --config dir
+
+Path to master_config directory
+
+=head2 -a|--all_levels
+
+Search from all levels (default is only level 1)
+
+=head2 -c|--count
+
+Returns the number of hits instead of listing all names
+
+=head2 -f1--full
+
+If combined with C<--wms> or other options except C<--metadata>, expand info.
+Otherwise show all metadata in listing.
+
+=head2 color
+
+Turn ANSI color output on/off
+
+=head2 -i|--id
+
+Show ds_id numbers
+
+=head2 --find
+
+Search by ds_id
+
+=head2 -p|--params key=value
+
+Search parameter for finding datasets (same as web interface... more or less).
+
+May be repeated as many times as desired, however each parameter can only be specified once. E.g.
+
+  --param freetext=ice --param date_from=20120101 # legal
+  --param freetext=ice --param freetext=sea # not legal
+
+=head2 -o|--ownertag tag
+
+Comma separated list of ownertags to filter search. Default is current DATASET_TAGS value from master_config.
+
+=head2 --projectioninfo
+
+Show projectioninfo
+
+=head2 --wms
+
+Show WMS URL and/or full WMSinfo, optionally (?) testing HTTP connection
+
+=head2 --xmlfile
+
+Show XML file path
+
+=head2 -m|--metadata name
+
+Show specified metadata
+
+=head1 EXAMPLES
+
+  $ lsds -q --find 4 -f
+  $ lsds -m area
+  $ lsds -q -p freetext=ice_conc
+  $ lsds -q -p 'freetext=ice AND arctic' -c
+  $ lsds --wms
+  $ lsds --projectioninfo
+  $ lsds --xmlfile
+  $ lsds -q -m timeseries
+  $ lsds -m dataref_OPENDAP
 
 =cut
 
@@ -67,12 +154,10 @@ local $Data::Dumper::Terse = 1;
 
 my ($config, $logger, %opt, $search_criteria);
 
-$logger = Log::Log4perl->get_logger('metamod.search');
-Log::Log4perl::CommandLine::handlelogoptions();
-#printf STDERR "level=%d\n", $logger->level;
-
 BEGIN { # run compile time to avoid nasty "You must call new() once before you can call instance()" bug
-    GetOptions(\%opt, 'config=s', 'count', 'ownertag=s@', 'wmstest', 'all_levels');
+
+    GetOptions(\%opt, 'config=s', 'count|c', 'all_levels', 'find=s', 'full', 'params|p=s%',
+               'metadata=s@', 'ownertag=s@', 'wms', 'projectioninfo', 'xmlfile', 'color!', 'id!') or pod2usage(2);
 
     my $config_file_or_dir = $opt{config} || $ENV{METAMOD_MASTER_CONFIG};
     if(! Metamod::Config->config_found($config_file_or_dir)){
@@ -81,29 +166,41 @@ BEGIN { # run compile time to avoid nasty "You must call new() once before you c
     $config = Metamod::Config->new($config_file_or_dir);
 }
 
-#if ($opt{debug}) {
-#    $logger->level($DEBUG);
-#} else {
-#    $logger->level($INFO); # not working
-#}
+my $color = defined $opt{color} ? $opt{color} : -t STDOUT; # use IO::Interactive::Tiny instead - FIXME
+if (defined $color) {
+    $ENV{ANSI_COLORS_DISABLED} = 1 unless $color;
+}
+
+$logger = Log::Log4perl->get_logger('metamod.tools');
+Log::Log4perl::CommandLine::handlelogoptions();
+#printf STDERR "loglevel=%d %d\n", $logger->level, $logger->is_info;
+#print STDERR Dumper \%opt;
 
 use Metamod::DBIxSchema::Metabase;
 #use Metamod::DBIxSchema::Userbase;
 
 my $ownertags = $opt{ownertag} || $config->split('DATASET_TAGS');
-@$ownertags = split(/,/,join(',',@$ownertags)); # allow comma separated list
+@$ownertags = split( /,/, join(',', @$ownertags) ); # allow comma separated list
 
-my $ua = LWP::UserAgent->new;
-$ua->timeout(10);
-#$ua->env_proxy;
+my $metadata = $opt{metadata} || [];
+@$metadata = split( /,/, join(',', @$metadata) ); # ditto
+
+#print STDERR 'params = ', Dumper $opt{params};
 
 my $db =_build_metabase();
+my $rs = $db->resultset('Dataset');
 
-$search_criteria = { @ARGV };
-#print STDERR 'search_criteria = ', Dumper $search_criteria;
-foreach (keys %$search_criteria) {
-    $$search_criteria{$_} = [ $$search_criteria{$_} ];
+$search_criteria = {};
+foreach (keys %{ $opt{params} }) {
+
+    if (/^freetext$/) {
+        $$search_criteria{$_} = [ $opt{params}->{$_} ];
+    } elsif (/^date_from$/) {
+        # dates => { 8 => { from => '20100205', to => '20100801', } },
+    }
 }
+#print STDERR 'search_criteria = ', Dumper $search_criteria;
+
 my $search_params = {
         ownertags => $ownertags,
         search_criteria => $search_criteria,
@@ -111,37 +208,79 @@ my $search_params = {
         all_levels => $opt{all_levels}||0,
 };
 
-my $rs = $db->resultset('Dataset');
-#$rs->search();
+my $ua = LWP::UserAgent->new;
+$ua->timeout(10);
+#$ua->env_proxy;
 
-my $result = $rs->metadata_search($search_params); # this might die, then just abort
+if (defined $opt{find} ) {
+    listds( $rs->find($opt{find}) );
+} else {
+    #$rs->search();
+    my $result = $rs->metadata_search($search_params); # this might die, if so then just abort
 
-if ( $opt{count} ) {
-    printf "Search returned %d hits.\n", $result->count;
-    exit 0;
-}
-
-while (my $ds = $result->next) {
-    printf "[%d] %s\n", $ds->ds_id, $ds->ds_name;
-    if ($opt{wmstest} && $ds->wmsinfo) {
-        if ($ds->wmsurl) {
-            my $rq = $ua->get($ds->wmsurl . 'service=WMS&version=1.3.0&request=GetCapabilities');
-            print $rq->code, ' ', status_message( $rq->code ), "\n";
-        } else {
-            print "*Missing URL*\n";
+    if ( $opt{count} ) {
+        printf "Search returned %d hits.\n", $result->count;
+    } else {
+        while (my $ds = $result->next) {
+            listds($ds);
         }
     }
 }
 
-#my $datasets = try {
-#    $dataset->metadata_search($search_params);
-#} catch {
-#    die $@;
-#};
+exit 0;
 
-#foreach my $parent( $db->level1_datasets($ownertags) ) {
-#    printf "- %d\n", $parent->ds_id;
-#}
+sub listds {
+    my $ds = shift;
+
+    my ($id, $name) = ($ds->ds_id, $ds->ds_name);
+    my $lead = colored($name, 'bold green');
+    $lead .= colored(" [$id]", 'bold blue') if $opt{id};
+
+    if ($opt{wms}) {
+
+        return unless $ds->wmsinfo;
+        if (my $url = $ds->wmsurl) {
+            my $rq = $ua->get("${url}service=WMS&version=1.3.0&request=GetCapabilities");
+            printf "$lead: $url - %d %s\n", $rq->code, status_message($rq->code);
+        } else {
+            printf "$lead: %s\n", colored('*Missing URL*', 'bold red');
+        }
+        print $ds->wmsinfo->toString(1) if $opt{full};
+        return;
+
+    } elsif ($opt{projectioninfo}) {
+
+        my $pi = $ds->projectioninfo or return;
+        print "$lead:\n", $pi->toString(1);
+
+    } elsif ($opt{xmlfile}) {
+
+        if (my $file = $ds->xmlfile) {
+            printf "$lead: $file - %s\n", -r $file ? 'OK' : colored('Not found');
+        } else {
+            printf "$lead: %s\n", colored('*Missing XMLfile*', 'bold red');
+        }
+
+    } elsif ($opt{full} || @$metadata) {
+
+        my $list = @$metadata > 1; # not compact format
+        print "$lead:\n" if $list;
+        my $md = $ds->metadata($metadata);
+        foreach my $k (keys %$md) {
+            foreach ( @{ $md->{$k} } ) {
+                if ($list) {
+                    print "  $k: $_\n";
+                } else {
+                    print "$lead: $_\n";
+                }
+            }
+        }
+
+    } else {
+        print "$lead\n";
+    }
+
+}
 
 sub _build_metabase {
 

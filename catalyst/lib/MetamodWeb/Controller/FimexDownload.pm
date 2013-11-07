@@ -94,7 +94,7 @@ sub fimexDownload :Path('/search/fimexdownload') :Args(0) {
         $c->detach('Root', 'error', [ 404, 'Unknown: ' . $ds_name||$ds_id ]); # not found
     }
 
-    my $projectioninfo = $ds->projectioninfos->first;
+    my $projectioninfo = $ds->projectioninfos->first; # use projectioninfo instead - FIXME
     unless ($projectioninfo) {
         # TODO error page
         $self->logger->warn("no projectioninfos for dataset: $ds_name");
