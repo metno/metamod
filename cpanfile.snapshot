@@ -5488,6 +5488,40 @@ DISTRIBUTIONS
       Test::TCP 1.11
       parent 0
       perl 5.008001
+  Statistics-Descriptive-3.0605
+    pathname: S/SH/SHLOMIF/Statistics-Descriptive-3.0605.tar.gz
+    provides:
+      Statistics::Descriptive 3.0605
+      Statistics::Descriptive::Smoother 3.0605
+      Statistics::Descriptive::Smoother::Exponential 3.0605
+      Statistics::Descriptive::Smoother::Weightedexponential 3.0605
+    requirements:
+      Benchmark 0
+      Carp 0
+      Module::Build 0.36
+      POSIX 0
+      Test::More 0
+      lib 0
+      strict 0
+      vars 0
+      warnings 0
+  Statistics-Distributions-1.02
+    pathname: M/MI/MIKEK/Statistics-Distributions-1.02.tar.gz
+    provides:
+      Statistics::Distributions 1.02
+    requirements:
+      ExtUtils::MakeMaker 0
+  Statistics-TTest-1.1.0
+    pathname: Y/YU/YUNFANG/Statistics-TTest-1.1.0.tar.gz
+    provides:
+      Statistics::PointEstimation 1.1
+      Statistics::PointEstimation::Sufficient 1.1
+      Statistics::TTest 1.1
+      Statistics::TTest::Sufficient 1.1
+    requirements:
+      ExtUtils::MakeMaker 0
+      Statistics::Descriptive 2.6
+      Statistics::Distributions 0.07
   Stream-Buffered-0.02
     pathname: D/DO/DOY/Stream-Buffered-0.02.tar.gz
     provides:
