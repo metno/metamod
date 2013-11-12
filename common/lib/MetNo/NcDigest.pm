@@ -649,7 +649,7 @@ sub digest {
         }
     };
     if ($@) {
-        warn $@;
+        warn $@; # should die unless file can be parsed - FIXME
     }
 
     my $usererrors_path = "nc_usererrors.out";

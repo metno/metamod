@@ -187,6 +187,7 @@ Returns 1 on success. Throws and exception on failure.
 =back
 
 =cut
+
 sub _writeToFileHelper {
     my ($self, $fileBase) = @_;
     $fileBase = Metamod::DatasetTransformer::getBasename($fileBase);
@@ -202,8 +203,8 @@ sub _writeToFileHelper {
     binmode $xmdF; # drop all PerlIO layers possibly created by a use open pragma
     binmode $xmlF;
     # use libxml to write the file, avoid any interference by perl (possible character conversion)
-    $self->{docXMD}->toFH($xmdF, 1);
-    $self->{docMETA}->toFH($xmlF, 1);
+    $self->{docXMD}->toFH($xmdF, 2);    # should pretty-print xml (not currently working)
+    $self->{docMETA}->toFH($xmlF, 2); 
     close $xmlF;
     close $xmdF;
 

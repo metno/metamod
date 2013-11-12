@@ -21,11 +21,11 @@ use MetNo::NcDigest qw( digest );
 my $test_setup = Metamod::Test::Setup->new( master_config_file => "$FindBin::Bin/../master_config.txt" );
 my $config = $test_setup->mm_config();
 
-my $out_dir = "$FindBin::Bin/xml_output/xml_output";
+my $out_dir = "$FindBin::Bin/xml_output/xml_output"; # sure this is writeable? FIXME
 my $baseline_dir = "$FindBin::Bin/../data/MetNo"; # dir with the correct xml files
 
 if( !( -e $out_dir ) ){
-    mkpath( $out_dir ) or die $!;
+    mkpath( $out_dir ) or die "Output dir not writeable: $!";
 }
 
 my $path_to_data = abs_path($baseline_dir);
@@ -51,6 +51,8 @@ close $DIGEST;
     digest( $digest_file, 'DAM', $out_file );
 
     compare_ok( $baseline_file, $out_file, 'Parsing NC file' );
+
+    #print STDERR "Compared files:\n  $baseline_file\n  $out_file:\n";
 
     BEGIN { $num_tests += 1 }
 }
