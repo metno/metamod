@@ -48,3 +48,4 @@ requires 'TAP::Harness::Archive', 0.15;
 requires 'Benchmark::Timer', 0.7102;
 requires 'Test::DatabaseRow', 2.03;
 requires 'Test::File', 1.35;
+requires 'TAP::Harness::Archive', 0.15;

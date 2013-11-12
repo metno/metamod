@@ -281,8 +281,8 @@ EOF
 # =======================================================
 #
 cd $basedir/source
-# this should be configurable - not everybody uses our debian pkg... FIXME
-export PERL5LIB=/opt/metno-catalyst-dependencies-ver1/lib/perl5/
+# not applicable since 2.12 - FIXME
+#export PERL5LIB=/opt/metno-catalyst-dependencies-ver1/lib/perl5/
 
 #update_target.pl no longer exists
 #./update_target.pl test/applic

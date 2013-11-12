@@ -63,14 +63,14 @@
             <a class="visual" href="[% c.uri_for( '/dataset', child.ds_id, 'view' ) %]" target="_blank"
                title="Show metadata for this file"><span>Show metadata</span></a><br clear="all"/>
 
-            [% FOREACH projection IN child.fimex_projections.listProjections() # FIXME remove after transform tested %]
+            [% FOREACH projection IN child.fimex_projections(mm_config).listProjections() # FIXME remove after transform tested %]
                 <a class="btn" href="[% c.uri_for( '/search/fimexdownload', { dataset_name => child.ds_name, projection => projection } ) %]" target="_blank"
                     title="Download file in [% projection %]"><span>[% projection %] Downl.</span></a><br clear="all"/>
             [% END %]
             [% IF opendap; tsvars = metadata.timeseries.0 %]
                 [% IF tsvars %]
                     [% IF ext_ts %]
-                        <a class="visualimg" href="[% child.external_ts_url %]"><span>Time series</span></a><br clear="all"/>
+                        <a class="visualimg" href="[% child.external_ts_url(mm_config) %]"><span>Time series</span></a><br clear="all"/>
                     [% ELSE %]
                         <a class="visual" href="[% c.uri_for('/search/ts', { ds_id => child.ds_id, vars => tsvars } ) %]"><span>Time series</span></a><br clear="all"/>
                     [% END %]

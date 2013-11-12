@@ -292,11 +292,13 @@ WMS_PROJECTIONS =
 
 # bounding boxes for each projection (currently used only for dynamic map search)
 WMS_BOUNDING_BOXES =
-    EPSG:4326    -180         180         -90         90
-    EPSG:32661   -3000000     7000000     -3000000    7000000
-    EPSG:32761   -3000000     7000000     -3000000    7000000
-    EPSG:3995    -5000000     5000000     -5000000    5000000
-    EPSG:3031    -5000000     5000000     -5000000    5000000
+    EPSG:4326       -180        180         -90         90
+    EPSG:32661      -3000000    7000000     -3000000    7000000
+    EPSG:32761      -3000000    7000000     -3000000    7000000
+    EPSG:3995       -5000000    5000000     -5000000    5000000
+    EPSG:3031       -5000000    5000000     -5000000    5000000
+
+#    EPSG:32633      166021.4431 0.0000      833978.5569 9329005.1825
 
 # URL to background map server delivering coastlines and reticules [DEPRECATED]
 WMS_BACKGROUND_MAPSERVER = http://wms.met.no/maps/

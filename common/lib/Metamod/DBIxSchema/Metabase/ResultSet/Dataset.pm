@@ -224,7 +224,6 @@ sub metadata_search_params {
         my $hk_ids = $search_criteria->{ topics }->{ hk_ids };
         my $bk_ids = $search_criteria->{ topics }->{ bk_ids };
 
-
         my @bk_conds = ();
         if( @$hk_ids ){
             my $hrb_rs = $self->result_source()->schema()->resultset('HkRepresentsBk');

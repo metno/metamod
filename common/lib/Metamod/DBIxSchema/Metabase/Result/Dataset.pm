@@ -175,19 +175,11 @@ use Log::Log4perl qw();
 use Metamod::FimexProjections;
 
 my $logger = Log::Log4perl::get_logger(__PACKAGE__);
-my $config = Metamod::Config->instance(); # problem - should be sent as parameter.
-# current fix for shell scripts is to run Metamod::Config->new() in BEGIN block
 
 =head2 $self->unqualified_ds_name()
 
-=over
-
-=item return
-
 Returns the dataset name without any qualification like DAMOC or similar. If
 the ds name is not qualified it just returns C<ds_name>.
-
-=back
 
 =cut
 
@@ -209,19 +201,19 @@ sub unqualified_ds_name {
 
 Get metadata associated with the dataset.
 
+Returns a hash reference with one key per mt_name that the dataset has metadata
+for. Each value is an array reference of metadata values. The value is an array
+reference even if only one value is associated with the datasets for a
+specific mt_name.
+
+=head3 Parameters
+
 =over
 
 =item $metadata_names (optional)
 
 An array reference with mt_names. If given only the metadata matching the
 mt_names will be returned.
-
-=item return
-
-Returns a hash reference with one key per mt_name that the dataset has metadata
-for. Each value is an array reference of metadata values. The value is an array
-reference even if only one value is associated with the datasets for a
-specific mt_name.
 
 =back
 
@@ -308,14 +300,16 @@ sub projectioninfos {
     return $self->selfprojectioninfos() || $self->parentprojectioninfos();
 }
 
-=head2 $self->fimex_projections()
+=head2 $self->fimex_projections($config)
 
-Returns a Metamod::FimexProjections object (never null)
+Returns a Metamod::FimexProjections object (never null).
+
+Must be given an existing Config object as a parameter (to avoid compile time problems)
 
 =cut
 
 sub fimex_projections {
-    my ($self) = @_;
+    my ($self, $config) = @_;
 
     return new Metamod::FimexProjections() unless $config->get('FIMEX_PROGRAM');
 
@@ -536,23 +530,21 @@ sub num_children {
 
 }
 
-=head2 $self->file_location()
+=head2 $self->file_location($config) (DEPRECATED?)
 
 Calculate the file location where the dataset is located if possible.
 
-=over
-
-=item return
+Must be given an existing Config object as a parameter (to avoid compile time problems)
 
 Returns an URL where the file can be downloaded if possible. Returns C<undef>
 if the file location cannot be calculated.
 
-=back
+B<Note:> Does not seem to be used anywhere.
 
 =cut
 
 sub file_location {
-    my $self = shift;
+    my ($self, $config) = shift;
 
     my $metadata = $self->metadata( ['dataref'] );
 
@@ -573,22 +565,18 @@ sub file_location {
 
 }
 
-=head2 $self->external_ts_url()
+=head2 $self->external_ts_url($config)
 
 Calculate URL to external timeseries plot if available (must be set in TIMESERIES_URL in master_config)
 
-=over
-
-=item return
+Must be given an existing Config object as a parameter (to avoid compile time problems)
 
 Returns an URL to the image file. Returns C<undef> if the URL cannot be calculated.
-
-=back
 
 =cut
 
 sub external_ts_url {
-    my $self = shift;
+    my ($self, $config) = shift;
 
     my $tsurl = $config->get('TIMESERIES_URL') or return;
 

@@ -25,6 +25,7 @@ copy bounding box for each layer from cap to wmc (nve)
 - what if > 1 projection?
 
 add search option for wmsinfo and projectioninfo
+* using lsds works for now
 
 fix fakeroot in debian make
 

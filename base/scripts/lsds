@@ -202,9 +202,11 @@ foreach (keys %{ $opt{params} }) {
         $$search_criteria{$_} = [ $opt{params}->{$_} ];
     } elsif (/^date_from$/) {
         # dates => { 8 => { from => '20100205', to => '20100801', } },
+    } else {
+        #$$search_criteria{$_} = [ $opt{params}->{$_} ]; # not working
     }
 }
-#print STDERR 'search_criteria = ', Dumper $search_criteria;
+print STDERR 'search_criteria = ', Dumper $search_criteria;
 
 my $search_params = {
         ownertags => $ownertags,
