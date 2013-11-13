@@ -66,7 +66,7 @@ if ($coverage) {
 my $prove = App::Prove->new();
 
 # setting lib using $prove->lib() does not work for some reason
-$prove->process_args('-I/opt/metno-perl-webdev-ver1/lib/perl5');
+$prove->process_args('-Ilocal/lib/perl5');
 
 if ($verbose) {
     $prove->verbose(1);
