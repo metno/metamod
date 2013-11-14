@@ -335,7 +335,7 @@ returns all configuration flags as a hash. Each flag is a bitfield composed of:
         1       default value set
         2       master value set
         4       envvar value set
-        8       obsolete !substitute_to_file_with_new_name directive
+        128     warning flag
 
 =cut
 
@@ -468,8 +468,15 @@ sub _readConfig {
                     #$newfilenames{$origname . ':' . $newname} = 1;
                 #} else {
                     # here we do the actual storing of the values
-                    $conf{$varname} = $value;
-                    $flags{$varname} |= $flagmask;
+                    if ( $conf{$varname} and ($conf{$varname} eq $value) ) {
+                        #code
+                        my $warn = "Duplicate default declaration $varname in $filename line $.\n";
+                        $_logger_initialised->warn($warn) if $_logger_initialised; # don't report for terminal apps
+                        $flags{$varname} |= 128;
+                    } else {
+                        $conf{$varname} = $value;
+                        $flags{$varname} |= $flagmask;
+                    }
                 #}
                 $varname = "";
             }
@@ -513,7 +520,7 @@ sub _readConfig {
     for (keys %ENV) {
         next unless /^METAMOD_(\w+)/;
         $conf{$1} = $ENV{$_};
-        $flags{$1} |= $flagmask;
+        $flags{$1} |= $flagmask; # should now be 4, but possibly higher if additional config files allowed
     }
 
     $self->{vars} = \%conf;

@@ -47,13 +47,14 @@ use Term::ANSIColor;
 use Pod::Usage;
 
 #Getopt::Long::Configure ("bundling");
-my ($help, $split, $config_file_or_dir, $default, $custom, $environment, $flags);
+my ($help, $split, $config_file_or_dir, $default, $custom, $environment, $duplicates, $flags);
 my $color = -t STDOUT; # use IO::Interactive::Tiny instead - FIXME
 GetOptions(
     'help'          => \$help,          # for dummies
     'default!'      => \$default,       # set in default_config
     'custom!'       => \$custom,        # set in master_config
     'environment!'  => \$environment,   # set in environment
+    'duplicates!'   => \$duplicates,    # same value set in default and master_config
     'color!'        => \$color,         # use colors
     'split'         => \$split,         # split var into key-value pairs
     'flags!'        => \$flags,         # show flag indicator
@@ -99,14 +100,15 @@ foreach (sort keys %$vars) {
     my $val = $$vars{$_};
     my $f = $vflags->{$_} || 0;
     # compare truthinesses
-    next if defined $default     && ( ($f & 1) xor $default );
-    next if defined $custom      && ( ($f & 2) xor $custom );
-    next if defined $environment && ( ($f & 4) xor $environment );
+    next if defined $default     && ( ($f & 1)   xor $default );
+    next if defined $custom      && ( ($f & 2)   xor $custom );
+    next if defined $environment && ( ($f & 4)   xor $environment );
+    next if defined $duplicates  && ( ($f & 128) xor $duplicates );
 
-    printf "%06b ", $f if $flags;
+    printf "%08b ", $f if $flags;
     print color $f & 1 ? 'bold green' : 'bold red'; # green if default
     print $_, color 'reset';
-    print '=', color $f & 2 ? 'bright_yellow' : 'bright_blue'; # yellow if local
+    print '=', color $f & 128 ? 'bright_red' : color $f & 2 ? 'bright_yellow' : 'bright_blue'; # yellow if local
     print ref $val ? '[ ' . join(', ', @$val) . ' ]' : "\"$val\"";
     print "\n", color 'reset';
 }
