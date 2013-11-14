@@ -443,7 +443,7 @@ sub _readConfig {
 
     my $default_config = $self->path_to_config_file('default_config.txt');
 
-    my (%conf, %flags);
+    my (%conf, %flags, %sources);
     my $flagmask = 1;
     for my $filename (($default_config, $self->{filename})) {
 
@@ -504,6 +504,7 @@ sub _readConfig {
             $flags{$varname} |= $flagmask;
         }
         close $fh;
+        $sources{$flagmask} = $filename;
         $flagmask <<= 1;
     }
 
@@ -520,11 +521,17 @@ sub _readConfig {
     for (keys %ENV) {
         next unless /^METAMOD_(\w+)/;
         $conf{$1} = $ENV{$_};
-        $flags{$1} |= $flagmask; # should now be 4, but possibly higher if additional config files allowed
+        $flags{$1} |= $flagmask; # should be 4 at time of writing, but possibly higher if additional config files allowed
     }
+    $sources{$flagmask} = 'ENV';
 
     $self->{vars} = \%conf;
     $self->{flags} = \%flags;
+    $self->{sources} = \%sources;
+    $conf{'CONFIG_SOURCES'} = "\n";
+    foreach (sort keys %sources) {
+        $conf{'CONFIG_SOURCES'} .= sprintf "  %.3d  %s\n", $_, $sources{$_};
+    }
 }
 
 # get a variable from env or the internal hash, without substitution

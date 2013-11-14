@@ -15,6 +15,18 @@ points for later.
 
 --------------------
 
+remove unused config directives:
+    all of METAMODQUEST configuration except QUEST_CONFIGURATIONS, QUEST_OUTPUT_DIRECTORY
+	QUEST_METADATA_UPLOAD_FORM
+	QUEST_SENDER_ADDRESS
+	QUEST_RECIPIENTS
+	QUEST_OKMESSAGE
+	QUEST_FORM_DEFINITON_FILE
+	QUEST_ADM_BACKGROUND
+	QUEST_ADM_TOPDIR
+	QUEST_FORM_DEFINITON_FILE
+	QUEST_CONFIG_DIRECTORY
+
 use setgid on webrun catalog for correct ownership of new files
 
 use mode 644 for files written to webrun

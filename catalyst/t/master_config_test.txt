@@ -57,10 +57,6 @@ PG_WEB_USER_PASSWORD = admin
 # the location of the initialization sql-script for the full-text facilities
 PG_TSEARCH2_SCRIPT = /usr/share/postgresql/8.1/contrib/tsearch2.sql
 
-# the language to use for the data for full-text indexing, pre-installed are 'default' and 'simple' (pg <= 8.2); 'english' and 'simple' (pg >= 8.3)
-# see 'select * from pg_ts_config;'
-PG_TSEARCH_LANGUAGE = english
-
 # PG_CONNECTSTRING_* are strings used to indicate hostname and port for
 # connecting to the PostgreSQL database. They are found in various
 # commands and script functions. These strings should be empty if hostname and
@@ -108,27 +104,9 @@ PHPLOGFILE = [==WEBRUN_DIRECTORY==]/phplog
 # Minimum log level, one of ERROR, WARNING, INFO, DEBUG
 PHPLOGLEVEL = DEBUG
 
-# Name of psql executable:
-PSQL = psql
-
-# Name of createdb executable:
-CREATEDB = createdb
-
-# Name of dropdb executable:
-DROPDB = dropdb
-
-# List of import directories:
-IMPORTDIRS = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
-
-# locate your fimex program for reprojection of data
-FIMEX_PROGRAM = fimex
-
 # ============ METAMODSEARCH configuration ==============
 # Name of web-based search application as seen by users:
 SEARCH_APP_NAME = METAMOD search
-
-# Title to appear on all web pages in the web search application:
-SEARCH_APP_TITLE = Metadata Catalogue Search
 
 # HTML code for a header across the top of the search application:
 SEARCH_APP_HEADER_HTML = Search app header
@@ -143,54 +121,6 @@ SEARCH_APP_DESCRIPTION =
 
 # HTML to fill an initial page where no results are shown (can be empty):
 SEARCH_APP_PRESENTATION_HTML =
-
-# Max number of columns allowed in the search result page:
-SEARCH_APP_MAX_COLUMNS = 5
-
-# Max number of rows displayed for second level datasets with same parent:
-SEARCH_APP_MAXROWS_SCNDLEV = 50
-
-# Set of Metadata types to be shown as columns in search results.
-# Each line below comprise at least two items (items with several words must be
-# enclosed in apostophes). Item1 is MT_name in the Metadatatype database table.
-# Item2 is the column heading.
-# One optional item is "col=n" where n is a number (1,2,...) designating the
-# default column number of the metadata in the result table. The optional item
-# "cross=X" sets how a column is shown in a cross table. X="h" makes the
-# column values define the horizontal axis of the cross table. X="v" will
-# similarly define the vertical axis. X="no" excludes the column to be used in
-# cross tables.
-SEARCH_APP_SHOW_COLUMNS =
- area 'Areas' col=3 cross=v
- institution 'Institutions' col=2
- variable 'Topics and variables'
- activity_type 'Activity types' col=4 cross=h
- abstract 'Abstract' col=5 cross=no
- datacollection_period 'Datacollection period'
- contact 'Contact (E-mail)'
- title 'Descriptive title for the dataset'
- keywords 'Keywords' cross=no
- Product_name 'Product name'
- references 'References' cross=no
- field_type 'Field type (frequency)'
- forecast_type 'Forecast type'
- Platform_name 'Platform name'
- PI_name 'Principal investigator'
- distribution_statement 'Distribution statement'
- spatial_resolution 'Spatial resolution'
- project_name 'Project name'
-
-# Column used to sort the rows representing second level datasets. Given as
-# MT_name in the Metadatatype table.
-SEARCH_APP_SORT_COLUMN = datacollection_period
-
-# The sequence by which the search categories are visible in the search
-# application. The numbers are keys in the SearchCategory database table.
-# In addition to the numbers, the keyword FullText may be used.
-SEARCH_CATEGORY_SEQUENCE = topics_and_variables,activity_types,institutions,areas,map_search,datacollection_period,fulltext
-
-# Set default fontsize for the results and the two-way tables (percent):
-DEFAULT_FONTSIZE = 80
 
 # ============ METAMODUPLOAD configuration ==============
 # Upload application: Set this to 1 for debug output to the screen
@@ -222,24 +152,6 @@ UPLOAD_APP_COMMON_TEXT =
  with these requirements, you will recieve an E-mail explaining the errors
  found.
 
-# For unknown reasons, sometimes it is neccessary to convert all POST-data
-# from UTF8 to latin-1. If this is the case, set the following variable to
-# TRUE:
-DECODE_FROM_UTF8 = FALSE
-
-# Directory path for files uploaded by the web application:
-UPLOAD_DIRECTORY = [==WEBRUN_DIRECTORY==]/webupload
-
-# Directory path for files uploaded by FTP:
-UPLOAD_FTP_DIRECTORY = [==WEBRUN_DIRECTORY==]/ftpupload
-
-# Required minimum file age (number of minutes) for initiating processing
-# of files uploaded through the WEB interface. Files less than this age will
-# postpone processing (in the upload_monitor.pl script) of all files with
-# the same dataset name. This will give the data provider time to upload
-# all files in a batch.
-UPLOAD_AGE_THRESHOLD = 10
-
 # Directory path for the top data repository directory. This will
 # be a directory accessible through some OPeNDAP server (like THREDDS).
 # If no OPeNDAP server is installed, links in the web interface pointing to
@@ -254,31 +166,8 @@ OPENDAP_URL = http://[==SERVER==]:8081/thredds/catalog/data
 # Ownertag for uploaded datasets:
 UPLOAD_OWNERTAG = MM
 
-# Max length of directory names created by users:
-MAXLENGTH_DIRNAME = 20
-
-# Max length of directory keys created by users:
-MAXLENGTH_DIRKEY = 10
-
 # Max size of files to be uploaded (bytes) (can be owerridden by php.ini):
 MAX_UPLOAD_SIZE_BYTES = 10000000
-
-# Text in mail body sent to a dataset owner when errors are found in an
-# uploaded file. The string [OWNER] is replaced by the name of the dataset
-# owner when the mail is sent. [DATASET] is replaced by the actual dataset
-# name, and [URL] is replaced by an url to the html-file describing the errors:
-EMAIL_BODY_WHEN_UPLOAD_ERROR =
- Dear [OWNER],
-
- The METAMOD system that automatically check files uploaded to the data
- repository, have found errors in files recently uploaded to the [DATASET]
- dataset. Please find the details on the URL below:
-
- [URL].
-
-# Subject field in E-mails sent to a dataset owner when errors are found
-# in an uploaded file:
-EMAIL_SUBJECT_WHEN_UPLOAD_ERROR = METAMOD file upload error
 
 # Mail address for person/group responsible for daily operation of the file
 # repository. Used for automatically sent notifications when manual action is
@@ -289,76 +178,15 @@ OPERATOR_EMAIL = someuser@somedomain.com
 # Institution set up for the Admin user during user database initialization:
 OPERATOR_INSTITUTION = someinstitution
 
-# Mail address used in the "from" field on automatically sent E-mails to
-# users:
-FROM_ADDRESS = [==OPERATOR_EMAIL==]
-
 # Final greetings and signature included in E-mail to users:
 EMAIL_SIGNATURE =
  Best regards,
  The project team for the EXAMPLE project
 
-# Initial content of the [==WEBRUN_DIRECTORY==]/ftp_events file. Note that
-# this file can be edited and new events added while the application is in
-# operation. An existing file will not be touched by an update of the of the
-# METAMOD 2.x software. The initial content will only be used if no ftp_events
-# file already exists.
-FTP_EVENTS_INITIAL_CONTENT =
- dummy      100 0 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
-
 # Institutions available in the new user registration form:
 INSTITUTION_LIST =
  IXI International Example Institute
  ASI Another Similar Institute
-
-# ============ METAMODQUEST configuration ==============
-#
-# Produce two different files from the same source file
-# (htdocs/qst/quest.php). Each having its own values for the
-# following macro variables:
-#
-#  QUEST_TITLE                Title for the questionnaire
-#  QUEST_FORM_DEFINITON_FILE  File defining the content of the form
-#  QUEST_OUTPUT_DIRECTORY     The directory (absolute path) where
-#                             XML output files should be written.
-#
-
-#!substitute_to_file_with_new_name htdocs/qst/quest.php => htdocs/qst/fmmeta.php
-#QUEST_TITLE = Damocles meta data form
-#QUEST_FORM_DEFINITON_FILE = [==SOURCE_DIRECTORY==]/catalyst/quest_config.json
-#QUEST_OUTPUT_DIRECTORY = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
-#!end_substitute_to_file_with_new_name
-
-QUEST_CONFIG_DIRECTORY = [==SOURCE_DIRECTORY==]/catalyst
-QUEST_FORM_DEFINITON_FILE = [==QUEST_CONFIG_DIRECTORY==]/quest_config.json
-QUEST_OUTPUT_DIRECTORY = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
-
-# use this form for editing UPLOAD metadata by QUEST
-# make sure the output directory of the form
-# is set to one of the IMPORTDIRS
-QUEST_METADATA_UPLOAD_FORM = [==LOCAL_URL==]/qst/fmmeta.php
-QUEST_OUTPUT_DIRECTORY = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
-
-# Ownertag used to tag all dataset entries sent to the database:
-QUEST_OWNERTAG = [==UPLOAD_OWNERTAG==]
-
-# Sender address to appear on E-mail sent from this application:
-QUEST_SENDER_ADDRESS = [==OPERATOR_EMAIL==]
-
-# Comma-separated list of E-mail addresses for administrator personell.
-# A summary of the filled in forms will be sent to these addresses:
-QUEST_RECIPIENTS = [==OPERATOR_EMAIL==]
-
-# Message shown to the user (as a web page) when the form has been submitted:
-QUEST_OKMESSAGE = Thanks for submitting information!
- <a href="[==LOCAL_URL==]/index.php">Return to the main page</a>.
-
-# Background image for file administration page
-QUEST_ADM_BACKGROUND = [==LOCAL_URL==]/img/ipydis_background.jpg
-
-# Top directory for the file administration utility:
-QUEST_ADM_TOPDIR = [==WEBRUN_DIRECTORY==]/XML
-
 
 # ============ Test configuration ==============
 #
@@ -386,51 +214,10 @@ TEST_IMPORT_PROGRESS_REPORT = 1
 # to [==OPERATOR_EMAIL==].
 TEST_EMAIL_RECIPIENT =
 
-#LOG4PERL_CONFIG = log4perl_config.ini
-LOG4PERL_WATCH_TIME = 30
-#LOG4PHP_CONFIG = [==TARGET_DIRECTORY==]/log4php_config.ini
 LOG4ALL_SYSTEM_LOG = metamod.log
-
-SRU2JDBC_TAGS = [==DATASET_TAGS==]
-
-# Basic latitude longitude earth (4035 = WGS84)
-LONLAT_SRID = 4035
-
-# List the supported geographical search environments
-#SRID_ID_COLUMNS = 93995 93031
-SRID_ID_COLUMNS = 93995 93031 3995 3031 4326
-
-# Corresponding short names of SRID_ID in Web-Interface
-SRID_ID_NAMES = Artic Antarctic
-
-# define a bounding box (north east south west) where each SRID is valid
-SRID_NESW_BOUNDING_BOX_93995 = 90 180 30 -180
-SRID_NESW_BOUNDING_BOX_93031 = -30 180 -90 -180
-
-# Translate the map-coordinates to the SRID-coordinates
-# srid_coord = (map_coord - offset) * scale_factor
-# SRID 93995
-# pole is x=280 y=240
-# scalefactor is derived from the map, y=540 := lat=60 := ry=-3333134.03
-# scale = -3333134.03/(240-540) +- 1 pixel
-SRID_MAP_SCALE_FACTOR_X_93995 = 11120
-SRID_MAP_OFFSET_X_93995 = 280
-SRID_MAP_SCALE_FACTOR_Y_93995 = -11120
-SRID_MAP_OFFSET_Y_93995 = 240
-
-# SRID 93031
-# pole is x=280 y=280
-# scalefactor is derived from the map, y=477 := lat=-70 := ry=-2194494.25
-# scale = 2194494.25/(477-280) +- 1 pixel
-SRID_MAP_SCALE_FACTOR_X_93031 = 11120
-SRID_MAP_OFFSET_X_93031 = 280
-SRID_MAP_SCALE_FACTOR_Y_93031 = -11120
-SRID_MAP_OFFSET_Y_93031 = 280
 
 LDAP_SERVER =
 LDAP_BASE_DN =
-
-SUBSCRIPTION_ENABLED = ENABLED
 
 PMH_REPOSITORY_IDENTIFIER =
 

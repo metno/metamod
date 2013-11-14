@@ -98,97 +98,28 @@ APP_FOOTER_HTML =
 # Comma-separated list of dataset tags accessible from this application:
 DATASET_TAGS = 'DAM', 'NP', 'HI', 'XXX', 'MM'
 
-# SRU/ISO23950-searchable datasets
-# if a database is shared among different projects
-# the tags of all projects will be searchable from each project
-SRU2JDBC_TAGS = [==DATASET_TAGS==]
-
 # ============ METAMODBASE configuration ==============
 # Path for logfile of php-messages (leave empty to log to webserver-errorlogfile)
 PHPLOGFILE = [==WEBRUN_DIRECTORY==]/phplog
 # Minimum log level, one of ERROR, WARNING, INFO, DEBUG
 PHPLOGLEVEL = DEBUG
 
-# Name of psql executable:
-PSQL = psql
-
-# Name of createdb executable:
-CREATEDB = createdb
-
-# Name of dropdb executable:
-DROPDB = dropdb
-
 # List of import directories:
-IMPORTDIRS = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
+IMPORTDIRS = [==INSTALLATION_DIR==]/test/xmlinput
 
 # ============ METAMODSEARCH configuration ==============
 # Name of web-based search application as seen by users:
 SEARCH_APP_NAME = METAMOD search
 
-# Title to appear on all web pages in the web search application:
-SEARCH_APP_TITLE = Metadata Catalogue Search
-
 # HTML code for a header across the top of the search application:
 SEARCH_APP_HEADER_HTML = [==APP_HEADER_HTML==]
-
-# Description of the web application:
-SEARCH_APP_DESCRIPTION =
- Search the METAMOD Catalogue. Use the links on the left hand side
- to access pages for setting search conditions. Then use the menu below to
- view results. Initially, only directory level datasets are shown. For each
- directory level dataset containing files on a second level, there is a small
- [+] button that may be used to show metadata about the files.<BR /><BR />
 
 # HTML to fill an initial page where no results are shown (can be empty):
 SEARCH_APP_PRESENTATION_HTML =
 
-# Max number of columns allowed in the search result page:
-SEARCH_APP_MAX_COLUMNS = 5
-
-# Max number of rows displayed for second level datasets with same parent:
-SEARCH_APP_MAXROWS_SCNDLEV = 50
-
-# Set of Metadata types to be shown as columns in search results.
-# Each line below comprise at least two items (items with several words must be
-# enclosed in apostophes). Item1 is MT_name in the Metadatatype database table.
-# Item2 is the column heading.
-# One optional item is "col=n" where n is a number (1,2,...) designating the
-# default column number of the metadata in the result table. The optional item
-# "cross=X" sets how a column is shown in a cross table. X="h" makes the
-# column values define the horizontal axis of the cross table. X="v" will
-# similarly define the vertical axis. X="no" excludes the column to be used in
-# cross tables.
-SEARCH_APP_SHOW_COLUMNS =
- dataref 'Name' col=1 cross=no
- area 'Areas' col=3 cross=v
- institution 'Institutions' col=2
- variable 'Topics and variables'
- activity_type 'Activity types' col=4 cross=h
- abstract 'Abstract' col=5 cross=no
- datacollection_period 'Datacollection period'
- contact 'Contact (E-mail)'
- title 'Descriptive title for the dataset'
- keywords 'Keywords' cross=no
- Product_name 'Product name'
- references 'References' cross=no
- field_type 'Field type (frequency)'
- forecast_type 'Forecast type'
- Platform_name 'Platform name'
- PI_name 'Principal investigator'
- distribution_statement 'Distribution statement'
- spatial_resolution 'Spatial resolution'
- project_name 'Project name'
-
-# Column used to sort the rows representing second level datasets. Given as
-# MT_name in the Metadatatype table.
-SEARCH_APP_SORT_COLUMN = datacollection_period
-
 # The sequence by which the search categories are visible in the search
 # application. The numbers are keys in the SearchCategory database table.
 SEARCH_CATEGORY_SEQUENCE = 4,1,7,2,9,8
-
-# Set default fontsize for the results and the two-way tables (percent):
-DEFAULT_FONTSIZE = 80
 
 # ============ METAMODUPLOAD configuration ==============
 # Upload application: Set this to 1 for debug output to the screen
@@ -220,24 +151,6 @@ UPLOAD_APP_COMMON_TEXT =
  with these requirements, you will recieve an E-mail explaining the errors
  found.
 
-# For unknown reasons, sometimes it is neccessary to convert all POST-data
-# from UTF8 to latin-1. If this is the case, set the following variable to
-# TRUE:
-DECODE_FROM_UTF8 = FALSE
-
-# Directory path for files uploaded by the web application:
-UPLOAD_DIRECTORY = [==WEBRUN_DIRECTORY==]/webupload
-
-# Directory path for files uploaded by FTP:
-UPLOAD_FTP_DIRECTORY = [==WEBRUN_DIRECTORY==]/ftpupload
-
-# Required minimum file age (number of minutes) for initiating processing
-# of files uploaded through the WEB interface. Files less than this age will
-# postpone processing (in the upload_monitor.pl script) of all files with
-# the same dataset name. This will give the data provider time to upload
-# all files in a batch.
-UPLOAD_AGE_THRESHOLD = 10
-
 # Directory path for the top data repository directory. This will
 # be a directory accessible through some OPeNDAP server (like THREDDS).
 # If no OPeNDAP server is installed, links in the web interface pointing to
@@ -254,106 +167,27 @@ THREDDS_DATASET_PREFIX =
 # Ownertag for uploaded datasets:
 UPLOAD_OWNERTAG = MM
 
-# Max length of directory names created by users:
-MAXLENGTH_DIRNAME = 20
-
-# Max length of directory keys created by users:
-MAXLENGTH_DIRKEY = 10
-
 # Max size of files to be uploaded (bytes) (can be owerridden by php.ini):
 MAX_UPLOAD_SIZE_BYTES = 10000000
-
-# Text in mail body sent to a dataset owner when errors are found in an
-# uploaded file. The string [OWNER] is replaced by the name of the dataset
-# owner when the mail is sent. [DATASET] is replaced by the actual dataset
-# name, and [URL] is replaced by an url to the html-file describing the errors:
-EMAIL_BODY_WHEN_UPLOAD_ERROR =
- Dear [OWNER],
-
- The METAMOD system that automatically check files uploaded to the data
- repository, have found errors in files recently uploaded to the [DATASET]
- dataset. Please find the details on the URL below:
-
- [URL].
-
-# Subject field in E-mails sent to a dataset owner when errors are found
-# in an uploaded file:
-EMAIL_SUBJECT_WHEN_UPLOAD_ERROR = METAMOD file upload error
 
 # Mail address for person/group responsible for daily operation of the file
 # repository. Used for automatically sent notifications when manual action is
 # needed. Also used as login name for the Admin user added to the user
 # database while this database is initialized:
-OPERATOR_EMAIL = someuser@somedomain.com
+OPERATOR_EMAIL = root@localhost
 
 # Institution set up for the Admin user during user database initialization:
 OPERATOR_INSTITUTION = someinstitution
-
-# Mail address used in the "from" field on automatically sent E-mails to
-# users:
-FROM_ADDRESS = [==OPERATOR_EMAIL==]
 
 # Final greetings and signature included in E-mail to users:
 EMAIL_SIGNATURE =
  Best regards,
  The project team for the EXAMPLE project
 
-# Initial content of the [==WEBRUN_DIRECTORY==]/ftp_events file. Note that
-# this file can be edited and new events added while the application is in
-# operation. An existing file will not be touched by an update of the of the
-# METAMOD 2.x software. The initial content will only be used if no ftp_events
-# file already exists.
-FTP_EVENTS_INITIAL_CONTENT =
- dummy      100 0 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
-
 # Institutions available in the new user registration form:
 INSTITUTION_LIST =
  IXI International Example Institute
  ASI Another Similar Institute
-
-# ============ METAMODQUEST configuration ==============
-#
-# Produce two different files from the same source file
-# (htdocs/qst/quest.php). Each having its own values for the
-# following macro variables:
-#
-#  QUEST_TITLE                Title for the questionnaire
-#  QUEST_FORM_DEFINITON_FILE  File defining the content of the form
-#  QUEST_OUTPUT_DIRECTORY     The directory (absolute path) where
-#                             XML output files should be written.
-#
-
-#!substitute_to_file_with_new_name htdocs/qst/quest.php => htdocs/qst/fmmeta.php
-#QUEST_TITLE = Damocles meta data form
-#QUEST_FORM_DEFINITON_FILE = config/metamod2-meta-config.txt
-#QUEST_OUTPUT_DIRECTORY = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
-#!end_substitute_to_file_with_new_name
-
-# use this form for editing UPLOAD metadata by QUEST
-# make sure the output directory of the form
-# is set to one of the IMPORTDIRS
-#QUEST_METADATA_UPLOAD_FORM = [==LOCAL_URL==]/qst/fmmeta.php
-
-# Ownertag used to tag all dataset entries sent to the database:
-QUEST_OWNERTAG = [==UPLOAD_OWNERTAG==]
-
-# Sender address to appear on E-mail sent from this application:
-QUEST_SENDER_ADDRESS = [==OPERATOR_EMAIL==]
-
-# Comma-separated list of E-mail addresses for administrator personell.
-# A summary of the filled in forms will be sent to these addresses:
-QUEST_RECIPIENTS = [==OPERATOR_EMAIL==]
-
-# Message shown to the user (as a web page) when the form has been submitted:
-QUEST_OKMESSAGE = Thanks for submitting information!
- <a href="[==LOCAL_URL==]/index.php">Return to the main page</a>.
-
-# Background image for file administration page
-QUEST_ADM_BACKGROUND = [==LOCAL_URL==]/img/ipydis_background.jpg
-
-# Top directory for the file administration utility:
-QUEST_ADM_TOPDIR = [==WEBRUN_DIRECTORY==]/XML
-
 
 # ============ Test configuration ==============
 #
@@ -383,23 +217,9 @@ TEST_EMAIL_RECIPIENT = 0
 
 LOG4PERL_CONFIG = log4perl_config.ini
 LOG4ALL_SYSTEM_LOG = system_log.log
-LOG4PERL_WATCH_TIME = 30
-
-# List the supported geographical search environments
-#SRID_ID_COLUMNS = 93995 93031
-SRID_ID_COLUMNS = 93995 93031 3995 3031 4326
-
-# define a bounding box (north east south west) where each SRID is valid
-SRID_NESW_BOUNDING_BOX_93995 = 90 180 30 -180
-SRID_NESW_BOUNDING_BOX_93031 = -30 180 -90 -180
-
-# Basic latitude longitude earth (4035 = WGS84)
-LONLAT_SRID = 4035
 
 PMH_REPOSITORY_IDENTIFIER = met.no
 
 PMH_SYNCHRONIZE_ISO_IDENTIFIER =
-
-PMH_VALIDATION = on
 
 PMH_EXPORT_TAGS = 'DAM', 'NDAM'
