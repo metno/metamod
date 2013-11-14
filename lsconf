@@ -47,32 +47,33 @@ use Term::ANSIColor;
 use Pod::Usage;
 
 #Getopt::Long::Configure ("bundling");
-my ($help, $split, $config_file_or_dir, $default, $custom, $defaults);
+my ($help, $split, $config_file_or_dir, $default, $custom, $environment, $flags);
 my $color = -t STDOUT; # use IO::Interactive::Tiny instead - FIXME
 GetOptions(
-    'help'      => \$help,      # for dummies
-    'default!'  => \$default,   # set in default_config
-    'custom!'   => \$custom,    # set in master_config
-    'color!'    => \$color,     # use colors
-    'split'     => \$split,     # split var into key-value pairs
-    'config=s'  => \$config_file_or_dir,
-    'defaults!' => \$defaults,  # show def indicator
+    'help'          => \$help,          # for dummies
+    'default!'      => \$default,       # set in default_config
+    'custom!'       => \$custom,        # set in master_config
+    'environment!'  => \$environment,   # set in environment
+    'color!'        => \$color,         # use colors
+    'split'         => \$split,         # split var into key-value pairs
+    'flags!'        => \$flags,         # show flag indicator
+    'config=s'      => \$config_file_or_dir,
 ) or pod2usage(2);
-#print STDERR Dumper [ $help, $split, $config_file_or_dir, $default, $custom ];
+#print STDERR Dumper [ $help, $split, $config_file_or_dir, $default, $custom, $environment ];
 
 pod2usage(1) if $help;
 
 if (defined $color) {
     $ENV{ANSI_COLORS_DISABLED} = 1 unless $color;
 }
-$defaults = ! $color unless defined $defaults; # use def prefix unless colorized
+$flags = ! $color unless defined $flags; # use def prefix unless colorized
 
 Metamod::Config->config_found($config_file_or_dir) or pod2usage(2);
 my $mm_config = Metamod::Config->new($config_file_or_dir, { nolog => 1 } );
 
 my $var = shift @ARGV;
 my $vars;
-my $flags = $mm_config->getallflags();
+my $vflags = $mm_config->getallflags();
 
 if ( !defined($var) || $var =~ /(.+)\*$/ ) {
     $vars = $mm_config->getall();
@@ -93,34 +94,17 @@ if ( !defined($var) || $var =~ /(.+)\*$/ ) {
     }
 }
 
-if (defined $default) { # default values
-    foreach (keys %$vars) {
-        my $dflag = $flags->{$_} || 0;
-        delete $vars->{$_} unless ($dflag & 1) == $default;
-    }
-}
-
-if (defined $custom) { # custom values
-    $custom <<= 1; # bitmask 00000010
-    foreach (keys %$vars) {
-        my $dflag = $flags->{$_} || 0;
-sub usage {
-    print STDERR "Usage: $0 [--config <config file or dir>] [--split] [--[no]default] [--[no]custom] [<variable>]\n"
-                ."  Variable may end in '*' wildcard.\n  --spilt can only be used with a single variable.\n";
-    exit (1);
-}        #print "$_ $dflag $custom\n";
-        delete $vars->{$_} unless ($dflag & 2) == $custom;
-    }
-}
-
-my @sigils = qw(= @ : ! $ . . . . . +);
 # print output
 foreach (sort keys %$vars) {
     my $val = $$vars{$_};
-    my $f = $flags->{$_} || 0;
-    #print $f;
+    my $f = $vflags->{$_} || 0;
+    # compare truthinesses
+    next if defined $default     && ( ($f & 1) xor $default );
+    next if defined $custom      && ( ($f & 2) xor $custom );
+    next if defined $environment && ( ($f & 4) xor $environment );
+
+    printf "%06b ", $f if $flags;
     print color $f & 1 ? 'bold green' : 'bold red'; # green if default
-    print $sigils[$f] // "?$f?" if $defaults;
     print $_, color 'reset';
     print '=', color $f & 2 ? 'bright_yellow' : 'bright_blue'; # yellow if local
     print ref $val ? '[ ' . join(', ', @$val) . ' ]' : "\"$val\"";
@@ -139,17 +123,57 @@ B<lsconf.pl> - list METAMOD config variables
 
 =head1 DESCRIPTION
 
-Given a variable name as parameter, list the computed value (optionally parsed as a hash if the --split option is used).
-
+Given a variable name as parameter, list the computed value (optionally parsed as a key-value pair if the --split option is used).
 With no arguments, list all variables alphabetically.
+Variable may end in '*' wildcard. --spilt can only be used with a single variable.
 
 =head1 USAGE
 
- lsconf.pl [--help] [--config <file>] [--split] [--[no]color] [--[no]default] [--[no]custom] [variable]
+ lsconf [--help] [--config <file>] [--split] [--[no]color] [--[no]default] [--[no]environment] [--[no]flags] [--[no]custom] [variable]
+
+=head1 ARGUMENTS
+
+(Optional) a variable name to display, or all if none given. Wildcards (*) are accepted at the end of the string.
+
+=head1 OPTIONS
+
+=head2 help
+
+=head2 config <file>
+
+Use specified config file
+
+=head2 split
+
+Split key-value pairs variables. Only works when a single variable name is given as argument.
+
+=head2 [no]color
+
+Toggles color display according to flags (default on if terminal)
+
+=head2 [no]default
+
+Only show variables [not] defined in default_config
+
+=head2 [no]flags
+
+Show flags as prefix instead of color (default opposite of color)
+
+=head2 [no]custom
+
+Only show variables updated in master_config
+
+=head2 [no]environment
+
+Only show variables updated in environment
+
+=head1 EXAMPLES
+
+  $ lsconf --nocustom --nodefault   # show only variables not defined in default or config (i.e. only computed/environment variables)
 
 =head1 LICENSE
 
-Copyright (C) 2010 The Norwegian Meteorological Institute.
+Copyright (C) 2013 The Norwegian Meteorological Institute.
 
 METAMOD is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

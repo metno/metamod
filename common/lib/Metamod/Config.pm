@@ -98,7 +98,7 @@ our $_config; #_config{file} => $config
 
 # we only initialise the logger once during the entire run. Different configuration
 # files cannot have their own logger config.
-our $_logger_initialised;
+our $_logger_initialised; # value is ref to logger
 
 =head2 Metamod::Config->new([configfilename], [options])
 
@@ -329,7 +329,13 @@ sub getall {
 
 =head2 $self->getallflags()
 
-returns all configuration flags as a hash
+returns all configuration flags as a hash. Each flag is a bitfield composed of:
+
+    bitmask:    description:
+        1       default value set
+        2       master value set
+        4       envvar value set
+        8       obsolete !substitute_to_file_with_new_name directive
 
 =cut
 
@@ -444,27 +450,27 @@ sub _readConfig {
         open my $fh, '<', $filename or confess "Cannot read file".$filename.": $!\n";
         #
         #  Loop through all lines read from a file:
-        my %newfilenames = ();
+        #my %newfilenames = ();
         my $value = "";
         my $varname = "";
-        my $origname = "";
-        my $newname = "";
+        #my $origname = "";
+        #my $newname = "";
         my $line = "";
-        while (defined (my $line = <$fh>)) {
+        while (defined (my $line = <$fh>)) { # this loop could be rewritten more concisely
             chomp($line);
             # Check if expression matches RE:
             if ($line =~ /^[A-Z0-9_#!]/ && $varname ne "") {
-                if (length($origname) > 0) {
-                    # what is going on here?
-                    my $k = $varname . ':' . $origname . ':' . $newname;
-                    $conf{$k} = $value;
-                    $flags{$k} |= $flagmask | 8;
-                    $newfilenames{$origname . ':' . $newname} = 1;
-                } else {
-                    # normal assignment
+                #if (length($origname) > 0) {
+                    # using !substitute_to_file_with_new_name which is now unsupported
+                    #my $k = $varname . ':' . $origname . ':' . $newname;
+                    #$conf{$k} = $value;
+                    #$flags{$k} |= $flagmask | 8;
+                    #$newfilenames{$origname . ':' . $newname} = 1;
+                #} else {
+                    # here we do the actual storing of the values
                     $conf{$varname} = $value;
                     $flags{$varname} |= $flagmask;
-                }
+                #}
                 $varname = "";
             }
             if ($line =~ /^([A-Z0-9_]+)\s*=(.*)$/) {
@@ -473,12 +479,15 @@ sub _readConfig {
                 $value =~ s/^\s*//;
                 $value =~ s/\s*$//;
             } elsif ($line =~ /^!substitute_to_file_with_new_name\s+(\S+)\s+=>\s+(\S+)\s*$/) {
-                $origname = $1;
-                $newname = $2;
+                my $err = "!substitute_to_file_with_new_name no longer supported in $filename line $.\n";
+                $_logger_initialised ? $_logger_initialised->error($err) : warn $err;
+                #$origname = $1;
+                #$newname = $2;
             } elsif ($line =~ /^!end_substitute_to_file_with_new_name\s*$/) {
-                $origname = "";
-                $newname = "";
+                #$origname = "";
+                #$newname = "";
             } elsif ($line !~ /^#/ && $line !~ /^\s*$/) {
+                # multi-line value
                 $value .= "\n" . $line;
             }
         }
@@ -516,11 +525,8 @@ sub _getVar {
     my ($self, $var) = @_;
 
     if (!exists $self->{vars}{$var}) {
-        if ($_logger_initialised) {
-            Log::Log4perl::get_logger('metamod::common::Metamod::Config')->warn("missing config variable in master_config.txt: $var");
-        } else {
-            warn("missing config variable in master_config.txt: $var");
-        }
+        my $err = "missing config variable in master_config.txt: $var\n";
+        $_logger_initialised ? $_logger_initialised->warn($err) : warn $err;
     }
     return $self->{vars}{$var};
 }
@@ -643,7 +649,7 @@ sub initLogger {
     require Log::Log4perl;
     Log::Log4perl->init_and_watch( $log_config, $reinit_period );
 
-    $_logger_initialised = 1;
+    $_logger_initialised = Log::Log4perl::get_logger('metamod::common::Metamod::Config');
     return 1;
 
 

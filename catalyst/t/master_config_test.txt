@@ -323,11 +323,11 @@ INSTITUTION_LIST =
 #                             XML output files should be written.
 #
 
-!substitute_to_file_with_new_name htdocs/qst/quest.php => htdocs/qst/fmmeta.php
-QUEST_TITLE = Damocles meta data form
-QUEST_FORM_DEFINITON_FILE = [==SOURCE_DIRECTORY==]/catalyst/quest_config.json
-QUEST_OUTPUT_DIRECTORY = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
-!end_substitute_to_file_with_new_name
+#!substitute_to_file_with_new_name htdocs/qst/quest.php => htdocs/qst/fmmeta.php
+#QUEST_TITLE = Damocles meta data form
+#QUEST_FORM_DEFINITON_FILE = [==SOURCE_DIRECTORY==]/catalyst/quest_config.json
+#QUEST_OUTPUT_DIRECTORY = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
+#!end_substitute_to_file_with_new_name
 
 QUEST_CONFIG_DIRECTORY = [==SOURCE_DIRECTORY==]/catalyst
 QUEST_FORM_DEFINITON_FILE = [==QUEST_CONFIG_DIRECTORY==]/quest_config.json

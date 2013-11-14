@@ -481,11 +481,6 @@ FTP_EVENTS_INITIAL_CONTENT =
 
 # ============ METAMODQUEST configuration ==============
 
-# OBSOLETE?
-#!substitute_to_file_with_new_name htdocs/qst/quest.php => htdocs/qst/fmmeta.php
-#QUEST_OUTPUT_DIRECTORY = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
-#!end_substitute_to_file_with_new_name
-
 # The directory (absolute path) where XML output files should be written.
 QUEST_OUTPUT_DIRECTORY = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
 
