@@ -108,7 +108,7 @@ foreach (sort keys %$vars) {
     printf "%08b ", $f if $flags;
     print color $f & 1 ? 'bold green' : 'bold red'; # green if default
     print $_, color 'reset';
-    print '=', color $f & 128 ? 'bright_red' : color $f & 2 ? 'bright_yellow' : 'bright_blue'; # yellow if local
+    print '=', color $f & 128 ? 'bright_red' : $f & 2 ? 'bright_yellow' : 'bright_blue'; # yellow if local
     print ref $val ? '[ ' . join(', ', @$val) . ' ]' : "\"$val\"";
     print "\n", color 'reset';
 }
