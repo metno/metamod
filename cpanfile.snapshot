@@ -1452,6 +1452,23 @@ DISTRIBUTIONS
     requirements:
       Digest::MD5 0
       ExtUtils::MakeMaker 0
+  Data-Validate-Domain-0.10
+    pathname: N/NE/NEELY/Data-Validate-Domain-0.10.tar.gz
+    provides:
+      Data::Validate::Domain 0.10
+    requirements:
+      ExtUtils::MakeMaker 0
+      Net::Domain::TLD 1.62
+      Test::More 0
+  Data-Validate-Email-0.04
+    pathname: S/SO/SONNEN/Data-Validate-Email-0.04.tar.gz
+    provides:
+      Data::Validate::Email 0.04
+      ExtUtils::TBone 1.124
+    requirements:
+      Data::Validate::Domain 0.04
+      Email::Address 0
+      ExtUtils::MakeMaker 0
   Data-Visitor-0.28
     pathname: D/DO/DOY/Data-Visitor-0.28.tar.gz
     provides:
@@ -2630,6 +2647,15 @@ DISTRIBUTIONS
       Sub::Exporter 0
       Test::Fatal 0
       Test::More 0.88
+  Email-Address-1.900
+    pathname: R/RJ/RJBS/Email-Address-1.900.tar.gz
+    provides:
+      Email::Address 1.900
+    requirements:
+      ExtUtils::MakeMaker 6.30
+      overload 0
+      strict 0
+      warnings 0
   Email-Valid-0.190
     pathname: R/RJ/RJBS/Email-Valid-0.190.tar.gz
     provides:
@@ -4501,6 +4527,14 @@ DISTRIBUTIONS
       IO::Socket 0
       MIME::Base64 2.11
       Test::More 0.18
+  Net-Domain-TLD-1.70
+    pathname: A/AL/ALEXP/Net-Domain-TLD-1.70.tar.gz
+    provides:
+      Net::Domain::TLD 1.70
+    requirements:
+      Carp 0
+      ExtUtils::MakeMaker 0
+      Storable 0
   Net-HTTP-6.05
     pathname: G/GA/GAAS/Net-HTTP-6.05.tar.gz
     provides:

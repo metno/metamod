@@ -60,10 +60,6 @@ PG_WEB_USER = admin
 # database:
 PG_CONNECTSTRING_SHELL =
 
-# String used in PHP db_Connect function to connect to the
-# database:
-PG_CONNECTSTRING_PHP =
-
 # String used in Perl DBI->connect function to connect to the
 # database:
 PG_CONNECTSTRING_PERL = host=localhost;password=admin
@@ -73,19 +69,11 @@ DATABASE_NAME = metamod_unittest
 
 USERBASE_NAME = metamod_unittest_userbase
 
-# URL of Metadata Search application:
-METADATA_SEARCH_URL = [==LOCAL_URL==]/sch/index.php
-
-# URL of Upload application:
-UPLOAD_URL = [==LOCAL_URL==]/upl/index.php
-
 # Main menu beneath the application header. Each line should start with
 # an URL followed by a space and some text. The text will be shown in
 # the application as a menu item, and the URL will be activated when the
 # text is clicked:
 APP_MENU =
- [==METADATA_SEARCH_URL==] Metadata Search
- [==UPLOAD_URL==] File Upload
  [==OPENDAP_URL==] Browse data repository
 
 # HTML code for a header across the top of applications:
@@ -99,10 +87,6 @@ APP_FOOTER_HTML =
 DATASET_TAGS = 'DAM', 'NP', 'HI', 'XXX', 'MM'
 
 # ============ METAMODBASE configuration ==============
-# Path for logfile of php-messages (leave empty to log to webserver-errorlogfile)
-PHPLOGFILE = [==WEBRUN_DIRECTORY==]/phplog
-# Minimum log level, one of ERROR, WARNING, INFO, DEBUG
-PHPLOGLEVEL = DEBUG
 
 # List of import directories:
 IMPORTDIRS = [==INSTALLATION_DIR==]/test/xmlinput

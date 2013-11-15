@@ -81,15 +81,6 @@ LOG4PERL_CONFIG = [==CONFIG_DIR==]/log4perl_config.ini
 LOG4PERL_WATCH_TIME = 30
 LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
 
-# obsolete
-#LOG4PHP_CONFIG = [==CONFIG_DIR==]/log4php_config.ini
-
-# Path for logfile of php-messages (leave empty to log to webserver-errorlogfile)
-# [Are these still in use???]
-#PHPLOGFILE = [==WEBRUN_DIRECTORY==]/phplog
-# Minimum log level, one of ERROR, WARNING, INFO, DEBUG
-#PHPLOGLEVEL = DEBUG
-
 # ============== Catalyst configuration =================
 
 # lib for Catalyst and other dependencies NOT handled by Carton or Debian

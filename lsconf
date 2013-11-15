@@ -41,13 +41,14 @@ use warnings FATAL => qw( all );
 use FindBin qw($Bin);
 use lib "$Bin/common/lib";
 use Metamod::Config;
+use Metamod::Config::Sanity qw(check);
 use Getopt::Long;
 use Data::Dumper;
 use Term::ANSIColor;
 use Pod::Usage;
 
 #Getopt::Long::Configure ("bundling");
-my ($help, $split, $config_file_or_dir, $default, $custom, $environment, $duplicates, $flags);
+my ($help, $split, $config_file_or_dir, $default, $custom, $environment, $duplicates, $flags, $check);
 my $color = -t STDOUT; # use IO::Interactive::Tiny instead - FIXME
 GetOptions(
     'help'          => \$help,          # for dummies
@@ -58,11 +59,13 @@ GetOptions(
     'color!'        => \$color,         # use colors
     'split'         => \$split,         # split var into key-value pairs
     'flags!'        => \$flags,         # show flag indicator
+    'check'         => \$check,         # run sanity check
     'config=s'      => \$config_file_or_dir,
 ) or pod2usage(2);
 #print STDERR Dumper [ $help, $split, $config_file_or_dir, $default, $custom, $environment ];
 
 pod2usage(1) if $help;
+check_conf() if $check;
 
 if (defined $color) {
     $ENV{ANSI_COLORS_DISABLED} = 1 unless $color;
@@ -119,6 +122,11 @@ sub missing {
     exit (1);
 }
 
+sub check_conf {
+    Metamod::Config::Sanity::check();
+    exit;
+}
+
 =head1 NAME
 
 B<lsconf.pl> - list METAMOD config variables
@@ -131,7 +139,7 @@ Variable may end in '*' wildcard. --spilt can only be used with a single variabl
 
 =head1 USAGE
 
- lsconf [--help] [--config <file>] [--split] [--[no]color] [--[no]default] [--[no]environment] [--[no]flags] [--[no]custom] [variable]
+ lsconf [--help] [--config <file>] [--split] [--[no]color] [--[no]default] [--[no]environment] [--[no]flags] [--[no]custom] [--check] [variable]
 
 =head1 ARGUMENTS
 
@@ -168,6 +176,10 @@ Only show variables updated in master_config
 =head2 [no]environment
 
 Only show variables updated in environment
+
+=head2 check
+
+Run sanity tests on config
 
 =head1 EXAMPLES
 

@@ -69,20 +69,6 @@ running() {
 
 start() {
 
-   ## deprecated? FIXME
-   #if [ ! -f $PHPLOGFILE ]; then
-   #   # create world writeable logfile (i.e. by nobody)
-   #   > $PHPLOGFILE
-   #   chmod 666 $PHPLOGFILE
-   #fi
-   #
-   ## deprecated? FIXME
-   #if [ ! -f $WEBRUN_DIRECTORY/userlog ]; then
-   #   # create world writeable logfile
-   #   > $WEBRUN_DIRECTORY/userlog
-   #   chmod 666 $WEBRUN_DIRECTORY/userlog
-   #fi
-
    if [ ! -f $system_log ]; then
       # create world writeable logfile
       touch $system_log
