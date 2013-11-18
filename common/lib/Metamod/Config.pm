@@ -511,7 +511,7 @@ sub _readConfig {
     # add computed values
     $conf{'INSTALLATION_DIR'} = $self->installation_dir();
     $conf{'CONFIG_DIR'}       = $self->config_dir();
-    $conf{'CATALYST_LIB'}     = $conf{'INSTALLATION_DIR'} . "/local/lib/perl5" unless exists $conf{'CATALYST_LIB'};
+    $conf{'CATALYST_LIB'}     = $conf{'INSTALLATION_DIR'} . "/local/lib/perl5" unless $conf{'CATALYST_LIB'};
 
     my $ver = $self->version();
     $conf{'VERSION'}   = $ver->{number};

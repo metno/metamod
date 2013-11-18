@@ -508,18 +508,6 @@ OAI_HARVEST_VALIDATION_SCHEMA = [==INSTALLATION_DIR==]/common/schema/OAI-PMH.xsd
 
 # ============ Metamod OAI_PMH configuration
 
-# The content-type the WWW-server delivers back. For debug-puposes,
-# "text/plain" is easier to view. On a production site you should use
-# "text/xml".
-PMH_CONTENT_TYPE = text/xml
-
-# OBSOLETE? only used in PHP version
-# If an unusual port number is used for the base URL, set the following to
-# a string like:
-#                     .':8080'
-# Othervise, leave this empty.
-PMH_PORT_NUMBER =
-
 # Repository name:
 PMH_REPOSITORY_NAME = [==APPLICATION_NAME==]
 

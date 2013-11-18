@@ -65,16 +65,19 @@ GetOptions(
 #print STDERR Dumper [ $help, $split, $config_file_or_dir, $default, $custom, $environment ];
 
 pod2usage(1) if $help;
+
+# find config file
+Metamod::Config->config_found($config_file_or_dir) or pod2usage(2);
+my $mm_config = Metamod::Config->new($config_file_or_dir, { nolog => 1 } );
 check_conf() if $check;
 
+# check color output
 if (defined $color) {
     $ENV{ANSI_COLORS_DISABLED} = 1 unless $color;
 }
 $flags = ! $color unless defined $flags; # use def prefix unless colorized
 
-Metamod::Config->config_found($config_file_or_dir) or pod2usage(2);
-my $mm_config = Metamod::Config->new($config_file_or_dir, { nolog => 1 } );
-
+# process argument
 my $var = shift @ARGV;
 my $vars;
 my $vflags = $mm_config->getallflags();

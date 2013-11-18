@@ -72,11 +72,12 @@ sub check {
 
     # required files/dirs
     ok( -d $conf->config_dir, 'config directory found');
-    ok( -w $$vars{WEBRUN_DIRECTORY}, 'WEBRUN_DIRECTORY is writable' );
-    ok( -d $$vars{CATALYST_LIB}, 'CATALYST_LIB found' );
-    ok( -d $$vars{INSTALLATION_DIR}, 'INSTALLATION_DIR found' );
+    ok( -w $$vars{WEBRUN_DIRECTORY}, "WEBRUN_DIRECTORY is writable: $$vars{WEBRUN_DIRECTORY}" );
+    ok( -d $$vars{CATALYST_LIB}, "CATALYST_LIB found: $$vars{CATALYST_LIB}" );
+    ok( -d $$vars{INSTALLATION_DIR}, "INSTALLATION_DIR found: $$vars{INSTALLATION_DIR}"  );
     ok( -e $$vars{PG_POSTGIS_SYSREF_SCRIPT}, 'PG_POSTGIS_SYSREF_SCRIPT found' );
     ok( -e $$vars{PG_POSTGIS_SCRIPT}, 'PG_POSTGIS_SCRIPT found' );
+    ok( -x $$vars{FIMEX_PROGRAM}, "FIMEX_PROGRAM executable: $$vars{FIMEX_PROGRAM}"  );
 
     # required directives
     ok( $$vars{SERVER}, 'SERVER is set' );
@@ -89,6 +90,8 @@ sub check {
     ok( $$vars{DATASET_TAGS}, 'DATASET_TAGS is set' );
     ok( $$vars{APPLICATION_ID}, 'APPLICATION_ID is set' );
     ok( $$vars{UPLOAD_OWNERTAG}, 'UPLOAD_OWNERTAG is set' );
+
+    is( ( grep { $$vars{$_} eq 'Substituted by test_application.sh' } keys %$vars ), 0, '"Substituted by test_application.sh" not present');
 
     # obsolete directives
     #is( $$vars{},                undef, ' is obsolete' );
@@ -106,8 +109,11 @@ sub check {
     is( $$vars{QUEST_ADM_TOPDIR},           undef, 'QUEST_ADM_TOPDIR is obsolete' );
     is( $$vars{QUEST_FORM_DEFINITON_FILE},  undef, 'QUEST_FORM_DEFINITON_FILE is obsolete' );
     is( $$vars{QUEST_CONFIG_DIRECTORY},     undef, 'QUEST_CONFIG_DIRECTORY is obsolete' );
+    is( $$vars{PMH_PORT_NUMBER},            undef, 'PMH_PORT_NUMBER is obsolete' );
+    is( $$vars{PMH_CONTENT_TYPE},           undef, 'PMH_CONTENT_TYPE is obsolete' );
 
-    ok( is_email($$vars{OPERATOR_EMAIL}),   'OPERATOR_EMAIL is a valid email address' );
+    ok( is_email($$vars{OPERATOR_EMAIL}) || $$vars{OPERATOR_EMAIL} eq 'root@localhost',
+        'OPERATOR_EMAIL is a valid email address' );
 
     done_testing();
 
