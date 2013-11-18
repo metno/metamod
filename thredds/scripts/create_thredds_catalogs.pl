@@ -86,6 +86,7 @@ foreach ( qw(THREDDS_CATALOG_FILE THREDDS_CATALOG_DIR THREDDS_CATALOG_NAME THRED
 }
 my $thredds_config_path = $webrun_directory . "/thredds_config";
 my $thredds_catalog_name = $config->get("THREDDS_CATALOG_NAME");
+my $thredds_dataset_prefix = $config->get("THREDDS_DATASET_PREFIX") || "";
 my $thredds_top_dataset_name = $config->get("THREDDS_TOP_DATASET_NAME");
 #my $java_home = $config->get("JAVA_HOME");
 #my $catalina_home = $config->get("CATALINA_HOME");
@@ -156,7 +157,7 @@ sub main_body {
 #
 #     Split line in 'keyword obj rest' (only rest may contain whitespace):
 #
-      if ($line =~ /^\s*([^ \t]+)\s+([^ \t]+)\s+(.+)\b\s*$/) {
+      if ($line =~ /^\s*([^ \t]+)\s+([^ \t]+)\s+(.+)\s*$/) {
          my $keyword = $1; # First matching ()-expression
          my $obj = $2;
          my $rest = $3;
@@ -349,12 +350,12 @@ EOF
                }
                if ($institution ne $prev_institution and $institution ne "dummy") {
                   print THREDDSCAT <<"EOF";
-<dataset name="$institution" ID="$institution">
+<dataset name="$institution" ID="$thredds_dataset_prefix$institution">
 EOF
                }
                if ($rolename eq "free") {
                   print THREDDSCAT <<"EOF";
-<datasetScan name="$dataset" ID="$institution/$dataset"
+<datasetScan name="$dataset" ID="$thredds_dataset_prefix$institution/$dataset"
    path="data/$institution/$dataset" location="$opendap_directory/$institution/$dataset">
    <metadata inherited="true">
       <serviceName>allServices</serviceName>
@@ -367,7 +368,7 @@ EOF
 EOF
                } elsif ($rolename ne "dummy") {
                   print THREDDSCAT <<"EOF";
-<datasetScan name="$dataset" ID="$institution/$dataset"
+<datasetScan name="$dataset" ID="$thredds_dataset_prefix$institution/$dataset"
    path="data/$institution/$dataset" location="$opendap_directory/$institution/$dataset" restrictAccess="$rolename">
    <metadata inherited="true">
       <serviceName>allServices</serviceName>
