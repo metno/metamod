@@ -90,7 +90,7 @@ sub metadata_search {
         $search_attrs->{ rows } = $rows_per_page;
     }
 
-    $logger->debug( 'metadata_search: ', Dumper $search_conds, $search_attrs ) if $logger->is_debug; # Dumper is expensive
+    #$logger->debug( 'metadata_search: ', Dumper $search_conds, $search_attrs ) if $logger->is_debug; # Dumper is expensive
 
     #my $matching_datasets = eval { $self->search( $search_conds, $search_attrs ) } or warn $@;
     #print STDERR "========== $@\n" if $@;
