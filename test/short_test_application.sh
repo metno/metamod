@@ -3,6 +3,16 @@
 # die on command failure
 set -e
 
+ok () {
+    if [ $? != 0 ]
+    then
+        echo "$*" 1>&2
+        exit $?
+    else
+        echo "$* passed"
+    fi
+}
+
 cd `dirname $0`
 SCRIPT_PATH=`pwd` # ./test catalog
 cd -
@@ -35,16 +45,6 @@ ok "run_automatic_tests"
 
 
 exit
-
-ok () {
-    if [ $? != 0 ]
-    then
-        echo "$*" 1>&2
-        exit $?
-    else
-        echo "$* passed"
-    fi
-}
 
 # END - DOCUMENTATION FOLLOWS
 : <<=cut
