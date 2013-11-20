@@ -63,6 +63,15 @@ short_test_application.sh - METAMOD integration test designed to run under Jenki
 
 ...
 
+=head1 CONFIGURATION
+
+Jenkins must be set up with the following envvars:
+
+    PERL5LIB=$WORKSPACE/metamod/local/lib/perl5
+    METAMOD_MASTER_CONFIG=$WORKSPACE/metamod/test/applic
+
+Make sure to avoid trailing slashes which may cause problems.
+
 =head1 CAVEATS
 
 This script is designed to run only with the test configuration in ./test/master_config.txt.

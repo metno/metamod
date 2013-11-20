@@ -1,10 +1,10 @@
 #!/bin/bash
 
 IMP=import
-echo Changing to `dirname $0`
+#echo Changing to `dirname $0`
 cd `dirname $0`
 SCRIPT_PATH=`pwd`
-echo SCRIPT_PATH=\"$SCRIPT_PATH\"
+#echo SCRIPT_PATH=\"$SCRIPT_PATH\"
 # the problem with this is that relative path arguments (e.g. "prepare_runtime_env.sh .") no longer work
 # so we must make sure to change back afterwards
 cd -
@@ -41,9 +41,9 @@ source $SHELL_CONF
 rm $SHELL_CONF
 
 # why are these redefined here when they are already set in master_config? FIXME
-PSQL=psql
-CREATEDB=createdb
-DROPDB=dropdb
+#PSQL=psql
+#CREATEDB=createdb
+#DROPDB=dropdb
 
 #
 # Re-initialize the data base, and load all static search data and datasets

@@ -2,6 +2,9 @@
 #
 # Re-initialize the User database. NOTE: All existing data will be lost!
 #
+
+set -e
+
 cd `dirname $0`
 SCRIPT_PATH=`pwd`
 # the problem with this is that relative path arguments (e.g. "prepare_runtime_env.sh .") no longer work
@@ -20,7 +23,14 @@ else
     echo "Usage: $0 Path_to_config_directory\n"
     exit
 fi
-cd $CONFIG
+#cd $CONFIG # why?
+
+SHELL_CONF=/tmp/metamod_tmp_bash_config.sh
+PERLCONF="$SCRIPT_PATH/../../common/scripts/gen_bash_conf.pl"
+echo Running $PERLCONF
+perl $PERLCONF ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
+source $SHELL_CONF
+rm $SHELL_CONF
 
 # put log somewhere writable since test/applic might be locked
 exec > $WEBRUN_DIRECTORY/run_createuserdb.out 2>&1
