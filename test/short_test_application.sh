@@ -13,17 +13,24 @@ echo Setting up test environment...
 
 ./common/prepare_runtime_env.sh
 
-exit $?
+echo "prepare_runtime_env:" $?
 
 ./base/init/create_and_load_all.sh
 
+echo "create_and_load_all:" $?
+
 ./base/userinit/run_createuserdb.sh
 
+echo "run_createuserdb:" $?
+
 ./upload/scripts/userbase_add_datasets.pl $operatoremail ./test/directories
+
+echo "userbase_add_datasets:" $?
 
 # Run the automatic test suite
 perl $basedir/source/run_automatic_tests.pl --smolder --no-pod
 
+echo "run_automatic_tests:" $?
 
 
 
