@@ -15,6 +15,10 @@ echo Setting up test environment...
 
 echo "prepare_runtime_env:" $?
 
+./base/init/createusers.sh
+
+echo "createusers:" $?
+
 ./base/init/create_and_load_all.sh
 
 echo "create_and_load_all:" $?
