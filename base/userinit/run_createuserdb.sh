@@ -32,8 +32,11 @@ perl $PERLCONF ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
 source $SHELL_CONF
 rm $SHELL_CONF
 
-# put log somewhere writable since test/applic might be locked
-exec > $WEBRUN_DIRECTORY/run_createuserdb.out 2>&1
+# put log in webrun since test/applic could be non-writeable
+OUTPUT="$WEBRUN_DIRECTORY/run_createuserdb.out"
+echo "Writing output to $OUTPUT"
+exec >$OUTPUT 2>&1
+
 echo "------------ Reinitialize the user database:"
 #. $SCRIPT_PATH/createuserdb.sh $CONFIG # why is this file sourced instead of run normally?
 $SCRIPT_PATH/createuserdb.sh $CONFIG
