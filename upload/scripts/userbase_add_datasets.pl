@@ -47,9 +47,9 @@ The name of the datasets are read from standard input. One dataset per line.
 Each dataset will be given an empty DSKEY value. No other accosiated information about
 the dataset will be loaded into the database.
 
-=head2 INVOCATION
+=head2 USAGE
 
-    userbase_add_datasets username <<EOF
+    userbase_add_datasets [ <username> | --operator ] [ --config <configfile> ] <<EOF
     dataset-name1
     dataset-name2
     ...
@@ -75,12 +75,19 @@ use lib "$Bin/../../common/lib";
 #}
 #use lib ( '../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.' );
 
+use Getopt::Long;
+use Pod::Usage;
 use Metamod::Config qw(:init_logger);
 use Metamod::mmUserbase;
 use Metamod::Utils qw(findFiles);
 use Log::Log4perl;
+
+my %opts;
+
+GetOptions (\%opts, 'config=s', 'operator') or pod2usage();
+
 my $logger           = Log::Log4perl->get_logger('metamod.upload.userbase_add_datasets');
-my $config           = new Metamod::Config();
+my $config           = new Metamod::Config( $opts{config} );
 my $webrun_directory = $config->get("WEBRUN_DIRECTORY");
 my $application_id   = $config->get("APPLICATION_ID");
 
@@ -90,8 +97,10 @@ if ( scalar @ARGV != 1) {
     $logger->error( $errmsg );
     die $errmsg;
 }
-my $username = $ARGV[0];
-$logger->info( 'username=', $username );
+my $username = $opts{operator} ? $config->get("OPERATOR_EMAIL") : $ARGV[0];
+die "Missing username argument" unless $username;
+$logger->debug( 'username=', $username );
+
 my $userbase = Metamod::mmUserbase->new();
 if (!$userbase) {
     $errmsg =  "Could not initialize Userbase object";
