@@ -36,5 +36,11 @@ echo "Writing output to $OUTPUT"
 exec >$OUTPUT 2>&1
 
 echo "------------ Reinitialize the user database:"
-#. $SCRIPT_PATH/createuserdb.sh $CONFIG # why is this file sourced instead of run normally?
+# createuserdb.sh must be run and not sourced otherwise paths will be screwed up
 $SCRIPT_PATH/createuserdb.sh $CONFIG
+
+if [ $? -ne 0 ]; then
+    # doesn't seem to work...
+    echo "createuserdb error $?"
+    exit $?
+fi
