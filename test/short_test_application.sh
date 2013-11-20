@@ -36,6 +36,7 @@ ok "create_and_load_all"
 ./base/userinit/run_createuserdb.sh
 ok "run_createuserdb"
 
+echo "OPERATOR_EMAIL=$OPERATOR_EMAIL"
 ./upload/scripts/userbase_add_datasets.pl "$OPERATOR_EMAIL" <./test/directories
 ok "userbase_add_datasets"
 

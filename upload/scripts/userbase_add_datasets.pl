@@ -91,6 +91,7 @@ if ( scalar @ARGV != 1) {
     die $errmsg;
 }
 my $username = $ARGV[0];
+$logger->info( 'username=', $username );
 my $userbase = Metamod::mmUserbase->new();
 if (!$userbase) {
     $errmsg =  "Could not initialize Userbase object";
