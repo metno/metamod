@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd `dirname $0`
+cd `dirname $0` # dirname doesn't work if file is sourced
 SCRIPT_PATH=`pwd`
 # the problem with this is that relative path arguments (e.g. "prepare_runtime_env.sh .") no longer work
 # so we must make sure to change back afterwards

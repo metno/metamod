@@ -22,6 +22,8 @@ else
 fi
 cd $CONFIG
 
-exec >run_createuserdb.out 2>&1
+# put log somewhere writable since test/applic might be locked
+exec > $WEBRUN_DIRECTORY/run_createuserdb.out 2>&1
 echo "------------ Reinitialize the user database:"
-. $SCRIPT_PATH/createuserdb.sh $CONFIG
+#. $SCRIPT_PATH/createuserdb.sh $CONFIG # why is this file sourced instead of run normally?
+$SCRIPT_PATH/createuserdb.sh $CONFIG
