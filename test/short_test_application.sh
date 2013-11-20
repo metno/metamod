@@ -6,10 +6,10 @@ set -e
 ok () {
     if [ $? != 0 ]
     then
-        echo "$*" 1>&2
+        echo "FAIL - $*" 1>&2
         exit $?
     else
-        echo "$* passed"
+        echo "OK - $* passed"
     fi
 }
 
@@ -28,7 +28,7 @@ echo Setting up test environment...
 ok "prepare_runtime_env"
 
 ./base/init/createusers.sh
-ok "createusers failed"
+ok "createusers"
 
 ./base/init/create_and_load_all.sh
 ok "create_and_load_all"
