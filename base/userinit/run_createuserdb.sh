@@ -12,7 +12,10 @@ if [ $# -eq 1 ]; then
     CONFIG=`readlink -f $1`
 elif [ ! -z "$METAMOD_MASTER_CONFIG" ]; then
     CONFIG=`readlink -f $METAMOD_MASTER_CONFIG`
-    CONFIG=`dirname $CONFIG`
+    if [ -f $CONFIG ]; then
+        # get parent dir
+        CONFIG=`dirname $CONFIG`
+    fi
 else
     echo "Usage: $0 Path_to_config_directory\n"
     exit

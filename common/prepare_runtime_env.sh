@@ -9,8 +9,12 @@ cd -
 if [ $# -eq 1 ]; then
     CONFIG=`readlink -f $1`
 elif [ ! -z "$METAMOD_MASTER_CONFIG" ]; then
+    # could probably skip this and let Metamod::Config read ENV
     CONFIG=`readlink -f $METAMOD_MASTER_CONFIG`
-    CONFIG=`dirname $CONFIG`
+    if [ -f $CONFIG ]; then
+        # get parent dir
+        CONFIG=`dirname $CONFIG`
+    fi
 else
     echo "Usage: $0 Path_to_config_directory\n"
     exit
@@ -46,7 +50,7 @@ if [ ! -w "$WEBRUN_DIRECTORY" ]; then
     exit 1
 fi
 
-# 
+#
 chmod g+s $WEBRUN_DIRECTORY
 # run following command to set sticky bits on existing webrun catalogs
 # find /path/to/directory -type d -exec chmod g+s {} \;

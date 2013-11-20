@@ -1,9 +1,7 @@
 #!/bin/sh
 
 cd `dirname $0`
-SCRIPT_PATH=`pwd` # test catalog
-# the problem with this is that relative path arguments (e.g. "prepare_runtime_env.sh .") no longer work
-# so we must make sure to change back afterwards
+SCRIPT_PATH=`pwd` # ./test catalog
 cd -
 
 export METAMOD_MASTER_CONFIG=`readlink -f $SCRIPT_PATH/applic`

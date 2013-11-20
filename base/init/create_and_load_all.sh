@@ -19,8 +19,8 @@ then
 elif [ ! -z "$METAMOD_MASTER_CONFIG" ]
 then
     CONFIG=`readlink -f $METAMOD_MASTER_CONFIG`
-    if [ ! -d $CONFIG ]
-    then
+    if [ -f $CONFIG ]; then
+        # get parent dir
         CONFIG=`dirname $CONFIG`
     fi
 else
