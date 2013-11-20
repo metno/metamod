@@ -100,7 +100,7 @@ if (!$userbase) {
 my $result = $userbase->user_find( $username, $application_id );
 if (!$result) {
     $errmsg =  $userbase->get_exception();
-    $logger->error( $errmsg );
+    $logger->error( $errmsg, $username );
     die $errmsg;
 }
 add_datasets();
