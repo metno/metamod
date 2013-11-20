@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# die on command failure
+set -e
+
 cd `dirname $0`
 SCRIPT_PATH=`pwd` # ./test catalog
 cd -
@@ -12,34 +15,38 @@ echo "config is $METAMOD_MASTER_CONFIG"
 echo Setting up test environment...
 
 ./common/prepare_runtime_env.sh
-
-echo "prepare_runtime_env:" $?
+ok "prepare_runtime_env"
 
 ./base/init/createusers.sh
-
-echo "createusers:" $?
+ok "createusers failed"
 
 ./base/init/create_and_load_all.sh
-
-echo "create_and_load_all:" $?
+ok "create_and_load_all"
 
 ./base/userinit/run_createuserdb.sh
-
-echo "run_createuserdb:" $?
+ok "run_createuserdb"
 
 ./upload/scripts/userbase_add_datasets.pl $operatoremail ./test/directories
-
-echo "userbase_add_datasets:" $?
+ok "userbase_add_datasets"
 
 # Run the automatic test suite
-perl $basedir/source/run_automatic_tests.pl --smolder --no-pod
+perl ./run_automatic_tests.pl --smolder --no-pod
+ok "run_automatic_tests"
 
-echo "run_automatic_tests:" $?
 
+exit
 
+ok () {
+    if [ $? != 0 ]
+    then
+        echo "$*" 1>&2
+        exit $?
+    else
+        echo "$* passed"
+    fi
+}
 
 # END - DOCUMENTATION FOLLOWS
-exit
 : <<=cut
 
 =pod
