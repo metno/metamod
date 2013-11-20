@@ -3,8 +3,6 @@
 # Re-initialize the User database. NOTE: All existing data will be lost!
 #
 
-set -e
-
 cd `dirname $0`
 SCRIPT_PATH=`pwd`
 # the problem with this is that relative path arguments (e.g. "prepare_runtime_env.sh .") no longer work
