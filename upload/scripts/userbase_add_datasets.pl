@@ -91,15 +91,14 @@ my $config           = new Metamod::Config( $opts{config} );
 my $webrun_directory = $config->get("WEBRUN_DIRECTORY");
 my $application_id   = $config->get("APPLICATION_ID");
 
+my $username = $opts{operator} ? $config->get("OPERATOR_EMAIL") : $ARGV[0];
+$logger->debug( 'username=', $username );
 my $errmsg;
-if ( scalar @ARGV != 1) {
-    $errmsg = "Illegal number of arguments: " . scalar @ARGV . " Should be 1";
+if ( ! $username ) {
+    $errmsg = "Missing username argument";
     $logger->error( $errmsg );
     die $errmsg;
 }
-my $username = $opts{operator} ? $config->get("OPERATOR_EMAIL") : $ARGV[0];
-die "Missing username argument" unless $username;
-$logger->debug( 'username=', $username );
 
 my $userbase = Metamod::mmUserbase->new();
 if (!$userbase) {
