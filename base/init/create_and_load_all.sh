@@ -48,6 +48,8 @@ rm $SHELL_CONF
 #
 # Re-initialize the data base, and load all static search data and datasets
 #
+
+# we should better let jenkins take care of the logs so they will be stored for each build
 OUTPUT="$WEBRUN_DIRECTORY/create_and_load_all.out"
 echo "Writing output to $OUTPUT"
 exec >$OUTPUT 2>&1

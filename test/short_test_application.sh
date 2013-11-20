@@ -40,7 +40,8 @@ ok "run_createuserdb"
 ok "userbase_add_datasets"
 
 # Run the automatic test suite
-perl ./run_automatic_tests.pl --smolder --no-pod
+# might add --smolder if we feel like continued use
+perl ./run_automatic_tests.pl --no-pod
 ok "run_automatic_tests"
 
 
@@ -88,6 +89,10 @@ by such, including:
 =item installation of system services
 
 Catalyst only runs on Starman/port 3000. Other daemons as needed (todo).
+
+=item redirecting to multiple log files (todo)
+
+We should collect all output to Jenkins so it is stored for each build
 
 =item communication with external services
 

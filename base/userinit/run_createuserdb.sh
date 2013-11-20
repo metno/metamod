@@ -30,6 +30,8 @@ perl $PERLCONF ${CONFIG:+"--config"} $CONFIG > $SHELL_CONF
 source $SHELL_CONF
 rm $SHELL_CONF
 
+# we should better let jenkins take care of the logs so they will be stored for each build
+
 # put log in webrun since test/applic could be non-writeable
 OUTPUT="$WEBRUN_DIRECTORY/run_createuserdb.out"
 echo "Writing output to $OUTPUT"
