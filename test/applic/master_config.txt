@@ -115,10 +115,10 @@ PG_CONNECTSTRING_SHELL =
 PG_CONNECTSTRING_PERL =
 
 # Name of the PostgreSQL database:
-DATABASE_NAME = mmbase-test
+DATABASE_NAME = metamod_unittest
 
 # Name of the PostgreSQL user database:
-USERBASE_NAME = mmuser-test
+USERBASE_NAME = metamod_unittest_userbase
 
 # URL of OPeNDAP server:
 OPENDAP_URL =
