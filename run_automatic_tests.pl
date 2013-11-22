@@ -75,10 +75,12 @@ if ($verbose) {
 $prove->recurse(1);
 $prove->archive($output_file);
 $prove->argv( [ "$FindBin::Bin/common/lib/t", "$FindBin::Bin/catalyst/t" ] );
-$prove->run();
+my $result = $prove->run();
 
 if ($send_to_smolder) { # should be configurable... FIXME
     system "$FindBin::Bin/test/smolder_smoke_signal.pl", '--server', 'dev-vm081', '--port', '8080', '--username',
         'admin', '--password',
         'qa_rocks', '--project', 'metamod', '--platform', $^O, '--file', $output_file;
 }
+
+exit( $result ? 0 : 1 );
