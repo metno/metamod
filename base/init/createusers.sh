@@ -25,6 +25,9 @@ echo "Creating admin user $PG_ADMIN_USER"
 createuser -e --username=postgres --adduser --createrole --createdb --superuser $PG_ADMIN_USER
 ordie "Couldn't create user $PG_ADMIN_USER"
 
+# also find a way to set passwd
+# postgres=# alter user admin with password 'admin';
+
 echo "Creating web user $PG_WEB_USER"
 createuser -e --username=postgres --no-adduser --no-createrole --no-createdb $PG_WEB_USER
 ordie "Couldn't create user $PG_WEB_USER"
