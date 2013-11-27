@@ -64,8 +64,8 @@ use Test::More;
 use Data::Validate::Email qw(is_email);
 
 sub check {
-    my $conf = Metamod::Config->new();
-    printf "Testing config in %s\n", $conf->config_dir;
+    my $conf = shift || Metamod::Config->new();
+    printf "# Testing config in %s\n", $conf->config_dir;
     my $vars = $conf->getall;
     my $flags = $conf->getallflags;
     #print Dumper \$vars;

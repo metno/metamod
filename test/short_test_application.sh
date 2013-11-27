@@ -69,7 +69,7 @@ short_test_application.sh - METAMOD integration test designed to run under Jenki
 Jenkins must be set up with the following envvars:
 
     PERL5LIB=$WORKSPACE/metamod/local/lib/perl5
-    METAMOD_MASTER_CONFIG=$WORKSPACE/metamod/test/applic
+    METAMOD_MASTER_CONFIG=$WORKSPACE/metamod/test/applic (probably not honored by unit tests)
 
 Make sure to avoid trailing slashes which may cause problems.
 

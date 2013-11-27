@@ -1,5 +1,8 @@
+#
 # this is a example config file needed for testing
+# it is used by the majority of tests in common/lib/t
 # do not remove, do not install
+#
 
 SERVER = somecomputer.somedomain.com
 BASE_DIRECTORY = /home/someuser

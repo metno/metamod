@@ -55,8 +55,8 @@ sub _build_mm_config {
     my $self = shift;
 
     my $path = File::Spec->catfile( $self->master_config_file );
+    get_logger()->info("Metamod::Test::Setup using $path");
     return Metamod::Config->new($path);
-
 }
 
 #

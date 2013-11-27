@@ -1,3 +1,7 @@
+#
+# This file is used by short_test_application.sh for database generation etc
+#
+
 SERVER = localhost
 
 METAMODBASE_DIRECTORY = dummy_true_value
@@ -49,8 +53,6 @@ WEBRUN_DIRECTORY = [==TEMPDIR==]/webrun
 # Logging configuration
 #LOG4PERL_CONFIG = [==WEBRUN_DIRECTORY==]/log4perl_config.ini
 # seems like log4perl_config now is hardcoded to config_dir?
-LOG4PERL_WATCH_TIME = 30
-LOG4ALL_SYSTEM_LOG = [==WEBRUN_DIRECTORY==]/metamod.log
 
 # Mail address for person/group responsible for daily operation of the file
 # repository. Used for automatically sent notifications when manual action is
@@ -133,75 +135,14 @@ APP_MENU =
 # locate your fimex program for reprojection of data
 FIMEX_PROGRAM = /usr/bin/fimex
 
-# ============ METAMODBASE configuration ==============
-
-# List of import directories:
-IMPORTDIRS = [==WEBRUN_DIRECTORY==]/XML/[==APPLICATION_ID==]
-
-# Seconds to wait between different dataset-import tasks
-IMPORT_DATASET_WAIT_SECONDS = 600
-
 # ============ METAMODSEARCH configuration ==============
 # Comma-separated list of dataset tags accessible from this application:
 DATASET_TAGS = [==APPLICATION_ID==]
-
-# SRU/ISO23950-searchable datasets
-SRU2JDBC_TAGS = [==DATASET_TAGS==]
-
-# Max number of columns allowed in the search result page:
-SEARCH_APP_MAX_COLUMNS = 5
-
-# Max number of rows displayed for second level datasets with same parent:
-SEARCH_APP_MAXROWS_SCNDLEV = 50
-
-# Set of Metadata types to be shown as columns in search results.
-# Each line below comprise at least two items (items with several words must be
-# enclosed in apostophes). Item1 is MT_name in the Metadatatype database table.
-# Item2 is the column heading.
-# One optional item is "col=n" where n is a number (1,2,...) designating the
-# default column number of the metadata in the result table. The optional item
-# "cross=X" sets how a column is shown in a cross table. X="h" makes the
-# column values define the horizontal axis of the cross table. X="v" will
-# similarly define the vertical axis. X="no" excludes the column to be used in
-# cross tables.
-SEARCH_APP_SHOW_COLUMNS =
- dataref 'Name' col=1 cross=no
- area 'Areas' col=3 cross=v
- institution 'Institutions' col=2
- variable 'Topics and variables'
- activity_type 'Activity types' col=4 cross=h
- abstract 'Abstract' col=5 cross=no
- datacollection_period 'Datacollection period'
- contact 'Contact (E-mail)'
- title 'Descriptive title for the dataset'
- keywords 'Keywords' cross=no
- Product_name 'Product name'
- references 'References' cross=no
- field_type 'Field type (frequency)'
- forecast_type 'Forecast type'
- Platform_name 'Platform name'
- PI_name 'Principal investigator'
- distribution_statement 'Distribution statement'
- spatial_resolution 'Spatial resolution'
- project_name 'Project name'
-
-# The sequence by which the search categories are visible in the search
-# application. The numbers are keys in the SearchCategory database table.
-# In addition to the numbers, the keyword FullText may be used.
-SEARCH_CATEGORY_SEQUENCE = topics_and_variables,activity_types,institutions,areas,map_search,datacollection_period,fulltext
-
-# Set default fontsize for the results and the two-way tables (percent):
-DEFAULT_FONTSIZE = 80
 
 # ============ METAMODUPLOAD configuration ==============
 # Upload application: Set this to 1 for debug output to the screen
 # and to the testlog file:
 DEBUG = 0
-
-# For unknown reasons, sometimes it is neccessary to convert all POST-data
-# from UTF8 to latin-1. If this is the case, set the following variable to
-# TRUE:
-DECODE_FROM_UTF8 = FALSE
 
 # Directory path for files uploaded by the web application:
 UPLOAD_DIRECTORY = [==TEMPDIR==]/upload
@@ -220,14 +161,6 @@ CLEANUP_CRONTAB = 30  * * * *
 # all files in a batch.
 UPLOAD_AGE_THRESHOLD = 20
 
-# Directory path for the top data repository directory. This will
-# be a directory accessible through some OPeNDAP server (like THREDDS).
-# If no OPeNDAP server is installed, links in the web interface pointing to
-# data files may be faulty. This dependence on OPeNDAP will be corrected in
-# a future version of the software.
-#OPENDAP_BASEDIR = data
-#OPENDAP_DIRECTORY = Substituted by test_application.sh
-
 # String (PREFIX below) used to build the URL pointing to the THREDDS dataset
 # corresponding to a file (METAMOD dataset, level 2). This URL has a structure like
 # "http://threddsserver/path_to_thredds_catalog?dataset=PREFIXinstitution/dir/file"
@@ -237,35 +170,8 @@ THREDDS_DATASET_PREFIX =
 # Ownertag for uploaded datasets:
 UPLOAD_OWNERTAG = [==APPLICATION_ID==]
 
-# Max length of directory names created by users:
-MAXLENGTH_DIRNAME = 20
-
-# Max length of directory keys created by users:
-MAXLENGTH_DIRKEY = 10
-
 # Max size of files to be uploaded (bytes) (can be owerridden by php.ini):
 MAX_UPLOAD_SIZE_BYTES = 100000000
-
-# Text in mail body sent to a dataset owner when errors are found in an
-# uploaded file. The string [OWNER] is replaced by the name of the dataset
-# owner when the mail is sent. [DATASET] is replaced by the actual dataset
-# name, and [URL] is replaced by an url to the html-file describing the errors:
-EMAIL_BODY_WHEN_UPLOAD_ERROR =
- Dear [OWNER],
-
- The METAMOD system that automatically check files uploaded to the data
- repository, have found errors in files recently uploaded to the [DATASET]
- dataset. Please find the details on the URL below:
-
- [URL].
-
-# Subject field in E-mails sent to a dataset owner when errors are found
-# in an uploaded file:
-EMAIL_SUBJECT_WHEN_UPLOAD_ERROR = METAMOD file upload error
-
-# Mail address used in the "from" field on automatically sent E-mails to
-# users:
-FROM_ADDRESS = [==OPERATOR_EMAIL==]
 
 # Final greetings and signature included in E-mail to users:
 EMAIL_SIGNATURE =
@@ -303,19 +209,9 @@ PMH_REPOSITORY_NAME = METAMOD Repository
 # Earliest datastamp:
 PMH_EARLIEST_DATESTAMP = 2000-01-01
 
-# Repository Identifier
-PMH_REPOSITORY_IDENTIFIER = [==APPLICATION_ID==]
-
 # make OAI-PMH identifier the same as ISO-identifier
 # i.e. oai:...:metamod/APP/file -> urn:...:APP_file
 PMH_SYNCHRONIZE_ISO_IDENTIFIER = 1
-
-# enable validation of PMH-results and map them to 'status=delete' if they don't validate
-PMH_VALIDATION = on
-
-# Maximum mumber of the records to deliver. If there are more records to
-# deliver a ResumptionToken will be generated.
-PMH_MAXRECORDS = 1000
 
 # optional set configuration, one set per row spec|name|description
 PMH_SETCONFIG =
@@ -331,8 +227,9 @@ HARVEST_CRONTAB = 45 * * * *
 # (without embedded spaces) which will serve as a short identification for
 # the source. Each source (given by the base URL) must have its own ownertag,
 #OAI_HARVEST_SOURCES = Substituted by test_application.sh
+
 # Strict validation of schema. Leave empty to switch off.
-OAI_HARVEST_VALIDATION_SCHEMA = [==INSTALLATION_DIR==]/common/schema/OAI-PMH.xsd
+#OAI_HARVEST_VALIDATION_SCHEMA = [==INSTALLATION_DIR==]/common/schema/OAI-PMH.xsd
 
 # ============ METAMODTHREDDS configuration ==============
 # Name of the THREDDS catalog (the name attribute in the catalog element in
@@ -370,28 +267,12 @@ TEST_IMPORT_PROGRESS_REPORT = 1
 # to [==OPERATOR_EMAIL==].
 TEST_EMAIL_RECIPIENT = 0
 
-# ============ Authentication configuration ============
-#
-# Configuration of METAMOD configuration
-
-# The type of authentication to perform. The types DB and LDAP are supported
-AUTH_TYPE = DB
-
-# The URL used to connect to the LDAP server. Only used when AUTH_TYPE is LDAP.
-# Examples: ldaps://ldap-dev.met.no and ldaps://ldap-dev.met.no
-#AUTH_LDAP_URL =
-
-# The LDAP DN where you should start search for the user. Example: dc=met,dc=no
-#AUTH_LDAP_BASE_DN=
-
 # ============ Subscription configuration ==============
 #
 # Configuration of the METAMOD subscription services
 
 # The directory where SMS will look for new transfers to perform.
-SUBSCRIPTION_SMS_DIRECTORY = some dir
-
-SUBSCRIPTION_ENABLED = ENABLED
+#SUBSCRIPTION_SMS_DIRECTORY = some dir
 
 # ======= Collection basket configuration =========
 

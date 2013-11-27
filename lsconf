@@ -69,7 +69,7 @@ pod2usage(1) if $help;
 # find config file
 Metamod::Config->config_found($config_file_or_dir) or pod2usage(2);
 my $mm_config = Metamod::Config->new($config_file_or_dir, { nolog => 1 } );
-check_conf() if $check;
+check($mm_config) if $check;
 
 # check color output
 if (defined $color) {
