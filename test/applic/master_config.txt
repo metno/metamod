@@ -131,10 +131,10 @@ DATASET_TAGS = [==APPLICATION_ID==]
 DEBUG = 0
 
 # Directory path for files uploaded by the web application:
-UPLOAD_DIRECTORY = [==TEMPDIR==]/upload
+UPLOAD_DIRECTORY = [==INSTALLATION_DIR==]/../upload
 
 # Directory path for files uploaded by FTP:
-UPLOAD_FTP_DIRECTORY = [==TEMPDIR==]/upload
+UPLOAD_FTP_DIRECTORY = [==INSTALLATION_DIR==]/../upload
 
 # Schedule for FTP upload monitor
 FTP_CRONTAB     = */5 * * * *
