@@ -14,12 +14,22 @@
 
 # ============ Enabled modules ==============
 
-# Set these values to any string value to enable the service.
+# Set these values to any non-blank string to enable each init.d service
 # All services are disabled by default.
+
+# start prepare_download_script?
 METAMODBASE_DIRECTORY =
+
+# start ftp_monitor_script?
 METAMODUPLOAD_DIRECTORY =
+
+# not used - OAI-PMH always available
 METAMODPMH_DIRECTORY =
+
+# start harvester?
 METAMODHARVEST_DIRECTORY =
+
+# start create_thredds_catalogs_script?
 METAMODTHREDDS_DIRECTORY =
 
 # ============ General configuration ==============

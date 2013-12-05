@@ -1,4 +1,9 @@
 
+add to /etc/apt/sources.list:
+
+deb http://repo.met.no/devel precise main contrib partner
+deb-src http://repo.met.no/devel precise main contrib partner
+
 
   # adduser jenkins
   # passwd jenkins
@@ -6,7 +11,8 @@
   # apt-get install apache2 postgresql-client-common postgresql-client libdbd-pg-perl pdl proj \
   libgeo-proj4-perl libpdl-netcdf-perl libconfig-tiny-perl libimager-perl libxml2 libxslt1.1 \
   libxml2-dev libxslt1-dev libssl-dev libexpat1 libexpat1-dev pkg-config libgdbm3 libgdbm-dev \
-  libpng-dev libnetcdf-dev postgresql postgresql-contrib postgis postgresql-9.1-postgis
+  libpng-dev libnetcdf-dev postgresql postgresql-contrib postgis postgresql-9.1-postgis \
+  fimex
 
   # apt-get install make cpanminus
   # cpanm Carton

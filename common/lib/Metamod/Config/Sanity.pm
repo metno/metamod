@@ -95,6 +95,7 @@ sub check {
 
     # obsolete directives
     #is( $$vars{},                undef, ' is obsolete' );
+    is( $$vars{BASE_DIRECTORY},             undef, 'BASE_DIRECTORY is obsolete' );
     is( $$vars{METADATA_SEARCH_URL},        undef, 'METADATA_SEARCH_URL is obsolete' );
     is( $$vars{UPLOAD_URL},                 undef, 'UPLOAD_URL is obsolete' );
     is( $$vars{PHPLOGLEVEL},                undef, 'PHPLOGLEVEL is obsolete' );
