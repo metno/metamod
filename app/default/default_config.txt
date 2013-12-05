@@ -259,7 +259,7 @@ SRID_MAP_OFFSET_Y_93031 = 280
 LONLAT_SRID = 4035
 
 # locate your fimex program for reprojection of data
-FIMEX_PROGRAM = fimex
+FIMEX_PROGRAM = /usr/bin/fimex
 
 # ============ WMS configuration =======================
 
