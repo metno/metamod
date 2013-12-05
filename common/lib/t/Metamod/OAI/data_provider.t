@@ -63,6 +63,7 @@ foreach my $dataset_file (@dataset_files) {
         },
     ];
 
+    diag('PMH_SETCONFIG=', $config->get('PMH_SETCONFIG'));
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: No conditions. Sets not supported" );
     is( $resumption_token, undef, "get_identifiers: No resumption token when not above max limit." );
 
@@ -93,6 +94,7 @@ foreach my $dataset_file (@dataset_files) {
         },
     ];
 
+    diag('PMH_SETCONFIG=', $config->get('PMH_SETCONFIG'));
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: Until condition. Sets not supported" );
 
     #
@@ -107,6 +109,7 @@ foreach my $dataset_file (@dataset_files) {
         },
     ];
 
+    diag('PMH_SETCONFIG=', $config->get('PMH_SETCONFIG'));
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: Until condition. Sets not supported" );
 
     #
@@ -135,6 +138,7 @@ foreach my $dataset_file (@dataset_files) {
         },
     ];
 
+    diag('PMH_SETCONFIG=', $config->get('PMH_SETCONFIG'));
     is_deeply( $identifiers, $expected_identifiers,
         "get_identifiers: No conditions. Invalid metadata marks dataset as deleted" );
     $ENV{METAMOD_PMH_VALIDATION} = 'off';
@@ -177,6 +181,7 @@ foreach my $dataset_file (@dataset_files) {
         },
     ];
 
+    diag('PMH_SETCONFIG=', $config->get('PMH_SETCONFIG'));
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: No conditions. Sets supported" );
 
     ($identifiers, $resumption_token) = $dp2->get_identifiers( 'dif', '', '', 'NDAM', '' );
@@ -188,6 +193,7 @@ foreach my $dataset_file (@dataset_files) {
         },
     ];
 
+    diag('PMH_SETCONFIG=', $config->get('PMH_SETCONFIG'));
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: Set condition. Sets supported" );
 
     BEGIN { $num_tests += 10 }
