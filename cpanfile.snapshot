@@ -2557,6 +2557,60 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       PadWalker 0.08
       Test::More 0
+  Devel-Cover-1.08
+    pathname: P/PJ/PJCJ/Devel-Cover-1.08.tar.gz
+    provides:
+      Devel::Cover 1.08
+      Devel::Cover::Annotation::Git 1.08
+      Devel::Cover::Annotation::Random 1.08
+      Devel::Cover::Annotation::Svk 1.08
+      Devel::Cover::Branch 1.08
+      Devel::Cover::Condition 1.08
+      Devel::Cover::Condition_and_2 1.08
+      Devel::Cover::Condition_and_3 1.08
+      Devel::Cover::Condition_or_2 1.08
+      Devel::Cover::Condition_or_3 1.08
+      Devel::Cover::Condition_xor_4 1.08
+      Devel::Cover::Criterion 1.08
+      Devel::Cover::DB 1.08
+      Devel::Cover::DB::Criterion 1.08
+      Devel::Cover::DB::Digests 1.08
+      Devel::Cover::DB::File 1.08
+      Devel::Cover::DB::IO 1.08
+      Devel::Cover::DB::IO::JSON 1.08
+      Devel::Cover::DB::IO::Storable 1.08
+      Devel::Cover::DB::Run 1.08
+      Devel::Cover::DB::Structure 1.08
+      Devel::Cover::Html_Common 1.08
+      Devel::Cover::Inc 1.08
+      Devel::Cover::Op 1.08
+      Devel::Cover::Pod 1.08
+      Devel::Cover::Report::Compilation 1.08
+      Devel::Cover::Report::Html 1.08
+      Devel::Cover::Report::Html_basic 1.08
+      Devel::Cover::Report::Html_basic::Template::Provider 1.08
+      Devel::Cover::Report::Html_minimal 1.08
+      Devel::Cover::Report::Html_subtle 1.08
+      Devel::Cover::Report::Html_subtle::Template::Provider 1.08
+      Devel::Cover::Report::Sort 1.08
+      Devel::Cover::Report::Text 1.08
+      Devel::Cover::Report::Text2 1.08
+      Devel::Cover::Report::Vim 1.08
+      Devel::Cover::Report::Vim::Template::Provider 1.08
+      Devel::Cover::Statement 1.08
+      Devel::Cover::Subroutine 1.08
+      Devel::Cover::Test 1.08
+      Devel::Cover::Time 1.08
+      Devel::Cover::Truth_Table 1.08
+      Devel::Cover::Truth_Table::Row 1.08
+      Devel::Cover::Util 1.08
+      Devel::Cover::Web 1.08
+    requirements:
+      Digest::MD5 0
+      ExtUtils::MakeMaker 0
+      Storable 0
+      Test::More 0
+      Test::Warn 0
   Devel-Cycle-1.11
     pathname: L/LD/LDS/Devel-Cycle-1.11.tar.gz
     provides:
