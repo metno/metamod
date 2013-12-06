@@ -25,7 +25,7 @@ use Pod::Usage;
 my $send_to_smolder = '';
 my $send_to_jenkins = '';
 my $verbose         = '';
-my $coverage        = '';
+my $coverage        = 1;
 my $performance     = '';
 my $pod             = 1;
 
