@@ -66,6 +66,12 @@ PG_CONNECTSTRING_SHELL =
 # database:
 PG_CONNECTSTRING_PERL = host=localhost;password=admin
 
+# POSTGIS scripts not actually used in init tests, but required for sanity check
+# the location of the initialization sql-script for postGIS
+PG_POSTGIS_SCRIPT = /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
+# the Coordinate System References
+PG_POSTGIS_SYSREF_SCRIPT = /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
+
 # Name of the PostgreSQL database:
 DATABASE_NAME = metamod_unittest
 
