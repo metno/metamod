@@ -24,7 +24,7 @@ BEGIN {
         plan skip_all => "Could not connect to the metabase database: " . $helper->errstr();
     }
 
-    plan tests => 29;
+    plan tests => 28;
 
     $metabase = $helper->metabase();
     $helper->setup_environment();
@@ -147,15 +147,6 @@ test_metadata_search(
 
 test_metadata_search(
     {
-        coords => { srid => 93995, x1 => 296, x2 => 313, y1 => 505, y2 => 517 },
-    },
-    1,
-    [ qw( TEST/dataset1 ) ],
-    'Map search that matches a single dataset.',
-);
-
-test_metadata_search(
-    {
         coords => { srid => 93995, x1 => 296, x2 => 363, y1 => 505, y2 => 517 },
     },
     1,
@@ -207,4 +198,5 @@ sub test_metadata_search {
     }
 
     is_deeply( \@actual_names, $expected_names, "$test_name: Dataset names" );
+    diag(join ',', @actual_names);
 }

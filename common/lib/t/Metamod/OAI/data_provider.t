@@ -41,6 +41,7 @@ foreach my $dataset_file (@dataset_files) {
 # Test for get_identifiers when sets are not turned on
 #
 {
+    # cannot use ENV here since requires config to be reloaded
     #$ENV{METAMOD_PMH_VALIDATION} = 'off';
     $config->set('PMH_VALIDATION', 'off');
     is( $config->get('PMH_VALIDATION'), 'off', 'PMH_VALIDATION turned off' );
@@ -204,7 +205,7 @@ foreach my $dataset_file (@dataset_files) {
 
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: Set condition. Sets supported" );
 
-    BEGIN { $num_tests += 10 }
+    BEGIN { $num_tests += 15 }
 
 }
 
@@ -291,7 +292,7 @@ foreach my $dataset_file (@dataset_files) {
 
     compare_records( $records, $expected_records, "get_records: No records match" );
 
-    BEGIN { $num_tests += 12 }
+    BEGIN { $num_tests += 16 }
 }
 
 #
@@ -362,7 +363,7 @@ foreach my $dataset_file (@dataset_files) {
     delete $expected_record->{metadata};
     is_deeply( $record, $expected_record, "get_record: Valid identifier and valid metadata. Sets turned on" );
 
-    BEGIN { $num_tests += 7 }
+    BEGIN { $num_tests += 10 }
 
 }
 
@@ -375,7 +376,7 @@ foreach my $dataset_file (@dataset_files) {
     #$ENV{METAMOD_PMH_SETCONFIG}  = '';
     $config->set('PMH_SETCONFIG', '');
     is( $config->get('PMH_SETCONFIG'), '', 'PMH_SETCONFIG is blank' );
-    $ENV{METAMOD_PMH_MAXRECORDS} = '1';
+    #$ENV{METAMOD_PMH_MAXRECORDS} = '1';
     $config->set('PMH_MAXRECORDS', '1');
     is( $config->get('PMH_MAXRECORDS'), '1', 'PMH_MAXRECORDS is 1' );
 
@@ -522,7 +523,7 @@ foreach my $dataset_file (@dataset_files) {
     is_deeply($identifiers, undef, 'Old resumption token gives no result');
     is_deeply($resumption_token, undef, 'Old resumption token gives no new resumption token');
 
-    BEGIN { $num_tests += 15 }
+    BEGIN { $num_tests += 18 }
 }
 
 BEGIN { plan tests => $num_tests }
