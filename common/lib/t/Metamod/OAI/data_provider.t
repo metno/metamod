@@ -43,6 +43,8 @@ foreach my $dataset_file (@dataset_files) {
 {
     $ENV{METAMOD_PMH_VALIDATION} = 'off';
     $ENV{METAMOD_PMH_SETCONFIG}  = '';
+    diag('PMH_VALIDATION=', $config->get('PMH_VALIDATION'));
+    diag('PMH_SETCONFIG=', $config->get('PMH_SETCONFIG'));
     my $dp = Metamod::OAI::DataProvider->new();
 
     #
@@ -63,7 +65,6 @@ foreach my $dataset_file (@dataset_files) {
         },
     ];
 
-    diag('PMH_SETCONFIG=', $config->get('PMH_SETCONFIG'));
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: No conditions. Sets not supported" );
     is( $resumption_token, undef, "get_identifiers: No resumption token when not above max limit." );
 
@@ -94,7 +95,6 @@ foreach my $dataset_file (@dataset_files) {
         },
     ];
 
-    diag('PMH_SETCONFIG=', $config->get('PMH_SETCONFIG'));
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: Until condition. Sets not supported" );
 
     #
@@ -109,7 +109,6 @@ foreach my $dataset_file (@dataset_files) {
         },
     ];
 
-    diag('PMH_SETCONFIG=', $config->get('PMH_SETCONFIG'));
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: Until condition. Sets not supported" );
 
     #
@@ -122,6 +121,9 @@ foreach my $dataset_file (@dataset_files) {
     #
     # Testing of metadata validation
     $ENV{METAMOD_PMH_VALIDATION} = 'on';
+    diag('PMH_VALIDATION=', $config->get('PMH_VALIDATION'));
+    $config->set('PMH_VALIDATION', 'on');
+    diag('*PMH_VALIDATION=', $config->get('PMH_VALIDATION'));
     ($identifiers, $resumption_token) = $dp->get_identifiers( 'dif', '', '', '', '' );
     $expected_identifiers = [
         { identifier => 'oai:met.no:metamod/OTHER/data_provider1', datestamp => '2009-03-20T11:08:29Z' },
@@ -138,10 +140,12 @@ foreach my $dataset_file (@dataset_files) {
         },
     ];
 
-    diag('PMH_SETCONFIG=', $config->get('PMH_SETCONFIG'));
     is_deeply( $identifiers, $expected_identifiers,
         "get_identifiers: No conditions. Invalid metadata marks dataset as deleted" );
     $ENV{METAMOD_PMH_VALIDATION} = 'off';
+    diag('PMH_VALIDATION=', $config->get('PMH_VALIDATION'));
+    $config->set('PMH_VALIDATION', 'off');
+    diag('*PMH_VALIDATION=', $config->get('PMH_VALIDATION'));
 
     #
     # Test for not matchin records
@@ -155,6 +159,9 @@ foreach my $dataset_file (@dataset_files) {
     # Testing no conditions when sets are not turned on.
     #
     $ENV{METAMOD_PMH_SETCONFIG} = 'DAM|dummy|dummy\nNDAM|dummy|dummy';
+    diag('PMH_SETCONFIG=', $config->get('PMH_SETCONFIG'));
+    $config->set('PMH_SETCONFIG', 'DAM|dummy|dummy\nNDAM|dummy|dummy');
+    diag('PMH_SETCONFIG=', $config->get('PMH_SETCONFIG'));
     my $dp2 = Metamod::OAI::DataProvider->new();
     ($identifiers, $resumption_token) = $dp2->get_identifiers( 'dif', '', '', '', '' );
     $expected_identifiers = [
@@ -181,7 +188,6 @@ foreach my $dataset_file (@dataset_files) {
         },
     ];
 
-    diag('PMH_SETCONFIG=', $config->get('PMH_SETCONFIG'));
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: No conditions. Sets supported" );
 
     ($identifiers, $resumption_token) = $dp2->get_identifiers( 'dif', '', '', 'NDAM', '' );
@@ -193,7 +199,6 @@ foreach my $dataset_file (@dataset_files) {
         },
     ];
 
-    diag('PMH_SETCONFIG=', $config->get('PMH_SETCONFIG'));
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: Set condition. Sets supported" );
 
     BEGIN { $num_tests += 10 }

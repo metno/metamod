@@ -274,6 +274,8 @@ sub _normalizeFile {
 
 Set a configuration variable
 
+B<TODO:> set flag (not relevant for lsconf)
+
 =cut
 
 sub set {
@@ -284,7 +286,7 @@ sub set {
 
 =head2 $self->unset()
 
-Set a configuration variable
+Unset a configuration variable
 
 =cut
 

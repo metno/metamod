@@ -40,16 +40,58 @@ Metamod::Test::Setup - Module that helps initialise the environment for testing.
 
 =head1 DESCRIPTION
 
-=head1 FUNCTIONS/METHODS
+Blah Blah Blah
+
+=head1 SYNOPSIS
+
+    my $config_file = "$FindBin::Bin/../../master_config.txt";
+    my $test_setup  = Metamod::Test::Setup->new( master_config_file => $config_file );
+    my $config      = $test_setup->mm_config();
+    my $metabase    = $test_setup->metabase();
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item master_config_file
+
+Path to config dir
+
+=item mm_config
+
+# The Metamod::Config object for the specified master config
+
+=item dataset_dir
+
+Directory that contains datasets that should be loaded as part of the setup process
+
+=item import_dataset_path
+
+Path to the import_dataset.pl script
+
+=item metabase
+
+The connection to the Metabase
+
+=item userbase
+
+The connection to the Userbase
+
+=item errstr
+
+The error message from the previous error
+
+=back
 
 =cut
 
 has 'master_config_file' => ( is => 'ro', required => 1 );
-
-#
-# The Metamod::Config object for the specified master config
-#
 has 'mm_config' => ( is => 'ro', builder => '_build_mm_config' );
+has 'dataset_dir' => ( is => 'ro' );
+has 'import_dataset_path' => ( is => 'ro', lazy => 1, builder => '_build_import_dataset_path' );
+has 'metabase' => ( is => 'rw', lazy => 1, builder => '_build_metabase' );
+has 'userbase' => ( is => 'rw', lazy => 1, builder => '_build_userbase' );
+has 'errstr' => ( is => 'rw', isa => 'Str' );
 
 sub _build_mm_config {
     my $self = shift;
@@ -59,16 +101,6 @@ sub _build_mm_config {
     get_logger()->info("Metamod::Test::Setup using $path");
     return $config;
 }
-
-#
-# Directory that contains datasets that should be loaded as part of the setup process
-#
-has 'dataset_dir' => ( is => 'ro' );
-
-#
-# Path to the import_dataset.pl script
-#
-has 'import_dataset_path' => ( is => 'ro', lazy => 1, builder => '_build_import_dataset_path' );
 
 sub _build_import_dataset_path {
     my $self = shift;
@@ -80,11 +112,6 @@ sub _build_import_dataset_path {
     }
 
 }
-
-#
-# The connection to the Metabase
-#
-has 'metabase' => ( is => 'rw', lazy => 1, builder => '_build_metabase' );
 
 sub _build_metabase {
     my $self = shift;
@@ -104,10 +131,9 @@ sub _build_metabase {
 
 }
 
-#
-# The connection to the Userbase
-#
-has 'userbase' => ( is => 'rw', lazy => 1, builder => '_build_userbase' );
+=head1 METHODS
+
+=cut
 
 sub _build_userbase {
     my $self = shift;
@@ -126,11 +152,11 @@ sub _build_userbase {
 
 }
 
-#
-# The error message from the previous error.
-#
-has 'errstr' => ( is => 'rw', isa => 'Str' );
+=head2 $self->run_import_dataset()
 
+Blah blah blah
+
+=cut
 
 sub run_import_dataset {
     my $self = shift;
@@ -144,6 +170,12 @@ sub run_import_dataset {
 
 }
 
+=head2 $self->valid_metabase()
+
+Blah blah blah
+
+=cut
+
 sub valid_metabase {
     my $self = shift;
 
@@ -151,6 +183,12 @@ sub valid_metabase {
     return $self->_valid_base($metabase);
 
 }
+
+=head2 $self->valid_userbase()
+
+Blah blah blah
+
+=cut
 
 sub valid_userbase {
     my $self = shift;
@@ -182,6 +220,12 @@ sub _valid_base {
     return $success;
 
 }
+
+=head2 $self->get_query_log($schema)
+
+Blah blah blah
+
+=cut
 
 sub get_query_log {
     my $self = shift;
