@@ -377,7 +377,7 @@ foreach my $dataset_file (@dataset_files) {
     is( $config->get('PMH_SETCONFIG'), '', 'PMH_SETCONFIG is blank' );
     $ENV{METAMOD_PMH_MAXRECORDS} = '1';
     $config->set('PMH_MAXRECORDS', '1');
-    is( $config->get('PMH_MAXRECORDS'), '', 'PMH_MAXRECORDS is 1' );
+    is( $config->get('PMH_MAXRECORDS'), '1', 'PMH_MAXRECORDS is 1' );
 
     my $dp = Metamod::OAI::DataProvider->new( resumption_token_dir => "$FindBin::Bin/resumption_tokens");
 

@@ -30,7 +30,8 @@ use Metamod::Test::Setup;
 my $num_tests = 0;
 
 my $test_setup = Metamod::Test::Setup->new( master_config_file => $config_file );
-$test_setup->mm_config->initLogger();
+my $config = $test_setup->mm_config;
+$config->initLogger();
 my $metabase = $test_setup->metabase();
 
 my $importer = Metamod::DatasetImporter->new();
@@ -209,8 +210,10 @@ my $importer = Metamod::DatasetImporter->new();
 #
 {
 
-    local $ENV{METAMOD_PMH_SYNCHRONIZE_ISO_IDENTIFIER} = 1;
-    local $ENV{METAMOD_PMH_REPOSITORY_IDENTIFIER} = 'dummy';
+    #local $ENV{METAMOD_PMH_SYNCHRONIZE_ISO_IDENTIFIER} = 1;
+    $config->set('PMH_SYNCHRONIZE_ISO_IDENTIFIER', 1);
+    #local $ENV{METAMOD_PMH_REPOSITORY_IDENTIFIER} = 'dummy';
+    $config->set('PMH_REPOSITORY_IDENTIFIER', 'dummy');
 
     $importer->write_to_database("$FindBin::Bin/../data/Metamod/dataset_importer3.xml");
 
@@ -221,14 +224,16 @@ my $importer = Metamod::DatasetImporter->new();
     my $oai_row = $dbh->selectrow_hashref($oai_select);
     is( $oai_row->{oai_identifier}, 'urn:dummy:OTHER_dataset_importer3', "Synchronised OAI identifier");
 
-    local $ENV{METAMOD_PMH_SYNCHRONIZE_ISO_IDENTIFIER} = 0;
+    #local $ENV{METAMOD_PMH_SYNCHRONIZE_ISO_IDENTIFIER} = 0;
+    $config->set('PMH_SYNCHRONIZE_ISO_IDENTIFIER', 0);
 
     $importer->write_to_database("$FindBin::Bin/../data/Metamod/dataset_importer3.xml");
 
     my $oai_row2 = $dbh->selectrow_hashref($oai_select);
     is( $oai_row2->{oai_identifier}, 'oai:dummy:metamod/OTHER/dataset_importer3', "OAI identifier not synchronised");
 
-    local $ENV{METAMOD_PMH_SYNCHRONIZE_ISO_IDENTIFIER} = 1;
+    #local $ENV{METAMOD_PMH_SYNCHRONIZE_ISO_IDENTIFIER} = 1;
+    $config->set('PMH_SYNCHRONIZE_ISO_IDENTIFIER', 1);
 
     $importer->write_to_database("$FindBin::Bin/../data/Metamod/dataset_importer3.xml");
 

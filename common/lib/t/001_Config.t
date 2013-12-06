@@ -37,7 +37,7 @@ use FindBin;
 use lib "$FindBin::Bin/../";
 
 
-use Test::More tests => 16;
+use Test::More tests => 18;
 use Test::Exception;
 
 BEGIN {use_ok('Metamod::Config');}
@@ -52,6 +52,11 @@ isa_ok($config, 'Metamod::Config');
 can_ok($config, 'get');
 
 ok(!$config->get('NOT_THERE'), 'getting false value + warning on NOT_THERE');
+$config->set('NOT_THERE', 'dummyvalue');
+is($config->get('NOT_THERE'), 'dummyvalue', 'setting NOT_THERE');
+$config->unset('NOT_THERE');
+ok(!$config->get('NOT_THERE'), 'unsetting NOT_THERE');
+
 ok(!$config->has("SOURCE_DIRECTORY"), "not getting obsolete SOURCE_DIRECTORY");
 
 is($config->getDSN(), "dbi:Pg:dbname=metamod_unittest;host=localhost;password=admin", "getDSN");
