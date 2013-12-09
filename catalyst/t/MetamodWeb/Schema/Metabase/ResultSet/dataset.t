@@ -197,6 +197,6 @@ sub test_metadata_search {
         push @actual_names, $row->ds_name();
     }
 
-    is_deeply( \@actual_names, $expected_names, "$test_name: Dataset names" );
-    diag(join ',', @actual_names);
+    is_deeply( \@actual_names, $expected_names, "$test_name: Dataset names" )
+    or diag(join ',', @actual_names);
 }

@@ -15,6 +15,8 @@ use Metamod::Config;
 use Metamod::Dataset;
 use Metamod::SubscriptionHandler::EmailToFile;
 
+no warnings 'once';
+
 my $num_tests = 0;
 
 my $config = Metamod::Config->new("$FindBin::Bin/../../master_config.txt");
@@ -41,9 +43,9 @@ my $dataset_file = "$FindBin::Bin/../../data/Metamod/SubscriptionHandler/itp04_i
 my $ds = Metamod::Dataset->newFromFile( $dataset_file );
 
 {
-    my $subscriptions1 = [
-        { address => 'oysteint@met.no' },
-        { address => 'oystein.torget@met.no' },
+    my $subscriptions1 = [ # FIXME must be customizable
+        { address => 'geira@met.no' },
+        { address => 'geir.aalberg@met.no' },
     ];
 
     $handler->push_to_subscribers( $ds, $subscriptions1 );
@@ -53,11 +55,11 @@ my $ds = Metamod::Dataset->newFromFile( $dataset_file );
 ===
 test 1 TIMESTAMP
 from: ${from_address}
-to:  oysteint\@met.no, oystein.torget\@met.no
+to:  geira\@met.no, geir.aalberg\@met.no
 
 Subject: [METAMOD] New dataset available for TEST/itp04
 From: ${from_address}
-Bcc: oysteint\@met.no, oystein.torget\@met.no
+Bcc: geira\@met.no, geir.aalberg\@met.no
 
 
 

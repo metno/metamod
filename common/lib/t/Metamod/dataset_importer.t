@@ -222,8 +222,8 @@ my $importer = Metamod::DatasetImporter->new();
     my $oai_select = 'SELECT oai_identifier FROM oaiinfo WHERE ds_id = 4';
 
     my $oai_row = $dbh->selectrow_hashref($oai_select);
-    is( $oai_row->{oai_identifier}, 'urn:dummy:OTHER_dataset_importer3', "Synchronised OAI identifier");
-    diag($oai_row->{oai_identifier});
+    is( $oai_row->{oai_identifier}, 'urn:dummy:OTHER_dataset_importer3', "Synchronised OAI identifier")
+    or diag($oai_row->{oai_identifier});
 
     #local $ENV{METAMOD_PMH_SYNCHRONIZE_ISO_IDENTIFIER} = 0;
     $config->set('PMH_SYNCHRONIZE_ISO_IDENTIFIER', 0);
@@ -231,8 +231,8 @@ my $importer = Metamod::DatasetImporter->new();
     $importer->write_to_database("$FindBin::Bin/../data/Metamod/dataset_importer3.xml");
 
     my $oai_row2 = $dbh->selectrow_hashref($oai_select);
-    is( $oai_row2->{oai_identifier}, 'oai:dummy:metamod/OTHER/dataset_importer3', "OAI identifier not synchronised");
-    diag($oai_row->{oai_identifier});
+    is( $oai_row2->{oai_identifier}, 'oai:dummy:metamod/OTHER/dataset_importer3', "OAI identifier not synchronised")
+    or diag($oai_row->{oai_identifier});
 
     #local $ENV{METAMOD_PMH_SYNCHRONIZE_ISO_IDENTIFIER} = 1;
     $config->set('PMH_SYNCHRONIZE_ISO_IDENTIFIER', 1);
@@ -240,8 +240,8 @@ my $importer = Metamod::DatasetImporter->new();
     $importer->write_to_database("$FindBin::Bin/../data/Metamod/dataset_importer3.xml");
 
     my $oai_row3 = $dbh->selectrow_hashref($oai_select);
-    is( $oai_row3->{oai_identifier}, 'urn:dummy:OTHER_dataset_importer3', "Synchronised OAI identifier after re-import");
-    diag($oai_row->{oai_identifier});
+    is( $oai_row3->{oai_identifier}, 'urn:dummy:OTHER_dataset_importer3', "Synchronised OAI identifier after re-import")
+    or diag($oai_row->{oai_identifier});
 
     BEGIN { $num_tests += 3 }
 

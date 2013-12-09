@@ -22,7 +22,12 @@ echo "config is $METAMOD_MASTER_CONFIG"
 
 #
 
+#OLD_P5=PERL5LIB
+#export PERL5LIB=`pwd`/local/lib/perl5:$PERL5LIB
+
 echo Setting up test environment...
+
+./lsconf SRID_ID_COLUMNS
 
 ./common/prepare_runtime_env.sh
 ok "prepare_runtime_env"
@@ -41,7 +46,7 @@ ok "userbase_add_datasets"
 
 # Run the automatic test suite
 # might add --smolder if we feel like continued use
-perl ./run_automatic_tests.pl --no-pod --jenkins
+PERL5LIB=`pwd`/local/lib/perl5 perl ./run_automatic_tests.pl --no-pod --jenkins
 ok "run_automatic_tests"
 
 
