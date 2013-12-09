@@ -13,7 +13,7 @@ use File::Spec;
 use Test::DatabaseRow;
 use Test::More;
 use Test::File;
-use Test::Files;
+#use Test::Files;
 
 BEGIN {
     $ENV{METAMOD_MASTER_CONFIG} = "$FindBin::Bin/../master_config.txt";
@@ -26,7 +26,7 @@ use Metamod::Test::Setup;
 
 my $num_tests = 0;
 
-my $webrun_dir = File::Spec->catdir($FindBin::Bin, 'webrun');
+my $webrun_dir = File::Spec->catdir($FindBin::Bin, 'webrun'); # not a good idea - should use regular config - FIXME
 my $upload_area = File::Spec->catdir($FindBin::Bin, 'upload');
 my $data_dir = File::Spec->catdir($webrun_dir, 'data' );
 my $metadata_dir = File::Spec->catdir($webrun_dir, 'XML', 'EXAMPLE' );
@@ -163,14 +163,15 @@ my $upload_helper = Metamod::UploadHelper->new();
 {
     my $testname = 'CDL conversion';
 
+    file_exists_ok("$upload_area/hirlam12_valid_cdl.tar.gz", "$testname: hirlam12_valid_cdl.tar.gz exists");
     $upload_helper->process_upload("$upload_area/hirlam12_valid_cdl.tar.gz", 'WEB');
-    diag("$upload_area/hirlam12_valid_cdl.tar.gz");
+    #diag("$upload_area/hirlam12_valid_cdl.tar.gz");
 
     file_exists_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_valid_cdl.nc'), "$testname: Valid CDL processed");
-    diag(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_valid_cdl.nc'));
+    #diag(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_valid_cdl.nc'));
 
     file_exists_ok(File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_valid_cdl.xml'), "$testname: Metadata for valid CDL generated");
-    diag(File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_valid_cdl.xml'));
+    #diag(File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_valid_cdl.xml'));
 
     row_ok( sql => q{SELECT * FROM file WHERE u_id = 1 AND f_name = 'hirlam12_valid_cdl.tar.gz'},
             tests => [ f_size => 4716, f_errurl => qr[/example/htdocs/upl/uerr/.*] ],
@@ -178,13 +179,13 @@ my $upload_helper = Metamod::UploadHelper->new();
     );
 
     $upload_helper->process_upload("$upload_area/hirlam12_invalid_cdl.tar.gz", 'WEB');
-    diag("$upload_area/hirlam12_invalid_cdl.tar.gz");
+    #diag("$upload_area/hirlam12_invalid_cdl.tar.gz");
 
     file_not_exists_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_invalid_cdl.nc'), "$testname: Invalid CDL not processed");
-    diag(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_invalid_cdl.nc'));
+    #diag(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_invalid_cdl.nc'));
 
     file_not_exists_ok(File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_invalid_cdl.xml'), "$testname: Metadata for invalid CDL not generated");
-    diag(File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_invalid_cdl.xml'));
+    #diag(File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_invalid_cdl.xml'));
 
     row_ok( sql => q{SELECT * FROM file WHERE u_id = 1 AND f_name = 'hirlam12_invalid_cdl.tar.gz'},
             tests => [ f_size => 0, f_errurl => qr[/example/htdocs/upl/uerr/.*] ],
@@ -192,7 +193,7 @@ my $upload_helper = Metamod::UploadHelper->new();
     );
 
 
-    BEGIN { $num_tests += 6 }
+    BEGIN { $num_tests += 7 }
 }
 
 

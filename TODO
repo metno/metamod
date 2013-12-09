@@ -15,6 +15,9 @@ points for later.
 
 --------------------
 
+update controllers to use recent catalyst features:
+http://www.catalystframework.org/calendar/2013/1
+
 remove unused config directives:
     all of METAMODQUEST configuration except QUEST_CONFIGURATIONS, QUEST_OUTPUT_DIRECTORY
 	QUEST_METADATA_UPLOAD_FORM
