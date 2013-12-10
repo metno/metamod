@@ -27,7 +27,7 @@ use Metamod::Test::Setup;
 my $num_tests = 0;
 
 my $webrun_dir = File::Spec->catdir($FindBin::Bin, 'webrun'); # not a good idea - should use regular config - FIXME
-my $upload_area = File::Spec->catdir($FindBin::Bin, 'upload_helper_files'); # was 'upload'... TESTING
+my $upload_area = File::Spec->catdir($FindBin::Bin, 'upload'); #
 my $data_dir = File::Spec->catdir($webrun_dir, 'data' );
 my $metadata_dir = File::Spec->catdir($webrun_dir, 'XML', 'EXAMPLE' );
 init_dir_structure();
@@ -52,7 +52,8 @@ my $upload_helper = Metamod::UploadHelper->new();
     is($config->get('WEBRUN_DIRECTORY'), $webrun_dir, "WEBRUN_DIRECTORY is $webrun_dir");
     is($config->get('OPENDAP_BASEDIR' ), "$FindBin::Bin/opendap", "OPENDAP_BASEDIR is $FindBin::Bin/opendap");
     is($config->get('LOG4PERL_CONFIG' ), "$FindBin::Bin/../log4perl_config.ini", "LOG4PERL_CONFIG is $FindBin::Bin/../log4perl_config.ini");
-    BEGIN { $num_tests += 3 };
+    ok( -w $upload_area, "upload directory is writable" );
+    BEGIN { $num_tests += 4 };
 }
 
 
