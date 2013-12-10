@@ -27,7 +27,7 @@ use Metamod::Test::Setup;
 my $num_tests = 0;
 
 my $webrun_dir = File::Spec->catdir($FindBin::Bin, 'webrun'); # not a good idea - should use regular config - FIXME
-my $upload_area = File::Spec->catdir($FindBin::Bin, 'upload');
+my $upload_area = File::Spec->catdir($FindBin::Bin, 'upload_helper_files'); # was 'upload'... TESTING
 my $data_dir = File::Spec->catdir($webrun_dir, 'data' );
 my $metadata_dir = File::Spec->catdir($webrun_dir, 'XML', 'EXAMPLE' );
 init_dir_structure();
@@ -178,6 +178,7 @@ my $upload_helper = Metamod::UploadHelper->new();
             label => "$testname: Valid file upload inserted into userbase",
     );
 
+    file_exists_ok("$upload_area/hirlam12_invalid_cdl.tar.gz", "$testname: hirlam12_invalid_cdl.tar.gz exists");
     $upload_helper->process_upload("$upload_area/hirlam12_invalid_cdl.tar.gz", 'WEB');
     #diag("$upload_area/hirlam12_invalid_cdl.tar.gz");
 
@@ -193,7 +194,7 @@ my $upload_helper = Metamod::UploadHelper->new();
     );
 
 
-    BEGIN { $num_tests += 7 }
+    BEGIN { $num_tests += 8 }
 }
 
 

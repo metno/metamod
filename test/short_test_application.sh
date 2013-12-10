@@ -46,7 +46,7 @@ ok "userbase_add_datasets"
 
 # Run the automatic test suite
 # might add --smolder if we feel like continued use
-PERL5LIB=`pwd`/local/lib/perl5 perl ./run_automatic_tests.pl --no-pod --jenkins --smolder
+PERL5LIB=`pwd`/local/lib/perl5 perl ./run_automatic_tests.pl --no-pod --jenkins
 ok "run_automatic_tests"
 
 
