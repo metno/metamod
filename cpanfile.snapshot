@@ -2653,6 +2653,16 @@ DISTRIBUTIONS
       Filter::Util::Call 0
       Test::More 0
       perl 5.008001
+  Devel-Symdump-2.11
+    pathname: A/AN/ANDK/Devel-Symdump-2.11.tar.gz
+    provides:
+      Devel::Symdump 2.11
+      Devel::Symdump::Export undef
+    requirements:
+      Compress::Zlib 0
+      ExtUtils::MakeMaker 0
+      Test::More 0
+      perl 5.004
   Digest-HMAC-1.03
     pathname: G/GA/GAAS/Digest-HMAC-1.03.tar.gz
     provides:
@@ -5337,6 +5347,20 @@ DISTRIBUTIONS
       Test::More 0.89
       Test::TCP 0
       URI 0
+  Pod-Coverage-0.23
+    pathname: R/RC/RCLAMP/Pod-Coverage-0.23.tar.gz
+    provides:
+      Pod::Coverage 0.23
+      Pod::Coverage::CountParents undef
+      Pod::Coverage::ExportOnly undef
+      Pod::Coverage::Extractor 0.23
+      Pod::Coverage::Overloader undef
+    requirements:
+      Devel::Symdump 2.01
+      ExtUtils::MakeMaker 0
+      Pod::Find 0.21
+      Pod::Parser 1.13
+      Test::More 0
   Readonly-1.03
     pathname: R/RO/ROODE/Readonly-1.03.tar.gz
     provides:
@@ -5974,6 +5998,21 @@ DISTRIBUTIONS
       Test::More 0
       Test::Tester 0.107
       perl 5.006
+  Test-Pod-Coverage-1.08
+    pathname: P/PE/PETDANCE/Test-Pod-Coverage-1.08.tar.gz
+    provides:
+      Nopod undef
+      Nosymbols undef
+      PC_Inherited undef
+      PC_Inherits undef
+      Privates undef
+      Simple undef
+      Test::Pod::Coverage 1.08
+    requirements:
+      ExtUtils::MakeMaker 0
+      Pod::Coverage 0
+      Test::Builder::Tester 0
+      Test::More 0
   Test-Requires-0.06
     pathname: T/TO/TOKUHIROM/Test-Requires-0.06.tar.gz
     provides:
