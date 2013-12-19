@@ -10,6 +10,7 @@ DESTDIR = $(DEBIANDIR)/opt/$(PACKAGENAME)
 
 BUILDDIR = $(CURDIR)/lib-build
 
+# this only works locally, not when checked out from svn
 VERSION: debian/changelog
 	debian/checkVersion.pl -u
 
@@ -24,7 +25,9 @@ deployment:
 
 # Build the actual debian package
 # It is a requirement that this should not produce any svn diffs
-debian_package: deployment VERSION
+debian_package: deployment
+	debian/checkVersion.pl -u
+
 	fakeroot mkdir -p $(DESTDIR)
 
 	fakeroot rsync -aC $(CURDIR)/app/* $(DESTDIR)/app
