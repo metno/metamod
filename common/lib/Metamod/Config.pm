@@ -868,9 +868,9 @@ sub version {
     my $top = <$file>;
     chomp $top;
     close $file;
-    $top =~ /^This is version ([0-9.\-]+) of METAMOD released ([0-9\-]+)/;
-    die "Format error in VERSION file:\n  '$top'" unless $1 && $2;
-    return { number => $1, date => $2 };
+    $top =~ /^This is version ([0-9.\-]+(~\w+)?) of METAMOD released ([0-9\-]+)/;
+    die "Format error in VERSION file:\n  '$top'" unless $1 && $3;
+    return { number => $1, date => $3 };
 }
 
 1;
