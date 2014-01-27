@@ -24,7 +24,7 @@ BEGIN {
         plan skip_all => "Could not connect to the metabase database: " . $helper->errstr();
     }
 
-    plan tests => 28;
+    plan tests => 29;
 
     $metabase = $helper->metabase();
     $helper->setup_environment();
@@ -136,7 +136,16 @@ test_metadata_search(
     'Map search that does not match any datasets.',
 );
 
-TODO: {
+test_metadata_search(
+    {
+        coords => { srid => 4326, x1 => -180, x2 => 180, y1 => 60, y2 => 90 },
+    },
+    1,
+    [ qw( TEST/dataset1 TEST/dataset2 TEST/dataset3 ) ],
+    'Map search using WGS 84',
+);
+
+{
     local $TODO = "can't make work on precise";
 
     test_metadata_search(
@@ -199,6 +208,7 @@ sub test_metadata_search {
     my @actual_names = ();
     while ( my $row = $result->next() ) {
         push @actual_names, $row->ds_name();
+        #printf STDERR " >> %5d %s\n", $row->ds_id, $row->ds_name;
     }
 
     is_deeply( \@actual_names, $expected_names, "$test_name: Dataset names" )

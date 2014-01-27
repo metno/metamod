@@ -98,7 +98,7 @@ sub test {
     { # test MM2
         my $root = $self->{mm2Doc}->getDocumentElement();
         my $nodeList = $xpc->findnodes('/m:MM2', $root);
-        $logger->debug("found ".$nodeList->size()." elements of /m:MM2");
+        #$logger->debug("found ".$nodeList->size()." elements of /m:MM2");
         if ($nodeList->size() == 1) {
             $success++;
         }

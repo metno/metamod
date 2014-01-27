@@ -63,6 +63,10 @@ import_dataset.pl [options] <file or dir>
   Options:
     --config Path to application directory or application config file.
 
+=head1 TODO
+
+Rewrite so can call Metamod::DatasetImporter directly to import file instead of via shell
+
 =cut
 
 my $config_file_or_dir = $ENV{METAMOD_MASTER_CONFIG};

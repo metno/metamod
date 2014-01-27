@@ -289,6 +289,8 @@ sub populate_metabase {
 
     my ($dump_file) = @_;
 
+    #print STDERR "Trying to read $dump_file";
+
     my $success = $self->populate_database($dump_file, 'metamod_unittest' );
 
     return $success;
@@ -396,7 +398,6 @@ sub clean_metabase {
         dataset
         dataset_location
         ds_has_md
-        geometry_columns
         metadata
         numberitem
         oaiinfo
@@ -406,6 +407,7 @@ sub clean_metabase {
         sru.meta_contact
         sru.products
     );
+    # geometry_columns must not be deleted since it's part of postgis
 
     my @reset_sequences = qw(
         dataset_ds_id_seq

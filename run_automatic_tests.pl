@@ -25,9 +25,9 @@ use Pod::Usage;
 my $send_to_smolder = '';
 my $send_to_jenkins = '';
 my $verbose         = '';
-my $coverage        = 1;
+my $coverage        = '';
 my $performance     = '';
-my $pod             = 1;
+my $pod             = '';
 
 GetOptions(
     'smolder'     => \$send_to_smolder,

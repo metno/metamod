@@ -70,7 +70,7 @@ sub check {
     my $flags = $conf->getallflags;
     #print Dumper \$vars;
 
-    # required files/dirs
+    # required files/dirs - FIXME: move to separate function so can be run before prepare_env
     ok( -d $conf->config_dir, 'config directory found');
     ok( -w $$vars{WEBRUN_DIRECTORY}, "WEBRUN_DIRECTORY is writable: $$vars{WEBRUN_DIRECTORY}" );
     ok( -d $$vars{CATALYST_LIB}, "CATALYST_LIB found: $$vars{CATALYST_LIB}" );

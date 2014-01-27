@@ -105,7 +105,7 @@ sub test {
     my $isDIF = 0;
     my $root = $self->{difDoc}->getDocumentElement();
     my $nodeList = $xpc->findnodes('/dif:DIF', $root);
-    $logger->debug("found ".$nodeList->size." nodes with /dif:DIF");
+    #$logger->debug("found ".$nodeList->size." nodes with /dif:DIF");
     if ($nodeList->size() == 1) {
         $isDIF = 1;
     }
