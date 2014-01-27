@@ -27,26 +27,26 @@ echo "config is $METAMOD_MASTER_CONFIG"
 
 echo Setting up test environment...
 
-./lsconf SRID_ID_COLUMNS
+$SCRIPT_PATH/../lsconf SRID_ID_COLUMNS
 
-./common/prepare_runtime_env.sh
+$SCRIPT_PATH/../common/prepare_runtime_env.sh
 ok "prepare_runtime_env"
 
-./base/init/createusers.sh
+$SCRIPT_PATH/../base/init/createusers.sh
 ok "createusers"
 
-./base/init/create_and_load_all.sh
+$SCRIPT_PATH/../base/init/create_and_load_all.sh
 ok "create_and_load_all"
 
-./base/userinit/run_createuserdb.sh
+$SCRIPT_PATH/../base/userinit/run_createuserdb.sh
 ok "run_createuserdb"
 
-./upload/scripts/userbase_add_datasets.pl --operator <./test/directories
+$SCRIPT_PATH/../upload/scripts/userbase_add_datasets.pl --operator < $SCRIPT_PATH/directories
 ok "userbase_add_datasets"
 
 # Run the automatic test suite
 # might add --smolder if we feel like continued use
-PERL5LIB=`pwd`/local/lib/perl5 perl ./run_automatic_tests.pl --no-pod --jenkins
+PERL5LIB=`pwd`/local/lib/perl5 perl $SCRIPT_PATH/../run_automatic_tests.pl --no-pod --jenkins
 ok "run_automatic_tests"
 
 
