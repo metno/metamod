@@ -114,12 +114,12 @@ if ( defined($inputfile) ) {
     #
     if ($@) {
         print STDERR "Error while importing $inputfile : $@\n";
-        $logger->error("$inputfile (single file) database error: $@\n");
+        $logger->error("$inputfile (single file) database error: $@");
         $dbh->rollback or die $dbh->errstr;
     }
     else {
         $dbh->commit or die $dbh->errstr;
-        $logger->info("$inputfile successfully imported (single file)\n");
+        $logger->info("$inputfile successfully imported (single file)");
     }
     $dbh->disconnect;
 }
@@ -133,7 +133,7 @@ sub process_found_file {
     my ($dbh) = @_;
     my $file = $File::Find::name;
     if ($file =~ /\.xm[ld]$/ and -f $file) {
-        $logger->info("$file -accepted\n");
+        $logger->info("$file -accepted");
         my $basename = substr $file, 0, length($file)-4; # remove .xm[ld]
         if ($file eq "$basename.xml" and -f "$basename.xmd") {
             # ignore .xml file, will be processed together with .xmd file
@@ -141,15 +141,15 @@ sub process_found_file {
             # import to database
             eval { update_database( $file ); };
             if ($@) {
-                $dbh->rollback or $logger->logdie( $dbh->errstr . "\n");
+                $dbh->rollback or $logger->logdie( $dbh->errstr );
                 $logger->error("$file database error: $@");
                 if ( my $stm = $dbh->{"Statement"} ) {
-                    $logger->error("SQL Statement: $stm\n");
+                    $logger->error("SQL Statement: < $stm > ");
                 }
             }
             else {
-                $dbh->commit or $logger->logdie( $dbh->errstr . "\n");
-                $logger->info("$basename successfully imported\n");
+                $dbh->commit or $logger->logdie( $dbh->errstr );
+                $logger->info("$basename successfully imported");
             }
         }
     }

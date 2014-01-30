@@ -48,6 +48,7 @@ if( !$performance ){
 
 my $output_file = $send_to_jenkins ? 'test_results' : 'auto_test_result.tar.gz';
 mkdir $output_file if $send_to_jenkins && ! -d $output_file;
+unlink 'log4perl-test.log';
 
 # run Devel::Cover to get some information about the test coverage
 if ($coverage) {
