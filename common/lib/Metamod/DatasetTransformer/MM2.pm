@@ -73,7 +73,7 @@ sub test {
             $self->{mm2Doc} = $self->XMLParser->parse_string($self->{xmlStr}) if $self->{xmlStr};
         }; # do nothing on error, doc stays empty
         if ($@) {
-            $logger->debug("$@\n");
+            $logger->debug($@);
         }
     }
     unless ($self->{xmdDoc} && $self->{mm2Doc}) {

@@ -91,7 +91,7 @@ sub test {
                 $self->{difDoc} = $self->XMLParser->parse_string($self->{xmlStr});
             }; # do nothing on error, $doc stays empty
             if ($@) {
-                $logger->debug("$@\n");
+                $logger->debug($@);
             }
         }
     }
@@ -122,7 +122,7 @@ sub test {
                     $self->{xmdDoc} = $self->XMLParser->parse_string($self->{xmdStr});
                 }; # do nothing on error, $doc stays empty
                 if ($@) {
-                    $logger->debug("$@ during xmdStr parsing\n");
+                    $logger->debug("$@ during xmdStr parsing");
                 }
             }
         }
@@ -133,7 +133,7 @@ sub test {
         if ($nodeList->size() == 1) {
             $isXMD = 1;
         } else {
-            $logger->debug("could not find /d:dataset/d:info/\@ownertag\n");
+            $logger->debug("could not find /d:dataset/d:info/\@ownertag");
         }
     }
     return $isXMD && $isDIF;

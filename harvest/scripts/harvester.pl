@@ -295,7 +295,7 @@ sub process_DIF_records {
     }
 
     my @records = $xpath->findnodes("/oai:OAI-PMH/oai:ListRecords/oai:record", $oaiDoc);
-    $log->debug("Found ", scalar @records, " DIF records\n");
+    $log->debug("Found ", scalar @records, " DIF records");
     my $i;
     foreach my $record (@records) {
         $i++;

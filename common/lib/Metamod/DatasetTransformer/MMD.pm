@@ -58,7 +58,7 @@ sub originalFormat {
 
 sub new {
     if (@_ < 3 || (scalar @_ % 2 != 1)) {
-        croak ("new " . __PACKAGE__ . " needs argument (package, file), got: @_\n");
+        croak ("new " . __PACKAGE__ . " needs argument (package, file), got: @_");
     }
 
     my $XSLT_FILE_MM2 = Metamod::DatasetTransformer::xslt_dir() . 'mmd-to-mm2.xsl';
@@ -90,7 +90,7 @@ sub test {
                 $self->{mmdDoc} = $self->XMLParser->parse_string($self->{xmlStr});
             }; # do nothing on error, $doc stays empty
             if ($@) {
-                $logger->debug("$@\n");
+                $logger->debug($@);
             }
         }
     }
@@ -121,7 +121,7 @@ sub test {
                     $self->{xmdDoc} = $self->XMLParser->parse_string($self->{xmdStr});
                 }; # do nothing on error, $doc stays empty
                 if ($@) {
-                    $logger->debug("$@ during xmdStr parsing\n");
+                    $logger->debug("$@ during xmdStr parsing");
                 }
             }
         }
@@ -132,7 +132,7 @@ sub test {
         if ($nodeList->size() == 1) {
             $isXMD = 1;
         } else {
-            $logger->debug("could not find /d:dataset/d:info/\@ownertag\n");
+            $logger->debug("could not find /d:dataset/d:info/\@ownertag");
         }
     }
     return $isXMD && $isMmd;
@@ -182,7 +182,7 @@ sub transform {
                 $info{$date} .= 'T00:00:00Z';
             }
             if (length $info{$date} != 20) {
-                warn "$date". $info{$date}." not in format YYYY-MM-DDTHH:MM:SSZ\n";
+                warn "$date". $info{$date}." not in format YYYY-MM-DDTHH:MM:SSZ";
             }
         }
         unless ($info{'name'}) {
@@ -206,7 +206,7 @@ sub transform {
                 # bounding_box consists of 4 degree values
                 my @bounding_box = split ',', $bb;
                 if (@bounding_box != 4) {
-                    warn "wrong defined bounding_box: $bb\n";
+                    warn "wrong defined bounding_box: $bb";
                 }
                 my %bb;
                 @bb{qw(east south west north)} = @bounding_box;

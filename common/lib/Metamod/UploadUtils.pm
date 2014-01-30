@@ -120,7 +120,7 @@ sub notify_web_system {
         $msg .= "$path_to_errors_html\t";
         $msg .= "Uploaded basenames:\t";
         $msg .= join "\t", split( "\n", Dumper( \@uploaded_basenames ) );
-        $logger->debug( $msg . "\n" );
+        $logger->debug( $msg );
     }
     my %file_sizes = ();
     my $i1         = 0;

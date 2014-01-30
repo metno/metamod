@@ -158,7 +158,7 @@ die unless $self->config; # remove when stable
     my $ftp_dir_path = $self->config->get('UPLOAD_FTP_DIRECTORY');
     my $logger = $self->logger or die "Missing logger object";
     $logger->info("Processing FTP upload area");
-    $logger->debug("ftp_process_hour: Entered at current_hour: $current_hour\n");
+    $logger->debug("ftp_process_hour: Entered at current_hour: $current_hour");
 
     # Hash containing, for each uploaded file to be processed (full path), the
     # modification time of that file. This hash is re- initialized for each new
@@ -171,7 +171,7 @@ die unless $self->config; # remove when stable
     foreach my $eventkey (@matches) {
         my ( $dataset_name, $hour ) = split( /\s+/, $eventkey );
         my $wait_minutes = $eventsref->{$eventkey};
-        $logger->debug(" [ftp_process_hour] Dataset=$dataset_name, hour=$hour, wait_minutes=$wait_minutes\n");
+        $logger->debug(" [ftp_process_hour] Dataset=$dataset_name, hour=$hour, wait_minutes=$wait_minutes");
         my @files_found = findFiles( $ftp_dir_path, eval 'sub {$_[0] =~ /^\Q$dataset_name\E_/o;}' );
         if ( scalar @files_found == 0 && length($self->shell_command_error) > 0 ) {
             $self->syserrorm( "SYS", "find_fails", "", "ftp_process_hour", "" );
@@ -193,12 +193,12 @@ die unless $self->config; # remove when stable
                     $age_seconds = $current_epoch_time - $modification_time;
                 }
                 $files_to_process{$filename} = $modification_time;
-                $logger->debug(" [ftp_process_hour] File $filename (" . localtime($modification_time) . ") scheduled\n");
+                $logger->debug(" [ftp_process_hour] File $filename (" . localtime($modification_time) . ") scheduled");
             }
         }
         my $filecount = scalar( keys %files_to_process );
         if ( $filecount > 0 ) {
-            $logger->debug("ftp_process_hour: $filecount files from $dataset_name with age $age_seconds\n");
+            $logger->debug("ftp_process_hour: $filecount files from $dataset_name with age $age_seconds");
         }
         if ( $filecount > 0 && $age_seconds > 60 * $wait_minutes ) {
             my $datestring = &get_date_and_time_string( $current_epoch_time - $age_seconds );
@@ -353,7 +353,7 @@ sub process_files {
         my $msg       = "Files to process for dataset $dataset_name at $datestring: ";
         my @files_arr = keys %files_to_process;
         $msg .= join "\t", split( "\n", Dumper( \@files_arr ) );
-        $self->logger->debug( $msg . "\n" );
+        $self->logger->debug( $msg );
     }
 
     my @originally_uploaded = keys %files_to_process;
@@ -379,12 +379,12 @@ sub process_files {
         # Copy uploaded file to the work_start directory
         my $newpath = File::Spec->catfile( $work_start, $baseupldname );
         if ( copy( $uploadname, $newpath ) == 0 ) {
-            die "Copy to workdir did not succeed. Uploaded file: $uploadname, $newpath Error code: $!\n";
+            die "Copy to workdir did not succeed. Uploaded file: $uploadname, $newpath Error code: $!";
         }
 
         # Get type of file and act accordingly:
         my $filetype = getFiletype($newpath);
-        $self->logger->debug("Processing $newpath Filtype: $filetype\n");
+        $self->logger->debug("Processing $newpath Filtype: $filetype");
 
         if ( $filetype =~ /^gzip/ ) {    # gzip or gzip-compressed
 
@@ -457,7 +457,7 @@ sub process_files {
     if ( $self->logger->is_debug ) {
         my $msg = "Unpacked files in the work_flat directory: ";
         $msg .= join "\t", split( "\n", Dumper( \@expanded_files ) );
-        $self->logger->debug( $msg . "\n" );
+        $self->logger->debug( $msg );
     }
 
     #  Convert CDL files to netCDF and then check that all files are netCDF:
@@ -478,7 +478,7 @@ sub process_files {
             $extension = $1;    # First matching ()-expression
         }
         my $filetype = getFiletype($expandedfile);
-        $self->logger->debug("Processing $expandedfile: $filetype\n");
+        $self->logger->debug("Processing $expandedfile: $filetype");
         if ( $filetype eq 'ascii' ) {
             my $errorMsg = remove_cr_from_file($expandedfile);
             if ( length($errorMsg) > 0 ) {
@@ -495,7 +495,7 @@ sub process_files {
                 }
                 my $firstline = <FH>;
                 close FH;
-                $self->logger->debug("Possible CDL-file. Firstline: $firstline\n");
+                $self->logger->debug("Possible CDL-file. Firstline: $firstline");
                 if ( $firstline =~ /^\s*netcdf\s/ ) {
                     my $ncname = substr( $expandedfile, 0, length($expandedfile) - 3 ) . 'nc';
                     if ( scalar grep( $_ eq $ncname, @expanded_files ) > 0 ) {
@@ -526,7 +526,7 @@ sub process_files {
                         }
                         $filetype     = getFiletype($ncname);
                         $expandedfile = $ncname;
-                        $self->logger->debug("Ncgen OK.\n");
+                        $self->logger->debug("Ncgen OK");
                     }
                 } else {
                     $self->syserrorm( "SYSUSER", "text_file_with_cdl_extension_not_a_cdlfile",
@@ -625,7 +625,7 @@ sub process_files {
     MetNo::NcDigest::digest("$work_directory/digest_input", $upload_ownertag, $xmlpath );
 
 #    my $command = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlpath";
-#    $self->logger->debug("RUN:    $command\n");
+#    $self->logger->debug("RUN:    $command");
 #    my $result = $self->shcommand_scalar($command);
 #    if ( defined($result) ) {
 #        open( DIGOUTPUT, ">digest_out" );
@@ -888,7 +888,7 @@ sub validate_tar_components {
     if ( $self->logger->is_debug ) {
         my $msg = "Components of the tar file $tarfile : ";
         $msg .= join "\t", split( "\n", Dumper( \@tarcomponents ) );
-        $self->logger->debug( $msg . "\n" );
+        $self->logger->debug( $msg );
     }
     my %basenames    = ();
     my %orignames    = ();
@@ -1352,7 +1352,7 @@ sub notify_web_system {
         $msg .= "$path_to_errors_html\t";
         $msg .= "Uploaded basenames:\t";
         $msg .= join "\t", split( "\n", Dumper( \@uploaded_basenames ) );
-        $self->logger->debug( $msg . "\n" );
+        $self->logger->debug( $msg );
     }
     my %file_sizes = ();
     my $i1         = 0;
@@ -1545,7 +1545,7 @@ sub clean_up_repository {
             }
             my $directory = $opendap_directory . "/" . $dataset_institution{$dataset}->{'institution'} . "/" . $dataset;
             my @files     = glob( $directory . "/" . $dataset . "_*" );
-            $logger->debug("clean_up_repository directory: $directory\n");
+            $logger->debug("clean_up_repository directory: $directory");
             foreach my $fname (@files) {
                 my @file_stat = stat($fname);
                 if ( scalar @file_stat == 0 ) {
@@ -1556,7 +1556,7 @@ sub clean_up_repository {
                 # Get last modification time of file (seconds since the epoch)
                 my $modification_time = $file_stat[9];
                 if ( $current_epoch_time - $modification_time > 60 * 60 * 24 * $days_to_keep_files ) {
-                    $logger->debug("$fname\n");
+                    $logger->debug($fname);
                     my @cdlcontent = &shcommand_array("ncdump -h $fname");
                     if ( length($self->shell_command_error) > 0 ) {
                         $self->syserrormm( "SYS", "Could not ncdump -h $fname", "", "clean_up_repository", "" );
@@ -1564,14 +1564,14 @@ sub clean_up_repository {
                     }
                     my $lnum = 0;
                     my $lmax = scalar @cdlcontent;
-                    $logger->debug("Line count of CDL file (lmax) = $lmax\n");
+                    $logger->debug("Line count of CDL file (lmax) = $lmax");
                     while ( $lnum < $lmax ) {
                         if ( $cdlcontent[$lnum] eq 'dimensions:' ) {
                             last;
                         }
                         $lnum++;
                     }
-                    $logger->debug("'dimensions:' found at line = $lnum\n");
+                    $logger->debug("'dimensions:' found at line = $lnum");
                     $lnum++;
                     while ( $lnum < $lmax ) {
                         if ( $cdlcontent[$lnum] eq 'variables:' ) {
@@ -1580,7 +1580,7 @@ sub clean_up_repository {
                         $cdlcontent[$lnum] =~ s/=\s*\d+\s*;$/= 1 ;/;
                         $lnum++;
                     }
-                    $logger->debug("'variables:' found at line = $lnum\n");
+                    $logger->debug("'variables:' found at line = $lnum");
                     if ( $lnum >= $lmax ) {
                         $self->syserrorm( "SYS", "Error while changing CDL content from $fname",
                             "", "clean_up_repository", "" );
