@@ -52,8 +52,9 @@ my $upload_helper = Metamod::UploadHelper->new();
     is($config->get('WEBRUN_DIRECTORY'), $webrun_dir, "WEBRUN_DIRECTORY is $webrun_dir");
     is($config->get('OPENDAP_BASEDIR' ), "$FindBin::Bin/opendap", "OPENDAP_BASEDIR is $FindBin::Bin/opendap");
     is($config->get('LOG4PERL_CONFIG' ), "$FindBin::Bin/../log4perl_config.ini", "LOG4PERL_CONFIG is $FindBin::Bin/../log4perl_config.ini");
+    ok( -w $webrun_dir, "webrun directory is writable" );
     ok( -w $upload_area, "upload directory is writable" );
-    BEGIN { $num_tests += 4 };
+    BEGIN { $num_tests += 5 };
 }
 
 
@@ -170,10 +171,12 @@ my $upload_helper = Metamod::UploadHelper->new();
 
     {
         #local $TODO = 'works locally, but not under Jenkins';
-        file_exists_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_valid_cdl.nc'), "$testname: Valid CDL processed");
+        my $cdl = File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_valid_cdl.nc');
+        file_exists_ok($cdl, "$testname: Valid CDL generated in $cdl");
         #diag(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_valid_cdl.nc'));
 
-        file_exists_ok(File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_valid_cdl.xml'), "$testname: Metadata for valid CDL generated");
+        my $meta = File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_valid_cdl.xml');
+        file_exists_ok($meta, "$testname: Metadata for valid CDL generated in $meta");
         #diag(File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_valid_cdl.xml'));
 
         row_ok( sql => q{SELECT * FROM file WHERE u_id = 1 AND f_name = 'hirlam12_valid_cdl.tar.gz'},
