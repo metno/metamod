@@ -402,12 +402,12 @@ sub clean_metabase {
         numberitem
         oaiinfo
         projectioninfo
-        sessions
         wmsinfo
         sru.meta_contact
         sru.products
     );
     # geometry_columns must not be deleted since it's part of postgis
+    # table 'sessions' doesn't exist
 
     my @reset_sequences = qw(
         dataset_ds_id_seq

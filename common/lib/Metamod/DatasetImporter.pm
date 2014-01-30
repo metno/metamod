@@ -194,6 +194,7 @@ sub write_to_database {
         $logger->error("cannot initialize dataset for $inputBaseFile");
         #return;
         my $error_text =  Metamod::Dataset->getErrorText();
+        $logger->error("Cannot initialize dataset for $inputBaseFile : $error_text");
         croak("Cannot initialize dataset for $inputBaseFile : $error_text");
     }
 
@@ -333,6 +334,8 @@ sub _insert_metadata {
     #  Insert metadata:
     #  Metadata with metadata type name not in the database are ignored.
     #
+
+    $logger->debug("Inserting metadata for dataset #$dsid");
     my %dbMetadata = %{ $self->_db_metadata() };
     my %shared_metadatatypes = %{ $self->_shared_metadatatypes() };
     my %rest_metadatatypes = %{ $self->_unshared_metadatatypes() };

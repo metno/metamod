@@ -541,7 +541,7 @@ sub _getVar {
     my ($self, $var) = @_;
 
     if (!exists $self->{vars}{$var}) {
-        my $err = "missing config variable in master_config.txt: $var\n";
+        my $err = "Missing config variable '$var'";
         $_logger_initialised ? $_logger_initialised->warn($err) : warn $err;
     }
     return $self->{vars}{$var};

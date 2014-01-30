@@ -171,12 +171,10 @@ my $upload_helper = Metamod::UploadHelper->new();
 
     {
         #local $TODO = 'works locally, but not under Jenkins';
-        my $cdl = File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_valid_cdl.nc');
-        file_exists_ok($cdl, "$testname: Valid CDL generated in $cdl");
+        file_exists_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_valid_cdl.nc'), "$testname: Valid CDL processed");
         #diag(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_valid_cdl.nc'));
 
-        my $meta = File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_valid_cdl.xml');
-        file_exists_ok($meta, "$testname: Metadata for valid CDL generated in $meta");
+        file_exists_ok(File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_valid_cdl.xml'), "$testname: Metadata for valid CDL generated");
         #diag(File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_valid_cdl.xml'));
 
         row_ok( sql => q{SELECT * FROM file WHERE u_id = 1 AND f_name = 'hirlam12_valid_cdl.tar.gz'},

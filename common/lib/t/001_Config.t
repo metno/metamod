@@ -51,11 +51,11 @@ my $config = Metamod::Config->new($confFile);
 isa_ok($config, 'Metamod::Config');
 can_ok($config, 'get');
 
-ok(!$config->get('NOT_THERE'), 'getting false value + warning on NOT_THERE');
+ok(!$config->has('NOT_THERE'), 'getting false value on NOT_THERE');
 $config->set('NOT_THERE', 'dummyvalue');
 is($config->get('NOT_THERE'), 'dummyvalue', 'setting NOT_THERE');
 $config->unset('NOT_THERE');
-ok(!$config->get('NOT_THERE'), 'unsetting NOT_THERE');
+ok(!$config->has('NOT_THERE'), 'unsetting NOT_THERE');
 
 ok(!$config->has("SOURCE_DIRECTORY"), "not getting obsolete SOURCE_DIRECTORY");
 
