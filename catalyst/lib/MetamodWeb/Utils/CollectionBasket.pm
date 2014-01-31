@@ -118,9 +118,10 @@ sub add_dataset {
 
     my @ds_ids = @{ $self->dataset_ids };
     my %ds_ids = map { $_ => 1 } @ds_ids;
-    my $user   = eval { $self->c->user->u_loginname } || '(none)';
+    my $user   = eval { $self->c->user->u_loginname } || $self->c->req->address || '(none)';
 
     my $dataset = $self->meta_db->resultset('Dataset')->find($ds_id);
+    $self->logger->debug("User $user added dataset $ds_id to basket");
 
     # default to 100 as max number of files
     my $max_files = $self->max_files();
@@ -171,7 +172,7 @@ sub add_dataset {
 
                         # when we reach the maximum we stop even if there might smaller files later.
                         # This probably will seem like less random behaviour.
-                        if( $file_info->{data_file_size} + $current_size > $max_size ){
+                        if( $file_info->{data_file_size}||0 + $current_size > $max_size ){
                             my $msg = 'Could not add all files to the basket since the basket would then exceed the ';
                             $msg .= "allowed maximum size ($max_size bytes).";
                             $self->add_user_msg($msg);
@@ -180,7 +181,7 @@ sub add_dataset {
                             return; # better not to add any files at all if size is too big
                         }
 
-                        $current_size += $file_info->{data_file_size};
+                        $current_size += $file_info->{data_file_size}||0;
                         $ds_ids{$child_ds->ds_id()} = 1;
                         $new_datasets++;
                     }
