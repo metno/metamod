@@ -42,7 +42,14 @@ use lib ("$FindBin::Bin/../../common/lib", '.');
 use Metamod::Config;
 use Getopt::Long;
 use Log::Log4perl qw(:levels);
-use Log::Log4perl::CommandLine qw(:all :noinit);
+#use Log::Log4perl::CommandLine qw(:all :noinit);
+use Log::Log4perl::CommandLine ':all',
+':loginit' => q(
+    log4perl.logger = WARN,  screen
+    log4perl.appender.screen=Log::Log4perl::Appender::Screen
+    log4perl.appender.screen.layout=Log::Log4perl::Layout::PatternLayout
+    log4perl.appender.screen.layout.ConversionPattern=[%-5p] %c %m%n
+);
 use Data::Dumper;
 use Pod::Usage;
 use Try::Tiny;
@@ -166,7 +173,7 @@ BEGIN { # run compile time to avoid nasty "You must call new() once before you c
     if(! Metamod::Config->config_found($config_file_or_dir)){
         pod2usage(1);
     }
-    $config = Metamod::Config->new($config_file_or_dir);
+    $config = Metamod::Config->new($config_file_or_dir, { nolog => 1 });
 }
 
 my $color = defined $opt{color} ? $opt{color} : -t STDOUT; # use IO::Interactive::Tiny instead - FIXME
