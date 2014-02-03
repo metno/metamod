@@ -89,17 +89,17 @@ if ( !defined($var) || $var =~ /(.+)\*$/ ) {
             #printf "- $1 in $_? %d\n",  index( $_, $1);
             delete $vars->{$_} unless index( $_, $1) == 0;
         }
-        #print Dumper $vars;
     }
 } else {
     missing($var) unless $mm_config->has($var);
     if ($split) {
         $vars = $mm_config->split($var); # hashes get separated into one var per key
-        $vars = { $var => $vars } if ref $vars eq 'ARRAY'; # arrays are just a list
-        } else {
+        $vars = { $var => $vars } if ref $vars ne 'HASH'; # arrays are just a list
+    } else {
         $vars = { $var => $mm_config->get($var) };
     }
 }
+#print STDERR Dumper $vars;
 
 # print output
 foreach (sort keys %$vars) {

@@ -417,12 +417,14 @@ sub _splitval {
     my @vals = ();
     s/^\s+//; # remove leading spaces
     #print STDERR " [$_]\n";
-    if ( /^["](.+?)["],?+(.*)$/ or /^['](.+?)['],?(.*)$/ or /^(\S+)(\s+(.*))?$/ ) {
+    if ( /^["](.+?)["],?+(.*)$/ or /^['](.+?)['],?(.*)$/ or /^([^,]+),?(.*)$/ or /^(\S+)(\s+(.*))?$/ ) {
         return $1 unless $2;
         #print STDERR " |$1|$2|\n";
         push @vals, $1;
         my $rest = _splitval($2);
         push @vals, ref $rest ? @{ $rest } : $rest if defined $rest;
+    } else {
+        push @vals, $_;
     }
     #print STDERR Dumper \@vals;
     return \@vals;
