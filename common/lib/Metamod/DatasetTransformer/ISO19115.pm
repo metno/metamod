@@ -149,12 +149,18 @@ sub test {
 
 sub transform {
     my $self = shift;
-    $logger->logcroak("Cannot run transform if test fails") unless $self->test;
 
-    # convert from dif to mm2
-    my ($xmdDoc, $mm2Doc) = $self->{difTransformer}->transform;
+    if ($self->test) {
+        # convert from dif to mm2
+        my ($xmdDoc, $mm2Doc) = $self->{difTransformer}->transform;
+        return ($xmdDoc, $mm2Doc);
+    } else {
+        $logger->error("Cannot run transform if test fails");
+        die "Cannot run transform if test fails";
+    }
 
-    return ($xmdDoc, $mm2Doc);
+
+
 }
 
 1;
@@ -166,7 +172,7 @@ Metamod::DatasetTransformaer::ISO19115 - conversion from ISO19115 to MM2 metadat
 
 =head1 SYNOPSIS
 
-  use Metamod::DatasetTransfomer::ISO19115.pm;
+  use Metamod::DatasetTransformer::ISO19115;
   my $dsT = new Metamod::DatasetTransfomer::ISO19115($xmdStr, $xmlStr);
   my $datasetStr;
   if ($dsT->test) {

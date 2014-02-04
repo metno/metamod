@@ -190,6 +190,7 @@ use Metamod::DBIxSchema::Metabase;
 #use Metamod::DBIxSchema::Userbase;
 
 my $ownertags = $opt{ownertag} || $config->split('DATASET_TAGS');
+#print STDERR Dumper \$ownertags;
 @$ownertags = split( /,/, join(',', @$ownertags) ); # allow comma separated list
 
 my $metadata = $opt{metadata} || [];

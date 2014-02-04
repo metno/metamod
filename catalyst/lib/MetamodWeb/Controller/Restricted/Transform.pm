@@ -99,6 +99,7 @@ sub transform_GET {
 
     my $dapurl = $c->stash->{dapurl};
     $self->logger->debug("Calling OPeNDAP DDX $dapurl ...");
+    $c->detach('Root', 'Bad OPeNDAP URL', [502, $@]) if $dapurl !~ /^http/; # workaround for value 'URL' in database
     my $dap = MetNo::OPeNDAP->new($dapurl);
     my $ddx = eval { $dap->ddx }
         or $c->detach('Root', 'error', [502, $@]); # bad gateway
