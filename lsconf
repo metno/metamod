@@ -47,35 +47,38 @@ use Data::Dumper;
 use Term::ANSIColor;
 use Pod::Usage;
 
-#Getopt::Long::Configure ("bundling");
-my ($help, $split, $config_file_or_dir, $default, $custom, $environment, $duplicates, $flags, $check);
-my $color = -t STDOUT; # use IO::Interactive::Tiny instead - FIXME
-GetOptions(
-    'help'          => \$help,          # for dummies
-    'default!'      => \$default,       # set in default_config
-    'custom!'       => \$custom,        # set in master_config
-    'environment!'  => \$environment,   # set in environment
-    'duplicates!'   => \$duplicates,    # same value set in default and master_config
-    'color!'        => \$color,         # use colors
-    'split'         => \$split,         # split var into key-value pairs
-    'flags!'        => \$flags,         # show flag indicator
-    'check'         => \$check,         # run sanity check
-    'config=s'      => \$config_file_or_dir,
-) or pod2usage(2);
-#print STDERR Dumper [ $help, $split, $config_file_or_dir, $default, $custom, $environment ];
+our $VERSION = do { my @r = (q$LastChangedRevision: 2617 $ =~ /\d+/g); sprintf "0.%d", @r };
 
-pod2usage(1) if $help;
+#Getopt::Long::Configure ("bundling");
+my %opt;
+$opt{color} = -t STDOUT; # use IO::Interactive::Tiny instead - FIXME
+GetOptions(\%opt,
+    'help',         # for dummies
+    'default!',     # set in default_config
+    'custom!',      # set in master_config
+    'environment!', # set in environment
+    'duplicates!',  # same value set in default and master_config
+    'color!',       # use colors
+    'split',        # split var into key-value pairs
+    'flags!',       # show flag indicator
+    'check',        # run sanity check
+    'version',      # run sanity check
+    'config=s',     # use config file
+) or pod2usage(2);
+#print STDERR Dumper \%opt;
+
+pod2usage(1) if $opt{help};
 
 # find config file
-Metamod::Config->config_found($config_file_or_dir) or pod2usage(2);
-my $mm_config = Metamod::Config->new($config_file_or_dir, { nolog => 1 } );
-check($mm_config) if $check;
+Metamod::Config->config_found($opt{config}) or pod2usage(2);
+my $mm_config = Metamod::Config->new($opt{config}, { nolog => 1 } );
+check_conf($mm_config) if $opt{check};
 
 # check color output
-if (defined $color) {
-    $ENV{ANSI_COLORS_DISABLED} = 1 unless $color;
+if (defined $opt{color}) {
+    $ENV{ANSI_COLORS_DISABLED} = 1 unless $opt{color};
 }
-$flags = ! $color unless defined $flags; # use def prefix unless colorized
+$opt{flags} = ! $opt{color} unless defined $opt{flags}; # use def prefix unless colorized
 
 # process argument
 my $var = shift @ARGV;
@@ -92,7 +95,7 @@ if ( !defined($var) || $var =~ /(.+)\*$/ ) {
     }
 } else {
     missing($var) unless $mm_config->has($var);
-    if ($split) {
+    if ($opt{split}) {
         $vars = $mm_config->split($var); # hashes get separated into one var per key
         $vars = { $var => $vars } if ref $vars ne 'HASH'; # arrays are just a list
     } else {
@@ -106,12 +109,12 @@ foreach (sort keys %$vars) {
     my $val = $$vars{$_};
     my $f = $vflags->{$_} || 0;
     # compare truthinesses
-    next if defined $default     && ( ($f & 1)   xor $default );
-    next if defined $custom      && ( ($f & 2)   xor $custom );
-    next if defined $environment && ( ($f & 4)   xor $environment );
-    next if defined $duplicates  && ( ($f & 128) xor $duplicates );
+    next if defined $opt{default}     && ( ($f & 1)   xor $opt{default} );
+    next if defined $opt{custom}      && ( ($f & 2)   xor $opt{custom} );
+    next if defined $opt{environment} && ( ($f & 4)   xor $opt{environment} );
+    next if defined $opt{duplicates}  && ( ($f & 128) xor $opt{duplicates} );
 
-    printf "%08b ", $f if $flags;
+    printf "%08b ", $f if $opt{flags};
     print color $f & 1 ? 'bold green' : 'bold red'; # green if default, else red
     print $_, color 'reset';
     print ' = ', color $f & 128 ? 'bright_red' : $f & 2 ? 'bright_yellow' : 'bright_blue'; # blue if default/generated, yellow if local, red if duplicate
@@ -126,7 +129,8 @@ sub missing {
 }
 
 sub check_conf {
-    Metamod::Config::Sanity::check();
+    my $conf = shift;
+    Metamod::Config::Sanity::check($conf);
     exit;
 }
 
@@ -152,9 +156,11 @@ Variable may end in '*' wildcard. --spilt can only be used with a single variabl
 
 =head2 help
 
+What you're reading here
+
 =head2 config <file>
 
-Use specified config file
+Use specified config file (overrides envvar C<METAMOD_MASTER_CONFIG>)
 
 =head2 split
 
@@ -162,7 +168,9 @@ Split key-value pairs variables. Only works when a single variable name is given
 
 =head2 [no]color
 
-Toggles color display according to flags (default on if terminal)
+Toggles color display according to flags (default on if terminal).
+
+TIP: To show colored output in a pager, use C<lsconf --color|less -R>
 
 =head2 [no]default
 

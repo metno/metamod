@@ -87,7 +87,7 @@ use constant ABS_PATH => Cwd::abs_path(__FILE__);
 #printf STDERR "ABS_PATH = %s\n", ABS_PATH;
 
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
-# works poorly since only detects change of current file
+# only detects change of current file, so cannot be used to determine metamod version
 our $DEBUG = 0;
 
 BEGIN {
@@ -382,8 +382,11 @@ sub is {
 
 =head2 $self->split($varname)
 
-Splits a config variable table into a hash of key/value pairs.
-Value is either a string or a list of strings.
+Splits a config variable separated by newlines, commas or spaces,
+optionally delimited by quotes (single or double – quotes are mandatory for comma separated lists).
+
+If multi-line table,  returns a hash of key/value pairs, where value is either a string or a list of strings.
+If single-line, returns a list, or if only one element, a string.
 
 =cut
 
@@ -412,6 +415,7 @@ sub split {
 }
 
 # recursive function splitting a string separated by spaces, commas and/or quotes
+# returns a string if 1 element, an array if several
 sub _splitval {
     my $_ = shift or return;
     my @vals = ();
@@ -423,6 +427,8 @@ sub _splitval {
         push @vals, $1;
         my $rest = _splitval($2);
         push @vals, ref $rest ? @{ $rest } : $rest if defined $rest;
+    #} else {
+    #    return $_; # does not seem to have any effect
     }
     #print STDERR Dumper \@vals;
     return \@vals;
