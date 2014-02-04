@@ -53,6 +53,10 @@ Look in /etc/apache2/mods-enabled to see if they have already been enabled.
   $ sudo a2enmod proxy_http
   $ sudo a2enmod rewrite
 
+For better performance you should also block spiders from overloading the search
+interface. Copy and optionally modify the file F<app/example/etc/robots.txt>
+into your DocumentRoot directory (must be global for the whole site).
+
 Restart Apache:
 
   $ sudo apache2ctl restart

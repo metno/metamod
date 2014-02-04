@@ -15,6 +15,12 @@ points for later.
 
 --------------------
 
+make custom robots.txt for each install and redirect in apache.conf
+
+change "add to basket" to POST to avoid robots
+
+make virtualenv set mode 755, add option for custom path to binstub
+
 howto customize email addresses in common/lib/t/Metamod/SubscriptionHandler/email_to_file.t
 
 update controllers to use recent catalyst features:

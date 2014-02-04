@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /metamod/search/page
+Disallow: /metamod/subscription
+Disallow: /metamod/search/add_to_basket
+Disallow: /metamod/search/collectionbasket
+Disallow: /metamod/search/fimexdownload

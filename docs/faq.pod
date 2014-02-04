@@ -70,3 +70,23 @@ If some of them are missing, make sure PostGIS is correctly installed and restar
   $ sudo service postgresql restart
 
 =back
+
+=head2 Performance
+
+=head3 Web server setup
+
+=over 4
+
+=item Q: GoogleBot seems to bring down my site!
+
+A: Add the following text to your robots.txt in the DocumentRoot directory
+(changing "metamod" if you have set LOCAL_URL to something else):
+
+  User-agent: *
+  Disallow: /metamod/search/page
+  Disallow: /metamod/subscription
+  Disallow: /metamod/search/add_to_basket
+  Disallow: /metamod/search/collectionbasket
+  Disallow: /metamod/search/fimexdownload
+
+=back
