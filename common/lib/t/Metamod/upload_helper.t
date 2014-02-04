@@ -170,7 +170,7 @@ my $upload_helper = Metamod::UploadHelper->new();
     #diag("$upload_area/hirlam12_valid_cdl.tar.gz");
 
     {
-        #local $TODO = 'works locally, but not under Jenkins';
+        local $TODO = 'works locally, but not under Jenkins';
         file_exists_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_valid_cdl.nc'), "$testname: Valid CDL processed");
         #diag(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_valid_cdl.nc'));
 
