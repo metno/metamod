@@ -38,6 +38,10 @@ Additional setup for servers running METAMOD as an automated service
 
 Upgrading from an older version of METAMOD
 
+=item L<System administration|sysadm>
+
+Common tasks for tuning and maintaining an installed system
+
 =item L<FAQ|faq>
 
 Frequently asked questions (for any definition of frequency)

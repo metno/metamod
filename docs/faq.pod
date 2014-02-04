@@ -2,6 +2,32 @@
 
 Back to L<Index|index>
 
+=head2 Installation issues
+
+=over 4
+
+=item Q: Which other libraries must I install to run METAMOD?
+
+A: When installing from a Debian package: I<NONE>. apt-get will automatically drag in
+all predependencies, and all Perl modules are included in the Debian package.
+
+If you want to run from source, you will find a list of required Debian dependency packages
+in F<debian/control>. The Perl modules are included in Subversion, but must be built using
+Carton as described in L<Installation|installation>.
+
+=item Q: Where can I get some test data to populate the database for testing?
+
+A: Set the config variable IMPORTDIRS before creating the databases. You can find
+some sample datasets included in F<test/xmlinput>.
+
+=item Q: I just found a config variable, but it doesn't seem to be set in either master_config or default_config?
+
+A: METAMOD computes some variables automatically. For a list of current values, run
+
+  $ lsconf --nocustom --nodefault
+
+=back
+
 =head2 Error messages
 
 =head3 Installation
@@ -45,6 +71,8 @@ layer. Check that you have a background map available in the specified projectio
 
 A: Your FIMEX version is out of date. Use 0.41 or later which supports selectVariables.
 
+=back
+
 =head3 PostGIS
 
 =over 4
@@ -77,7 +105,7 @@ If some of them are missing, make sure PostGIS is correctly installed and restar
 
 =over 4
 
-=item Q: GoogleBot seems to bring down my site!
+=item Q: Help! GoogleBot seems to bring down my site!
 
 A: Add the following text to your robots.txt in the DocumentRoot directory
 (changing "metamod" if you have set LOCAL_URL to something else):
@@ -88,5 +116,12 @@ A: Add the following text to your robots.txt in the DocumentRoot directory
   Disallow: /metamod/search/add_to_basket
   Disallow: /metamod/search/collectionbasket
   Disallow: /metamod/search/fimexdownload
+
+=item Q: Metamod/Catalyst/Apache suddenly stopped, and I can't find it when running C<ps aux>
+
+Check that your server hasn't run out of swap. If this happens, the Linux kernel
+will start killing processes arbitrarily. This is very hard to handle locally since
+you won't be able to start new processes, instead you must rely on external monitoring tools
+like Nagios.
 
 =back

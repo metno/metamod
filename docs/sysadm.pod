@@ -1,0 +1,25 @@
+=head1 System administration
+
+Back to L<Index|index>
+
+=head2 Configuration
+
+Keeping track of all necessary config variables in master_config.txt has
+often been the most time-consuming part of setting up a new installation.
+The C<lsconf> tool has been developed to assist with this.
+Here are some examples (using virtualenv):
+
+Checking if your configuration is valid:
+
+    $ lsconf --check
+    # Testing config in /home/anton/metamod/mysite
+    ok 1 - config directory found
+    ok 2 - WEBRUN_DIRECTORY is writable: /home/anton/metamod/webrun
+    [...]
+    ok 37 - OPERATOR_EMAIL is a valid email address
+    1..37
+
+How to get nice color output when using a pager:
+
+    $ lsconf --color | less -R
+

@@ -9,30 +9,30 @@ for the application are decribed. These properties will include:
 
 =over 2
 
-=item
+=item *
 
 Which modules are activated for the application
 
-=item
+=item *
 
 Basic information like domain name and URLs for accessing the web portal, identification
 of the application, directory path for storing runtime information and XML archive, etc.
 
-=item
+=item *
 
 Stylesheets and other web configuration
 
-=item
+=item *
 
 Which search methods available in the metadata data base will be exposed in the web search
 interface, and how metadata are presented to the user.
 
-=item
+=item *
 
 For the base application, overall information on the metadata categories that are searchable
 in the matadata data base.
 
-=item
+=item *
 
 For applications using the UPLOAD module, which metadata will be extracted from the
 uploaded netCDF files.
