@@ -23,3 +23,47 @@ How to get nice color output when using a pager:
 
     $ lsconf --color | less -R
 
+=head2 Dataset administration
+
+=head3 virtualenv
+
+This handy utility, lifted from Ruby and Python, creates a small shell script
+which can be sourced to set all necessary environment variables like
+PERL5LIB and METAMOD_MASTER_CONFIG so you won't have to repeat that for
+every shell command. It also puts most METAMOD commands in your PATH for
+easy access.
+
+    $ /opt/metno-metamod-2.13/virtualenv.pl metamod/config
+    $  . metamod/config/bin/activate
+    (config)$ lsconf
+    (config)$ lsds
+    (config)$ metamod_server
+
+If for some reason you don't have write permissions to the config directory,
+you can specify another path to write the files:
+
+    $ /opt/metno-metamod-2.13/virtualenv.pl metamod/config /home/anton
+
+To reset the environment:
+
+    $  deactivate
+
+
+=head3 lsds
+
+A quick way to query the metadata database without using the web interface
+is to use the C<lsds> command line tool. This will list datasets with
+as much info as can be found in the database. Some search facilities are available,
+but most parameters from the web interface has not been implemented yet.
+
+Some examples of use:
+
+  $ lsds 828 829 830 831                    # list datasets by id
+  $ lsds --full NORMAP/metno-sstana05-V2    # show metadata by name
+  $ lsds -m dataref_OPENDAP                 # list datasets containing a keyword
+  $ lsds -p freetext=ice_conc               # search by free text parameter
+  $ lsds -c -p 'freetext=ice AND arctic'    # boolean search, only show count
+  $ lsds --wms                              # list datasets with wmsinfo and test if valid
+  $ lsds --projectioninfo                   # list datasets with projectioninfo
+  $ lsds --xmlfile                          # list paths to xml files
+

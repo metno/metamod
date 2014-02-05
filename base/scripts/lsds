@@ -166,11 +166,11 @@ my ($config, $logger, %opt, $search_criteria);
 
 BEGIN { # run compile time to avoid nasty "You must call new() once before you can call instance()" bug
 
-    GetOptions(\%opt, 'config=s', 'count|c', 'all_levels', 'find=s', 'full!', 'params|p=s%',
+    GetOptions(\%opt, 'help', 'config=s', 'count|c', 'all_levels', 'f|full!', 'params|p=s%',
                'metadata=s@', 'ownertag=s@', 'wms', 'projectioninfo', 'xmlfile', 'color!', 'id!') or pod2usage(2);
 
     my $config_file_or_dir = $opt{config} || $ENV{METAMOD_MASTER_CONFIG};
-    if(! Metamod::Config->config_found($config_file_or_dir)){
+    if($opt{help} or ! Metamod::Config->config_found($config_file_or_dir)){
         pod2usage(1);
     }
     $config = Metamod::Config->new($config_file_or_dir, { nolog => 1 });
@@ -214,7 +214,7 @@ foreach (keys %{ $opt{params} }) {
         #$$search_criteria{$_} = [ $opt{params}->{$_} ]; # not working
     }
 }
-print STDERR 'search_criteria = ', Dumper $search_criteria;
+#print STDERR 'search_criteria = ', Dumper $search_criteria;
 
 my $search_params = {
         ownertags => $ownertags,

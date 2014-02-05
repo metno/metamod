@@ -45,12 +45,8 @@ use lib "$Bin/common/lib";
 use Metamod::Config; # this depends only on core modules
 use Pod::Usage;
 
-#sub usage {
-#    printf "Usage:$0 <config_dir>\n";
-#    exit 1;
-#}
-
 my $config_dir = $ARGV[0] or pod2usage(1);
+my $install_dir = $ARGV[1] || $config_dir;
 
 if (!Metamod::Config->config_found($config_dir)){
   die "Could not find the configuration on the command line or the in the environment\n";
@@ -58,14 +54,14 @@ if (!Metamod::Config->config_found($config_dir)){
 
 my $config = Metamod::Config->new($config_dir, { nolog => 1 });
 
-if (-f $config_dir) {
-    $config_dir = `dirname $config_dir`;
-    chomp $config_dir;
+if (-f $install_dir) {
+    $install_dir = `dirname $install_dir`;
+    chomp $install_dir;
 }
 
-mkpath "$config_dir/bin";
+mkpath "$install_dir/bin";
 
-open my $file, '>', "$config_dir/bin/activate";
+open my $file, '>', "$install_dir/bin/activate";
 while (<DATA>) {
     s/\[==([A-Z0-9_]+)==\]/$config->get($1)/ge;
     print $file $_;
@@ -79,11 +75,20 @@ B<virtualenv.pl> - check METAMOD master_config
 
 =head1 DESCRIPTION
 
-Perl version of Python's virtualenv, modified to METAMOD environment
+Perl version of Python's virtualenv, modified to METAMOD environment.
+This script will create a file ./bin/activate in your config directory
+(or somewhere else if specified as the second parameter).
+
+This file can later be sourced to set all necessary environment
+variables like PATH, PERL5LIB and METAMOD_MASTER_CONFIG so you won't
+have to repeat that for every shell command.
 
 =head1 USAGE
 
- virtualenv.pl <path_to_config_dir>
+    $ virtualenv.pl <path_to_config_dir> [ <install_dir>]
+    $  source ./bin/activate
+    $  . ./bin/activate 	# short version
+    $  deactivate		# unset environment
 
 =head1 AUTHOR
 
@@ -155,6 +160,7 @@ export METAMOD_MASTER_CONFIG=[==CONFIG_DIR==]
 
 export _OLD_VIRTUAL_PATH="$PATH"
 ROOT=[==INSTALLATION_DIR==]
+PROMPT=`basename [==CONFIG_DIR==]`
 export PATH=$PATH:"$ROOT:$ROOT/base/init":"$ROOT/base/userinit":"$ROOT/base/scripts":"$ROOT/common":"$ROOT/common/scripts":"$ROOT/catalyst/script"
 
 if [ -n "[==CATALYST_LIB==]" ]; then
@@ -164,7 +170,7 @@ fi
 
 if [ -z "$VIRTUAL_ENV_DISABLE_PROMPT" ] ; then
     _OLD_VIRTUAL_PS1="$PS1"
-    export PS1="\033[1;44m([==CONFIG_DIR==])\033[1;m $PS1"
+    export PS1="\033[1;44m($PROMPT)\033[1;m $PS1"
 fi
 
 # This should detect bash and zsh, which have a hash command that must
