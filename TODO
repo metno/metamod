@@ -15,6 +15,9 @@ points for later.
 
 --------------------
 
+try setting <VirtualHost *> in generated httpd.conf to avoid conflict with 000-default
+
+
 make custom robots.txt for each install and redirect in apache.conf
 
 change "add to basket" to POST to avoid robots

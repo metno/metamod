@@ -42,6 +42,8 @@ You may then try to start it as a service:
 
 =head3 Apache
 
+=head4 Proxy setup
+
 Accessing METAMOD directly from Catalyst is usually not possible in production due to
 firewall and load balancing issues; instead a proxy server like Apache is recommended.
 C<./install_jobs.sh> automatically generates the necessary Apache setup files for you.
@@ -53,9 +55,21 @@ Look in /etc/apache2/mods-enabled to see if they have already been enabled.
   $ sudo a2enmod proxy_http
   $ sudo a2enmod rewrite
 
+Note that if you are I<not> running METAMOD as a VirtualHost (i.e. VIRTUAL_HOST is not set
+in master_config), the default Apache config will block all proxy directives defined in conf.d.
+Therefore you must disable the default virtualhost:
+
+  $ sudo a2dissite 000-default
+
+A fix for this is hopefully coming in 2.14.
+
+=head4 Blocking robots
+
 For better performance you should also block spiders from overloading the search
 interface. Copy and optionally modify the file F<app/example/etc/robots.txt>
 into your DocumentRoot directory (must be global for the whole site).
+
+=head4 Testing
 
 Restart Apache:
 
