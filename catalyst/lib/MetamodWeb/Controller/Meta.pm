@@ -59,7 +59,7 @@ Output generated robots.txt
 
 =cut
 
-sub version :Path('/robots.txt') :Args(0) {
+sub robots :Path('/robots.txt') :Args(0) {
     my ($self, $c) = @_;
 
     $c->response->content_type('text/plain');
