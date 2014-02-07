@@ -139,20 +139,6 @@ sub auto :Private {
     return 1;
 }
 
-=head2 version
-
-Displays version information
-
-=cut
-
-sub version :Path('/version') :Args(0) {
-    my ($self, $c) = @_;
-
-    $c->response->content_type('text/plain');
-    my $dir = $c->stash->{mm_config}->get('INSTALLATION_DIR');
-    $c->serve_static_file( "$dir/VERSION" );
-}
-
 =head2 end
 
 Default end action. Attempt to render a view, if needed.

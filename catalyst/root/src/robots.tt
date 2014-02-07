@@ -1,0 +1,9 @@
+[%  USE date;
+    local_url = mm_config.get('LOCAL_URL')
+%]# Generated dynamically by METAMOD on [% date.format %]
+
+User-agent: *
+Disallow: [% local_url %]/search/
+Disallow: [% local_url %]/subscription
+Disallow: /images
+Crawl-delay: 180

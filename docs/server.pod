@@ -63,12 +63,6 @@ Therefore you must disable the default virtualhost:
 
 A fix for this is hopefully coming in 2.14.
 
-=head4 Blocking robots
-
-For better performance you should also block spiders from overloading the search
-interface. Copy and optionally modify the file F<app/example/etc/robots.txt>
-into your DocumentRoot directory (must be global for the whole site).
-
 =head4 Testing
 
 Restart Apache:

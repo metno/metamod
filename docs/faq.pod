@@ -107,17 +107,15 @@ If some of them are missing, make sure PostGIS is correctly installed and restar
 
 =item Q: Help! GoogleBot seems to bring down my site!
 
-A: You need to block parts of the search interface to robots. Copy the file
-app/example/etc/robots.txt to your DocumentRoot directory (changing "metamod"
-if you have set LOCAL_URL to something else) and restart Apache.
+A: You need to block parts of the search interface to robots. METAMOD generates a
+robots.txt dynamically on /metamod/robots.txt and aliases this in the Apache configuration.
 
-If you already have a robots.txt, add the following lines to your
-existing file (warning: work in progress – always check
-app/example/etc/robots.txt for the authorative data):
+If you already have an existing robots.txt file you should disable the alias
+and copy the relevant lines into your own file.
 
-  User-agent: *
-  Disallow: /metamod/search/
-  Disallow: /metamod/subscription/
+Note that if you have a static welcome page served by Apache for the site,
+it is important that you link to C</metamod/> and not C</metamod/search>,
+otherwise robots will not index your datasets.
 
 =item Q: Metamod/Catalyst/Apache suddenly stopped, and I can't find it when running C<ps aux>
 

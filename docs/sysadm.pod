@@ -37,7 +37,7 @@ easy access.
     $  . metamod/config/bin/activate
     (config)$ lsconf
     (config)$ lsds
-    (config)$ metamod_server
+    (config)$ metamodweb_server -dr
 
 If for some reason you don't have write permissions to the config directory,
 you can specify another path to write the files:

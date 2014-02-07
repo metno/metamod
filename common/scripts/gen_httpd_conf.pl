@@ -150,6 +150,8 @@ Alias               $local/upl/uerr     $webrun/upl/uerr
 # as well as system documentation
 Alias               $local/docs         $installation_dir/docs/html
 
+# generated arachnid control
+Alias               /robots.txt         $local/robots.txt
 
 <Directory $installation_dir/docs/html>
     Options Indexes FollowSymLinks MultiViews
