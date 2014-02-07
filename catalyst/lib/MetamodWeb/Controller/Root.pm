@@ -59,7 +59,11 @@ The root page (/) for the Catalyst site. We configure it to send the user direct
 sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->visit( 'Search', 'index' );
+    if ($c->req->user_agent =~ /Googlebot/) {
+        return $c->res->redirect( $c->uri_for( '/dataset/', $c->req->params ), 301 );
+    } else {
+        $c->visit( 'Search', 'index' );
+    }
 
 }
 

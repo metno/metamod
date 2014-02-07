@@ -70,6 +70,11 @@ sub auto :Private {
     $c->stash( debug => $self->logger->is_debug() || $c->req->params->{ debug } );
     push @{ $c->stash->{ css_files } }, $c->uri_for( '/static/css/search.css' );
 
+    if ($c->req->user_agent =~ /Googlebot/) {
+        $self->logger->debug($c->req->user_agent . " is spidering me");
+        $c->detach( 'Root', 'error', [403, 'Forbidden to non-humans'] );
+    }
+
 }
 
 =head2 index
