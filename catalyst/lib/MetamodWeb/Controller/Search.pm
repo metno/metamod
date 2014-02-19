@@ -102,6 +102,7 @@ sub search_criteria : Path('/search') : Args(1) {
     my ( $self, $c, $active_criteria ) = @_;
 
     my $cats = $c->stash->{search_ui_utils}->search_categories();
+    #print STDERR Dumper $cats;
     $c->detach('Root', 'default') unless grep { $_->{sc_idname} eq $active_criteria } @$cats;
 
     # Check for information from the map search

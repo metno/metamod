@@ -21,5 +21,5 @@ BEGIN {
 BEGIN { use_ok 'Catalyst::Test', 'MetamodWeb' }
 BEGIN { use_ok 'MetamodWeb::Controller::Map' }
 
-ok( request('/search/map')->is_success, 'Request should succeed' );
+ok( request('/search/map_search')->is_success, 'Request should succeed' ); # where did /search/map come from?
 done_testing();
