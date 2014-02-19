@@ -17,10 +17,12 @@ points for later.
 
 try setting <VirtualHost *> in generated httpd.conf to avoid conflict with 000-default
 
-
 make custom robots.txt for each install and redirect in apache.conf
+- make disable option in install_jobs.sh
 
 change "add to basket" to POST to avoid robots
+- impossible w/o javascript since search result already a GET form
+- requires complete redesign of UI
 
 make virtualenv set mode 755, add option for custom path to binstub
 

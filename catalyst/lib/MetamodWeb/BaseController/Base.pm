@@ -115,7 +115,6 @@ sub add_info_msgs {
     my ($self, $c, $msgs) = @_;
 
     return $self->_add_msgs($c, 'info_msgs', $msgs );
-
 }
 
 =head2 $self->add_error_msgs($c, $msgs)
@@ -144,7 +143,6 @@ sub add_error_msgs {
     my ($self, $c, $msgs) = @_;
 
     return $self->_add_msgs($c, 'error_msgs', $msgs );
-
 }
 
 sub _add_msgs {
@@ -159,7 +157,8 @@ sub _add_msgs {
         push @{ $curr_msgs }, $msgs;
     }
 
-    $c->flash( $msg_type => $curr_msgs );
+    $c->flash( $msg_type => $curr_msgs ); # rewrite to use Catalyst::Plugin::StatusMessage - FIXME
+    # see http://search.cpan.org/~jjnapiork/Catalyst-Plugin-Session-0.39/lib/Catalyst/Plugin/Session.pm
 
     return;
 }

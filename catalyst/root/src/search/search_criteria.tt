@@ -1,6 +1,9 @@
+
+[%# Template used for displaying the various search forms in the main window area %]
+
 <form name="search" method="GET" action="[% c.uri_for( '/search/page/1/result' ) %]" id="search_form">
 
-<!-- This input element is used to change between the criteria -->
+[%# This input element is used to change between the criteria %]
 <input type="hidden" name="active_criteria" id="active_criteria" />
 
 <div id="search_criteria" class="inside criteria-active-area">

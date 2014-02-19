@@ -78,6 +78,7 @@ sub error :Path {
     $c->response->content_type('text/html');
     $c->response->status($status);
     $c->response->body( "<h1>$status " . status_message($status) . "</h1><p>$message</p>\n" );
+    $c->clear_flash; # get rid of hanging error msgs on subsequent page
 }
 
 =head2 default
@@ -130,6 +131,9 @@ For instance creating objects that are relevant for all requests.
 
 sub auto :Private {
     my ( $self, $c ) = @_;
+
+    # abort security exploit attempts as early as possible in the dispatch chain
+    $c->detach('Root', 'default') if $c->request->path =~/\.(php|cgi|pl|jsp|dll|html)$/;
 
     my $mm_config = Metamod::Config->instance();
 

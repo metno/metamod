@@ -90,14 +90,19 @@ sub index : Path("/search") :Args(0) {
 
 }
 
-=head2 display_search_criteria
+=head2 search_criteria
+
+# formerly display_search_criteria
 
 Action for displaying one of the search criteria forms.
 
 =cut
 
-sub display_search_criteria : Path('/search') : Args(1) {
+sub search_criteria : Path('/search') : Args(1) {
     my ( $self, $c, $active_criteria ) = @_;
+
+    my $cats = $c->stash->{search_ui_utils}->search_categories();
+    $c->detach('Root', 'default') unless grep { $_->{sc_idname} eq $active_criteria } @$cats;
 
     # Check for information from the map search
     my $x_coord = $c->req->params->{ 'map_coord.x' };
@@ -151,22 +156,24 @@ sub display_search_criteria : Path('/search') : Args(1) {
     }
     #print STDERR Dumper \%searchmaps;
 
-    $c->stash( template => 'search/search_criteria.tt',
+    $c->stash( #template => 'search/search_criteria.tt',
                active_criteria => $active_criteria,
                searchmaps =>\%searchmaps,
     );
 }
 
-=head2 display_result
+=head2 search_result
+
+# formerly display_result
 
 Chained action for displaying the search result.
 
 =cut
 
-sub display_result : Chained("perform_search") : PathPart('result') : Args(0) {
+sub search_result : Chained("perform_search") : PathPart('result') : Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->stash( template => 'search/search_result.tt' );
+    #$c->stash( template => 'search/search_result.tt' );
 
 }
 
@@ -179,7 +186,7 @@ Action for displaying the search options form.
 sub search_options : Path('/search/options') : Args(0) {
     my ($self, $c) = @_;
 
-    $c->stash( template => 'search/search_options.tt' );
+    #$c->stash( template => 'search/search_options.tt' );
 }
 
 =head2 perform_search
@@ -194,6 +201,8 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
     my $dataset = $c->model('Metabase::Dataset');
 
     my $curr_page = $c->req->args->[0];
+    $c->detach('Root', 'error', [400, 'Page number must be a positive integer']) unless $curr_page > 0;
+
     my $datasets_per_page = $c->req->params->{ datasets_per_page } || 10;
 
     my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $c, config => $c->stash->{ mm_config } } );
