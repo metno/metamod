@@ -1,4 +1,4 @@
-metno-metamod-2.13 (2.13.10-0) stable; urgency=low
+metno-metamod-2.13 (2.13.10-1) stable; urgency=low
 
   * dynamic search map using WMS
   * improved support for background maps in different projections
@@ -17,7 +17,7 @@ metno-metamod-2.13 (2.13.10-0) stable; urgency=low
   * v8: fix for some XSS vulnerabitilities, wms services with awkward urls and/or inordinate number of layers
   * v9: custom error page, MM2:related_url, workaround for infinite bounding box in reprojection, updated DIF schema, 
   	fixes for oai-pmh, basket URL, missing thredds catalog, wms search map thumbnail
-  * v10: dynamic generation of robots.txt
+  * v10: dynamic generation of robots.txt, faster rejection of illegal intruder requests
 
  -- Geir Aalberg <geira@met.no>  Mon, 03 Jun 2013 11:32:06 +0200
 
