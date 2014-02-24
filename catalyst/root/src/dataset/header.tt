@@ -1,0 +1,3 @@
+<h1 class="std">[% app.dataset.title %]</h1>
+
+<p>[% app.dataset.description %]</p>

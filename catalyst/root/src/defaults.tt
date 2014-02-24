@@ -72,6 +72,17 @@ app = {
 
     }
 
+    dataset = {
+
+        title = "Available datasets"
+
+        description =
+        "This page is primarily intended for search engines as it links to <a href='" _ c.uri_for('/dataset') _
+        "'>all available level 1 datasets</a> and then further to all level 2 datasets.
+        Human users are recommended to use the search interface found <a href='"
+        _ c.uri_for('/search') _ "'>here.</a>"
+    }
+
     email = { # NOT IN USE - current email system doesn't use Template Toolkit
 
         # Text in mail body sent to a dataset owner when errors are found in an

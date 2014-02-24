@@ -1,27 +1,33 @@
-<h1>Information about dataset</h1>
-
-[% IF ds.xmlfile # FIXME formatting %]
-    <a class="btn" href="[% c.uri_for( '/dataset', ds_id, 'xml' ) %]"
-       title="Show raw XML metadata for this file"><span>Show XML</span></a>
-[% END %]
+<h1 class="std">Information about dataset [% ds.ds_id() %]</h1>
 
 <table>
 <tr>
-    <td class="dataset_view"><label>Unqualified dataset name</label></td>
+    <td class="dataset_view">Unqualified dataset name</td>
     <td class="dataset_view">[% ds.unqualified_ds_name() %]</td>
 </tr>
 
 <tr>
-    <td class="dataset_view"><label>Full dataset name</label></td>
+    <td class="dataset_view">Full dataset name</td>
     <td class="dataset_view">[% ds.ds_name() %]</td>
 </tr>
 
-[% IF ds.is_level2_dataset %]
-    <tr>
-        <td class="dataset_view"><label>Parent dataset</label></td>
-        <td class="dataset_view"><a href="[% c.uri_for( '/dataset/' _ ds.ds_parent() _ '/view' ) %]">Parent</a></td>
-    </tr>
+<tr>
+<td class="dataset_header" colspan="2">
+
+[% IF ds.xmlfile %]
+    <a class="btn" href="[% c.uri_for( '/dataset', ds_id, 'xml' ) %]"
+       title="Show XML metadata"><button type="button">XML</button></a>
 [% END %]
+
+[% IF ds.is_level1_dataset %]
+    <a class="btn" href="[% c.uri_for( '/dataset', ds_id, 'rss' ) %]"
+       title="RSS feed for new files in dataset"><button type="button">RSS</button></a>
+[% ELSE %]
+    <a href="[% c.uri_for( '/dataset/' _ ds.ds_parent() _ '/view' ) %]"><button type="button">Parent dataset</button></a>
+[% END %]
+
+</td>
+</tr>
 
 <tr>
 <td class="dataset_header" colspan="2">Metadata</td>
@@ -31,12 +37,16 @@
 [% FOREACH mt_name IN metadata.keys().sort() %]
 
     <tr>
-        <td class="dataset_view"><label>[% mt_name %]</label></td>
-        <td class="dataset_view">[% metadata.$mt_name.join('<br />') %]</td>
+        <td class="dataset_view">[% mt_name %]</td>
+        [% IF mt_name.match('^dataref') %]
+            <td class="dataset_view"><a href="[% metadata.$mt_name.0 %]">[% metadata.$mt_name.0 %]</a></td>
+        [% ELSE %]
+            <td class="dataset_view">[% metadata.$mt_name.join('<br />') %]</td>
+        [% END %]
     </tr>
 [% END %]
 
-[% IF ds.is_level1_dataset() %]
+[% IF ds.child_datasets %]
 
     <tr>
     <td class="dataset_header" colspan="2">Child datasets</td>

@@ -32,6 +32,18 @@
     }
 %]
 
+<!--
+    This link is here to facilitate indexing by search engine by giving and entry point to all datasets in
+    the application. Is it is not meant to be used by humans (but it is not problem if someone actually use it).
+    The link is placed in the search menu under the assumption that if you enabled search you will probably
+    also want to the page to indexable.
+ -->
+<div class="menu-item" style="display_: none;">
+    <a href="[% c.uri_for('/dataset') %]">Browse datasets</a>
+</div>
+[% IF section == 'dataset' %]
+[% INCLUDE "${section}/menu.tt" %]
+[% END %]
 
 [% IF c.user_exists %]
     <div class="menu-item"><a href="[% c.uri_for( '/userprofile' )%]">User profile</a></div>
@@ -43,15 +55,3 @@
 [% ELSE %]
     <div class="menu-item"><a href="[% c.uri_for( '/login', redirect_params )%]">Login</a></div>
 [% END %]
-
-
-
-<!--
-    This link is here to facilitate indexing by search engine by giving and entry point to all datasets in
-    the application. Is it is not meant to be used by humans (but it is not problem if someone actually use it).
-    The link is placed in the search menu under the assumption that if you enabled search you will probably
-    also want to the page to indexable.
- -->
-<div style="display: none;">
-    <a href="[% c.uri_for('/dataset') %]">Browse level 1 datasets</a>
-</div>

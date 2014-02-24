@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+#use WWW::Mechanize;
 use Test::WWW::Mechanize::Catalyst;
 
 use FindBin;
@@ -88,3 +89,14 @@ $mech->text_contains('dataset4', 'Search found matching datasets (num 1, page 2)
 
 $mech->text_unlike( qr/dataset2/, 'Matching dataset only on one page');
 
+##
+
+
+#
+#$mech = WWW::Mechanize->new;
+#$mech->get( '/search/page/0/result?' . $basic_search_params );
+#not_ok( $mech->success, 'Search with bad page number' );
+##is( $mech->base, 'http://petdance.com', 'Proper <BASE HREF>' );
+##is( $mech->title, 'Invoice Status', "Make sure we're on the invoice page" );
+##ok( index( $mech->content( format => 'text' ), 'Andy Lester' ) >= 0, 'My name somewhere' );
+##like( $mech->content, qr/(cpan|perl)\.org/, 'Link to perl.org or CPAN' );

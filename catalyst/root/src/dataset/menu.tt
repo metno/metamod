@@ -1,0 +1,5 @@
+<div class="level2-menu" id="dataset-menu">
+
+<!--<div class="level2-menu-item"><a href="[% c.uri_for('/upload/test') %]">Test a file</a></div>-->
+
+</div>
