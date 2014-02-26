@@ -41,6 +41,12 @@ L<http://proj.maptools.org>
 
 libnetcdf, ncdump and ncgen
 
+=item FIMEX (optional, but recommended)
+
+While not stricly necessary, FIMEX is required for functionality regarding
+transformation and OPeNDAP. However, since it is not available via official Ubuntu
+repositories it is not a required dependency.
+
 =back
 
 =head2 Installation from Debian packages
@@ -89,10 +95,19 @@ If you want to run development versions (recommended), also add:
 Note that the Perl dependencies package metno-perl-webdev-ver1 has been obsoleted from 2.13 onwards.
 Instead all Perl dependency libraries are now included in the Metamod package.
 
+=head3 Installing FIMEX
+
+  $ sudo apt-get install fimex-bin
+
+If repo.met.no is not available, please follow the instructions at
+L<Launchpad|https://launchpad.net/~heiko-klein/+archive/fimex> on how
+to add a PPA to your system.
+
 =head3 Installing packages manually
 
-Alternately you may download the .deb files and install manually. These may be found
-on the following sites:
+Alternately you may download the .deb files and install manually.
+This is not recommended as you will lose automatic upgrading.
+The packages may be found on the following sites:
 
 =over 4
 
