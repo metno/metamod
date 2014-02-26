@@ -47,7 +47,7 @@ sub auto :Private {
     my ( $self, $c ) = @_;
 
     push @{ $c->stash->{ css_files } }, $c->uri_for( '/static/css/dataset.css' );
-    $c->stash( section => 'dataset' );
+    $c->stash( section => 'dataset', 'current_view' => 'Raw', title => 'Dataset' );
 }
 
 =head2 index

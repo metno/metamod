@@ -38,7 +38,7 @@
     The link is placed in the search menu under the assumption that if you enabled search you will probably
     also want to the page to indexable.
  -->
-<div class="menu-item" style="display_: none;">
+<div class="menu-item" style="display: none;">
     <a href="[% c.uri_for('/dataset') %]">Browse datasets</a>
 </div>
 [% IF section == 'dataset' %]

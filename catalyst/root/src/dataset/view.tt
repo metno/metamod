@@ -1,3 +1,6 @@
+[% BLOCK scripts %]
+[% END %]
+
 <h1 class="std">Information about dataset [% ds.ds_id() %]</h1>
 
 <table>

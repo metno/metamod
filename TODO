@@ -15,6 +15,8 @@ points for later.
 
 --------------------
 
+show /dataset with normal view instead of raw unless opened in iframe (so we get nav menus for bots)
+
 try setting <VirtualHost *> in generated httpd.conf to avoid conflict with 000-default
 
 make custom robots.txt for each install and redirect in apache.conf

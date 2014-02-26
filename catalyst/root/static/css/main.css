@@ -14,6 +14,10 @@ body {
     overflow-y: scroll;
 }
 
+body.plain {
+    background-color: white;
+}
+
 div.info_msg {
     border: 1px solid #0b5a00;
     padding: 5px 5px 5px 5px;

@@ -169,3 +169,6 @@ text to come...
 }
 
 %]
+
+[% BLOCK scripts %]
+[% END %]

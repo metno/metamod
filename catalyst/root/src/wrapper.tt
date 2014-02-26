@@ -3,21 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <title>[% title %]</title>
-<link rel="shortcut icon" href="[% c.uri_for('/favicon.ico') %]" />
-<link rel="stylesheet" href="[% c.uri_for('/static/css/reset.css') %]" />
-<link rel="stylesheet" href="[% c.uri_for('/static/css/base.css') %]" />
-<link rel="stylesheet" href="[% c.uri_for('/static/css/golden.css') %]" />
-<link rel="stylesheet" href="[% c.uri_for('/static/css/metamod_theme/jquery-ui.css') %]" />
-<link rel="stylesheet" href="[% c.uri_for('/static/css/main.css') %]" />
-<link rel="stylesheet" href="[% c.uri_for('/static/css/button.css') %]" />
 
-<!-- include any extra style sheets -->
-[% FOREACH file IN css_files %]
-    <link rel="stylesheet" href="[% file %]" />
-[% END %]
-
-<!-- Load the custom style sheet last, so that it can override any style -->
-<link rel="stylesheet" href="[% c.uri_for('/static/css/custom.css') %]" />
+[% INCLUDE 'styles.tt' %]
 
 <script type="text/javascript" src="[% c.uri_for('/static/js/jquery.min.js') %]"></script>
 <script type="text/javascript" src="[% c.uri_for('/static/js/jquery-ui.min.js') %]"></script>

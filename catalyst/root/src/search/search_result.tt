@@ -87,7 +87,7 @@ jQuery(document).ready( function () {
 
             <div class="btns" _class="dataset_actions">
 
-                <a class="btn" href="[% c.uri_for( '/dataset', dataset.ds_id, 'view' ) %]" target="_blank"
+                <a class="visual" href="[% c.uri_for( '/dataset', dataset.ds_id, 'view' ) %]" target="_blank"
                    title="Show metadata for this file"><span>Show metadata</span></a><br clear="all"/>
 
                 [% IF opendap; tsvars = metadata.timeseries.0 %]
@@ -97,7 +97,7 @@ jQuery(document).ready( function () {
                         [% ELSE %]
                             <a class="visual" href="[% c.uri_for('/search/ts', { ds_id => dataset.ds_id, vars => tsvars } ) %]"><span>Time series</span></a><br clear="all"/>
                         [% END %]
-                        <a class="btn" target="_blank" href="[% c.uri_for('/ts', dataset.ds_id, tsvars, 'csv') %]"><span>ASCII</span></a><br clear="all"/>
+                        <a class="visual" target="_blank" href="[% c.uri_for('/ts', dataset.ds_id, tsvars, 'csv') %]"><span>ASCII</span></a><br clear="all"/>
                     [% ELSE %]
                         <a class="visual" href="[% c.uri_for('/search/transform', { ds_id => dataset.ds_id }) %]"><span>Transform</span></a><br clear="all"/>
                     [% END %]
