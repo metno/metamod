@@ -151,7 +151,7 @@ sub ts :Path("/ts") :Args(3) {
 
         if (exists $cols{$name} || $role eq 'timeseries_id') { # skip vars not in request
             my @dim = $nc2->dimensions($v);
-            @dim = grep !/^string$/, @dim;
+            @dim = grep !/^string|maxStrlen64$/, @dim;
             $self->logger->debug("name = $name [", join(', ', @dim), "]\n", Dumper $cols{$name});
 
             foreach my $d (@dim) { # check if should be put in indexes
