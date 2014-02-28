@@ -1,0 +1,26 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!--<!DOCTYPE html>-->
+<!--<html>-->
+<!--DOCTYPE html will cause WMS client to fail-->
+<head>
+    <title>[% title %]</title>
+    [% INCLUDE 'styles.tt' %]
+    <!--link rel="stylesheet" href="style.css" type="text/css" /-->
+    <style type="text/css">
+        .ui-state-default {
+            background-image: url("[% c.uri_for('/static/css/metamod_theme/images/ui-bg_highlight-soft_100_hack_1x100.png') %]") !important;
+        }
+    </style>
+
+    <link rel="stylesheet" href="[% c.uri_for('/static/css/metamod_theme/jquery-ui.css') %]" />
+    <script type="text/javascript" src="[% c.uri_for('/static/js/jquery.min.js') %]"></script>
+    <script type="text/javascript" src="[% c.uri_for('/static/js/jquery-ui.min.js') %]"></script>
+
+    <!--processed scripts-->
+    [% PROCESS scripts %]
+</head>
+
+<body class="plain" onload="[% onload %]">
+    [% content %]
+</body>
+</html>
