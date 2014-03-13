@@ -143,9 +143,32 @@ Now try starting Catalyst by running
   $ ./bin/activate        # if not done already
   $ metamodweb_server.pl
 
-MetamodWeb should now be available on L<http://localhost:3000/>.
-If all set you should see the METAMOD search interface.
-Stop it with ctrl-c.
+MetamodWeb should now be available on L<http://localhost:3000/> using any
+browser running on the same computer. If successful you should see the METAMOD
+search interface in your browser at the above link.
+Stop it with ctrl-c when finished testing.
+
+If using a remote server, use one the following methods for testing:
+
+=over 4
+
+=item *
+
+If lucky and not blocked by firewalls, the link L<http://myserver.example.com:3000/> should work
+
+=item *
+
+try a text-based browser like C<lynx> to browser from the server command line
+
+=item *
+
+use SSH tunnelling:
+
+  ssh -f user@myserver -L 8080:localhost:3000 -N
+
+Then open L<http://localhost:8080/> in your local browser.
+
+=back
 
 =head3 Other METAMOD daemons (FIXME)
 

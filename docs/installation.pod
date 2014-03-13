@@ -295,13 +295,13 @@ Then go to the end of the file and change C<local> from "peer" to "trust" at the
   # maintenance (custom daily cronjobs, replication, and similar tasks).
   #
   # Database administrative login by Unix domain socket
-  #local   all             postgres                                peer
+  #local   all             postgres                                peer  <--- *** CHANGE THIS ***
   local   all             postgres                                trust
 
   # TYPE  DATABASE        USER            ADDRESS                 METHOD
 
   # "local" is for Unix domain socket connections only
-  #local   all             all                                     peer
+  #local   all             all                                     peer  <--- *** AND THIS ***
   local   all             all                                     trust
   # IPv4 local connections:
   host    all             all             127.0.0.1/32            md5
