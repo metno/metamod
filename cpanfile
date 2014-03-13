@@ -26,6 +26,7 @@ requires 'Devel::Cover', 1.00;
 requires 'Geo::Proj4', 1.04;
 requires 'HTML::FormHandler::Model::DBIC', 0.14;
 requires 'HTTP::OAI', 3.27;
+requires 'HTTP::DAV', 0.46;
 requires 'JSON::Any', 1.29;
 requires 'local::lib', '1.008010';
 requires 'Log::Log4perl::CommandLine', 0.07;

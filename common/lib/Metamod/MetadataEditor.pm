@@ -61,8 +61,10 @@ use warnings;
 use LWP::UserAgent; # rewrite to use HTTP::Request - FIXME
 use HTTP::Request;
 
+
 use Metamod::Config;
 use Metamod::MMD;
+use Data::Dumper;
 
 __PACKAGE__->run(@ARGV) unless caller();
 
@@ -86,17 +88,18 @@ sub new {
     my $project = shift || $config->get('APPLICATION_ID') or die "Missing project for metadata editor";
     $self->{'editor_url'} = shift || $config->get('METAEDIT_WS_URL') or die "Missing metadata editor URL";
     $self->{'editor_url'} =~ s/\[PROJECT\]/$project/;
+
     $self->{'DEBUG'} = 1 unless caller();
     return $self;
 }
 
-=head2 $editor->url($datasetname)
+=head2 $editor->editor_url($datasetname)
 
 Return API URL for a given dataset
 
 =cut
 
-sub url {
+sub editor_url {
     my $self = shift;
     my $docname = shift or die "Missing document name";
     my $url = $self->{'editor_url'};
@@ -117,7 +120,7 @@ sub upload_mmd {
     my $self = shift;
     my $docname = shift or die "Missing document name";
     my $mmd = shift or die "Missing document";
-    my $url = $self->url($docname);
+    my $url = $self->editor_url($docname);
 
     # encode XML entitites in $mmd here - FIXME
     # check if string/filehandle/DOM - FIXME
@@ -147,7 +150,7 @@ Download a document from the editor
 sub download_mmd {
     my $self = shift;
     my $docname = shift or die "Missing document name";
-    my $url = $self->url($docname);
+    my $url = $self->editor_url($docname);
 
     my $ua = LWP::UserAgent->new;
     $ua->timeout(180);
@@ -178,14 +181,15 @@ sub run {
 }
 
 sub test {
-    my $file = shift or die;
+    my $file = shift or die "Missing input file parameter";
     #my $config = Metamod::Config->new();
     my $dataset = `basename $file .xml`; # rewrite to use some File::* method
+    chomp $dataset;
 
     my $editor = Metamod::MetadataEditor->new(); # for testing put project into METAEDIT_WS_URL in config
-
     my $doc = Metamod::MMD->new($file)->mmd;
-    print "****\n" . $doc->toString(2);
+    print STDERR "**** $dataset:\n" . $doc->toString(2);
+
     my $GUI_url = $editor->upload_mmd($dataset, $doc->toString);
     print STDERR "Edit at $GUI_url\n";
 

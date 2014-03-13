@@ -3012,6 +3012,17 @@ DISTRIBUTIONS
       Fcntl 1.03
       File::Path 2.06
       File::Spec 0.8
+  File-Which-1.09
+    pathname: A/AD/ADAMK/File-Which-1.09.tar.gz
+    provides:
+      File::Which 1.09
+    requirements:
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      File::Spec 0.60
+      Getopt::Std 0
+      Test::More 0.80
+      Test::Script 1.05
   Filesys-Notify-Simple-0.10
     pathname: M/MI/MIYAGAWA/Filesys-Notify-Simple-0.10.tar.gz
     provides:
@@ -3402,6 +3413,32 @@ DISTRIBUTIONS
       HTTP::Headers::Util 6
       Time::Local 0
       perl 5.008001
+  HTTP-DAV-0.47
+    pathname: C/CO/COSIMO/HTTP-DAV-0.47.tar.gz
+    provides:
+      HTTP::DAV 0.47
+      HTTP::DAV::Comms 0.23
+      HTTP::DAV::Headers 0.23
+      HTTP::DAV::Lock 0.09
+      HTTP::DAV::Resource 0.31
+      HTTP::DAV::ResourceList 0.11
+      HTTP::DAV::Response 0.14
+      HTTP::DAV::UserAgent 0.23
+      HTTP::DAV::Utils 0.11
+    requirements:
+      Cwd 0
+      ExtUtils::MakeMaker 0
+      File::Temp 0
+      Getopt::Long 0
+      LWP 5.48
+      Pod::Usage 0
+      Scalar::Util 0
+      Term::ReadLine 0
+      Text::ParseWords 0
+      Time::Local 0
+      URI 0
+      URI::Escape 0
+      XML::DOM 0
   HTTP-Daemon-6.01
     pathname: G/GA/GAAS/HTTP-Daemon-6.01.tar.gz
     provides:
@@ -3572,6 +3609,28 @@ DISTRIBUTIONS
       File::Temp 0
       Scalar::Util 0
       Test::More 0.88
+  IO-Pager-0.31
+    pathname: J/JP/JPIERCE/IO-Pager-0.31.tgz
+    provides:
+      IO::Pager 0.31
+      IO::Pager::Buffered 0.3
+      IO::Pager::Page 0.16
+      IO::Pager::Unbuffered 0.31
+    requirements:
+      Config 0
+      Env 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      File::Spec 0
+      File::Temp 0
+      File::Which 0
+      IO::Handle 0
+      PerlIO 0
+      SelectSaver 0
+      Symbol 0
+      Test::More 0
+      Tie::Handle 0
+      base 0
   IO-Pipely-0.005
     pathname: R/RC/RCAPUTO/IO-Pipely-0.005.tar.gz
     provides:
@@ -3612,6 +3671,14 @@ DISTRIBUTIONS
       IO::WrapTie::Slave 2.110
     requirements:
       ExtUtils::MakeMaker 0
+  IPC-Run3-0.046
+    pathname: R/RJ/RJBS/IPC-Run3-0.046.tar.gz
+    provides:
+      IPC::Run3 0.046
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0.31
+      Time::HiRes 0
   Image-Size-3.232
     pathname: R/RJ/RJRAY/Image-Size-3.232.tar.gz
     provides:
@@ -5361,6 +5428,15 @@ DISTRIBUTIONS
       Pod::Find 0.21
       Pod::Parser 1.13
       Test::More 0
+  Probe-Perl-0.03
+    pathname: K/KW/KWILLIAMS/Probe-Perl-0.03.tar.gz
+    provides:
+      Probe::Perl 0.03
+    requirements:
+      Config 0
+      ExtUtils::MakeMaker 6.30
+      File::Spec 0
+      strict 0
   Readonly-1.03
     pathname: R/RO/ROODE/Readonly-1.03.tar.gz
     provides:
@@ -6021,6 +6097,19 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 6.42
       Test::More 0.61
       perl 5.006
+  Test-Script-1.07
+    pathname: A/AD/ADAMK/Test-Script-1.07.tar.gz
+    provides:
+      Test::Script 1.07
+    requirements:
+      ExtUtils::MakeMaker 6.42
+      File::Spec 0.80
+      IPC::Run3 0.034
+      Probe::Perl 0.01
+      Test::Builder 0.32
+      Test::Builder::Tester 1.02
+      Test::More 0.62
+      blib 0
   Test-SharedFork-0.21
     pathname: T/TO/TOKUHIROM/Test-SharedFork-0.21.tar.gz
     provides:
@@ -6485,6 +6574,47 @@ DISTRIBUTIONS
       Fcntl 0
       URI 1.10
       perl 5.008001
+  XML-DOM-1.44
+    pathname: T/TJ/TJMATHER/XML-DOM-1.44.tar.gz
+    provides:
+      CheckAncestors undef
+      CmpDOM undef
+      XML::DOM 1.44
+      XML::DOM::AttDef undef
+      XML::DOM::AttlistDecl undef
+      XML::DOM::Attr undef
+      XML::DOM::CDATASection 1.44
+      XML::DOM::CharacterData undef
+      XML::DOM::Comment 1.44
+      XML::DOM::DOMException undef
+      XML::DOM::DOMImplementation 1.44
+      XML::DOM::Document undef
+      XML::DOM::DocumentFragment 1.44
+      XML::DOM::DocumentType undef
+      XML::DOM::Element undef
+      XML::DOM::ElementDecl undef
+      XML::DOM::Entity undef
+      XML::DOM::EntityReference undef
+      XML::DOM::NamedNodeMap undef
+      XML::DOM::Node undef
+      XML::DOM::NodeList undef
+      XML::DOM::Notation undef
+      XML::DOM::Parser 1.44
+      XML::DOM::PerlSAX undef
+      XML::DOM::PrintToFileHandle 1.44
+      XML::DOM::PrintToString 1.44
+      XML::DOM::ProcessingInstruction undef
+      XML::DOM::Text 1.44
+      XML::DOM::XMLDecl undef
+      XML::Handler::BuildDOM undef
+      XML::Parser::Dom 1.44
+      XML::XQL::Node 1.44
+    requirements:
+      ExtUtils::MakeMaker 0
+      LWP::UserAgent 0
+      XML::Parser 2.30
+      XML::Parser::PerlSAX 0.07
+      XML::RegExp 0
   XML-Filter-BufferText-1.01
     pathname: R/RB/RBERJON/XML-Filter-BufferText-1.01.tar.gz
     provides:
@@ -6601,6 +6731,12 @@ DISTRIBUTIONS
       UNIVERSAL::require 0
       XML::LibXML 1.66
       XML::LibXML::XPathContext 0
+  XML-RegExp-0.04
+    pathname: T/TJ/TJMATHER/XML-RegExp-0.04.tar.gz
+    provides:
+      XML::RegExp 0.04
+    requirements:
+      ExtUtils::MakeMaker 0
   XML-SAX-0.99
     pathname: G/GR/GRANTM/XML-SAX-0.99.tar.gz
     provides:
@@ -6794,6 +6930,32 @@ DISTRIBUTIONS
       URI::Escape 0
       WWW::RobotRules 6
       perl 5.008001
+  libxml-perl-0.08
+    pathname: K/KM/KMACLEOD/libxml-perl-0.08.tar.gz
+    provides:
+      Data::Grove 0.08
+      Data::Grove::Characters 0.08
+      Data::Grove::Parent 0.08
+      Data::Grove::ParentList 0.08
+      Data::Grove::Visitor 0.08
+      MyHandler undef
+      XML::ESISParser 0.08
+      XML::Handler::CanonXMLWriter 0.08
+      XML::Handler::Sample undef
+      XML::Handler::Subs 0.08
+      XML::Handler::XMLWriter 0.08
+      XML::Parser::PerlSAX 0.08
+      XML::PatAct::ACTION undef
+      XML::PatAct::Amsterdam 0.08
+      XML::PatAct::MatchName 0.08
+      XML::PatAct::PATTERN undef
+      XML::PatAct::ToObjects 0.08
+      XML::Perl2SAX 0.08
+      XML::SAX2Perl 0.08
+      libxml::perl undef
+    requirements:
+      ExtUtils::MakeMaker 0
+      XML::Parser 2.19
   local-lib-1.008018
     pathname: E/ET/ETHER/local-lib-1.008018.tar.gz
     provides:
