@@ -49,7 +49,7 @@ repositories it is not a required dependency.
 
 =back
 
-=head2 Installation from Debian packages
+=head2 Installation from Debian repository
 
 This requires you have sufficient sudo privileges to install packages and
 add repositories.
@@ -102,6 +102,17 @@ Instead all Perl dependency libraries are now included in the Metamod package.
 If repo.met.no is not available, please follow the instructions at
 L<Launchpad|https://launchpad.net/~heiko-klein/+archive/fimex> on how
 to add a PPA to your system.
+
+=head3 Setting up automatic upgrades
+
+This should enable unattended upgrades of all packages. Note that even though
+a METAMOD package is upgraded, you still need to restart the services manually
+(this cannot be automated since METAMOD has no idea how many instances you
+have created).
+
+  sudo apt-get install unattended-upgrades
+  sudo dpkg-reconfigure unattended-upgrades
+  # Answered Yes
 
 =head3 Installing packages manually
 
@@ -252,15 +263,21 @@ Look in /etc/apache2/mods-enabled to see if they have already been enabled.
 =head2 Installing the PostgreSQL database
 
 METAMOD requires two databases, one for metadata (which is just an index and can be recreated from the XML files)
-and one for user credentials (which is authorative and must be backed up).
+and one for user credentials (which is authorative and must be backed up). These may reside on the same server
+as METAMOD, but in production environments are usually running on a separate database server (specified by PG_HOST
+in the config.)
 
 =head3 Required software
 
-The following Debian packets must be installed on the server:
+The following Debian packets must be installed on the B<database> server:
 
 =over 4
 
 =item * postgresql
+
+=item * postgresql-contrib
+
+=item * postgis
 
 (Defaults to the current version)
 
@@ -270,12 +287,17 @@ The following Debian packets must be installed on the server:
 
 =back
 
-In addition, the following files must be copied to the METAMOD application server and configured in
-C<PG_POSTGIS_SCRIPT> and C<PG_POSTGIS_SYSREF_SCRIPT> so that createdb.sh can read them:
+In addition if running a separate database server, the following files
+must be copied to the METAMOD application server and configured in
+C<PG_POSTGIS_SCRIPT> and C<PG_POSTGIS_SYSREF_SCRIPT> so that createdb.sh
+can read them:
 
   /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
   /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
 
+Unfortunately it is not possible to install these files via Debian automatically
+as a) the postgresql-client version may not be the same as the postgresql server,
+and b) it would drag in postgresql server as a dependency.
 This will hopefully be resolved more elegantly in a later version.
 
 =head3 Authentication (FIXME)
