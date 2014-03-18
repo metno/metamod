@@ -80,7 +80,7 @@ sub new {
     #print STDERR "Opening $self->{'url'} for business\n";
 
     $self->{'dav'} = HTTP::DAV->new();
-    $self->{'dav'}->DebugLevel(3);
+    $self->{'dav'}->DebugLevel(1);
     $self->{'dav'}->credentials(
         -user  => $config->get('METAEDIT_SVN_DAV_USER'),
         -pass  => $config->get('METAEDIT_SVN_DAV_PASSWORD'),
@@ -113,18 +113,16 @@ sub find {
     my %docs;
 
     if ( my $r = $d->propfind( -url => $self->{'url'}, -depth => 1) ) {
-        ## Print collection or content length
         if ( $r->is_collection ) {
             my $rlist = $r->get_resourcelist;
             #printf STDERR "Collection: %s %s\n", ref $rlist, $rlist->as_string;
             foreach ($rlist->get_resources) {
-                my $uri = $_->get_uri->rel( $self->{'url'} )->as_string;
-                $docs{$uri} = { modified => $_->get_property('lastmodifieddate') };
+                my $uri = $_->get_property('rel_uri'); # $_->get_uri->rel( $self->{'url'} )->as_string;
+                $docs{$uri} = { lastmodified => $_->get_property('lastmodifiedepoch') };
             }
         } else {
-            #printf STDERR "Length: %s\n", $r->get_property("getcontentlength");
-            my $uri = $r->get_uri->rel( $self->{'url'} )->as_string;
-            $docs{$uri} = { modified => $r->get_property('lastmodifieddate') };
+            my $uri = $r->get_property('rel_uri'); # $r->get_uri->rel( $self->{'url'} )->as_string;
+            $docs{$uri} = { lastmodified => $r->get_property('lastmodifiedepoch') };
         }
         return \%docs;
     } else {
@@ -132,7 +130,7 @@ sub find {
     }
 }
 
-=head2 $resource->get()
+=head2 $resource->get($docname)
 
 Download a document from the SVN repo
 
@@ -143,15 +141,15 @@ sub get {
     my $docname = shift or die "Missing resource name";
     my $xml;
     my $dav = $self->{'dav'};
-    my $url = $self->{'url'};
-    $dav->get("$url/$docname", \$xml) or die "cannot, MODE|EXPR, LIST) or die EXPR GET from $url: ". $dav->message;
+    my $url = $self->{'url'} . "$docname.xml";
+    $dav->get($url, \$xml) or die "cannot GET from $url: ". $dav->message;
     #print "$xml\n";
     return $xml;
 }
 
-=head2 $editor->put($doc)
+=head2 $resource->put($doc)
 
-=head2 $editor->put($doc, $docname)
+=head2 $resource->put($doc, $docname)
 
 Upload a document to the SVN repo.
 
@@ -161,12 +159,28 @@ $doc may be filename or ref to XML string; in the latter case $docname is requir
 
 sub put {
     my $self = shift;
-    my $doc = shift or die "Missing document";
-    my $docname = shift || '';
+    my $doc = shift or die "Missing document filename";
+    my $docname = shift;
     die "Missing document name" if ref $doc && !$docname;
-    my $url = $self->{'url'} . $docname;
+    my $url = $self->{'url'};
+    $url .= "$docname.xml" if $docname;
     my $dav = $self->{'dav'};
     $dav->put($doc, $url) or die "cannot PUT to $url: ". $dav->message;
+    return $dav->is_success;
+}
+
+=head2 $resource->delete($docname)
+
+Delete a document in the SVN repo.
+
+=cut
+
+sub delete {
+    my $self = shift;
+    my $docname = shift or die "Missing document name";
+    my $url = $self->{'url'} . "$docname.xml";
+    my $dav = $self->{'dav'};
+    $dav->delete($url) or die "cannot DELETE $url: ". $dav->message;
     return $dav->is_success;
 }
 
@@ -183,6 +197,7 @@ sub run {
         test($file);
     } else {
         print STDERR "Usage: perl $0 <xmlfile>\n";
+        exit 1;
     }
 }
 
@@ -192,13 +207,27 @@ sub test {
     chomp $dataset;
 
     my $r = Metamod::MMD::DAV->new();
-    print Dumper $r->find();
+    my $coll = $r->find();
 
-    #eval { $r->put($file) } or die $@;
-    #my $doc = eval { $r->get("$dataset.xml") } or die $@;
+    if (my $lastmod = $$coll{"$dataset.xml"}->{'lastmodified'}) {
+        printf STDERR "%s: <<%s<< >>%s>>\n", $dataset, scalar localtime( (stat($file))[10] ), scalar localtime($lastmod);
+        my $doc = $r->get($dataset);
+        print $doc;
+        eval {
+            $r->put($file, 'dummy_test');
+            my $doc2 = $r->get('dummy_test');
+            print $doc2;
+            $r->delete('dummy_test');
+        } or die $@;
+    } else {
+        eval {
+            $r->put($file);
+            my $doc = $r->get($dataset);
+            $r->delete($dataset);
+        } or die $@;
+    }
+
     #eval { $r->put(\$doc, 'test2.xml') } or die $@;
-
-
 }
 
 =head1 AUTHOR

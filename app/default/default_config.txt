@@ -652,4 +652,6 @@ NEW_USER_GREETING =
 # =============== Metadataeditor configuration ================
 
 #METAEDIT_WS_URL = http://metaedit.met.no/metadataeditor/service/metaedit_api/[PROJECT]/[DATASET]
-
+#METAEDIT_SVN_DAV = http://svn.met.no/svn/metamodtest/XML/
+#METAEDIT_SVN_DAV_USER = metamod
+#METAEDIT_SVN_DAV_PASSWORD = secret

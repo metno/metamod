@@ -168,7 +168,7 @@ sub register : Path('register') :Args(0) {
         @roles = qw(subscription upload);
     }
 
-    $self->logger->info( "User registration attempt:" . $valid_fields->{realname} . ' ' . 
+    $self->logger->info( "User registration attempt:" . $valid_fields->{realname} . ' ' .
                          $valid_fields->{register_username} );
 
     if ($mm_config->get('JUNK_REGISTRATION') ne 'name_eq_loginname' or
@@ -452,7 +452,7 @@ END_BODY
 
     Metamod::Email::send_simple_email(
         to => [ $operator_email ],
-        from => 'dummy@example.com',
+        from => $operator_email,
         subject => "$application_name new role requested",
         body => $email_body,
     );

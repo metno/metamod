@@ -14,6 +14,7 @@ just as an electronic Post-It note for developers to quickly note action
 points for later.
 
 --------------------
+use compressed version of openlayers lib
 
 rewrite to use libnetcdf instead of fimex for opendap
 	https://publicwiki.deltares.nl/display/OET/OPeNDAP+access+with+perl
