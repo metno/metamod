@@ -176,7 +176,7 @@ use Metamod::FimexProjections;
 
 my $logger = Log::Log4perl::get_logger(__PACKAGE__);
 
-=head2 $self->unqualified_ds_name()
+=head2 $ds->unqualified_ds_name()
 
 Returns the dataset name without any qualification like DAMOC or similar. If
 the ds name is not qualified it just returns C<ds_name>.
@@ -197,7 +197,7 @@ sub unqualified_ds_name {
 
 }
 
-=head2 $self->metadata( [ $metadata_names ] )
+=head2 $ds->metadata( [ $metadata_names ] )
 
 Get metadata associated with the dataset.
 
@@ -256,7 +256,7 @@ sub metadata {
     return \%metadata;
 }
 
-=head2 $self->xmlfile()
+=head2 $ds->xmlfile()
 
 Returns the path to the XML file if exists, otherwise undef
 
@@ -274,7 +274,7 @@ sub xmlfile {
     return $path if -r $path;
 }
 
-=head2 $self->projectioninfo()
+=head2 $ds->projectioninfo()
 
 Returns projectioninfo object of either self or parent
 
@@ -289,7 +289,7 @@ sub projectioninfo {
     return $dom;
 }
 
-=head2 $self->projectioninfos() [DEPRECATED]
+=head2 $ds->projectioninfos() [DEPRECATED]
 
 Returns projectioninfo resultset of either self or parent
 
@@ -300,7 +300,7 @@ sub projectioninfos {
     return $self->selfprojectioninfos() || $self->parentprojectioninfos();
 }
 
-=head2 $self->fimex_projections($config)
+=head2 $ds->fimex_projections($config)
 
 Returns a Metamod::FimexProjections object (never null).
 
@@ -328,7 +328,7 @@ sub fimex_projections {
     return $projinfo;
 }
 
-=head2 $self->wmsinfo()
+=head2 $ds->wmsinfo()
 
 Returns the C<wi_content> XML DOM for the dataset if it has any Wmsinfo. Returns undef otherwise.
 
@@ -366,7 +366,7 @@ sub wmsinfo {
 
 }
 
-=head2 $self->wmsurl()
+=head2 $ds->wmsurl()
 
 Returns the WMS URL for the dataset if it has any Wmsinfo, or undef otherwise.
 The URL is given in either the B<aggregate_url> or B<url> attribute depending on level 1 or 2 dataset.
@@ -473,7 +473,7 @@ sub wmsurl {
 }
 
 
-=head2 $self->is_level1_dataset()
+=head2 $ds->is_level1_dataset()
 
 =over
 
@@ -492,7 +492,7 @@ sub is_level1_dataset {
 
 }
 
-=head2 $self->is_level2_dataset()
+=head2 $ds->is_level2_dataset()
 
 =over
 
@@ -511,7 +511,7 @@ sub is_level2_dataset {
 
 }
 
-=head2 $self->num_children()
+=head2 $ds->num_children()
 
 =over
 
@@ -530,7 +530,7 @@ sub num_children {
 
 }
 
-=head2 $self->file_location($config) (DEPRECATED?)
+=head2 $ds->file_location($config) (DEPRECATED?)
 
 Calculate the file location where the dataset is located if possible.
 
@@ -565,7 +565,23 @@ sub file_location {
 
 }
 
-=head2 $self->external_ts_url($config)
+=head2 $ds->opendap_url
+
+Returns the OPENDAP dataref URL (if valid), else undef
+
+=cut
+
+sub opendap_url {
+    my $self = shift;
+
+    my $metadata = $self->metadata( ['dataref_OPENDAP'] );
+    if (my $opendap = $metadata->{dataref_OPENDAP}->[0]) {
+        print STDERR "-- OPENDAP: $opendap\n";
+        return $opendap if $opendap =~ m|^http(s)?://|;
+    }
+}
+
+=head2 $ds->external_ts_url($config)
 
 Calculate URL to external timeseries plot if available (must be set in TIMESERIES_URL in master_config)
 
@@ -581,7 +597,7 @@ sub external_ts_url {
     my $tsurl = $config->get('TIMESERIES_URL') or return;
 
     my $metadata = $self->metadata( ['dataref_OPENDAP', 'timeseries'] );
-    my $opendap = $metadata->{dataref_OPENDAP}->[0] or return;
+    my $opendap = $self->opendap_url or return;
     my $tsvars  = $metadata->{timeseries}->[0] || $self->parent_dataset->metadata->{timeseries}->[0];
 
     $tsurl =~ s/\[OPENDAP\]/$opendap/;

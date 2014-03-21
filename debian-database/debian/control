@@ -1,16 +1,16 @@
-Source: metno-metamoddb-2.10
+Source: metno-metamoddb-2.13
 Priority: extra
-Maintainer: Heiko Klein <heiko.klein@met.no>
+Maintainer: Geir Aalberg <geira@met.no>
 Build-Depends: debhelper (>=5)
 Standards-Version: 3.7.3
 Section: web
 
-Package: metno-metamoddb-2.10
+Package: metno-metamoddb-2.13
 Section: web
 Priority: optional
 Architecture: all
 Essential: no
-Depends: postgresql, postgresql-contrib, postgis, postgresql-8.4-postgis | postgresql-8.3-postgis
+Depends: postgresql, postgresql-contrib, postgis, postgresql-9.1-postgis
 Recommends: postgresql-client
 Suggests:
 Conflicts:

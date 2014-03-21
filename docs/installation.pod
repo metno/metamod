@@ -287,6 +287,10 @@ The following Debian packets must be installed on the B<database> server:
 
 =back
 
+The simplest way to install all the above is using the virtual metamoddb package:
+
+  $ sudo apt-get install metno-metamoddb-2.13
+
 In addition if running a separate database server, the following files
 must be copied to the METAMOD application server and configured in
 C<PG_POSTGIS_SCRIPT> and C<PG_POSTGIS_SYSREF_SCRIPT> so that createdb.sh

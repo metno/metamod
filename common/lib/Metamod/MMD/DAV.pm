@@ -80,7 +80,6 @@ sub new {
     #print STDERR "Opening $self->{'url'} for business\n";
 
     $self->{'dav'} = HTTP::DAV->new();
-    $self->{'dav'}->DebugLevel(1);
     $self->{'dav'}->credentials(
         -user  => $config->get('METAEDIT_SVN_DAV_USER'),
         -pass  => $config->get('METAEDIT_SVN_DAV_PASSWORD'),
@@ -207,6 +206,7 @@ sub test {
     chomp $dataset;
 
     my $r = Metamod::MMD::DAV->new();
+    $r->{'dav'}->DebugLevel(1);
     my $coll = $r->find();
 
     if (my $lastmod = $$coll{"$dataset.xml"}->{'lastmodified'}) {

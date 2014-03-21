@@ -46,7 +46,7 @@
         SET child_metadata = child.metadata( diff_names );
         SET dummy = diff_names.pop(); # ?
         SET dummy = diff_names.pop(); # ?
-        SET opendap = child.metadata(['dataref_OPENDAP']).dataref_OPENDAP.0;
+        SET opendap = child.opendap_url;
         SET dataref = child.metadata(['dataref']).dataref.0;
     %]
     <td class="sub_result">
