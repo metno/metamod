@@ -576,7 +576,7 @@ sub opendap_url {
 
     my $metadata = $self->metadata( ['dataref_OPENDAP'] );
     if (my $opendap = $metadata->{dataref_OPENDAP}->[0]) {
-        print STDERR "-- OPENDAP: $opendap\n";
+        #print STDERR "-- OPENDAP: $opendap\n";
         return $opendap if $opendap =~ m|^http(s)?://|;
     }
 }

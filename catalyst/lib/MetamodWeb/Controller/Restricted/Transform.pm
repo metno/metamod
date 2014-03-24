@@ -87,7 +87,7 @@ sub transform :Path('/search/transform') :ActionClass('REST') :Args {
     }
     my $ds = $c->model('Metabase::Dataset')->find($para)
         or $c->detach('Root', 'error', [404, "Dataset not found"]);
-    my $dapurl = $ds->metadata()->{'dataref_OPENDAP'}->[0]
+    my $dapurl = $ds->opendap_url()
         or $c->detach('Root', 'error', [501, "Missing OPeNDAP URL in dataset"]);
     $c->stash( dapurl => $dapurl, dataset => $ds );
 

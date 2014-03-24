@@ -120,7 +120,7 @@ sub ts :Path("/ts") :Args(3) {
     $MetNo::Fimex::DEBUG = 0; # turn off debug or nothing will happen
 
     my $ds = $c->model('Metabase::Dataset')->find($ds_id) or $c->detach('Root', 'default');
-    my $dapurl = $ds->metadata()->{'dataref_OPENDAP'}->[0] or $c->detach('Root', 'default');
+    my $dapurl = $ds->opendap_url() or $c->detach('Root', 'default');
 
     # setup fimex to fetch data via opendap
     my $f = new MetNo::Fimex(
