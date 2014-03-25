@@ -39,13 +39,14 @@ Metamod::Config::Sanity - sanity check the configuration environment
 
 =head1 SYNOPSIS
 
-  use Metamod::Config::Sanity;
-
-...
+    use Metamod::Config::Sanity qw(check);
+    my $conf =  Metamod::Config->new( $configfile, { nolog => 1 } );
+    Metamod::Config::Sanity::check($conf);
 
 =head1 DESCRIPTION
 
-Checks the most important variables are set correctly.
+Checks the most important variables are set correctly, and deprecated
+variables unset. Prints TAP output, can be used as unit test.
 
 =head1 FUNCTIONS
 
@@ -62,6 +63,12 @@ use strict;
 use Metamod::Config;
 use Test::More;
 use Data::Validate::Email qw(is_email);
+
+=head2 check( [$filename] )
+
+Run tests on config singleton, optionally given path to master_config.txt explicitly
+
+=cut
 
 sub check {
     my $conf = shift || Metamod::Config->new();
@@ -122,3 +129,17 @@ sub check {
 }
 
 1;
+
+=head1 AUTHOR
+
+Geir Aalberg, E<lt>geira@met.noE<gt>
+
+=head1 LICENSE
+
+GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
+
+=head1 SEE ALSO
+
+L<Metamod::Config>
+
+=cut

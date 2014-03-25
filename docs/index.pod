@@ -54,6 +54,10 @@ The data-model and the data-flow within METAMOD2
 
 Import and upload description
 
+=item L<API documentation|api/index>
+
+Documentation for all Perl modules (METAMOD and dependencies) - I<only available locally (not SVN)>
+
 =back
 
 METAMOD is copyright L<The Norwegian Meteorological Institute|http://met.no>.

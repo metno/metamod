@@ -40,10 +40,11 @@ Metamod::WMS - WMS helper methods
 =head1 SYNOPSIS
 
   use Metamod::WMS;
+  my $xml = getXML('http://example.com/wms?service=WMS&version=1.3.0&request=GetCapabilities');
 
 =head1 DESCRIPTION
 
-.....
+Various helper functions for WMS
 
 =cut
 
@@ -61,7 +62,7 @@ use Metamod::Config;
 use Data::Dumper;
 use Hash::Util qw{ lock_hash  unlock_hash };
 
-our @EXPORT = qw(logger param getXML getMapURL getSetup outputXML defaultWMC getProjName getProjString bgmapURLs);
+our @EXPORT = qw(logger param getXML getMapURL getSetup outputXML defaultWMC getProjName bgmapURLs);
 
 ####################
 # init
@@ -78,11 +79,11 @@ my $coastlinemaps = $config->split('WMS_MAPS');
 my $projnames = $config->split('WMS_PROJECTIONS');
 #print STDERR Dumper \$projnames;
 
-sub logger {
+sub logger { # pollutes global namespace... FIXME
     return $logger;
 }
 
-sub param {
+sub param { # pollutes global namespace... FIXME
     return $q->param(shift);
 }
 
@@ -248,3 +249,14 @@ sub bgmapURLs {
 }
 
 1;
+
+=head1 AUTHOR
+
+Geir Aalberg, E<lt>geira@met.noE<gt>
+
+=head1 LICENSE
+
+GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
+
+=cut
+

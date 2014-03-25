@@ -169,6 +169,6 @@ Heiko Klein, E<lt>H.Klein@met.noE<gt>
 
 =head1 SEE ALSO
 
-L<Metamod::DatsetTransformer>
+L<Metamod::DatasetTransformer>
 
 =cut

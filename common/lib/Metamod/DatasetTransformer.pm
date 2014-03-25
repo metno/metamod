@@ -255,8 +255,6 @@ with "To"
 
 Return: @array = (Metamod::DatasetTransformer::Impl1, Metamod::DatasetTransformer::Impl2, ...)
 
-=back
-
 =item autodetect($foreignDataset|$baseFileName)
 
 Create a datasettransformer from a Metamod::ForeignDataset or from a file. Try to autodetect

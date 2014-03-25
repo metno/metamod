@@ -14,6 +14,8 @@ just as an electronic Post-It note for developers to quickly note action
 points for later.
 
 --------------------
+rewrite makedocs to use Pod::Simple::HTMLBatch 
+
 use compressed version of openlayers lib
 
 rewrite to use libnetcdf instead of fimex for opendap

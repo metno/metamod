@@ -45,8 +45,8 @@ Metamod::Config - get runtime configuration environment
     die "Could not find the configuration on the commandline or the in the environment\n";
   }
 
-  my $config = Metamod::Config->new($config_file_or_dir);
-  my $var = $config->get($varname);
+  my $conf = Metamod::Config->new($config_file_or_dir);
+  my $var = $conf->get($varname);
 
 =begin OBSOLETE?
 
@@ -57,7 +57,8 @@ Metamod::Config - get runtime configuration environment
 
 =head1 DESCRIPTION
 
-This module can be used to read the configuration file.
+This module must be used to read the configuration file. It is initialised
+during startup of MetamodWeb.
 
 =head1 FUNCTIONS
 
@@ -270,7 +271,7 @@ sub _normalizeFile {
     return Cwd::abs_path($file);
 }
 
-=head2 $self->set($varname, $value)
+=head2 $conf->set($varname, $value)
 
 Set a configuration variable
 
@@ -284,7 +285,7 @@ sub set {
     return $self; # useful for chaining
 }
 
-=head2 $self->unset()
+=head2 $conf->unset()
 
 Unset a configuration variable
 
@@ -296,7 +297,7 @@ sub unset {
     return $self; # useful for chaining
 }
 
-=head2 $self->get($varname)
+=head2 $conf->get($varname)
 
 return the configuration variable configVar as currently set. This will reread the
 config-file each time it has been changed. Gives a warning if not specified in
@@ -312,7 +313,7 @@ sub get {
     return $self->_substituteVariable($var); # OK, where is the warning triggered?
 }
 
-=head2 $self->getall()
+=head2 $conf->getall()
 
 returns all configuration variables as a hash
 
@@ -329,7 +330,7 @@ sub getall {
     return \%vars;
 }
 
-=head2 $self->getallflags()
+=head2 $conf->getallflags()
 
 returns all configuration flags as a hash. Each flag is a bitfield composed of:
 
@@ -347,7 +348,7 @@ sub getallflags {
     return $self->{flags};
 }
 
-=head2 $self->has($varname)
+=head2 $conf->has($varname)
 
 return true if the configuration variable configVar is currently set. This will reread the
 config-file each time it has been changed. Does not give any warnings.
@@ -362,7 +363,7 @@ sub has {
     return exists $self->{vars}{$var};
 }
 
-=head2 $self->is($varname)
+=head2 $conf->is($varname)
 
 return true if the configuration variable has been set and is not among a list of
 false values (0, false, empty string). Does not give any warnings.
@@ -380,7 +381,7 @@ sub is {
     return ($val && lc($val) ne 'false') ? 1 : 0;
 }
 
-=head2 $self->split($varname)
+=head2 $conf->split($varname)
 
 Splits a config variable separated by newlines, commas or spaces,
 optionally delimited by quotes (single or double – quotes are mandatory for comma separated lists).
@@ -573,7 +574,7 @@ sub _substituteVariable {
     return $textline;
 }
 
-=head2 $self->getDSN()
+=head2 $conf->getDSN()
 
 Return the database source name of the metadata database,
 i.e. "dbi:Pg:dbname=damocles;host=localhost;port=5432"
@@ -591,7 +592,7 @@ sub getDSN {
     return $dsn;
 }
 
-=head2 $self->getDSN_Userbase()
+=head2 $conf->getDSN_Userbase()
 
 Return the database source name of the user-database,
 i.e. "dbi:Pg:dbname=userbase;host=localhost;port=5432"
@@ -609,7 +610,7 @@ sub getDSN_Userbase {
     return $dsn;
 }
 
-=head2 $self->getDBH()
+=head2 $conf->getDBH()
 
 Return a cached/pooled DBI-handler to the default database of metamod. The handler is in
 AutoCommit = 0 and RaiseError = 1, FetchHash mode. This function will die on error. (DBI-connect error)
@@ -635,7 +636,7 @@ sub getDBH {
 }
 
 
-=head2 $self->initLogger()
+=head2 $conf->initLogger()
 
 Initialise a Log::Log4perl logger.
 
@@ -677,7 +678,7 @@ sub initLogger {
 
 }
 
-=head2 $self->config_dir()
+=head2 $conf->config_dir()
 
 Get the directory that the master config file is located in. Can be used to get
 paths relative to the config file.
@@ -710,7 +711,7 @@ sub config_dir {
 
 }
 
-=head2 $self->installation_dir()
+=head2 $conf->installation_dir()
 
 Get the absolute path to the directory where the METAMOD application is installed.
 
@@ -752,7 +753,7 @@ sub installation_dir {
     return Cwd::abs_path($curr_dir);
 }
 
-=head2 $self->getVarNames()
+=head2 $conf->getVarNames()
 
 =over
 
@@ -771,7 +772,7 @@ sub getVarNames {
     return @var_names;
 }
 
-=head2 $self->getDSFilePath($ds_name)
+=head2 $conf->getDSFilePath($ds_name)
 
 Get the file path to where the XML metadata files are stored on disk.
 
@@ -819,7 +820,7 @@ sub getDSFilePath {
 
 }
 
-=head2 $self->path_to_config_file($filename, @dirnames)
+=head2 $conf->path_to_config_file($filename, @dirnames)
 
 Get the path to a file that is either located in the application configuration catalog
 or in the config/ catalog.
@@ -862,7 +863,7 @@ sub path_to_config_file {
 
 }
 
-=head2 $self->version()
+=head2 $conf->version()
 
 Return the METAMOD version number and build date
 
@@ -885,7 +886,16 @@ sub version {
 
 Heiko Klein, E<lt>H.Klein@met.noE<gt>
 
+=head2 CONTRIBUTORS
+
+Geir Aalberg, E<lt>geira@met.noE<gt>
+
+=head1 LICENSE
+
+GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
+
 =head1 SEE ALSO
 
+L<Metamod::Config::Sanity>
 
 =cut

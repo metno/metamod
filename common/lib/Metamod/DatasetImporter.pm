@@ -38,15 +38,16 @@ Metamod::DatasetImporter - Module for importing dataset information into the met
 
 =head1 SYNOPSIS
 
-Blah blah blah FIXME
+    use Metamod::DatasetImporter;
+    my $importer = Metamod::DatasetImporter->new();
+    eval { $importer->write_to_database($inputfile); } or ...
 
 =head1 DESCRIPTION
 
-Blah blah blah FIXME
+Parses XML files in various formats (ISO 19115, DIF plus met.no formats MM2 and MMD) and inserts metadata in database.
+Formats are supported via plugins in the Metamod::DatasetTransformer namespace.
 
-=head1 FUNCTIONS/METHODS
-
-Blah blah blah FIXME
+=head1 METHODS
 
 =cut
 
@@ -1036,4 +1037,5 @@ sub clean_content {
 GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
 
 =cut
+
 1;

@@ -33,14 +33,15 @@ __PACKAGE__->config(
 
 =head1 NAME
 
-MetamodWeb::View::Subscription - TT View for MetamodWeb
+MetamodWeb::View::Raw - TT View for MetamodWeb
 
 =head1 DESCRIPTION
 
-TT View for MetamodWeb.
+View for showing pages in iframes (e.g. without masthead, menus etc)
 
 =head1 SEE ALSO
 
+L<MetamodWeb::View::TT>, 
 L<MetamodWeb>
 
 =head1 LICENSE

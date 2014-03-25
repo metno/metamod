@@ -20,18 +20,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
-=head1 NAME
-
-Metamod::Utils - Misc stuff
-
-=head1 DESCRIPTION
-
-Blah blah blah (FIXME)
-
-=head1 FUNCTIONS/METHODS
-
-=cut
-
 use base qw(Exporter);
 use strict;
 use warnings;
@@ -251,6 +239,7 @@ sub random_string {
 }
 
 1;
+
 __END__
 
 =head1 NAME
@@ -282,7 +271,8 @@ Metamod::Utils - utilities for metamod
 =head1 DESCRIPTION
 
 This modules is a collection of small functions useful when working with Metamod.
-The functions are listed below:
+
+=head1 FUNCTIONS
 
 =over 8
 

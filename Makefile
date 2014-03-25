@@ -14,6 +14,14 @@ BUILDDIR = $(CURDIR)/lib-build
 VERSION: debian/changelog
 	debian/checkVersion.pl -u
 
+apidocs:
+	mkdir -p docs/html/api
+	perl -MPod::Simple::HTMLBatch -e Pod::Simple::HTMLBatch::go \
+	"catalyst/lib:common/lib:local/lib/perl5:local/lib/perl5/x86_64-linux-gnu-thread-multi" \
+	docs/html/api
+	cp docs/apidocs.css docs/html/api/_blkbluw.css
+# ok, the last one is a hack... write perl script later
+
 deps:
 	carton install
 
@@ -25,7 +33,7 @@ deployment:
 
 # Build the actual debian package
 # It is a requirement that this should not produce any svn diffs
-debian_package: deployment
+debian_package: deployment apidocs
 	debian/checkVersion.pl -u
 
 	fakeroot mkdir -p $(DESTDIR)

@@ -192,6 +192,10 @@ sub end : ActionClass('RenderView') :Does('DumpQueryLog') :Does('DeleteStash')  
 
 __PACKAGE__->meta->make_immutable;
 
+=head1 AUTHOR
+
+Oystein Torget, E<lt>oysteint@met.noE<gt>
+
 =head1 LICENSE
 
 GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>

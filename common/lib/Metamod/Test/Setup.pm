@@ -40,7 +40,8 @@ Metamod::Test::Setup - Module that helps initialise the environment for testing.
 
 =head1 DESCRIPTION
 
-Blah Blah Blah
+Mainly routines for setting up database for unit tests.
+Must be told which config file to use when initialized.
 
 =head1 SYNOPSIS
 
@@ -330,6 +331,8 @@ sub populate_userbase {
 
 Populate the database based on a PostgreSQL dump file.
 
+=over 4
+
 =item $dump_file
 
 A PostgreSQL dump file that is used to populate the database. This dump file
@@ -342,6 +345,8 @@ The name of the database.
 =item return
 
 Returns false on success and an error message otherwise.
+
+=back
 
 =cut
 
@@ -499,3 +504,13 @@ sub _clean_database {
 }
 
 1;
+
+=head1 AUTHOR
+
+Oystein Torget, E<lt>oysteint@met.noE<gt>
+
+=head1 LICENSE
+
+GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
+
+=cut

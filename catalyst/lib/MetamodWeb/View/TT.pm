@@ -34,14 +34,15 @@ __PACKAGE__->config(
 
 =head1 NAME
 
-MetamodWeb::View::Subscription - TT View for MetamodWeb
+MetamodWeb::View::TT - TT View for MetamodWeb
 
 =head1 DESCRIPTION
 
-TT View for MetamodWeb.
+Template for normal pages using masthead, menus etc.
 
 =head1 SEE ALSO
 
+L<MetamodWeb::View::Raw>, 
 L<MetamodWeb>
 
 =head1 LICENSE

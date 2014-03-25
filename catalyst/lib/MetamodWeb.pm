@@ -20,6 +20,22 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =cut
 
+=head1 NAME
+
+MetamodWeb - Catalyst based application providing Discovery, Access and Retrieve functionality for scientific datasets
+
+=head1 SYNOPSIS
+
+    script/metamod_web_server.pl
+
+=head1 DESCRIPTION
+
+METAMOD2 is a metadata catalogue developed by the Norwegian Metrological
+Institute. METAMOD can harvest metadata from several different sources
+and offers a web-based search interface to the metadata catalogue.
+
+=cut
+
 use version; our $VERSION = qv('2.13'); # PBP 404
 
 use Moose;
@@ -162,18 +178,6 @@ sub path_to_custom {
 }
 
 __END__
-
-=head1 NAME
-
-MetamodWeb - Catalyst based application
-
-=head1 SYNOPSIS
-
-    script/metamod_web_server.pl
-
-=head1 DESCRIPTION
-
-[enter your description here]
 
 =head1 SEE ALSO
 

@@ -449,6 +449,10 @@ sub calculate_bounds {
 
 }
 
+=head1 AUTHOR
+
+Geir Aalberg, E<lt>geira@met.noE<gt>
+
 =head1 LICENSE
 
 GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
