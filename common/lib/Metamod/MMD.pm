@@ -59,7 +59,7 @@ The MMD format is the new metadata format for METAMOD and other met.no systems, 
 for better intercompatibility between data formats and a richer vocabulary. Designed to
 be used in conjunction with the met.no Metadata Editor available at L<https://github.com/metno/metadata-editor>.
 
-=head1 FUNCTIONS
+=head1 METHODS
 
 =cut
 

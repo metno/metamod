@@ -1,30 +1,37 @@
-#----------------------------------------------------------------------------
-#  METAMOD - Web portal for metadata search and upload
-#
-#  Copyright (C) 2008 met.no
-#
-#  Contact information:
-#  Norwegian Meteorological Institute
-#  Box 43 Blindern
-#  0313 OSLO
-#  NORWAY
-#  email: Heiko.Klein@met.no
-#
-#  This file is part of METAMOD
-#
-#  METAMOD is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  METAMOD is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with METAMOD; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+=begin licence
+
+----------------------------------------------------------------------------
+METAMOD - Web portal for metadata search and upload
+
+Copyright (C) 2008 met.no
+
+Contact information:
+Norwegian Meteorological Institute
+Box 43 Blindern
+0313 OSLO
+NORWAY
+email: geira@met.no
+
+This file is part of METAMOD
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+METAMOD is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with METAMOD; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+----------------------------------------------------------------------------
+
+=end licence
+
+=cut
 #----------------------------------------------------------------------------
 
 package Metamod::Dataset;
@@ -58,7 +65,7 @@ sub new {
     my $dataDS = $class->DATASET;
     $dataDS =~ s/\Q1970-01-01T00:00:00Z\E/$sDate/g; # changes datestamp and creationDate
     $dataDS =~ s/metadataFormat=""/metadataFormat="MM2"/g;
-	my $dataMM2 = $class->MM2;
+    my $dataMM2 = $class->MM2;
     return $class->newFromDoc($dataMM2, $dataDS, %options);
 }
 
@@ -81,34 +88,34 @@ sub newFromDoc {
 
 sub newFromFile {
     my ($class, $basename, %options) = @_;
-	my $something;
-	eval {
-	    my ($dsXML, $mm2XML) = Metamod::DatasetTransformer::getFileContent($basename);
+    my $something;
+    eval {
+        my ($dsXML, $mm2XML) = Metamod::DatasetTransformer::getFileContent($basename);
         die "No XMD file" unless $dsXML;
         die "No metadata xml file (MM2, DIF, ...)" unless $mm2XML;
-	    my @plugins = Metamod::DatasetTransformer::getPlugins();
-		foreach my $plugin (@plugins) {
-			my $p = $plugin->new($dsXML, $mm2XML, %options);
-			if ($p->test) {
-				my $format = $p->originalFormat;
-				my ($docDS, $docMM2) = $p->transform;
-				$something = $class->_initSelf($format, $docDS, $docMM2);
-				last;
-			}
-		}
-	};
-	if ($@) {
+        my @plugins = Metamod::DatasetTransformer::getPlugins();
+        foreach my $plugin (@plugins) {
+            my $p = $plugin->new($dsXML, $mm2XML, %options);
+            if ($p->test) {
+                my $format = $p->originalFormat;
+                my ($docDS, $docMM2) = $p->transform;
+                $something = $class->_initSelf($format, $docDS, $docMM2);
+                last;
+            }
+        }
+    };
+    if ($@) {
         $error_text = $@;
-		$logger->error('newFromFile error: ', $@);
-		croak("newFromFile error: $@");
-	}
+        $logger->error('newFromFile error: ', $@);
+        croak("newFromFile error: $@");
+    }
     if (! $something) {
         $error_text = "Unknown XML metadata format";
-		$logger->error('newFromFile error: ', $error_text);
-		croak("newFromFile error: $error_text");
+        $logger->error('newFromFile error: ', $error_text);
+        croak("newFromFile error: $error_text");
     }
-	#print STDERR $something ? "newFromFile succeded" : "newFromFile failed, but didn't die\n";
-	return $something;
+    #print STDERR $something ? "newFromFile succeded" : "newFromFile failed, but didn't die\n";
+    return $something;
 }
 
 sub _initSelf {
@@ -124,8 +131,8 @@ sub getMetadata {
     foreach my $n ($self->{xpath}->findnodes('/m:MM2/m:metadata', $self->{docMETA})) {
         my $value = "";
         foreach my $child ($n->childNodes) {
-    		if ($child->nodeType == XML::LibXML::XML_TEXT_NODE) {
-   				$value .= $child->nodeValue;
+            if ($child->nodeType == XML::LibXML::XML_TEXT_NODE) {
+                $value .= $child->nodeValue;
             }
         }
         push @{ $metadata{$n->getAttribute("name")} }, $value;
@@ -137,7 +144,7 @@ sub addMetadata {
     my ($self, $metaRef) = @_;
     foreach my $name (keys %$metaRef) {
         foreach my $val (@{ $metaRef->{$name} }) {
-        	$val = $self->_decode($val);
+            $val = $self->_decode($val);
             $val = Metamod::ForeignDataset::removeUndefinedXMLCharacters($val);
             if (!defined $val) {
                 Carp::carp("undefined value for metadata $name");
@@ -164,8 +171,8 @@ sub removeMetadataName {
     foreach my $n ($self->{xpath}->findnodes('/m:MM2/m:metadata[@name=\''.$name."']", $self->{docMETA})) {
         my $value = "";
         foreach my $child ($n->childNodes) {
-    		if ($child->nodeType == XML::LibXML::XML_TEXT_NODE) {
-   				$value .= $child->nodeValue;
+            if ($child->nodeType == XML::LibXML::XML_TEXT_NODE) {
+                $value .= $child->nodeValue;
             }
         }
         push @oldValues, $value;
