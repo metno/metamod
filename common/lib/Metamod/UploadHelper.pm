@@ -37,7 +37,7 @@ Files are either uploaded to an FTP area, or interactively to an HTTP area
 using the web interface. The top level directory pathes for these two areas are
 given by FIXME [was: the global variables $ftp_dir_path and $upload_dir_path].
 
-=head1 FUNCTIONS/METHODS
+=head1 METHODS
 
 =cut
 
@@ -73,12 +73,11 @@ has 'all_ftp_datasets'      => ( is => 'rw', default => sub { {} } );
 
 has 'ftp_events'            => ( is => 'rw', default => sub { {} } );
 
-
-
 sub BUILD { # ye olde init "constructor"
     my $self = shift;
 
     ## Make sure static directories exists - FIXME
+
     #foreach my $directory ( $work_directory, $work_start, $work_expand, $work_flat, $uerr_directory,
     #    $xml_directory, $xml_history_directory, $problem_dir_path ) {
     #    mkpath($directory);
@@ -154,7 +153,7 @@ sub ftp_process_hour {
     my $current_hour = $ltime[2];                    # 0-23
     my $eventsref = $self->ftp_events;
 
-die unless $self->config; # remove when stable
+    #die unless $self->config; # remove when stable
     my $ftp_dir_path = $self->config->get('UPLOAD_FTP_DIRECTORY');
     my $logger = $self->logger or die "Missing logger object";
     $logger->info("Processing FTP upload area");
@@ -246,23 +245,9 @@ die unless $self->config; # remove when stable
     return 1;
 }
 
-sub add_user_error {
-    my ($self, $error) = @_;
-
-    my $user_errors = $self->user_errors();
-    push @{ $user_errors }, $error;
-    $self->user_errors($user_errors);
-}
-
-sub reset_user_errors {
-    my $self = shift;
-
-    $self->user_errors([]);
-}
-
 =head2 process_upload
 
-
+Not sure what this does except call process_files() ...
 
 =cut
 
@@ -314,7 +299,7 @@ CDL files are converted to netCDF.
 
 =cut
 
-sub process_files {
+sub process_files { # rewrite this monster into small, more manageable modules which can be tested separately ... FIXME
 
     my ( $self, $input_files, $dataset_name, $ftp_or_web, $datestring ) = @_;
 
@@ -460,7 +445,9 @@ sub process_files {
         $self->logger->debug( $msg );
     }
 
+    #
     #  Convert CDL files to netCDF and then check that all files are netCDF:
+    #
     $errors = 0;
     my %not_accepted = ();
     foreach my $expfile (@expanded_files) {
@@ -479,13 +466,15 @@ sub process_files {
         }
         my $filetype = getFiletype($expandedfile);
         $self->logger->debug("Processing $expandedfile: $filetype");
-        if ( $filetype eq 'ascii' ) {
+        if ( $filetype eq 'ascii' ) { # this logic is awful - rewrite asap! FIXME
+
             my $errorMsg = remove_cr_from_file($expandedfile);
-            if ( length($errorMsg) > 0 ) {
+            if ( length($errorMsg) > 0 ) { # error
                 $self->syserrorm( "SYS", "remove_cr_failed: $errorMsg", $uploadname, "process_files", "" );
                 $not_accepted{$expandedfile} = 1;
                 $errors = 1;
-            } elsif ( defined($extension) && ( $extension eq 'cdl' || $extension eq 'CDL' ) ) {
+            }
+            elsif ( defined($extension) && ( $extension eq 'cdl' || $extension eq 'CDL' ) ) { # presumably CDL file
 
                 # get the first line of the file, think 'head'
                 if ( !open( FH, $expandedfile ) ) {
@@ -496,17 +485,20 @@ sub process_files {
                 my $firstline = <FH>;
                 close FH;
                 $self->logger->debug("Possible CDL-file. Firstline: $firstline");
+
                 if ( $firstline =~ /^\s*netcdf\s/ ) {
                     my $ncname = substr( $expandedfile, 0, length($expandedfile) - 3 ) . 'nc';
-                    if ( scalar grep( $_ eq $ncname, @expanded_files ) > 0 ) {
+                    if ( scalar grep( $_ eq $ncname, @expanded_files ) > 0 ) { # error, name taken
                         $self->syserrorm( "SYSUSER", "cdlfile_collides_with_ncfile_already_encountered",
                             $uploadname, "process_files", "File: $expandedfile" );
                         $not_accepted{$expandedfile} = 1;
                         $errors = 1;
                         next;
-                    } else {
+                    }
+                    else { # not error
+                        # run ncgen on CDL file
                         my $result = $self->shcommand_scalar("ncgen $expandedfile -o $ncname");
-                        if ( length($self->shell_command_error) > 0 ) {
+                        if ( length($self->shell_command_error) > 0 ) { # ncgen failed
                             my $diagnostic = $self->shell_command_error;
                             $diagnostic =~ s/^[^\n]*\n//m;
                             $diagnostic =~ s/\n/ /mg;
@@ -524,11 +516,12 @@ sub process_files {
                             $self->syserrorm( "SYS", "unlink_fails_on_expandedfile",
                                 "", "process_files", "Expanded file: $expandedfile" );
                         }
-                        $filetype     = getFiletype($ncname);
+                        $filetype     = getFiletype($ncname); # presumably setting to 'nc3'
                         $expandedfile = $ncname;
                         $self->logger->debug("Ncgen OK");
                     }
-                } else {
+                }
+                else { # not valid CDL
                     $self->syserrorm( "SYSUSER", "text_file_with_cdl_extension_not_a_cdlfile",
                         $uploadname, "process_files", "File: $expandedfile" );
                     $not_accepted{$expandedfile} = 1;
@@ -537,14 +530,14 @@ sub process_files {
                 }
             }
         }
-        if ( $filetype ne 'nc3' ) {
+        if ( $filetype ne 'nc3' ) { # something unexpected must have happened
             $self->syserrorm( "SYSUSER", "file_not_netcdf", $uploadname, "process_files",
                 "File: $expfile\nBadfile: $expandedfile\nFiletype: $filetype" );
             $not_accepted{$expandedfile} = 1;
             $errors = 1;
         }
     }
-    if ( $errors == 1 ) {
+    if ( $errors == 1 ) { # CDL batch conversion failed
         foreach my $expandedfile ( keys %not_accepted ) {
             if ( unlink($expandedfile) == 0 ) {
                 $self->syserrorm( "SYS", "could_not_unlink", "", "process_files", "File: $expandedfile" );
@@ -562,7 +555,7 @@ sub process_files {
     #  uploaded before. If any re-uploads, find the XML-file representing most of the existing
     #  files in the repository that are not affected by re-uploads. Base the digest_nc.pl run
     #  on this XML file.
-    my @uploaded_files = findFiles( $work_flat, eval 'sub {$_[0] =~ /^\Q$dataset_name\E_/o;}' );
+    my @uploaded_files = findFiles( $work_flat, eval 'sub {$_[0] =~ /^\Q$dataset_name\E_/o;}' ); # ouch! rewrite ASAP ZULU! FIXME
 
     #   print "Uploaded files:\n";
     #   print Dumper(\@uploaded_files);
@@ -615,14 +608,10 @@ sub process_files {
     #chdir $starting_dir or die "Could not cd to script dir '$starting_dir': $!"; # not working... FIXME
 
     #
-    #  Run the digest_nc.pl script and process user errors if found:
-    #
-
-    #
-    #  Run the digest_nc.pl script:
+    #  Digest the NetCDF file(s?) and process user errors if found:
     #
     my $upload_ownertag = $self->config->get('UPLOAD_OWNERTAG');
-    MetNo::NcDigest::digest("$work_directory/digest_input", $upload_ownertag, $xmlpath );
+    MetNo::NcDigest::digest("$work_directory/digest_input", $upload_ownertag, $xmlpath ); # at least no longer running via shell
 
 #    my $command = "$path_to_digest_nc $path_to_etc digest_input $upload_ownertag $xmlpath";
 #    $self->logger->debug("RUN:    $command");
@@ -632,6 +621,7 @@ sub process_files {
 #        print DIGOUTPUT $result . "\n";
 #        close(DIGOUTPUT);
 #    }
+
     open( USERERRORS, ">>$usererrors_path" ) or die "Cannot open $usererrors_path for output!";
     my @user_errors = @{ $self->user_errors() };
     foreach my $line (@user_errors) {
@@ -658,8 +648,8 @@ sub process_files {
                 $destination_paths{$filepath} = File::Spec->catfile($destination_dir, $basename);
             }
 
-            #     run digest_nc again for each file with output to dataset/file.xml
-            #     this creates the level 2 (children) xml-files
+            # run digest_nc again for each file with output to dataset/file.xml
+            # this creates the level 2 (children) xml-files
             foreach my $filepath (@uploaded_files) {
                 my ( undef, undef, $basename ) = File::Spec->splitpath($filepath);
                 my $destination_path = $destination_paths{$filepath};
@@ -696,9 +686,7 @@ sub process_files {
                 #}
             }
 
-            #
-            #     Move new files to the data repository:
-            #
+            # Move new files to the data repository:
             my $movecount = 0;
             foreach my $filepath (@digest_input) {
                 my $destination_path = $destination_paths{$filepath};
@@ -722,11 +710,8 @@ sub process_files {
         }
         my $dont_send_email_to_user =
             $self->string_found_in_file( $dataset_name, $webrun_directory . '/' . 'datasets_for_silent_upload' );
-        if ( -z $usererrors_path ) {
 
-            #
-            #     No user errors:
-            #
+        if ( -z $usererrors_path ) { # No user errors:
             my @no_error_files = keys %files_to_process;    # files not moved to problem_dir
             if ( $ftp_or_web ne 'TAF' ) {
                 if ($dont_send_email_to_user) {
@@ -739,11 +724,7 @@ sub process_files {
                 my $bnames_string = join( ", ", @bnames );
                 $mailbody = "Dear [OWNER],\n\nNo errors found in file(s) $bnames_string .\n\n";
             }
-        } else {
-
-            #
-            #     User errors found (by digest_nc.pl or this script):
-            #
+        } else { # User errors found (by digest_nc.pl or this script):
             my $local_url = $self->config->get('LOCAL_URL');
             my $uerr_directory = $webrun_directory . "/upl/uerr";
 
@@ -762,9 +743,7 @@ sub process_files {
             $url_to_errors_html = $local_url . '/upl/uerr/' . $name_html_errfile;
             my $path_to_usererrors_conf  = $self->config->path_to_config_file('usererrors.conf', 'etc');
 
-            #
-            #     Run the print_usererrors.pl script:
-            #
+            # Run the print_usererrors.pl script:
             Metamod::PrintUsererrors::print_errors($path_to_usererrors_conf, $usererrors_path, $errorinfo_path);
 #            my $result = $self->shcommand_scalar(
 #                "$path_to_print_usererrors " . "$path_to_usererrors_conf " . "$usererrors_path " . "$errorinfo_path " );
@@ -781,11 +760,9 @@ sub process_files {
                 }
             }
         }
-        if ( defined($mailbody) ) {
 
-            #
-            #     Send mail to owner of the dataset:
-            #
+        # Send mail to owner of the dataset:
+        if ( defined($mailbody) ) {
             my $recipient;
             my $username;
             if ( $ftp_or_web ne 'TAF' ) {
@@ -856,159 +833,51 @@ sub process_files {
     }
 }
 
-sub gunzip_file {
-    my $self = shift;
-
-    my ($filename) = @_;
-
-    # Uncompress file:
-    my $result = $self->shcommand_scalar("gunzip $filename");
-    if ( !defined($result) ) {
-        $self->syserrorm( "SYSUSER", "gunzip_problem_with_uploaded_file", $filename, "process_files", "" );
-        return;
-    }
-
-    my ($basename, $dirs, $extension) = fileparse($filename, qr/\.[^.]*/);
-
-    return File::Spec->catfile($dirs, $basename);
-
-}
-
-sub validate_tar_components {
-    my $self = shift;
-
-    my ($tarfile, $orig_name, $dataset_name) = @_;
-
-    # Get all component file names in the tar file:
-    my @tarcomponents = $self->shcommand_array("tar tf $tarfile");
-    if ( length($self->shell_command_error) > 0 ) {
-        $self->syserrorm( "SYSUSER", "unable_to_unpack_tar_archive", $orig_name, "process_files", "" );
-        return;
-    }
-    if ( $self->logger->is_debug ) {
-        my $msg = "Components of the tar file $tarfile : ";
-        $msg .= join "\t", split( "\n", Dumper( \@tarcomponents ) );
-        $self->logger->debug( $msg );
-    }
-    my %basenames    = ();
-    my %orignames    = ();
-    my $errcondition = "";
-
-    # Check the component file names:
-    foreach my $component (@tarcomponents) {
-        if ( substr( $component, 0, 1 ) eq "/" ) {
-            $self->syserrorm( "USER", "uploaded_tarfile_with_abs_pathes",
-                $orig_name, "process_files", "Component: $component" );
-            return;
-        }
-        my $basename = $component;
-        if ( $component =~ /\/([^\/]+)$/ ) {
-            $basename = $1;    # First matching ()-expression
-        }
-        if ( exists( $basenames{$basename} ) ) {
-            $self->syserrorm( "USER", "uploaded_tarfile_with_duplicates",
-                $orig_name, "process_files", "Component: $basename" );
-            return;
-        }
-        $basenames{$basename} = 1;
-        $orignames{$basename} = $orig_name;
-        if ( index( $basename, $dataset_name . '_' ) < 0 ) {
-            $self->syserrorm( "USER", "uploaded_tarfile_with_illegal_component_name",
-                $orig_name, "process_files", "Component: $basename" );
-            return;
-        }
-    }
-
-    return \%orignames;
-
-}
-
-sub unpack_tar_archive {
-    my $self = shift;
-
-    my ($tar_file, $uploadname, $work_expand, $work_flat) = @_;
-
-    # Expand the tar file onto the $work_expand directory
-    unless ( chdir $work_expand ) {
-        die "Could not cd to $work_expand: $!\n";
-    }
-    my $tar_results = $self->shcommand_scalar("tar xf $tar_file");
-    if ( length($self->shell_command_error) > 0 ) {
-        $self->syserrorm( "SYSUSER", "tar_xf_fails", $uploadname, "process_files", "" );
-        next;
-    }
-
-    my @tarcomponents = $self->shcommand_array("tar tf $tar_file");
-    if ( length($self->shell_command_error) > 0 ) {
-        $self->syserrorm( "SYSUSER", "unable_to_unpack_tar_archive", $uploadname, "process_files", "" );
-        next;
-    }
-
-    my $errors = 0;
-
-    # Move all expanded files to the $work_flat directory, which
-    # will not contain any subdirectories. Check that no duplicate
-    # file names arise.
-    foreach my $component (@tarcomponents) {
-        my $bname = $component;
-        if ( $component =~ /\/([^\/]+)$/ ) {
-            $bname = $1;    # First matching ()-expression
-        }
-        if ( -e File::Spec->catfile( $work_flat, $bname ) ) {
-                $self->syserrorm( "USER", "uploaded_tarfile_with_component_already_encountered",
-                    $uploadname, "process_files", "Component: $bname" );
-                $errors = 1;
-            next;
-        }
-        if ( move( $component, $work_flat ) == 0 ) {
-            $self->syserrorm( "SYS", "move_tar_component_did_not_succeed",
-                "", "process_files", "Component: $component Error code: $!" );
-            next;
-        }
-    }
-
-    return $errors;
-
-}
-
-sub get_date_and_time_string {
-    my $self = shift;
-
-    my @ta;
-    if ( scalar @_ > 0 ) {
-        @ta = localtime( $_[0] );
-    } else {
-        @ta = localtime( time() );
-    }
-    my $year       = 1900 + $ta[5];
-    my $mon        = $ta[4] + 1;                                                               # 1-12
-    my $mday       = $ta[3];                                                                   # 1-31
-    my $hour       = $ta[2];                                                                   # 0-23
-    my $min        = $ta[1];                                                                   # 0-59
-    my $datestring = sprintf( '%04d-%02d-%02d %02d:%02d', $year, $mon, $mday, $hour, $min );
-    return $datestring;
-}
-
-
 =head2 get_dataset_institution
 
-Initialize hash connecting each dataset to a reference to a hash with the following
-elements:
+Initialize hash connecting each dataset to a reference to a hash with the following elements:
 
-->{'institution'} Name of institution as found in an <heading> element within the webrun/u1
-      file for the user that owns the dataset.
-->{'email'} The owners E-mail address.
-->{'name'} The owners name.
-->{'key'} The directory key.
+=over 4
+
+=item institution
+
+Name of institution as found in an <heading> element within the webrun/u1 file for the user that owns the dataset.
+
+=item email
+
+The owners E-mail address
+
+=item name
+
+The owners name
+
+=item key
+
+The directory key
+
+=back
 
 If found, extra elements are included:
 
-->{'location'} Location
-->{'catalog'} Catalog
-->{'wmsurl'} URL to WMS
+=over 4
+
+=item location
+
+Location
+
+=item catalog
+
+Catalog
+
+=item wmsurl
+
+URL to WMS
+
+=back
 
 The last elements are taken from the line:
-<dir ... location="..." catalog="..." wmsurl="..."/>)
+
+  <dir ... location="..." catalog="..." wmsurl="..."/>)
 
 =cut
 
@@ -1118,14 +987,17 @@ sub get_dataset_institution {
     return $dataset_institution;
 }
 
+=head2 shcommand_scalar
 
-#
-#---------------------------------------------------------------------------------
-#
+Run command via shell (in most cases needlessly as should be Perl modules instead)
+
+=cut
+
 sub shcommand_scalar {
     my $self = shift;
 
     my ($command) = @_;
+    $self->logger->debug( 'shcommand_scalar running: ', $command );
 
     my $webrun_directory = $self->config->get('WEBRUN_DIRECTORY');
     my $path_to_shell_error   = $webrun_directory . "/upl/shell_command_error";
@@ -1134,16 +1006,15 @@ sub shcommand_scalar {
     #   print SHELLLOG "---------------------------------------------------\n";
     #   print SHELLLOG $command . "\n";
     #   print SHELLLOG "                    ------------RESULT-------------\n";
-    my $result = `$command 2>$path_to_shell_error`;
+
+    my $result = `$command 2>$path_to_shell_error`; # FIXME
     my $error = $?;
 
     #   print SHELLLOG $result ."\n";
     #   close (SHELLLOG);
     if ( $error && -s $path_to_shell_error ) {
 
-        #
-        #     Slurp in the content of a file
-        #
+        # Slurp in the content of a file
         unless ( -r $path_to_shell_error ) { die "Can not read from file: shell_command_error\n"; }
         open( ERROUT, $path_to_shell_error );
         local $/ = undef;
@@ -1165,13 +1036,19 @@ sub shcommand_scalar {
     }
 }
 
-#
-#---------------------------------------------------------------------------------
-#
+=head2 shcommand_array
+
+Run command via shell (in most cases needlessly as should be Perl modules instead)
+
+Returns output split into array on newlines (did that really deserve a copypasted method?)
+
+=cut
+
 sub shcommand_array {
     my $self = shift;
 
     my ($command) = @_;
+    $self->logger->debug( 'shcommand_array running: ', $command );
 
     my $webrun_directory = $self->config->get('WEBRUN_DIRECTORY');
     my $path_to_shell_error   = $webrun_directory . "/upl/shell_command_error";
@@ -1210,6 +1087,11 @@ sub shcommand_array {
     }
 }
 
+=head2 move_to_problemdir
+
+Move away file, log error
+
+=cut
 
 sub move_to_problemdir {
     my $self = shift;
@@ -1224,9 +1106,7 @@ sub move_to_problemdir {
             $baseupldname = $1;    # First matching ()-expression
         }
 
-        #
         #  Move upload file to problem file directory:
-        #
         my @file_stat = stat($uploadname);
         if ( scalar @file_stat == 0 ) {
             die "In move_to_problemdir: Could not stat $uploadname\n";
@@ -1242,9 +1122,7 @@ sub move_to_problemdir {
             die "In move_to_problemdir: Moving '$uploadname' to '$destpath' did not succeed. Error code: $!\n";
         }
 
-        #
-        #     Write message to files_with_errors log:
-        #
+        # Write message to files_with_errors log:
         my $datestring = $self->get_date_and_time_string($modification_time);
         my $path       = $problem_dir_path . "/files_with_errors";
         open( OUT, ">>$path" );
@@ -1257,6 +1135,12 @@ sub move_to_problemdir {
         #}
     }
 }
+
+=head2 purge_current_directory
+
+Delete a bunch of files
+
+=cut
 
 sub purge_current_directory {
     my $self = shift;
@@ -1275,9 +1159,172 @@ sub purge_current_directory {
     }
 }
 
+# ------------------------------------------------------------------------------
+#  various local helper methods below
+# ------------------------------------------------------------------------------
+
 #
-#---------------------------------------------------------------------------------
+# add another error message to the queue
 #
+sub add_user_error {
+    my ($self, $error) = @_;
+
+    my $user_errors = $self->user_errors();
+    push @{ $user_errors }, $error;
+    $self->user_errors($user_errors);
+}
+
+#
+# delete all error messages
+#
+sub reset_user_errors {
+    my $self = shift;
+
+    $self->user_errors([]);
+}
+
+#
+# what it say on the tin
+#
+sub gunzip_file {
+    my $self = shift;
+
+    my ($filename) = @_;
+
+    # Uncompress file:
+    my $result = $self->shcommand_scalar("gunzip $filename");
+    if ( !defined($result) ) {
+        $self->syserrorm( "SYSUSER", "gunzip_problem_with_uploaded_file", $filename, "process_files", "" );
+        return;
+    }
+
+    my ($basename, $dirs, $extension) = fileparse($filename, qr/\.[^.]*/);
+
+    return File::Spec->catfile($dirs, $basename);
+
+}
+
+#
+# extract filenames in tarball
+#
+sub validate_tar_components {
+    my $self = shift;
+
+    my ($tarfile, $orig_name, $dataset_name) = @_;
+
+    # Get all component file names in the tar file:
+    my @tarcomponents = $self->shcommand_array("tar tf $tarfile");
+    if ( length($self->shell_command_error) > 0 ) {
+        $self->syserrorm( "SYSUSER", "unable_to_unpack_tar_archive", $orig_name, "process_files", "" );
+        return;
+    }
+    if ( $self->logger->is_debug ) {
+        my $msg = "Components of the tar file $tarfile : ";
+        $msg .= join "\t", split( "\n", Dumper( \@tarcomponents ) );
+        $self->logger->debug( $msg );
+    }
+    my %basenames    = ();
+    my %orignames    = ();
+    my $errcondition = "";
+
+    # Check the component file names:
+    foreach my $component (@tarcomponents) {
+        if ( substr( $component, 0, 1 ) eq "/" ) {
+            $self->syserrorm( "USER", "uploaded_tarfile_with_abs_pathes",
+                $orig_name, "process_files", "Component: $component" );
+            return;
+        }
+        my $basename = $component;
+        if ( $component =~ /\/([^\/]+)$/ ) {
+            $basename = $1;    # First matching ()-expression
+        }
+        if ( exists( $basenames{$basename} ) ) {
+            $self->syserrorm( "USER", "uploaded_tarfile_with_duplicates",
+                $orig_name, "process_files", "Component: $basename" );
+            return;
+        }
+        $basenames{$basename} = 1;
+        $orignames{$basename} = $orig_name;
+        if ( index( $basename, $dataset_name . '_' ) < 0 ) {
+            $self->syserrorm( "USER", "uploaded_tarfile_with_illegal_component_name",
+                $orig_name, "process_files", "Component: $basename" );
+            return;
+        }
+    }
+
+    return \%orignames;
+
+}
+
+sub unpack_tar_archive {
+    my $self = shift;
+
+    my ($tar_file, $uploadname, $work_expand, $work_flat) = @_;
+
+    # Expand the tar file onto the $work_expand directory
+    unless ( chdir $work_expand ) {
+        die "Could not cd to $work_expand: $!\n";
+    }
+    my $tar_results = $self->shcommand_scalar("tar xf $tar_file");
+    if ( length($self->shell_command_error) > 0 ) {
+        $self->syserrorm( "SYSUSER", "tar_xf_fails", $uploadname, "process_files", "" );
+        next;
+    }
+
+    my @tarcomponents = $self->shcommand_array("tar tf $tar_file");
+    if ( length($self->shell_command_error) > 0 ) {
+        $self->syserrorm( "SYSUSER", "unable_to_unpack_tar_archive", $uploadname, "process_files", "" );
+        next;
+    }
+
+    my $errors = 0;
+
+    # Move all expanded files to the $work_flat directory, which
+    # will not contain any subdirectories. Check that no duplicate
+    # file names arise.
+    foreach my $component (@tarcomponents) {
+        my $bname = $component;
+        if ( $component =~ /\/([^\/]+)$/ ) {
+            $bname = $1;    # First matching ()-expression
+        }
+        if ( -e File::Spec->catfile( $work_flat, $bname ) ) {
+                $self->syserrorm( "USER", "uploaded_tarfile_with_component_already_encountered",
+                    $uploadname, "process_files", "Component: $bname" );
+                $errors = 1;
+            next;
+        }
+        if ( move( $component, $work_flat ) == 0 ) {
+            $self->syserrorm( "SYS", "move_tar_component_did_not_succeed",
+                "", "process_files", "Component: $component Error code: $!" );
+            next;
+        }
+    }
+
+    return $errors;
+
+}
+
+#
+# poor man's reimplementation of DateTime->now->datetime...
+#
+sub get_date_and_time_string {
+    my $self = shift;
+
+    my @ta;
+    if ( scalar @_ > 0 ) {
+        @ta = localtime( $_[0] );
+    } else {
+        @ta = localtime( time() );
+    }
+    my $year       = 1900 + $ta[5];
+    my $mon        = $ta[4] + 1;                                                               # 1-12
+    my $mday       = $ta[3];                                                                   # 1-31
+    my $hour       = $ta[2];                                                                   # 0-23
+    my $min        = $ta[1];                                                                   # 0-59
+    my $datestring = sprintf( '%04d-%02d-%02d %02d:%02d', $year, $mon, $mday, $hour, $min );
+    return $datestring;
+}
+
 sub get_basenames {
     my $self = shift;
 
@@ -1291,9 +1338,6 @@ sub get_basenames {
     return @result;
 }
 
-#
-#---------------------------------------------------------------------------------
-#
 sub subtract {
     my $self = shift;
 
@@ -1312,7 +1356,6 @@ sub subtract {
 }
 
 #
-#-----------------------------------------------------------------------------------
 # Check if string found in file:
 #
 sub string_found_in_file {
@@ -1336,7 +1379,7 @@ sub string_found_in_file {
 }
 
 #
-#---------------------------------------------------------------------------------
+# send email to users (?)
 #
 sub notify_web_system {
     my $self = shift;
@@ -1369,7 +1412,7 @@ sub notify_web_system {
     }
 
     #
-    #  Find current time
+    # Find current time
     #
     my @time_arr        = gmtime;
     my $year            = 1900 + $time_arr[5];
@@ -1377,10 +1420,10 @@ sub notify_web_system {
     my $mday            = $time_arr[3];                                                                 # 1-31
     my $hour            = $time_arr[2];                                                                 # 0-23
     my $min             = $time_arr[1];                                                                 # 0-59
+    # rewrite to use DateTime->now->datetime
     my $timestring      = sprintf( '%04d-%02d-%02d %02d:%02d UTC', $year, $mon, $mday, $hour, $min );
     my @found_basenames = ();
 
-    #
     my $userbase = Metamod::mmUserbase->new() or die "Could not initialize Userbase object";
     my @infotypes = qw(f_name f_size f_status f_errurl);
 
@@ -1395,10 +1438,7 @@ sub notify_web_system {
         do {
             foreach my $basename (@uploaded_basenames) {
 
-                #
-                #             Search for an existing file
-                #             (owned by the curent user) and make it the current file
-                #
+                # Search for an existing file (owned by the current user) and make it the current file
                 my @infovalues = ( $basename, $file_sizes{$basename}, $code . $timestring, $path_to_errors_html );
                 if ( !$userbase->file_find($basename) ) {
                     if ( $userbase->exception_is_error() ) {
@@ -1407,9 +1447,7 @@ sub notify_web_system {
                 } else {
                     for ( my $i1 = 1 ; $i1 < 4 ; $i1++ ) {
 
-                        #
-                        #                   Set file property for the current file
-                        #
+                        # Set file property for the current file
                         if ( ( !$userbase->file_put( $infotypes[$i1], $infovalues[$i1] ) )
                             and $userbase->exception_is_error() ) {
                             $self->logger->error( $userbase->get_exception() . "\n" );
@@ -1424,13 +1462,14 @@ sub notify_web_system {
         }
     }
 
+    #
+    # now doing what?
+    #
     my $application_id = $self->config->get('APPLICATION_ID');
     my @rest_basenames = $self->subtract( \@uploaded_basenames, \@found_basenames );
     if ( scalar @rest_basenames > 0 ) {
 
-        #
-        #     Find a dataset in the database
-        #
+        # Find a dataset in the database
         my $ok_to_now = 1;
         my $result = $userbase->dset_find( $application_id, $dataset_name );
         if ( ( !$result ) and $userbase->exception_is_error() ) {
@@ -1442,26 +1481,19 @@ sub notify_web_system {
         }
         if ($ok_to_now) {
 
-            #
-            #     Synchronize user against the current dataset owner
-            #
+            # Synchronize user against the current dataset owner
             if ( ( !$userbase->user_dsync() ) and $userbase->exception_is_error() ) {
                 $self->logger->error( $userbase->get_exception() . "\n" );
                 $ok_to_now = 0;
             }
         }
 
-        #
-        #    foreach value in an array
-        #
+        # foreach value in an array
         foreach my $basename (@rest_basenames) {
             my @infovalues = ( $basename, $file_sizes{$basename}, $code . $timestring, $path_to_errors_html );
             if ($ok_to_now) {
 
-                #
-                #        Create a new file
-                #        (for the current user) and make it the current file
-                #
+                # Create a new file (for the current user) and make it the current file
                 if ( ( !$userbase->file_create($basename) ) and $userbase->exception_is_error() ) {
                     $self->logger->error( $userbase->get_exception() . "\n" );
                     $ok_to_now = 0;
@@ -1470,9 +1502,7 @@ sub notify_web_system {
             for ( my $i1 = 1 ; $i1 < 4 ; $i1++ ) {
                 if ($ok_to_now) {
 
-                    #
-                    #                   Set file property for the current file
-                    #
+                    # Set file property for the current file
                     if ( ( !$userbase->file_put( $infotypes[$i1], $infovalues[$i1] ) )
                         and $userbase->exception_is_error() ) {
                         $self->logger->error( $userbase->get_exception() . "\n" );
@@ -1486,12 +1516,9 @@ sub notify_web_system {
 }
 
 
-=head2 clean_up_problem_dir
-
-Delete problem files older than 14 days (or whatever)
-
-=cut
-
+#
+# Delete problem files older than 14 days (or whatever)
+#
 sub clean_up_problem_dir {
     my $self = shift;
     my $webrun_directory = $self->config->get('WEBRUN_DIRECTORY');
@@ -1523,12 +1550,9 @@ sub clean_up_problem_dir {
     }
 }
 
-=head2 clean_up_repository
-
-Delete files
-
-=cut
-
+#
+# Delete files in repo
+#
 sub clean_up_repository {
     my $self = shift;
     my $current_epoch_time = time();
@@ -1817,6 +1841,10 @@ where checking for new files take place.
 
 For each hourN, a hash key is constructed as "dataset_name hourN" and the
 corresponding value is set to wait_minutes.
+
+=head1 SEE ALSO
+
+L<MetNo::NcDigest>
 
 =head1 LICENSE
 
