@@ -34,6 +34,12 @@ The OPeNDAP URL to the file:
 
   <metadata name="dataref_OPENDAP">http://thredds.met.no/thredds/dodsC/cryoclim/met.no/sie-mar/sie-mar_osisaf_monthly_mean_sie_mar.nc</metadata>
 
+=item F<searchdata.xml>
+
+You must also add the following entry to F<staticdata/searchdata.xml> before reimporting all required datasets:
+
+  <mt name="timeseries" share="FALSE" def="List of variables to visualise in time series" />
+
 =back
 
 =head3 Server side plotting (optional)

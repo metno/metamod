@@ -136,8 +136,8 @@ of data files set up automatically by the UPLOAD module will not work.
 
 =item OPENDAP_URL
 
-The URL used to access the data files. If no OPeNDAP server is installed, use an
-URL for HTTP download.
+The URL used to access the data file directory (top level).
+If no OPeNDAP server is installed, use an URL for HTTP download.
 
 =item OPERATOR_EMAIL
 
