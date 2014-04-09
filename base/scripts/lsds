@@ -39,6 +39,8 @@ use warnings;
 use FindBin;
 use lib ("$FindBin::Bin/../../common/lib", '.');
 
+use Metamod::DBIxSchema::Metabase;
+#use Metamod::DBIxSchema::Userbase;
 use Metamod::Config;
 use Getopt::Long;
 use Log::Log4perl qw(:levels);
@@ -186,10 +188,8 @@ Log::Log4perl::CommandLine::handlelogoptions();
 #printf STDERR "loglevel=%d %d\n", $logger->level, $logger->is_info;
 #print STDERR Dumper \%opt, \@ARGV;
 
-use Metamod::DBIxSchema::Metabase;
-#use Metamod::DBIxSchema::Userbase;
 
-my $ownertags = $opt{ownertag} || $config->split('DATASET_TAGS');
+my $ownertags = ( defined $opt{ownertag} ? $opt{ownertag} : $config->split('DATASET_TAGS') ) || [];
 #print STDERR Dumper \$ownertags;
 @$ownertags = split( /,/, join(',', @$ownertags) ); # allow comma separated list
 

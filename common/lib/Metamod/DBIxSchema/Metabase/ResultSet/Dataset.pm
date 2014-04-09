@@ -242,7 +242,7 @@ sub metadata_search_params {
         push @ds_ids_conds, \%cond;
     }
 
-    $search_cond{'me.ds_ownertag'} = { IN => $ownertags };
+    $search_cond{'me.ds_ownertag'} = { IN => $ownertags } if @$ownertags;
     $search_cond{'me.ds_status'} = 1;
     $search_cond{'me.ds_id'}    = [ -and => @ds_ids_conds ] if @ds_ids_conds;
 
