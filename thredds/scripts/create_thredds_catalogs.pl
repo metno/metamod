@@ -122,6 +122,7 @@ sub sigterm {
 sub main_body {
    my %rolenames_from_config = ();
    my %datasets_to_ignore = ();
+   my %datasets_to_add = ();
    my $minutes_between_runs = 10;
 #
 #  Slurp in the content of the config file
@@ -165,6 +166,8 @@ sub main_body {
             $rolenames_from_config{lc($rest)} = $obj;
          } elsif ($keyword eq "ignore") {
             $datasets_to_ignore{$rest} = 1;
+         } elsif ($keyword eq "add") {
+            $datasets_to_add{$obj} = $rest;
          } elsif ($keyword eq "run") {
             $minutes_between_runs = $rest;
             $minutes_between_runs =~ s/[^0-9].*$//;
@@ -181,14 +184,14 @@ sub main_body {
       }
    }
    $rolenames_from_config{"forbidden"} = "FORBIDDEN";
-   &inner_loop(\%rolenames_from_config,\%datasets_to_ignore);
+   &inner_loop(\%rolenames_from_config,\%datasets_to_ignore,\%datasets_to_add);
    sleep(60*$minutes_between_runs);
 }
 #
 # ----------------------------------------------------------------------------
 #
 sub inner_loop {
-   my ($rolenames_from_config,$datasets_to_ignore) = @_;
+   my ($rolenames_from_config,$datasets_to_ignore,$datasets_to_add) = @_;
 #   print "--- inner loop:\n";
 #
 #  Fetch 'dataref' and 'distribution_statement' from the
@@ -281,8 +284,13 @@ sub inner_loop {
 #               print "   found dataset directory: $dset_dir\n";
                my $dataset = $dset_dir;
                $dataset =~ s|^.*/||mg;
+               my $distribution_statement;
                if (exists($dist_statements{$dataset})) {
-                  my $distribution_statement = lc($dist_statements{$dataset});
+                  $distribution_statement = lc($dist_statements{$dataset});
+               } elsif (exists($datasets_to_add->{"$institution/$dataset"})) {
+                  $distribution_statement = lc($datasets_to_add->{"$institution/$dataset"});
+               }
+               if (defined($distribution_statement)) {
                   if (exists($rolenames_from_config->{$distribution_statement})) {
                      my $rolename = $rolenames_from_config->{$distribution_statement};
                      $catalog_signature .= "$institution/$dataset $rolename\n";

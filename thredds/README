@@ -21,11 +21,12 @@ The script reads one configuration file that resides in the webrun directory:
 
    thredds_config
 
-This file contains three different line types (commands). The line types are
+This file contains four different line types (commands). The line types are
 identified by an initial command keyword:
 
    distribution <rolename> <distribution_statement>
    ignore dataset <dataset_name>
+   add <institution/dataset> <distribution_statement>
    run each <minutes> minute
 
 Blank lines and comments are ignored. Comments starts with the '#' character
@@ -60,6 +61,14 @@ NOTE: If no distribution statement is found for a dataset in the database,
 
 The 'ignore' command will exclude the corresponding dataset from the THREDDS
 catalog. The dataset will not be visible in the THREDDS web interface at all.
+
+The 'add' command will add a dataset to the THREDDS catalog which is not found
+in the METAMOD2 database. The dataset to add is identified by an institution
+acronym that must correspond to a directory in the data repository, followed
+by "/" and the dataset name (corresponding to a subdirectory of the
+institution directory). The last item in this command is the distribution
+statement that may restrict access to the dataset (must be one of the
+distribution statements declared by a distribution command).
 
 The 'run' command tells the script how often it should wake up to check for
 any changes in the database.
