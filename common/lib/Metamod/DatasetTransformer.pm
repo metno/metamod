@@ -61,14 +61,12 @@ use constant XSLTParser => new XML::LibXSLT();
 
 sub xslt_dir {
 
-    my $config = Metamod::Config->instance();
-    my $xsltdir = $config->get("XSLT_DIR") || $ENV{METAMOD_XSLT_DIR}; # last part should be unnecessary
-    #if ($ENV{METAMOD_XSLT_DIR}) {
-    #    return $ENV{METAMOD_XSLT_DIR}
-    #} else {
-    #    return $config->get("INSTALLATION_DIR") . '/common/schema/';
-    #}
-    return $xsltdir || $config->get("INSTALLATION_DIR") . '/common/schema/';
+    if ($ENV{METAMOD_XSLT_DIR}) { # must be handled explicitly since used before parsing config
+        return $ENV{METAMOD_XSLT_DIR};
+    } else {
+        my $config = Metamod::Config->instance();
+        return $config->get("XSLT_DIR") || $config->get("INSTALLATION_DIR") . '/common/schema/';
+    }
 }
 
 sub new {
