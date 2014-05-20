@@ -14,10 +14,12 @@ BUILDDIR = $(CURDIR)/lib-build
 VERSION: debian/changelog
 	debian/checkVersion.pl -u
 
+LIBDEPS="local/lib/perl5:local/lib/perl5/x86_64-linux-gnu-thread-multi"
+
 apidocs:
 	mkdir -p docs/html/api
 	perl -MPod::Simple::HTMLBatch -e Pod::Simple::HTMLBatch::go \
-	"catalyst/lib:common/lib:local/lib/perl5:local/lib/perl5/x86_64-linux-gnu-thread-multi" \
+	"catalyst/lib:common/lib:base/scripts:common/scripts:virtualenv:lsconf" \
 	docs/html/api
 	cp docs/apidocs.css docs/html/api/_blkbluw.css
 # ok, the last one is a hack... write perl script later

@@ -14,13 +14,19 @@ just as an electronic Post-It note for developers to quickly note action
 points for later.
 
 --------------------
-rewrite makedocs to use Pod::Simple::HTMLBatch 
+
+remove hardcoded list of searchcategories in Metamod::DatasetImporter::_insert_metadata
+- should be read from searchdata.xml
+- has not worked since implemented in 2008:
+  https://svn.met.no/viewvc/metamod/trunk/base/scripts/import_dataset.pl?revision=2&view=markup&pathrev=1760
+
+rewrite makedocs to use Pod::Simple::HTMLBatch
 
 use compressed version of openlayers lib
 
 rewrite to use libnetcdf instead of fimex for opendap
 	https://publicwiki.deltares.nl/display/OET/OPeNDAP+access+with+perl
-	
+
 customize authorization according to roles:
 "admin"
 "dataadmin"

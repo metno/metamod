@@ -112,7 +112,7 @@ digest($pathfilename, $ownertag, $xml_metadata_path, $is_child );
 
 =head1 AUTHOR
 
-Egil Støren, E<lt>egils\@met.noE<gt>
+Egil StE<248>ren, E<lt>egils\@met.noE<gt>
 
 =head1 LICENSE
 

@@ -274,9 +274,9 @@ sub showlog :Local :Args(0) {
             if (grep(/$name/,@selected_categories)) {
                 $checked = "checked";
             }
-            $categories .= '<tr><td>&nbsp;</td><td><input type="checkbox" ' . $checked . 
+            $categories .= '<tr><td>&nbsp;</td><td><input type="checkbox" ' . $checked .
                            ' name="category" value = "' .  $name . '" />' .  $name . "</td><td>" .
-                            $count . '</td><td colspan="3">&nbsp;</td></tr>' . "\n"; 
+                            $count . '</td><td colspan="3">&nbsp;</td></tr>' . "\n";
         }
     } elsif (scalar @selected_categories > 0) {
         foreach my $cat (@selected_categories) {
@@ -294,9 +294,9 @@ sub showlog :Local :Args(0) {
             if (grep(/$name/,@selected_files)) {
                 $checked = "checked";
             }
-            $files .= '<tr><td>&nbsp;</td><td><input type="checkbox" ' . $checked . 
+            $files .= '<tr><td>&nbsp;</td><td><input type="checkbox" ' . $checked .
                            ' name="files" value = "' .  $name . '" />' .  $name . "</td><td>" .
-                            $count . '</td><td colspan="3">&nbsp;</td></tr>' . "\n"; 
+                            $count . '</td><td colspan="3">&nbsp;</td></tr>' . "\n";
         }
     } elsif (scalar @selected_files > 0) {
         foreach my $cat (@selected_files) {
@@ -314,9 +314,9 @@ sub showlog :Local :Args(0) {
             if (grep(/$name/,@selected_levels)) {
                 $checked = "checked";
             }
-            $levels .= '<tr><td>&nbsp;</td><td><input type="checkbox" ' . $checked . 
+            $levels .= '<tr><td>&nbsp;</td><td><input type="checkbox" ' . $checked .
                            ' name="levels" value = "' .  $name . '" />' .  $name . "</td><td>" .
-                            $count . '</td><td colspan="3">&nbsp;</td></tr>' . "\n"; 
+                            $count . '</td><td colspan="3">&nbsp;</td></tr>' . "\n";
         }
     } elsif (scalar @selected_levels > 0) {
         foreach my $cat (@selected_levels) {
@@ -350,7 +350,7 @@ sub showlog :Local :Args(0) {
 
 =head1 AUTHOR
 
-Egil Støren
+Egil StE<248>ren, E<lt>egils\@met.noE<gt>
 
 =head1 LICENSE
 

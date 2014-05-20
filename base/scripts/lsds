@@ -122,12 +122,13 @@ Search parameter for finding datasets (same as web interface... more or less).
 
 May be repeated as many times as desired, however each parameter can only be specified once. E.g.
 
-  --param freetext=ice --param date_from=20120101 # legal
+  --param freetext=ice --param date_from=20120101 # legal (except date_from is not yet implemented)
   --param freetext=ice --param freetext=sea # not legal
 
 =head2 -o|--ownertag tag
 
 Comma separated list of ownertags to filter search. Default is current DATASET_TAGS value from master_config.
+Setting to blank ('') causes search to span all ownertags.
 
 =head2 --projectioninfo
 
@@ -159,6 +160,7 @@ ds_id or ds_name (assuming the former if numeric)
   $ lsds --wms
   $ lsds --projectioninfo
   $ lsds --xmlfile
+  $ lsds -c --ownertag ''
 
 =cut
 
@@ -189,7 +191,7 @@ Log::Log4perl::CommandLine::handlelogoptions();
 #print STDERR Dumper \%opt, \@ARGV;
 
 
-my $ownertags = ( defined $opt{ownertag} ? $opt{ownertag} : $config->split('DATASET_TAGS') ) || [];
+my $ownertags = ( defined $opt{ownertag} ? $opt{ownertag} : $config->split('DATASET_TAGS') ) || []; # allow setting to blank, i.e. all tags
 #print STDERR Dumper \$ownertags;
 @$ownertags = split( /,/, join(',', @$ownertags) ); # allow comma separated list
 
@@ -204,10 +206,11 @@ my $db =_build_metabase();
 my $rs = $db->resultset('Dataset');
 
 $search_criteria = {};
-foreach (keys %{ $opt{params} }) {
+my $params = $opt{params};
+foreach (keys %$params) {
 
     if (/^freetext$/) {
-        $$search_criteria{$_} = [ $opt{params}->{$_} ];
+        $$search_criteria{$_} = [ $$params{$_} ];
     } elsif (/^date_from$/) {
         # dates => { 8 => { from => '20100205', to => '20100801', } },
     } else {

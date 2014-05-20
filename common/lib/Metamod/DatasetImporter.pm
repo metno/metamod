@@ -47,6 +47,11 @@ Metamod::DatasetImporter - Module for importing dataset information into the met
 Parses XML files in various formats (ISO 19115, DIF plus met.no formats MM2 and MMD) and inserts metadata in database.
 Formats are supported via plugins in the Metamod::DatasetTransformer namespace.
 
+=head1 TODO
+
+Remove hardcoded list of search category IDs:
+L<https://metamod.bugs.met.no/show_bug.cgi?id=126>
+
 =head1 METHODS
 
 =cut
@@ -312,6 +317,8 @@ sub _insert_metadata {
     #  Create hash mapping the correspondence between MetadataType name
     #  and SearchCategory
     #
+
+    # FIXME - should be read from searchdata.xml, but keys are in plural there... HOWTOFIX?
     my %searchcategories = (
         variable              => 3,
         area                  => 2,
@@ -381,9 +388,12 @@ sub _insert_metadata {
         #
         my %basickeys = %{ $self->_basickeys };
         if ( exists( $searchcategories{$mtname} ) ) {
-            my $skey = $searchcategories{$mtname} . ':' . $self->clean_content($mdcontent);
+            my $scid = $searchcategories{$mtname};
+            $logger->debug("Using hardcoded search category id $scid for $mtname... FIXME");
+            my $skey = $scid . ':' . $self->clean_content($mdcontent);
             $logger->debug("Insert searchdata. Try: '$skey'");
             if ( exists( $basickeys{$skey} ) ) {
+
                 my $bkid = $basickeys{$skey};
                 $sql_selectCount_BKDS->execute( $bkid, $dsid);
                 my $count = $sql_selectCount_BKDS->fetchall_arrayref()->[0][0];
@@ -394,13 +404,15 @@ sub _insert_metadata {
                     $logger->debug("duplicate basic key: '$skey'");
                 }
                 $logger->debug(" -OK: $bkid,$dsid");
+
             } elsif ( $mtname eq 'datacollection_period' ) {
-                my $scid = $searchcategories{$mtname};
+
                 if ( $mdcontent =~ /(\d{4,4})-(\d{2,2})-(\d{2,2}) to (\d{4,4})-(\d{2,2})-(\d{2,2})/ ) {
                     my $from = $1 . $2 . $3;
                     my $to   = $4 . $5 . $6;
                     $sql_insert_NI->execute( $scid, $from, $to, $dsid );
                 }
+
             }
         }
     }

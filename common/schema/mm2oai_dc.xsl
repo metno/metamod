@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-	version="1.0" xmlns:mm="http://www.met.no/schema/metamod/MM2"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/oai_dc/"
-	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/"
-	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd"
-	exclude-result-prefixes="mm xsi">
+    version="1.0" xmlns:mm="http://www.met.no/schema/metamod/MM2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.openarchives.org/OAI/2.0/oai_dc/"
+    xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd"
+    exclude-result-prefixes="mm xsi">
 
-	<xsl:output encoding="UTF-8" indent="yes" />
+    <xsl:output encoding="UTF-8" indent="yes" />
     <xsl:key name="mm2" match="/*/mm:metadata" use="@name"/>
-	<xsl:template match="/">
-		<oai_dc:dc xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+    <xsl:template match="/">
+        <oai_dc:dc xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
 
             <xsl:for-each select="/*/mm:metadata[@name = 'dataref']">
                 <dc:identifier><xsl:value-of select="."/></dc:identifier>
@@ -55,6 +55,6 @@
                 <dc:subject><xsl:value-of select="."/></dc:subject>
             </xsl:for-each>
 
-		</oai_dc:dc>
-	</xsl:template>
+        </oai_dc:dc>
+    </xsl:template>
 </xsl:stylesheet>

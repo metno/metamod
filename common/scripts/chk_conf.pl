@@ -91,7 +91,7 @@ sub usage {
 
 =head1 NAME
 
-B<chk_conf.pl> - check METAMOD master_config
+B<chk_conf.pl> - check METAMOD master_config B<(DEPRECATED)>
 
 =head1 DESCRIPTION
 

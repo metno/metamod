@@ -77,14 +77,15 @@ sub check {
     my $flags = $conf->getallflags;
     #print Dumper \$vars;
 
-    # required files/dirs - FIXME: move to separate function so can be run before prepare_env
+    # required files/dirs - FIXME: move to separate function so can be run before prepare_runtime_env.sh
     ok( -d $conf->config_dir, 'config directory found');
     ok( -w $$vars{WEBRUN_DIRECTORY}, "WEBRUN_DIRECTORY is writable: $$vars{WEBRUN_DIRECTORY}" );
+    ok( -w $$vars{UPLOAD_DIRECTORY}, "UPLOAD_DIRECTORY is writable: $$vars{UPLOAD_DIRECTORY}" );
     ok( -d $$vars{CATALYST_LIB}, "CATALYST_LIB found: $$vars{CATALYST_LIB}" );
     ok( -d $$vars{INSTALLATION_DIR}, "INSTALLATION_DIR found: $$vars{INSTALLATION_DIR}"  );
     ok( -e $$vars{PG_POSTGIS_SYSREF_SCRIPT}, 'PG_POSTGIS_SYSREF_SCRIPT found' );
     ok( -e $$vars{PG_POSTGIS_SCRIPT}, 'PG_POSTGIS_SCRIPT found' );
-    ok( -x $$vars{FIMEX_PROGRAM}, "FIMEX_PROGRAM executable: $$vars{FIMEX_PROGRAM}"  );
+    ok( -x $$vars{FIMEX_PROGRAM} || !defined($$vars{FIMEX_PROGRAM}), "FIMEX_PROGRAM executable: $$vars{FIMEX_PROGRAM}"  );
 
     # required directives
     ok( $$vars{SERVER},         'SERVER is set' );

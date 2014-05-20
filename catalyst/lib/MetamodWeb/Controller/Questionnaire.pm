@@ -37,6 +37,8 @@ MetamodWeb::Controller::Questionnaire - Controller for viewing a questionnaire a
 
 =head1 DESCRIPTION
 
+Is this operational? Has it ever worked?
+
 =head1 FUNCTIONS/METHODS
 
 =cut

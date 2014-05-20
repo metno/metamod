@@ -989,7 +989,7 @@ sub variable {
 
 =head2 set_global_attribute_value
 
-...
+... FIXME
 
 =cut
 
@@ -1121,7 +1121,6 @@ sub init_escapes {
 
 =head3 hloop($refval,$level,$path,$subrhash)
 
-
 Recursively traverse the XML tree:
 
 Split argument array into the following variables:
@@ -1159,17 +1158,14 @@ when hloop encounters these keywords in the XML tree.
 
 sub hloop {
 
-    #
     my ( $refval, $level, $path, $subrhash ) = @_;
 
-    #
-    #     Check if reference is a HASH
-    #
+    #  Check if reference is a HASH
     if ( ref($refval) eq "HASH" ) {
 
         #
-        #       Loop through a given level of tags rooted in a hash reference $refval.
-        #       Each $refvalnew is a reference to HASH or ARRAY, or is a scalar.
+        #  Loop through a given level of tags rooted in a hash reference $refval.
+        #  Each $refvalnew is a reference to HASH or ARRAY, or is a scalar.
         #
         foreach my $hkey ( keys %$refval ) {
             my $refvalnew = $refval->{$hkey};
@@ -1182,16 +1178,15 @@ sub hloop {
                 if ($CTR_printconf) { print STDOUT $hkey . ":\n" }
 
                 #
-                #       If the hash keyword is also found in %$subrhash, call the subroutine
-                #       identified by that hash:
+                #  If the hash keyword is also found in %$subrhash, call the subroutine
+                #  identified by that hash:
                 #
                 if ( $CTR_parseactions && exists( $subrhash->{$hkey} ) ) {
                     my $coderef = $subrhash->{$hkey};
                     &$coderef( $refvalnew, $newpath, $level + 1 );
                 }
 
-                #
-                #       Recursive call to hloop for hash elements:
+                #  Recursive call to hloop for hash elements:
 
                 &hloop( $refvalnew, $level + 1, $newpath, $subrhash );
             } else {
@@ -1201,9 +1196,9 @@ sub hloop {
     } elsif ( ref($refval) eq "ARRAY" ) {
 
         #
-        #       Loop through all array elements
-        #       found through an array reference $refval.
-        #       Each $scalarval is a scalar value
+        #  Loop through all array elements
+        #  found through an array reference $refval.
+        #  Each $scalarval is a scalar value
         #
         my $i1 = 0;
         foreach my $refvalnew (@$refval) {
@@ -1211,9 +1206,7 @@ sub hloop {
             if ($CTR_printconf) { print STDOUT substr( $manyspaces, 0, 3 * $level ) }
             if ($CTR_printconf) { print STDOUT $i1 . ":\n" }
 
-            #
-            #       Recursive call to hloop for array elements:
-            #
+            #  Recursive call to hloop for array elements:
             &hloop( $refvalnew, $level + 1, $newpath, $subrhash );
             $i1++;
         }
@@ -1493,16 +1486,14 @@ sub parse_all {
         }
     }
 
-    #
     #  Place the list of variable names into the %metadata hash:
-    #
     $metadata{"variable"} = [ keys %variablename ];
 
     #
     #  Prepare output to the XML file:
     #
-    # clear all metadata from the dataset
-    $ds->removeMetadata;
+
+    $ds->removeMetadata; # clear all metadata from the dataset
 
     # the following might exist in metadata instead of the info
     $info{'status'}       = ( delete $metadata{'status'} )->[0]       if exists $metadata{'status'};
@@ -1742,15 +1733,22 @@ sub getDatasetRegion {
     return $region;
 }
 
-#
-#---------------------------------------------------------------------------------
-#
+=head2 parse_file( $fpath, $xml_metadata_path )
+
+This subroutine parses one netCDF file given by the file or URL path $fpath
+
+=over 4
+
+=item $fpath
+
+=item $xml_metadata_path (optional)
+
+=back
+
+=cut
+
 sub parse_file {
 
-    #
-    #  This subroutine parses one netCDF file given by the file or URL
-    #  path $fpath (argument to the subroutine).
-    #
     my ( $fpath, $xml_metadata_path ) = @_;
 
     #
@@ -2083,9 +2081,9 @@ sub parse_file {
     }
 
     #
-    #    Set global switches corresponding to the variable types found:
-    #    These global switches are created here, they are not found in the
-    #    %globswitches hash.
+    #  Set global switches corresponding to the variable types found:
+    #  These global switches are created here, they are not found in the
+    #  %globswitches hash.
     #
     foreach my $varname ( keys %foundvars ) {
         my $vref = $foundvars{$varname};
@@ -2093,7 +2091,7 @@ sub parse_file {
     }
 
     #
-    #    Parse the variables. Modify attribute values if neccessary. Add to error messages.
+    #  Parse the variables. Modify attribute values if neccessary. Add to error messages.
     #
     foreach my $varname ( keys %foundvars ) {
         my $vref              = $foundvars{$varname};
@@ -2159,7 +2157,7 @@ sub parse_file {
     }
 
     #
-    #    Set global attributes that are hardcoded in the configuration file:
+    #  Set global attributes that are hardcoded in the configuration file:
     #
     foreach my $attname ( keys %RH_presetattributes ) {
         my $attval = $RH_presetattributes{$attname};
@@ -2174,7 +2172,7 @@ sub parse_file {
     }
 
     #
-    #   Check that all mandatory global attributes are present:
+    # Check that all mandatory global attributes are present:
     #
     foreach my $hkey ( grep { /^global_attributes,/ } keys %RH_attributes ) {
         my $attname     = substr( $hkey, 18 );

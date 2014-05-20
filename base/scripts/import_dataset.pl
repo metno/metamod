@@ -56,12 +56,19 @@ B<import_dataset.pl> - Import an dataset or a directory with datasets into the m
 
 Imports an XML file or a directory of metadata XML files inthe the metadata database.
 
-=head1 SYNOPSIS
+=head1 USAGE
 
-import_dataset.pl [options] <file or dir>
+  import_dataset.pl [options] <file or dir>
 
-  Options:
-    --config Path to application directory or application config file.
+Options:
+
+=over 4
+
+=item --config
+
+Path to application directory or application config file.
+
+=back
 
 =head1 TODO
 
@@ -184,6 +191,10 @@ sub update_database {
 
     return;
 }
+
+=head1 SEE ALSO
+
+L<Metamod::DatasetImporter>
 
 =head1 AUTHOR
 

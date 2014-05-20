@@ -43,10 +43,6 @@ uploaded files.
 
 =head1 USAGE
 
-See Metamod::UploadHelper
-
-=head1 USAGE
-
 ftp_monitor.pl [ --test | --pidfile <path> ] [ --logfile <path> ] [ --config <path> ]
 
 =over
@@ -68,6 +64,10 @@ Path to the log file to use (mandatory when running in daemon mode, otherwise op
 Run the script in test mode (no loop)
 
 =back
+
+=head1 SEE ALSO
+
+L<Metamod::UploadHelper>
 
 =cut
 

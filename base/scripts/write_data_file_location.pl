@@ -20,16 +20,25 @@ use Metamod::DBIxSchema::Userbase;
 
 =head1 NAME
 
-write_data_file_location.pl Parse metadata dataref to determine the data_file_location and write the result to the metadata files.
+write_data_file_location.pl - calculate data_file_location
 
 =head1 DESCRIPTION
 
+Parse metadata dataref to determine the data_file_location and write the result to the metadata files.
+
 =head1 SYNOPSIS
 
-write_data_file_location.pl [options] [path to config file or dir] [dirname]
+  write_data_file_location.pl [options] [path to config file or dir] [dirname]
 
-  Options:
-    --overwrite Should data_file_location be overwritten if it already exists for a dataset
+Options:
+
+=over 4
+
+=item --overwrite
+
+Should data_file_location be overwritten if it already exists for a dataset
+
+=back
 
 =cut
 

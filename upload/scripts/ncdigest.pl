@@ -73,7 +73,8 @@ Path to an XML file that will receive the result of the netCDF parsing. If this
 file already exists, it will contain  the metadata for a previous version
 of the dataset. In this case, a new version of the file will be created,
 comprising a merge of the old and new metadata.
-Defaults to same basename as from NetCDF (not implemented).
+
+Defaults to same basename as from NetCDF (not implemented). [Will not work using OPeNDAP - FIXME]
 
 =item ischild
 
@@ -109,14 +110,17 @@ use lib ("$FindBin::Bin/../../common/lib", '.');
 use Metamod::Config qw( :init_logger );
 use MetNo::NcDigest qw( digest );
 
+my $etcdirectory = $ENV{METAMOD_MASTER_CONFIG};
+
 # Parse cmd line params
-my ($ownertag, $xml_metadata_path, $etcdirectory, $is_child, $pathfilename, $readfromfile);
+my ($ownertag, $xml_metadata_path, $is_child, $pathfilename, $readfromfile, $verbose);
 
 GetOptions ('ownertag|o=s'  => \$ownertag,
             'xmlfile|x=s'   => \$xml_metadata_path,
-            'config=s'      => \$etcdirectory,
+            'config|C=s'    => \$etcdirectory,
             'ischild'       => \$is_child,
             'files|f'       => \$readfromfile,
+            'verbose|v'     => \$verbose,
 ) or pod2usage(2);
 
 pod2usage(2) unless @ARGV;
@@ -128,20 +132,24 @@ if ($readfromfile) {
     # construct a filelist textfile
     ($TEMPFILE, $pathfilename) = tempfile();
     foreach (@ARGV) {
-        print STDERR "$_\n";
+        print STDERR "$_\n" if $verbose;
         print $TEMPFILE "$_\n";
     }
 }
 
 if(!Metamod::Config->config_found($etcdirectory)){
-    pod2usage "Could not find the configuration on the commandline or the in the environment\n";
+    pod2usage "Could not find the configuration on the commandline or the in the environment";
+    exit 3;
 }
 
-my $config = Metamod::Config->new( $etcdirectory );
+my $config = Metamod::Config->new( $etcdirectory ) or die "Missing configuration";
 
-$ownertag = $config-get('UPLOAD_OWNERTAG') unless $ownertag;
+$ownertag = $config->get('UPLOAD_OWNERTAG') unless $ownertag;
 
-printf STDERR "pathfilename=%s, ownertag=%s, xml_metadata_path=%s, is_child=%s\n", $pathfilename, $ownertag, $xml_metadata_path, $is_child ? 'yes' : 'no';
+#$xml_metadata_path = '' unless $xml_metadata_path; # calculate FIXME
+
+printf STDERR "pathfilename=%s, ownertag=%s, xml_metadata_path=%s, is_child=%s\n",
+    $pathfilename, $ownertag, $xml_metadata_path, $is_child ? 'yes' : 'no' if $verbose;
 sleep 10;
 
 digest($pathfilename, $ownertag, $xml_metadata_path, $is_child );

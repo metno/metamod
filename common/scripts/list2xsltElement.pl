@@ -1,37 +1,58 @@
 #! /usr/bin/perl -w
-# small helper-script to convert a list as used in oaidp-config.php
-# to xslt-elements
-#
-# the results need to be manuall post processed
-# the list needs to be added/exchanged manually
-#----------------------------------------------------------------------------
-#  METAMOD - Web portal for metadata search and upload
-#
-#  Copyright (C) 2008 met.no
-#
-#  Contact information:
-#  Norwegian Meteorological Institute
-#  Box 43 Blindern
-#  0313 OSLO
-#  NORWAY
-#  email: Heiko.Klein@met.no
-#
-#  This file is part of METAMOD
-#
-#  METAMOD is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  METAMOD is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with METAMOD; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-#----------------------------------------------------------------------------
+
+=begin LICENSE
+
+METAMOD - Web portal for metadata search and upload
+
+Copyright (C) 2008 met.no
+
+Contact information:
+Norwegian Meteorological Institute
+Box 43 Blindern
+0313 OSLO
+NORWAY
+email: Heiko.Klein@met.no
+
+This file is part of METAMOD
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+METAMOD is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with METAMOD; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=end LICENSE
+
+=cut
+
+
+
+=head1 NAME
+
+B<list2xsltElement.pl> - DEPRECATED?
+
+=head1 DESCRIPTION
+
+small helper-script to convert a list as used in oaidp-config.php to xslt-elements
+
+the results need to be manually post processed
+
+the list needs to be added/exchanged manually
+
+=head1 USAGE
+
+  list2xsltElement.pl ???
+
+=cut
+
 use strict;
 use warnings;
 
@@ -76,7 +97,7 @@ my @list = (
          '', 'Data_Center Data_Center_URL', 'http://met.no/',
          '', 'Data_Center Personnel Role', 'DATA CENTER CONTACT',
          '', 'Data_Center Personnel First_Name', 'Egil',
-         '', 'Data_Center Personnel Last_Name', 'Støren',
+         '', 'Data_Center Personnel Last_Name', "St\0xf8ren",
          '', 'Data_Center Personnel Phone', '+4722963000',
          '', 'Data_Center Personnel Contact_Address Address', "Norwegian Meteorological Institute\nP.O. Box 43\nBlindern",
          '', 'Data_Center Personnel Contact_Address City', 'Oslo',
