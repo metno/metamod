@@ -55,11 +55,12 @@ chmod g+s $WEBRUN_DIRECTORY
 # run following command to set sticky bits on existing webrun catalogs
 # find /path/to/directory -type d -exec chmod g+s {} \;
 
+mkdir -p $WEBRUN_DIRECTORY/webupload
+
 #
 # Initialise the collection basket download directory
 #
 mkdir -p $WEBRUN_DIRECTORY/download
-
 
 mkdir -p $WEBRUN_DIRECTORY/upl
 mkdir -p $WEBRUN_DIRECTORY/upl/problemfiles
