@@ -161,7 +161,7 @@ export METAMOD_MASTER_CONFIG=[==CONFIG_DIR==]
 export _OLD_VIRTUAL_PATH="$PATH"
 ROOT=[==INSTALLATION_DIR==]
 PROMPT=`basename [==CONFIG_DIR==]`
-export PATH=$PATH:"$ROOT:$ROOT/base/init":"$ROOT/base/userinit":"$ROOT/base/scripts":"$ROOT/common":"$ROOT/common/scripts":"$ROOT/catalyst/script"
+export PATH=$PATH:"$ROOT:$ROOT/base/init":"$ROOT/base/userinit":"$ROOT/base/scripts":"$ROOT/common":"$ROOT/common/scripts":"$ROOT/catalyst/script:$ROOT/local/bin"
 
 if [ -n "[==CATALYST_LIB==]" ]; then
     export _OLD_VIRTUAL_PERL5LIB="$PERL5LIB"
