@@ -64,11 +64,13 @@ use Log::Log4perl qw( get_logger );
 
 # Parse cmd line params
 #
-my ($pid, $errlog, $ownertag, $config_file_or_dir);
-GetOptions ('pid|p=s' => \$pid,     # name of pid file - if given, run as daemon
-            'log|l=s' => \$errlog,  # optional, redirect STDERR and STDOUT here
-            'owner=s' => \$ownertag, # archive files under this owner
-            'config=s'  => \$config_file_or_dir,
+my ($pid, $errlog, $ownertag);
+my $config_file_or_dir = $ENV{METAMOD_MASTER_CONFIG};
+
+GetOptions ('pid|p=s'       => \$pid,     # name of pid file - if given, run as daemon
+            'log|l=s'       => \$errlog,  # optional, redirect STDERR and STDOUT here
+            'owner=s'       => \$ownertag, # archive files under this owner
+            'config|C=s'    => \$config_file_or_dir,
 );
 
 if(!Metamod::Config->config_found($config_file_or_dir)){
@@ -78,7 +80,6 @@ if(!Metamod::Config->config_found($config_file_or_dir)){
 
 my $config = Metamod::Config->new($config_file_or_dir);
 my $log = get_logger('metamod.harvester');
-
 
 my $xmldirectory = $config->get('WEBRUN_DIRECTORY').'/XML/'.$config->get('APPLICATION_ID').'/';
 my $applicationid = $config->get('APPLICATION_ID');
