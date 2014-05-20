@@ -44,7 +44,7 @@ MetamodWeb::Utils::XML::Generator - Create an XML DOM tree programmatically
     my $dom = new MetamodWeb::Utils::XML::Generator;
 
     $dom->setDocumentElement(
-        $dom->tag('html', [
+        $dom->tag('html', { xmlns => "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" } , [
             $dom->tag('head', [
                 $dom->tag('meta', {
                     HTTP-EQUIV => "REFRESH",
@@ -64,16 +64,16 @@ Convenience methods for generating XML... not in production use... expect change
 
 =head2 tag
 
-Generates a LibXML::Element node with a given name (string), attributes (hash)
-and children nodes (list).
+Generates a LibXML::Element node with a given name (string), attributes (hashref) and children nodes (arrayref).
+Namespace is set
 
 =cut
 
 sub tag {
     # create a new element, optionally with given attributes (hash ref),
     # childnodes (array ref) and/or text content (string)
-    # this is not really namespace-aware, but can be faked using xmlns attr
     my $self = shift;
+
     my $name = shift() or die "Missing tag name";
     #printf STDERR "<%s>\n", $name;
     my $node = $self->createElement($name);
@@ -82,8 +82,12 @@ sub tag {
         if (ref($param) eq 'HASH') { # attributes
             foreach my $attr (keys %$param) {
                 #printf STDERR "  \@%s = '%s'\n", $attr, $$param{$attr};
-                if (defined (my $value = $$param{$attr}) ) { # skip empty attrs
-                    $node->setAttribute($attr, $value);
+                my $value = $$param{$attr};
+                if ($attr =~ /^xmlns$|^xmlns:(\w+)$/) {
+                    # now actually namespace-aware
+                    $node->setNamespace( $value , $1, 0 );
+                } else {
+                    $node->setAttribute($attr, $value) if defined $value # skip empty attrs
                 }
             }
         } elsif (ref($param) eq 'ARRAY') { # child elements
@@ -91,7 +95,7 @@ sub tag {
                 #printf STDERR "  <%s>\n", $_->nodeName;
                 $node->addChild($_);
             }
-        } else { # text content
+        } elsif ( ! ref($param) ) { # text content
             #printf STDERR "  '%s'\n", $param;
             $node->appendText($param);
         }
