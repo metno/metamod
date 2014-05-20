@@ -90,6 +90,7 @@ sub upload_POST  {
 
     my $institution = $c->user->u_institution;
     my $updir = $c->stash->{mm_config}->get('UPLOAD_DIRECTORY');
+    die "Upload directory $updir not writeable" unless -w $updir;
     my $upload_utils = MetamodWeb::Utils::UploadUtils->new( { c => $c, config => $c->stash->{ mm_config } } );
 
     $c->stash( template => 'upload/form.tt' );
@@ -168,7 +169,7 @@ sub upload_POST  {
     } else {
 
         $self->logger->info("New file '$filepath' uploaded");
-        $upload->copy_to("$updir/$filepath") or die $!;
+        $upload->copy_to("$updir/$filepath") or die "Can't write $updir/$filepath: $!";
 
         my $success = $queue->insert_job(
             job_type => 'Metamod::Queue::Worker::Upload',
