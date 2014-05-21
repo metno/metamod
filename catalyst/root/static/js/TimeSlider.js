@@ -8,6 +8,9 @@
  *
  */
 
+// jQuery UI slideshow object
+slideshow : null,
+
 OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
 
     // mapping of the times are available.
@@ -25,6 +28,7 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
     sliderId : 'timeslider-slider',
     nextButtonId : 'timeslider-next',
     previousButtonId : 'timeslider-previous',
+    playButtonId : 'timeslider-play',
     sliderCurrentId : 'timeslider-current',
     buttonDivId : 'timeslider-button-div',
 
@@ -177,8 +181,9 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
         }
         );
 
-        //jQuery('#' + this.previousButtonId ).on('click', function () { outerThis.timesliderPrevious(); } );
-        //jQuery('#' + this.nextButtonId).on('click', function () { outerThis.timesliderNext(); } );
+        jQuery('#' + this.previousButtonId).on('click', function () { outerThis.timesliderPrevious(); } );
+        jQuery('#' + this.nextButtonId    ).on('click', function () { outerThis.timesliderNext();     } );
+        jQuery('#' + this.playButtonId    ).on('click', function () { outerThis.timesliderPlay( outerThis );     } );
 
         //we set the value to make sure that we fire the value changed event.
         this.slider.slider("value", 0);
@@ -186,11 +191,20 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
     },
 
     /**
+     * Advance the slider to the next value continously
+     */
+    timesliderPlay : function (outer) {
+        slideshow = setInterval( function() {
+            outer.timesliderNext();
+        }, 3000);
+    },
+
+    /**
      * Advance the slider to the next value. This method wraps around to the start.
      */
     timesliderNext : function () {
         var val = this.slider.slider("value");
-        log.debug('next: ' + val);
+        log.debug('next from ' + val);
         if( val < this.sortedTimes.length - 1 ){
             this.slider.slider("value", val + 1);
         } else {
@@ -203,7 +217,7 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
      */
     timesliderPrevious : function () {
         var val = this.slider.slider("value");
-        log.debug('prev: ' + val);
+        log.debug('prev from ' + val);
         if( val > 0 ){
             this.slider.slider("value", val - 1);
         } else {
@@ -266,13 +280,15 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
      * @returns {String}
      */
     timesliderHtml : function () {
-        var html = '<div id="' + this.sliderId + '">';
-        html += '<span id="' + this.sliderCurrentId + '" class="timeslider-current" style="margin-left: 310px; white-space: nowrap;"></span>';
-        html += '</div>';
+        var html = '';
         html += '<div id="' + this.buttonDivId + '" class="timeslider-button-div">';
-        //html += '<button id="' + this.previousButtonId + '" class="timeslider-previous">Previous</button>'; // not working
-        //html += '<span id="' + this.sliderCurrentId + '" class="timeslider-current"></span>';
-        //html += '<button id="' + this.nextButtonId + '" class="timeslider-next">Next</button>'; // not working
+        html += '<button id="' + this.playButtonId + '" class="timeslider-play">Slideshow</button>';
+        html += '<button onclick="clearInterval(slideshow)">Stop</button>';
+        html += '<button id="' + this.previousButtonId + '" class="timeslider-previous">Previous</button>';
+        html += '<button id="' + this.nextButtonId + '" class="timeslider-next">Next</button>';
+        html += '<span id="' + this.sliderCurrentId + '" class="timeslider-current"></span>';
+        html += '</div>';
+        html += '<div id="' + this.sliderId + '">';
         html += '</div>';
         return html;
     },

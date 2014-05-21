@@ -11,6 +11,22 @@
     font-family: sans-serif
 }
 
+#timesliderId {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    z-index: 1000;
+    width: 400px;
+}
+
+#timeslider-button-div {
+    white-space: nowrap;
+}
+
+#timeslider-current {
+    /*margin-left: 310px;*/
+    white-space: nowrap;
+}
 
 /* crappy css selectors below don't work... have to use inline styles instead :( */
 /*#timebox { visibility: hidden };*/
