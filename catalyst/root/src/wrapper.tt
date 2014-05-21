@@ -6,7 +6,7 @@
 
 [% INCLUDE 'styles.tt' %]
 
-<script type="text/javascript" src="[% c.uri_for('/static/js/jquery.min.js') %]"></script>
+<script type="text/javascript" src="[% c.uri_for('/static/js/jquery-1.8.3.min.js') %]"></script>
 <script type="text/javascript" src="[% c.uri_for('/static/js/jquery-ui.min.js') %]"></script>
 <script type="text/javascript" src="[% c.uri_for('/static/js/metamod.js') %]"></script>
 <script type="text/javascript" src="[% c.uri_for('/static/lib/log4javascript-1.4.6/js/log4javascript.js') %]"></script>
