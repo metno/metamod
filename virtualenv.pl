@@ -68,9 +68,6 @@ while (<DATA>) {
     #print $_;
 }
 close($file);
-chmod 0775, $file or die "Could not set activate script executable";
-
-exit 0;
 
 =head1 NAME
 
