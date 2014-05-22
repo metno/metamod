@@ -49,7 +49,7 @@ my $config_dir = $ARGV[0] or pod2usage(1);
 my $install_dir = $ARGV[1] || $config_dir;
 
 if (!Metamod::Config->config_found($config_dir)){
-  die "Could not find the configuration on the command line or the in the environment\n";
+  die "Could not find the configuration on the command line or the in the environment";
 }
 
 my $config = Metamod::Config->new($config_dir, { nolog => 1 });
@@ -68,6 +68,9 @@ while (<DATA>) {
     #print $_;
 }
 close($file);
+chmod 0775, $file or die "Could not set activate script executable";
+
+exit 0;
 
 =head1 NAME
 
