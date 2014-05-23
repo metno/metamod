@@ -65,7 +65,11 @@ sub xslt_dir {
         return $ENV{METAMOD_XSLT_DIR};
     } else {
         my $config = Metamod::Config->instance();
-        return $config->get("XSLT_DIR") || $config->get("INSTALLATION_DIR") . '/common/schema/';
+        if( $config->has("XSLT_DIR") ) {
+            return $config->get("XSLT_DIR");
+        } else {
+            return $config->get("INSTALLATION_DIR") . '/common/schema/';
+        }
     }
 }
 
