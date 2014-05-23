@@ -47,6 +47,7 @@ use Data::Dumper;
 use File::Basename;
 use File::Copy;
 use File::Path;
+use Try::Tiny;
 use Log::Log4perl qw( get_logger );
 use Metamod::Email;
 use Moose;
@@ -65,6 +66,7 @@ has 'file_in_error_counter' => ( is => 'rw', default => 1 );
 # Worst-case scenario is files being overwritten since FTP and web upload has separate counters
 # (even worse if initing UploadHelper more than once in a script).
 
+#has 'system_error'          => ( is => 'ro', writer  => '_log_error' );
 has 'user_errors'           => ( is => 'rw', default => sub { [] } );
 has 'days_to_keep_errfiles' => ( is => 'rw', default => 14 );
 has 'all_ftp_datasets'      => ( is => 'rw', default => sub { {} } );
@@ -73,10 +75,17 @@ has 'all_ftp_datasets'      => ( is => 'rw', default => sub { {} } );
 
 has 'ftp_events'            => ( is => 'rw', default => sub { {} } );
 
+our ($webrun_directory, $work_directory, $work_expand, $work_flat, $work_start);
+
 sub BUILD { # ye olde init "constructor"
     my $self = shift;
 
     ## Make sure static directories exists - FIXME
+    $webrun_directory      = $self->config->get('WEBRUN_DIRECTORY');
+    $work_directory        = $webrun_directory . "/upl/work" . $$;
+    $work_expand           = $work_directory . "/expand";
+    $work_flat             = $work_directory . "/flat";
+    $work_start            = $work_directory . "/start";
 
     #foreach my $directory ( $work_directory, $work_start, $work_expand, $work_flat, $uerr_directory,
     #    $xml_directory, $xml_history_directory, $problem_dir_path ) {
@@ -97,9 +106,7 @@ sub BUILD { # ye olde init "constructor"
     #  The hash will be filled with updated info from the directory
     #  $webrun_directory/u1 at the beginning of each repetition of the loop.
     $self->get_dataset_institution();
-
 }
-
 
 =head2 read_ftp_events
 
@@ -109,7 +116,6 @@ Load the content of the ftp_events file into a hash.
 
 sub read_ftp_events {
     my $self = shift;
-    my $webrun_directory      = $self->config->get('WEBRUN_DIRECTORY');
     my $eventsref = $self->ftp_events;
     my $eventsfile = $webrun_directory . '/ftp_events';
     if ( -r $eventsfile ) {
@@ -271,8 +277,36 @@ sub process_upload {
     my $age_seconds        = 60 * $upload_age_threshold + 1;
 
     my $datestring = $self->get_date_and_time_string( $current_epoch_time - $age_seconds );
-    $self->process_files( $inputfile, $dataset_name, $upload_type, $datestring );
+    my $error = try {
+        $self->makeworkdir();
+        $self->process_files( $inputfile, $dataset_name, $upload_type, $datestring );
+    } catch {
+        $self->logger->error("Upload processing died: $_");
+        #$self->_log_error($_);
+        $_;
+    } finally {
+        eval { $self->cleanworkdir(); } or return $@;
+    };
+    return $error;
+}
 
+sub makeworkdir {
+    my ( $self ) = @_;
+    #  Create the necessary directories
+    foreach my $dir ( $work_start, $work_expand, $work_flat ) {
+        mkpath($dir) or die "Failed to create $dir: $!";    # create a fresh directory
+    }
+}
+
+sub cleanworkdir {
+    my $self = shift;
+    #  Clean up the work_start, work_flat and work_expand directories:
+    foreach my $dir ( $work_start, $work_expand, $work_flat ) {
+        rmtree($dir);
+        if ( -d $dir ) {
+            die "Unable to clean up $dir: " . $self->shell_command_error;
+        }
+    }
 }
 
 =head2 process_files
@@ -299,23 +333,12 @@ CDL files are converted to netCDF.
 
 =cut
 
-sub process_files { # rewrite this monster into small, more manageable modules which can be tested separately ... FIXME
+sub process_files { # rewrite this 800-line monster into small, more manageable modules which can be tested separately ... FIXME
 
     my ( $self, $input_files, $dataset_name, $ftp_or_web, $datestring ) = @_;
 
-    my $webrun_directory      = $self->config->get('WEBRUN_DIRECTORY');
-    my $work_directory        = $webrun_directory . "/upl/work" . $$;
-    my $work_expand           = $work_directory . "/expand";
-    my $work_flat             = $work_directory . "/flat";
-    my $work_start            = $work_directory . "/start";
-    my $xml_history_directory = $webrun_directory . '/XML/history';
     my $problem_dir_path      = $webrun_directory . "/upl/problemfiles";
     my $starting_dir          = getcwd();
-
-    #  Create the necessary directories
-    foreach my $dir ( $work_start, $work_expand, $work_flat ) {
-        mkpath($dir) or die "Failed to create $dir: $!";    # create a fresh directory
-    }
 
     # need to reset the user error messages for each upload.
     $self->reset_user_errors();
@@ -369,7 +392,7 @@ sub process_files { # rewrite this monster into small, more manageable modules w
 
         # Get type of file and act accordingly:
         my $filetype = getFiletype($newpath);
-        $self->logger->debug("Processing $newpath Filtype: $filetype");
+        $self->logger->info("Processing $newpath Filtype: $filetype");
 
         if ( $filetype =~ /^gzip/ ) {    # gzip or gzip-compressed
 
@@ -769,7 +792,7 @@ sub process_files { # rewrite this monster into small, more manageable modules w
                 $recipient = $dataset_institution{$dataset_name}->{'email'};
                 $username  = $dataset_institution{$dataset_name}->{'name'} . " ($recipient)";
             } else {
-                my $identfile = $self->config->get('WEBRUN_DIRECTORY') . '/upl/etaf/' . $taf_basename;
+                my $identfile = File::Spec->catfile($webrun_directory, 'upl', 'etaf', $taf_basename);
                 unless ( -r $identfile ) {
                     $self->logger->error("email_file_not_found: $identfile" );
                     return;
@@ -817,20 +840,13 @@ sub process_files { # rewrite this monster into small, more manageable modules w
         if ( $ftp_or_web eq 'TAF' ) {
             my @bnames = $self->get_basenames( \@originally_uploaded );
             foreach my $bn (@bnames) {
-                if ( unlink( $self->config->get('WEBRUN_DIRECTORY') . '/upl/etaf/' . $bn ) == 0 ) {
+                if ( unlink( "$webrun_directory/upl/etaf/$bn" ) == 0 ) {
                     $self->syserrorm( "SYS", "Unlink TAF file etaf/$bn did not succeed", "", "process_files", "" );
                 }
             }
         }
     }
 
-    #  Clean up the work_start, work_flat and work_expand directories:
-    foreach my $dir ( $work_start, $work_expand, $work_flat ) {
-        rmtree($dir);
-        if ( -d $dir ) {
-            die "Unable to clean up $dir: " . $self->shell_command_error;
-        }
-    }
 }
 
 =head2 get_dataset_institution
@@ -999,7 +1015,6 @@ sub shcommand_scalar {
     my ($command) = @_;
     $self->logger->debug( 'shcommand_scalar running: ', $command );
 
-    my $webrun_directory = $self->config->get('WEBRUN_DIRECTORY');
     my $path_to_shell_error   = $webrun_directory . "/upl/shell_command_error";
 
     #   open (SHELLLOG,">>$path_to_shell_log");
@@ -1050,7 +1065,6 @@ sub shcommand_array {
     my ($command) = @_;
     $self->logger->debug( 'shcommand_array running: ', $command );
 
-    my $webrun_directory = $self->config->get('WEBRUN_DIRECTORY');
     my $path_to_shell_error   = $webrun_directory . "/upl/shell_command_error";
 
     #   open (SHELLLOG,">>$path_to_shell_log");
@@ -1096,7 +1110,6 @@ Move away file, log error
 sub move_to_problemdir {
     my $self = shift;
 
-    my $webrun_directory = $self->config->get('WEBRUN_DIRECTORY');
     my $problem_dir_path = $webrun_directory . "/upl/problemfiles";
 
     my ($uploadname) = @_;
@@ -1183,30 +1196,43 @@ sub reset_user_errors {
     $self->user_errors([]);
 }
 
-#
-# what it say on the tin
-#
+=head2 $self->gunzip_file( $filename )
+
+Unzip gzipped file, returning basename minus extension (or .tar if .tgz)
+
+=cut
+
 sub gunzip_file {
     my $self = shift;
 
     my ($filename) = @_;
 
     # Uncompress file:
-    my $result = $self->shcommand_scalar("gunzip $filename");
+    my $result = $self->shcommand_scalar("gunzip $filename"); # FIXME - use Gzip::Faster instead
     if ( !defined($result) ) {
         $self->syserrorm( "SYSUSER", "gunzip_problem_with_uploaded_file", $filename, "process_files", "" );
         return;
     }
 
     my ($basename, $dirs, $extension) = fileparse($filename, qr/\.[^.]*/);
-
-    return File::Spec->catfile($dirs, $basename);
-
+    my $newfilename = File::Spec->catfile($dirs, $basename);
+    if ($extension eq 'tgz') {
+        $newfilename = File::Spec->catfile($newfilename, 'tar');
+    }
+    if ( -r $newfilename) {
+        return $newfilename;
+    } else {
+        $self->syserrorm( "Can't find $newfilename after unpacking $filename" );
+        return;
+    }
 }
 
-#
-# extract filenames in tarball
-#
+=head2 $tar_orignames = $self->validate_tar_components($newpath, $uploadname, $dataset_name)
+
+extract filenames in tarball
+
+=cut
+
 sub validate_tar_components {
     my $self = shift;
 
@@ -1256,6 +1282,15 @@ sub validate_tar_components {
 
 }
 
+=head2 $errors = $self->unpack_tar_archive($newpath, $uploadname, $work_expand, $work_flat);
+
+Expand the tar file onto the $work_expand directory.
+Move all expanded files to the $work_flat directory, which
+will not contain any subdirectories. Check that no duplicate
+file names arise.
+
+=cut
+
 sub unpack_tar_archive {
     my $self = shift;
 
@@ -1265,7 +1300,7 @@ sub unpack_tar_archive {
     unless ( chdir $work_expand ) {
         die "Could not cd to $work_expand: $!\n";
     }
-    my $tar_results = $self->shcommand_scalar("tar xf $tar_file");
+    my $tar_results = $self->shcommand_scalar("tar xf $tar_file"); # FIXME - use  Archive::Tar
     if ( length($self->shell_command_error) > 0 ) {
         $self->syserrorm( "SYSUSER", "tar_xf_fails", $uploadname, "process_files", "" );
         next;
@@ -1325,14 +1360,19 @@ sub get_date_and_time_string {
     return $datestring;
 }
 
-sub get_basenames {
-    my $self = shift;
+=head1 $self->get_basenames( $arrayref )
 
-    my ($ref) = @_;
+Apparently strips paths from a list of filenames
+
+=cut
+
+sub get_basenames {
+    my ($self, $ref) = @_;
     my @result = ();
     foreach my $path1 (@$ref) {
         my $path = $path1;
-        $path =~ s:^.*/::;
+        $path =~ s:^.*/::; # stripping path from filename? better use fileparse()
+        #eval { print STDERR " >> basename = '$path' was '$path1'\n"; };
         push( @result, $path );
     }
     return @result;
@@ -1388,7 +1428,7 @@ sub notify_web_system {
     my @uploaded_basenames = $self->get_basenames($ref_uploaded_files);
 
     #
-    #  Get file sizees for each uploaded file:
+    #  Get file sizes for each uploaded file:
     #
     if ( $self->logger->is_debug ) {
         my $msg = "notify_web_system: $code,$dataset_name\t";
@@ -1521,7 +1561,6 @@ sub notify_web_system {
 #
 sub clean_up_problem_dir {
     my $self = shift;
-    my $webrun_directory = $self->config->get('WEBRUN_DIRECTORY');
     my $problem_dir_path = $webrun_directory . "/upl/problemfiles";
 
     my @files_found = findFiles( $problem_dir_path, sub { $_[0] =~ /^\d/; } );
@@ -1550,9 +1589,15 @@ sub clean_up_problem_dir {
     }
 }
 
-#
-# Delete files in repo
-#
+
+=head2 $upload_helper->clean_up_repository()
+
+Delete files in repo (only FTP?)
+
+This method is only called from ftp_monitor...
+
+=cut
+
 sub clean_up_repository {
     my $self = shift;
     my $current_epoch_time = time();

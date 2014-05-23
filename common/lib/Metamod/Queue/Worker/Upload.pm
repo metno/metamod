@@ -67,7 +67,7 @@ sub work {
     my $logger = get_logger('job');
     $logger->debug( sprintf "Worked starting job %d, file %s of type %s", $job->jobid(), $job->arg->{file}, $job->arg->{type} );
 
-    eval {
+    #eval {
 
         $mm_job = Metamod::Queue::Job::Upload->new() unless defined $mm_job;
         my $success = $mm_job->process_file(
@@ -76,13 +76,14 @@ sub work {
             $job->arg->{type}
         );
 
-        if( !$success ){
-            die $mm_job->error_msg();
+        if ($success) {
+            $job->completed();
+        } else {
+            $job->failed( $mm_job->error_msg, 1 );
+            #$logger->error( $mm_job->error_msg );
         }
 
-        $job->completed();
-
-    } or print $@;
+    #} or $logger->error( "Upload worker died: $@" );
 
 }
 

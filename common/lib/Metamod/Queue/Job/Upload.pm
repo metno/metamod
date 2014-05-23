@@ -39,7 +39,7 @@ Metamod::Queue::Job::Upload - Server side job for processing uploaded NetCDF fil
 
 =head1 DESCRIPTION
 
-...
+... blah blah blah FIXME
 
 This module shall be indenpendent of the actual job queue system that is used
 to simplify testing and make it easier to replace the job queue system as
@@ -75,15 +75,19 @@ sub process_file {
     my $self = shift;
 
     my $upload_helper = Metamod::UploadHelper->new();
-    my ( $jobid, $file, $type ) =
-        validate_pos( @_, 1, 1, 1 );
+    my ( $jobid, $file, $type ) = validate_pos( @_, 1, 1, 1 );
     my $logger = get_logger('job');
 
     #print STDERR "Processing file $file ($type)\n";
     $logger->info("Processing file $file ($type)");
-    $upload_helper->process_upload($file, $type);
-    $logger->debug('Job $file done');
-    return 1;
+    my $error = $upload_helper->process_upload($file, $type);
+    if ($error) {
+        $logger->warn("Job $file failed: $error");
+    } else {
+        $logger->debug("Job $file done");
+    }
+
+    return ! $error;
 
 }
 
