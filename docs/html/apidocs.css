@@ -1,0 +1,68 @@
+
+body {
+    font-size: 10pt;
+    line-height: 14pt;
+    font-family: Sans, sans-serif;
+    margin: 20 20 20 260;
+}
+
+/*h1 { font-size: 24pt;  }*/
+h1 { font-size: 18pt; border-top: 1px solid #eeeeee; padding-top: 13px; }
+h2 { font-size: 12pt}
+h3 { font-size: 10pt}
+h4 { font-size: 9pt}
+
+a.u { color: #9999cc; text-decoration: none; }
+h2 a.u { color: #003366; }
+/*h2 a.u { color: #666666; }*/
+h3 a.u { color: #cc6666; }
+/*h4 a.u { color: #666666; }*/
+/*h5 a.u { color: #666666; }*/
+
+p {
+    font-family: "Bitstream Charter", Serif, serif;
+    font-size: 11pt;
+    padding-left: 7;
+}
+
+pre {
+    background-color: #eeeeff;
+    font-family: "DejaVu Sans Mono", monospace;
+    font-size: 11px;
+    padding: 4 4 4 4;
+}
+
+dt a {
+    color: #660000;
+}
+
+div.indexgroup {
+    position: fixed;
+    top:20;
+    left:0;
+    width:240px;
+    background-color: #ddddee;
+}
+
+ul.indexList {
+    list-style: none;
+    padding-left: 7;
+    font-size: 9pt;
+}
+
+li.indexitem {
+    padding: 3 3 3 3;
+}
+
+li.indexitem a {
+    text-decoration: none;
+    color: #000066;
+}
+
+p.contentsfooty {
+    border-top: #cccccc 1pt solid;
+    text-align: right;
+    font-family: Sans, sans-serif;
+    font-size: 7pt;
+    color: #999999;
+}
