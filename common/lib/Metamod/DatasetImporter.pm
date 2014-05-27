@@ -868,7 +868,7 @@ sub _isoDoc2SruDb {
     push @values, $info{name};
 
     push @params, "ownertag";
-    push @values, uc($info{ownertag});
+    push @values, uc( $info{ownertag} || '' );
 
     push @params, "created";
     push @values, $info{creationDate};

@@ -366,7 +366,7 @@ sub has {
 =head2 $conf->is($varname)
 
 return true if the configuration variable has been set and is not among a list of
-false values (0, false, empty string). Does not give any warnings.
+false values (0, false, no, off, empty string). Does not give any warnings.
 
 =cut
 
@@ -378,7 +378,7 @@ sub is {
     return undef unless exists $self->{vars}{$var};
     my $val = $self->_substituteVariable($var);
     #printf STDERR "Config boolean %s = %s\n", $var, $val;
-    return ($val && lc($val) ne 'false') ? 1 : 0;
+    return ( $val && lc($val) !~ /^(false)|(no)|(off)$/ ) ? 1 : 0;
 }
 
 =head2 $conf->split($varname)

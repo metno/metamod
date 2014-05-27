@@ -466,7 +466,7 @@ sub _oai_record_header {
 
     # If metadata validation is turned on we will mark all datasets with invalid
     # metadata as deleted.
-    if( $self->config->get('PMH_VALIDATION') eq 'on' && $dataset->ds_status() != 0 ) {
+    if( $self->config->is('PMH_VALIDATION') && $dataset->ds_status() != 0 ) {
         my $xml;
         try {
             my $xml_dom = $self->_get_metadata( $dataset, $format );
