@@ -185,6 +185,20 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 0
       Storable 0
+  Capture-Tiny-0.24
+    pathname: D/DA/DAGOLDEN/Capture-Tiny-0.24.tar.gz
+    provides:
+      Capture::Tiny 0.24
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.17
+      File::Spec 0
+      File::Temp 0
+      IO::Handle 0
+      Scalar::Util 0
+      strict 0
+      warnings 0
   Carp-1.26
     pathname: Z/ZE/ZEFRAM/Carp-1.26.tar.gz
     provides:
@@ -1562,7 +1576,7 @@ DISTRIBUTIONS
       Class::Factory::Util 1.6
       DateTime 0.12
       DateTime::Format::Strptime 1.04
-      Module::Build 0.36
+      Module::Build 0
       Params::Validate 0.72
       Task::Weaken 0
   DateTime-Format-Mail-0.3001
@@ -2086,7 +2100,7 @@ DISTRIBUTIONS
       DateTime::Locale::zu_ZA undef
     requirements:
       List::MoreUtils 0
-      Module::Build 0.36
+      Module::Build 0
       Params::Validate 0.91
       perl 5.006
   DateTime-Set-0.32
@@ -3012,17 +3026,6 @@ DISTRIBUTIONS
       Fcntl 1.03
       File::Path 2.06
       File::Spec 0.8
-  File-Which-1.09
-    pathname: A/AD/ADAMK/File-Which-1.09.tar.gz
-    provides:
-      File::Which 1.09
-    requirements:
-      Exporter 0
-      ExtUtils::MakeMaker 0
-      File::Spec 0.60
-      Getopt::Std 0
-      Test::More 0.80
-      Test::Script 1.05
   Filesys-Notify-Simple-0.10
     pathname: M/MI/MIYAGAWA/Filesys-Notify-Simple-0.10.tar.gz
     provides:
@@ -3609,28 +3612,6 @@ DISTRIBUTIONS
       File::Temp 0
       Scalar::Util 0
       Test::More 0.88
-  IO-Pager-0.31
-    pathname: J/JP/JPIERCE/IO-Pager-0.31.tgz
-    provides:
-      IO::Pager 0.31
-      IO::Pager::Buffered 0.3
-      IO::Pager::Page 0.16
-      IO::Pager::Unbuffered 0.31
-    requirements:
-      Config 0
-      Env 0
-      Exporter 0
-      ExtUtils::MakeMaker 0
-      File::Spec 0
-      File::Temp 0
-      File::Which 0
-      IO::Handle 0
-      PerlIO 0
-      SelectSaver 0
-      Symbol 0
-      Test::More 0
-      Tie::Handle 0
-      base 0
   IO-Pipely-0.005
     pathname: R/RC/RCAPUTO/IO-Pipely-0.005.tar.gz
     provides:
@@ -3671,14 +3652,6 @@ DISTRIBUTIONS
       IO::WrapTie::Slave 2.110
     requirements:
       ExtUtils::MakeMaker 0
-  IPC-Run3-0.046
-    pathname: R/RJ/RJBS/IPC-Run3-0.046.tar.gz
-    provides:
-      IPC::Run3 0.046
-    requirements:
-      ExtUtils::MakeMaker 0
-      Test::More 0.31
-      Time::HiRes 0
   Image-Size-3.232
     pathname: R/RJ/RJRAY/Image-Size-3.232.tar.gz
     provides:
@@ -5428,15 +5401,6 @@ DISTRIBUTIONS
       Pod::Find 0.21
       Pod::Parser 1.13
       Test::More 0
-  Probe-Perl-0.03
-    pathname: K/KW/KWILLIAMS/Probe-Perl-0.03.tar.gz
-    provides:
-      Probe::Perl 0.03
-    requirements:
-      Config 0
-      ExtUtils::MakeMaker 6.30
-      File::Spec 0
-      strict 0
   Readonly-1.03
     pathname: R/RO/ROODE/Readonly-1.03.tar.gz
     provides:
@@ -5991,7 +5955,6 @@ DISTRIBUTIONS
     provides:
       Test::Exception 0.31
     requirements:
-      Module::Build 0.36
       Sub::Uplevel 0.18
       Test::Builder 0.7
       Test::Builder::Tester 1.07
@@ -6097,19 +6060,6 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 6.42
       Test::More 0.61
       perl 5.006
-  Test-Script-1.07
-    pathname: A/AD/ADAMK/Test-Script-1.07.tar.gz
-    provides:
-      Test::Script 1.07
-    requirements:
-      ExtUtils::MakeMaker 6.42
-      File::Spec 0.80
-      IPC::Run3 0.034
-      Probe::Perl 0.01
-      Test::Builder 0.32
-      Test::Builder::Tester 1.02
-      Test::More 0.62
-      blib 0
   Test-SharedFork-0.21
     pathname: T/TO/TOKUHIROM/Test-SharedFork-0.21.tar.gz
     provides:
