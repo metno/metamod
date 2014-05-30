@@ -46,6 +46,7 @@
     	    <xs:element name="access_constraint" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
     	    <xs:element name="use_constraint" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
     	    <xs:element name="project" type="mmd:project_type" maxOccurs="1" minOccurs="0"></xs:element>
+	    <xs:element name="activity_type" type="xs:string" maxOccurs="unbounded" minOccurs="0"></xs:element>
     	    <xs:element name="instrument" type="mmd:instrument_type" maxOccurs="unbounded" minOccurs="0"></xs:element>
     	    <xs:element name="platform" type="mmd:platform_type" maxOccurs="unbounded" minOccurs="0"></xs:element>
     	    <xs:element name="keywords" type="mmd:keywords_type" maxOccurs="unbounded" minOccurs="0"></xs:element>
