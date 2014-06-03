@@ -93,7 +93,7 @@ jQuery(document).ready( function () {
                 [% IF opendap; tsvars = metadata.timeseries.0 %]
                     [% IF tsvars %]
                         [% IF ext_ts %]
-                            <a class="visualimg" href="[% dataset.external_ts_url(mm_config) %]"><span>Time series</span></a><br clear="all"/>
+                            <a class="visualimg" href="[% dataset.external_ts_url(ext_ts) %]"><span>Time series</span></a><br clear="all"/>
                         [% ELSE %]
                             <a class="visual" href="[% c.uri_for('/search/ts', { ds_id => dataset.ds_id, vars => tsvars } ) %]"><span>Time series</span></a><br clear="all"/>
                         [% END %]
@@ -104,10 +104,12 @@ jQuery(document).ready( function () {
                 [% END %]
 
                 [% IF dataset.num_children() != 0 %]
-                    <a class="btn" href="[% c.uri_for( '/dataset', dataset.ds_id, 'rss' ) %]" target="_blank" title="The RSS feed for this dataset. The RSS feed will notify you about any new datafiles associated with this dataset"><span>RSS Feed</span></a><br clear="all"/>
+                    <a class="btn" href="[% c.uri_for( '/dataset', dataset.ds_id, 'rss' ) %]" target="_blank"
+                       title="The RSS feed for this dataset. The RSS feed will notify you about any new datafiles associated with this dataset"><span>RSS Feed</span></a><br clear="all"/>
 
                     [% IF mm_config.get('SUBSCRIPTION_ENABLED') == 'ENABLED' and search_ui_utils.dataset_in_userbase(dataset) %]
-                        <a class="btn" href="[% c.uri_for( '/subscription', dataset.unqualified_ds_name() ) %]" title="Setup a subscription to get notified about new datafiles (requires login)"><span>Subscribe</span></a><br clear="all"/>
+                        <a class="btn" href="[% c.uri_for( '/subscription', dataset.unqualified_ds_name() ) %]"
+                           title="Setup a subscription to get notified about new datafiles (requires login)"><span>Subscribe</span></a><br clear="all"/>
                     [% END %]
 
                     [% c.req.params.return_path = c.uri_for(c.req.path) %]

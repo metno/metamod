@@ -70,7 +70,7 @@
             [% IF opendap; tsvars = metadata.timeseries.0 %]
                 [% IF tsvars %]
                     [% IF ext_ts %]
-                        <a class="visualimg" href="[% child.external_ts_url(mm_config) %]"><span>Time series</span></a><br clear="all"/>
+                        <a class="visualimg" href="[% child.external_ts_url(ext_ts) %]"><span>Time series</span></a><br clear="all"/>
                     [% ELSE %]
                         <a class="visual" href="[% c.uri_for('/search/ts', { ds_id => child.ds_id, vars => tsvars } ) %]"><span>Time series</span></a><br clear="all"/>
                     [% END %]

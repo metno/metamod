@@ -592,9 +592,14 @@ Returns an URL to the image file. Returns C<undef> if the URL cannot be calculat
 =cut
 
 sub external_ts_url {
-    my ($self, $config) = shift;
+    my ($self) = shift;
+    #print STDERR Dumper \@_;
+    my $tsurl = shift;
 
-    my $tsurl = $config->get('TIMESERIES_URL') or return;
+    if (! defined $tsurl) {
+        $logger->error("Missing external timeseries base URL");
+        return;
+    }
 
     my $metadata = $self->metadata( ['dataref_OPENDAP', 'timeseries'] );
     my $opendap = $self->opendap_url or return;

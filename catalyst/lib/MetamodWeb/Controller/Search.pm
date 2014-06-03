@@ -65,7 +65,7 @@ sub auto :Private {
                in_search_app     => 1, #used to control which header to show
                section           => 'search',
                collection_basket => $collection_basket,
-               ext_ts            => $mm_config->has("TIMESERIES_URL"),
+               ext_ts            => $mm_config->has("TIMESERIES_URL") ? $mm_config->get("TIMESERIES_URL") : undef,
     );
     $c->stash( debug => $self->logger->is_debug() || $c->req->params->{ debug } );
     push @{ $c->stash->{ css_files } }, $c->uri_for( '/static/css/search.css' );
