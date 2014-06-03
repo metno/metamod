@@ -61,7 +61,7 @@ my $upload_helper = Metamod::UploadHelper->new();
 {
     my $testname = 'Single .nc upload';
 
-    $upload_helper->process_upload("$upload_area/hirlam12_ml_2008-05-20_00.nc", 'WEB');
+    $upload_helper->process_upload("$upload_area/hirlam12_ml_2008-05-20_00.nc", 'WEB'); # test if returns error
 
     file_exists_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_ml_2008-05-20_00.nc'), "$testname: File moved to data directory");
 
@@ -101,7 +101,7 @@ my $upload_helper = Metamod::UploadHelper->new();
 }
 
 {
-    my $testname = '.tar.gz upload';
+    my $testname = '.tar.gz upload'; # TODO - add .tgz - FIXME
 
     $upload_helper->process_upload("$upload_area/hirlam12_upload.tar.gz", 'WEB');
 

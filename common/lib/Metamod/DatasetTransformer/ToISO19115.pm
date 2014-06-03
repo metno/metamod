@@ -43,17 +43,15 @@ use Log::Log4perl;
 our @EXPORT_OK = qw(foreignDataset2iso19115);
 our $_logger = Log::Log4perl->get_logger('metamod::common::Metamod::DatasetTransformer::ToISO19115');
 
-my $difToIsoStyle;
+my ($difToIsoStyle, $mmdToIsoStyle);
 my $_init = 0;
 sub _init {
     return if $_init++;
 
     my $difToIsoXslt = Metamod::DatasetTransformer::xslt_dir() . 'dif2iso.xslt';
-    my $styleDoc = Metamod::DatasetTransformer->XMLParser->parse_file($difToIsoXslt);
-    $difToIsoStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet($styleDoc);
-    if (!$difToIsoStyle) {
-        $_logger->logcroak("cannot parse stylesheet $difToIsoXslt");
-    }
+    my $mmdToIsoXslt = Metamod::DatasetTransformer::xslt_dir() . 'mmd-to-iso.xsl';
+    $difToIsoStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet_file($difToIsoXslt) or $_logger->logcroak("cannot parse stylesheet $difToIsoXslt");
+    $mmdToIsoStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet_file($mmdToIsoXslt) or $_logger->logcroak("cannot parse stylesheet $difToIsoXslt");
 }
 
 sub foreignDataset2iso19115 {
@@ -72,6 +70,12 @@ sub foreignDataset2iso19115 {
     } elsif (UNIVERSAL::isa($transformer,'Metamod::DatasetTransformer::DIF')) {
         $_logger->debug("foreignDataset is DIF, only one transformation need");
         $difFds = $foreignDataset;
+    } elsif (UNIVERSAL::isa($transformer,'Metamod::DatasetTransformer::MMD')) {
+        ## MMD is converted directly to ISO without going through MM2 and DIF
+        $_logger->debug("foreignDataset is MMD, only simple transformation needed");
+        my $mmdDoc = $foreignDataset->getMETA_DOC();
+        my $isoDoc = $mmdToIsoStyle->transform($mmdDoc);
+        return Metamod::ForeignDataset->newFromDoc($isoDoc, $foreignDataset->getXMD_DOC());
     } elsif (UNIVERSAL::isa($transformer,'Metamod::DatasetTransformer')) {
         $_logger->debug("foreignDataset is does map to internal, converting to internal->DIF->ISO");
         my ($xmdDoc, $xmlDoc) = $transformer->transform();

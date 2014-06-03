@@ -255,6 +255,8 @@ sub ftp_process_hour {
 
 Not sure what this does except call process_files() ...
 
+Returns error string if failed, otherwise nothing.
+
 =cut
 
 sub process_upload {
@@ -286,6 +288,7 @@ sub process_upload {
         $_;
     } finally {
         eval { $self->cleanworkdir(); } or return $@;
+        # everything presumably now ok, returns undef by default
     };
     return $error;
 }
@@ -293,6 +296,7 @@ sub process_upload {
 sub makeworkdir {
     my ( $self ) = @_;
     #  Create the necessary directories
+    $self->logger->info("Creating work dir $work_start");
     foreach my $dir ( $work_start, $work_expand, $work_flat ) {
         mkpath($dir) or die "Failed to create $dir: $!";    # create a fresh directory
     }
@@ -301,6 +305,7 @@ sub makeworkdir {
 sub cleanworkdir {
     my $self = shift;
     #  Clean up the work_start, work_flat and work_expand directories:
+    $self->logger->info("Deleting work dir $work_start");
     foreach my $dir ( $work_start, $work_expand, $work_flat ) {
         rmtree($dir);
         if ( -d $dir ) {

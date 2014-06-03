@@ -53,6 +53,7 @@ use warnings;
 
 use Carp qw( confess );
 use Data::Dumper;
+use Capture::Tiny ':all';
 use DateTime;
 use DateTime::Format::Strptime;
 use File::Spec;
@@ -449,6 +450,7 @@ sub _oai_record_header {
     my $self = shift;
 
     my ( $identifier, $dataset, $format ) = @_;
+    #$self->logger->debug( '_oai_record_header:', $identifier, ' ', $dataset, ' ', $format );
 
     my $datestring = $self->_convert_date( $dataset->get_column('ds_datestamp') );
 
@@ -470,12 +472,12 @@ sub _oai_record_header {
         my $xml;
         try {
             my $xml_dom = $self->_get_metadata( $dataset, $format );
+            $xml = $xml_dom->toString(1) or die "Missing DOM... file unparsable?";
             $self->_validate_metadata($format, $xml_dom, $dataset);
-            $xml = $xml_dom->toString(1);
         } catch {
             $record->{status} = 'deleted';
-            $self->logger->error($_);
-            $self->logger->debug( $xml ) if defined $xml;
+            $self->logger->error("Document is not valid $format: $_");
+            $self->logger->debug($xml) if defined $xml;
         };
     }
 
@@ -527,7 +529,7 @@ sub _get_metadata {
 
     my $converted = $convert_func->($ds);
     my $dom = $converted->getMETA_DOC();
-    $self->logger->debug( "DataProvider::_get_metadata( ", $dataset->ds_id(), ", $format ) ", substr $dom->toString(2), 0, 130 );
+    $self->logger->debug( "DataProvider::_get_metadata( ", $dataset->ds_id(), ", $format ) ", substr( $dom->toString(2), 0, 130 ), '...' );
 
     return $dom;
 }
@@ -680,7 +682,7 @@ A DBIx::Class row object to the dataset.
 =item return
 
 Returns true if the metadata is valid or if no XSD file is registered for the
-format. False if the format is not valid.
+format. Dies if the document is not valid.
 
 =back
 
@@ -708,7 +710,8 @@ sub _validate_metadata {
     my $ext_validators = $self->config->split('PMH_LOCAL_VALIDATION');
     my $ds_name = $dataset->ds_name();
 
-    my $error = try {
+    #my $error = try {
+    try {
 
         if (my $cmd = $ext_validators->{$format}) { # use custom validator
             return 1 if $cmd eq '-';
@@ -717,12 +720,20 @@ sub _validate_metadata {
             $cmd =~ s/\[SCHEMA\]/$schema/;
             $cmd =~ s/\[FILE\]/$tmpfile/;
             $self->logger->debug("Validating $cmd");
-            system($cmd) == 0 or die "External validator failed";
+            my $exit;
+            my $shell_err = capture_merged {
+                $exit = system($cmd);
+            };
+            if ($exit != 0) {
+                $self->logger->error($shell_err);
+                die "External validator failed";
+            }
+
         } else { # use ordinary schema
             my $xsd_validator = XML::LibXML::Schema->new( location => $schema );
             $xsd_validator->validate($xml_dom);
         }
-        $self->logger->info("OAI XML document $ds_name in $format format validated successfully");
+        $self->logger->debug("OAI XML document $ds_name in $format format validated successfully");
         return 1;
 
     } catch {

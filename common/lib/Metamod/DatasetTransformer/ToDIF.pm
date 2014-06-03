@@ -46,32 +46,21 @@ use Metamod::ForeignDataset;
 our @EXPORT_OK = qw(foreignDataset2Dif);
 our $_logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
 
-my $mm2ToDifStyle;
-my $isoToDifStyle;
-my $jifStyle;
+my ($mm2ToDifStyle, $mmdToDifStyle, $isoToDifStyle, $jifStyle);
+
 my $_init = 0;
 sub _init {
     return if $_init++;
 
     my $mm2ToDifXslt = Metamod::DatasetTransformer::xslt_dir() . 'mm2dif.xsl';
+    my $mmdToDifXslt = Metamod::DatasetTransformer::xslt_dir() . 'mmd-to-dif.xsl';
     my $isoToDifXslt = Metamod::DatasetTransformer::xslt_dir() . 'iso2dif.xslt';
     my $jifXslt = Metamod::DatasetTransformer::xslt_dir() . 'jif.xsl';
 
-    my $styleDoc = Metamod::DatasetTransformer->XMLParser->parse_file($mm2ToDifXslt);
-    $mm2ToDifStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet($styleDoc);
-    if (!$mm2ToDifStyle) {
-        $_logger->logcroak("cannot parse stylesheet $mm2ToDifXslt");
-    }
-    $styleDoc = Metamod::DatasetTransformer->XMLParser->parse_file($isoToDifXslt);
-    $isoToDifStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet($styleDoc);
-    if (!$isoToDifStyle) {
-        $_logger->logcroak("cannot parse stylesheet $isoToDifXslt");
-    }
-    $styleDoc = Metamod::DatasetTransformer->XMLParser->parse_file($jifXslt);
-    $jifStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet($styleDoc);
-    if (!$jifStyle) {
-        $_logger->logcroak("cannot parse stylesheet $jifXslt");
-    }
+    $mm2ToDifStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet_file($mm2ToDifXslt) or $_logger->logcroak("cannot parse stylesheet $mm2ToDifXslt");
+    $mmdToDifStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet_file($mmdToDifXslt) or $_logger->logcroak("cannot parse stylesheet $mmdToDifXslt");
+    $isoToDifStyle = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet_file($isoToDifXslt) or $_logger->logcroak("cannot parse stylesheet $isoToDifXslt");
+    $jifStyle      = Metamod::DatasetTransformer->XSLTParser->parse_stylesheet_file($jifXslt)      or $_logger->logcroak("cannot parse stylesheet $jifXslt");
 }
 
 sub foreignDataset2Dif {
@@ -82,13 +71,18 @@ sub foreignDataset2Dif {
     }
     # get a DatasetTransformer-plugin
     my $transformer = Metamod::DatasetTransformer::autodetect($foreignDataset);
-        if (UNIVERSAL::isa($transformer, 'Metamod::DatasetTransformer::DIF')) {
+    if (UNIVERSAL::isa($transformer, 'Metamod::DatasetTransformer::DIF')) {
         $_logger->debug("foreign dataset is DIF, no change needed");
         return $foreignDataset;
     } elsif (UNIVERSAL::isa($transformer,'Metamod::DatasetTransformer::ISO19115')) {
         $_logger->debug("foreignDataset is ISO19115, only simple transformation needed");
         my $isoDoc = $foreignDataset->getMETA_DOC();
         my $difDoc = $isoToDifStyle->transform($isoDoc);
+        return Metamod::ForeignDataset->newFromDoc($difDoc, $foreignDataset->getXMD_DOC());
+    } elsif (UNIVERSAL::isa($transformer,'Metamod::DatasetTransformer::MMD')) {
+        $_logger->debug("foreignDataset is MMD, only simple transformation needed");
+        my $mmdDoc = $foreignDataset->getMETA_DOC();
+        my $difDoc = $mmdToDifStyle->transform($mmdDoc);
         return Metamod::ForeignDataset->newFromDoc($difDoc, $foreignDataset->getXMD_DOC());
     } elsif (UNIVERSAL::isa($transformer,'Metamod::DatasetTransformer')) {
         my ($xmdDoc, $xmlDoc);

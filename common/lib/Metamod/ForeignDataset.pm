@@ -54,7 +54,7 @@ use XML::LibXML::XPathContext qw();
 use Log::Log4perl;
 use UNIVERSAL qw();
 use mmTtime;
-use Carp qw(croak);
+use Carp qw(cluck);
 
 use constant NAMESPACE_DS => 'http://www.met.no/schema/metamod/dataset';
 use constant DATASET => << 'EOT';
@@ -69,6 +69,68 @@ EOT
 my $logger = Log::Log4perl::get_logger('metamod::common::'.__PACKAGE__);
 my $nameReg = qr{^([^/]*)/([^/]*/)?([^/]*)$}; # project/[parent/]name where parent is optional
 
+=head1 NAME
+
+Metamod::ForeignDataset - working with Metamod datasets without known Metadata
+
+=head1 SYNOPSIS
+
+  use Metamod::ForeignDataset;
+
+  # create a new dataset/mm2
+  $ds = new Metamod::ForeignDataset('<DIF></DIF>');
+  %info = ('name' => 'NEW/Name',
+              'ownertag' => 'DAM');
+  $ds->setInfo(\%info);
+
+  # read an existing dataset from $basename.xml and $basename.xmd
+  $ds = newFromFile Metamod::ForeignDataset($basename);
+  %info = $ds->getInfo;
+  @quadtreeNodes = $ds->getQuadtree;
+
+=head1 DESCRIPTION
+
+The Metamod::ForeignDataset package give a convenient way to work with the xml-files describing
+default datasets consisting of meta-metadata (dataset.xmd files) and metadata (file.xml) files or
+strings. The metadata-file is not modified, except for content-invariant changes through the xml-parser/writer.
+
+XML::LibXML requires properly encoded utf-8 strings as input, with
+perl utf8-flag switched on. Please make sure to provide such data by:
+
+=over 4
+
+=item use Encode; and decode all data with decode('charset', $string);
+
+=item use encoding 'utf-8'; To set non-binary input-files annd all literals ('name') to utf8
+
+=back
+
+=head1 FUNCTIONS
+
+=over 4
+
+=begin deprecated
+
+=item isXMLCharacter($str)
+
+Check if the first character in $str is a valid xml-character as defined in http://www.w3.org/TR/REC-xml/#dt-character
+
+=end deprecated
+
+=item removeUndefinedXMLCharacters($str)
+
+Remove all undefined xml characters as defined in http://www.w3.org/TR/REC-xml/#dt-character from the string.
+
+Return: clean string in scalar context
+
+=back
+
+=head1 METHODS
+
+These methods need to be implemented by the extending modules.
+
+=cut
+
 sub _decode {
     my ($self, $string) = @_;
     if (!Encode::is_utf8($string)) {
@@ -81,6 +143,19 @@ sub _decode {
     }
     return $string;
 }
+
+=head2 newFromDoc($metaXML, [$xmdXML, %options])
+
+Create a dataset from L<XML::LibXML::Document> or xml-string. The foreign-(metadata) document needs to be set. If $xmdXML is empty, new dataset information will be created.
+In that case the creationDate-info will be set to currentDate, status-info is active, everything
+else is empty.
+
+Currently known options: 'format', this will set the originalFormat of the dataset.
+
+Return: $xmdXML object
+Dies on missing $metaXML, or on invalid xml-strings.
+
+=cut
 
 sub newFromDoc {
     my ($class, $metaXML, $xmdXML, %options) = @_;
@@ -99,11 +174,28 @@ sub newFromDoc {
     return $class->_initSelf($format, $docXMD, $docMETA, %options);
 }
 
+=head2 newFromFile($basename)
+
+read a dataset from a file. The file may or may not end with .xml or .xmd. The xml-file needs to exist.
+The xml file is mapped to foreign and the xmd file is mapped to $xmdXML. See L<newFromDoc> for more information.
+
+Return: $xmdXML object
+Dies on missing xml-file, or on invalid xml-strings in xml or xmd files.
+
+=cut
+
 sub newFromFile {
     my ($class, $basename, %options) = @_;
     my ($xmdXML, $metaXML) = Metamod::DatasetTransformer::getFileContent($basename);
     return $class->newFromDoc($metaXML, $xmdXML, %options);
 }
+
+=head2 newFromFileAutocomplete($basename)
+
+Read a dataset from a file. If only a .xml file is given without .xml file,
+try to autdetect the DatasetTransformer plugin and let it generate the xmd information.
+
+=cut
 
 sub newFromFileAutocomplete {
     my ($class, $basename, %options) = @_;
@@ -147,6 +239,13 @@ sub _initSelf {
     return bless $self, $class;
 }
 
+
+=head2 writeToFile($basename)
+
+write the current content to $basename.xml and $basename.xmd (appendixes will be truncated). This will
+overwrite an existing file! Dies on error.
+
+=cut
 
 sub writeToFile {
     my ($self, $fileBase) = @_;
@@ -204,7 +303,7 @@ sub _writeToFileHelper {
     binmode $xmlF;
     # use libxml to write the file, avoid any interference by perl (possible character conversion)
     $self->{docXMD}->toFH($xmdF, 2);    # should pretty-print xml (not currently working)
-    $self->{docMETA}->toFH($xmlF, 2); 
+    $self->{docMETA}->toFH($xmlF, 2);
     close $xmlF;
     close $xmdF;
 
@@ -238,6 +337,14 @@ sub _writeToDatabase {
 
 }
 
+=head2 deleteDatasetFile($basename)
+
+delete the files belonging to the dataset $basename (.xml and .xmd).
+Return false on failure, true on success.
+This is a class rather than a object-method.
+
+=cut
+
 sub deleteDatasetFile {
      my ($self, $fileBase) = @_;
      $fileBase = Metamod::DatasetTransformer::getBasename($fileBase);
@@ -256,15 +363,35 @@ sub deleteDatasetFile {
     return $err1 && $err2;
 }
 
+=head2 getXMD_XML
+
+Return: xml-string of xmd-file as byte stream
+
+=cut
+
 sub getXMD_XML {
     my ($self) = @_;
     return $self->{docXMD}->toString(1);
 }
 
+=head2 getMETA_XML
+
+Return: xml-string of MM2 as byte stream in the original document encoding
+
+=cut
+
 sub getMETA_XML {
     my ($self) = @_;
     return $self->{docMETA}->toString(1);
 }
+
+=head2 getXMD_DOC
+
+Get a clone of the internal xmd document.
+
+Return: XML::LibXML::Document of dataset
+
+=cut
 
 sub getXMD_DOC {
     my ($self) = @_;
@@ -274,13 +401,31 @@ sub getXMD_DOC {
     return $out;
 }
 
+=head2 getMETA_DOC
+
+Get a clone of the internal metadata document.
+
+Return: XML::LibXML::Document of the metadata
+
+=cut
+
 sub getMETA_DOC { # may return any data format
     my ($self) = @_;
     my $doc = $self->{docMETA};
+    #cluck "getMETA called";
+    #printf STDERR "%s\n%s\n%s\n", -1 x 33, $doc->toString, -1 x 33;
     my $out = new XML::LibXML::Document($doc->version, $doc->encoding);
     $out->setDocumentElement($doc->getDocumentElement->cloneNode(1));
     return $out;
 }
+
+=head2 getInfo()
+
+read the info attributes (name, ownertag, status, metadataFormat, creationDate, datestamp) from the dataset
+
+Return: %info
+
+=cut
 
 sub getInfo {
     my ($self) = @_;
@@ -292,11 +437,27 @@ sub getInfo {
     return %retVal;
 }
 
+=head2 setInfo(\%info)
+
+add or overwrite info attributes to the dataset
+
+Return: undef
+
+=cut
+
 sub setInfo {
     my ($self, $infoRef) = @_;
     my %info = ($self->getInfo, %$infoRef);
     return $self->replaceInfo(\%info);
 }
+
+=head2 replaceInfo(\%info)
+
+replace all info attributes with those in %info. This will remove all attributes not in %info.
+
+Return: undef
+
+=cut
 
 sub replaceInfo {
     my ($self, $infoRef) = @_;
@@ -318,6 +479,13 @@ sub replaceInfo {
     return undef;
 }
 
+=head2 getParentName
+
+The dataset-name can consist on 2 or 3 parts: project/parentname/filename or project/filename
+In the first case, this method will return project/parentname in the second case undef.
+
+=cut
+
 sub getParentName {
     my ($self) = @_;
     my %info = $self->getInfo;
@@ -332,6 +500,13 @@ sub getParentName {
         Carp::croak("Cannot parse name to $info{name}, need project/[parent/]filename");
     }
 }
+
+=head2 originalFormat()
+
+Return: string describing the original format as defined through 'newFromFile' or 'newFromDoc'. This does
+not describe the originalFormat field in the info region of the .xmd file.
+
+=cut
 
 sub originalFormat {
     my ($self) = @_;
@@ -361,6 +536,11 @@ sub _getLastNodeBefore {
     return undef;
 }
 
+=head2 getQuadtree()
+
+Return: array with quadtree_nodes
+
+=cut
 
 sub getQuadtree {
     my ($self) = @_;
@@ -376,6 +556,14 @@ sub getQuadtree {
     @retVal = map {s/^\s+//; s/\s+$//; $_;} @retVal; # trim
     return @retVal;
 }
+
+=head2 setQuadtree(\@quadtree_nodes)
+
+set the @quadtree_nodes as dataset-quadtree-nodes
+
+Return: @oldQuadtree_nodes
+
+=cut
 
 sub setQuadtree {
     my ($self, $quadRef) = @_;
@@ -394,6 +582,12 @@ sub setQuadtree {
     return @oldQuadtree;
 }
 
+=head2 getWMSInfo()
+
+Return: raw-xml content of the WMSInfo node
+
+=cut
+
 sub getWMSInfo {
     my ($self) = @_;
     my ($node) = $self->{xpath}->findnodes('/d:dataset/d:wmsInfo/*[1]', $self->{docXMD}) or return;
@@ -402,6 +596,16 @@ sub getWMSInfo {
     #printf STDERR "***************\n%s***************\n", $doc->toString;
     return $doc->toString;
 }
+
+=head2 setWMSInfo($wmsInfo)
+
+set/replace the raw-xml WMSInfo node.
+
+Return: old WMSInfo
+
+Throws: Exception if $wmsInfo is not valid
+
+=cut
 
 sub setWMSInfo {
     my ($self, $content) = @_;
@@ -423,6 +627,12 @@ sub setWMSInfo {
     return $oldContent;
 }
 
+=head2 getProjectionInfo()
+
+Return: raw content of the ProjectionInfo node
+
+=cut
+
 sub getProjectionInfo {
     my ($self) = @_;
     my $retVal;
@@ -432,6 +642,16 @@ sub getProjectionInfo {
     #printf STDERR "***************\n%s***************\n", $doc->toString;
     return $doc->toString;
 }
+
+=head2 setProjectionInfo($projectionInfo)
+
+set/replace the raw ProjectionInfo node
+
+Return: old ProjectionInfo
+
+Throws: Exception if $projectionInfo is not valid
+
+=cut
 
 sub setProjectionInfo {
     my ($self, $content) = @_;
@@ -453,11 +673,26 @@ sub setProjectionInfo {
     return $oldContent;
 }
 
+=head2 getDatasetRegion()
+
+Return: a Metamod::DatasetRegion
+
+Warning: this is a copy of the region, when changing, a call to setDatasetRegion is required
+
+=cut
+
+
 sub getDatasetRegion {
     my ($self) = @_;
     my ($node) = $self->{xpath}->findnodes('/d:dataset/r:datasetRegion', $self->{docXMD});
     return new Metamod::DatasetRegion($node);
 }
+
+=head2 deleteDatasetRegion()
+
+Return: the old region
+
+=cut
 
 sub deleteDatasetRegion {
     my ($self) = @_;
@@ -468,6 +703,12 @@ sub deleteDatasetRegion {
     }
     return $oldRegion;
 }
+
+=head2 setDatasetRegion($region)
+
+set the Metamod::DatasetRegion to a new region.
+
+=cut
 
 sub setDatasetRegion {
     my ($self, $dsRegion) = @_;
@@ -515,201 +756,8 @@ sub removeUndefinedXMLCharacters {
 }
 
 1;
+
 __END__
-
-=head1 NAME
-
-Metamod::ForeignDataset - working with Metamod datasets without known Metadata
-
-=head1 SYNOPSIS
-
-  use Metamod::ForeignDataset;
-
-  # create a new dataset/mm2
-  $ds = new Metamod::ForeignDataset('<DIF></DIF>');
-  %info = ('name' => 'NEW/Name',
-              'ownertag' => 'DAM');
-  $ds->setInfo(\%info);
-
-  # read an existing dataset from $basename.xml and $basename.xmd
-  $ds = newFromFile Metamod::ForeignDataset($basename);
-  %info = $ds->getInfo;
-  @quadtreeNodes = $ds->getQuadtree;
-
-=head1 DESCRIPTION
-
-The Metamod::ForeignDataset package give a convenient way to work with the xml-files describing
-default datasets consisting of meta-metadata (dataset.xmd files) and metadata (file.xml) files or
-strings. The metadata-file is not modified, except for content-invariant changes through the xml-parser/writer.
-
-XML::LibXML requires properly encoded utf-8 strings as input, with
-perl utf8-flag switched on. Please make sure to provide such data by:
-
-=over 4
-
-=item use Encode; and decode all data with decode('charset', $string);
-
-=item use encoding 'utf-8'; To set non-binary input-files annd all literals ('name') to utf8
-
-=back
-
-=head1 FUNCTIONS
-
-=over 4
-
-=begin deprecated
-
-=item isXMLCharacter($str)
-
-Check if the first character in $str is a valid xml-character as defined in http://www.w3.org/TR/REC-xml/#dt-character
-
-=end deprecated
-
-=item removeUndefinedXMLCharacters($str)
-
-Remove all undefined xml characters as defined in http://www.w3.org/TR/REC-xml/#dt-character from the string.
-Return: clean string in scalar context
-
-=back
-
-=head1 METHODS
-
-These methods need to be implemented by the extending modules.
-
-=over 4
-
-=item newFromDoc($metaXML, [$xmdXML, %options])
-
-Create a dataset from L<XML::LibXML::Document> or xml-string. The foreign-(metadata) document needs to be set. If $xmdXML is empty, new dataset information will be created.
-In that case the creationDate-info will be set to currentDate, status-info is active, everything
-else is empty.
-
-Currently known options: 'format', this will set the originalFormat of the dataset.
-
-Return: $xmdXML object
-Dies on missing $metaXML, or on invalid xml-strings.
-
-=item newFromFile($basename)
-
-read a dataset from a file. The file may or may not end with .xml or .xmd. The xml-file needs to exist.
-The xml file is mapped to foreign and the xmd file is mapped to $xmdXML. See L<newFromDoc> for more information.
-
-Return: $xmdXML object
-Dies on missing xml-file, or on invalid xml-strings in xml or xmd files.
-
-=item newFromFileAutocomplete($basename)
-
-Read a dataset from a file. If only a .xml file is given without .xml file,
-try to autdetect the DatasetTransformer plugin and let it generate the xmd information.
-
-=item writeToFile($basename)
-
-write the current content to $basename.xml and $basename.xmd (appendixes will be truncated). This will
-overwrite an existing file! Dies on error.
-
-=item deleteDatasetFile($basename)
-
-delete the files belonging to the dataset $basename (.xml and .xmd).
-Return false on failure, true on success.
-This is a class rather than a object-method.
-
-=item getXMD_XML
-
-Return: xml-string of xmd-file as byte stream
-
-=item getMETA_XML
-
-Return: xml-string of MM2 as byte stream in the original document encoding
-
-=item getXMD_DOC
-
-Get a clone of the internal xmd document.
-
-Return: XML::LibXML::Document of dataset
-
-=item getMETA_DOC
-
-Get a clone of the internal metadata document.
-
-Return: XML::LibXML::Document of the metadata
-
-=item getInfo()
-
-read the info attributes (name, ownertag, status, metadataFormat, creationDate, datestamp) from the dataset
-
-Return: %info
-
-=item setInfo(\%info)
-
-add or overwrite info attributes to the dataset
-
-Return: undef
-
-=item replaceInfo(\%info)
-
-replace all info attributes with those in %info. This will remove all attributes not in %info.
-
-Return: undef
-
-=item getParentName
-
-The dataset-name can consist on 2 or 3 parts: project/parentname/filename or project/filename
-In the first case, this method will return project/parentname in the second case undef.
-
-=item originalFormat()
-
-Return: string describing the original format as defined through 'newFromFile' or 'newFromDoc'. This does
-not describe the originalFormat field in the info region of the .xmd file.
-
-=item getQuadtree()
-
-Return: array with quadtree_nodes
-
-=item setQuadtree(\@quadtree_nodes)
-
-set the @quadtree_nodes as dataset-quadtree-nodes
-
-Return: @oldQuadtree_nodes
-
-=item getDatasetRegion()
-
-Return: a Metamod::DatasetRegion
-
-Warning: this is a copy of the region, when changing, a call to setDatasetRegion is required
-
-=item deleteDatasetRegion()
-
-Return: the old region
-
-=item setDatasetRegion($region)
-
-set the Metamod::DatasetRegion to a new region.
-
-=item getWMSInfo()
-
-Return: raw-xml content of the WMSInfo node
-
-=item setWMSInfo($wmsInfo)
-
-set/replace the raw-xml WMSInfo node.
-
-Return: old WMSInfo
-
-Throws: Exception if $wmsInfo is not valid
-
-=item getProjectionInfo()
-
-Return: raw content of the ProjectionInfo node
-
-=item setProjectionInfo($projectionInfo)
-
-set/replace the raw ProjectionInfo node
-
-Return: old ProjectionInfo
-
-Throws: Exception if $projectionInfo is not valid
-
-=back
 
 =head1 AUTHOR
 
@@ -718,5 +766,9 @@ Heiko Klein, E<lt>H.Klein@met.noE<gt>
 =head1 SEE ALSO
 
 L<XML::LibXML>, L<Metamod::Dataset>
+
+=head1 LICENSE
+
+GPLv2 L<http://www.gnu.org/licenses/gpl-2.0.html>
 
 =cut
