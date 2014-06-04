@@ -124,7 +124,7 @@ my %default_config = (
     },
 
     'Plugin::Session' => {
-        #expires => 3600,
+        expires => 3600 * 24 * 7, # one week login time should be sufficient
         storage => $mm_config->get('WEBRUN_DIRECTORY') . '/session_data',
     },
 
