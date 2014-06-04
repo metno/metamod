@@ -130,7 +130,7 @@ $old_redirect
     #RewriteOptions Inherit
     RewriteLog "/var/log/apache2/error.log"
     RewriteLogLevel 6
-    LogLevel debug
+    #LogLevel debug
 
     # redefine to first look for static files in application directory
     Alias               $local/static      $paths{custom}/static
