@@ -1,4 +1,4 @@
-metno-metamod-2.13 (2.13.11-1) stable; urgency=low
+metno-metamod-2.13 (2.13.11-2) stable; urgency=low
 
   * dynamic search map using WMS
   * improved support for background maps in different projections
@@ -19,7 +19,8 @@ metno-metamod-2.13 (2.13.11-1) stable; urgency=low
   	fixes for oai-pmh, basket URL, missing thredds catalog, wms search map thumbnail
   * v10: googlebot optimizations, dynamic generation of robots.txt, faster rejection of illegal intruder requests,
     fix for netcdf 4 strings, consistent handling of popup windows
-  * v11: WMS timeslider back/fwd + slideshow, fix for .tgz upload, webdav support, api documentation
+  * v11: WMS timeslider back/fwd + slideshow, fix for .tgz upload, webdav support, api documentation,
+  	fix for external timeseries url bug, apache debuglevel
 
  -- Geir Aalberg <geira@met.no>  Mon, 03 Jun 2013 11:32:06 +0200
 
