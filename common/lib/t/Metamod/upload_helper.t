@@ -54,14 +54,16 @@ my $upload_helper = Metamod::UploadHelper->new();
     is($config->get('LOG4PERL_CONFIG' ), "$FindBin::Bin/../log4perl_config.ini", "LOG4PERL_CONFIG is $FindBin::Bin/../log4perl_config.ini");
     ok( -w $webrun_dir, "webrun directory is writable" );
     ok( -w $upload_area, "upload directory is writable" );
-    BEGIN { $num_tests += 5 };
+    ok( -w $data_dir, "data directory is writable" );
+    ok( -w $metadata_dir, "metadata directory is writable" );
+    BEGIN { $num_tests += 7 };
 }
 
 
 {
     my $testname = 'Single .nc upload';
 
-    $upload_helper->process_upload("$upload_area/hirlam12_ml_2008-05-20_00.nc", 'WEB'); # test if returns error
+    is( $upload_helper->process_upload("$upload_area/hirlam12_ml_2008-05-20_00.nc", 'WEB'), '', "$testname: No error in process_upload");
 
     file_exists_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_ml_2008-05-20_00.nc'), "$testname: File moved to data directory");
 
@@ -76,14 +78,14 @@ my $upload_helper = Metamod::UploadHelper->new();
             label => "$testname: File inserted into userbase",
     );
 
-    BEGIN { $num_tests += 5 };
+    BEGIN { $num_tests += 6 };
 }
 
 
 {
     my $testname = 'Single .nc.gz upload';
 
-    $upload_helper->process_upload("$upload_area/hirlam12_ml_2008-05-16_00.nc.gz", 'WEB');
+    is( $upload_helper->process_upload("$upload_area/hirlam12_ml_2008-05-16_00.nc.gz", 'WEB'), '', "$testname: No error in process_upload");
 
     file_exists_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_ml_2008-05-16_00.nc'), "$testname: File moved to data directory");
 
@@ -96,14 +98,14 @@ my $upload_helper = Metamod::UploadHelper->new();
             label => "$testname: Uploaded file inserted into userbase",
     );
 
-    BEGIN { $num_tests += 4 };
+    BEGIN { $num_tests += 5 };
 
 }
 
 {
     my $testname = '.tar.gz upload'; # TODO - add .tgz - FIXME
 
-    $upload_helper->process_upload("$upload_area/hirlam12_upload.tar.gz", 'WEB');
+    is( $upload_helper->process_upload("$upload_area/hirlam12_upload.tar.gz", 'WEB'), '', "$testname: No error in process_upload");
 
     file_exists_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_ml_2008-05-21_00.nc'), "$testname: File 1 moved to data directory");
     file_exists_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_ml_2008-05-22_00.nc'), "$testname: File 2 moved to data directory");
@@ -119,13 +121,54 @@ my $upload_helper = Metamod::UploadHelper->new();
             label => "$testname: Uploaded file inserted into userbase",
     );
 
-    BEGIN { $num_tests += 7 }
+    BEGIN { $num_tests += 8 }
+}
+
+#{
+#    my $testname = '.tgz upload'; # TODO - add .tgz - FIXME
+#
+#    is( $upload_helper->process_upload("$upload_area/hirlam12_upload.tgz", 'WEB'), '', "$testname: No error in process_upload");
+#
+#    file_exists_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_ml_2008-05-21_00.nc'), "$testname: File 1 moved to data directory");
+#    file_exists_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_ml_2008-05-22_00.nc'), "$testname: File 2 moved to data directory");
+#
+#    file_size_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_ml_2008-05-21_00.nc'), 5252, "$testname: Moved file has identical filesize");
+#    file_size_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_ml_2008-05-22_00.nc'), 5252, "$testname: Moved file has identical filesize");
+#
+#    file_exists_ok(File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_ml_2008-05-21_00.xml'), "$testname: File 1 level 2 metadata created");
+#    file_exists_ok(File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_ml_2008-05-22_00.xml'), "$testname: File 2 level 2 metadata created");
+#
+#    row_ok( sql => q{SELECT * FROM file WHERE u_id = 1 AND f_name = 'hirlam12_upload.tgz'},
+#            tests => [ f_size => 1616, f_errurl => q{} ],
+#            label => "$testname: Uploaded file inserted into userbase",
+#    );
+#
+#    BEGIN { $num_tests += 8 }
+#}
+
+{
+    my $testname = '.tgz upload';
+
+    is( $upload_helper->process_upload("$upload_area/hirlam12_upload.tgz", 'WEB'), '', "$testname: No error in process_upload");
+
+    file_exists_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_sf_60h_2010-10-28_06.nc'), "$testname: File 1 moved to data directory");
+
+    file_size_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_sf_60h_2010-10-28_06.nc'), 5036, "$testname: Moved file has identical filesize");
+
+    file_exists_ok(File::Spec->catfile($metadata_dir, 'hirlam12', 'hirlam12_sf_60h_2010-10-28_06.xml'), "$testname: File 1 level 2 metadata created");
+
+    row_ok( sql => q{SELECT * FROM file WHERE u_id = 1 AND f_name = 'hirlam12_upload.tgz'},
+            tests => [ f_size => 1664, f_errurl => q{} ],
+            label => "$testname: Uploaded file inserted into userbase",
+    );
+
+    BEGIN { $num_tests += 5 }
 }
 
 {
     my $testname = '.tar upload';
 
-    $upload_helper->process_upload("$upload_area/hirlam12_upload2.tar", 'WEB');
+    is( $upload_helper->process_upload("$upload_area/hirlam12_upload2.tar", 'WEB'), '', "$testname: No error in process_upload");
 
     file_exists_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_pl_2008-05-29_00.nc'), "$testname: File moved to data directory");
 
@@ -138,13 +181,13 @@ my $upload_helper = Metamod::UploadHelper->new();
             label => "$testname: Uploaded file inserted into userbase",
     );
 
-    BEGIN { $num_tests += 4 }
+    BEGIN { $num_tests += 5 }
 }
 
 {
     my $testname = '.tar.gz with invalid name for one file.';
 
-    $upload_helper->process_upload("$upload_area/hirlam12_invalid_component.tar.gz", 'WEB');
+    is( $upload_helper->process_upload("$upload_area/hirlam12_invalid_component.tar.gz", 'WEB'), '', "$testname: No error in process_upload");
 
     file_not_exists_ok(File::Spec->catfile($data_dir, 'met.no', 'hirlam12', 'hirlam12_pl_2008-07-01_18.nc'), "$testname: File with valid name not processed");
 
@@ -159,14 +202,14 @@ my $upload_helper = Metamod::UploadHelper->new();
             label => "$testname: Uploaded file inserted into userbase",
     );
 
-    BEGIN { $num_tests += 5 }
+    BEGIN { $num_tests += 6 }
 }
 
 {
     my $testname = 'CDL conversion';
 
     file_exists_ok("$upload_area/hirlam12_valid_cdl.tar.gz", "$testname: hirlam12_valid_cdl.tar.gz exists");
-    $upload_helper->process_upload("$upload_area/hirlam12_valid_cdl.tar.gz", 'WEB');
+    is( $upload_helper->process_upload("$upload_area/hirlam12_valid_cdl.tar.gz", 'WEB'), '', "$testname: No error in process_upload");
     #diag("$upload_area/hirlam12_valid_cdl.tar.gz");
 
     {
@@ -199,7 +242,7 @@ my $upload_helper = Metamod::UploadHelper->new();
     );
 
 
-    BEGIN { $num_tests += 8 }
+    BEGIN { $num_tests += 9 }
 }
 
 

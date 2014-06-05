@@ -401,9 +401,9 @@ sub process_files { # rewrite this 800-line monster into small, more manageable 
 
         if ( $filetype =~ /^gzip/ ) {    # gzip or gzip-compressed
 
-            my $uncompressed_path = $self->gunzip_file($newpath);
+            my $uncompressed_path = eval { $self->gunzip_file($newpath) };
             if( !defined $uncompressed_path){
-                $self->syserrorm( "SYSUSER", "gunzip_problem_with_uploaded_file", $uploadname, "process_files", "" );
+                $self->syserrorm( "SYSUSER", "gunzip_problem_with_uploaded_file: $@", $uploadname, "process_files", "" );
                 $errors = 1;
                 next;
             }
@@ -1213,6 +1213,7 @@ sub gunzip_file {
     my ($filename) = @_;
 
     # Uncompress file:
+    $self->logger->debug( "gunziping $filename ..." );
     my $result = $self->shcommand_scalar("gunzip $filename"); # FIXME - use Gzip::Faster instead
     if ( !defined($result) ) {
         $self->syserrorm( "SYSUSER", "gunzip_problem_with_uploaded_file", $filename, "process_files", "" );
@@ -1221,14 +1222,16 @@ sub gunzip_file {
 
     my ($basename, $dirs, $extension) = fileparse($filename, qr/\.[^.]*/);
     my $newfilename = File::Spec->catfile($dirs, $basename);
-    if ($extension eq 'tgz') {
-        $newfilename = File::Spec->catfile($newfilename, 'tar');
+    if ($extension eq '.tgz') {
+        $newfilename = "$newfilename.tar";
     }
+    $self->logger->debug( "Filename after gunzip: $newfilename" );
     if ( -r $newfilename) {
         return $newfilename;
     } else {
-        $self->syserrorm( "Can't find $newfilename after unpacking $filename" );
-        return;
+        #$self->syserrorm( "Can't find $newfilename after unpacking $filename" );
+        #return;
+        die "Can't find $newfilename after unpacking $filename";
     }
 }
 
