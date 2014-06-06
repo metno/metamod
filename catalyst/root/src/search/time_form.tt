@@ -1,22 +1,7 @@
 [% SET from_id = search_ui_utils.html_id_for_date( category.sc_id, 'from' ) %]
 [% SET to_id = search_ui_utils.html_id_for_date( category.sc_id, 'to' ) %]
 
-<p class="help">
-Enter the [% category.name %] to search for by filling in the [% category.lower %] and [% category.upper %]
-fields below.
-</p>
-
-[% IF category.numtype == 'date' %]
-    <p class="help">
-    In each field, use the date format "YYYY-MM-DD". Just "YYYY" or "YYYY-MM"
-    will also be understood.
-    </p>
-[% END %]
-
-<p class="help">
-Only datasets having a [% category.name %] overlapping the interval thus defined, will be selected.
-</p>
-
+<p class="help">[% app.search.time_form_help | eval %]</p>
 
 <label for="[% from_id %]">[% category.lower %]</label>
 <script>$(function() { $( "#[% from_id %]" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
@@ -26,5 +11,4 @@ Only datasets having a [% category.name %] overlapping the interval thus defined
 <script>$(function() { $( "#[% to_id %]" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
 <input type="text" size="12" name="[% to_id %]" id="[% to_id %]" value="[% c.req().param( to_id ) %]" />
 
-<br />
-<button type="button" onclick="jQuery('#[% from_id %]').val(''); jQuery('#[% to_id %]').val('')">Clear dates</button>
+[% button_js( 'clear_dates', "jQuery('#" _ from_id _ "').val(''); jQuery('#" _ to_id _ "').val('')" ) %]

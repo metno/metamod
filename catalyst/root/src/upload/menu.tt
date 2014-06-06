@@ -1,10 +1,10 @@
 <div class="level2-menu" id="upload-menu">
 
-[% IF NOT external_repository  %]
+[% IF 0 # NOT external_repository  # does not make sense - same link as parent above %]
     <div class="level2-menu-item"><a href="[% c.uri_for('/upload') %]">Upload files</a></div>
 [% END %]
-<div class="level2-menu-item"><a href="[% c.uri_for('/upload/test') %]">Test a file</a></div>
-<div class="level2-menu-item"><a href="[% c.uri_for('/upload/dataset') %]">Dataset administration</a></div>
-<div class="level2-menu-item"><a href="[% c.uri_for('/upload/help') %]">Help</a></div>
+<div class="level2-menu-item"><a href="[% c.uri_for('/upload/test') %]">[% app.upload.menu.test %]</a></div>
+<div class="level2-menu-item"><a href="[% c.uri_for('/upload/dataset') %]">[% app.upload.menu.dataset %]</a></div>
+<div class="level2-menu-item"><a href="[% c.uri_for('/upload/help') %]">[% ui.button.help %]</a></div>
 
 </div>

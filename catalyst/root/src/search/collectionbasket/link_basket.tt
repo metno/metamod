@@ -1,6 +1,6 @@
 [% SET files = link_basket.files() %]
 
-<h2 class="std">File collection</h2>
+<h2 class="std">[% app.basket.coll_title %]</h2>
 
 <br />
 
@@ -16,12 +16,9 @@
     <table class="plain" style="width: 100%">
 
         <tr>
-            <th class="collection-basket">
-                Dataset name
-            </th>
-            <th class="collection-basket">
-                File size
-            </th>
+            [% FOREACH hd IN app.basket.remove_hd %]
+                <th class="collection-basket">[% hd %]</th>
+            [% END %]
         </tr>
 
         [% FOREACH file IN files %]
@@ -41,10 +38,13 @@
 
     </table>
 
-    <a class="button-link" href="[% c.uri_for( '/search/collectionbasket/replace_basket', c.req.params ) %]"><button type="button">Replace current basket</button></a>
-    <a class="button-link" href="[% c.uri_for( '/search/collectionbasket/merge_basket', c.req.params  ) %]"><button type="button">Merge current basket</button></a>
-    </form>
-
+    <a class="button-link" href="[% c.uri_for( '/search/collectionbasket/replace_basket', c.req.params ) %]">
+        <button type="button">[% ui.button.repl_basket %]</button>
+    </a>
+    <a class="button-link" href="[% c.uri_for( '/search/collectionbasket/merge_basket', c.req.params  ) %]">
+        <button type="button">[% ui.button.merge_basket %]</button>
+    </a>
+</form>
 
 [% ELSE %]
 
@@ -52,7 +52,7 @@
 <form name="search_form" id="search_form" method="GET" action="[% c.uri_for( '/search/collectionbasket/remove_selected' ) %]">
     [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
 </form>
-    There are no files in the file collection.
+    [% app.basket.no_files %]
 [% END %]
 
 </form>

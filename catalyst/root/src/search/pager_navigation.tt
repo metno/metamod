@@ -21,8 +21,10 @@ INPUT
 
 [% IF show_option_buttons %]
     <div style="width: 100%; text-align: right">
-        <a href="[% c.uri_for('/search/options', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/options' ) %]')">Search options</a>
-        <a href="[% c.uri_for('/search/two_way_table', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/two_way_table' ) %]')">Pivot table</a>
+        <a href="[% c.uri_for('/search/options', link_params) %]"
+           onclick="return submitSearchForm('[% c.uri_for( '/search/options' ) %]')">[% ui.button.search_opt %]</a>
+        <a href="[% c.uri_for('/search/two_way_table', link_params) %]"
+           onclick="return submitSearchForm('[% c.uri_for( '/search/two_way_table' ) %]')">[% ui.button.pivot_tbl %]</a>
     </div>
 [% END %]
 

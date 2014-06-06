@@ -39,6 +39,8 @@ MetamodWeb::Restricted::Editor - Controller for the restricted part of the metad
 
 =head1 DESCRIPTION
 
+Is this operational? Has it ever worked?
+
 =head1 FUNCTIONS/METHODS
 
 =cut

@@ -41,6 +41,7 @@ th.result, th.sub_result, td.two_way_vertical_key, td.option_label, th.collectio
 
 th.result, td.two_way_vertical_key, th.collection-basket {
     background-color: #f6f6f6;
+    white-space:nowrap;
 }
 
 td.two_way_vertical_key {
@@ -79,6 +80,12 @@ td.result, th.result, td.sub_result, th.sub_result, th.collection-basket, td.col
 td.options_heading {
     font-size: 1.1em;
     font-weight: bolder;
+}
+
+td.options_heading span {
+    margin-left: 10px;
+    margin-right: 10px;
+    border-bottom: solid 1px gray;
 }
 
 li.topics_tree {

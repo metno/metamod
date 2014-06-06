@@ -5,30 +5,14 @@
 [% END %]
 
 
-<h2 class="std">Test a file</h2>
+<h2 class="std">[% app.upload.test.title %]</h2>
 
-<p>Use the "File name" entry or the "Browse..." button below to enter the name of
-a file on your local file system that you want to test against the requirements for
-this data repository.</p>
-
-<p>The file should be a netCDF file or a CDL file (the text version of a netCDF file).</p>
-<p><b><i>Note</i></b>:The file will not be sent to the data repository. If you
-want to upload a file to the repository, use the
-<a href="[% c.uri_for('/upload') %]">Upload file</a> page.</p>
-
-<p><b><i>Note</i></b>: Files to be tested must not exceed a size limit of 100 MB.</p>
-
-<p>Only alphanumeric characters, underline (_), period (.) and hyphens (-)
-are allowed in file names. The initial part of a file name must be the name of a
-user directory followed by underline (_).
-The user directory need not exist in the repository.</p>
+<p>[% app.upload.test.text %]</p>
 
 <form enctype="multipart/form-data" action="[% c.uri_for('/upload/test') %]" method="post">
 
-File name: <input name="data" type="file" />
+[% app.upload.filename %]: <input name="data" type="file" />
 
-<input class="selectbutton1" type="submit" name="BTN_upload" value="Upload" />
+<input class="selectbutton1" type="submit" name="BTN_upload" value="[% ui.button.upload %]" />
 
 </form>
-
-

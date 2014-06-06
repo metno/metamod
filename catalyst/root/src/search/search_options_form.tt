@@ -3,24 +3,24 @@
 <table>
     <tr>
         <td>&nbsp;</td>
-        <td class="options_heading" style="padding-left: 10px; padding-right: 10px;" colspan="[% num_search_cols %]">Column number</td>
-        <td class="options_heading" style="padding-left: 10px; padding-right: 10px;" colspan="3">Pivot table</td>
+        <td class="options_heading" colspan="[% num_search_cols %]"><span>[% app.search.opt.col_num %]</span></td>
+        <td class="options_heading" colspan="3"><span>[% ui.button.pivot_tbl %]</span></td>
     </tr>
     <tr>
-        <td class="options_heading">Column names</td>
+        <td class="options_heading">[% app.search.opt.col_name %]</td>
 
         [% FOREACH col_num IN [ 1 .. num_search_cols ] %]
             <td class="option_label" style="text-align: center">[% col_num %]</td>
         [% END %]
 
-        <td class="option_label" style="text-align: center">Vertical&nbsp;</td>
-        <td class="option_label" style="text-align: center">Horisontal</td>
+        <td class="option_label" style="text-align: center">[% app.search.opt.vert %]</td>&nbsp;
+        <td class="option_label" style="text-align: center">[% app.search.opt.hori %]</td>
     </tr>
 
     <!-- The name column should always be displayed as the first column. We include is an option
         so that is apparant to the user and so that we don't need special code for the special case. -->
     <tr>
-        <td class="option_label">Name</td>
+        <td class="option_label">[% app.search.opt.name %]</td>
         <td><input type="radio" name="shown_mt_name_1" id="shown_mt_name_1" value="dataref" checked="checked" /></td>
         [% FOREACH col_num IN [ 2 .. num_search_cols ] %]
             <td>&nbsp;</td>
@@ -43,8 +43,8 @@
     [% END %]
 
     <tr>
-        <td class="option_label" title="Used to set the number for metadata columns to show on the search result page.">
-            Number of metadata columns
+        <td class="option_label" title="[% app.search.opt.num_title %]">
+            [% app.search.opt.num_cols %]
         </td>
         <td colspan="4">
             <select name="num_mt_columns" id="num_mt_columns">
@@ -59,7 +59,7 @@
     </tr>
 
     <tr>
-        <td class="option_label">Results per page (datasets)</td>
+        <td class="option_label">[% app.search.opt.res_pg_ds %]</td>
         <td colspan="4">
             <select name="datasets_per_page" id="datasets_per_page">
                 <option value="10" [% c.req.params.datasets_per_page == 10 ? 'selected="selected"' : '' %]>10</option>
@@ -70,7 +70,7 @@
     </tr>
 
     <tr>
-        <td class="option_label">Results per page (file)</td>
+        <td class="option_label">[% app.search.opt.res_pg_file %]</td>
         <td colspan="4">
             <select name="files_per_page" id="files_per_page">
                 <option value="10" [% c.req.params.files_per_page == 10 ? 'selected="selected"' : '' %]>10</option>

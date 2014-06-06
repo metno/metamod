@@ -1,16 +1,10 @@
-<p class="help">
-Mark one or more [% category.name %] from the list below by checking the corresponding checkboxes.
-Then, click the "Search" button above.
-</p>
 
 <p class="help">
-The selected [% category.name %] will restrict the search result to only those datasets that match
-at least one of the selected [% category.name %]. If no [% category.name %] are selected, no restrictions
-regarding [% category.name %] are used.
+[% app.search.basickey_form_help | eval %]
 </p>
 
-<button type="button" onclick="jQuery( 'input.basickey_[% category.sc_id %]' ).attr('checked', 'checked')">Select All</button>
-<button type="button" onclick="jQuery( 'input.basickey_[% category.sc_id %]' ).attr('checked', '')">Clear All</button>
+<button type="button" onclick="jQuery( 'input.basickey_[% category.sc_id %]' ).attr('checked', 'checked')">[% ui.button.select_all %]</button>
+<button type="button" onclick="jQuery( 'input.basickey_[% category.sc_id %]' ).attr('checked', '')">[% ui.button.clear_all %]</button>
 <br />
 
 [% FOREACH basickey IN search_ui_utils.basickeys( category.sc_id ) %]

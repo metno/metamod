@@ -1,33 +1,9 @@
 
 <p>[% app.upload.common_text %]</p>
 
-<p>Use the "Browse..." button below to enter the name of a file on your local file system
-that you want to upload to the data repository.</p>
+<h2 class="std">[% app.upload.format.title %]</h2>
 
-<p>You may also re-upload a previously uploaded file. The files previously uploaded are
-shown in the table <b>Previously uploaded files</b> below. If the file to be uploaded should
-replace any of these files, you will be asked to confirm this on the next page.</p>
-
-<p>Finally, push the "Upload" button to initiate the actual upload.</p>
-
-<p>You may upload files to directories not owned by you (even directories owned by another
-institution). In that case you must obtain the directory key from the owner of the
-directory, and fill it into the entry field below. Otherwise, you should leave the directory
-key field empty.</p>
-
-<p><b>Note:</b> Files to be uploaded must not exceed a size limit of 100 MB.
-Only alphanumeric characters, underscore (_), period (.) and hyphens (-)
-are allowed in file names. <b>The initial part of a file name must be the name of a
-user directory followed by an underscore (_)</b>.</p>
-
-<h2 class="std">File format</h2>
-
-<p>Normally, a file to be uploaded should be a netCDF file (with a ".nc" file extention),
-or the equivalent CDL variant (".cdl" extention).
-However, if you have a large number of small files, you may pack the files into an archive
-file. Then you upload the archive file</p>
-
-<p>The following archive formats are accepted:</p>
+<p>[% app.upload.format.text %]</p>
 
 <div align="center">
     <table class="box" cellspacing="0" cellpadding="8" border="1">

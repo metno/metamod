@@ -9,20 +9,15 @@
     [% INCLUDE user_msgs.tt %]
 
     [% IF !role_requested %]
-        <h1 class="std" style="color: red">Not authorized</h1>
+        <h1 class="std" style="color: red">[% app.restricted.title %]</h1>
 
-        <p>
-
-        You are not authorized to view this page. You can request additional access
-        rights that will have to be manually approved.
-
-        </p>
+        <p>[% app.restricted.text %]</p>
 
         <form name="request_role" action="[% c.uri_for('/login/request_role') %]" method="POST">
-        <label for="role">Role</label>
+        <label for="role">[% app.register.accress_rights %]</label>
         <select name="role" id="role">
-            <option value="upload" [% required_role == 'upload' ? 'selected="selected"' : '' %]>File upload</option>
-            <option value="admin" [% required_role == 'admin' ? 'selected="selected"' : '' %]>Administrator</option>
+            <option value="upload" [% required_role == 'upload' ? 'selected="selected"' : '' %]>[% app.menu.upload %]</option>
+            <option value="admin" [% required_role == 'admin' ? 'selected="selected"' : '' %]>[% app.menu.admin %]</option>
         </select>
         <input type="submit" value="Request role" />
 

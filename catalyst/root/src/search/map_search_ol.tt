@@ -11,31 +11,19 @@
 <!--  An anchor that is used to scroll the page back to the map after clicking the map -->
 <a name="map_search">&nbsp;</a>
 
+<p class="help">[% app.search.map_search_help %]</p>
 
-<p class="help">
-Select a rectangular search area in the map below by dragging the mouse.
-</p>
-
-<p class="help">
-The search result will contain any datasets that partially covered by the selected area.
-</p>
-
-<p class="help">
-To clear you current selection press "Clear map". If more than one map is available you can select it from the
-dropdown list.
-</p>
-
-<label for="selected_map">Select map</label>
+<label for="selected_map">[% ui.button.select_map %]</label>
 <select name="selected_map" id="selected_map" onchange="clearMap();loadMap(this[this.selectedIndex].value)">
 [% FOREACH crs IN searchmaps.keys.sort %]
     <option value="[% crs %]">[% searchmaps.$crs.name %]</option>
 [% END %]
 </select>
 
-<button type="button" onclick="clearMap();">Clear map</button>
+[% button_js('clear_map', "clearMap()") %]
 
 <input type="checkbox" name="allow-pan" value="allow-pan" id="allowPanCheckbox" onclick="allowPan(this);" />
-<label for="allowPanCheckbox">Pan</label>
+<label for="allowPanCheckbox">[% ui.button.pan_map %]</label>
 
 <div id="bbox_params" style="display: none">
     <input type="text" size="10" name="[% x1_id %]" id="[% x1_id %]" value="[% c.req().param( x1_id ) %]" />

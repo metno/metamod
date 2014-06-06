@@ -2,7 +2,6 @@
 
 [% INCLUDE search/keep_search_params.tt category_type = 'none' category_id = 'none' %]
 
-
 [% app.search.presentation_html %]
 
 </form>

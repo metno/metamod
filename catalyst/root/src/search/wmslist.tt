@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
     <head>
-        <title>WMS client</title>
+        <title>[% app.wms.title %]:</title>
 
         <link rel="stylesheet" href="[% c.uri_for('/static/css/reset.css') %]" />
         <link rel="stylesheet" href="[% c.uri_for('/static/css/base.css') %]" />
@@ -91,7 +91,7 @@
     </head>
     <body>
 
-    <h1 class="std">WMS layers</h1>
+    <h1 class="std">[% app.wms.layers %]:</h1>
 
     <form action="[% c.uri_for('/search/wms') %]" method="get">
     <!--<form action="[% c.uri_for('/multiwmc') %]" method="get">-->
@@ -160,8 +160,9 @@
                         [% inputs = inputs + 1 %]
                     [% END %]
                     [% ELSE %]
-                        <div class="error_msg"><a href="[% wms_utils.getcap_url(ds.wmsurl) %]">WMS server failure </a></div>
+                        <div class="error_msg"><a href="[% wms_utils.getcap_url(ds.wmsurl) %]">[% app.wms.fail %]: </a></div>
                     [% END %]
+                    <br clear="all"/>
                 </div>
 
             </div>
@@ -173,7 +174,7 @@
             <select id="crs" name="crs" style="width:150px">
                 <!--<option disabled="disabled" selected="selected">No common projection</option>-->
             </select>
-            <input type="submit" value="Visualize"/>
+            <input type="submit" value="[% ui.button.wms_client %]"/>
         </div>
 
     </form>

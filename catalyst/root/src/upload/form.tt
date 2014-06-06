@@ -1,6 +1,6 @@
 [% IF NOT external_repository  %]
 
-<h2 class="std">Upload file</h2>
+<h2 class="std">[% app.upload.file %]</h2>
 
 [% IF overwrite_file %]
 
@@ -8,16 +8,15 @@
 
     <form action="[% c.uri_for('/upload') %]" method="post">
 
-        <label>Overwrite file?
+        <label>[% app.upload.overwr %]
             <input type="hidden" name="filename" value="[% overwrite_file %]" />
-            <input type="submit" name="BTN_overwrite" value="Cancel" />
-            <input type="submit" name="BTN_overwrite" value="OK" />
+            <input type="submit" name="BTN_overwrite" value="[% ui.button.cancel %]" />
+            <input type="submit" name="BTN_overwrite" value="[% ui.button.ok %]" />
         </label>
 
     </form>
 
 [% ELSE %]
-
 
     [% IF data %]
         <p style="color: red">[% data %]</p>
@@ -25,9 +24,10 @@
 
     <form enctype="multipart/form-data" action="[% c.uri_for('/upload') %]" method="post">
         <div id="upload-form">
-        Directory key: <input name="dirkey" value="" size="10" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        File name: <input name="data" type="file" />
-        <input class="selectbutton1" type="submit" name="BTN_upload" value="Upload" />
+        [% app.upload.dirkey %]: <input name="dirkey" value="" size="10" />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        [% app.upload.filename %]: <input name="data" type="file" />
+        <input class="selectbutton1" type="submit" name="BTN_upload" value="[% ui.button.upload %]" />
         </div>
     </form>
 
@@ -35,15 +35,13 @@
 
     <div id="upload-list">
 
-    <h2 class="std">Previously processed files</h2>
+    <h2 class="std">[% app.upload.prev_title %]</h2>
 
     <table class="box" width="100%">
         <tr>
-          <th>File name</th>
-          <th>Size</th>
-          <th>Time</th>
-          <th>Status</th>
-          <th>Show errors</th>
+            [% FOREACH hd IN app.upload.prev_headers %]
+                <th>[% hd %]</th>
+            [% END %]
        </tr>
 
     [% FOREACH fi IN upload_ui_utils.user_files() %]
@@ -55,9 +53,9 @@
         <td class="list_table">
             [% IF fi.f_errurl %]
                 [% IF fi.f_errurl.match('http://') %]
-                     <a href="[% fi.f_errurl %]">Error</a>
+                     <a href="[% fi.f_errurl %]">[% app.upload.err %]</a>
                 [% ELSE %]
-                     <a href="[% mm_config.get('BASE_PART_OF_EXTERNAL_URL') %][% fi.f_errurl %]">Error</a>
+                     <a href="[% mm_config.get('BASE_PART_OF_EXTERNAL_URL') %][% fi.f_errurl %]">[% app.upload.err %]</a>
                 [% END %]
             [% END %]
         </td>
@@ -68,7 +66,7 @@
     </div>
 
     <form action="[% c.uri_for('/upload') %]" method="get" style="text-align: right">
-        <input type="submit" value="Refresh"/>
+        <input type="submit" value="[% ui.button.refresh %]"/>
     </form>
 
 [% END %]

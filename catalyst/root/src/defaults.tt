@@ -5,6 +5,10 @@
 mm_logo = c.uri_for('/static/images/metamod_logo.png')
 version = mm_config.get('VERSION')
 builddate = mm_config.get('BUILDDATE')
+thumbsize = 64
+getCapabilities = 'service=WMS&version=1.3.0&request=GetCapabilities'
+
+# not translated: admin, questionnaire, email
 
 app = {
 
@@ -20,9 +24,32 @@ app = {
         </div>'
     }
 
+    menu = {
+        browse = 'Browse datasets'
+        admin = 'Admin'
+        search = 'Metadata search'
+        upload = 'File upload'
+        sub = 'Subscription'
+        profile = 'User profile'
+        login = 'Login'
+        logout = 'Logout'
+    }
+
     upload = {
 
         title = "Uploads to the Data Repository"
+        menu = {
+            test = 'Test a file'
+            dataset = 'Dataset administration'
+            help = 'Help'
+        }
+        file = 'Upload file'
+        dirkey = 'Directory key'
+        filename = 'File name'
+        overwr = 'Overwrite file?'
+        err = 'Error'
+        prev_title = 'Previously processed files'
+        prev_headers = [ 'File name', 'Size', 'Time', 'Status', 'Show errors' ]
 
         # Common text in the heading for all upload pages:
         login_text =
@@ -43,8 +70,72 @@ app = {
         files\" page). New files are checked against a set of file format requirements.
         If the file does not comply with these requirements, you will recieve an E-mail
         explaining the errors found. You may also upload files that merely are checked
-        against the file format requirements. To do this, use the \"Test a file\" page"
+        against the file format requirements. To do this, use the \"Test a file\" page.<br/></br>
 
+        Use the \"Browse...\" button below to enter the name of a file on your local file system
+        that you want to upload to the data repository.<br/></br>
+
+        You may also re-upload a previously uploaded file. The files previously uploaded are
+        shown in the table <b>Previously uploaded files</b> below. If the file to be uploaded should
+        replace any of these files, you will be asked to confirm this on the next page.<br/></br>
+
+        Finally, push the \"Upload\" button to initiate the actual upload.<br/></br>
+
+        You may upload files to directories not owned by you (even directories owned by another
+        institution). In that case you must obtain the directory key from the owner of the
+        directory, and fill it into the entry field below. Otherwise, you should leave the directory
+        key field empty.<br/></br>
+
+        <b>Note:</b> Files to be uploaded must not exceed a size limit of 100 MB.
+        Only alphanumeric characters, underscore (_), period (.) and hyphens (-)
+        are allowed in file names. <b>The initial part of a file name must be the name of a
+        user directory followed by an underscore (_)</b>."
+
+        format = {
+            title = 'File format'
+            text =
+            "Normally, a file to be uploaded should be a netCDF file (with a
+            \".nc\" file extention), or the equivalent CDL variant (\".cdl\"
+            extention). However, if you have a large number of small files,
+            you may pack the files into tar archive file. Then you upload the
+            archive file.<br/><br/>The following archive formats are accepted:"
+        }
+
+        dataset = {
+            edit = 'Edit dataset'
+            create = 'Create dataset'
+            update = 'Update dataset'
+            edit_md = 'Edit metadata'
+            edit_wms = 'Edit WMS/projection'
+            name = 'Dataset name'
+            key = 'Dataset key'
+            location = 'Dataset location'
+            catalog = 'Dataset catalog'
+            abspath = 'absolute directory path'
+            delete = 'Delete dataset'
+            uploaded = 'files previously uploaded in dataset'
+            owned = 'Dataset directories you own'
+        }
+
+        test = {
+            title = 'Test a file'
+            text =
+            "Use the \"File name\" entry or the \"Browse...\" button below to enter the name of
+            a file on your local file system that you want to test against the requirements for
+            this data repository.<br/><br/>
+
+            The file should be a netCDF file or a CDL file (the text version of a netCDF file).
+            <b>Note</b>:The file will not be sent to the data repository. If you
+            want to upload a file to the repository, use the
+            <a href=\"\[% c.uri_for('/upload') %\]\">Upload file</a> page.<br/><br/>
+
+            <b>Note</b>: Files to be tested must not exceed a size limit of 100 MB.<br/><br/>
+
+            Only alphanumeric characters, underline (_), period (.) and hyphens (-)
+            are allowed in file names. The initial part of a file name must be the name of a
+            user directory followed by underline (_).
+            The user directory need not exist in the repository."
+        }
     }
 
     search = {
@@ -70,12 +161,147 @@ app = {
         # HTML to fill an initial page where no results are shown (can be empty):
         presentation_html = ""
 
+        basickey_form_help =
+        "Mark one or more <b>\[% category.name %\]</b> from the list below by checking
+        the corresponding checkboxes. Then, click the \"Search\" button above.<br/></br>
+        The selected \[% category.name %\] will restrict the search result to only those
+        datasets that match at least one of the selected \[% category.name %\].
+        If no \[% category.name %\] are selected, no restrictions regarding \[% category.name %\] are used."
+
+        tree_form_help =
+        "Mark one or more <b>\[% category.name %\]</b> in the tree structure
+        below by checking checkboxes in the the tree. To view lower levels in
+        the tree click a \"<span class='toggle_indicator'>+</span>\" button.
+        Expanded sub-trees can be collapsed by clicking the corresponding \"<span
+        class='toggle_indicator'>&#8211;</span>\"&nbsp;button.<br/></br>
+        The selected \[% category.name %\] will restrict the search result to only
+        those datasets that match at least one the selected criteria.<br/></br>
+        Selecting a higher level criteria implies that all lower level criteria
+        are also selected."
+
+        time_form_help =
+        "Enter the \[% category.name %\] to search for by filling in the \[%
+        category.lower %\] and \[% category.upper %\] fields below.<br/></br>
+        \[% IF category.numtype == 'date' %\] In each field, use the date format
+        \"YYYY-MM-DD\". Just \"YYYY\" or \"YYYY-MM\" will also be
+        understood.<br/></br>\[% END %\]
+        Only datasets having a \[% category.name %\] overlapping the interval
+        thus defined, will be selected."
+
+        text_search_help =
+        "Enter a list of search words separated by spaces. If more than one
+        search word is used it will only match datasets that match all
+        words.<br/></br> <b>Advanced search:</b>Enter search words separated by
+        one of the operators AND, OR or NOT, optionally with parenthesis.
+        Complete phrases can be used enclosed in <i>single</i> quotes (not
+        double). Wildcards (*) are allowed at the end of a word, but not
+        elsewhere."
+
+        map_search_help =
+        "Select a rectangular search area in the map below by dragging the
+        mouse.<br/></br> The search result will contain any datasets that
+        partially covered by the selected area.<br/></br> To clear you current
+        selection press \"Clear map\". If more than one map is available you can
+        select it from the dropdown list."
+
+        # old map search - deprecated
+        map_search_old_help =
+        "Select a rectangular search area in the map below. Click once to place
+        the first corner of rectangle, then after the page reloads click again
+        to place the second corner of the rectangle. The two selected points are
+        used as opposite corners of the rectangle.<br/></br> The search result
+        will contain any datasets that partially covered by the selected
+        area.<br/></br> To clear you current selection press \"Clear map\". If
+        more than one map is available you can select it from the dropdown list."
+
+        no_matching_datasets = "No datasets that match your search criteria were found."
+        ds_name = 'Dataset name'
+        current = 'Current search'
+
+        opt = {
+            col_num = 'Column number'
+            col_name = 'Column names'
+            vert = 'Vertical'
+            hori = 'Horisontal'
+            name = 'Name'
+            num_cols = 'Number of metadata columns'
+            res_pg_ds = 'Results per page (datasets)'
+            res_pg_file = 'Results per page (file)'
+            num_title = 'Used to set the number for metadata columns to show on the search result page.'
+        }
+
     }
 
-    dataset = {
+    wms = {
+        title = 'WMS client'
+        layers = 'WMS layers'
+        fail = 'WMS server failure'
+        js_warn = 'Javascript must be enabled for WMS client to work!'
+    }
 
+    transform = {
+        title = 'Transform dataset'
+        repro = 'Reprojection'
+        proj = 'projection'
+        inter = 'interpolation'
+        x_axis = 'x axis values'
+        y_axis = 'y axis values'
+        not_avail = 'Dataset no longer available'
+    }
+
+    basket = {
+        title = 'Basket'
+        coll_title = 'File collection'
+        total = 'Total'
+        unavail = 'Datasets shown in italic are unavailable for download.'
+        remove_hd = [ 'Dataset name', 'File size']
+        confirm_empty = "Really remove all \[% collection_basket.files.size %\] files from basket?"
+        no_files = 'There are no files in the file collection.'
+    }
+
+    login = {
+        title = "Login"
+        user = 'Username'
+        pass = 'Password'
+        forgot = 'Forgotten your passord?'
+        reset =
+        "Enter your user name and click \"Reset password\" to get a new password
+        sent to your email address."
+        description =
+        "<p class=\"info\">Log in to METAMOD to get access to more functions.
+        When logged in you can do the following:</p>
+        <ul>
+        <li>Setup automatic subscriptions to get notified about new data files.</li>
+        <li>Upload new datafiles and add meta data</li>
+        <li>Administrate your own account.</li>
+        </ul>"
+    }
+
+    register = {
+        title = 'Request new user'
+        username = 'Username'
+        email = 'Email address'
+        access_rights = 'Access rights'
+        realname = 'Name'
+        institution_name = 'Name of institution'
+        other = 'Other (please specify)'
+        telephone = 'Telephone number'
+        description =
+        "If you do not already have a username and password you can send
+        a request for one. Be aware that it can take some time to
+        process your request as it has to be manually approved."
+    }
+
+    restricted = {
+        title = 'Not authorized'
+        text =
+        "You are not authorized to view this page. You can request additional access
+        rights that will have to be manually approved."
+    }
+
+    dataset = { # not translated fully - intended for search engines
         title = "Available datasets"
-
+        info = 'Information about dataset'
         description =
         "This page is primarily intended for search engines as it links to <a href='" _ c.uri_for('/dataset') _
         "'>all available level 1 datasets</a> and then further to all level 2 datasets.
@@ -108,7 +334,7 @@ app = {
 
     }
 
-    quest = { # these don't seem to be implemented in Catalyst templates for 2.6
+    quest = { # these don't seem to be implemented in Catalyst templates ?
 
         title = "Meta data form"
 
@@ -163,7 +389,80 @@ displayArea can be (obsolete - FIXME):
         projection_help = '
 text to come...
         '
+    }
 
+    error = {
+        fatal =
+        "<h1>Congratulations!</h1>
+        <p>You have managed to break METAMOD in a new and mysterious way we have
+        never seen before. There might be a prize for this. Please contact our
+        <a href=\"mailto:\[% mm_config.get('OPERATOR_EMAIL') %\]\">code monkeys</a>
+        and include the diagnostic information below to see if you've won:</p>"
+    }
+
+}
+
+ui = {
+
+    button = {
+        search = 'Search'
+        search_opt = 'Search options'
+        pivot_tbl = 'Pivot table'
+        select_all = 'Select All'
+        clear_all = 'Clear All'
+        clear_dates = 'Clear dates'
+        subscribe = 'Subscribe'
+        add_basket = 'Add to basket'
+        add_aggr = 'Add to basket'
+        view_basket = 'View basket'
+        empty_basket = 'Empty basket'
+        repl_basket = 'Replace current basket'
+        merge_basket = 'Merge current basket'
+        get_basket_url = 'Get basket URL'
+        basket_download = 'Request download'
+        req_access = 'Request access'
+        upload = 'Upload'
+        wms_client = 'Visualize'
+        timeseries = "Time series"
+        ascii = 'ASCII'
+        show_md = 'Show metadata'
+        transform = 'Transform'
+        rss = 'RSS Feed'
+        opendap = 'OPeNDAP'
+        wmcdata = 'WMC data'
+        wmsdata = 'WMS data'
+        wmsinfo = 'WMSinfo'
+        deflate = '&#8211;'
+        expand = '+'
+        select_map = 'Select map'
+        clear_map = 'Clear map'
+        pan_map = 'Pan'
+        match_txt = 'Matching text'
+        email = "Email"
+        login = 'Login'
+        logout = 'Logout'
+        reset = 'Reset'
+        help = 'Help'
+        refresh = 'Refresh'
+        ok = 'OK'
+        cancel = 'Cancel'
+        back = 'Back to menu'
+    }
+
+    linktitle = {
+        subscribe = 'Setup a subscription to get notified about new datafiles (requires login)'
+        add_basket = 'Add all child dataset to the collection basket'
+        add_aggr = 'Add aggregated dataset to the collection basket'
+        wms_client = 'Show data on interactive map'
+        timeseries = 'Show data as graph'
+        ascii = "Download data as tab-separated file"
+        show_md = 'how metadata for this file'
+        transform = 'Extract subsets, reproject and download data (requires login)'
+        opendap = 'View data on THREDDS'
+        rss = 'The RSS feed for this dataset. The RSS feed will notify you about any new datafiles associated with this dataset'
+        deflate = 'Hide the datafiles for this dataset'
+        expand = 'Show the datafiles for this dataset'
+        remove_crit = 'Remove criteria'
     }
 
 }

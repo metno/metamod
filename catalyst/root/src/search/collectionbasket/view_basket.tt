@@ -15,7 +15,7 @@ jQuery(document).ready( function () {
 
 [% SET files = collection_basket.files() %]
 
-<h2 class="std">Basket</h2>
+<h2 class="std">[% app.basket.title %]</h2>
 
 <br />
 
@@ -23,83 +23,92 @@ jQuery(document).ready( function () {
 
 [% IF files.size > 0 %]
 
-<form name="request_download" action="[% c.uri_for('/search/collectionbasket/request_download') %]" method="POST" >
-    [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
-    <label for="email_address">Email</label>
-    <input type="text" name="email_address" id="email_address" size="40" value="[% c.req.params.email_address || c.user.u_email %]" />
-    <input type="submit" value="Request download" />
-</form>
+    <form name="request_download" action="[% c.uri_for('/search/collectionbasket/request_download') %]" method="POST" >
+        [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
+        <label for="email_address">[% ui.button.email %]</label>
+        <input type="text" name="email_address" id="email_address" size="40" value="[% c.req.params.email_address || c.user.u_email %]" />
+        <input type="submit" value="[% ui.button.basket_download %]" />
+    </form>
 
-<p>Datasets shown in italic are unavailable for download.</p>
+    <p>[% app.basket.unavail %]</p>
 
-<form name="search_form" id="search_form" method="POST" action="[% c.uri_for('/search/collectionbasket/remove_dataset' ) %]">
-<!--<form name="search_form" id="search_form" method="POST" action="[% c.uri_for('/qtips' ) %]">-->
-    [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
+    <form name="search_form" id="search_form" method="POST" action="[% c.uri_for('/search/collectionbasket/remove_dataset' ) %]">
+        [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
 
-    <br />
+        <br />
 
-    <table class="plain" style="width: 100%">
+        <table class="plain" style="width: 100%">
 
-        <tr>
-            <th class="collection-basket" colspan="2">
-                Dataset name
-            </th>
-            <th class="collection-basket" style="white-space:nowrap;">
-                File size
-            </th>
-        </tr>
-
-        [% FOREACH file IN files %]
-            [% filesize = file.data_file_size %]
             <tr>
-                <td class="collection-basket" width="90%">
-                    <span style="[% filesize ? '' : 'font-style: italic' %]">[% file.name %]</span>
-                </td>
-                <td class="collection-basket" style="white-space:nowrap;text-align: right">
-                    [% IF file.OPENDAP %]
-                        <a class="visual" href="[% c.uri_for('/search/transform', { ds_id => file.ds_id }) %]"><button type="button">Transform</button></a>
-                    [% END %]
-                    [% IF file.wms_url %]
-                        <a class="visual" href="[% c.uri_for('/search/wms') %]?ds_id=[% file.ds_id %]"><button type="button">Visualize</button></a>
-                    [% END %]
-                    <button type="submit" name="remove_file" value="[% file.ds_id %]">
-                        <img src="[% c.uri_for('/static/images/cancel.png') %]" alt="Remove"/>
-                    </button>
-                </td>
+                [% FOREACH hd IN app.basket.remove_hd %]
+                    <th class="collection-basket" style="text-align: left">[% hd %]</th>
+                [% END %]
+            </tr>
+
+            [% FOREACH file IN files %]
+                [% filesize = file.data_file_size %]
+                <tr>
+                    <td class="collection-basket" width="90%">
+                        <span style="[% filesize ? '' : 'font-style: italic' %]">[% file.name %]</span>
+                        <span style="float: right; white-space:nowrap;">
+                            [% IF file.OPENDAP # can't use normal macros since variable width and no break %]
+                                <a class="visual" href="[% c.uri_for('/search/transform', { ds_id => file.ds_id }) %]">
+                                    <button type="button">[% ui.button.transform %]</button>
+                                </a>
+                            [% END %]
+                            [% IF file.wms_url %]
+                                <a class="visual" href="[% c.uri_for('/search/wms') %]?ds_id=[% file.ds_id %]">
+                                    <button type="button">[% ui.button.wms_client %]</button>
+                                </a>
+                            [% END %]
+                            <button type="submit" name="remove_file" value="[% file.ds_id %]">
+                                <img src="[% c.uri_for('/static/images/cancel.png') %]" alt="Remove"/>
+                            </button>
+                        </span>
+                    </td>
+                    <td class="collection-basket" style="text-align: right">
+                        [% filesize ? collection_basket.human_readable_size( file.data_file_size ) : '&nbsp' %]
+                    </td>
+                </tr>
+            [% END %]
+            <tr>
+                <td class="collection-basket" style="text-align: right"><b>[% app.basket.total %]:</b></td>
                 <td class="collection-basket" style="text-align: right">
-                    [% filesize ? collection_basket.human_readable_size( file.data_file_size ) : '&nbsp' %]
+                    <b>[% collection_basket.human_readable_size( collection_basket.calculate_size() ) %]</b>
                 </td>
             </tr>
-        [% END %]
-        <tr>
-            <td class="collection-basket" colspan="2"><b>Total</b></td>
-            <td class="collection-basket" style="text-align: right">
-                <b>[% collection_basket.human_readable_size( collection_basket.calculate_size() ) %]</b>
-            </td>
-        </tr>
 
-    </table>
+        </table>
 
-</form>
+    </form>
 
-<hr/>
+    <hr/>
 
-<a class="button-link" href="[% c.uri_for( '/search/collectionbasket/empty_basket', c.req.params ) %]"><button type="button">Empty basket</button></a>
+    <a class="button-link" href="[% c.uri_for( '/search/collectionbasket/empty_basket', c.req.params ) %]">
+        <button type="button">[% ui.button.empty_basket %]</button>
+    </a>
 
-[% SET basket_params = { ds_id => collection_basket.dataset_ids } %]
-<a class="button-link" href="[% c.uri_for( '/search/collectionbasket/link_basket', basket_params  ) %]"><button type="button">Get basket URL</button></a>
-<a class="visual" href="[% c.uri_for( '/search/wmslist', basket_params  ) %]"><button type="button">Visualize layers</button></a>
-[% IF 0 # multiple datasets no longer working %]
-    <a class="visual" href="[% c.uri_for( '/search/wms', basket_params  ) %]"><button type="button">Visualize set</button></a>
-[% END %]
+    [% SET basket_params = { ds_id => collection_basket.dataset_ids } %]
+    <a class="button-link" href="[% c.uri_for( '/search/collectionbasket/link_basket', basket_params  ) %]">
+        <button type="button">[% ui.button.get_basket_url %]</button>
+    </a>
+    <a class="visual" href="[% c.uri_for( '/search/wmslist', basket_params  ) %]">
+        <button type="button">[% ui.button.wms_client %] layers</button>
+    </a>
+    [% IF 0 # multiple datasets no longer working %]
+        <a class="visual" href="[% c.uri_for( '/search/wms', basket_params  ) %]">
+            <button type="button">[% ui.button.wms_client %] set</button>
+        </a>
+    [% END %]
 
 [% ELSE %]
 
-[%# the form is needed since many the search criteria links are dependant upon it %]
-<form name="search_form" id="search_form" method="GET" action="[% c.uri_for( '/search/collectionbasket/remove_selected' ) %]">
-    [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
-</form>
-    There are no files in the basket.
-[% END %]
+    [%# the form is needed since many the search criteria links are dependant upon it %]
+    <form name="search_form" id="search_form" method="GET"
+          action="[% c.uri_for( '/search/collectionbasket/remove_selected' ) %]">
+        [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
+    </form>
 
-</form>
+    [% app.basket.no_files %]
+
+[% END # files %]

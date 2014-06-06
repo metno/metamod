@@ -31,15 +31,13 @@ use Metamod::Dataset;
 
 =head1 NAME
 
-<package name> - <description>
+MetamodWeb::Controller::Admin::DatasetManager - probably does something... FIXME
 
 =head1 DESCRIPTION
 
+Blah blah blah .... FIXME
+
 =head1 METHODS
-
-=cut
-
-=head2 auto
 
 =cut
 
@@ -49,7 +47,9 @@ sub auto :Private {
     # Controller specific initialisation for each request.
 }
 
-=head2 index
+=head2 /admin/dsmanager
+
+Some comments would be nice
 
 =cut
 

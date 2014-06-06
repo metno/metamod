@@ -33,7 +33,7 @@
     [% INCLUDE search/keep_search_params.tt category_type = category.sc_type category_id = category.sc_id %]
 [% END %]
 
-<button type="submit">Search</button>
+<button type="submit">[% ui.button.search %]</button>
 </div>
 
 </form>

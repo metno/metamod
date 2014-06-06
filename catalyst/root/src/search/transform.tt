@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
     <head>
-        <title>Transform dataset</title>
+        <title>[% app.transform.title %]</title>
 
         <link rel="stylesheet" href="[% c.uri_for('/static/css/reset.css') %]" />
         <link rel="stylesheet" href="[% c.uri_for('/static/css/base.css') %]" />
@@ -35,7 +35,7 @@
 
     <div class="main">
 
-    <h1 class="std">Transform</h1>
+    <h1 class="std">[% app.transform.title %]</h1>
 
     [%# IF c.request.method = "GET" %]
 
@@ -58,7 +58,9 @@
             <script>$(function() { $( "#stop_date" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
 
 
-            <h2>Reprojection</h2>
+            <h2>[% app.transform.repro %]</h2>
+
+            [% app.transform.proj %]:
             <select name="projection">
                 <option value="">(original)</option>
             [% FOREACH proj IN projections %]
@@ -66,7 +68,7 @@
             [% END %]
             </select>
 
-            interpolation:
+            [% app.transform.inter %]:
             <select name="interpolation">
                 <option value="nearestneighbor">nearestneighbor</option>
                 <option value="bilinear">bilinear</option>
@@ -81,12 +83,12 @@
 
             <br/>
 
-            X axis values: <input type="text" name="xAxisValues" value="-180,-179,...,180"/>
-            y axis values: <input type="text" name="yAxisValues" value="-90,-89,...,90"/>
+            [% app.transform.x_axis %]: <input type="text" name="xAxisValues" value="-180,-179,...,180"/>
+            [% app.transform.y_axis %]: <input type="text" name="yAxisValues" value="-90,-89,...,90"/>
 
             <div>
                 <br/>
-                <button type="button" onclick="jQuery('#start_date').val(''); jQuery('#stop_date').val('')">Clear dates</button>
+                [% button_js( 'clear_dates', "jQuery('#start_date').val(''); jQuery('#stop_date').val('')" ) %]
                 <input type="submit" value="Transform"/>
             </div>
 
@@ -94,7 +96,7 @@
 
     [% ELSE %]
 
-        <p>Dataset no longer available</p>
+        <p>[% app.transform.not_avail %]</p>
 
     [% END %]
 

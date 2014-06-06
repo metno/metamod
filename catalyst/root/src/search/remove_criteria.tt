@@ -17,8 +17,8 @@
     [% c.req.params.delete(html_id) %]
 [% END %]
 
-<a class="image-link" href="[% c.uri_for( '/' _ c.req.path() , c.req.params ) %]" title="Remove criteria">
-    <img class="clickable" src="[% c.uri_for( '/static/images/cancel.png') %]" alt="Remove" />
+<a class="image-link" href="[% c.uri_for( '/' _ c.req.path() , c.req.params ) %]" title="[% ui.linktitle.remove_crit %]">
+    <img class="clickable" src="[% c.uri_for( '/static/images/cancel.png') %]" alt="[% ui.linktitle.remove_crit %]" />
 </a>
 
 [% # we place the deleted value back in the req.params %]

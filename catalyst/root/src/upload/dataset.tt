@@ -1,7 +1,9 @@
+
+
 [% IF ds_id %]
-    <h1 class="std">Edit dataset [% dataset.ds_name %]</h1>
+    <h1 class="std">[% app.upload.dataset.edit %] [% dataset.ds_name %]</h1>
 [% ELSE %]
-    <h1 class="std">Create dataset</h1>
+    <h1 class="std">[% app.upload.dataset.create %]</h1>
 [% END %]
 
 <form name="dataset" action="[% root %]/[% ds_id %]" method="POST" class="datasetedit">
@@ -16,7 +18,7 @@
 <table class="airy">
 
     <tr>
-        <td><label for="ds_name">Dataset name:</label></td>
+        <td><label for="ds_name">[% app.upload.dataset.name %]:</label></td>
         <td>
             [% IF ds_id %]
                 [% dataset.ds_name %]
@@ -27,18 +29,18 @@
     </tr>
 
     <tr>
-        <td><label for="dskey">Dataset key:</label></td>
+        <td><label for="dskey">[% app.upload.dataset.key %]:</label></td>
         <td><input id="dskey" name="dskey" value="[% dataset.dskey %]" size="10"> (max 10 characters)</td>
     </tr>
 
-    [% IF mm_config.get('EXTERNAL_REPOSITORY') == "true" # used for osisaf et al %]
+    [% IF mm_config.is('EXTERNAL_REPOSITORY') # used for osisaf et al %]
         <tr>
-            <td><label for="location">Dataset location:</label></td>
-            <td><input id="location" name="location" value="[% dataset.location %]" size="60"> (absolute directory path)</td>
+            <td><label for="location">[% app.upload.dataset.location %]:</label></td>
+            <td><input id="location" name="location" value="[% dataset.location %]" size="60"> ([% app.upload.dataset.abspath %])</td>
         </tr>
 
         <tr>
-            <td><label for="catalog">Dataset catalog:</label></td>
+            <td><label for="catalog">[% app.upload.dataset.catalog %]:</label></td>
             <td><input id="catalog" name="catalog" value="[% dataset.catalog %]" size="60"> (THREDDS URL)</td>
         </tr>
     [% END %]
@@ -46,9 +48,9 @@
     <tr>
         <td>
             [% IF ds_id %]
-                <input type="submit" value="Update">
+                <input type="submit" value="[% app.upload.dataset.update %]">
             [% ELSE %]
-                <input type="submit" value="Create">
+                <input type="submit" value="[% app.upload.dataset.create %]">
             [% END %]
         </td>
     </tr>
@@ -62,19 +64,19 @@
 <br/>
 <form name="dataset" action="[% root %]/[% ds_id %]" method="POST" class="datasetedit">
 <table class="airy">
-    <tr><td>[% files %] files uploaded in dataset.</td></tr>
-    <tr><td><input type="checkbox" name="delete" value="1"/> delete dataset</td></tr>
-    <tr><td><input type="submit" value="Delete"/></td></tr>
+    <tr><td>[% files %] [% app.upload.dataset.uploaded %].</td></tr>
+    <tr><td><input type="checkbox" name="delete" value="1"/> [% app.upload.dataset.delete %]</td></tr>
+    <tr><td><input type="submit" value="[% ui.button.ok %]"/></td></tr>
 </table>
 </form>
 [% END %]
 
-<h1 class="std">Dataset directories you own</h1>
+<h1 class="std">[% app.upload.dataset.owned %]</h1>
 
 <table class="box">
     <thead>
     <tr class="list_table">
-    <th class="list_table">Dataset name</th>
+    <th class="list_table">[% app.upload.dataset.name %]</th>
     <th class="list_table">&nbsp;</th>
     <th class="list_table">&nbsp;</th>
     <th class="list_table">&nbsp;</th>
@@ -83,15 +85,32 @@
     [% FOREACH ds IN upload_ui_utils.user_datasets() %]
         <tr class="list_table">
             <td class="list_table">[% ds.ds_name %]</td>
-            <td class="list_table"><div class="btns"><a class="btn2" style="width:120px" href="[% root _ '/' _ ds.ds_id %]"><span>Edit</span></a></div></td>
-            <td class="list_table"><div class="btns"><a class="btn2" style="width:120px" href="[% c.uri_for( '/editor/metadata/restricted', ds.ds_id ) %]"><span>Edit metadata</span></a></div></td>
-            <td class="list_table"><div class="btns"><a class="btn2" style="width:120px;"href="[% c.uri_for( '/editor/wms_and_projection/restricted', ds.ds_id ) %]"><span>Edit WMS/projection</span></a></div></td>
+            <td class="list_table">
+                <div class="btns"><a class="btn2" style="width:120px"
+                    href="[% root _ '/' _ ds.ds_id %]"><span>[% app.upload.dataset.edit %]</span></a></div>
+            </td>
+            <td class="list_table">
+                <div class="btns"><a class="btn2" style="width:120px"
+                    href="[% c.uri_for( '/editor/metadata/restricted', ds.ds_id ) %]">
+                        <span>[% app.upload.dataset.edit_md %]</span>
+                </a></div>
+            </td>
+            <td class="list_table">
+                <div class="btns"><a class="btn2" style="width:120px;"
+                    href="[% c.uri_for( '/editor/wms_and_projection/restricted', ds.ds_id ) %]">
+                        <span>[% app.upload.dataset.edit_wms %]</span>
+                </a></div>
+            </td>
         </tr>
     [% END %]
     [% IF ds_id %]
         <tr class="list_table">
             <td class="list_table">New dataset</td>
-            <td class="list_table" colspan="3"><div class="btns"><a class="btn2" style="width:120px" href="[% root %]"><span>Create</span></a></div></td>
+            <td class="list_table" colspan="3">
+                <div class="btns"><a class="btn2" style="width:120px" href="[% root %]">
+                    <span>[% app.upload.dataset.create %]</span>
+                </a></div>
+            </td>
         </tr>
     [% END %]
 </table>

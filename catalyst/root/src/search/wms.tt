@@ -37,7 +37,7 @@
     </div>
 </form>
 
-<div id="docs"><p id="warning">Javascript must be enabled for WMS client to work!</p></div>
+<div id="docs"><p id="warning">[% app.wms.js_warn %]:</p></div>
 <!--<div id="tags"></div>-->
 
 <div id="formcontainer" style="position: absolute; top: 0px; left: 50px; z-index: 1000">
@@ -68,7 +68,7 @@
 
     [% ELSE %]
         <form name="form1" id="form1" action="#" style="">
-            <button type="button" onclick="history.back()">Back to menu</button>
+            [% button_js('back', 'history.back()') %]
         </form>
     [% END %]
 

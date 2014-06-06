@@ -8,29 +8,10 @@ function toggleTree( hkId ){
 
 </script>
 
-<p class="help">
+<p class="help">[% app.search.tree_form_help | eval %]</p>
 
-Mark one or more [% category.name %] in the tree structure below by checking checkboxes in the
-the tree. To view lower levels in the tree click a <span class="toggle_indicator">+</span> button.
-Expanded sub-trees can be collapsed by clicking the corresponding <span class="toggle_indicator">-</span> button.
-
-</p>
-
-<p class="help">
-
-The selected [% category.name %] will restrict the search result to only those datasets that match at least one
-the selected criteria.
-
-</p>
-
-<p class="help">
-
-Selecting a higher level criteria implies that all lower level criteria are also selected.
-
-</p>
-
-<button type="button" onclick="jQuery( 'input.topictree_level1' ).attr('checked', 'checked')">Select All</button>
-<button type="button" onclick="jQuery( 'input.topictree' ).attr('checked', '')">Clear All</button>
+<button type="button" onclick="jQuery( 'input.topictree_level1' ).attr('checked', 'checked')">[% ui.button.select_all %]</button>
+<button type="button" onclick="jQuery( 'input.topictree' ).attr('checked', '')">[% ui.button.clear_all %]</button>
 <br />
 
 <ul class="topics_tree topics_tree_level1">

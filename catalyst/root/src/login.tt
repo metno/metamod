@@ -1,21 +1,12 @@
 [% META title = 'Login' %]
 
-<div id="info">
-    <p class="info">
-    Log in to METAMOD to get access to more functions. When logged in you can do the following:
-    </p>
-    <ul>
-    <li>Setup automatic subscriptions to get notified about new data files.</li>
-    <li>Upload new datafiles and add meta data</li>
-    <li>Administrate your own account.</li>
-    </ul>
-</div>
+<div id="info">[% app.login.description %]</div>
 
 [% INCLUDE 'user_msgs.tt' %]
 
 <div id="loginform">
 
-    <h2 class="std">Login</h2>
+    <h2 class="std">[% app.login.title %]</h2>
 
     <form name="login" method="POST" action="[% c.uri_for('/login/authenticate') %]">
         <input type="hidden" name="return_path" value="[% c.req.params.return_path %]" />
@@ -23,18 +14,22 @@
         <table>
 
             <tr>
-            <td><label for="username">Username<label></td>
+            <td><label for="username">[% app.login.user %]<label></td>
             <td><input type="text" name="username" id="username" value="[% c.req.params.username %]" /></td>
             </tr>
 
             <tr>
-            <td><label for="password">Password</label></td>
-            <td><input type="password" id="password" name="password" /></td>
+            <td><label for="password">[% app.login.pass %]</label></td>
+            <td><input type="password" id="password" name="password" />
+                <a href="[% c.uri_for('/login/reset_password_form',
+                    { username => c.req.params.username } ) # username in link not working %]">
+                    [% app.login.forgot %]
+                </a>
+            </td>
             </tr>
 
             <tr>
-            <td><input type="submit" value="Login" /></td>
-            <td><a href="[% c.uri_for('/login/reset_password_form', { username => c.req.params.username } ) %]">Forgotten your passord?</a>
+            <td><input type="submit" value="[% ui.button.login %]" /></td>
             </tr>
         </table>
     </form>
@@ -42,28 +37,25 @@
 
 <div id="registerform">
 
-    <h2 class="std">Request new user</h2>
+    <h2 class="std">[% app.register.title %]</h2>
 
-    <p class="form">
-    If you do not already have a username and password you can send a request for one. Be aware that it can take
-    some time to process your request as it has to be manually approved.
-    </p>
+    <p class="form">[% app.register.description %]</p>
 
     <form id="register" name="register" method="POST" action="[% c.uri_for('/login/register') %]">
         <table>
 
             <tr>
-            <td><label for="register_username">Username</label></td>
+            <td><label for="register_username">[% app.register.username %]</label></td>
             <td><input type="text" id="register_username" name="register_username" value="[% c.req.params.register_username %]" /></td>
             </tr>
 
             <tr>
-            <td><label for="email">Email address</label></td>
+            <td><label for="email">[% app.register.email %]</label></td>
             <td><input type="text" id="register_email" name="email" value="[% c.req.params.email %]" /></td>
             </tr>
 
             <tr>
-            <td><label for="access_rights">Access rights</label></td>
+            <td><label for="access_rights">[% app.register.access_rights %]</label></td>
             <td>
                 <select name="access_rights" id="access_rights">
                     <option value=""></option> [%# default set blank to avoid wrong data resubmitted by mistake %]
@@ -75,12 +67,12 @@
             </tr>
 
             <tr>
-            <td><label for="realname">Name</label></td>
+            <td><label for="realname">[% app.register.realname %]</label></td>
             <td><input type="text" id="realname" name="realname" value="[% c.req.params.realname %]" /></td>
             </tr>
 
             <tr>
-            <td><label for="institution_name">Name of institution</label></td>
+            <td><label for="institution_name">[% app.register.institution_name %]</label></td>
             <td>
                 <select id="institution_name" name="institution_name">
                     <option value=""></option> [%# default set blank to avoid wrong data resubmitted by mistake %]
@@ -95,22 +87,22 @@
                         [% SET institution_selected = '' %]
 
                     [% END %]
-                    <option value="other">Other (please specify)</option>
+                    <option value="other">[% app.register.other %]</option>
                 </select>
             </tr>
 
             <tr>
-            <td><label for="institution_other">Name of institution (other)</label></td>
+            <td><label for="institution_other">[% app.register.other %]</label></td>
             <td><input type="text" id="institution_other" name="institution_other" value="[% c.req.params.institution_other %]" /></td>
             </tr>
 
             <tr>
-            <td><label for="telephone">Telephone number</label></td>
+            <td><label for="telephone">[% app.register.telephone %]</label></td>
             <td><input type="text" id="telephone" name="telephone" value="[% c.req.params.telephone %]" /></td>
             </tr>
 
             <tr>
-            <td colspan="2"><input type="submit" value="Request access" /></td>
+            <td colspan="2"><input type="submit" value="[% ui.button.req_access %]" /></td>
             </tr>
         </table>
     </form>

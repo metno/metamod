@@ -17,7 +17,7 @@ function submitSearchForm(actionUrl){
 
 <div class="search-criteria-menu">
 
-<span style="font-weight: normal; font-size: 1.1em; font-style:italic">Current search</span> (<a href="[% c.uri_for( '/' _ c.req.path ) %]">Clear all</a>)
+<span style="font-weight: normal; font-size: 1.1em; font-style:italic">[% app.search.current %]</span> (<a href="[% c.uri_for( '/' _ c.req.path ) %]">[% ui.button.clear_all %]</a>)
 
 [% FOREACH category IN search_ui_utils.search_categories() %]
 
@@ -105,7 +105,7 @@ function submitSearchForm(actionUrl){
 [% END %]
 
     <div class="criteria-item">
-        <img src="[% c.uri_for( '/static/images/bullet_go.png') %]" alt="Search" />
-        <a href="[% c.uri_for( '/search/page/1/result', c.req.params ) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/page/1/result' ) %]')">Search</a>
+        <img src="[% c.uri_for( '/static/images/bullet_go.png') %]" alt="*" />
+        <a href="[% c.uri_for( '/search/page/1/result', c.req.params ) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/page/1/result' ) %]')">[% ui.button.search %]</a>
     </div>
 </div>

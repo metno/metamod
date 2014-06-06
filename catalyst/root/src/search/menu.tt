@@ -7,7 +7,9 @@
         [% SET item_class = "level2-menu-item" %]
     [% END %]
     <div class="[% item_class %]">
-        <a href="[% c.uri_for('/search/collectionbasket', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/collectionbasket' ) %] ')">View Basket ([% collection_basket.num_files() %])</a>
+        <a href="[% c.uri_for('/search/collectionbasket', link_params) %]"
+           onclick="return submitSearchForm('[% c.uri_for('/search/collectionbasket') %] ')">
+            [% ui.button.view_basket _ ' (' _ collection_basket.num_files() _ ')' %]</a>
     </div>
 
     [% IF c.req.path().search('search/help') %]
@@ -16,6 +18,7 @@
         [% SET item_class = "level2-menu-item" %]
     [% END %]
     <div class="[% item_class %]">
-        <a href="[% c.uri_for('/search/help', link_params) %]" onclick="return submitSearchForm('[% c.uri_for( '/search/help' ) %] ')">Help</a>
+        <a href="[% c.uri_for('/search/help', link_params) %]"
+           onclick="return submitSearchForm('[% c.uri_for('/search/help') %] ')">[% ui.button.help %]</a>
     </div>
 </div>

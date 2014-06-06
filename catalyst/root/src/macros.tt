@@ -1,0 +1,32 @@
+[%# Place to define Template Toolkit macros. Not meant to be redefined locally %]
+
+[% MACRO link(name, href, text) BLOCK %]
+    <a name="[% name %]" href="[% href %]">[% text %]</a>
+[% END %]
+
+[% MACRO visual(name, href) BLOCK # show inline %]
+    <a class="[% class || 'visual' %]" href="[% href %]" title="[% ui.linktitle.$name %]"><span>[% ui.button.$name %]</span></a><br clear="all"/>
+[% END %]
+
+[% MACRO button(name, href, text) BLOCK %]
+    <a class="btn" href="[% href %]" title="[% ui.linktitle.$name %]"><span>[% text || ui.button.$name %]</span></a><br clear="all"/>
+[% END %]
+
+[% MACRO button_new(name, href) BLOCK # open in new window %]
+    <a class="btn" href="[% href %]" target="_blank" title="[% ui.linktitle.$name %]"><span>[% text || ui.button.$name %]</span></a><br clear="all"/>
+[% END %]
+
+[% MACRO button_js(name, href, text) BLOCK # javascript event trigger %]
+<button type="button" name="[% name %]" onclick="[% href %]">[% text || ui.button.$name %]</button>
+[% END %]
+
+[% MACRO wmsthumb(src, z) BLOCK %]
+    <div class="wmsthumb" style="[% style %] height: [% thumbsize %]px; width: [% thumbsize %]px; z-index: [% z %]"><img src="[% src %]"/></div>
+[% END %]
+
+[% MACRO expand_button(name) BLOCK %]
+    <a class="btn2" href="[% c.uri_for( '/search/page/' _ datasets_pager.current_page() _ '/' _ name _ '/' _ dataset.ds_id, c.req.parameters ) _ '#ds' _ dataset.ds_id %]"
+       title="[% ui.linktitle.$name %]" />
+    <span>[% ui.button.$name %]</span>
+    </a>
+[% END %]

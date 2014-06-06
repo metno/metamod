@@ -1,10 +1,10 @@
 
 <form name="search_form" id="search_form" method="POST" action="[% c.uri_for('/search/collectionbasket/empty_basket' ) %]">
 
-    <p>Really remove all [% files = collection_basket.files.size %] files from basket?</p>
+    <p>[% app.basket.confirm_empty | eval %]</p>
 
-    <input type="submit" name="empty_basket" value="Empty basket" />
-    <input type="submit" name="empty_basket" value="Cancel" />
+    <input type="submit" name="empty_basket" value="[% ui.button.empty_basket %]" />
+    <input type="submit" name="empty_basket" value="[% ui.button.cancel %]" />
 
 </form>
 

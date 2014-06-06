@@ -7,11 +7,11 @@
 
 <div class="inside level2-active-area">
 
-<h2 class="std">Search options</h2>
+<h2 class="std">[% ui.button.search_opt %]</h2>
 
 [% INCLUDE search/search_options_form.tt %]
 
-<button type="submit">Search</button>
+<button type="submit">[% ui.button.search %]</button>
 
 </div>
 

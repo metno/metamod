@@ -28,7 +28,7 @@ use base 'Catalyst::View::TT';
 __PACKAGE__->config(
     #TEMPLATE_EXTENSION => '.tt',
     WRAPPER => 'wrapper.tt',
-    PRE_PROCESS => ['defaults.tt', 'custom.tt'],
+    PRE_PROCESS => ['defaults.tt', 'custom.tt', 'macros.tt'],
     render_die => 1, # will be default behaviour soon
 );
 

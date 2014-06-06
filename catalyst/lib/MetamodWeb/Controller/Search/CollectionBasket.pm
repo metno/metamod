@@ -175,7 +175,7 @@ Makes a basket containing the datasets listed as params
 
 =cut
 
-sub link_basket : Path('/search/collectionbasket/link_basket' ) : Args(0) { # FIXME: should be a POST request
+sub link_basket : Path('/search/collectionbasket/link_basket' ) : Args(0) { # FIXME: should be a POST request?
     my ($self, $c) = @_;
 
     my $dataset_ids = $c->req->params->{'ds_id'} || [];

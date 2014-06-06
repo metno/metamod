@@ -7,23 +7,23 @@
 [% END %]
 
 [% IF c.check_user_roles('admin') %]
-    <div class="menu-item"><a href="[% c.uri_for( '/admin' )%]">Admin</a></div>
+    <div class="menu-item"><a href="[% c.uri_for( '/admin' )%]">[% app.menu.admin %]</a></div>
 [% END %]
 
 <!-- standard level 1 menu items -->
-<div class="menu-item"><a href="[% c.uri_for( '/search' )%]">Metadata search</a></div>
+<div class="menu-item"><a href="[% c.uri_for( '/search' )%]">[% app.menu.search %]</a></div>
 [% IF section == 'search' %]
 [% INCLUDE "${section}/menu.tt" %]
 [% END %]
 
 [% IF c.check_user_roles('upload') %]
-    <div class="menu-item"><a href="[% c.uri_for( '/upload' )%]">File upload</a></div>
+    <div class="menu-item"><a href="[% c.uri_for( '/upload' )%]">[% app.menu.upload %]</a></div>
     [% IF section == 'upload' %]
     [% INCLUDE "${section}/menu.tt" %]
     [% END %]
 [% END %]
 
-<div class="menu-item"><a href="[% c.uri_for( '/subscription' )%]">Subscription</a></div>
+<div class="menu-item"><a href="[% c.uri_for( '/subscription' )%]">[% app.menu.sub %]</a></div>
 
 [%
     redirect_params = {
@@ -38,20 +38,20 @@
     The link is placed in the search menu under the assumption that if you enabled search you will probably
     also want to the page to indexable.
  -->
-<div class="menu-item" style="display: none;">
-    <a href="[% c.uri_for('/dataset') %]">Browse datasets</a>
+<div class="menu-item" [% IF ! debug; GET 'style="display: none;"'; END %]>
+    <a href="[% c.uri_for('/dataset') %]">[% app.menu.browse %]</a>
 </div>
 [% IF section == 'dataset' %]
 [% INCLUDE "${section}/menu.tt" %]
 [% END %]
 
 [% IF c.user_exists %]
-    <div class="menu-item"><a href="[% c.uri_for( '/userprofile' )%]">User profile</a></div>
+    <div class="menu-item"><a href="[% c.uri_for( '/userprofile' )%]">[% app.menu.profile %]</a></div>
     [% IF section == 'userprofile' %]
     [% INCLUDE "${section}/menu.tt" %]
     [% END %]
-    <div class="menu-item"><a href="[% c.uri_for( '/logout', redirect_params )%]">Logout</a></div>
+    <div class="menu-item"><a href="[% c.uri_for( '/logout', redirect_params )%]">[% app.menu.logout %]</a></div>
     <p>&nbsp;[% c.user.u_name %] ([% c.user.u_loginname %])</p>
 [% ELSE %]
-    <div class="menu-item"><a href="[% c.uri_for( '/login', redirect_params )%]">Login</a></div>
+    <div class="menu-item"><a href="[% c.uri_for( '/login', redirect_params )%]">[% app.menu.login %]</a></div>
 [% END %]
