@@ -1,4 +1,4 @@
-metno-metamod-2.13 (2.13.11-2) stable; urgency=low
+metno-metamod-2.13 (2.13.12-1) stable; urgency=low
 
   * dynamic search map using WMS
   * improved support for background maps in different projections
@@ -21,6 +21,7 @@ metno-metamod-2.13 (2.13.11-2) stable; urgency=low
     fix for netcdf 4 strings, consistent handling of popup windows
   * v11: WMS timeslider back/fwd + slideshow, fix for .tgz upload, webdav support, api documentation,
   	fix for external timeseries url bug, apache debuglevel
+  * v12: template texts now site configurable, various bugfixes
 
  -- Geir Aalberg <geira@met.no>  Mon, 03 Jun 2013 11:32:06 +0200
 
