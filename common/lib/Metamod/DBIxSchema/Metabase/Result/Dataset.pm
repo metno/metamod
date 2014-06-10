@@ -167,6 +167,7 @@ DBIx::Class Dataset class in the metadata database
 =cut
 
 use Carp;
+use URI::Escape;
 use Try::Tiny;
 use XML::LibXML;
 use Data::Dumper;
@@ -602,7 +603,7 @@ sub external_ts_url {
     }
 
     my $metadata = $self->metadata( ['dataref_OPENDAP', 'timeseries'] );
-    my $opendap = $self->opendap_url or return;
+    my $opendap = uri_escape( $self->opendap_url or return );
     my $tsvars  = $metadata->{timeseries}->[0] || $self->parent_dataset->metadata->{timeseries}->[0];
 
     $tsurl =~ s/\[OPENDAP\]/$opendap/;

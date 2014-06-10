@@ -126,3 +126,12 @@
 </table>
 </td>
 </tr>
+
+<tr>
+    <td class="sub_result_pager" colspan="5" style="padding-bottom: 15px;">
+
+        [% INCLUDE 'search/pager_navigation.tt' pager = level2_pager, url_template = '/search/page/'
+            _ datasets_pager.current_page() _ '/level2page/' _ dataset.ds_id _ '/%s' %]
+
+    </td>
+</tr>
