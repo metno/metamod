@@ -201,9 +201,9 @@ sub inner_loop {
 #
    my $dbname = $config->get("DATABASE_NAME");
    my $user   = $config->get("PG_WEB_USER");
-   my $dbh =
-     DBI->connect( "dbi:Pg:dbname=" . $dbname . " ". $config->get("PG_CONNECTSTRING_PERL"),
-	   $user, "" );
+   my $constr = $config->has("PG_CONNECTSTRING_PERL") ? $config->get("PG_CONNECTSTRING_PERL") : '';
+   my $dbh = DBI->connect( "dbi:Pg:dbname=$dbname $constr", $user, "" );
+
    my %datarefs = ();
    my %distrib_stm = ();
    my $stm = $dbh->prepare("SELECT DataSet.DS_id, MT_name, MD_content " .

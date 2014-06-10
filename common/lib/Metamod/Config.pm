@@ -549,7 +549,7 @@ sub _getVar {
 
     if (!exists $self->{vars}{$var}) {
         my $err = "Missing config variable '$var'";
-        $_logger_initialised ? $_logger_initialised->warn($err) : warn $err;
+        $_logger_initialised ? $_logger_initialised->logcarp($err) : carp $err;
     }
     return $self->{vars}{$var};
 }

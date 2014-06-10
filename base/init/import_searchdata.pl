@@ -71,8 +71,9 @@ my $searchdataxml = $config->path_to_config_file('searchdata.xml', 'staticdata')
 #
 my $dbname = $config->get("DATABASE_NAME");
 my $user = $config->get("PG_ADMIN_USER");
+my $constr = $config->has("PG_CONNECTSTRING_PERL") ? $config->get("PG_CONNECTSTRING_PERL") : '';
 
-$dbh = DBI->connect("dbi:Pg:dbname=" . $dbname . " ".$config->get("PG_CONNECTSTRING_PERL"), $user, "");
+$dbh = DBI->connect("dbi:Pg:dbname=$dbname $constr", $user, "");
 #
 #  Use full transaction mode. The changes has to be committed or rolled back:
 #
