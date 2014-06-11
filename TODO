@@ -15,12 +15,18 @@ points for later.
 
 --------------------
 
+wms client multiple dataset support is broken in 2.11
+
+calendar styles in Datacollection period broken
+
+rewrite BaseController/Base.pm to use Catalyst::Plugin::StatusMessage instead of flash
+
 remove hardcoded list of searchcategories in Metamod::DatasetImporter::_insert_metadata
 - should be read from searchdata.xml
 - has not worked since implemented in 2008:
   https://svn.met.no/viewvc/metamod/trunk/base/scripts/import_dataset.pl?revision=2&view=markup&pathrev=1760
 
-rewrite makedocs to use Pod::Simple::HTMLBatch
+#rewrite makedocs to use Pod::Simple::HTMLBatch
 
 use compressed version of openlayers lib
 
@@ -46,7 +52,7 @@ change "add to basket" to POST to avoid robots
 - impossible w/o javascript since search result already a GET form
 - requires complete redesign of UI
 
-make virtualenv set mode 755, add option for custom path to binstub
+#virtualenv, add option for custom path to binstub
 
 howto customize email addresses in common/lib/t/Metamod/SubscriptionHandler/email_to_file.t
 

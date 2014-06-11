@@ -150,6 +150,12 @@ For all datasets scheduled to be processed at the current hour, check if the
 newest file in the dataset have large enough age. If so, process the files in
 that dataset.
 
+Does not return any sensible value since not checked on return.
+
+=head3 TODO
+
+Make unit tests
+
 =cut
 
 sub ftp_process_hour {
@@ -206,10 +212,16 @@ sub ftp_process_hour {
             $logger->debug("ftp_process_hour: $filecount files from $dataset_name with age $age_seconds");
         }
         if ( $filecount > 0 && $age_seconds > 60 * $wait_minutes ) {
-            my $datestring = &get_date_and_time_string( $current_epoch_time - $age_seconds );
-            $self->process_files( \%files_to_process, $dataset_name, 'FTP', $datestring );
+            my $datestring = _get_date_and_time_string( $current_epoch_time - $age_seconds );
+            try {
+                $self->makeworkdir();
+                $self->process_files( \%files_to_process, $dataset_name, 'FTP', $datestring );
+            } catch {
+                $self->logger->error("FTP processing died: $_");
+            };
         }
     }
+    $logger->info("Finished processing files, started housecleaning");
 
     #print STDERR "Dump av hash all_ftp_datasets:\n";
     #print STDERR Dumper($self->all_ftp_datasets);
@@ -248,7 +260,8 @@ sub ftp_process_hour {
             }
         }
     }
-    return 1;
+    $self->cleanworkdir() or $logger->warn("Couldn't clean up working dirs in ftp_process_hour");
+    $logger->info("Finished processing FTP upload area");
 }
 
 =head2 process_upload
@@ -278,7 +291,7 @@ sub process_upload {
     my $current_epoch_time = time();
     my $age_seconds        = 60 * $upload_age_threshold + 1;
 
-    my $datestring = $self->get_date_and_time_string( $current_epoch_time - $age_seconds );
+    my $datestring = _get_date_and_time_string( $current_epoch_time - $age_seconds );
     my $error = try {
         $self->makeworkdir();
         $self->process_files( $inputfile, $dataset_name, $upload_type, $datestring );
@@ -287,11 +300,18 @@ sub process_upload {
         #$self->_log_error($_);
         $_;
     } finally {
-        eval { $self->cleanworkdir(); } or return $@;
-        # everything presumably now ok, returns undef by default
+        $self->cleanworkdir() ? '' : "Couldn't clean up working dirs in process_upload";
     };
     return $error;
 }
+
+=head2 $self->makeworkdir
+
+Create temporary working dirs
+
+Die on failure
+
+=cut
 
 sub makeworkdir {
     my ( $self ) = @_;
@@ -302,16 +322,28 @@ sub makeworkdir {
     }
 }
 
+=head2 $self->cleanworkdir
+
+Remove temporary working dirs
+
+Returns true on success, false on failure
+
+=cut
+
 sub cleanworkdir {
     my $self = shift;
     #  Clean up the work_start, work_flat and work_expand directories:
-    $self->logger->info("Deleting work dir $work_start");
+    my @all_errors;
     foreach my $dir ( $work_start, $work_expand, $work_flat ) {
-        rmtree($dir);
-        if ( -d $dir ) {
-            die "Unable to clean up $dir: " . $self->shell_command_error;
+        $self->logger->debug("Deleting work dir $dir");
+        my $errors;
+        rmtree($dir, error => \$errors);
+        foreach (@$errors) {
+            $self->logger->error("cleanworkdir failed: $_");
+            push @all_errors, $_;
         }
     }
+    return @all_errors == 0;
 }
 
 =head2 process_files
@@ -1141,7 +1173,7 @@ sub move_to_problemdir {
         }
 
         # Write message to files_with_errors log:
-        my $datestring = $self->get_date_and_time_string($modification_time);
+        my $datestring = _get_date_and_time_string($modification_time);
         my $path       = $problem_dir_path . "/files_with_errors";
         open( OUT, ">>$path" );
         print OUT "File: $uploadname modified $datestring copied to $destname\n";
@@ -1350,15 +1382,9 @@ sub unpack_tar_archive {
 #
 # poor man's reimplementation of DateTime->now->datetime...
 #
-sub get_date_and_time_string {
-    my $self = shift;
-
-    my @ta;
-    if ( scalar @_ > 0 ) {
-        @ta = localtime( $_[0] );
-    } else {
-        @ta = localtime( time() );
-    }
+sub _get_date_and_time_string {
+    my $notnow = shift;
+    my @ta = localtime( $notnow || time() );
     my $year       = 1900 + $ta[5];
     my $mon        = $ta[4] + 1;                                                               # 1-12
     my $mday       = $ta[3];                                                                   # 1-31
@@ -1677,10 +1703,16 @@ sub clean_up_repository {
     }
 }
 
+=head2 $upload_helper->syserrorm( $type, $error, $uploadname, $where, $what );
+
+Log error and move problem file
+
+=cut
+
 sub syserrorm {
     my $self = shift;
 
-    my ( $type, $errmsg, $uploadname, $where, $what ) = @_;
+    my ( $type, $error, $uploadname, $where, $what ) = @_;
 
     #
     if ( $type eq "SYS" || $type eq "SYSUSER" ) {
@@ -1690,17 +1722,38 @@ sub syserrorm {
             $self->move_to_problemdir($uploadname);
         }
     }
-    $self->syserror( $type, $errmsg, $uploadname, $where, $what );
+    $self->syserror( $type, $error, $uploadname, $where, $what );
 }
+
+=head2 $upload_helper->syserrorm( $type, $error, $uploadname, $where, $what );
+
+Log errors in the most complicated way possible
+
+Apparently resets shell_command_error attr and returns blank string
+
+=over 4
+
+=item type
+
+can be SYS, USER, SYSUSER ... no idea what that means
+
+=item errmsg
+
+could be 'NORMAL TERMINATION', in which case it's not an error after all (!)
+(this is only done by ftp_monitor and upload_monitor)
+
+=back
+
+=cut
 
 sub syserror {
     my $self = shift;
 
-    my ( $type, $errmsg, $uploadname, $where, $what ) = @_;
+    my ( $type, $error, $uploadname, $where, $what ) = @_;
     my ( undef, undef, $baseupldname ) = File::Spec->splitpath($uploadname);
 
     if ( $type eq "SYS" || $type eq "SYSUSER" ) {
-        ( my $msg = $errmsg );# =~ s/\n/ | /g;
+        ( my $msg = $error );# =~ s/\n/ | /g;
         my $errMsg = "$type IN: $where: $msg; ";
         $errMsg .= "Uploaded file: $uploadname; " if $uploadname;
         if ($what) {
@@ -1711,7 +1764,7 @@ sub syserror {
             ( $msg = $self->shell_command_error );# =~ s/\n/ | /g;
             $errMsg .= "Stderr: $msg; ";
         }
-        if ( $errmsg eq 'NORMAL TERMINATION' ) {
+        if ( $error eq 'NORMAL TERMINATION' ) {
             $self->logger->info( $errMsg );
         } else {
             if ( $type eq "SYSUSER" ) {
@@ -1723,7 +1776,7 @@ sub syserror {
     }
     if ( $type eq "USER" || $type eq "SYSUSER" ) {
         # warnings about the uploaded data
-        $self->add_user_error("$errmsg\nUploadfile: $baseupldname\n$what\n\n" );
+        $self->add_user_error("$error\nUploadfile: $baseupldname\n$what\n\n" );
     }
     $self->shell_command_error("");
 }

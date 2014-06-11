@@ -65,6 +65,10 @@ Run the script in test mode (no loop)
 
 =back
 
+=head1 TODO
+
+Rewrite to trap SIGINT in ftp_monitor - L<http://www.perlmonks.org/?node_id=93004>
+
 =head1 SEE ALSO
 
 L<Metamod::UploadHelper>
@@ -74,11 +78,12 @@ L<Metamod::UploadHelper>
 
 # Parse cmd line params
 my ($pidfile, $logfile, $test, $config_file_or_dir);
-GetOptions ('pidfile|p=s'   => \$pidfile,                # name of pid file - if given, run as daemon
-            'logfile|l=s'   => \$logfile,                # optional, redirect STDERR and STDOUT here
-            'config=s'      => \$config_file_or_dir,     # path to config dir/file
-            'test!'         => \$test,                   # dry run
-) or pod2usage();
+GetOptions ('pidfile|p=s'   => \$pidfile,               # name of pid file - if given, run as daemon
+            'logfile|l=s'   => \$logfile,               # optional, redirect STDERR and STDOUT here
+            'config=s'      => \$config_file_or_dir,    # path to config dir/file
+            'test!'         => \$test,                  # dry run
+            'help'          => sub { pod2usage(1) },    # for the helpless
+) or pod2usage(2);
 
 if(!Metamod::Config->config_found($config_file_or_dir)){
     pod2usage "Could not find the configuration on the commandline or the in the environment\n";
@@ -98,6 +103,8 @@ my $sleeping_seconds      = 60;
 #    $sleeping_seconds = 1;
 #}
 
+our $ok_to_run = 1;
+
 eval {
     if ($test) {
 
@@ -113,7 +120,9 @@ eval {
     } else {
 
         print STDERR "ftp monitor: Not running as daemon. Stop me with Ctrl + C\n";
-        while( $upload_helper->ftp_process_hour() ) {
+        use sigtrap 'handler' => \&int_handler, 'INT';
+        while( $ok_to_run ) {
+            $upload_helper->ftp_process_hour();
             sleep $sleeping_seconds;
         }
 
@@ -125,6 +134,10 @@ if ($@) {
     $upload_helper->syserrorm( "SYS", "NORMAL TERMINATION", "", "", "" );
 }
 
+sub int_handler {
+    print STDERR "Terminating ftp monitor\n";
+    $ok_to_run = 0;
+}
 
 sub ftp_monitor {
     my ($kernel, $heap, $session) = @_[KERNEL, HEAP, SESSION];
