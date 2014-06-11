@@ -133,10 +133,12 @@ PG_PORT = 5432
 # String used in shell commands psql, createdb and dropdb to connect to the
 # database:
 #PG_CONNECTSTRING_SHELL = --host [==PG_HOST==] --port [==PG_PORT==]
+PG_CONNECTSTRING_SHELL =
 
 # String used in Perl DBI->connect function to connect to the
 # database:
 #PG_CONNECTSTRING_PERL = ;host=[==PG_HOST==];port=[==PG_PORT==]
+PG_CONNECTSTRING_PERL =
 
 # Directory for PostgreSQL contrib libs
 # i.e. tsearch2.sql, pgcrypto.sql and lwpostgis.sql
