@@ -95,10 +95,13 @@ sub check {
     ok( $$vars{USERBASE_NAME},  'USERBASE_NAME is set'  );
     ok( $$vars{PG_WEB_USER},    'PG_WEB_USER is set'    );
     ok( $$vars{OPERATOR_EMAIL}, 'OPERATOR_EMAIL is set' );
-    ok( $$vars{DATASET_TAGS},   'DATASET_TAGS is set'   ); diag($$vars{DATASET_TAGS});
-    ok( $$vars{APPLICATION_ID}, 'APPLICATION_ID is set' ); diag($$vars{APPLICATION_ID});
-    ok( $$vars{UPLOAD_OWNERTAG},'UPLOAD_OWNERTAG is set'); diag($$vars{UPLOAD_OWNERTAG});
-    ok( $$vars{SRID_ID_COLUMNS},'SRID_ID_COLUMNS is set'); diag($$vars{SRID_ID_COLUMNS});
+    ok( $$vars{DATASET_TAGS},   'DATASET_TAGS is set'   ); #diag($$vars{DATASET_TAGS});
+    ok( $$vars{APPLICATION_ID}, 'APPLICATION_ID is set' ); #diag($$vars{APPLICATION_ID});
+    ok( $$vars{UPLOAD_OWNERTAG},'UPLOAD_OWNERTAG is set'); #diag($$vars{UPLOAD_OWNERTAG});
+    ok( $$vars{SRID_ID_COLUMNS},'SRID_ID_COLUMNS is set'); #diag($$vars{SRID_ID_COLUMNS});
+    ok( $$vars{SRID_ID_NAMES},  'SRID_ID_COLUMNS is set'); #diag($$vars{SRID_ID_NAMES});
+    is( scalar @{ $conf->split('SRID_ID_COLUMNS') },
+        scalar @{ $conf->split('SRID_ID_NAMES')   }, 'Equal number of SRID columns and names' );
 
     is( ( grep { $$vars{$_} eq 'Substituted by test_application.sh' } keys %$vars ), 0, '"Substituted by test_application.sh" not present');
 

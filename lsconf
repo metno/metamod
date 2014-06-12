@@ -54,11 +54,11 @@ my %opt;
 $opt{color} = -t STDOUT; # use IO::Interactive::Tiny instead - FIXME
 GetOptions(\%opt,
     'help',         # for dummies
-    'default!',     # set in default_config
-    'custom!',      # set in master_config
-    'environment!', # set in environment
-    'duplicates!',  # same value set in default and master_config
-    'color!',       # use colors
+    'default!',     # set in default_config - change to string param
+    'custom!',      # set in master_config - "
+    'environment!', # set in environment - "
+    'duplicates!',  # same value set in default and master_config - "
+    'color|x!',     # use colors
     'split',        # split var into key-value pairs
     'flags!',       # show flag indicator
     'check',        # run sanity check
@@ -78,7 +78,7 @@ check_conf($mm_config) if $opt{check};
 if (defined $opt{color}) {
     $ENV{ANSI_COLORS_DISABLED} = 1 unless $opt{color};
 }
-$opt{flags} = ! $opt{color} unless defined $opt{flags}; # use def prefix unless colorized
+#$opt{flags} = ! $opt{color} unless defined $opt{flags}; # use def prefix unless colorized
 
 # process argument
 my $var = shift @ARGV;

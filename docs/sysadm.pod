@@ -25,6 +25,20 @@ How to get nice color output when using a pager:
 
 =head2 Dataset administration
 
+=head3 Debugging
+
+If you want to check dataset metadata like XML, WMS, WMC, OPeNDAP etc, you can
+enable debug functions in the web search interface by adding I<&debug=1>
+to the end of the query string (prefixed by "?" if not set):
+
+  http://example.com/metamod/search/page/1/result?debug=1
+
+You can also use the command line utility C<lsds> (see below):
+
+  $ lsds --wms                              # list datasets with wmsinfo and test if valid
+  $ lsds --projectioninfo                   # list datasets with projectioninfo
+  $ lsds --xmlfile                          # list paths to xml files
+
 =head3 virtualenv
 
 This handy utility, lifted from Ruby and Python, creates a small shell script
@@ -47,7 +61,6 @@ you can specify another path to write the files:
 To reset the environment:
 
     $  deactivate
-
 
 =head3 lsds
 
