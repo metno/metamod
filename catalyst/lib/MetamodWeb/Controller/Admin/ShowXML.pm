@@ -50,7 +50,6 @@ sub auto : Private {
     $c->stash(
         xmldir => $xmldir,
         #xmldir => '/home/user/projects/metamod28/src/test/xmlinput',
-        current_view => 'Raw',
         template => 'admin/showxml.tt',
         admin_utils => MetamodWeb::Utils::AdminUtils->new(),
         maxfiles => 5,

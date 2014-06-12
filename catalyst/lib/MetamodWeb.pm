@@ -109,6 +109,14 @@ my %default_config = (
         CATALYST_VAR => 'c',
     },
 
+    'View::None' => {
+        INCLUDE_PATH => [
+            __PACKAGE__->path_to( 'root', 'src' ),
+        ],
+        TEMPLATE_EXTENSION => '.tt',
+        CATALYST_VAR => 'c',
+    },
+
     'default_view' => 'TT',
 
     'Plugin::Static::Simple' => {

@@ -70,7 +70,6 @@ sub index : Path("/admin/viewtable") :Args(0) {
     my ( $self, $c ) = @_;
 
     $c->stash(template => 'admin/viewtable.tt');
-    $c->stash(current_view => 'Raw');
     my $dbh            = $c->model('Metabase')->storage()->dbh();
     my $tables_ref     = DbTableinfo::get_tablenames($dbh);
     my @table_desc = ();
@@ -114,7 +113,6 @@ Stash the $wholetable reference.
 sub viewtbl : Path("/admin/viewtable") :Args(1) {
     my ( $self, $c, $tbl ) = @_;
     $c->stash(template => 'admin/viewtbl.tt');
-    $c->stash(current_view => 'Raw');
     $c->stash(name => "Metadata table: $tbl");
     my $params = $c->req->parameters;
     my $no_parent_filter = 0;
@@ -171,7 +169,6 @@ Stash the $wholetable reference.
 sub viewdataset : Path("/admin/viewtable/dataset") :Args(1) {
     my ( $self, $c, $dsid ) = @_;
     $c->stash(template => 'admin/viewtbl.tt');
-    $c->stash(current_view => 'Raw');
     $c->stash(name => 'Metadata table: dataset');
     my $params = $c->req->parameters;
     my $dbh = $c->model('Metabase')->storage()->dbh();
@@ -201,7 +198,6 @@ sub viewusertable : Path("/admin/viewusertable") :Args(0) {
     my ( $self, $c ) = @_;
 
     $c->stash(template => 'admin/viewtable.tt');
-    $c->stash(current_view => 'Raw');
     my $dbh            = $c->model('Userbase')->storage()->dbh();
     my $tables_ref     = DbTableinfo::get_tablenames($dbh);
     my @table_desc = ();
@@ -245,7 +241,6 @@ Stash the $wholetable reference.
 sub viewusertbl : Path("/admin/viewusertable") :Args(1) {
     my ( $self, $c, $tbl ) = @_;
     $c->stash(template => 'admin/viewtbl.tt');
-    $c->stash(current_view => 'Raw');
     $c->stash(name => "User Database table: $tbl");
     my $params = $c->req->parameters;
     my $dbh = $c->model('Userbase')->storage()->dbh();

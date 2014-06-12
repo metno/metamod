@@ -48,7 +48,7 @@ sub auto : Private {
     my $xmldir = $mm_config->get('WEBRUN_DIRECTORY') ."/XML/" . $mm_config->get('APPLICATION_ID');
 
     $c->stash(
-        current_view => 'Raw',
+        current_view => 'None',
         #admin_utils => MetamodWeb::Utils::AdminUtils->new(),
     );
 }

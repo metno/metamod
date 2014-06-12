@@ -57,7 +57,6 @@ sub dataset_manager : Path("/admin/dsmanager") :Args(0) {
     my ( $self, $c ) = @_;
 
     $c->stash(template => 'admin/dataset_manager.tt');
-    $c->stash(current_view => 'Raw');
     $c->stash(dsmanager_url => $c->uri_for('/admin/dsmanager'));
     my $config = $c->stash->{ mm_config };
     my $params = $c->req->parameters;

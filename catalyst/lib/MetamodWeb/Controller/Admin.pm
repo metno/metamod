@@ -30,6 +30,7 @@ sub auto :Private {
         return 0;
     }
 
+    $c->stash(current_view => 'None');
 
     my $mm_config = $c->stash->{ mm_config };
     my $application_id = $mm_config->get('APPLICATION_ID');
@@ -59,7 +60,6 @@ sub adminmenu :Path :Args(0) {
     my ( $self, $c ) = @_;
 
      $c->stash(template => 'admin/adminmenu.tt');
-     $c->stash(current_view => 'Raw');
 }
 
 =head2 showconfigfile
@@ -72,7 +72,6 @@ sub showconfigfile :Local :Args(0) {
     my ( $self, $c ) = @_;
 
     $c->stash(template => 'admin/showconfig.tt');
-    $c->stash(current_view => 'Raw');
     my $mm_config = $c->stash->{ mm_config };
     my $config_filename = $mm_config->{ filename };
     my $config_content;
@@ -95,7 +94,6 @@ sub showconfig :Local :Args(0) {
     my ( $self, $c ) = @_;
 
     $c->stash(template => 'admin/showconfig.tt');
-    $c->stash(current_view => 'Raw');
 }
 
 =head2 showlog
@@ -331,7 +329,6 @@ sub showlog :Local :Args(0) {
         }
     }
     $c->stash(template => 'admin/showlog.tt');
-    $c->stash(current_view => 'Raw');
     $c->stash(result => $result);
     $c->stash(optionstring => $optionstring);
     $c->stash(fromdate => $fromdate);

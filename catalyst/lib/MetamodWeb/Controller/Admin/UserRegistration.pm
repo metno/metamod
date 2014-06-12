@@ -51,7 +51,7 @@ sub confirm_user : Path('/admin/confirm_user') : Args(1) : ActionClass('REST') {
     }
 
     $c->stash( userbase_user => $userbase_user );
-    $c->stash( current_view  => 'Raw' );
+    #$c->stash( current_view  => 'None' );
 }
 
 sub confirm_user_GET {
@@ -104,9 +104,6 @@ sub confirm_user_POST {
 
 sub confirm_role : Path('/admin/confirm_role') : Args(2) : ActionClass('REST') {
     my ( $self, $c, $role, $username ) = @_;
-
-
-    $c->stash( current_view  => 'Raw' );
 }
 
 sub confirm_role_GET : Private {

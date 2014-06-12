@@ -80,7 +80,6 @@ sub sql_prepare_user : Path("/admin/sql_prepare_user") :Args(0) {
 sub prepare {
     my ($c, $dbh) = @_;
     $c->stash(template => 'admin/sql_prepare.tt');
-    $c->stash(current_view => 'Raw');
     my $tables_ref     = DbTableinfo::get_tablenames($dbh);
     my @table_desc = ();
     foreach my $tbl (@$tables_ref) {
@@ -113,7 +112,6 @@ sub sql_result_user : Path("/admin/sql_result_user") :Args(0) {
 sub run_sql {
     my ($c, $dbh) = @_;
     $c->stash(template => 'admin/sql_result.tt');
-    $c->stash(current_view => 'Raw');
     my $params = $c->req->parameters;
     my $sql = "";
     if (exists($params->{'sqlsentence'})) {
