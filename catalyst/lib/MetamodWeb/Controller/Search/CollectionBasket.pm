@@ -294,6 +294,34 @@ sub request_download : Path('/search/collectionbasket/request_download') {
 
 }
 
+=head2 /search/collectionbasket/get_download_script
+
+Generate script for downloading files in various languages
+
+=cut
+
+sub get_download_script : Path('/search/collectionbasket/script') : Args(1) {
+    my ( $self, $c, $type ) = @_;
+    my $mm_config = $c->stash->{ mm_config } or die "No config";
+    my $scripts = $mm_config->split('COLLECTION_BASKET_DOWNLOAD_SCRIPTS');
+
+    $c->detach('Root', 'error', [400, "Script language not supported"])
+        unless $scripts->{$type}; # bad request
+
+    my $basket = $c->stash->{collection_basket};
+    #print STDERR Dumper $basket->files;
+    my @URIs = map { $_->{'dataref_HTTP'} } @{ $basket->files };
+
+    $c->stash(
+        current_view => 'None',
+        template => "scripts/basket_dl/$type.tt",
+        links => \@URIs,
+    );
+    $c->response->content_type('application/x-unknown');
+    $c->response->header("Content-Disposition", "attachment; filename=\"$type\"");
+
+}
+
 __PACKAGE__->meta->make_immutable;
 
 =head1 LICENSE
