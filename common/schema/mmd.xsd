@@ -2,10 +2,10 @@
 <xs:schema elementFormDefault="qualified" targetNamespace="http://www.met.no/schema/mmd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:mmd="http://www.met.no/schema/mmd"
            xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
-    <xs:import schemaLocation="http://www.w3.org/2001/xml.xsd" namespace="http://www.w3.org/XML/1998/namespace"/>
-    
+    <xs:import schemaLocation="xml.xsd" namespace="http://www.w3.org/XML/1998/namespace"/>
+
     <xs:element name="mmd" type="mmd:mmd_type"></xs:element>
-        
+
     <xs:complexType name="personnel_type">
         <xs:all>
             <xs:element name="role" type="mmd:role_type"></xs:element>
@@ -17,7 +17,7 @@
             <xs:element name="contact_address" type="mmd:contact_address" minOccurs="0"></xs:element>
         </xs:all>
     </xs:complexType>
-    
+
     <xs:complexType name="contact_address">
         <xs:all>
             <xs:element name="address" type="xs:string"></xs:element>
@@ -93,7 +93,7 @@
     		<xs:element name="polygon" type="mmd:geographic_polygon_type" maxOccurs="1" minOccurs="0"></xs:element>
     	</xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="geographic_polygon_type">
         <xs:annotation>
             <xs:documentation>This allows gml:polygon to be addedd</xs:documentation>
@@ -215,7 +215,7 @@
     		<xs:element name="dataset_id" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
     	</xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="reference_type">
     	<xs:choice maxOccurs="unbounded">
             <xs:element name="title" type="xs:string" maxOccurs="1" minOccurs="1"></xs:element>
@@ -234,14 +234,14 @@
     		<xs:element name="other_reference_details" type="xs:string" maxOccurs="1" minOccurs="0"></xs:element>
     	</xs:choice>
     </xs:complexType>
-    
+
     <xs:complexType name="data_center_name_type">
     	<xs:sequence>
     		<xs:element name="short_name" type="xs:string"></xs:element>
     		<xs:element name="long_name" type="xs:string"></xs:element>
     	</xs:sequence>
     </xs:complexType>
-    
+
     <xsd:complexType name="system_specific_product_relevance_type">
     <xsd:sequence>
       <xsd:element name="used_by" type="mmd:used_by_type" maxOccurs="unbounded" />
