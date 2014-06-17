@@ -639,6 +639,10 @@ COLLECTION_BASKET_MAX_FILES = 100
 # will use a hard coded default value.
 COLLECTION_BASKET_MAX_SIZE = 524288000
 
+COLLECTION_BASKET_DOWNLOAD_SCRIPTS =
+    download_files.sh      'Unix/Linux shell script'
+#    download_files.bat     'Windows Powershell script (Vista and later)'
+
 # ============== Admin configuration =================
 
 # Text in mail body sent to newly registered users.

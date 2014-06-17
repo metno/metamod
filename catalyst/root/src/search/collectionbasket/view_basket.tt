@@ -91,19 +91,12 @@ jQuery(document).ready( function () {
             </a>
         [% END %]
 
-        <br/>
-
-        [% FOREACH tpl IN collection_basket.list_download_scripts.keys %]
-            <a href="[% c.uri_for( '/search/collectionbasket/script', tpl ) %]">
-                <button type="button">[% collection_basket.list_download_scripts.$tpl %]</button>
-            </a>
-        [% END %]
-
     </div>
 
     <p><hr/></p>
 
-    <h2 class="std">[% app.basket.zip_title %]</h2>
+    <h2 class="std">[% app.basket.dl_title %]</h2>
+
     <form name="request_download" action="[% c.uri_for('/search/collectionbasket/request_download') %]" method="POST" >
         [% INCLUDE search/keep_search_params.tt category_id = 'none', category_type = 'none' %]
         <label for="email_address">[% ui.button.email %]</label>
@@ -111,6 +104,14 @@ jQuery(document).ready( function () {
         <input type="submit" value="[% ui.button.basket_download %]" />
         <p>[% app.basket.unavail %]</p>
     </form>
+
+    <div><b>[% app.basket.script_label %]</b>
+        [% FOREACH tpl IN collection_basket.list_download_scripts.keys %]
+            <a href="[% c.uri_for( '/search/collectionbasket/script', tpl ) %]">
+                <button type="button">[% collection_basket.list_download_scripts.$tpl %]</button>
+            </a>
+        [% END %]
+    </div>
 
 [% ELSE %]
 

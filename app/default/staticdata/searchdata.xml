@@ -4007,11 +4007,13 @@
 <mt name="metadata_standard" share="TRUE" def="Short descripion of metadata standards used" />
 <mt name="file_format" share="TRUE" def="File format. One of: GRIB|BUFR|netCDF|netCDF/CF|HDF|HDF-EOS|HDF5|Excel|CSV|ASCII|Other" />
 <mt name="format_description" share="FALSE" def="Free text descripion of data format" />
-<mt name="dataref" share="FALSE" def="URL reference to data, or short name" />
 <mt name="gtsInstancePattern" share="FALSE" def="Pattern to locate data in GTS" />
 <mt name="gtsFileIdentifier" share="FALSE" def="Identifier for data in GTS" />
 <mt name="data_file_location" share="FALSE" def="The location of the dataset on disk. Only for level 2 datasets" />
 <mt name="data_file_size" share="FALSE" def="The size of the file in bytes. Only for level 2 datasets" />
+<mt name="dataref" share="FALSE" def="URL reference to data, or short name" />
 <mt name="dataref_OPENDAP" share="FALSE" def="URL reference to OPeNDAP service" />
+<mt name="dataref_WMS" share="FALSE" def="URL to WMS service (without GetCapabilities)" />
+<mt name="dataref_HTTP" share="FALSE" def="URL where data file can be downloaded" />
 <mt name="timeseries" share="FALSE" def="List of variables to visualise in time series" />
 </searchdata>
