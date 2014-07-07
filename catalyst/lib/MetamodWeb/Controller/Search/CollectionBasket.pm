@@ -309,7 +309,7 @@ sub get_download_script : Path('/search/collectionbasket/script') : Args(1) {
         unless $scripts->{$type}; # bad request
 
     my $basket = $c->stash->{collection_basket};
-    my @URIs = map { $_->{'dataref_HTTP'} } grep { $_->{'dataref_HTTP'} } @{ $basket->files };
+    my @URIs = map { $_->{'HTTPServer'} } grep { $_->{'HTTPServer'} } @{ $basket->files };
     #print STDERR Dumper \@URIs;
 
     $c->stash(

@@ -382,8 +382,8 @@ sub num_files {
 =item return
 
 Returns an array reference with information about all the files in the
-collection basket. Each element in the array is a hash reference with the
-following keys 'data_file_location', 'data_file_size', 'ds_name' and 'ds_id'.
+collection basket. Each element in the array is a hash reference; see
+file_info() for a list of keys.
 
 =back
 
@@ -428,7 +428,25 @@ A C<DBIx::Class> row object for a dataset.
 =item return
 
 A hash reference with file information for the dataset. The hash reference has
-the following keys: 'data_file_location', 'data_file_size', 'ds_name' and 'ds_id'.
+the following keys (more may be added later):
+
+=over 4
+
+=item name
+
+=item ds_id
+
+=item data_file_location
+
+=item data_file_size
+
+=item wms_url
+
+=item distribution
+
+=item HTTPServer
+
+=item OPENDAP
 
 Returns false if the dataset does not have a 'data_file_location' as part of the
 metadata.
@@ -442,7 +460,7 @@ sub file_info {
 
     my ($dataset) = @_;
 
-    my $metadata = $dataset->metadata( [qw( data_file_location data_file_size distribution_statement dataref_HTTP)] );
+    my $metadata = $dataset->metadata( [qw( data_file_location data_file_size distribution_statement dataref_HTTPServer)] );
 
     # now allowing for datasets w/o file info
     #return if !exists $metadata->{data_file_location} || !defined $metadata->{data_file_location}->[0];
@@ -457,7 +475,7 @@ sub file_info {
         data_file_location => $metadata->{data_file_location}->[0],
         data_file_size     => $metadata->{data_file_size}->[0],
         distribution       => $metadata->{distribution_statement}->[0],
-        dataref_HTTP       => $metadata->{dataref_HTTP}->[0],
+        HTTPServer         => $metadata->{dataref_HTTPServer}->[0],
         OPENDAP            => $dataset->opendap_url(),
     };
 

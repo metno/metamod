@@ -54,6 +54,8 @@ now defined in F<default_config.txt> and only used in case C<WMS_MAPS> should ha
 In addition, C<CATALYST_LIB> is now automatically computed and should be unset in F<master_config.txt>,
 unless your dependencies are located somewhere else than in the METAMOD tree.
 
+To check that your configuration is valid, run C<lsconf --check>.
+
 =head2 New WMS features
 
 =head3 WMS background maps
@@ -141,3 +143,56 @@ PMH_LOCAL_VALIDATION =
     iso19139  '/opt/local/bin/xmllint --noout --schema [SCHEMA] [FILE]'
 
 From Ubuntu 14.4, ISO validation will be handled normally in METAMOD without the need for external validators.
+
+=head2 New operations on datasets ((2.13.13+)
+
+The download, transformation and timeseries functionality has been improved;
+however this necessitates editing and re-importating dataset XML files.
+The following fields are currently supported, with more to come later:
+
+=over 4
+
+=item dataref_OPENDAP
+
+=item dataref_HTTPServer
+
+=item dataref_WMS (experimental, does not replace wmsinfo yet)
+
+=back
+
+=head3 get_dataref.pl
+
+To help insert datarefs into the XML files, there is now a script which
+can communicate with THREDDS and insert the dataref elements automatically.
+See the script documentation for details (get_dataref.pl --help).
+
+=head3 Importing data
+
+To enable the new features, use the following procedure:
+
+=over 4
+
+=item #
+
+Update searchdata.xml with new dataref_* elements (only necessary if not using app/default)
+
+=item #
+
+Run import_searchdata.pl to reload database
+
+=item #
+
+Update XML files with dataref_* elements (see get_dataref.pl for help)
+
+=item #
+
+Re-import XML files using import_dataset.pl
+
+=back
+
+=head3 Consolidated transform and timeseries plot/download
+
+These functions have now been merged, and the C<timeseries> variable is no longer
+needed in the MM2 file. However, this feature is considered experimental for the time being.
+To enable it, set CONSOLIDATE_TRANSFORM_FUNCTIONS to true in F<master_config.txt>.
+

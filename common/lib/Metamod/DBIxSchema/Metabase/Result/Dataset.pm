@@ -167,7 +167,7 @@ DBIx::Class Dataset class in the metadata database
 =cut
 
 use Carp;
-use URI::Escape;
+use URI::Escape; # remove - FIXME
 use Try::Tiny;
 use XML::LibXML;
 use Data::Dumper;
@@ -439,13 +439,13 @@ sub wmsurl {
         $url =~ s|%DATASET%|$dataset|;
         $url =~ s|%DATASET_PARENT%|$parent|;
         if ( $url =~ /%(THREDDS_|UGLY_HACK)/ ){
-            #$logger->debug("*** WMS URL before substitution: $url");
+            $logger->debug("*** WMS URL before substitution: $url");
             my $metadata = $self->metadata(['dataref']);
             if (exists $metadata->{dataref}) {
 
                 my $dataref = $metadata->{dataref}[0];
                 # %THREDDS_DATAREF% translates OSISAF-like THREDDS URLs into WMS URLs... DEPRECATED
-                #$logger->debug("*** dataref: $dataref");
+                $logger->debug("*** dataref: $dataref");
                 unless ( $dataref =~ m|(.*/thredds)/catalog/.*\?dataset=(.*)| ) {
                     $logger->warn("Missing dataset ID in dataref $dataref");
                     return;
@@ -459,6 +459,7 @@ sub wmsurl {
                 my $filename = $datarefpath[1] || $dataset_id;
                 $url =~ s|%THREDDS_DATASET%|$dataset_id|;
                 $url =~ s|%UGLY_HACK_FOR_MYOCEAN%|$filename|; #FIXME ASAP
+                $logger->debug("***  WMS URL after substitution: $url");
             } else {
                 $logger->warn("Missing dataref for dataset #" . $self->ds_id);
                 return; # wmsinfo does not compute
@@ -473,16 +474,9 @@ sub wmsurl {
 
 }
 
-
 =head2 $ds->is_level1_dataset()
 
-=over
-
-=item return
-
 Returns 1 if the dataset is a level 1 dataset. 0 otherwise.
-
-=back
 
 =cut
 
@@ -495,13 +489,7 @@ sub is_level1_dataset {
 
 =head2 $ds->is_level2_dataset()
 
-=over
-
-=item return
-
 Returns 1 if the dataset is a level 2 dataset. 0 otherwise.
-
-=back
 
 =cut
 
@@ -514,13 +502,7 @@ sub is_level2_dataset {
 
 =head2 $ds->num_children()
 
-=over
-
-=item return
-
 Get the number of children for a level 1 dataset. For a level 2 dataset it will always return 0.
-
-=back
 
 =cut
 
@@ -531,7 +513,7 @@ sub num_children {
 
 }
 
-=head2 $ds->file_location($config) (DEPRECATED?)
+=head2 $ds->file_location($config) - DEPRECATED
 
 Calculate the file location where the dataset is located if possible.
 
@@ -540,12 +522,13 @@ Must be given an existing Config object as a parameter (to avoid compile time pr
 Returns an URL where the file can be downloaded if possible. Returns C<undef>
 if the file location cannot be calculated.
 
-B<Note:> Does not seem to be used anywhere.
+B<Note:> Does not seem to be used anywhere. Will be removed shortly.
 
 =cut
 
 sub file_location {
     my ($self, $config) = shift;
+    $logger->warn(__PACKAGE__ . "::file_location() is deprecated and will be removed asap. Notify dev if you find this message in the log.");
 
     my $metadata = $self->metadata( ['dataref'] );
 
@@ -582,25 +565,21 @@ sub opendap_url {
     }
 }
 
-=head2 $ds->external_ts_url($config)
+=head2 $ds->external_ts_url($tsurl) - DEPRECATED
 
-Calculate URL to external timeseries plot if available (must be set in TIMESERIES_URL in master_config)
+Calculate URL to external timeseries graph.
 
-Must be given an existing Config object as a parameter (to avoid compile time problems)
+Must be given the external TIMESERIES_URL from master_config as parameter or it will die.
 
 Returns an URL to the image file. Returns C<undef> if the URL cannot be calculated.
 
 =cut
 
-sub external_ts_url {
+sub external_ts_url { # DEPRECATED
     my ($self) = shift;
+    $logger->warn(__PACKAGE__ . '::external_ts_url() is deprecated. Use Metamod::Config::external_ts_url() instead.');
     #print STDERR Dumper \@_;
-    my $tsurl = shift;
-
-    if (! defined $tsurl) {
-        $logger->error("Missing external timeseries base URL");
-        return;
-    }
+    my $tsurl = shift or die "Missing external timeseries base URL";
 
     my $metadata = $self->metadata( ['dataref_OPENDAP', 'timeseries'] );
     my $opendap = uri_escape( $self->opendap_url or return );

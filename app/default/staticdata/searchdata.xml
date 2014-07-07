@@ -4014,6 +4014,6 @@
 <mt name="dataref" share="FALSE" def="URL reference to data, or short name" />
 <mt name="dataref_OPENDAP" share="FALSE" def="URL reference to OPeNDAP service" />
 <mt name="dataref_WMS" share="FALSE" def="URL to WMS service (without GetCapabilities)" />
-<mt name="dataref_HTTP" share="FALSE" def="URL where data file can be downloaded" />
+<mt name="dataref_HTTPServer" share="FALSE" def="URL where data file can be downloaded" />
 <mt name="timeseries" share="FALSE" def="List of variables to visualise in time series" />
 </searchdata>

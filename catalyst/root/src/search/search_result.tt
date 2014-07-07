@@ -53,6 +53,8 @@ ELSE;
         # we need to fetch metadata for all selected column AND the dataref
         SET metadata = dataset.metadata( metadata_columns.merge( ['dataref', 'timeseries'] ) );
         SET opendap = dataset.opendap_url;
+        SET consolidate_transform = mm_config.is('CONSOLIDATE_TRANSFORM_FUNCTIONS');
+
     %]
         <tr>
             <td class="result">
@@ -89,7 +91,7 @@ ELSE;
 
                         IF opendap;
                             tsvars = metadata.timeseries.0;
-                            IF tsvars;
+                            IF tsvars && ! consolidate_transform;
                                 IF ext_ts; # must be checked in template since not available compile time
                                     visual( 'timeseries', dataset.external_ts_url(ext_ts), {class => "visualimg"} );
                                 ELSE;
@@ -99,6 +101,7 @@ ELSE;
                             ELSE;
                                 visual( 'transform', c.uri_for('/search/transform', { ds_id => dataset.ds_id }) );
                             END;
+                            #visual( 'transform', c.uri_for('/search/transform', { ds_id => dataset.ds_id }) );
                         END;
 
                         IF dataset.num_children() != 0;

@@ -15,6 +15,18 @@ points for later.
 
 --------------------
 
+enable HTTPServer download when -f $ds->{data_file_location}
+
+/etc/apt/apt.conf.d/50unattended-upgrades :
+// Automatically reboot *WITHOUT CONFIRMATION* if a
+// the file /var/run/reboot-required is found after the upgrade
+//Unattended-Upgrade::Automatic-Reboot "false";
+
+
+change download script buttons to select box (needs fancy js)
+
+zoom in wms not working after changing background layer
+
 http://superuser.com/questions/25538/what-is-the-windows-equivalent-of-wget
 
 wms client multiple dataset support is broken in 2.11

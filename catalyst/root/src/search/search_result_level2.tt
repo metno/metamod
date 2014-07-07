@@ -68,7 +68,7 @@
             IF opendap;
                 tsvars = metadata.timeseries.0;
                 IF tsvars;
-                    IF ext_ts;
+                    IF ext_ts && ! consolidate_transform; # not tested - do we have any level 2 timeseries data? FIXME
                         visual( 'timeseries', child.external_ts_url(ext_ts), {class => "visualimg"} );
                     ELSE;
                         visual( 'timeseries', c.uri_for('/search/ts', { ds_id => child.ds_id, vars => tsvars }), {class => "visualimg"} );
@@ -77,6 +77,7 @@
                 ELSE;
                     visual( 'transform', c.uri_for('/search/transform', { ds_id => child.ds_id }) );
                 END;
+                #visual( 'transform', c.uri_for('/search/transform', { ds_id => child.ds_id }) );
             END;
 
             c.req.params.return_path = c.uri_for(c.req.path);

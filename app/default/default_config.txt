@@ -365,6 +365,9 @@ SEARCH_CATEGORY_SEQUENCE = topics_and_variables,activity_types,institutions,area
 # Set default fontsize for the results and the two-way tables (percent) (obsolete?):
 DEFAULT_FONTSIZE = 80
 
+# merge transform and timeseries functions into same subpage
+CONSOLIDATE_TRANSFORM_FUNCTIONS = false
+
 # ============ METAMODUPLOAD configuration ==============
 
 # Upload application: Set this to 1 for debug output to the screen
@@ -385,12 +388,6 @@ EXTERNAL_REPOSITORY = false
 # check the files and eventually report any irregularities back
 # to the data provider.
 #EXTERNAL_REPOSITORY = true
-
-# For unknown reasons, sometimes it is neccessary to convert all POST-data
-# from UTF8 to latin-1. If this is the case, set the following variable to
-# TRUE:
-DECODE_FROM_UTF8 = FALSE
-# please change this to true/false or 1/0 - FIXME
 
 # Directory path for files uploaded by the web application:
 UPLOAD_DIRECTORY = [==WEBRUN_DIRECTORY==]/webupload
@@ -430,6 +427,7 @@ THREDDS_DATASET_PREFIX =
 # URL of external timeseries plotter. If not given, internal client-based
 # plotting will be performed.
 #TIMESERIES_URL=http://ts.example.com/jtimeseries-webservices/thredds/diagram?parameters=[TIMESERIES]&url=[OPENDAP]
+TIMESERIES_URL =
 
 # Ownertag for uploaded datasets:
 #UPLOAD_OWNERTAG = MM

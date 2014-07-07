@@ -38,8 +38,8 @@ jQuery(document).ready( function () {
                     <td class="collection-basket" width="90%">
                         <span style="[% filesize ? '' : 'font-style: italic' %]">[% file.name %]</span>
                         <span style="float: right; white-space:nowrap;">
-                            [% IF file.dataref_HTTP %]
-                                <a href="[% file.dataref_HTTP %]"><button type="button">[% ui.button.download %]</button></a>
+                            [% IF file.HTTPServer %]
+                                <a href="[% file.HTTPServer %]"><button type="button">[% ui.button.download %]</button></a>
                             [% END %]
                             [% IF file.OPENDAP # can't use normal macros since variable width and no break %]
                                 <a class="visual" href="[% c.uri_for('/search/transform', { ds_id => file.ds_id }) %]">

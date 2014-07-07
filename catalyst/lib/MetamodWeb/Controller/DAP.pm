@@ -96,6 +96,7 @@ Either "json" or "csv" (comma separated with header row)
 sub ts :Path("/ts") :Args(3) {
     my ( $self, $c, $ds_id, $varlist, $format ) = @_;
 
+    $c->detach( 'Root', 'error', [ 400, "Missing parameter(s)"] ) unless $ds_id && $varlist && $format;
     my $config = Metamod::Config->instance();
     my $fimexpath = $config->get('FIMEX_PROGRAM')
         or $c->detach( 'Root', 'error', [ 501, "Not available without FIMEX installed"] );
@@ -143,11 +144,11 @@ sub ts :Path("/ts") :Args(3) {
 
     # first fetch all variables from db since we need to lookup names
     foreach my $v ($nc2->variables) {
-        #print STDERR "+++ $v\n";
 
         my $name = $nc2->att_value($v, 'standard_name'); # TODO also check long_name, short_name
-        $name = $v if $name eq 'Not available';
-        my $role = $nc2->att_value($v, 'cf_role');
+        $name = $v if ( $name eq 'Not available' or exists $cols{$v} );
+        my $role = $nc2->att_value($v, 'cf_role') || '';
+        $self->logger->debug("NC var $v: $name ($role)");
 
         if (exists $cols{$name} || $role eq 'timeseries_id') { # skip vars not in request
             my @dim = $nc2->dimensions($v);
@@ -240,7 +241,7 @@ sub ts :Path("/ts") :Args(3) {
                     if ( my $legends = $indexes{$d} ) {
                         my $index = shift @{ $legends };
                         $self->logger->debug("*** index of $v = $index");
-                        push @tablehead, @{ $data{$index} };
+                        push @tablehead, @{ $data{$index} } if $index; # what if not? must check FIXME
                     } else {
 
                     }

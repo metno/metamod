@@ -80,6 +80,7 @@ use Exporter;
 use File::Basename;
 use File::Spec qw();
 use FindBin;
+use URI::Escape;
 
 our %EXPORT_TAGS = ( init_logger => [] ); # hack for old scipts using Metamod::Config qw(:init_logger)
 
@@ -825,6 +826,8 @@ sub getDSFilePath {
 Get the path to a file that is either located in the application configuration catalog
 or in the config/ catalog.
 
+=head3 Parameters
+
 =over
 
 =item $filename
@@ -861,6 +864,36 @@ sub path_to_config_file {
         die "The configuration file '$path' you requested is not in the installation dir or the config dir";
     }
 
+}
+
+=head2 $conf->external_ts_url()
+
+Return URL to external timeseries plotter, or undef if not enabled
+
+=head3 Parameters
+
+=over
+
+=item $opendap
+
+URL to OPeNDAP service for dataset
+
+=item $vars
+
+Comma separated list of variables to plot
+
+=back
+
+=cut
+
+sub external_ts_url {
+    my ($self, $opendap, $vars) = @_;
+
+    my $tsurl = $self->get("TIMESERIES_URL") or return;
+    $opendap = uri_escape( $opendap or die "Missing opendap parameter" );
+    $tsurl =~ s/\[OPENDAP\]/$opendap/;
+    $tsurl =~ s/\[TIMESERIES\]/$vars/ if $vars;
+    return $tsurl;
 }
 
 =head2 $conf->version()

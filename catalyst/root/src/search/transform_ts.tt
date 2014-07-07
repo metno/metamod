@@ -37,7 +37,7 @@
 
     <h1 class="std">[% app.transform.title %]</h1>
 
-        <form action="[% c.uri_for('/search/transform', dataset.ds_name _ '.nc') %]" method="post">
+        <form action="[% c.uri_for('/search/ts') %]" method="GET">
 
             <input type="hidden" name="ds_id" value="[% dataset.ds_id %]"/>
 
@@ -50,41 +50,11 @@
 
             [% html %]
 
-            <script>$(function() { $( "#start_date" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
-            <script>$(function() { $( "#stop_date" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
-
-            <h2>[% app.transform.repro %]</h2>
-
-            [% app.transform.proj %]:
-            <select name="projection">
-                <option value="">(original)</option>
-            [% FOREACH proj IN projections %]
-                <option value="[% proj.key %]">[% proj.value %] ([% proj.key %])</option>
-            [% END %]
-            </select>
-
-            [% app.transform.inter %]:
-            <select name="interpolation">
-                <option value="nearestneighbor">nearestneighbor</option>
-                <option value="bilinear">bilinear</option>
-                <option value="bicubic">bicubic</option>
-                <option value="coord_nearestneighbor">coord_nearestneighbor</option>
-                <option value="coord_kdtree">coord_kdtree</option>
-                <option value="forward_max">forward_max</option>
-                <option value="forward_mean">forward_mean</option>
-                <option value="forward_median">forward_median</option>
-                <option value="forward_sum">forward_sum</option>
-            </select>
-
-            <br/>
-
-            [% app.transform.x_axis %]: <input type="text" name="xAxisValues" value="-180,-179,...,180"/>
-            [% app.transform.y_axis %]: <input type="text" name="yAxisValues" value="-90,-89,...,90"/>
-
             <div>
                 <br/>
-                [% button_js( 'clear_dates', "jQuery('#start_date').val(''); jQuery('#stop_date').val('')" ) %]
-                <input type="submit" value="[% ui.button.transform %]"/>
+                <input type="submit" name="ts_graph" value="[% ui.button.timeseries %]"/>
+                <input type="submit" name="ts_ascii" value="[% ui.button.ascii %]"/>
+                <input type="submit" name="ts_json" value="JSON"/>
             </div>
 
         </form>

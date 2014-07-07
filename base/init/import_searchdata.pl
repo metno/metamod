@@ -120,12 +120,15 @@ foreach my $line (@logarr) {
 # ------------------------------------------------------------------
 sub update_database {
 #
-#  Convert XML file to a hash (using XML::Simple):
+#  Convert XML file to a hash (using XML::Simple): [why? use XPath instead]
 #  First, read the whole XML file into the string variable $xmlcontent. Then
 #  substitute all occurences of '&' with '&amp;'. Otherwise, XML::Simple
 #  will decode all XML entities into their Latin-1 equivalents.
+#  [actually this makes it illegal XML and should be avoided]
 #  The XML entities should be preserved to avoid difficult-to-debug character
 #  conversions while the text is sent to the database and later retrieved.
+#  [one should never store escaped XML entities in a database (unless as a document)]
+#  [escaping is only part of XML syntax, when parsed into separate strings they will disappear]
 #
    unless (-r $searchdataxml) {die "Can not read from file: $searchdataxml\n";}
 #

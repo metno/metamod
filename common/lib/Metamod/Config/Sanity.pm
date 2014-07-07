@@ -124,6 +124,7 @@ sub check {
     is( $$vars{QUEST_CONFIG_DIRECTORY},     undef, 'QUEST_CONFIG_DIRECTORY is obsolete' );
     is( $$vars{PMH_PORT_NUMBER},            undef, 'PMH_PORT_NUMBER is obsolete' );
     is( $$vars{PMH_CONTENT_TYPE},           undef, 'PMH_CONTENT_TYPE is obsolete' );
+    is( $$vars{DECODE_FROM_UTF8},           undef, 'DECODE_FROM_UTF8 is obsolete' );
 
     ok( is_email($$vars{OPERATOR_EMAIL}) || $$vars{OPERATOR_EMAIL} eq 'root@localhost',
         'OPERATOR_EMAIL is a valid email address' );

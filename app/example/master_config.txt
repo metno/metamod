@@ -220,12 +220,6 @@ DATASET_TAGS = 'MM'
 # to the data provider.
 #EXTERNAL_REPOSITORY = true
 
-# For unknown reasons, sometimes it is neccessary to convert all POST-data
-# from UTF8 to latin-1. If this is the case, set the following variable to
-# TRUE:
-#DECODE_FROM_UTF8 = TRUE
-# please change this to true/false or 1/0 - FIXME
-
 # Schedule for FTP upload monitor
 FTP_CRONTAB     = 30 04 * * *
 CLEANUP_CRONTAB = 15 00 * * *

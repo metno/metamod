@@ -78,7 +78,7 @@ Download and process file, then send to user
 sub transform :Path('/search/transform') :ActionClass('REST') :Args {
     my ($self, $c) = @_;
 
-    $c->stash( template => 'search/transform.tt', 'current_view' => 'Raw' );
+    $c->stash( 'current_view' => 'Raw' );
     $c->stash( debug => $self->logger->is_debug() );
 
     my $para = $c->req->params->{ ds_id };
@@ -98,6 +98,7 @@ sub transform_GET {
     my ($self, $c) = @_;
 
     my $dapurl = $c->stash->{dapurl};
+    my $ds_id = $c->stash->{dataset}->ds_id;
     $self->logger->debug("Calling OPeNDAP DDX $dapurl ...");
     $c->detach('Root', 'Bad OPeNDAP URL', [502, $@]) if $dapurl !~ /^http/; # workaround for value 'URL' in database
     my $dap = MetNo::OPeNDAP->new($dapurl);
@@ -112,27 +113,34 @@ sub transform_GET {
     # check if data has expired
     my $now = DateTime->now;
     my $dataparser = DateTime::Format::Strptime->new( pattern => '%F %TZ');
+    my $gridded = $ddx->findvalue('/*/*[local-name()="Grid"]');
     my $expires = $ddx->findvalue('/*/*[@name="NC_GLOBAL"]/*[@name="Expires"]/*');
     my $expiration_date = $expires ? $dataparser->parse_datetime($expires) : $now;
 
     if( $now > $expiration_date ){
-        $c->detach( 'Root', 'error', [ 410, "Dataset expired"] );
+        $c->detach( 'Root', 'error', [ 410, "Dataset $ds_id expired"] );
     }
 
     # extract bounding box coords from DB since OPeNDAP not necessarily in lat/lon
-    my @bbox = split ',', $c->stash->{dataset}->metadata()->{'bounding_box'}->[0]; # ESWN
-    my %xslparam = (
-        e => shift @bbox,
-        s => shift @bbox,
-        w => shift @bbox,
-        n => shift @bbox,
-    );
+    my $bounding_box = $c->stash->{dataset}->metadata()->{'bounding_box'}->[0]
+        or $self->logger->warn("Missing bounding box in dataset $ds_id (timeseries?)");;
+    my @bbox = split(',', $bounding_box) if defined $bounding_box; # ESWN
+    my @dirs = qw(e s w n);
+    my %xslparam = map { shift @dirs => $_ } @bbox;
+    #(
+        #e => shift @bbox,
+        #s => shift @bbox,
+        #w => shift @bbox,
+        #n => shift @bbox,
+    #);
 
     # using XSLT here since extracting data in Template Toolkit is too cumbersome
     my $stylesheet = $self->xslt->parse_stylesheet_file( $c->path_to( '/root/xsl/ddx2html.xsl' ) ); # move to constructor
-    my $results = $stylesheet->transform( $ddx, XML::LibXSLT::xpath_to_string(%xslparam) );
+    my $results = eval { $stylesheet->transform( $ddx, XML::LibXSLT::xpath_to_string(%xslparam) ) }
+        or $c->detach('Root', 'error', [500, $@]);
 
     $c->stash(
+        template => $gridded ? 'search/transform.tt' : 'search/transform_ts.tt',
         html => $results->toString,
         #projs => Metamod::WMS::projList()
     );
@@ -155,7 +163,7 @@ sub transform_POST {
         program => $fimexpath,
     );
 
-    my $vars = $p->{variable};
+    my $vars = $p->{vars};
     $fiParams{selectVariables} = ref $vars ? $vars : [ $vars ] if $vars; # listify if single, skip if empty
 
     for (qw(north south east west)) {

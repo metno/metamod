@@ -65,7 +65,7 @@ sub auto :Private {
                in_search_app     => 1, #used to control which header to show
                section           => 'search',
                collection_basket => $collection_basket,
-               ext_ts            => $mm_config->has("TIMESERIES_URL") ? $mm_config->get("TIMESERIES_URL") : undef,
+               ext_ts            => $mm_config->get("TIMESERIES_URL"), # remove FIXME
     );
     $c->stash( debug => $self->logger->is_debug() || $c->req->params->{ debug } );
     push @{ $c->stash->{ css_files } }, $c->uri_for( '/static/css/search.css' );
@@ -410,24 +410,48 @@ Action for displaying time series graphs rendered in browser
 
 sub timeseries :Path('/search/ts') :Args {
     my ($self, $c) = @_;
-
-    $c->stash( template => 'search/ts.tt', 'current_view' => 'Raw' );
+    #print STDERR Dumper $c->req->params;
+    $c->stash( template => 'search/ts_graph.tt', 'current_view' => 'Raw' );
 
     my $ds_id = $c->req->params->{ ds_id };
-    my $vars = $c->req->params->{ vars };
     if ( ref $ds_id ) { # more than one ds_id... TODO?
         $self->logger->debug("Only one ds_id currently allowed");
         $c->detach( 'Root', 'error', [ 400, "Only one ds_id currently allowed"] );
     }
-    my $ds = $c->model('Metabase::Dataset')->find($ds_id) or $c->detach('Root', 'default');
-    #my $ts = $ds->metadata(['timeseries']) || $ds->parent_dataset()->metadata(['timeseries'])
-    #    or $c->detach( 'Root', 'error', [ 404, "Missing timeseries"] );
-    #print STDERR Dumper $ts;
 
-    my ($title) = @{ $ds->metadata(['title'])->{'title'} };
-    #print STDERR Dumper \$timeseries;
-    #$c->stash( dataset => $ds, title => $title, timeseries => $ts->{'timeseries'} );
-    $c->stash( dataset => $ds, title => $title, timeseries => $vars );
+    my $dims = $c->req->params->{ dims };
+    #print STDERR "DIMS = ", Dumper \$dims;
+    $dims = @$dims[0] if ref $dims; # only take first dimension if several
+
+    my $vars = $c->req->params->{ vars };
+    $vars = join ',', @$vars if ref $vars; # accept list of params
+    $vars = "$dims,$vars" if $dims; # prepend dimension
+    $self->logger->debug("Timeseries for $vars");
+    $c->detach( 'Root', 'error', [ 400, "No variables specified in request"] ) unless $vars;
+
+    my $ds = $c->model('Metabase::Dataset')->find($ds_id) or $c->detach('Root', 'default');
+    my $metadata = $ds->metadata( ['dataref_OPENDAP', 'title'] );
+    my $opendap = $metadata->{'dataref_OPENDAP'}->[0] or die "Missing dataref_OPENDAP in dataset";
+
+    if ( $c->req->params->{ts_ascii} ) {
+
+        $c->res->redirect($c->uri_for('/ts', $ds_id, $vars, 'csv') );
+
+    } elsif ( $c->req->params->{ts_json} ) {
+
+        $c->res->redirect($c->uri_for('/ts', $ds_id, $vars, 'json') );
+
+    } else { # implicitly ts_graph (not always set)
+
+        my $ext_ts = $c->stash->{mm_config}->external_ts_url($opendap, $vars);
+        if ($ext_ts) {
+            $self->logger->debug("External TS_URL = $ext_ts");
+            $c->res->redirect($ext_ts);
+        } else {
+            $c->stash( dataset => $ds, title => $metadata->{'title'}->[0], timeseries => $vars );
+        }
+
+    }
 
 }
 

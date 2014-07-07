@@ -108,7 +108,7 @@ Otherwise show all metadata in listing.
 
 Implicit if called with only one argument
 
-=head2 color
+=head2 -x | --color
 
 Turn ANSI color output on/off
 
@@ -171,7 +171,7 @@ my ($config, $logger, %opt, $search_criteria);
 BEGIN { # run compile time to avoid nasty "You must call new() once before you can call instance()" bug
 
     GetOptions(\%opt, 'help', 'config=s', 'count|c', 'all_levels', 'f|full!', 'params|p=s%',
-               'metadata=s@', 'ownertag=s@', 'wms', 'projectioninfo', 'xmlfile', 'color!', 'id!') or pod2usage(2);
+               'metadata=s@', 'ownertag=s@', 'wms', 'projectioninfo', 'xmlfile', 'color|x!', 'id!') or pod2usage(2);
 
     my $config_file_or_dir = $opt{config} || $ENV{METAMOD_MASTER_CONFIG};
     if($opt{help} or ! Metamod::Config->config_found($config_file_or_dir)){
@@ -198,7 +198,7 @@ my $ownertags = ( defined $opt{ownertag} ? $opt{ownertag} : $config->split('DATA
 my $metadata = $opt{metadata} || [];
 @$metadata = split( /,/, join(',', @$metadata) ); # ditto
 
-$opt{full} = (@ARGV == 1) unless defined $opt{full}; # default to full view if only one dataset argument
+$opt{full} = (@ARGV == 1) unless defined $opt{full} || @$metadata; # default to full view if only one dataset argument
 
 #print STDERR 'params = ', Dumper $opt{params};
 

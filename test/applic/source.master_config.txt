@@ -213,11 +213,6 @@ DEFAULT_FONTSIZE = 80
 # and to the testlog file:
 DEBUG = 0
 
-# For unknown reasons, sometimes it is neccessary to convert all POST-data
-# from UTF8 to latin-1. If this is the case, set the following variable to
-# TRUE:
-DECODE_FROM_UTF8 = FALSE
-
 # Directory path for files uploaded by the web application:
 UPLOAD_DIRECTORY = Substituted by test_application.sh
 

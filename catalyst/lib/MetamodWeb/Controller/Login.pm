@@ -104,9 +104,11 @@ sub authenticate :Path('authenticate') :Args(0) {
         if ($c->authenticate({ u_loginname => $username,
                                u_password => $password  } )) {
 
+            $self->logger->info("User $username successfully logged in.");
             $c->response->redirect($c->uri_for($return_path) . "?$return_params" );
             return;
         } else {
+            $self->logger->info("Failed login for user $username.");
             $self->add_error_msgs($c, 'Invalid username or password.' );
         }
     } else {
