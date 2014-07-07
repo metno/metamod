@@ -1,4 +1,4 @@
-metno-metamod-2.13 (2.13.12-3) stable; urgency=low
+metno-metamod-2.13 (2.13.13-1) stable; urgency=low
 
   * dynamic search map using WMS
   * improved support for background maps in different projections
@@ -13,15 +13,16 @@ metno-metamod-2.13 (2.13.12-3) stable; urgency=low
   * v4: support for custom validators in OAI-PMH
   * v5: oai and wms fixes, added html view of xml files
   * v6: support for two-dimensional arrays in timeseries plots and ascii/json download
-  * v7: bugfixes in basket visualization and file count, proj list, version page 
+  * v7: bugfixes in basket visualization and file count, proj list, version page
   * v8: fix for some XSS vulnerabitilities, wms services with awkward urls and/or inordinate number of layers
-  * v9: custom error page, MM2:related_url, workaround for infinite bounding box in reprojection, updated DIF schema, 
+  * v9: custom error page, MM2:related_url, workaround for infinite bounding box in reprojection, updated DIF schema,
   	fixes for oai-pmh, basket URL, missing thredds catalog, wms search map thumbnail
   * v10: googlebot optimizations, dynamic generation of robots.txt, faster rejection of illegal intruder requests,
     fix for netcdf 4 strings, consistent handling of popup windows
   * v11: WMS timeslider back/fwd + slideshow, fix for .tgz upload, webdav support, api documentation,
   	fix for external timeseries url bug, apache debuglevel
   * v12: template texts now site configurable, various bugfixes
+  * v13: customizable download scripts, consolidated gridded/timeseries transformation and visualization, get_dataref.pl util
 
  -- Geir Aalberg <geira@met.no>  Mon, 03 Jun 2013 11:32:06 +0200
 
