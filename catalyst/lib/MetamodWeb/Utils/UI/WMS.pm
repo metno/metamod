@@ -188,7 +188,8 @@ sub getcap_url {
         $logger->error($_);
         return;
     };
-    return "${url}service=WMS&version=1.3.0&request=GetCapabilities";
+    my $config = Metamod::Config->instance();
+    return $url . $config->get('WMS_GET_CAPABILITIES');
 }
 
 =head1 LICENSE

@@ -15,6 +15,7 @@
   <!--does not currently handle wildcards in layer names in ncWmsSetup-->
 
   <xsl:param name="debug">0</xsl:param>
+  <xsl:param name="gcquery"/>
 
   <xsl:output indent="yes"/>
 
@@ -46,7 +47,7 @@
   <xsl:template match="/*/setup:layer|/*/setup:baselayer">
     <xsl:variable name="name" select="@name"/>
     <xsl:variable name="proj" select="/*/setup:displayArea/@crs"/>
-    <xsl:variable name="url" select="concat(@url, 'service=WMS&amp;request=GetCapabilities&amp;version=1.3.0')"/>
+    <xsl:variable name="url" select="concat(@url, $gcquery)"/>
     <xsl:if test="$debug">
       <xsl:message>WMS URL = <xsl:value-of select="$url"/></xsl:message>
     </xsl:if>

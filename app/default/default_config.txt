@@ -315,6 +315,10 @@ WMS_WORLD_MAP     = world.map
 # Actual number may be higher or lower if specified explicitly in wmsinfo
 MAX_WMS_LAYERS = 30
 
+# query string to append to WMS URL to get Capabilities document (must not contain ?)
+WMS_GET_CAPABILITIES = service=WMS&version=1.3.0&request=GetCapabilities
+# add &verbose=true if using thredds
+
 # ============ METAMODSEARCH configuration ==============
 
 # Max number of columns allowed in the search result page (obsolete?):

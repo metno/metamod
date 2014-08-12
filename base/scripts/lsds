@@ -271,7 +271,7 @@ sub listds {
 
         return unless $ds->wmsinfo;
         if (my $url = $ds->wmsurl) {
-            my $rq = $ua->get("${url}service=WMS&version=1.3.0&request=GetCapabilities");
+            my $rq = $ua->get($url . $config->get('WMS_GET_CAPABILITIES'));
             printf "$lead: $url - %d %s\n", $rq->code, status_message($rq->code);
         } else {
             printf "$lead: %s\n", colored('*Missing URL*', 'bold red');

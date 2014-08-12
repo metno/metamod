@@ -323,7 +323,9 @@ sub _reproject { # seems to do more or less the same as calculate_bounds() - mer
 #
 sub _gen_wmc {
     my ($self, $wmsurl, $params) = @_;
-    my $gcquery = 'service=WMS&version=1.3.0&request=GetCapabilities'; # can sometimes return 1.1.1
+
+    my $config = $self->{ c }->stash->{ mm_config };
+    my $gcquery = $config->get('WMS_GET_CAPABILITIES'); # can sometimes return 1.1.1 even if 1.3.0 is requested
     my %stylesheets = (
         '1.3.0' => '/root/xsl/gc2wmc.xsl',
         '1.1.1' => '/root/xsl/gc111_2wmc.xsl'
@@ -370,12 +372,13 @@ Generate WMC directly from wmsinfo setup document (can merge several Capabilitie
 sub setup2wmc {
     my ($self, $setup, $params) = @_;
     #print STDERR "setup2wmc", $setup->toString(1);
+    my $config = $self->{ c }->stash->{ mm_config };
 
     my $xslt = XML::LibXSLT->new();
-
     my $stylesheet = $xslt->parse_stylesheet_file( $self->c->path_to( '/root/xsl/setup2wmc.xsl' ) );
     $params = {} unless defined $params;
     $$params{debug} = 1 if $logger->is_debug();
+    $$params{gcquery} = $config->get('WMS_GET_CAPABILITIES');
     #print STDERR "setup2wmc: ", Dumper $params;
     my $wmcdoc = eval {
         $stylesheet->transform( $setup, XML::LibXSLT::xpath_to_string( %{$params} ) );
