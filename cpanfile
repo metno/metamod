@@ -1,6 +1,6 @@
 requires 'Archive::Zip', 1.30;
 requires 'Capture::Tiny', 0.24;
-requires 'Catalyst::Action::REST', 0.87;
+requires 'Catalyst::Action::REST', 1.15;
 requires 'Catalyst::Authentication::Store::DBIx::Class', 0.1400;
 #requires 'Catalyst::Authentication::Store::LDAP', 1.012;
 requires 'Catalyst::Controller::ActionRole', 0.15;

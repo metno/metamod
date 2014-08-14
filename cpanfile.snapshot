@@ -237,52 +237,64 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 0
       Test::Exception 0
-  Catalyst-Action-REST-1.12
-    pathname: J/JJ/JJNAPIORK/Catalyst-Action-REST-1.12.tar.gz
+  Catalyst-Action-REST-1.15
+    pathname: F/FR/FREW/Catalyst-Action-REST-1.15.tar.gz
     provides:
-      Catalyst::Action::Deserialize 1.12
-      Catalyst::Action::Deserialize::Callback 1.12
-      Catalyst::Action::Deserialize::JSON 1.12
-      Catalyst::Action::Deserialize::JSON::XS 1.12
-      Catalyst::Action::Deserialize::View 1.12
-      Catalyst::Action::Deserialize::XML::Simple 1.12
-      Catalyst::Action::Deserialize::YAML 1.12
-      Catalyst::Action::DeserializeMultiPart 1.12
-      Catalyst::Action::REST 1.12
-      Catalyst::Action::REST::ForBrowsers 1.12
-      Catalyst::Action::Serialize 1.12
-      Catalyst::Action::Serialize::Callback 1.12
-      Catalyst::Action::Serialize::JSON 1.12
-      Catalyst::Action::Serialize::JSON::XS 1.12
-      Catalyst::Action::Serialize::JSONP 1.12
-      Catalyst::Action::Serialize::View 1.12
-      Catalyst::Action::Serialize::XML::Simple 1.12
-      Catalyst::Action::Serialize::YAML 1.12
-      Catalyst::Action::Serialize::YAML::HTML 1.12
-      Catalyst::Action::SerializeBase 1.12
-      Catalyst::Controller::REST 1.12
-      Catalyst::Request::REST 1.12
-      Catalyst::Request::REST::ForBrowsers 1.12
-      Catalyst::TraitFor::Request::REST 1.12
-      Catalyst::TraitFor::Request::REST::ForBrowsers 1.12
+      Catalyst::Action::Deserialize 1.15
+      Catalyst::Action::Deserialize::Callback 1.15
+      Catalyst::Action::Deserialize::JSON 1.15
+      Catalyst::Action::Deserialize::JSON::XS 1.15
+      Catalyst::Action::Deserialize::View 1.15
+      Catalyst::Action::Deserialize::XML::Simple 1.15
+      Catalyst::Action::Deserialize::YAML 1.15
+      Catalyst::Action::DeserializeMultiPart 1.15
+      Catalyst::Action::REST 1.15
+      Catalyst::Action::REST::ForBrowsers 1.15
+      Catalyst::Action::Serialize 1.15
+      Catalyst::Action::Serialize::Callback 1.15
+      Catalyst::Action::Serialize::JSON 1.15
+      Catalyst::Action::Serialize::JSON::XS 1.15
+      Catalyst::Action::Serialize::JSONP 1.15
+      Catalyst::Action::Serialize::View 1.15
+      Catalyst::Action::Serialize::XML::Simple 1.15
+      Catalyst::Action::Serialize::YAML 1.15
+      Catalyst::Action::Serialize::YAML::HTML 1.15
+      Catalyst::Action::SerializeBase 1.15
+      Catalyst::Action::Serializer::Broken undef
+      Catalyst::Controller::REST 1.15
+      Catalyst::Request::REST 1.15
+      Catalyst::Request::REST::ForBrowsers 1.15
+      Catalyst::TraitFor::Request::REST 1.15
+      Catalyst::TraitFor::Request::REST::ForBrowsers 1.15
+      Test::Action::Class undef
+      Test::Action::Class::Sub undef
+      Test::Catalyst::Action::REST undef
+      Test::Catalyst::Action::REST::Controller::Actions undef
+      Test::Catalyst::Action::REST::Controller::ActionsForBrowsers undef
+      Test::Catalyst::Action::REST::Controller::Deserialize undef
+      Test::Catalyst::Action::REST::Controller::DeserializeMultiPart undef
+      Test::Catalyst::Action::REST::Controller::Override undef
+      Test::Catalyst::Action::REST::Controller::REST undef
+      Test::Catalyst::Action::REST::Controller::Root undef
+      Test::Catalyst::Action::REST::Controller::Serialize undef
+      Test::Catalyst::Log undef
+      Test::Rest undef
+      Test::Serialize undef
+      Test::Serialize::Controller::JSON undef
+      Test::Serialize::Controller::REST undef
+      Test::Serialize::View::Awful undef
+      Test::Serialize::View::Simple undef
     requirements:
       Catalyst::Runtime 5.80030
       Class::Inspector 1.13
-      Config::General 0
-      ExtUtils::MakeMaker 6.59
-      HTML::Parser 0
-      JSON 2.12
-      JSON::XS 2.2222
+      ExtUtils::MakeMaker 6.30
       LWP::UserAgent 2.033
       MRO::Compat 0.10
       Module::Pluggable::Object 0
       Moose 1.03
       Params::Validate 0.76
-      Test::More 0.88
       URI::Find 0
-      XML::Simple 0
       namespace::autoclean 0
-      perl 5.008001
   Catalyst-Action-RenderView-0.16
     pathname: B/BO/BOBTFISH/Catalyst-Action-RenderView-0.16.tar.gz
     provides:
