@@ -99,6 +99,9 @@
                     visual( 'wmsdata', thumbnail.wms_url _ getCapabilities );
                     visual( 'wmsinfo', c.uri_for('/dataset', child.ds_id, 'wmsinfo') );
                 END;
+                IF child.projectioninfo != '';
+                    visual( 'projectioninfo', c.uri_for('/dataset', child.ds_id, 'projectioninfo') );
+                END;
                 IF opendap;
                     visual( 'opendap', opendap _ '.info' );
                 END;

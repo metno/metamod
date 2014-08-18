@@ -435,6 +435,7 @@ ui = {
         wmcdata = 'WMC data'
         wmsdata = 'WMS data'
         wmsinfo = 'WMSinfo'
+        projectioninfo = 'Projectioninfo'
         deflate = '&#8211;'
         expand = '+'
         select_map = 'Select map'

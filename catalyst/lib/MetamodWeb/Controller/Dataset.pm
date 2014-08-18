@@ -148,6 +148,32 @@ sub wmsinfo :Chained("ds_id") :PathPart("wmsinfo") :Args(0) {
 
 }
 
+=head2 projectioninfo
+
+A chained action for displaying the projectioninfo XML for a dataset.
+
+=cut
+
+sub projectioninfo :Chained("ds_id") :PathPart("projectioninfo") :Args(0) {
+    my ( $self, $c ) = @_;
+
+    eval {
+        my $ds_id = $c->stash->{ ds_id };
+        my $meta_db = $c->model('Metabase');
+        my $ds = $meta_db->resultset('Dataset')->find( $ds_id ) or die "Dataset $ds_id not found";
+        my $projectioninfo =  $ds->projectioninfo() or die "No projectioninfo not found for dataset $ds_id";
+        $c->response->content_type('text/xml');
+        $c->response->body( $projectioninfo->toString(1) );
+    };
+
+    if( $@ ){
+        $self->logger->warn("Error in dataset projectioninfo output: $@");
+        #print STDERR ("Error in dataset xml output: $@\n");
+        $c->detach( 'Root', 'error', [404, $@] );
+    }
+
+}
+
 =head2 view
 
 A chained action for viewing the metadata for a dataset in HTML.
@@ -161,15 +187,18 @@ sub view :Chained("ds_id") :PathPart("view") :Args(0) {
 
 }
 
-=head2 wmssetup
+=head2 wmssetup (DEPRECATED)
 
 A chained action for getting the WMS setup info for a dataset. The WMS setup
 info is returned as a XML document.
+
+B<Duplicate of /wmsinfo - to be removed!>
 
 =cut
 
 sub wmssetup :Chained("ds_id") :PathPart("wmssetup") :Args(0) {
     my ( $self, $c ) = @_;
+    $self->logger->warning("Deprecated function wmssetup - use wmsinfo instead");
 
     eval {
         my $ds_id = $c->stash->{ ds_id };
