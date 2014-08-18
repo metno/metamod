@@ -1,4 +1,4 @@
-requires 'namespace::autoclean', 0.19;
+#requires 'namespace::autoclean', 0.19; # not used directly, workaround for build problems
 requires 'Archive::Zip', 1.30;
 requires 'Capture::Tiny', 0.24;
 requires 'Catalyst::Action::REST', 1.15;
