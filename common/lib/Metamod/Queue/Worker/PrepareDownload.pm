@@ -77,8 +77,8 @@ sub work {
         my $locations = $job->arg->{locations};
         my $email = $job->arg->{email};
 
-        my $mm_job = Metamod::Queue::Job::PrepareDownload->new();
-        my $success = $mm_job->prepare_download($jobid, $locations, $email);
+        my $mm_job = Metamod::Queue::Job::PrepareDownload->new(recipient => $email);
+        my $success = $mm_job->prepare_download($jobid, $locations);
 
         if( !$success ){
             die $mm_job->error_msg();

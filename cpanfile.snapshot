@@ -3038,6 +3038,12 @@ DISTRIBUTIONS
       Fcntl 1.03
       File::Path 2.06
       File::Spec 0.8
+  Filesys-DfPortable-0.85
+    pathname: I/IG/IGUTHRIE/Filesys-DfPortable-0.85.tar.gz
+    provides:
+      Filesys::DfPortable 0.85
+    requirements:
+      ExtUtils::MakeMaker 0
   Filesys-Notify-Simple-0.10
     pathname: M/MI/MIYAGAWA/Filesys-Notify-Simple-0.10.tar.gz
     provides:

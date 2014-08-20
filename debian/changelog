@@ -1,4 +1,4 @@
-metno-metamod-2.13 (2.13.13-3) stable; urgency=low
+metno-metamod-2.13 (2.13.13-4) stable; urgency=low
 
   * dynamic search map using WMS
   * improved support for background maps in different projections
@@ -23,7 +23,7 @@ metno-metamod-2.13 (2.13.13-3) stable; urgency=low
   	fix for external timeseries url bug, apache debuglevel
   * v12: template texts now site configurable, various bugfixes
   * v13: customizable download scripts, consolidated gridded/timeseries transformation and visualization, get_dataref.pl util
-  	new config WMS_GET_CAPABILITIES
+  	new config WMS_GET_CAPABILITIES, downloads external files to basket ZIP archive
 
  -- Geir Aalberg <geira@met.no>  Mon, 03 Jun 2013 11:32:06 +0200
 

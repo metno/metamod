@@ -46,6 +46,7 @@ use Getopt::Long;
 use LWP::UserAgent;
 use XML::LibXML;
 use URI;
+use HTTP::Status qw(:constants :is status_message);
 
 use constant THREDDS_NS => 'http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0';
 use constant MM2_NS     => 'http://www.met.no/schema/metamod/MM2';
