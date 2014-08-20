@@ -262,10 +262,11 @@ sub find_data_locations {
     my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $self->c, config => $self->config } );
 
     for (@$files) {
-        my $loc = $_->{data_file_location} || $_->{HTTPServer};
+        next unless $search_utils->freely_available($_);
+        my $readable = defined($_->{data_file_location}) && -r $_->{data_file_location};
+        my $loc = $readable ? $_->{data_file_location} : $_->{HTTPServer};
         #printf STDERR "- %s > %s\n", $_->{name}, $loc||'-';
-        my $free = $search_utils->freely_available($_);
-        push @dataset_locations, $loc if $loc && $free;
+        push @dataset_locations, $loc if $loc;
     }
     return \@dataset_locations;
 

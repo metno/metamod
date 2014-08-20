@@ -26,6 +26,9 @@
 #timeslider-current {
     /*margin-left: 310px;*/
     white-space: nowrap;
+    background-color: #FFF;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 /* crappy css selectors below don't work... have to use inline styles instead :( */
