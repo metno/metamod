@@ -9,8 +9,8 @@ OpenLayers.IMAGE_RELOAD_ATTEMPTS = 5;
 $(function() { // runs after document loaded
     $('#accordion').accordion( {
         create: function(event, ui) {
-            alert('accordion!');
-            log.debug('accordion created!');
+            //alert('accordion!');
+            //log.debug('accordion created!');
         }/*,
         change: function(event, ui) {
             log.debug('layer change: ' + ui.oldHeader.attr('id') + ' to ' + ui.newHeader.attr('id'));
