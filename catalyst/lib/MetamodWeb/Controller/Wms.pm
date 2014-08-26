@@ -131,22 +131,29 @@ sub gc2wmc :Path("/gc2wmc") :Args(0) {
 
 This returns a WMC document containing layers from different datasets.
 
-Parameters:
+=head3 Parameters:
 
-=head3 layer_nnn
+=over 4
+
+=item layer_nnn
 
 where nnn is the ds_id and value is the WMS Name of the layer. Repeated for each layer
 
-=head3 crs
+=item crs
 
 projection for the map tiles
 
-=head3 left
-=head3 top
-=head3 right
-=head3 bottom
+=item left
+
+=item top
+
+=item right
+
+=item bottom
 
 Bounding box coordinates as in the given projection
+
+=back
 
 =cut
 

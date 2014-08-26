@@ -93,7 +93,9 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
     #################################
     # reproject coords in setup
     #
-    _reproject($crs, \%bbox);
+    my $limits = $config->split('WMS_BOUNDING_BOXES')->{$crs};
+
+    _reproject($crs, $limits, \%bbox);
 
     $logger->debug("old_gen_wmc: " . Dumper \%bbox);
 
@@ -242,12 +244,12 @@ sub old_gen_wmc { # DEPRECATED but seems to hang around for some time still
 }
 
 #
-# reproject bounding box
+# reproject bounding box - DEPRECATED (used by old_gen_wmc)
 #
 
 sub _reproject { # seems to do more or less the same as calculate_bounds() - merge? FIXME
 
-    my ($crs, $bbox) = @_;
+    my ($crs, $limits, $bbox) = @_;
 
     if ( defined $crs and $crs ne $$bbox{crs} ) {
 
@@ -311,7 +313,16 @@ sub _reproject { # seems to do more or less the same as calculate_bounds() - mer
         $$bbox{ bottom } = min(@y);
         $$bbox{ top    } = max(@y);
 
-        $logger->debug(Dumper $bbox);
+        # check reprojected bounds don't extend outside max bounds for new projection
+        if ( $limits ) {
+            my ($left, $right, $bottom, $top) = @$limits;
+            $$bbox{ left   } = max( $left,   $$bbox{left}  );
+            $$bbox{ right  } = min( $right,  $$bbox{right} );
+            $$bbox{ bottom } = max( $bottom, $$bbox{bottom});
+            $$bbox{ top    } = min( $top,    $$bbox{top}   );
+        }
+
+        #$logger->debug('WMS bounding box: ', Dumper $bbox);
 
     }
 
@@ -446,7 +457,18 @@ sub calculate_bounds {
         bottom => min(@y),
         top    => max(@y),
     };
-    $logger->debug(Dumper $setopts);
+
+    # check reprojected bounds don't extend outside max bounds for new projection
+    my $config = $self->{ c }->stash->{ mm_config };
+    my $limits = $config->split('WMS_BOUNDING_BOXES')->{$newcrs};
+    if ( $limits ) {
+        my ($left, $right, $bottom, $top) = @$limits;
+        $$setopts{ left   } = max( $left,   $$setopts{left}  );
+        $$setopts{ right  } = min( $right,  $$setopts{right} );
+        $$setopts{ bottom } = max( $bottom, $$setopts{bottom});
+        $$setopts{ top    } = min( $top,    $$setopts{top}   );
+    }
+    $logger->debug("calculate_bounds: " . Dumper $setopts);
 
     return $setopts;
 
