@@ -1,4 +1,4 @@
-metno-metamod-2.13 (2.13.13-4) stable; urgency=low
+metno-metamod-2.13 (2.13.13-5) stable; urgency=low
 
   * dynamic search map using WMS
   * improved support for background maps in different projections
