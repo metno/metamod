@@ -73,14 +73,13 @@ use warnings;
 # to read config in order to configure dependencies.
 # See http://perldoc.perl.org/index-modules-A.html for list
 #
-use Carp qw(cluck croak carp confess);
+use Carp;
 use Cwd qw();
 use Data::Dumper;
 use Exporter;
 use File::Basename;
 use File::Spec qw();
 use FindBin;
-use URI::Escape;
 
 our %EXPORT_TAGS = ( init_logger => [] ); # hack for old scipts using Metamod::Config qw(:init_logger)
 
@@ -890,7 +889,7 @@ sub external_ts_url {
     my ($self, $opendap, $vars) = @_;
 
     my $tsurl = $self->get("TIMESERIES_URL") or return;
-    $opendap = uri_escape( $opendap or die "Missing opendap parameter" );
+    #$opendap = uri_escape( $opendap or die "Missing opendap parameter" ); # can't use URI::Escape as not a Core module
     $tsurl =~ s/\[OPENDAP\]/$opendap/;
     $tsurl =~ s/\[TIMESERIES\]/$vars/ if $vars;
     return $tsurl;
