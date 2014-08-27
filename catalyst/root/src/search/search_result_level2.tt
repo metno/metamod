@@ -87,9 +87,9 @@
                 SET thumbnail = wms_utils.wmsthumb(child, thumbsize);
                 visual( 'wms_client_resultpage', c.uri_for('/search/wms',{ ds_id => child.ds_id }) );
                 IF thumbnail.outline;
-                    wmsthumb( thumbnail.outline, 12, {style => 'position: absolute;'} );
+                    wmsthumblink( thumbnail.outline, 12, child, {style => 'position: absolute;'} );
                 END;
-                wmsthumb(thumbnail.datamap, 10);
+                wmsthumblink(thumbnail.datamap, 10, child);
             END;
 
             IF debug;

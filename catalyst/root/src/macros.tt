@@ -32,6 +32,13 @@
     <div class="wmsthumb" style="[% style %] height: [% thumbsize %]px; width: [% thumbsize %]px; z-index: [% z %]"><img src="[% src %]"/></div>
 [% END %]
 
+[% MACRO wmsthumblink(src, z, ds) BLOCK;
+    img = '<img src="' _ src _ '"/>';
+    link = '<a href="' _ c.uri_for('/search/wms',{ ds_id => ds.ds_id }) _ '" target="_blank">' _ img _ '</a>';
+    div2 = '<div class="wmsthumb" style="' _ style _ ' height: ' _ thumbsize _ 'px; width: ' _ thumbsize _ 'px; z-index: ' _ z _'">' _ (clickable_thumbs ? link : img) _'</div>';
+    GET div2;
+END %]
+
 [% MACRO expand_button(name) BLOCK %]
     <a class="btn2" href="[% c.uri_for( '/search/page/' _ datasets_pager.current_page() _ '/' _ name _ '/' _ dataset.ds_id, c.req.parameters ) _ '#ds' _ dataset.ds_id %]"
        title="[% ui.linktitle.$name %]" />

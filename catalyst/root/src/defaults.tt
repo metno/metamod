@@ -6,6 +6,7 @@ mm_logo = c.uri_for('/static/images/metamod_logo.png')
 version = mm_config.get('VERSION')
 builddate = mm_config.get('BUILDDATE')
 thumbsize = 64
+clickable_thumbs = 0 # enable links on WMS thumbsnails (open in new window due to conflict with FancyBox)
 getCapabilities = mm_config.get('WMS_GET_CAPABILITIES') # 'service=WMS&version=1.3.0&request=GetCapabilities'
 
 # not translated: admin, questionnaire, email
