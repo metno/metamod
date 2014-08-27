@@ -4,20 +4,28 @@
     <a name="[% name %]" href="[% href %]">[% text %]</a>
 [% END %]
 
-[% MACRO visual(name, href) BLOCK # show inline %]
-    <a class="[% class || 'visual' %]" href="[% href %]" title="[% ui.linktitle.$name %]"><span>[% ui.button.$name %]</span></a><br clear="all"/>
+[% MACRO visual(name, href) BLOCK # show inline -%]
+    [% IF ui.button.$name -%]
+        <a class="[% class || 'visual' %]" href="[% href %]" title="[% ui.linktitle.$name %]"><span>[% ui.button.$name %]</span></a><br clear="all"/>
+    [% END %]
 [% END %]
 
 [% MACRO button(name, href, text) BLOCK %]
-    <a class="btn" href="[% href %]" title="[% ui.linktitle.$name %]"><span>[% text || ui.button.$name %]</span></a><br clear="all"/>
+    [% IF ui.button.$name || text -%]
+        <a class="btn" href="[% href %]" title="[% ui.linktitle.$name %]"><span>[% text || ui.button.$name %]</span></a><br clear="all"/>
+    [% END %]
 [% END %]
 
 [% MACRO button_new(name, href) BLOCK # open in new window %]
-    <a class="btn" href="[% href %]" target="_blank" title="[% ui.linktitle.$name %]"><span>[% text || ui.button.$name %]</span></a><br clear="all"/>
+    [% IF ui.button.$name || text -%]
+        <a class="btn" href="[% href %]" target="_blank" title="[% ui.linktitle.$name %]"><span>[% text || ui.button.$name %]</span></a><br clear="all"/>
+    [% END %]
 [% END %]
 
 [% MACRO button_js(name, href, text) BLOCK # javascript event trigger %]
-<button type="button" name="[% name %]" onclick="[% href %]">[% text || ui.button.$name %]</button>
+    [% IF ui.button.$name || text -%]
+        <button type="button" name="[% name %]" onclick="[% href %]">[% text || ui.button.$name %]</button>
+    [% END %]
 [% END %]
 
 [% MACRO wmsthumb(src, z) BLOCK %]

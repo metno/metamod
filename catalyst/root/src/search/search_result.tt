@@ -120,7 +120,7 @@ ELSE;
 
                         IF dataset.wmsurl != '';
                             SET thumbnail = wms_utils.wmsthumb(dataset, thumbsize);
-                            visual( 'wms_client', c.uri_for('/search/wms',{ ds_id => dataset.ds_id }) );
+                            visual( 'wms_client_resultpage', c.uri_for('/search/wms',{ ds_id => dataset.ds_id }) );
                             IF thumbnail.outline;
                                 wmsthumb( thumbnail.outline, 12, {style => 'position: absolute;'} );
                             END;
