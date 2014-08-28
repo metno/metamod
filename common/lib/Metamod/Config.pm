@@ -865,7 +865,7 @@ sub path_to_config_file {
 
 }
 
-=head2 $conf->external_ts_url()
+=head2 $conf->external_ts_plot()
 
 Return URL to external timeseries plotter, or undef if not enabled
 
@@ -885,14 +885,32 @@ Comma separated list of variables to plot
 
 =cut
 
-sub external_ts_url {
-    my ($self, $opendap, $vars) = @_;
+# maybe move to MetamodWeb::Controller::Search to avoid core module restriction
 
+sub external_ts_plot {
+    my ($self, $opendap, $vars) = @_;
     my $tsurl = $self->get("TIMESERIES_URL") or return;
-    #$opendap = uri_escape( $opendap or die "Missing opendap parameter" ); # can't use URI::Escape as not a Core module
+    $opendap = _uri_escape( $opendap ) or die "Missing opendap parameter"; # can't use URI::Escape as not a Core module
     $tsurl =~ s/\[OPENDAP\]/$opendap/;
     $tsurl =~ s/\[TIMESERIES\]/$vars/ if $vars;
     return $tsurl;
+}
+
+# from URI::Escape
+my %Unsafe = (
+    RFC2732 => qr/[^A-Za-z0-9\-_.!~*'()]/,
+    RFC3986 => qr/[^A-Za-z0-9\-\._~]/,
+);
+our %escapes;
+for (0..255) {
+    $escapes{chr($_)} = sprintf("%%%02X", $_);
+}
+
+sub _uri_escape {
+    my($text) = @_;
+    return unless defined $text;
+    $text =~ s/($Unsafe{RFC3986})/$escapes{$1}/ge;
+    $text;
 }
 
 =head2 $conf->version()

@@ -443,7 +443,7 @@ sub timeseries :Path('/search/ts') :Args {
 
     } else { # implicitly ts_graph (not always set)
 
-        my $ext_ts = $c->stash->{mm_config}->external_ts_url($opendap, $vars);
+        my $ext_ts = $c->stash->{mm_config}->external_ts_plot($opendap, $vars);
         if ($ext_ts) {
             $self->logger->debug("External TS_URL = $ext_ts");
             $c->res->redirect($ext_ts);
