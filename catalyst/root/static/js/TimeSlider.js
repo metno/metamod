@@ -196,7 +196,7 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
     timesliderPlay : function (outer) {
         slideshow = setInterval( function() {
             outer.timesliderNext();
-        }, 3000);
+        }, wms_client.slideshow.delay);
     },
 
     /**
@@ -282,8 +282,10 @@ OpenLayers.Control.TimeSlider = OpenLayers.Class(OpenLayers.Control, {
     timesliderHtml : function () {
         var html = '';
         html += '<div id="' + this.buttonDivId + '" class="timeslider-button-div">';
-        html += '<button id="' + this.playButtonId + '" class="timeslider-play">Slideshow</button>';
-        html += '<button onclick="clearInterval(slideshow)">Stop</button>';
+        if (! wms_client.slideshow.disabled) {
+            html += '<button id="' + this.playButtonId + '" class="timeslider-play">Slideshow</button>';
+            html += '<button onclick="clearInterval(slideshow)">Stop</button>';
+        };
         html += '<button id="' + this.previousButtonId + '" class="timeslider-previous">Previous</button>';
         html += '<button id="' + this.nextButtonId + '" class="timeslider-next">Next</button>';
         html += '<span id="' + this.sliderCurrentId + '" class="timeslider-current"></span>';

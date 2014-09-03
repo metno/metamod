@@ -3,7 +3,6 @@
 
 [% BLOCK scripts %]
     <script type="text/javascript" src="[% c.uri_for('/static/lib/OpenLayers.js') %]"></script>
-    <script type="text/javascript" src="[% c.uri_for('/static/js/TimeSlider.js') %]"></script>
     <script type="text/javascript" src="[% c.uri_for('/static/lib/log4javascript-1.4.6/js/log4javascript.js') %]"></script>
     <script type="text/javascript">
         var log = log4javascript.getLogger();
@@ -24,7 +23,9 @@
     <script type="text/javascript">
         [% USE JSON.Escape( pretty => 1 ) %]
         var projnames    = [% projections.json %];
+        var wms_client   = [% wms.client.json %];
     </script>
+    <script type="text/javascript" src="[% c.uri_for('/static/js/TimeSlider.js') %]"></script>
 
     <link rel="stylesheet" href="[% c.uri_for('/static/css/openlayers_theme/default/style.css') %]" type="text/css" />
     <link rel="stylesheet" href="[% c.uri_for('/static/css/wms.css') %]" type="text/css" />

@@ -131,7 +131,7 @@ ELSE;
                             GET '<hr/>';
                             IF dataset.wmsurl != '';
                                 visual( 'wmcdata', c.uri_for('/gc2wmc',{ ds_id => dataset.ds_id }) );
-                                visual( 'wmsdata', thumbnail.wms_url _ getCapabilities );
+                                visual( 'wmsdata', thumbnail.wms_url _ wms.client.getCapabilities );
                                 visual( 'wmsinfo', c.uri_for('/dataset', dataset.ds_id, 'wmsinfo') );
                             END;
                             IF dataset.projectioninfo;

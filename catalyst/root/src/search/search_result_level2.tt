@@ -96,7 +96,7 @@
                 GET '<hr/>';
                 IF child.wmsurl != '';
                     visual( 'wmcdata', c.uri_for('/gc2wmc',{ ds_id => child.ds_id }) );
-                    visual( 'wmsdata', thumbnail.wms_url _ getCapabilities );
+                    visual( 'wmsdata', thumbnail.wms_url _ wms.client.getCapabilities );
                     visual( 'wmsinfo', c.uri_for('/dataset', child.ds_id, 'wmsinfo') );
                 END;
                 IF child.projectioninfo != '';

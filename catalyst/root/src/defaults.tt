@@ -7,7 +7,17 @@ version = mm_config.get('VERSION')
 builddate = mm_config.get('BUILDDATE')
 thumbsize = 64
 clickable_thumbs = 0 # enable links on WMS thumbsnails (open in new window due to conflict with FancyBox)
-getCapabilities = mm_config.get('WMS_GET_CAPABILITIES') # 'service=WMS&version=1.3.0&request=GetCapabilities'
+
+
+wms = {
+    client = {
+        getCapabilities = mm_config.get('WMS_GET_CAPABILITIES') # 'service=WMS&version=1.3.0&request=GetCapabilities'
+        slideshow = {
+            delay = 5000 # ms
+            disabled = 0
+        }
+    }
+}
 
 # not translated: admin, questionnaire, email
 
