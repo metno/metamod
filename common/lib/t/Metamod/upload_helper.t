@@ -28,11 +28,12 @@ my $num_tests = 0;
 
 my $webrun_dir = File::Spec->catdir($FindBin::Bin, 'webrun'); # not a good idea - should use regular config - FIXME
 my $upload_area = File::Spec->catdir($FindBin::Bin, 'upload'); #
-my $ftp_area = File::Spec->catdir($FindBin::Bin, 'ftp_upload'); #
+my $ftp_area = $upload_area; # File::Spec->catdir($FindBin::Bin, 'ftp_upload');
 my $data_dir = File::Spec->catdir($webrun_dir, 'data' );
 my $metadata_dir = File::Spec->catdir($webrun_dir, 'XML', 'EXAMPLE' );
 init_dir_structure();
 
+# we use same dir for ftp and upload, letting ftp_events determine which files should be read by ftp_process_hour
 $ENV{METAMOD_UPLOAD_FTP_DIRECTORY} = $ftp_area;
 $ENV{METAMOD_WEBRUN_DIRECTORY} = $webrun_dir;
 $ENV{METAMOD_OPENDAP_BASEDIR} = "$FindBin::Bin/opendap";
@@ -61,7 +62,6 @@ my $upload_helper = Metamod::UploadHelper->new();
     ok( -w $metadata_dir, "metadata directory is writable" );
     BEGIN { $num_tests += 9 };
 }
-
 
 {
     my $testname = 'Single .nc upload';
@@ -226,10 +226,11 @@ my $upload_helper = Metamod::UploadHelper->new();
 }
 
 {
-    my $testname = 'ftp_monitor --test';
+    my $testname = 'ftp_monitor --test'; #
 
-    ok( $upload_helper->ftp_process_hour(), "$testname: ftp_process_hour"); # maybe process_files() instead?
-
+    ok( $upload_helper->ftp_process_hour(), "$testname: ftp_process_hour");
+    # TODO - more testing on imported files
+    
     BEGIN { $num_tests += 1 };
 
 }
@@ -246,9 +247,10 @@ sub copy_test_files { # copy test files to web_upload and ftp_upload
     while( my $file = readdir($test_files_dir) ){
         if( -f "$FindBin::Bin/upload_helper_files/$file" ){ # skip non-files
             copy( "$FindBin::Bin/upload_helper_files/$file", "$upload_area/$file" ) or die $!;
-            copy( "$FindBin::Bin/upload_helper_files/$file", "$ftp_area/$file" ) or die $!;
+            #copy( "$FindBin::Bin/upload_helper_files/$file", "$ftp_area/$file" ) or die $!;
         }
     }
+    copy( "$FindBin::Bin/ftp_events", $webrun_dir ) or die $!;
 }
 
 sub init_dir_structure {
@@ -269,7 +271,7 @@ sub clean_dir_structure {
     # need to reset current dir because the modules that is tested might not do it.
     chdir $FindBin::Bin;
     rmtree($upload_area);
-    rmtree($ftp_area);
+    #rmtree($ftp_area);
     rmtree("$FindBin::Bin/webrun");
 
 }

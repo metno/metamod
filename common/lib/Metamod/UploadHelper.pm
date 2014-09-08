@@ -163,7 +163,7 @@ sub ftp_process_hour {
     my $self = shift;
     my @ltime = localtime( time() );
     my $current_hour = $ltime[2];                    # 0-23
-    my $eventsref = $self->ftp_events;
+    my $eventsref = $self->ftp_events or die "Missing ftp_events file";
 
     #die unless $self->config; # remove when stable
     my $ftp_dir_path = $self->config->get('UPLOAD_FTP_DIRECTORY');
@@ -182,7 +182,7 @@ sub ftp_process_hour {
     foreach my $eventkey (@matches) {
         my ( $dataset_name, $hour ) = split( /\s+/, $eventkey );
         my $wait_minutes = $eventsref->{$eventkey};
-        $logger->debug(" [ftp_process_hour] Dataset=$dataset_name, hour=$hour, wait_minutes=$wait_minutes");
+        $logger->debug("[ftp_process_hour] Dataset=$dataset_name, hour=$hour, wait_minutes=$wait_minutes");
         my @files_found = findFiles( $ftp_dir_path, eval 'sub {$_[0] =~ /^\Q$dataset_name\E_/o;}' );
         if ( scalar @files_found == 0 && length($self->shell_command_error) > 0 ) {
             $self->syserrorm( "SYS", "find_fails", "", "ftp_process_hour", "" );
@@ -204,12 +204,12 @@ sub ftp_process_hour {
                     $age_seconds = $current_epoch_time - $modification_time;
                 }
                 $files_to_process{$filename} = $modification_time;
-                $logger->debug(" [ftp_process_hour] File $filename (" . localtime($modification_time) . ") scheduled");
+                $logger->debug("[ftp_process_hour] File $filename (" . localtime($modification_time) . ") scheduled");
             }
         }
         my $filecount = scalar( keys %files_to_process );
         if ( $filecount > 0 ) {
-            $logger->debug("ftp_process_hour: $filecount files from $dataset_name with age $age_seconds");
+            $logger->debug("[ftp_process_hour] $filecount files from $dataset_name with age $age_seconds");
         }
         if ( $filecount > 0 && $age_seconds > 60 * $wait_minutes ) {
             my $datestring = _get_date_and_time_string( $current_epoch_time - $age_seconds );
@@ -218,6 +218,8 @@ sub ftp_process_hour {
                 $self->process_files( \%files_to_process, $dataset_name, 'FTP', $datestring );
             } catch {
                 $self->logger->error("FTP processing died: $_");
+            } finally {
+                $self->cleanworkdir() or $logger->warn("Couldn't clean up working dirs in ftp_process_hour");
             };
         }
     }
@@ -260,7 +262,7 @@ sub ftp_process_hour {
             }
         }
     }
-    $self->cleanworkdir() or $logger->warn("Couldn't clean up working dirs in ftp_process_hour");
+    #$self->cleanworkdir() or $logger->warn("Couldn't clean up working dirs in ftp_process_hour");
     $logger->info("Finished processing FTP upload area");
 }
 
@@ -318,7 +320,9 @@ sub makeworkdir {
     #  Create the necessary directories
     $self->logger->info("Creating work dir $work_start");
     foreach my $dir ( $work_start, $work_expand, $work_flat ) {
-        mkpath($dir) or die "Failed to create $dir: $!";    # create a fresh directory
+        #$self->logger->debug("Creating work dir $dir if not exists");
+        #mkpath($dir) or die "Failed to create $dir: $!" unless -d $dir && -w $dir;    # create a fresh directory if not exists
+        mkpath($dir) or die "Failed to create $dir: $!";    # create a fresh directory if not exists
     }
 }
 
