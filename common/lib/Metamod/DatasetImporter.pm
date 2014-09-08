@@ -329,6 +329,16 @@ sub _insert_metadata {
         project_name          => 14,
     );
 
+    # Add to the above hardcoded key - value pairs by reading from the searchcategory database table:
+
+    my $sql_searchcategories = $dbh->prepare_cached("SELECT sc_id, sc_idname FROM searchcategory " .
+        "WHERE sc_type = 'basickey' or sc_type = 'date_interval'");
+    $sql_searchcategories->execute();
+    while ( my @row = $sql_searchcategories->fetchrow_array ) {
+        my $key = $self->clean_content($row[1]);
+        $searchcategories{$key} = $row[0];
+    }
+
     #  Prepare SQL statements for repeated use.
     my $sql_getkey_MD = $dbh->prepare_cached("SELECT nextval('Metadata_MD_id_seq')");
     my $sql_insert_MD = $dbh->prepare_cached("INSERT INTO Metadata (MD_id, MT_name, MD_content) VALUES (?, ?, ?)");
