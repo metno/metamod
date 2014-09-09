@@ -54,7 +54,7 @@
 
     <xsl:if test="/*/dap:Grid"> <!--don't show unless gridded-->
       <h2>Area</h2>
-      <p>Specify geographical area of desired output data (in degrees):</p>
+      <p>Specify geographical area of desired output data (in degrees, relative to zero meridian/equator):</p>
       <table class="dapform">
           <tr>
             <td class="label">Select region:</td>
