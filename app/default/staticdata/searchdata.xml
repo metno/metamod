@@ -4012,8 +4012,12 @@
 <mt name="data_file_location" share="FALSE" def="The location of the dataset on disk. Only for level 2 datasets" />
 <mt name="data_file_size" share="FALSE" def="The size of the file in bytes. Only for level 2 datasets" />
 <mt name="dataref" share="FALSE" def="URL reference to data, or short name" />
+<mt name="dataref_PROJ" share="FALSE" def="URL to related information on the project(s) that created this dataset" />
+<mt name="dataref_DOC" share="FALSE" def="URL to related information on this specific dataset" />
 <mt name="dataref_OPENDAP" share="FALSE" def="URL reference to OPeNDAP service" />
+<mt name="dataref_THREDDS" share="FALSE" def="URL reference to THREDDS dataset" />
 <mt name="dataref_WMS" share="FALSE" def="URL to WMS service (without GetCapabilities)" />
 <mt name="dataref_HTTPServer" share="FALSE" def="URL where data file can be downloaded" />
-<mt name="timeseries" share="FALSE" def="List of variables to visualise in time series" />
+<mt name="dataref_FTP" share="FALSE" def="URL where data file can be downloaded via FTP" />
+<mt name="timeseries" share="FALSE" def="List of variables to visualise in time series" /> <!-- deprecated -->
 </searchdata>

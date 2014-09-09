@@ -116,6 +116,18 @@
         </URL_Content_Type>
         <URL><xsl:value-of select="key('mm2', 'dataref')"/></URL>
       </Related_URL>
+      <Related_URL>
+        <URL_Content_Type>
+          <Type>VIEW RELATED INFORMATION</Type>
+        </URL_Content_Type>
+        <URL><xsl:value-of select="key('mm2', 'dataref_DOC')"/></URL>
+      </Related_URL>
+      <Related_URL>
+        <URL_Content_Type>
+          <Type>VIEW RELATED INFORMATION</Type>
+        </URL_Content_Type>
+        <URL><xsl:value-of select="key('mm2', 'dataref_PROJ')"/></URL>
+      </Related_URL>
       <xsl:apply-templates select="key('mm2', 'gtsFileIdentifier')"/>
       <xsl:apply-templates select="key('mm2', 'gtsInstancePattern')"/>
 
