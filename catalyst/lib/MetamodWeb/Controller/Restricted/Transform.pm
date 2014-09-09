@@ -175,9 +175,15 @@ sub transform_POST {
     $fiParams{'startTime'} = $$p{start_date};
     $fiParams{'endTime'}  = $$p{stop_date};
 
+    my $xAxisValues = sprintf "%s,%s,...,%s", $p->{'xAxisMin'}, $p->{'xAxisMin'} + $p->{'xAxisStep'}, $p->{'xAxisMax'};
+    my $yAxisValues = sprintf "%s,%s,...,%s", $p->{'yAxisMin'}, $p->{'yAxisMin'} + $p->{'yAxisStep'}, $p->{'yAxisMax'};
+
+    #printf STDERR "<<$xAxisValues>> <<$xAxisValues>>";
+
+
     # setup fimex to fetch data via opendap
     my $fimex = new MetNo::Fimex(\%fiParams);
-    $fimex->setProjString( $p->{'projection'}, $p->{'interpolation'}, $p->{'xAxisValues'}, $p->{'yAxisValues'} )
+    $fimex->setProjString( $p->{'projection'}, $p->{'interpolation'}, $xAxisValues, $yAxisValues )
         if $p->{'projection'};
     my $cmd = eval { $fimex->doWork() };
     if ($@) {

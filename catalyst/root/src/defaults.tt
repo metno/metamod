@@ -258,6 +258,7 @@ app = {
         x_axis = 'x axis values'
         y_axis = 'y axis values'
         not_avail = 'Dataset no longer available'
+        repro_help = 'Transform data from current projection to:'
     }
 
     basket = {

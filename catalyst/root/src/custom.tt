@@ -4,6 +4,12 @@
 
 [%
 
-    # app.search.title = "Hello, world!"
+# some useful configuration items:
+
+# app.search.title = "Hello, world!"
+#clickable_thumbs = 1
+#ui.button.wms_client_resultpage = ''
+#wms.client.slideshow.delay = 5000 # ms
+#wms.client.disabled = 1
 
 %]

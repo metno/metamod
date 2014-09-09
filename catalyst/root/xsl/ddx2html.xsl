@@ -54,6 +54,7 @@
 
     <xsl:if test="/*/dap:Grid"> <!--don't show unless gridded-->
       <h2>Area</h2>
+      <p>Specify geographical area of desired output data (in degrees):</p>
       <table class="dapform">
           <tr>
             <td class="label">Select region:</td>
@@ -80,12 +81,13 @@
 
     <xsl:if test="dap:Attribute[@name='start_date']">
       <h2>Time</h2>
+      <p>Specify time period of desired output data:</p>
       <table class="dapform">
           <tr>
             <td class="label">Select time range:</td>
             <td class="fields">
-              <input name="start_date" id="start_date" value="{dap:Attribute[@name='start_date']/dap:value}"/> to
-              <input name="stop_date"  id="stop_date"  value="{dap:Attribute[@name='stop_date']/dap:value}"/>
+              from <input name="start_date" id="start_date" value="{dap:Attribute[@name='start_date']/dap:value}"/>
+              to   <input name="stop_date"  id="stop_date"  value="{dap:Attribute[@name='stop_date']/dap:value}"/>
             </td>
           </tr>
       </table>
@@ -103,7 +105,7 @@
           <input type="hidden" name="dims" value="{@name}"/>
         </xsl:when>
         <xsl:otherwise>
-          <td class="fields"><input type="checkbox" name="vars" value="{@name}"/></td> <!-- renamed to match ts which can take plural -->
+          <td class="fields"><input type="checkbox" name="vars" value="{@name}" checked="checked" /></td> <!-- renamed to match ts which can take plural -->
         </xsl:otherwise>
       </xsl:choose>
       <td class="label"><xsl:value-of select="@name"/></td>
