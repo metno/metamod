@@ -103,6 +103,7 @@ my %default_config = (
 
     'View::Raw' => {
         INCLUDE_PATH => [
+            $custdir ? "$custdir/templates" : undef,
             __PACKAGE__->path_to( 'root', 'src' ),
         ],
         TEMPLATE_EXTENSION => '.tt',
@@ -111,6 +112,7 @@ my %default_config = (
 
     'View::None' => {
         INCLUDE_PATH => [
+            $custdir ? "$custdir/templates" : undef,
             __PACKAGE__->path_to( 'root', 'src' ),
         ],
         TEMPLATE_EXTENSION => '.tt',
