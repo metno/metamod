@@ -25,11 +25,11 @@
         <th>Long name</th>
         <th>Units</th>
       </tr>
-      <xsl:apply-templates select="dap:Array[not( dap:Attribute[@name='axis'] )]"/>
+      <xsl:apply-templates select="dap:Array[not( dap:Attribute[@name='axis'] | dap:Attribute[@name='standard_name'][dap:value='time'] )]"/>
       <xsl:apply-templates select="dap:Grid"/>
     </table>
 
-    <xsl:if test="dap:Array[dap:Attribute[@name='axis']]">
+    <xsl:if test="1 or dap:Array[dap:Attribute[@name='axis']]">
       <h2>Dimensions</h2>
       <table class="dapform">
         <tr>
@@ -40,6 +40,7 @@
           <th>Units</th>
         </tr>
         <xsl:apply-templates select="dap:Array[dap:Attribute[@name='axis']]"/>
+        <xsl:apply-templates select="dap:Array[dap:Attribute[@name='standard_name'][dap:value='time']]"/>
       </table>
     </xsl:if>
 
@@ -101,7 +102,7 @@
 
     <tr>
       <xsl:choose>
-        <xsl:when test="dap:Attribute[@name='axis']">
+        <xsl:when test="dap:Attribute[@name='axis'] | dap:Attribute[@name='standard_name'][dap:value='time']">
           <input type="hidden" name="dims" value="{@name}"/>
         </xsl:when>
         <xsl:otherwise>
