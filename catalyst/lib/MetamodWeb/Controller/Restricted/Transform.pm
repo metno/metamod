@@ -44,6 +44,7 @@ our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); @r ? sprintf "0.
 our $DEBUG = 0; # or does nothing
 
 use Data::Dumper;
+#use Try::Tiny;
 use IO::File;
 #use File::Spec qw();
 use XML::LibXSLT;
@@ -172,11 +173,17 @@ sub transform_POST {
 
     # we should probably do some timestamp validation here, but seems to work for the moment... FIXME
     # note that validation must be against FIMEX allowed format, not Perl or ISO
-    $fiParams{'startTime'} = $$p{start_date};
-    $fiParams{'endTime'}  = $$p{stop_date};
+    eval {
+        $fiParams{'startTime'} = _fimextime( $$p{start_date} );
+        $fiParams{'endTime'}   = _fimextime( $$p{stop_date} );
+    };
+    if ($@) {
+        $self->logger->error("Cannot parse times '$$p{start_date}' '$$p{stop_date}': $@");
+        $c->detach( 'Root', 'error', [ 400, "Cannot parse times: $@"] );
+    };
 
-    my $xAxisValues = sprintf "%s,%s,...,%s", $p->{'xAxisMin'}, $p->{'xAxisMin'} + $p->{'xAxisStep'}, $p->{'xAxisMax'};
-    my $yAxisValues = sprintf "%s,%s,...,%s", $p->{'yAxisMin'}, $p->{'yAxisMin'} + $p->{'yAxisStep'}, $p->{'yAxisMax'};
+    my $xAxisValues = sprintf "%s,%s,...,%s", $p->{'xAxisMin'}, $p->{'xAxisMin'} + $p->{'xAxisStep'}||0, $p->{'xAxisMax'} if $p->{'xAxisMin'};
+    my $yAxisValues = sprintf "%s,%s,...,%s", $p->{'yAxisMin'}, $p->{'yAxisMin'} + $p->{'yAxisStep'}||0, $p->{'yAxisMax'} if $p->{'yAxisMin'};
 
     #printf STDERR "<<$xAxisValues>> <<$xAxisValues>>";
 
@@ -205,6 +212,15 @@ sub transform_POST {
 
 }
 
+
+sub _fimextime {
+    # convert timestamp into udunits as in https://projects.met.no/fimex/doc/classMetNoFimex_1_1TimeSpec.html
+    my $time = shift;
+    my ($yy, $mm, $dd, $rest) = $time =~ /^(\d+)-(\d+)-(\d+)[ T]?(.*)/ or die "Invalid time format";
+    my ($h, $m, $s)        = $rest =~ /^(\d+):(\d+):(\d+(\.\d+)?)/;
+    return $rest ? "$yy-$mm-$dd $h:$m:$s" : "$yy-$mm-$dd 00:00:00";
+
+}
 
 __PACKAGE__->meta->make_immutable;
 
