@@ -57,7 +57,7 @@
                 // add all projections common to all layers into selector
                 for (pc in projCount) {
                     //log.debug('** ' + pc + ' = ' + projCount[pc] + ' of ' + allLayers.length);
-                    if (pc == "CRS:84"){
+                    if (pc == "CRS:84" || pc == "EPSG:27700") {
                         continue;  // not a proper projection
                     }
                     // check if background map is available - FIXME
