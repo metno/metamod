@@ -171,27 +171,38 @@ sub transform_POST {
         $fiParams{$_} = $$p{$_} if exists $$p{$_};
     }
 
-    # we should probably do some timestamp validation here, but seems to work for the moment... FIXME
-    # note that validation must be against FIMEX allowed format, not Perl or ISO
-    eval {
+    my ($fimex, $xAxisValues, $yAxisValues);
+
+    eval { # Try::Tiny segfaults when used to catch errors
+
+        # do some timestamp validation here
         $fiParams{'startTime'} = _fimextime( $$p{start_date} );
         $fiParams{'endTime'}   = _fimextime( $$p{stop_date} );
+
+        # setup fimex to fetch data via opendap
+        $fimex = new MetNo::Fimex(\%fiParams);
+
+        if ($p->{'projection'} ) {
+            $xAxisValues = sprintf "%s,%s,...,%s", $p->{'xAxisMin'}, $p->{'xAxisMin'} + $p->{'xAxisStep'}||0, $p->{'xAxisMax'} if $p->{'xAxisMin'};
+            $yAxisValues = sprintf "%s,%s,...,%s", $p->{'yAxisMin'}, $p->{'yAxisMin'} + $p->{'yAxisStep'}||0, $p->{'yAxisMax'} if $p->{'yAxisMin'};
+            #printf STDERR "<<$xAxisValues>> <<$xAxisValues>>";
+            $fimex->setProjString( $p->{'projection'}, $p->{'interpolation'}, $xAxisValues, $yAxisValues );
+        }
+        1;
+
+    } or do {
+
+        $self->add_info_msgs( $c, "Invalid input parameters to Fimex:\n$@" );
+        #$c->res->redirect( $c->request->uri );
+
+        #$self->logger->error("Cannot parse times '$$p{start_date}' '$$p{stop_date}': $@");
+        #$c->detach( 'Root', 'error', [ 400, "Cannot parse times: $@"] );
+        #
+        $self->logger->debug("Invalid input parameters to Fimex: $@");
+        $c->detach( 'Root', 'error', [ 400, "Invalid input parameters to Fimex:\n$@"] );
+
     };
-    if ($@) {
-        $self->logger->error("Cannot parse times '$$p{start_date}' '$$p{stop_date}': $@");
-        $c->detach( 'Root', 'error', [ 400, "Cannot parse times: $@"] );
-    };
 
-    my $xAxisValues = sprintf "%s,%s,...,%s", $p->{'xAxisMin'}, $p->{'xAxisMin'} + $p->{'xAxisStep'}||0, $p->{'xAxisMax'} if $p->{'xAxisMin'};
-    my $yAxisValues = sprintf "%s,%s,...,%s", $p->{'yAxisMin'}, $p->{'yAxisMin'} + $p->{'yAxisStep'}||0, $p->{'yAxisMax'} if $p->{'yAxisMin'};
-
-    #printf STDERR "<<$xAxisValues>> <<$xAxisValues>>";
-
-
-    # setup fimex to fetch data via opendap
-    my $fimex = new MetNo::Fimex(\%fiParams);
-    $fimex->setProjString( $p->{'projection'}, $p->{'interpolation'}, $xAxisValues, $yAxisValues )
-        if $p->{'projection'};
     my $cmd = eval { $fimex->doWork() };
     if ($@) {
         $self->logger->warn("FIMEX runtime error: $@");
