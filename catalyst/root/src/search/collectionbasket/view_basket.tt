@@ -36,7 +36,10 @@ jQuery(document).ready( function () {
                 [% filesize = file.data_file_size %]
                 <tr>
                     <td class="collection-basket" width="90%">
-                        <span style="[% filesize ? '' : 'font-style: italic' %]">[% file.name %]</span>
+                        <span style="font-style: [% filesize || file.HTTPServer ? 'normal' : 'italic' %]">
+                            <!-- input type="checkbox" value="[% file.ds_id %]"/ -->
+                            [% file.name %]
+                        </span>
                         <span style="float: right; white-space:nowrap;">
                             [% IF file.HTTPServer %]
                                 <a href="[% file.HTTPServer %]"><button type="button">[% ui.button.download %]</button></a>
@@ -57,7 +60,7 @@ jQuery(document).ready( function () {
                         </span>
                     </td>
                     <td class="collection-basket" style="text-align: right">
-                        [% filesize ? collection_basket.human_readable_size( file.data_file_size ) : '&nbsp' %]
+                        [% filesize ? collection_basket.human_readable_size( file.data_file_size ) : file.HTTPServer ? '?' : '&nbsp' %]
                     </td>
                 </tr>
             [% END %]
