@@ -36,20 +36,25 @@ Class for hiding the xml-structure and giving easy access to the FimexSetup stri
 
 Example of fimex-setup string:
 
- <fimexProjections xmlns="http://www.met.no/schema/metamod/fimexProjections">
- <dataset urlRegex="" urlReplace=""/>
- <!-- see fimex-interpolation for more info on options -->
- <projection name="Lat/Long" method="nearestghbor"
-           projString="+proj=latlong +elips=sphere +a=6371000 +e=0"
-           xAxis="0,1,...,x;relativeStart=0"
-           yAxis="0,1,...,x;relativeStart=0"
-           toDegree="true"/>
- <projection name="Stereo" method="coord_nearestneighbor"
-           projString="+proj=stere +elips=sphere +lon_0=-32 +lat_0=90 +lat_ts=60 +a=6371000 +e=0"
-           xAxis="0,50000,...,x;relativeStart=0"
-           yAxis="0,50000,...,x;relativeStart=0"
-           toDegree="false" />
- </fimexProjections>
+  <fimexProjections xmlns="http://www.met.no/schema/metamod/fimexProjections">
+
+    <dataset urlRegex="..." urlReplace="..."/>
+
+    <!-- see fimex-interpolation for more info on options -->
+
+    <projection name="Lat/Long" method="nearestghbor"
+                projString="+proj=latlong +elips=sphere +a=6371000 +e=0"
+                xAxis="0,1,...,x;relativeStart=0"
+                yAxis="0,1,...,x;relativeStart=0"
+                toDegree="true"/>
+
+    <projection name="Stereo" method="coord_nearestneighbor"
+                projString="+proj=stere +elips=sphere +lon_0=-32 +lat_0=90 +lat_ts=60 +a=6371000 +e=0"
+                xAxis="0,50000,...,x;relativeStart=0"
+                yAxis="0,50000,...,x;relativeStart=0"
+                toDegree="false" />
+
+  </fimexProjections>
 
 =cut
 

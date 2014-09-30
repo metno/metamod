@@ -176,8 +176,8 @@ sub transform_POST {
     eval { # Try::Tiny segfaults when used to catch errors
 
         # do some timestamp validation here
-        $fiParams{'startTime'} = _fimextime( $$p{start_date} );
-        $fiParams{'endTime'}   = _fimextime( $$p{stop_date} );
+        $fiParams{'startTime'} = _fimextime( $$p{start_date} ) if $$p{start_date};
+        $fiParams{'endTime'}   = _fimextime( $$p{stop_date } ) if $$p{stop_date };
 
         # setup fimex to fetch data via opendap
         $fimex = new MetNo::Fimex(\%fiParams);

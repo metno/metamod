@@ -74,18 +74,20 @@ use File::Temp qw();
 use Data::Dumper;
 use Carp;
 
+__PACKAGE__->meta->error_class('Moose::Error::Croak');
+
 # never used since only projectioninfo in Dataset has all fimex needs (REALLY?)
 # replace with Geo::Proj4 - DONE, remove after testing
-my %projstrings = (
-    'EPSG:32661' => '+proj=stere +lat_0=90 +lat_ts=90 +lon_0=0 +k=0.994 +x_0=2000000 +y_0=2000000 +datum=WGS84 +units=m +no_defs',
-    'EPSG:32761' => '+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +k=0.994 +x_0=2000000 +y_0=2000000 +datum=WGS84 +units=m +no_defs',
-    'EPSG:3411'  => '+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs',
-    'EPSG:3412'  => '+proj=stere +lat_0=-90 +lat_ts=-70 +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs',
-    'EPSG:3413'  => '+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs',
-    'EPSG:3995'  => '+proj=stere +lat_0=90 +lat_ts=71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs',
-    'EPSG:32633' => '+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs',
-    'EPSG:4326'  => '+proj=longlat +datum=WGS84 +no_defs',
-);
+#my %projstrings = (
+#    'EPSG:32661' => '+proj=stere +lat_0=90 +lat_ts=90 +lon_0=0 +k=0.994 +x_0=2000000 +y_0=2000000 +datum=WGS84 +units=m +no_defs',
+#    'EPSG:32761' => '+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +k=0.994 +x_0=2000000 +y_0=2000000 +datum=WGS84 +units=m +no_defs',
+#    'EPSG:3411'  => '+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs',
+#    'EPSG:3412'  => '+proj=stere +lat_0=-90 +lat_ts=-70 +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs',
+#    'EPSG:3413'  => '+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs',
+#    'EPSG:3995'  => '+proj=stere +lat_0=90 +lat_ts=71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs',
+#    'EPSG:32633' => '+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs',
+#    'EPSG:4326'  => '+proj=longlat +datum=WGS84 +no_defs',
+#);
 
 =head1 METHODS
 
@@ -343,7 +345,7 @@ sub setProjString {
     my $proj = Geo::Proj4->new( init => lc($epsgcode) ) or die;
     #my $projstr = $projstrings{$epsgcode} or die;
     my $projstr = $proj->normalized();
-    printf STDERR "+++ getting projstring for %s...\n%s\n%s\n", $epsgcode, $projstr, $projstrings{$epsgcode};
+    #printf STDERR "+++ getting projstring for %s...\n%s\n%s\n", $epsgcode, $projstr, $projstrings{$epsgcode};
     $self->projString( $projstr );
     $self->interpolateMethod($interpolate);
     $self->xAxisValues($xAxisValues);
@@ -513,9 +515,9 @@ sub projectFile {
         'output.file' => 1,
         'output.config' => 0,
         'interpolate.method' => {default => 'nearestneighbor'},
-        'interpolate.projString' => 1,
-        'interpolate.xAxisValues' => 1,
-        'interpolate.yAxisValues' => 1,
+        'interpolate.projString' => { optional => 1 },
+        'interpolate.xAxisValues' => { optional => 1,  depends  => [ 'interpolate.projString' ] },
+        'interpolate.yAxisValues' => { optional => 1,  depends  => [ 'interpolate.projString' ] },
         # either ?axisUnit or metricAxes is required
         'interpolate.xAxisUnit' => 0,
         'interpolate.yAxisUnit' => 0,
