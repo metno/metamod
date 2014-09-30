@@ -8,7 +8,7 @@
             table.dapform tr td { padding: 5 5 5 5; border-bottom: solid 1px black; }
             table.dapform tr th { padding: 5 5 5 5; border-bottom: solid 1px black; background-color: grey; color: white;  }
             table.dapform input { width: 150 }
-            input.transform_axes { width: 60 }
+            input.transform_axes { width: 90 }
         </style>
 
     <div class="main">

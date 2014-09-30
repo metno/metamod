@@ -168,7 +168,9 @@ sub transform_POST {
     $fiParams{selectVariables} = ref $vars ? $vars : [ $vars ] if $vars; # listify if single, skip if empty
 
     for (qw(north south east west)) {
-        $fiParams{$_} = $$p{$_} if exists $$p{$_};
+        next unless exists $$p{$_};
+        $$p{$_} =~ s/^\s+|\s+$//g;
+        $fiParams{$_} = $$p{$_};
     }
 
     my ($fimex, $xAxisValues, $yAxisValues);
