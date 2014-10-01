@@ -4,6 +4,11 @@
 [% BLOCK scripts %]
 [% END %]
 
+[% SET linksuffix = {
+    dataref_OPENDAP = '.info'
+    dataref_WMS = mm_config.get('WMS_GET_CAPABILITIES')
+} %]
+
 <h1 class="std">[% app.dataset.info _ ' ' _ ds.ds_id() %]</h1>
 
 <table>
@@ -45,7 +50,7 @@
     <tr>
         <td class="dataset_view">[% mt_name %]</td>
         [% IF mt_name.match('^dataref') %]
-            <td class="dataset_view"><a href="[% metadata.$mt_name.0 %]">[% metadata.$mt_name.0 %]</a></td>
+            <td class="dataset_view"><a href="[% metadata.$mt_name.0 _ linksuffix.$mt_name %]">[% metadata.$mt_name.0 %]</a></td>
         [% ELSE %]
             <td class="dataset_view">[% metadata.$mt_name.join('<br />') %]</td>
         [% END %]

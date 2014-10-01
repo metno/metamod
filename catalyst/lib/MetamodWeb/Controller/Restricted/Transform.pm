@@ -125,7 +125,7 @@ sub transform_GET {
     # extract bounding box coords from DB since OPeNDAP not necessarily in lat/lon
     my $bounding_box = $c->stash->{dataset}->metadata()->{'bounding_box'}->[0]
         or $self->logger->warn("Missing bounding box in dataset $ds_id (timeseries?)");;
-    my @bbox = split(',', $bounding_box) if defined $bounding_box; # ESWN
+    my @bbox = split(/\s*,\s*/, $bounding_box) if defined $bounding_box; # ESWN
     my @dirs = qw(e s w n);
     my %xslparam = map { shift @dirs => $_ } @bbox;
     #(
@@ -169,7 +169,7 @@ sub transform_POST {
 
     for (qw(north south east west)) {
         next unless exists $$p{$_};
-        $$p{$_} =~ s/^\s+|\s+$//g;
+        $$p{$_} =~ s/^\s+|\s+$//g; # trim whitespace so fimex doesn't choke
         $fiParams{$_} = $$p{$_};
     }
 
