@@ -156,9 +156,14 @@ The following fields are currently supported, with more to come later:
 
 =item dataref_HTTPServer
 
-=item dataref_WMS (experimental, does not replace wmsinfo yet)
+=item dataref_WMS (experimental, not yet implemented)
 
 =back
+
+In addition, the projectionInfo section in XMD is no longer used for
+transformation/reprojection and can usually be removed. It is currently
+only required for the /search/fimexdownload subservice, which does not seem
+to be in general use anymore.
 
 =head3 get_dataref.pl
 
@@ -172,19 +177,19 @@ To enable the new features, use the following procedure:
 
 =over 4
 
-=item #
+=item 1
 
 Update searchdata.xml with new dataref_* elements (only necessary if not using app/default)
 
-=item #
+=item 2
 
 Run import_searchdata.pl to reload database
 
-=item #
+=item 3
 
 Update XML files with dataref_* elements (see get_dataref.pl for help)
 
-=item #
+=item 4
 
 Re-import XML files using import_dataset.pl
 
