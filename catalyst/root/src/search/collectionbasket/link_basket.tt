@@ -4,7 +4,7 @@
 
 <br />
 
-[% INCLUDE 'user_msgs.tt' %]
+[%# INCLUDE 'user_msgs.tt' %]
 
 [% IF files.size > 0 %]
 

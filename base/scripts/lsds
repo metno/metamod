@@ -192,9 +192,13 @@ Log::Log4perl::CommandLine::handlelogoptions();
 
 
 my $ownertags = ( defined $opt{ownertag} ? $opt{ownertag} : $config->split('DATASET_TAGS') ) || []; # allow setting to blank, i.e. all tags
-#print STDERR Dumper \$ownertags;
-$ownertags = join(',', @$ownertags) if ref $ownertags;
-@$ownertags = split( /,/, $ownertags ); # allow comma separated list
+$ownertags = [ $ownertags ] unless ref $ownertags;
+foreach (@$ownertags) {
+    #$_ = 'xxx';
+}
+print STDERR "OWNERTAGS = ", Dumper $ownertags;
+#$ownertags = join(',', @$ownertags);
+#@$ownertags = split( /,/, $ownertags ); # allow comma separated list
 
 my $metadata = $opt{metadata} || [];
 @$metadata = split( /,/, join(',', @$metadata) ); # ditto

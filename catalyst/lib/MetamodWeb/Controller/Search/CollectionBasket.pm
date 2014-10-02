@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 use Email::Valid;
 use Moose;
-use TheSchwartz; # can this be removed? FIXME
+#use TheSchwartz; # can this be removed? FIXME
 use namespace::autoclean;
 use Data::Dumper;
 

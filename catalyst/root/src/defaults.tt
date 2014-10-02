@@ -412,6 +412,8 @@ text to come...
         never seen before. There might be a prize for this. Please contact our
         <a href=\"mailto:\[% mm_config.get('OPERATOR_EMAIL') %\]\">code monkeys</a>
         and include the diagnostic information below to see if you've won:</p>"
+
+        userinput = "<p>Invalid input parameters:</p>"
     }
 
 }

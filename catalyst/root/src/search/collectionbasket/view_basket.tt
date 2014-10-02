@@ -17,7 +17,7 @@ jQuery(document).ready( function () {
 
 <h2 class="std">[% app.basket.title %]</h2>
 
-[% INCLUDE 'user_msgs.tt' %]
+[%# INCLUDE 'user_msgs.tt' %]
 
 [% IF files.size > 0 %]
 

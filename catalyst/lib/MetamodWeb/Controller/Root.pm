@@ -77,7 +77,7 @@ sub error :Path {
     my ( $self, $c, $status, $message ) = @_;
     $c->response->content_type('text/html');
     $c->response->status($status);
-    $c->response->body( "<h1>$status " . status_message($status) . "</h1><p>$message</p>\n" );
+    $c->response->body( "<h1>$status " . status_message($status) . "</h1><pre>$message</pre>\n" );
     $c->clear_flash; # get rid of hanging error msgs on subsequent page
 }
 

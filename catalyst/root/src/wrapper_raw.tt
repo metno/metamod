@@ -21,6 +21,7 @@
 </head>
 
 <body class="plain" onload="[% onload %]">
+    [% INCLUDE 'user_msgs.tt' %]
     [% content %]
 </body>
 </html>
