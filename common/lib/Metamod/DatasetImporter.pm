@@ -596,7 +596,7 @@ sub _transform_metadata {
 
         if ( $name eq 'bounding_box' && $ref2->[0] ) {
             my ($e, $s, $w, $n) = split(/\s*,\s*/, $ref2->[0]);
-            die "bounding_box coords in wrong order" unless ($e > $w && $n > $s);
+            die "bounding_box coords in wrong order" unless ($e >= $w && $n >= $s);
             die "Illegal degree values in bounding_box"
                 unless ($e >= -180 && $e <= 180)
                     && ($w >= -180 && $w <= 180)
