@@ -424,10 +424,10 @@ sub doWork {
         $args{'interpolate.xAxisValues'} = $self->xAxisValues;
         $args{'interpolate.yAxisValues'} = $self->yAxisValues;
 
-        $args{'extract.reduceToBoundingBox.north'} = $self->north;
-        $args{'extract.reduceToBoundingBox.south'} = $self->south;
-        $args{'extract.reduceToBoundingBox.west'} = $self->west;
-        $args{'extract.reduceToBoundingBox.east'} = $self->east;
+        $args{'extract.reduceToBoundingBox.north'} = $self->north if $self->north;
+        $args{'extract.reduceToBoundingBox.south'} = $self->south if $self->south;
+        $args{'extract.reduceToBoundingBox.west'} = $self->west if $self->west;
+        $args{'extract.reduceToBoundingBox.east'} = $self->east if $self->east;
         $args{'extract.selectVariables'} = $self->selectVariables;
         $args{'extract.reduceTime.start'} = $self->startTime;
         $args{'extract.reduceTime.end'} = $self->endTime;

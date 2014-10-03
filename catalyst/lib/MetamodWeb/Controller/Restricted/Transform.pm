@@ -124,7 +124,7 @@ sub transform_GET {
 
     # extract bounding box coords from DB since OPeNDAP not necessarily in lat/lon
     my $bounding_box = $c->stash->{dataset}->metadata()->{'bounding_box'}->[0]
-        or $self->logger->warn("Missing bounding box in dataset $ds_id (timeseries?)");;
+        or $self->logger->warn("Missing bounding box in dataset $ds_id (timeseries?)");
     my ($e, $s, $w, $n) = split(/\s*,\s*/, $bounding_box) if defined $bounding_box; # ESWN
 
     my %xslparam;
@@ -167,7 +167,7 @@ sub transform_POST {
     $fiParams{selectVariables} = ref $vars ? $vars : [ $vars ] if $vars; # listify if single, skip if empty
 
     for (qw(north south east west)) {
-        next unless exists $$p{$_};
+        next unless $$p{$_};
         $$p{$_} =~ s/^\s+|\s+$//g; # trim whitespace so fimex doesn't choke
         $fiParams{$_} = $$p{$_};
     }
