@@ -125,15 +125,14 @@ sub transform_GET {
     # extract bounding box coords from DB since OPeNDAP not necessarily in lat/lon
     my $bounding_box = $c->stash->{dataset}->metadata()->{'bounding_box'}->[0]
         or $self->logger->warn("Missing bounding box in dataset $ds_id (timeseries?)");;
-    my @bbox = split(/\s*,\s*/, $bounding_box) if defined $bounding_box; # ESWN
-    my @dirs = qw(e s w n);
-    my %xslparam = map { shift @dirs => $_ } @bbox;
-    #(
-        #e => shift @bbox,
-        #s => shift @bbox,
-        #w => shift @bbox,
-        #n => shift @bbox,
-    #);
+    my ($e, $s, $w, $n) = split(/\s*,\s*/, $bounding_box) if defined $bounding_box; # ESWN
+
+    my %xslparam;
+    if ($e > $w && $n > $s) {
+       %xslparam = ( e => $e, s => $s, w => $w, n => $n );
+    } else {
+        $self->add_error_msgs($c, 'Error: bounding box coordinates not in correct order');
+    }
 
     # using XSLT here since extracting data in Template Toolkit is too cumbersome
     my $stylesheet = $self->xslt->parse_stylesheet_file( $c->path_to( '/root/xsl/ddx2html.xsl' ) ); # move to constructor

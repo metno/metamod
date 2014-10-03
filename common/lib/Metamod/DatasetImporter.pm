@@ -318,7 +318,7 @@ sub _insert_metadata {
     #  and SearchCategory
     #
 
-    # FIXME - should be read from searchdata.xml, but keys are in plural there... HOWTOFIX?
+    # FIXME - should be read from searchdata.xml, but keys are in plural there... HOWTOFIX? (plural keys fixed by Egil in 2.13.13)
     my %searchcategories = (
         variable              => 3,
         area                  => 2,
@@ -593,6 +593,17 @@ sub _transform_metadata {
 
     foreach my $name ( keys %metadata ) {
         my $ref2 = $metadata{$name};
+
+        if ( $name eq 'bounding_box' && $ref2->[0] ) {
+            my ($e, $s, $w, $n) = split(/\s*,\s*/, $ref2->[0]);
+            die "bounding_box coords in wrong order" unless ($e > $w && $n > $s);
+            die "Illegal degree values in bounding_box"
+                unless ($e >= -180 && $e <= 180)
+                    && ($w >= -180 && $w <= 180)
+                    && ($s >= -90 && $s <= 90)
+                    && ($n >= -90 && $n <= 90);
+        }
+
         if ( $name eq 'abstract' ) {
             my $mref = [ $name, $ref2->[0] ];
             push( @metaarray, $mref );
