@@ -350,7 +350,7 @@ sub setProjString {
     $self->interpolateMethod($interpolate);
     $self->xAxisValues($xAxisValues);
     $self->yAxisValues($yAxisValues);
-    $self->metricAxes();
+    $self->metricAxes( ! $proj->isLatlong );
 }
 
 
