@@ -46,12 +46,16 @@ our $DEBUG = 0; # or does nothing
 use Data::Dumper;
 #use Try::Tiny;
 use IO::File;
+use List::Util qw(max);
 #use File::Spec qw();
 use XML::LibXSLT;
 use DateTime::Format::Strptime;
 use MetNo::Fimex qw();
 use MetNo::OPeNDAP;
 use Metamod::Config qw();
+use Metamod::WMS;
+use MetamodWeb::Utils::FormValidator;
+
 #use Metamod::WMS qw(getProjString);
 
 has 'xslt' => ( is => 'ro', isa => 'XML::LibXSLT', default => sub { XML::LibXSLT->new() } );
@@ -139,9 +143,26 @@ sub transform_GET {
     my $results = eval { $stylesheet->transform( $ddx, XML::LibXSLT::xpath_to_string(%xslparam) ) }
         or $c->detach('Root', 'error', [500, $@]);
 
+    # experimental openlayers map bbox selector
+    my $config = Metamod::Config->instance();
+    my %searchmaps;
+    my $wmsprojs = $config->split('WMS_PROJECTIONS');
+    foreach (keys %$wmsprojs) {
+        my $crs = $_;
+        my ($code) = /^EPSG:(\d+)/ or next; # search map needs just EPSG numeric code
+        my $name = $wmsprojs->{$crs};
+        my $url = getMapURL($crs) or next;
+        $searchmaps{$code} = {
+            url => $url,
+            name => "$name ($crs)"|| getProjName($crs) || $crs,
+        };
+    }
+    #print STDERR Dumper \%searchmaps;
+
     $c->stash(
         template => $gridded ? 'search/transform.tt' : 'search/transform_ts.tt',
         html => $results->toString,
+        searchmaps =>\%searchmaps,
         #projs => Metamod::WMS::projList()
     );
 
@@ -150,13 +171,19 @@ sub transform_GET {
 sub transform_POST {
     my ($self, $c) = @_;
 
+    my $result = $self->validate_transform($c);
+    if( !$result->success() ){
+        $self->add_form_errors($c, $c->stash->{validator});
+        return $c->res->redirect($c->uri_for('/search/transform', $c->req->params ) );
+    }
+
     my $config = Metamod::Config->instance();
     my $fimexpath = $config->get('FIMEX_PROGRAM')
         or $c->detach( 'Root', 'error', [ 501, "Not available without FIMEX installed"] );
     $MetNo::Fimex::DEBUG = 0; # turn off debug or nothing will happen
 
     my $p = $c->request->params;
-    #printf STDERR Dumper \$p;
+    printf STDERR Dumper \$p;
 
     my %fiParams = (
         dapURL => $c->stash->{dapurl},
@@ -183,11 +210,17 @@ sub transform_POST {
         # setup fimex to fetch data via opendap
         $fimex = new MetNo::Fimex(\%fiParams);
 
-        if ($p->{'projection'} ) {
-            $xAxisValues = sprintf "%s,%s,...,%s", $p->{'xAxisMin'}, $p->{'xAxisMin'} + $p->{'xAxisStep'}||0, $p->{'xAxisMax'} if $p->{'xAxisMin'};
-            $yAxisValues = sprintf "%s,%s,...,%s", $p->{'yAxisMin'}, $p->{'yAxisMin'} + $p->{'yAxisStep'}||0, $p->{'yAxisMax'} if $p->{'yAxisMin'};
-            #printf STDERR "<<$xAxisValues>> <<$xAxisValues>>";
-            $fimex->setProjString( $p->{'projection'}, $p->{'interpolation'}, $xAxisValues, $yAxisValues );
+        my $proj = $p->{'selected_map'} ? 'EPSG:' . $p->{'selected_map'} : $p->{'projection'};
+
+        if ($proj) {
+            #my $step = $proj eq 'EPSG:4326' ? 0.5 : 10000;
+            my $range = max($p->{'yAxisMax'} - $p->{'xAxisMin'}, $p->{'yAxisMax'} - $p->{'xAxisMin'});
+            my $step = $range / ( ( $p->{'steps'} || 500 ) - 1 );
+            #print STDERR " * step = $step \n";
+            $xAxisValues = sprintf "%s,%s,...,%s", $p->{'xAxisMin'}, $p->{'xAxisMin'} + $step, $p->{'xAxisMax'} if $p->{'xAxisMin'};
+            $yAxisValues = sprintf "%s,%s,...,%s", $p->{'yAxisMin'}, $p->{'yAxisMin'} + $step, $p->{'yAxisMax'} if $p->{'yAxisMin'};
+            printf STDERR "== $proj : <<$xAxisValues>> <<$xAxisValues>>\n";
+            $fimex->setProjString( $proj, $p->{'interpolation'}, $xAxisValues, $yAxisValues );
         }
         1;
 
@@ -224,6 +257,59 @@ sub transform_POST {
 
 }
 
+sub validate_transform : Private {
+    my ($self, $c) = @_;
+
+    my %form_profile = (
+        required => [qw( ds_id vars )],
+        require_some => {
+        },
+        optional => [qw( start_date stop_date north south east west interpolation steps ) ],
+        optional_regexp => qr/^(x|y)Axis(Min|Max|Step)$/,
+        dependency_groups  => {
+            # if either field is filled in, they all become required
+            txt_coords => [qw( projection xAxisMax xAxisMin yAxisMax yAxisMin xAxisStep yAxisStep )],
+        },
+        filters       => ['trim'],
+        field_filters => {
+            north       => ['decimal'],
+            south       => ['decimal'],
+            east        => ['decimal'],
+            west        => ['decimal'],
+            west        => ['decimal'],
+            steps       => ['pos_decimal'],
+        },
+        field_filter_regexp_map => {
+            # sanitize numbers
+            qr/Axis(Min|Max)$/  => ['decimal'],
+            qr/AxisStep$/       => ['pos_decimal'],
+        },
+        constraint_methods => {
+            interpolation   => qr/^(nearestneighbor|bilinear|bicubic|coord_nearestneighbor|coord_kdtree|forward_max|forward_mean|forward_median|forward_sum)$/,
+        },
+        constraint_method_regexp_map => {
+            qr/Axis(Min|Max)$/    => qr/^-?\d+(\.\d*)?$/,
+        },
+        labels => {
+            vars => 'Variables',
+            xAxisMax    => 'x axis max',
+            xAxisMin    => 'x axis min',
+            yAxisMax    => 'y axis max',
+            yAxisMin    => 'y axis min',
+            xAxisStep   => 'x axis increment',
+            yAxisStep   => 'y axis increment',
+        },
+        msgs => {
+            missing => 'Required input missing or invalid format',
+            invalid => 'Format not valid',
+        },
+        debug => 1,
+    );
+    my $validator = MetamodWeb::Utils::FormValidator->new( validation_profile => \%form_profile );
+    my $result = $validator->validate($c->req->params);
+    $c->stash( validator => $validator );
+    return $result;
+}
 
 sub _fimextime {
     # convert timestamp into udunits as in https://projects.met.no/fimex/doc/classMetNoFimex_1_1TimeSpec.html

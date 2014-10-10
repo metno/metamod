@@ -342,7 +342,7 @@ Set projection params by EPSG code
 sub setProjString {
     my ($self, $epsgcode, $interpolate, $xAxisValues, $yAxisValues) = @_;
 
-    my $proj = Geo::Proj4->new( init => lc($epsgcode) ) or die;
+    my $proj = Geo::Proj4->new( init => lc($epsgcode) ) or die "Projection $epsgcode not found in Proj4";
     #my $projstr = $projstrings{$epsgcode} or die;
     my $projstr = $proj->normalized();
     #printf STDERR "+++ getting projstring for %s...\n%s\n%s\n", $epsgcode, $projstr, $projstrings{$epsgcode};

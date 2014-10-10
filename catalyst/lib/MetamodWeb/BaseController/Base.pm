@@ -202,7 +202,7 @@ sub add_form_errors {
 
     my @missing = $result->missing();
     foreach my $field (@missing) {
-        $error_messages{$field} = { label => $validator->field_label($field), msg => 'Missing required input' };
+        $error_messages{$field} = { msg => 'Missing required input', label => $validator->field_label($field)||$field };
     }
 
     my $msgs = $result->msgs();

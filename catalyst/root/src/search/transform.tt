@@ -1,84 +1,96 @@
 
-        <style type="text/css">
-            body { padding: 12 12 12 12; background-color: #ccc0cf; }
-            div.main { padding: 12 12 12 12; background-color: white; }
-            td.label { font-weight: bold; font-size: 12px; }
-            td.fields { text-align: center; padding-left: 20px; }
-            table.dapform tr { background-color: white; }
-            table.dapform tr td { padding: 5 5 5 5; border-bottom: solid 1px black; }
-            table.dapform tr th { padding: 5 5 5 5; border-bottom: solid 1px black; background-color: grey; color: white;  }
-            table.dapform input { width: 150 }
-            input.transform_axes { width: 90 }
-        </style>
+<script type="text/javascript" src="../static/lib/log4javascript-1.4.6/js/log4javascript.js"></script>
+<script type="text/javascript">
+    var log = log4javascript.getLogger();
+    log4javascript.logLog.setAlertAllErrors(true);
+    var appender = new log4javascript.BrowserConsoleAppender();
+    log.addAppender(appender);
+</script>
 
-    <div class="main">
+<style type="text/css">
+    body { padding: 12 12 12 12; background-color: #ccc0cf; }
+    div.main { padding: 12 12 12 12; background-color: white; }
+    td.label { font-weight: bold; font-size: 12px; }
+    td.fields { text-align: center; padding-left: 20px; }
+    table.dapform tr { background-color: white; }
+    table.dapform tr td { padding: 5 5 5 5; border-bottom: solid 1px black; }
+    table.dapform tr th { padding: 5 5 5 5; border-bottom: solid 1px black; background-color: grey; color: white;  }
+    table.dapform input { width: 150 }
+    input.transform_axes { width: 90 }
+</style>
 
-    <h1 class="std">[% app.transform.title %]</h1>
+<div class="main">
 
-        <form action="[% c.uri_for('/search/transform', dataset.ds_name _ '.nc') %]" method="post">
+<h1 class="std">[% app.transform.title %]</h1>
 
-            <input type="hidden" name="ds_id" value="[% dataset.ds_id %]"/>
+    <form action="[% c.uri_for('/search/transform', dataset.ds_name _ '.nc') %]" method="post">
 
-            <h2 class="debug">
-                [% IF debug -%]
-                    <a href="[% dap %]">[% dataset.ds_id %]</a>:
-                [% END -%]
-                <a href="[% dap %]">[% dataset.ds_name %]</a>
-            </h2>
+        <input type="hidden" name="ds_id" value="[% dataset.ds_id %]"/>
 
-            [% html %]
+        <h2 class="debug">
+            [% IF debug -%]
+                <a href="[% dap %]">[% dataset.ds_id %]</a>:
+            [% END -%]
+            <a href="[% dap %]">[% dataset.ds_name %]</a>
+        </h2>
 
-            <script>$(function() { $( "#start_date" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
-            <script>$(function() { $( "#stop_date" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
+        [% html %]
 
-            <h2>[% app.transform.repro %]</h2>
+        <script>$(function() { $( "#start_date" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
+        <script>$(function() { $( "#stop_date" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
 
-            <p>[% app.transform.repro_help %]</p>
+        <h2>[% app.transform.repro %]</h2>
 
-            [% app.transform.proj %]:
-            <select name="projection">
-                <option value="">(original)</option>
-            [% FOREACH proj IN projections %]
-                <option value="[% proj.key %]">[% proj.value %] ([% proj.key %])</option>
-            [% END %]
-            </select>
+        <p>[% app.transform.repro_help %]</p>
 
-            [% app.transform.inter %]:
-            <select name="interpolation">
-                <option value="nearestneighbor">nearestneighbor</option>
-                <option value="bilinear">bilinear</option>
-                <option value="bicubic">bicubic</option>
-                <option value="coord_nearestneighbor">coord_nearestneighbor</option>
-                <option value="coord_kdtree">coord_kdtree</option>
-                <option value="forward_max">forward_max</option>
-                <option value="forward_mean">forward_mean</option>
-                <option value="forward_median">forward_median</option>
-                <option value="forward_sum">forward_sum</option>
-            </select>
+        [% app.transform.proj %]:
+        <select name="projection">
+            <option value="">(original)</option>
+        [% FOREACH proj IN projections %]
+            <option value="[% proj.key %]">[% proj.value %] ([% proj.key %])</option>
+        [% END %]
+        </select>
 
+        <label for="interpolation">[% app.transform.inter %]:</label>
+        <select name="interpolation">
+            <option value="nearestneighbor">nearestneighbor</option>
+            <option value="bilinear">bilinear</option>
+            <option value="bicubic">bicubic</option>
+            <option value="coord_nearestneighbor">coord_nearestneighbor</option>
+            <option value="coord_kdtree">coord_kdtree</option>
+            <option value="forward_max">forward_max</option>
+            <option value="forward_mean">forward_mean</option>
+            <option value="forward_median">forward_median</option>
+            <option value="forward_sum">forward_sum</option>
+        </select>
+
+        <!--Steps: <input name="steps" value="500"/>-->
+
+        <br/>
+
+        <label for="xAxisMin">x axis min:</label>        <input class="transform_axes" type="text" name="xAxisMin" value=""/>
+        <label for="xAxisMax">x axis max:</label>        <input class="transform_axes" type="text" name="xAxisMax" value=""/>
+        <label for="xAxisStep">x axis increment:</label> <input class="transform_axes" type="text" name="xAxisStep" value=""/>
+
+        <br/>
+
+        <label for="yAxisMin">y axis min:</label>        <input class="transform_axes" type="text" name="yAxisMin" value=""/>
+        <label for="yAxisMax">y axis max:</label>        <input class="transform_axes" type="text" name="yAxisMax" value=""/>
+        <label for="yAxisStep">y axis increment:</label> <input class="transform_axes" type="text" name="yAxisStep" value=""/>
+
+        [%# INCLUDE 'search/map_search_ol.tt' # openlayers version %]
+
+        <p>Reprojection and transformation performed by <a href="https://wiki.met.no/fimex/start">FIMEX</a>.
+        For more information on parameters, see the <a href="https://wiki.met.no/fimex/documentation">documentation</a>.</p>
+
+        <div>
             <br/>
+            <input type="reset" value="Reset"/>
+            [% button_js( 'clear_dates', "jQuery('#start_date').val(''); jQuery('#stop_date').val('')" ) %]
+            <input type="submit" value="[% ui.button.transform %]"/>
+        </div>
 
-            x axis min:       <input class="transform_axes" type="text" name="xAxisMin" value=""/>
-            x axis max:       <input class="transform_axes" type="text" name="xAxisMax" value=""/>
-            x axis increment: <input class="transform_axes" type="text" name="xAxisStep" value=""/>
+    </form>
 
-            <br/>
-
-            y axis min:       <input class="transform_axes" type="text" name="yAxisMin" value=""/>
-            y axis max:       <input class="transform_axes" type="text" name="yAxisMax" value=""/>
-            y axis increment: <input class="transform_axes" type="text" name="yAxisStep" value=""/>
-
-            <p>Reprojection and transformation performed by <a href="https://wiki.met.no/fimex/start">FIMEX</a>.
-            For more information on parameters, see the <a href="https://wiki.met.no/fimex/documentation">documentation</a>.</p>
-
-            <div>
-                <br/>
-                <input type="reset" value="Reset"/>
-                [% button_js( 'clear_dates', "jQuery('#start_date').val(''); jQuery('#stop_date').val('')" ) %]
-                <input type="submit" value="[% ui.button.transform %]"/>
-            </div>
-
-        </form>
-
-    </div>
+</div>
 
