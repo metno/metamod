@@ -153,14 +153,14 @@ sub transform_GET {
         my $name = $wmsprojs->{$crs};
         my $url = getMapURL($crs) or next;
         $searchmaps{$code} = {
-            url => $url,
-            name => "$name ($crs)"|| getProjName($crs) || $crs,
+            url     => $url,
+            name    => "$name ($crs)"|| getProjName($crs) || $crs,
         };
     }
     #print STDERR Dumper \%searchmaps;
 
     $c->stash(
-        template => $gridded ? 'search/transform.tt' : 'search/transform_ts.tt',
+        template => $gridded ? 'search/transform/grid.tt' : 'search/transform/ts.tt',
         html => $results->toString,
         searchmaps =>\%searchmaps,
         #projs => Metamod::WMS::projList()
@@ -171,7 +171,10 @@ sub transform_GET {
 sub transform_POST {
     my ($self, $c) = @_;
 
-    my $result = $self->validate_transform($c);
+    my $p = $c->request->params;
+    printf STDERR Dumper \$p;
+
+    my $result = $self->validate_transform($c, exists $p->{'projection'});
     if( !$result->success() ){
         $self->add_form_errors($c, $c->stash->{validator});
         return $c->res->redirect($c->uri_for('/search/transform', $c->req->params ) );
@@ -181,9 +184,6 @@ sub transform_POST {
     my $fimexpath = $config->get('FIMEX_PROGRAM')
         or $c->detach( 'Root', 'error', [ 501, "Not available without FIMEX installed"] );
     $MetNo::Fimex::DEBUG = 0; # turn off debug or nothing will happen
-
-    my $p = $c->request->params;
-    printf STDERR Dumper \$p;
 
     my %fiParams = (
         dapURL => $c->stash->{dapurl},
@@ -219,7 +219,7 @@ sub transform_POST {
             #print STDERR " * step = $step \n";
             $xAxisValues = sprintf "%s,%s,...,%s", $p->{'xAxisMin'}, $p->{'xAxisMin'} + $step, $p->{'xAxisMax'} if $p->{'xAxisMin'};
             $yAxisValues = sprintf "%s,%s,...,%s", $p->{'yAxisMin'}, $p->{'yAxisMin'} + $step, $p->{'yAxisMax'} if $p->{'yAxisMin'};
-            printf STDERR "== $proj : <<$xAxisValues>> <<$xAxisValues>>\n";
+            #printf STDERR "== $proj : <<$xAxisValues>> <<$xAxisValues>>\n";
             $fimex->setProjString( $proj, $p->{'interpolation'}, $xAxisValues, $yAxisValues );
         }
         1;
@@ -243,7 +243,7 @@ sub transform_POST {
         $c->detach( 'Root', 'error', [ 502, "FIMEX runtime error: $@"] );
     }
 
-    $self->logger->debug("Running FIMEX: $cmd");
+    $self->logger->info("Running FIMEX: $cmd");
 
     my $ncfile = $fimex->outputPath;
 
@@ -258,7 +258,7 @@ sub transform_POST {
 }
 
 sub validate_transform : Private {
-    my ($self, $c) = @_;
+    my ($self, $c, $oldstyle) = @_;
 
     my %form_profile = (
         required => [qw( ds_id vars )],
@@ -268,7 +268,8 @@ sub validate_transform : Private {
         optional_regexp => qr/^(x|y)Axis(Min|Max|Step)$/,
         dependency_groups  => {
             # if either field is filled in, they all become required
-            txt_coords => [qw( projection xAxisMax xAxisMin yAxisMax yAxisMin xAxisStep yAxisStep )],
+            txt_coords => $oldstyle ? [qw( projection xAxisMax xAxisMin yAxisMax yAxisMin xAxisStep yAxisStep )]
+                          : [qw( selected_map xAxisMax xAxisMin yAxisMax yAxisMin steps )],
         },
         filters       => ['trim'],
         field_filters => {

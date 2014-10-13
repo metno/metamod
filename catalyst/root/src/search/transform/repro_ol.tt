@@ -1,0 +1,26 @@
+
+
+<h2>[% app.transform.repro %]</h2>
+
+<p>[% app.transform.repro_help %]</p>
+
+<label for="interpolation">[% app.transform.inter %]:</label>
+<select name="interpolation">
+    <option value="nearestneighbor">nearestneighbor</option>
+    <option value="bilinear">bilinear</option>
+    <option value="bicubic">bicubic</option>
+    <option value="coord_nearestneighbor">coord_nearestneighbor</option>
+    <option value="coord_kdtree">coord_kdtree</option>
+    <option value="forward_max">forward_max</option>
+    <option value="forward_mean">forward_mean</option>
+    <option value="forward_median">forward_median</option>
+    <option value="forward_sum">forward_sum</option>
+</select>
+
+Steps: <input name="steps" value="500"/>
+
+
+[% INCLUDE 'search/map_search_ol.tt' # openlayers version %]
+
+<p>Reprojection and transformation performed by <a href="https://wiki.met.no/fimex/start">FIMEX</a>.
+For more information on parameters, see the <a href="https://wiki.met.no/fimex/documentation">documentation</a>.</p>

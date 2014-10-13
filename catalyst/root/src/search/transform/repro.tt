@@ -1,0 +1,41 @@
+
+
+<h2>[% app.transform.repro %]</h2>
+
+<p>[% app.transform.repro_help %]</p>
+
+[% app.transform.proj %]:
+<select name="projection">
+    <option value="">(original)</option>
+[% FOREACH proj IN projections %]
+    <option value="[% proj.key %]">[% proj.value %] ([% proj.key %])</option>
+[% END %]
+</select>
+
+<label for="interpolation">[% app.transform.inter %]:</label>
+<select name="interpolation">
+    <option value="nearestneighbor">nearestneighbor</option>
+    <option value="bilinear">bilinear</option>
+    <option value="bicubic">bicubic</option>
+    <option value="coord_nearestneighbor">coord_nearestneighbor</option>
+    <option value="coord_kdtree">coord_kdtree</option>
+    <option value="forward_max">forward_max</option>
+    <option value="forward_mean">forward_mean</option>
+    <option value="forward_median">forward_median</option>
+    <option value="forward_sum">forward_sum</option>
+</select>
+
+<br/>
+
+<label for="xAxisMin">x axis min:</label>        <input class="transform_axes" type="text" name="xAxisMin" value=""/>
+<label for="xAxisMax">x axis max:</label>        <input class="transform_axes" type="text" name="xAxisMax" value=""/>
+<label for="xAxisStep">x axis increment:</label> <input class="transform_axes" type="text" name="xAxisStep" value=""/>
+
+<br/>
+
+<label for="yAxisMin">y axis min:</label>        <input class="transform_axes" type="text" name="yAxisMin" value=""/>
+<label for="yAxisMax">y axis max:</label>        <input class="transform_axes" type="text" name="yAxisMax" value=""/>
+<label for="yAxisStep">y axis increment:</label> <input class="transform_axes" type="text" name="yAxisStep" value=""/>
+
+<p>Reprojection and transformation performed by <a href="https://wiki.met.no/fimex/start">FIMEX</a>.
+For more information on parameters, see the <a href="https://wiki.met.no/fimex/documentation">documentation</a>.</p>

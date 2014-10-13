@@ -136,7 +136,7 @@ Show projectioninfo
 
 =head2 --wms
 
-Show WMS URL and/or full WMSinfo, optionally (?) testing HTTP connection
+Show WMS URL and/or full WMSinfo, testing HTTP connection (should be made optional)
 
 =head2 --xmlfile
 
@@ -196,7 +196,7 @@ $ownertags = [ $ownertags ] unless ref $ownertags;
 foreach (@$ownertags) {
     #$_ = 'xxx';
 }
-print STDERR "OWNERTAGS = ", Dumper $ownertags;
+#print STDERR "OWNERTAGS = ", Dumper $ownertags;
 #$ownertags = join(',', @$ownertags);
 #@$ownertags = split( /,/, $ownertags ); # allow comma separated list
 

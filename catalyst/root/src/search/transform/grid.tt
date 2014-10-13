@@ -1,0 +1,55 @@
+
+<script type="text/javascript" src="../static/lib/log4javascript-1.4.6/js/log4javascript.js"></script>
+<script type="text/javascript">
+    var log = log4javascript.getLogger();
+    log4javascript.logLog.setAlertAllErrors(true);
+    var appender = new log4javascript.BrowserConsoleAppender();
+    log.addAppender(appender);
+</script>
+
+<style type="text/css">
+    body { padding: 12 12 12 12; background-color: #ccc0cf; }
+    div.main { padding: 12 12 12 12; background-color: white; }
+    td.label { font-weight: bold; font-size: 12px; }
+    td.fields { text-align: center; padding-left: 20px; }
+    table.dapform tr { background-color: white; }
+    table.dapform tr td { padding: 5 5 5 5; border-bottom: solid 1px black; }
+    table.dapform tr th { padding: 5 5 5 5; border-bottom: solid 1px black; background-color: grey; color: white;  }
+    table.dapform input { width: 150 }
+    input.transform_axes { width: 90 }
+</style>
+
+<div class="main">
+
+<h1 class="std">[% app.transform.title %]</h1>
+
+    <form action="[% c.uri_for('/search/transform', dataset.ds_name _ '.nc') %]" method="post">
+
+        <input type="hidden" name="ds_id" value="[% dataset.ds_id %]"/>
+
+        <h2 class="debug">
+            [% IF debug -%]
+                <a href="[% dap %]">[% dataset.ds_id %]</a>:
+            [% END -%]
+            <a href="[% dap %]">[% dataset.ds_name %]</a>
+        </h2>
+
+        [% html %]
+
+        <script>$(function() { $( "#start_date" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
+        <script>$(function() { $( "#stop_date" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
+
+        [% INCLUDE 'search/transform/repro.tt' %]
+        [%# INCLUDE 'search/transform/repro_ol.tt' %]
+
+        <div>
+            <br/>
+            <input type="reset" value="Reset"/>
+            [% button_js( 'clear_dates', "jQuery('#start_date').val(''); jQuery('#stop_date').val('')" ) %]
+            <input type="submit" value="[% ui.button.transform %]"/>
+        </div>
+
+    </form>
+
+</div>
+

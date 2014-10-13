@@ -3,10 +3,10 @@
 <script type="text/javascript" src="[% c.uri_for('/static/lib/OpenLayers.js') %]"></script>
 
 [% SET map_srid = search_ui_utils.selected_map() %]
-[% SET x1_id = search_ui_utils.html_id_for_map('x1') %]
-[% SET x2_id = search_ui_utils.html_id_for_map('x2') %]
-[% SET y1_id = search_ui_utils.html_id_for_map('y1') %]
-[% SET y2_id = search_ui_utils.html_id_for_map('y2') %]
+[% SET x1_id = search_ui_utils.html_id_for_map('x1') || 'xAxisMin' %]
+[% SET x2_id = search_ui_utils.html_id_for_map('x2') || 'xAxisMax' %]
+[% SET y1_id = search_ui_utils.html_id_for_map('y1') || 'yAxisMax' %]
+[% SET y2_id = search_ui_utils.html_id_for_map('y2') || 'yAxisMin' %]
 
 <!--  An anchor that is used to scroll the page back to the map after clicking the map -->
 <a name="map_search">&nbsp;</a>

@@ -153,7 +153,7 @@ TODO: read from master_config (not working... FIXME? are you sure this is not fi
 sub getMapURL {
     my $crs = shift or croak "Missing parameter 'crs'";
 
-    $logger->debug("Getting map URL for $crs");
+    #$logger->debug("Getting map URL for $crs");
 
     my $mapurl = $$coastlinemaps{ $crs };
     if (! defined $$coastlinemaps{ $crs } ) {
