@@ -293,13 +293,14 @@ WMS_PROJECTIONS =
     EPSG:4326       'WGS 84'
 
 # bounding boxes for each projection (currently used only for dynamic map search, experimentally for transform)
+# order is left right bottom top
 WMS_BOUNDING_BOXES =
     EPSG:3031       -5000000    5000000     -5000000    5000000
-    EPSG:32633      166022      0           833978      9329005
+    EPSG:32633      -100000     1100000      3000000    9329005
     EPSG:32661      -3000000    7000000     -3000000    7000000
     EPSG:32761      -3000000    7000000     -3000000    7000000
     EPSG:3411       -5000000    0           0           5000000
-    EPSG:3412       0           -5000000    0           0
+    EPSG:3412       -5000000    5000000     -5000000    5000000
     EPSG:3413       -5000000    0           0           5000000
     EPSG:3995       -5000000    5000000     -5000000    5000000
     EPSG:4326       -180        180         -90         90
