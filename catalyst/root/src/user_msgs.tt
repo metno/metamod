@@ -64,3 +64,5 @@ function markFormErrors(fieldNames){
 
     </div>
 [% END %]
+
+[% CALL c.clear_flash # pretty brutal, but avoids duplication %]
