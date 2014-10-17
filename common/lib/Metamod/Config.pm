@@ -524,6 +524,7 @@ sub _readConfig {
 
     my $ver = $self->version();
     $conf{'VERSION'}   = $ver->{number};
+    $conf{'BUILD'}     = $ver->{build};
     $conf{'BUILDDATE'} = $ver->{date};
 
     # add environment variables (currently no keyword substitution)
@@ -925,9 +926,11 @@ sub version {
     my $top = <$file>;
     chomp $top;
     close $file;
-    $top =~ /^This is version ([0-9.\-]+(~\w+)?) of METAMOD released ([0-9\-]+)/;
-    die "Format error in VERSION file:\n  '$top'" unless $1 && $3;
-    return { number => $1, date => $3 };
+    $top =~ /^This is version ([0-9.\-]+(~\w+)?)(, build )?(\d+|\?) of METAMOD released ([0-9\-]+)/;
+    die "Format error in VERSION file:\n  '$top'" unless $1 && $5;
+    my $ver = { number => $1, build => $4, date => $5 };
+    print STDERR Dumper $ver;
+    return $ver;
 }
 
 1;
