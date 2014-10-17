@@ -27,15 +27,15 @@
 
 <br/>
 
-<label for="xAxisMin">x axis min:</label>        <input class="transform_axes" type="text" name="xAxisMin" value=""/>
-<label for="xAxisMax">x axis max:</label>        <input class="transform_axes" type="text" name="xAxisMax" value=""/>
-<label for="xAxisStep">x axis increment:</label> <input class="transform_axes" type="text" name="xAxisStep" value=""/>
+<label for="xAxisMin">x axis min:</label>        <input class="transform_axes" type="text" name="xAxisMin" value="[% c.req().param('xAxisMin') %]"/>
+<label for="xAxisMax">x axis max:</label>        <input class="transform_axes" type="text" name="xAxisMax" value="[% c.req().param('xAxisMax') %]"/>
+<label for="xAxisStep">x axis increment:</label> <input class="transform_axes" type="text" name="xAxisStep" value="[% c.req().param('xAxisStep') %]"/>
 
 <br/>
 
-<label for="yAxisMin">y axis min:</label>        <input class="transform_axes" type="text" name="yAxisMin" value=""/>
-<label for="yAxisMax">y axis max:</label>        <input class="transform_axes" type="text" name="yAxisMax" value=""/>
-<label for="yAxisStep">y axis increment:</label> <input class="transform_axes" type="text" name="yAxisStep" value=""/>
+<label for="yAxisMin">y axis min:</label>        <input class="transform_axes" type="text" name="yAxisMin" value="[% c.req().param('yAxisMin') %]"/>
+<label for="yAxisMax">y axis max:</label>        <input class="transform_axes" type="text" name="yAxisMax" value="[% c.req().param('yAxisMax') %]"/>
+<label for="yAxisStep">y axis increment:</label> <input class="transform_axes" type="text" name="yAxisStep" value="[% c.req().param('yAxisStep') %]"/>
 
 <p>Reprojection and transformation performed by <a href="https://wiki.met.no/fimex/start">FIMEX</a>.
 For more information on parameters, see the <a href="https://wiki.met.no/fimex/documentation">documentation</a>.</p>
