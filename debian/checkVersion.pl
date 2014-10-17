@@ -52,6 +52,10 @@ die "Only one -u or -v option allowed" if $verbose && $update;
 my $mmVersion = "$Bin/../VERSION";
 my $changeLog = "$Bin/changelog";
 
+my $build = $ENV{BUILD_NUMBER} || '?';
+my $date =  $ENV{BUILD_ID} || strftime("%Y-%m-%d", localtime);
+
+
 # read changelog
 my ($chMajorVersion, $chMinorVersion);
 open (my $ch, $changeLog) or die "Cannot read $changeLog: $!";
@@ -68,14 +72,13 @@ die "no changelog version" unless $chMajorVersion;
 
 # read VERSION
 my ($mmMajorVersion, $mmMinorVersion, $out);
-my $date = strftime("%Y-%m-%d", localtime);
 open (my $mh, $mmVersion) or die "Cannot read $mmVersion: $!";
 while (defined (my $line = <$mh>)) {
-    if ($line =~ /version (\d+\.\w+)(\.[^ ]+) of METAMOD/) {
+    if ($line =~ /version (\d+\.\w+)(\.[^, ]+)(, build )?(\d+|\?) of METAMOD/) {
         $mmMajorVersion = $1;
         $mmMinorVersion = "$1$2";
         if ($update) {
-            $out = "This is version $chMinorVersion of METAMOD released $date\n";
+            $out = "This is version $chMinorVersion, build $build of METAMOD released $date\n";
         } else {
             last;
         }
