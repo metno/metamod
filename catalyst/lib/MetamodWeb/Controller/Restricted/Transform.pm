@@ -179,6 +179,23 @@ sub transform_POST {
         $self->add_form_errors($c, $c->stash->{validator});
         return $c->res->redirect($c->uri_for('/search/transform', $c->req->params ) );
     }
+#
+# Extra validation not successfully done by validate_transform (egils):
+#
+    my $numeric_rex = '^ *[+-]?(\d+|\.\d+|\d+\.\d*) *$';
+    my %error_messages = ();
+    my $validator = $c->stash->{validator};
+    foreach my $field ('xAxisMin', 'yAxisMin', 'xAxisMax', 'yAxisMax', 'xAxisStep', 'yAxisStep',
+                       'east', 'west', 'north', 'south' ) {
+        if ($p->{$field} && $p->{$field} !~ /$numeric_rex/) {
+            $error_messages{$field} = { label => $validator->field_label($field), msg => 'Only numeric values allowed' };
+        }
+    }
+    if (scalar keys(%error_messages) > 0) {
+        $c->flash( 'form_errors' => \%error_messages );
+        return $c->res->redirect($c->uri_for('/search/transform', $c->req->params ) );
+    }
+# Extra validation finished
 
     my $config = Metamod::Config->instance();
     my $fimexpath = $config->get('FIMEX_PROGRAM')
@@ -299,6 +316,10 @@ sub validate_transform : Private {
             yAxisMin    => 'y axis min',
             xAxisStep   => 'x axis increment',
             yAxisStep   => 'y axis increment',
+            north       => 'north',
+            south       => 'south',
+            east        => 'east',
+            west        => 'west',
         },
         msgs => {
             missing => 'Required input missing or invalid format',
