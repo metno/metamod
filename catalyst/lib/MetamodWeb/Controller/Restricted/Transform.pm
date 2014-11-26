@@ -234,8 +234,8 @@ sub transform_POST {
             my $range = max($p->{'yAxisMax'} - $p->{'xAxisMin'}, $p->{'yAxisMax'} - $p->{'xAxisMin'});
             my $step = $range / ( ( $p->{'steps'} || 500 ) - 1 );
             #print STDERR " * step = $step \n";
-            $xAxisValues = sprintf "%s,%s,...,%s", $p->{'xAxisMin'}, $p->{'xAxisMin'} + $step, $p->{'xAxisMax'} if $p->{'xAxisMin'};
-            $yAxisValues = sprintf "%s,%s,...,%s", $p->{'yAxisMin'}, $p->{'yAxisMin'} + $step, $p->{'yAxisMax'} if $p->{'yAxisMin'};
+            $xAxisValues = sprintf "%s,%s,...,%s", $p->{'xAxisMin'}, $p->{'xAxisMin'} + $step, $p->{'xAxisMax'} if defined $p->{'xAxisMin'};
+            $yAxisValues = sprintf "%s,%s,...,%s", $p->{'yAxisMin'}, $p->{'yAxisMin'} + $step, $p->{'yAxisMax'} if defined $p->{'yAxisMin'};
             #printf STDERR "== $proj : <<$xAxisValues>> <<$xAxisValues>>\n";
             $fimex->setProjString( $proj, $p->{'interpolation'}, $xAxisValues, $yAxisValues );
         }
