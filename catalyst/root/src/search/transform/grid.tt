@@ -39,8 +39,11 @@
         <script>$(function() { $( "#start_date" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
         <script>$(function() { $( "#stop_date" ).datepicker({ dateFormat: 'yy-mm-dd', changeMonth: true, changeYear: true }); });</script>
 
-        [% INCLUDE 'search/transform/repro.tt' %]
-        [%# INCLUDE 'search/transform/repro_ol.tt' %]
+        [% IF mm_config.is('WMS_MAP_REPROJECTION');
+            INCLUDE 'search/transform/repro_ol.tt';
+        ELSE;
+            INCLUDE 'search/transform/repro.tt';
+        END %]
 
         <div>
             <br/>

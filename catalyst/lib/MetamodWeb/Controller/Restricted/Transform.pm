@@ -132,10 +132,10 @@ sub transform_GET {
     my ($e, $s, $w, $n) = split(/\s*,\s*/, $bounding_box) if defined $bounding_box; # ESWN
 
     my %xslparam;
-    if ($e > $w && $n > $s) {
+    if ($e >= $w && $n >= $s) { # allow to be the same for point data
        %xslparam = ( e => $e, s => $s, w => $w, n => $n );
     } else {
-        $self->add_error_msgs($c, 'Error: bounding box coordinates not in correct order');
+        $self->add_error_msgs($c, 'Error: bounding box coordinates not in correct order (ESWN)');
     }
 
     # using XSLT here since extracting data in Template Toolkit is too cumbersome

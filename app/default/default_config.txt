@@ -373,6 +373,9 @@ DEFAULT_FONTSIZE = 80
 # merge transform and timeseries functions into same subpage
 CONSOLIDATE_TRANSFORM_FUNCTIONS = false
 
+# use map for reprojection bounding box
+WMS_MAP_REPROJECTION = false
+
 # ============ METAMODUPLOAD configuration ==============
 
 # Upload application: Set this to 1 for debug output to the screen
