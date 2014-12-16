@@ -55,6 +55,7 @@ use MetNo::OPeNDAP;
 use Metamod::Config qw();
 use Metamod::WMS;
 use MetamodWeb::Utils::FormValidator;
+#use Data::FormValidator::Constraints qw(:regexp_common);
 
 #use Metamod::WMS qw(getProjString);
 
@@ -172,30 +173,30 @@ sub transform_POST {
     my ($self, $c) = @_;
 
     my $p = $c->request->params;
-    printf STDERR Dumper \$p;
+    #printf STDERR Dumper \$p;
 
     my $result = $self->validate_transform($c, exists $p->{'projection'});
     if( !$result->success() ){
         $self->add_form_errors($c, $c->stash->{validator});
         return $c->res->redirect($c->uri_for('/search/transform', $c->req->params ) );
     }
-#
-# Extra validation not successfully done by validate_transform (egils):
-#
-    my $numeric_rex = '^ *[+-]?(\d+|\.\d+|\d+\.\d*) *$';
-    my %error_messages = ();
-    my $validator = $c->stash->{validator};
-    foreach my $field ('xAxisMin', 'yAxisMin', 'xAxisMax', 'yAxisMax', 'xAxisStep', 'yAxisStep',
-                       'east', 'west', 'north', 'south' ) {
-        if ($p->{$field} && $p->{$field} !~ /$numeric_rex/) {
-            $error_messages{$field} = { label => $validator->field_label($field), msg => 'Only numeric values allowed' };
-        }
-    }
-    if (scalar keys(%error_messages) > 0) {
-        $c->flash( 'form_errors' => \%error_messages );
-        return $c->res->redirect($c->uri_for('/search/transform', $c->req->params ) );
-    }
-# Extra validation finished
+##
+## Extra validation not successfully done by validate_transform (egils):
+##
+#    my $numeric_rex = '^ *[+-]?(\d+|\.\d+|\d+\.\d*) *$';
+#    my %error_messages = ();
+#    my $validator = $c->stash->{validator};
+#    foreach my $field ('xAxisMin', 'yAxisMin', 'xAxisMax', 'yAxisMax', 'xAxisStep', 'yAxisStep',
+#                       'east', 'west', 'north', 'south' ) {
+#        if ($p->{$field} && $p->{$field} !~ /$numeric_rex/) {
+#            $error_messages{$field} = { label => $validator->field_label($field), msg => 'Only numeric values allowed' };
+#        }
+#    }
+#    if (scalar keys(%error_messages) > 0) {
+#        $c->flash( 'form_errors' => \%error_messages );
+#        return $c->res->redirect($c->uri_for('/search/transform', $c->req->params ) );
+#    }
+## Extra validation finished
 
     my $config = Metamod::Config->instance();
     my $fimexpath = $config->get('FIMEX_PROGRAM')
@@ -281,32 +282,39 @@ sub validate_transform : Private {
         required => [qw( ds_id vars )],
         require_some => {
         },
-        optional => [qw( start_date stop_date north south east west interpolation steps ) ],
+        optional => [qw( start_date stop_date north south east west interpolation steps )],
         optional_regexp => qr/^(x|y)Axis(Min|Max|Step)$/,
+        dependencies => {
+            # map version
+            selected_map => [qw( xAxisMax xAxisMin yAxisMax yAxisMin steps interpolation )],
+            # non-map version
+            projection => [qw( xAxisMax xAxisMin yAxisMax yAxisMin xAxisStep yAxisStep interpolation )],
+        },
         dependency_groups  => {
             # if either field is filled in, they all become required
-            txt_coords => $oldstyle ? [qw( projection xAxisMax xAxisMin yAxisMax yAxisMin xAxisStep yAxisStep )]
-                          : [qw( selected_map xAxisMax xAxisMin yAxisMax yAxisMin steps )],
+            #txt_coords => $oldstyle ? [qw( projection xAxisMax xAxisMin yAxisMax yAxisMin xAxisStep yAxisStep )]
+            #              : [qw( selected_map xAxisMax xAxisMin yAxisMax yAxisMin steps )],
         },
         filters       => ['trim'],
-        field_filters => {
-            north       => ['decimal'],
-            south       => ['decimal'],
-            east        => ['decimal'],
-            west        => ['decimal'],
-            west        => ['decimal'],
-            steps       => ['pos_decimal'],
-        },
-        field_filter_regexp_map => {
-            # sanitize numbers
-            qr/Axis(Min|Max)$/  => ['decimal'],
-            qr/AxisStep$/       => ['pos_decimal'],
-        },
+        #field_filters => {
+        #    north       => ['decimal'],
+        #    south       => ['decimal'],
+        #    east        => ['decimal'],
+        #    west        => ['decimal'],
+        #    steps       => ['pos_decimal'],
+        #},
+        #field_filter_regexp_map => {
+        #    # sanitize numbers
+        #    qr/Axis(Min|Max)$/  => ['decimal'],
+        #    qr/AxisStep$/       => ['pos_decimal'],
+        #},
         constraint_methods => {
             interpolation   => qr/^(nearestneighbor|bilinear|bicubic|coord_nearestneighbor|coord_kdtree|forward_max|forward_mean|forward_median|forward_sum)$/,
         },
         constraint_method_regexp_map => {
-            qr/Axis(Min|Max)$/    => qr/^-?\d+(\.\d*)?$/,
+            qr/Axis(Min|Max)$/  => qr/^[-+]?\d+(\.\d*)?$/,
+            qr/AxisStep$/       => qr/^\d+(\.\d*)?$/,
+            qr/^(north|south|east|west|steps)$/  => qr/^[-+]?\d+(\.\d*)?$/,
         },
         labels => {
             vars => 'Variables',
@@ -322,9 +330,14 @@ sub validate_transform : Private {
             west        => 'west',
         },
         msgs => {
-            missing => 'Required input missing or invalid format',
-            invalid => 'Format not valid',
+            missing => 'Required input missing',
+            invalid => 'Only numeric values allowed',
+            constraints => {
+                interpolation => 'Not a valid interpolation format',
+            },
         },
+        # For more specific error msgs according to type of constraint failure, see
+        # http://search.cpan.org/~markstos/Data-FormValidator-4.81/lib/Data/FormValidator/Results.pm#msgs%28[config_parameters]%29
         debug => 1,
     );
     my $validator = MetamodWeb::Utils::FormValidator->new( validation_profile => \%form_profile );

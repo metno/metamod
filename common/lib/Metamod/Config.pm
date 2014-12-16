@@ -929,7 +929,7 @@ sub version {
     $top =~ /^This is version ([0-9.\-]+(~\w+)?)(, build )?(\d+|\?) of METAMOD released ([0-9\-]+)/;
     die "Format error in VERSION file:\n  '$top'" unless $1 && $5;
     my $ver = { number => $1, build => $4, date => $5 };
-    print STDERR Dumper $ver;
+    #print STDERR Dumper $ver;
     return $ver;
 }
 

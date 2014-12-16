@@ -49,7 +49,7 @@ function markFormErrors(fieldNames){
             [% SET error_fields = [] %]
             [% FOREACH error IN c.flash.form_errors %]
                 <li>
-                [% error.value.label %] - [% error.value.msg | xml %]
+                [% error.value.label %] - [% error.value.msg #| xml # FormValidator generates HTML %]
                 [% error_fields.push('"' _ error.key _ '"' ) | xml %]
                 </li>
             [% END %]
