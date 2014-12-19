@@ -31,7 +31,8 @@
                 <br/>
                 <input type="submit" name="ts_graph" value="[% ui.button.timeseries %]"/>
                 <input type="submit" name="ts_ascii" value="[% ui.button.ascii %]"/>
-                <input type="submit" name="ts_json" value="JSON"/>
+                <input type="submit" name="ts_csv"   value="[% ui.button.csv %]"/>
+                <input type="submit" name="ts_json"  value="[% ui.button.json %]"/>
             </div>
 
         </form>

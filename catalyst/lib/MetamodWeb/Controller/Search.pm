@@ -434,13 +434,11 @@ sub timeseries :Path('/search/ts') :Args {
     my $opendap = $metadata->{'dataref_OPENDAP'}->[0] or die "Missing dataref_OPENDAP in dataset";
 
     if ( $c->req->params->{ts_ascii} ) {
-
+        $c->res->redirect($c->uri_for('/ts', $ds_id, $vars, 'ascii') );
+    } elsif ( $c->req->params->{ts_csv} ) {
         $c->res->redirect($c->uri_for('/ts', $ds_id, $vars, 'csv') );
-
     } elsif ( $c->req->params->{ts_json} ) {
-
         $c->res->redirect($c->uri_for('/ts', $ds_id, $vars, 'json') );
-
     } else { # implicitly ts_graph (not always set)
 
         my $ext_ts = $c->stash->{mm_config}->external_ts_plot($opendap, $vars);

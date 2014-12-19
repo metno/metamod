@@ -219,7 +219,7 @@ sub ts :Path("/ts") :Args(3) {
         $c->response->content_type('application/json');
         $c->response->body( $json );
 
-    } elsif ($format eq 'csv') {
+    } elsif ($format eq 'csv' or $format eq 'ascii') {
 
         my (@tablecols, @tablerows, @tablehead);
 
@@ -262,7 +262,11 @@ sub ts :Path("/ts") :Args(3) {
 
         my $out;
         foreach (@tablerows) {
-            $out .= join("\t", @$_) . "\n";
+            if ($format eq 'csv') {
+                $out .= join(",", @$_) . "\n"; # rewrite using Text::CSV to allow escaping
+            } else {
+                $out .= join("\t", @$_) . "\n";
+            }
         }
         $c->response->content_type('text/plain');
         $c->response->body( $out );
