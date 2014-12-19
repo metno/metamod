@@ -25,8 +25,8 @@
         <th>Long name</th>
         <th>Units</th>
       </tr>
-      <xsl:apply-templates select="dap:Array[not( dap:dimension | dap:Attribute[@name='axis'] | dap:Attribute[@name='standard_name'][dap:value='time'] )]"/>
-      <xsl:apply-templates select="dap:Grid"/>
+      <xsl:apply-templates select="dap:Array[not( dap:Attribute[@name='axis'] | dap:Attribute[@name='standard_name'][dap:value='time'] )]" mode="variable"/>
+      <xsl:apply-templates select="dap:Grid" mode="variable"/>
     </table>
 
     <xsl:if test="1 or dap:Array[dap:Attribute[@name='axis']]">
@@ -39,9 +39,7 @@
           <th>Long name</th>
           <th>Units</th>
         </tr>
-        <xsl:apply-templates select="dap:Array[dap:Attribute[@name='axis']]"/>
-        <xsl:apply-templates select="dap:Array[dap:dimension]"/>
-        <xsl:apply-templates select="dap:Array[dap:Attribute[@name='standard_name'][dap:value='time']]"/>
+        <xsl:apply-templates select="dap:Array[ dap:Attribute[@name='axis'] | dap:Attribute[@name='standard_name'][dap:value='time'] ]" mode="dimension"/>
       </table>
     </xsl:if>
 
@@ -99,24 +97,26 @@
 
   <!-- for each variable -->
 
-  <xsl:template match="dap:Array|dap:Grid">
-
+  <xsl:template match="dap:Array|dap:Grid" mode="variable">
     <tr>
-      <xsl:choose>
-        <xsl:when test="dap:dimension | dap:Attribute[@name='axis'] | dap:Attribute[@name='standard_name'][dap:value='time']">
-          <input type="hidden" name="dims" value="{@name}"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <td class="fields"><input type="checkbox" name="vars" value="{@name}" checked="checked" /></td> <!-- renamed to match ts which can take plural -->
-        </xsl:otherwise>
-      </xsl:choose>
+      <td class="fields"><input type="checkbox" name="vars" value="{@name}" checked="checked" /></td> <!-- renamed to match ts which can take plural -->
       <td class="label"><xsl:value-of select="@name"/></td>
       <td><xsl:value-of select="dap:Attribute[@name='description']"/>&#160;</td>
       <td><xsl:value-of select="dap:Attribute[@name='standard_name']"/>&#160;</td>
       <td><xsl:value-of select="dap:Attribute[@name='long_name']"/>&#160;</td>
       <td><xsl:value-of select="dap:Attribute[@name='units']"/>&#160;</td>
     </tr>
+  </xsl:template>
 
+  <xsl:template match="dap:Array|dap:Grid" mode="dimension">
+    <tr>
+      <input type="hidden" name="dims" value="{@name}"/>
+      <td class="label"><xsl:value-of select="@name"/></td>
+      <td><xsl:value-of select="dap:Attribute[@name='description']"/>&#160;</td>
+      <td><xsl:value-of select="dap:Attribute[@name='standard_name']"/>&#160;</td>
+      <td><xsl:value-of select="dap:Attribute[@name='long_name']"/>&#160;</td>
+      <td><xsl:value-of select="dap:Attribute[@name='units']"/>&#160;</td>
+    </tr>
   </xsl:template>
 
 </xsl:stylesheet>
