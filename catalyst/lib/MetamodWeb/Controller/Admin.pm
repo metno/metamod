@@ -103,10 +103,6 @@ sub showconfig :Local :Args(0) {
 sub showlog :Local :Args(0) {
     my ( $self, $c ) = @_;
 
-    my $testout = '/home/egils/egil/m2test/tdamoc/webrun/testout';
-    open (TESTOUT,">$testout");
-    print TESTOUT "Hoy\n";
-
     my $mm_config = $c->stash->{ mm_config };
     my $log_filename = $mm_config->get("LOG4ALL_SYSTEM_LOG");
     my $pars = $c->req->parameters;
@@ -342,7 +338,6 @@ sub showlog :Local :Args(0) {
     $c->stash(excludes => $excludes);
     $c->stash(showresult => $showresult);
     $c->stash(multiline_is_checked => $multiline_is_checked);
-    close (TESTOUT);
 }
 
 =head1 AUTHOR
