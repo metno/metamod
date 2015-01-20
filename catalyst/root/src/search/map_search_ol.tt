@@ -8,11 +8,6 @@
 [% SET y1_id = search_ui_utils.html_id_for_map('y1') || 'yAxisMax' %]
 [% SET y2_id = search_ui_utils.html_id_for_map('y2') || 'yAxisMin' %]
 
-<!--  An anchor that is used to scroll the page back to the map after clicking the map -->
-<a name="map_search">&nbsp;</a>
-
-<p class="help">[% app.search.map_search_help %]</p>
-
 <label for="selected_map">[% ui.button.select_map %]</label>
 <select name="selected_map" id="selected_map" onchange="clearMap();loadMap(this[this.selectedIndex].value)">
 [% FOREACH crs IN searchmaps.keys.sort %]

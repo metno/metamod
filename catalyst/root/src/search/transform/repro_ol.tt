@@ -4,6 +4,8 @@
 
 <p>[% app.transform.repro_help %]</p>
 
+[% INCLUDE 'search/map_search_ol.tt' # openlayers version %]
+
 <label for="interpolation">[% app.transform.inter %]:</label>
 <select name="interpolation">
     <option value="nearestneighbor">nearestneighbor</option>
@@ -17,10 +19,9 @@
     <option value="forward_sum">forward_sum</option>
 </select>
 
-Steps: <input name="steps" value="500"/>
+Steps: <input name="steps" value="500" size="4"/>
 
 
-[% INCLUDE 'search/map_search_ol.tt' # openlayers version %]
 
 <p>Reprojection and transformation performed by <a href="https://wiki.met.no/fimex/start">FIMEX</a>.
 For more information on parameters, see the <a href="https://wiki.met.no/fimex/documentation">documentation</a>.</p>
