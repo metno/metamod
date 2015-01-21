@@ -114,7 +114,7 @@ ProxyPass           $local/static   !
 ProxyPass           $local/upl      !
 ProxyPass           $local/docs     !
 
-ProxyPass           $local/         http://127.0.0.1:$port/
+ProxyPass           $local/         http://127.0.0.1:$port/     retry=5
 ProxyPassReverse    $local/         http://127.0.0.1:$port/
 
 # broken - generates infinite redirect loop

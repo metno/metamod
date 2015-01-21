@@ -4,7 +4,7 @@
 
 <p>[% app.transform.repro_help %]</p>
 
-[% INCLUDE 'search/map_search_ol.tt' # openlayers version %]
+[% INCLUDE 'search/map_search_ol.tt' transformMode=1 # openlayers version %]
 
 <label for="interpolation">[% app.transform.inter %]:</label>
 <select name="interpolation">

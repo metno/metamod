@@ -10,6 +10,9 @@
 
 <label for="selected_map">[% ui.button.select_map %]</label>
 <select name="selected_map" id="selected_map" onchange="clearMap();loadMap(this[this.selectedIndex].value)">
+[% IF transformMode %]
+    <option value="" selected="selected">(original)</option>
+[% END %]
 [% FOREACH crs IN searchmaps.keys.sort %]
     <option value="[% crs %]">[% searchmaps.$crs.name %]</option>
 [% END %]
@@ -38,7 +41,7 @@
 
 var map;
 var vectors;
-var currentProj = "[% c.req().param('selected_map') || 3995 %]";
+var currentProj = "[% c.req().param('selected_map') || ( transformMode ? '' : 3995 ) # no default map for transform %]";
 log.debug("Current projection is " + currentProj);
 
 var maps = { [%
@@ -57,7 +60,9 @@ jQuery(function() {
 
 function clearMap() {
     $('#[% x1_id %], #[% x2_id %], #[% y1_id %], #[% y2_id %]' ).val('');
-    vectors.removeAllFeatures();
+    if (vectors !== undefined) {
+        vectors.removeAllFeatures();
+    }
 }
 
 function updateCoords(xy) {
@@ -72,6 +77,7 @@ function updateCoords(xy) {
 
 function loadMap(proj) {
     if (map !== undefined) { map.destroy(); }
+    if (! proj) { return 0; }
     //jQuery('#[% x1_id %], #[% x2_id %], #[% y1_id %], #[% y2_id %]' ).val('');
     wms_url = maps[proj];
     log.debug("WMS URL for EPSG:" + proj + " is " + wms_url);
