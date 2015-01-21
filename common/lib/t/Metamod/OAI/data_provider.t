@@ -162,9 +162,9 @@ foreach my $dataset_file (@dataset_files) {
     #
     # Testing no conditions when sets are not turned on.
     #
-    #$ENV{METAMOD_PMH_SETCONFIG} = 'DAM|DAM|dummy|dummy\nNDAM|NDAM|dummy|dummy';
-    $config->set('PMH_SETCONFIG', 'DAM|DAM|dummy|dummy\nNDAM|NDAM|dummy|dummy');
-    is( $config->get('PMH_SETCONFIG'), 'DAM|DAM|dummy|dummy\nNDAM|NDAM|dummy|dummy', 'PMH_SETCONFIG using DAM' );
+    #$ENV{METAMOD_PMH_SETCONFIG} = 'DAM|dummy|dummy\nNDAM|dummy|dummy';
+    $config->set('PMH_SETCONFIG', 'DAM|dummy|dummy\nNDAM|dummy|dummy');
+    is( $config->get('PMH_SETCONFIG'), 'DAM|dummy|dummy\nNDAM|dummy|dummy', 'PMH_SETCONFIG using DAM' );
 
     my $dp2 = Metamod::OAI::DataProvider->new();
     ($identifiers, $resumption_token) = $dp2->get_identifiers( 'dif', '', '', '', '' );
@@ -346,9 +346,9 @@ foreach my $dataset_file (@dataset_files) {
     delete $expected_record->{metadata};
     is_deeply( $record, $expected_record, "get_record: Valid identifier and invalid metadata" );
 
-    #$ENV{METAMOD_PMH_SETCONFIG} = 'DAM|DAM|dummy|dummy\nNDAM|NDAM|dummy|dummy';
-    $config->set('PMH_SETCONFIG', 'DAM|DAM|dummy|dummy\nNDAM|NDAM|dummy|dummy');
-    is( $config->get('PMH_SETCONFIG'), 'DAM|DAM|dummy|dummy\nNDAM|NDAM|dummy|dummy', 'PMH_SETCONFIG using DAM' );
+    #$ENV{METAMOD_PMH_SETCONFIG} = 'DAM|dummy|dummy\nNDAM|dummy|dummy';
+    $config->set('PMH_SETCONFIG', 'DAM|dummy|dummy\nNDAM|dummy|dummy');
+    is( $config->get('PMH_SETCONFIG'), 'DAM|dummy|dummy\nNDAM|dummy|dummy', 'PMH_SETCONFIG using DAM' );
 
     my $dp2 = Metamod::OAI::DataProvider->new();
     $record = $dp2->get_record('dif', 'oai:met.no:metamod/OTHER/data_provider1' );

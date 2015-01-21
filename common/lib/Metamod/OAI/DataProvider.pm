@@ -81,8 +81,6 @@ has 'metadata_formats' => ( is => 'ro', isa => 'HashRef', lazy => 1, builder => 
 
 has 'available_sets' => ( is => 'ro', isa => 'ArrayRef', lazy => 1, builder => '_init_available_sets' );
 
-has 'tags_to_sets' => ( is => 'ro', isa => 'HashRef', lazy => 1, builder => '_init_tags_to_sets' );
-
 has 'resumption_token_dir' => ( is => 'ro', lazy => 1, builder => '_init_resumption_token_dir' );
 
 has 'max_records' => ( is => 'ro', lazy => 1, default => sub { $_[0]->config->get('PMH_MAXRECORDS') || '1000' } );
@@ -124,39 +122,11 @@ sub _init_available_sets {
     my @sets = ();
     my @lines = split( '\n', $config_string );
     foreach my $line (@lines) {
-        my ( $set_spec, $dataset_tags, $set_name, $set_desc ) = split( '\|', $line );
-        $set_spec =~ s/^\s*//;
-        push @sets, { setSpec => $set_spec, datasetTags => $dataset_tags, setName => $set_name, setDescription => [$set_desc] };
+        my ( $set_spec, $set_name, $set_desc ) = split( '\|', $line );
+        push @sets, { setSpec => $set_spec, setName => $set_name, setDescription => [$set_desc] };
     }
 
     return \@sets;
-}
-
-sub _init_tags_to_sets {
-    my $self = shift;
-
-    my $config_string = $self->config->get('PMH_SETCONFIG');
-
-    if ( !$config_string ) {
-        return {};
-    }
-
-    my %tags = ();
-    my @lines = split( '\n', $config_string );
-    foreach my $line (@lines) {
-        my ( $set_spec, $dataset_tags, $set_name, $set_desc ) = split( '\|', $line );
-        $set_spec =~ s/^\s*//;
-        my @tgarr = split(/\s+/,$dataset_tags);
-        foreach my $tg (@tgarr) {
-            if (exists($tags{$tg})) {
-                push @{$tags{$tg}}, $set_spec;
-            } else {
-                $tags{$tg} = [$set_spec];
-            }
-        }
-    }
-
-    return \%tags;
 }
 
 sub _init_resumption_token_dir {
@@ -186,7 +156,6 @@ sub supports_sets {
     my $self = shift;
 
     my $available_sets = $self->available_sets();
-print Dumper $available_sets;
 
     if( @$available_sets == 0 ){
         return;
@@ -311,7 +280,7 @@ sub get_records {
     while ( my $dataset = $datasets->next() ) {
 
         my $identifier = $dataset->oai_info()->first()->oai_identifier();
-        my $record = $self->_oai_record( $identifier, $dataset, $format, $set );
+        my $record = $self->_oai_record( $identifier, $dataset, $format );
         push @records, $record;
     }
 
@@ -493,11 +462,8 @@ sub _oai_record_header {
         $record->{status} = 'deleted';
     }
 
-    my %set_specs = %{ $self->tags_to_sets };
-    my $ownertag = $dataset->ds_ownertag();
-    if (exists($set_specs{$ownertag})) {
-        my @specarr = @{$set_specs{$ownertag}};
-        $record->{setSpec} = \@specarr;
+    if ( @{ $self->available_sets } > 0 ) {
+        $record->{setSpec} = $dataset->ds_ownertag();
     }
 
     # If metadata validation is turned on we will mark all datasets with invalid
@@ -628,8 +594,7 @@ ds_datestamp less or equal to this is returned.
 
 =item $set
 
-A setSpec string identifying a set. Only datasets with ownertag in the
-datasetTags list defined for the set is returned.
+A string with a ownertag. Only datasets matching the ownertag is returned.
 
 =item return
 
@@ -673,14 +638,7 @@ sub _search_datasets {
     }
 
     if( $set ) {
-        my $available_sets = $self->available_sets();
-        foreach my $s1 (@$available_sets) {
-            if ($s1->{setSpec} eq $set) {
-                my @tgarr = split(/\s+/,$s1->{datasetTags});
-                $conds{'ds_ownertag'} = { IN => \@tgarr };
-                last;
-            }
-        }
+        $conds{ds_ownertag} = $set;
     }
 
     my $datasets_count = $base_resultset->search( \%conds )->count();

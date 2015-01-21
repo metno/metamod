@@ -369,11 +369,7 @@ sub _oai_header {
     $header->datestamp( $record->{datestamp} );
     $header->status( $record->{status} ) if exists $record->{status};
 
-    if ( exists $record->{setSpec} ) {
-        foreach my $set_spec (@{$record->{setSpec}}) {
-            $header->setSpec( $set_spec );
-        }
-    }
+    $header->setSpec( $record->{setSpec} ) if exists $record->{setSpec};
     return $header;
 }
 

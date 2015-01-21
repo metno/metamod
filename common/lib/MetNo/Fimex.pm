@@ -76,19 +76,6 @@ use Carp;
 
 __PACKAGE__->meta->error_class('Moose::Error::Croak');
 
-# never used since only projectioninfo in Dataset has all fimex needs (REALLY?)
-# replace with Geo::Proj4 - DONE, remove after testing
-#my %projstrings = (
-#    'EPSG:32661' => '+proj=stere +lat_0=90 +lat_ts=90 +lon_0=0 +k=0.994 +x_0=2000000 +y_0=2000000 +datum=WGS84 +units=m +no_defs',
-#    'EPSG:32761' => '+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +k=0.994 +x_0=2000000 +y_0=2000000 +datum=WGS84 +units=m +no_defs',
-#    'EPSG:3411'  => '+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs',
-#    'EPSG:3412'  => '+proj=stere +lat_0=-90 +lat_ts=-70 +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs',
-#    'EPSG:3413'  => '+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs',
-#    'EPSG:3995'  => '+proj=stere +lat_0=90 +lat_ts=71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs',
-#    'EPSG:32633' => '+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs',
-#    'EPSG:4326'  => '+proj=longlat +datum=WGS84 +no_defs',
-#);
-
 =head1 METHODS
 
 =head2 new
@@ -205,6 +192,20 @@ has 'outputDirectory' => (
 =head2 outputConfig([$str])
 
 Get or set the outputconfig. Use '' to not use a config.
+
+The config files should be validated. Some schemas are bundled with FIMEX:
+
+=over 4
+
+=item GRIB1
+
+F</usr/share/fimex/cdmGribWriterConfig.xsd>
+
+=item NetCDF
+
+F</usr/share/fimex/ncml-2.2.xsd> or F</usr/share/fimex/ncml-2.2-fimex-0.xsd>
+
+=back
 
 =cut
 
@@ -417,6 +418,7 @@ sub doWork {
         $args{'input.file'} = $input;
         $args{'input.config'} = $self->inputConfig if $self->inputConfig;
         $args{'output.file'} = $outputPath;
+        # output.type cannot be set without valid output.config in cdmGribWriterConfig format
         $args{'output.config'} = $self->outputConfig if $self->outputConfig;
         $args{'interpolate.method'} = $self->interpolateMethod;
         $args{'interpolate.projString'} = $self->projString;
