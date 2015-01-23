@@ -18,18 +18,6 @@
 [% END %]
 </select>
 
-[% button_js('clear_map', "clearMap()") %]
-
-<input type="checkbox" name="allow-pan" value="allow-pan" id="allowPanCheckbox" onclick="allowPan(this);" />
-<label for="allowPanCheckbox">[% ui.button.pan_map %]</label>
-
-<div id="bbox_params" [%# style="display: none" %]>
-    x1 <input type="text" size="10" name="[% x1_id %]" id="[% x1_id %]" value="[% c.req().param( x1_id ) %]" />
-    y1 <input type="text" size="10" name="[% y1_id %]" id="[% y1_id %]" value="[% c.req().param( y1_id ) %]" />
-    x2 <input type="text" size="10" name="[% x2_id %]" id="[% x2_id %]" value="[% c.req().param( x2_id ) %]" />
-    y2 <input type="text" size="10" name="[% y2_id %]" id="[% y2_id %]" value="[% c.req().param( y2_id ) %]" />
-</div>
-
 <script>
 
 //alert( "starting...." );
@@ -59,6 +47,7 @@ jQuery(function() {
 } );
 
 function clearMap() {
+    //$("#map_ui").show();
     $('#[% x1_id %], #[% x2_id %], #[% y1_id %], #[% y2_id %]' ).val('');
     if (vectors !== undefined) {
         vectors.removeAllFeatures();
@@ -77,7 +66,12 @@ function updateCoords(xy) {
 
 function loadMap(proj) {
     if (map !== undefined) { map.destroy(); }
-    if (! proj) { return 0; }
+    if (! proj) {
+        $("#map_ui").hide();
+        vectors = undefined;
+        return 0;
+    }
+    $("#map_ui").show();
     //jQuery('#[% x1_id %], #[% x2_id %], #[% y1_id %], #[% y2_id %]' ).val('');
     wms_url = maps[proj];
     log.debug("WMS URL for EPSG:" + proj + " is " + wms_url);
@@ -181,8 +175,40 @@ function showError(response) {
 
 </script>
 
-<div id="searchmap" style="height:540px; width:540; border: solid 1px; margin-bottom: 10px"
-     xonclick="jQuery('#search_form').attr('action','[% c.uri_for('/search/map_search') %]');"></div>
+<div id="map_ui" [% IF transformMode %] style="display: none" [%END%]>
 
+[% IF transformMode %]
+    <div>
+        <label for="interpolation">[% app.transform.inter %]:</label>
+        <select name="interpolation">
+            <option value="nearestneighbor">nearestneighbor</option>
+            <option value="bilinear">bilinear</option>
+            <option value="bicubic">bicubic</option>
+            <option value="coord_nearestneighbor">coord_nearestneighbor</option>
+            <option value="coord_kdtree">coord_kdtree</option>
+            <option value="forward_max">forward_max</option>
+            <option value="forward_mean">forward_mean</option>
+            <option value="forward_median">forward_median</option>
+            <option value="forward_sum">forward_sum</option>
+        </select>
+
+        Steps: <input name="steps" value="500" size="4"/>
+    </div>
+[%END%]
+
+    <div id="searchmap" style="height:540px; width:540; border: solid 1px; margin-bottom: 10px"
+         xonclick="jQuery('#search_form').attr('action','[% c.uri_for('/search/map_search') %]');"></div>
+
+    <div id="bbox_params" [%# style="display: none" %]>
+        x1 <input type="text" size="9" name="[% x1_id %]" id="[% x1_id %]" value="[% c.req().param( x1_id ) %]" />
+        y1 <input type="text" size="9" name="[% y1_id %]" id="[% y1_id %]" value="[% c.req().param( y1_id ) %]" />
+        x2 <input type="text" size="9" name="[% x2_id %]" id="[% x2_id %]" value="[% c.req().param( x2_id ) %]" />
+        y2 <input type="text" size="9" name="[% y2_id %]" id="[% y2_id %]" value="[% c.req().param( y2_id ) %]" />
+        [% button_js('clear_map', "clearMap()") %]
+        <input type="checkbox" name="allow-pan" value="allow-pan" id="allowPanCheckbox" onclick="allowPan(this);" />
+        <label for="allowPanCheckbox">[% ui.button.pan_map %]</label>
+    </div>
+
+</div>
 
 <!--<input type="image" name="map_coord" alt="Map search" src="[% c.uri_for( '/search/map/' _ map_srid, search_ui_utils.map_coordinates() ) %]" onclick="jQuery( '#search_form' ).attr( 'action', '[% c.uri_for( '/search/map_search' ) %]' );" />-->
