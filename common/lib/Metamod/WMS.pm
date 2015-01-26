@@ -62,7 +62,7 @@ use Metamod::Config;
 use Data::Dumper;
 use Hash::Util qw{ lock_hash  unlock_hash };
 
-our @EXPORT = qw(logger param getXML getMapURL getSetup outputXML defaultWMC getProjName bgmapURLs);
+our @EXPORT = qw(logger param getXML getMaps getMapURL getSetup outputXML defaultWMC getProjName bgmapURLs);
 
 ####################
 # init
@@ -142,11 +142,34 @@ sub outputXML { # move this stuff to a Catalyst controller
     print $content;
 }
 
+=head2 getMaps
+
+fdas fds fdasfdas
+
+=cut
+
+sub getMaps {
+
+    # openlayers map bbox selector
+    my %searchmaps;
+    my $wmsprojs = $config->split('WMS_PROJECTIONS');
+    foreach (keys %$wmsprojs) {
+        my $crs = $_;
+        my ($code) = /^EPSG:(\d+)/ or next; # search map needs just EPSG numeric code
+        my $name = $wmsprojs->{$crs};
+        my $url = getMapURL($crs) or next;
+        $searchmaps{$code} = {
+            url     => $url,
+            name    => "$name ($crs)"|| getProjName($crs) || $crs,
+        };
+    }
+    #print STDERR Dumper \%searchmaps;
+    return \%searchmaps;
+}
+
 =head2 getMapURL(crs)
 
 Lookup WMS URL to background map for given CRS code
-
-TODO: read from master_config (not working... FIXME? are you sure this is not fixed???)
 
 =cut
 

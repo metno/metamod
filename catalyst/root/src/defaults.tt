@@ -260,6 +260,9 @@ app = {
         y_axis = 'y axis values'
         not_avail = 'Dataset no longer available'
         repro_help = 'Transform data from current projection to:'
+        repro_footer =
+        'Reprojection and transformation performed by <a href="https://wiki.met.no/fimex/start">FIMEX</a>.
+        For more information on parameters, see the <a href="https://wiki.met.no/fimex/documentation">documentation</a>.'
     }
 
     basket = {

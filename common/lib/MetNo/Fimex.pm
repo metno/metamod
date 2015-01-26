@@ -71,6 +71,7 @@ use LWP::UserAgent;
 use File::Copy qw(copy);
 use File::Spec qw();
 use File::Temp qw();
+use List::Util qw(max);
 use Data::Dumper;
 use Carp;
 
@@ -491,6 +492,41 @@ no Moose;
 __PACKAGE__->meta->make_immutable;
 
 # below follow static functions
+
+=head2 calculateAxisValues
+
+Calculate FIMEX format axis value string from a given number of steps.
+
+=head3 Arguments
+
+A hash reference containing the following key/values:
+
+=over 4
+
+=item xAxisMin
+
+=item xAxisMax
+
+=item yAxisMin
+
+=item yAxisMax
+
+=item steps
+
+=back
+
+=cut
+
+sub calculateAxisValues {
+    my $param = shift;
+
+    my $range = max($param->{'xAxisMax'} - $param->{'xAxisMin'}, $param->{'yAxisMax'} - $param->{'yAxisMin'}) or die "Illegal min/max values";
+    my $step = $range / ( ( $param->{'steps'} || 500 ) - 1 );
+    #print STDERR " * step = $step \n";
+    my $xAxisValues = sprintf "%s,%s,...,%s", $param->{'xAxisMin'}, $param->{'xAxisMin'} + $step, $param->{'xAxisMax'} if defined $param->{'xAxisMin'};
+    my $yAxisValues = sprintf "%s,%s,...,%s", $param->{'yAxisMin'}, $param->{'yAxisMin'} + $step, $param->{'yAxisMax'} if defined $param->{'yAxisMin'};
+    return ($xAxisValues, $yAxisValues);
+}
 
 =head2 projectFile
 

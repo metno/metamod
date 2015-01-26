@@ -6,6 +6,5 @@
 
 [% INCLUDE 'search/map_search_ol.tt' transformMode=1 # openlayers version %]
 
-<p>Reprojection and transformation performed by <a href="https://wiki.met.no/fimex/start">FIMEX</a>.
-For more information on parameters, see the <a href="https://wiki.met.no/fimex/documentation">documentation</a>.</p>
+<p>[% app.transform.repro_footer %]</p>
 

@@ -28,6 +28,7 @@ use Data::Dumper;
 
 use Metamod::Queue;
 use MetamodWeb::Utils::CollectionBasket;
+use Metamod::WMS;
 
 BEGIN { extends 'MetamodWeb::BaseController::Base'; }
 
@@ -61,7 +62,10 @@ Action for displaying the collection basket.
 sub view : Path('/search/collectionbasket') : Args(0) {
     my ( $self, $c ) = @_;
 
-    $c->stash( template => 'search/collectionbasket/view_basket.tt' );
+    $c->stash(
+        template => 'search/collectionbasket/view_basket.tt',
+        searchmaps => Metamod::WMS::getMaps(),
+    );
 
 }
 
@@ -255,8 +259,10 @@ TODO: require login FIXME
 sub request_download : Path('/search/collectionbasket/request_download') {
     # should be rewritten to only accept POST - FIXME
     my ( $self, $c ) = @_;
+    my $p = $c->request->params;
+    #printf STDERR Dumper \$p;
 
-    my $email_address = $c->req->params->{email_address};
+    my $email_address = $p->{email_address};
     if ( !$email_address || !Email::Valid->address($email_address) ) {
         $self->add_error_msgs($c, 'You must supply a valid email address before requesting a download');
         $c->res->redirect($c->uri_for('/search/collectionbasket'));

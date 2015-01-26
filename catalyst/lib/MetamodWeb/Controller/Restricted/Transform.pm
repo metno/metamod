@@ -46,7 +46,6 @@ our $DEBUG = 0; # or does nothing
 use Data::Dumper;
 #use Try::Tiny;
 use IO::File;
-use List::Util qw(max);
 #use File::Spec qw();
 use XML::LibXSLT;
 use DateTime::Format::Strptime;
@@ -144,26 +143,10 @@ sub transform_GET {
     my $results = eval { $stylesheet->transform( $ddx, XML::LibXSLT::xpath_to_string(%xslparam) ) }
         or $c->detach('Root', 'error', [500, $@]);
 
-    # experimental openlayers map bbox selector
-    my $config = Metamod::Config->instance();
-    my %searchmaps;
-    my $wmsprojs = $config->split('WMS_PROJECTIONS');
-    foreach (keys %$wmsprojs) {
-        my $crs = $_;
-        my ($code) = /^EPSG:(\d+)/ or next; # search map needs just EPSG numeric code
-        my $name = $wmsprojs->{$crs};
-        my $url = getMapURL($crs) or next;
-        $searchmaps{$code} = {
-            url     => $url,
-            name    => "$name ($crs)"|| getProjName($crs) || $crs,
-        };
-    }
-    #print STDERR Dumper \%searchmaps;
-
     $c->stash(
         template => $gridded ? 'search/transform/grid.tt' : 'search/transform/ts.tt',
         html => $results->toString,
-        searchmaps =>\%searchmaps,
+        searchmaps => Metamod::WMS::getMaps(),
         #projs => Metamod::WMS::projList()
     );
 
@@ -231,12 +214,7 @@ sub transform_POST {
         my $proj = $p->{'selected_map'} ? 'EPSG:' . $p->{'selected_map'} : $p->{'projection'};
 
         if ($proj) {
-            #my $step = $proj eq 'EPSG:4326' ? 0.5 : 10000;
-            my $range = max($p->{'yAxisMax'} - $p->{'xAxisMin'}, $p->{'yAxisMax'} - $p->{'xAxisMin'});
-            my $step = $range / ( ( $p->{'steps'} || 500 ) - 1 );
-            #print STDERR " * step = $step \n";
-            $xAxisValues = sprintf "%s,%s,...,%s", $p->{'xAxisMin'}, $p->{'xAxisMin'} + $step, $p->{'xAxisMax'} if defined $p->{'xAxisMin'};
-            $yAxisValues = sprintf "%s,%s,...,%s", $p->{'yAxisMin'}, $p->{'yAxisMin'} + $step, $p->{'yAxisMax'} if defined $p->{'yAxisMin'};
+            my ($xAxisValues, $yAxisValues) = MetNo::Fimex::calculateAxisValues($p);
             #printf STDERR "== $proj : <<$xAxisValues>> <<$xAxisValues>>\n";
             $fimex->setProjString( $proj, $p->{'interpolation'}, $xAxisValues, $yAxisValues );
         }
