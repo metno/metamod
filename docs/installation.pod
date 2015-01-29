@@ -251,6 +251,22 @@ However, if you decided to install them outside your normal @INC path you need
 to specify the location in C<CATALYST_LIB> in master_config.txt, as well as in
 PERL5LIB when running from the command line (activate_env doesn't handle this special case yet).
 
+=head2 Testing METAMOD
+
+Once you have installed METAMOD from source and compiled the binaries (alternatively installed both from a Debian package),
+you may want to test that the installation is working properly. The easiest way is to run the unit tests.
+
+For the first time, you need to create the necessary test databases. This is done automatically by the C<short_test_application.sh> script.
+There is no need to configure an application first as the test framework generates this for it's own need automatically.
+
+  $ cd <installation_dir>
+  $ test/short_test_application.sh
+
+Once this has been run, you can rerun the unit tests directly:
+
+  $ ./run_automatic_tests.pl
+
+
 =head2 Installing Apache
 
 Apache is probably installed by default on most servers, however to work with Catalyst you also need the proxy and rewrite modules.
