@@ -15,6 +15,7 @@ ok () {
 
 cd `dirname $0`
 SCRIPT_PATH=`pwd` # ./test catalog
+BASE_DIR=`dirname $SCRIPT_PATH`
 cd -
 
 export METAMOD_MASTER_CONFIG=`readlink -f $SCRIPT_PATH/applic`
@@ -22,33 +23,35 @@ echo "config is $METAMOD_MASTER_CONFIG"
 
 #
 
-#OLD_P5=PERL5LIB
-#export PERL5LIB=`pwd`/local/lib/perl5:$PERL5LIB
+OLD_P5=$PERL5LIB
+export PERL5LIB="$BASE_DIR/local/lib/perl5"
 
 echo Setting up test environment...
 
-$SCRIPT_PATH/../lsconf SRID_ID_COLUMNS
+$BASE_DIR/lsconf SRID_ID_COLUMNS
 
-$SCRIPT_PATH/../common/prepare_runtime_env.sh
+$BASE_DIR/common/prepare_runtime_env.sh
 ok "prepare_runtime_env"
 
-$SCRIPT_PATH/../base/init/createusers.sh
+$BASE_DIR/base/init/createusers.sh
 ok "createusers"
 
-$SCRIPT_PATH/../base/init/create_and_load_all.sh
+$BASE_DIR/base/init/create_and_load_all.sh
 ok "create_and_load_all"
 
-$SCRIPT_PATH/../base/userinit/run_createuserdb.sh
+$BASE_DIR/base/userinit/run_createuserdb.sh
 ok "run_createuserdb"
 
-$SCRIPT_PATH/../upload/scripts/userbase_add_datasets.pl --operator < $SCRIPT_PATH/directories
+$BASE_DIR/upload/scripts/userbase_add_datasets.pl --operator < $SCRIPT_PATH/directories
 ok "userbase_add_datasets"
 
 # Run the automatic test suite
 # might add --smolder if we feel like continued use
-PERL5LIB=`pwd`/local/lib/perl5 perl $SCRIPT_PATH/../run_automatic_tests.pl --no-pod --jenkins
+#PERL5LIB=`pwd`/local/lib/perl5 perl $BASE_DIR/run_automatic_tests.pl --no-pod --jenkins
+perl $BASE_DIR/run_automatic_tests.pl --no-pod --jenkins
 ok "run_automatic_tests"
 
+export PERL5LIB="$OLD_P5"
 
 exit
 
