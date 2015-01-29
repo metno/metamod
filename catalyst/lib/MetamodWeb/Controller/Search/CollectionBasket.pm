@@ -260,9 +260,11 @@ sub request_download : Path('/search/collectionbasket/request_download') {
     # should be rewritten to only accept POST - FIXME
     my ( $self, $c ) = @_;
     my $p = $c->request->params;
-    #printf STDERR Dumper \$p;
+    my $reproj = $p->{selected_map};
 
     my $email_address = $p->{email_address};
+    delete $p->{email_address};
+    #printf STDERR Dumper \$p;
     if ( !$email_address || !Email::Valid->address($email_address) ) {
         $self->add_error_msgs($c, 'You must supply a valid email address before requesting a download');
         $c->res->redirect($c->uri_for('/search/collectionbasket'));
@@ -271,7 +273,7 @@ sub request_download : Path('/search/collectionbasket/request_download') {
 
     my $basket = $c->stash->{collection_basket};
 
-    my $dataset_locations = $basket->find_data_locations();
+    my $dataset_locations = $basket->find_data_locations( {fimex => $reproj} );
 
     #print STDERR "+++++++++++++++++" . Dumper \$dataset_locations;
 
@@ -286,14 +288,15 @@ sub request_download : Path('/search/collectionbasket/request_download') {
             locations => $dataset_locations,
             email     => $email_address,
     };
+    $job_parameters->{reproj} = $p if $reproj;
 
     my $success = $queue->insert_job( job_type => 'Metamod::Queue::Worker::PrepareDownload',
                                       job_parameters => $job_parameters );
 
     if( $success ){
-        $self->add_info_msgs( $c, 'The download is being prepared for you. Please wait for an email' );
+        $self->add_info_msgs( $c, scalar @$dataset_locations . " files archived. The download is being prepared for you. Please wait for an email." );
     } else {
-        $self->add_error_msgs( $c, 'An error occured and your download could not be prepared' );
+        $self->add_error_msgs( $c, 'An error occured and your download could not be prepared.' );
     }
 
     $c->res->redirect($c->uri_for('/search/collectionbasket'));

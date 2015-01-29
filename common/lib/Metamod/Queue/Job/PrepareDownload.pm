@@ -37,6 +37,7 @@ use Data::Dumper;
 
 use Metamod::Config;
 use Metamod::Email;
+use MetNo::Fimex;
 
 use namespace::autoclean;
 
@@ -169,8 +170,8 @@ is available via C<error_msg()>;
 sub prepare_download {
     my $self = shift;
 
-    my ( $jobid, $locations ) =
-        validate_pos( @_, { type => SCALAR }, { type => ARRAYREF } );
+    my ( $jobid, $locations, $reproj ) =
+        validate_pos( @_, { type => SCALAR }, { type => ARRAYREF }, { type => HASHREF, optional => 1 } );
 
     try {
         $self->_check_download_area();
@@ -189,18 +190,22 @@ sub prepare_download {
 
     # prepare zip archive
     my $zip = Archive::Zip->new();
-    #print STDERR Dumper $locations;
+    #print STDERR '*** prepare_download: ', Dumper $locations, $reproj;
     foreach my $location (@$locations) {
         $self->logger->info("Processing file for download: $location");
 
-        my ($local_file, $basename) = $self->make_file_available($location, $tmpdir) or next;
+        my ($local_file, $basename) = $reproj ?
+            $self->transform_file($location, $reproj, $tmpdir) :
+            $self->make_file_available($location, $tmpdir) or next;
 
         if( !(-r $local_file)){
             $self->report_error("Cannot read file at location: $local_file");
             next;
         }
 
-        $self->logger->debug("Adding $local_file as $basename to archive");
+        my $msg = "Adding $local_file to archive";
+        $msg .= " as $basename" if $basename; # blank if using transform
+        $self->logger->debug($msg);
         $zip->addFile( $local_file, $basename );
     }
 
@@ -233,6 +238,64 @@ END_EMAIL
 
 =head1 INTERNAL METHODS
 
+=head2 $self->transform_file($file, $reproj, $dir)
+
+Reproject file using fimex via OPeNDAP or local filesystem, store in $dir
+
+$reproj is a hash of parameters controlling transformation:
+
+    {
+        'selected_map' => '32661',
+        'interpolation' => 'nearestneighbor',
+        'steps' => '500',
+        'xAxisMin' => '-1212890.625'
+        'xAxisMax' => '4373046.875',
+        'yAxisMin' => '-2244791.2693024',
+        'yAxisMax' => '1895833.7306976',
+    }
+
+Returns list (<path to file>, <filename to use in zip>).
+
+=cut
+
+sub transform_file {
+    my ($self, $file, $reproj, $dir) = @_;
+    $self->logger->debug("Transforming file $file ...");
+    my ($basename) = $file =~ m|([^/]+)$|;
+
+    my $fimexpath = $self->config->get('FIMEX_PROGRAM'); # should be moved to constructor - FIXME
+    unless ( $fimexpath ) {
+        $self->report_error( "Not available without FIMEX installed" );
+        return;
+    }
+    $MetNo::Fimex::DEBUG = 0; # turn off debug or nothing will happen
+
+    my %fiParams = (
+        dapURL => $file, # should be inputFile for local files, but work identically
+        program => $fimexpath,
+    );
+
+    my $fimex;
+    eval {
+        # setup fimex to fetch data via opendap
+        $fimex = new MetNo::Fimex(\%fiParams);
+
+        my $proj = 'EPSG:' . $reproj->{'selected_map'};
+        my ($xAxisValues, $yAxisValues) = MetNo::Fimex::calculateAxisValues($reproj);
+        $fimex->setProjString( $proj, $reproj->{'interpolation'}, $xAxisValues, $yAxisValues );
+
+        $self->logger->info("Running FIMEX: " . $fimex->doWork());
+    };
+    if ($@) {
+        $self->report_error("FIMEX runtime error: $@");
+        return;
+    }
+
+    my $ncfile = $fimex->outputPath;
+    return ($ncfile, $basename);
+
+}
+
 =head2 $self->make_file_available($file, $dir)
 
 Download $file to $dir via HTTP if not local.
@@ -245,7 +308,7 @@ Returns list (<path to file>, <filename to use in zip>).
 
 sub make_file_available {
     my ($self, $file, $dir) = @_;
-    
+
     # check if local file
     if ( $file !~ /^https?:/ ) { # local file
         my @path = File::Spec->splitpath($file);

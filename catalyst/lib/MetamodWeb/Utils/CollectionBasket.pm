@@ -85,7 +85,7 @@ has 'user_msgs' => ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
 #
 has 'temp_basket' => ( is => 'ro', default => 0 );
 
-=head2 $self->add_dataste($ds_id)
+=head2 $basket->add_dataste($ds_id)
 
 Add a new level 1 or level 2 dataset to the collection basket. In the case of
 adding a level 1 dataset it will add level 2 datasets that match the current
@@ -96,18 +96,18 @@ efficiency reason.
 If the level 1 dataset has no children but has wmsinfo, the parent dataset will be
 added instead. (work in progress)
 
+=head3 Parameters
+
 =over
 
 =item $ds_id
 
 The ds_id of the dataset to add.
 
-=item return
+=back
 
 Return the number of datasets to that was added to the collection basket.
 Returns undef if for some reason no dataset could not be added, or number of files added if successful.
-
-=back
 
 =cut
 
@@ -238,24 +238,27 @@ sub _metadata_search_params {
 
 }
 
-=head2 $self->find_data_locations()
+=head2 $basket->find_data_locations( {fimex => $bool} )
 
 Returns ref to list of file locations (may be fewer than # of items in basket, possibly none)
 
+=head3 Options
+
 =over
 
-=item Parameters
+=item fimex
 
-Collection basket ref
+If set, use OPeNDAP URL instead of HTTPServer
 
 =back
 
 =cut
 
 sub find_data_locations {
-    my $self = shift;
+    my ($self, $opt) = @_;
 
     my $files = $self->files();
+    my $dataref = $opt && $$opt{fimex} ? 'OPENDAP' : 'HTTPServer';
 
     #print STDERR "*********" . Dumper \$files;
     my @dataset_locations;
@@ -264,7 +267,7 @@ sub find_data_locations {
     for (@$files) {
         next unless $search_utils->freely_available($_);
         my $readable = defined($_->{data_file_location}) && -r $_->{data_file_location};
-        my $loc = $readable ? $_->{data_file_location} : $_->{HTTPServer};
+        my $loc = $readable ? $_->{data_file_location} : $_->{$dataref};
         #printf STDERR "- %s > %s\n", $_->{name}, $loc||'-';
         push @dataset_locations, $loc if $loc;
     }
@@ -272,7 +275,7 @@ sub find_data_locations {
 
 }
 
-=head2 $self->empty_basket()
+=head2 $basket->empty_basket()
 
 Make the basket empty, i.e. remove all datasets from the basket.
 
@@ -295,7 +298,7 @@ sub empty_basket {
 
 }
 
-=head2 remove_datasets(@remove_ids)
+=head2 $basket->remove_datasets(@remove_ids)
 
 Remove a list of dataset ids from the basket.
 
@@ -332,7 +335,7 @@ sub remove_datasets {
     return 1;
 }
 
-=head2 $self->calculate_size()
+=head2 $basket->calculate_size()
 
 =over
 
@@ -358,7 +361,7 @@ sub calculate_size {
     return $total_size;
 }
 
-=head2 $self->num_files()
+=head2 $basket->num_files()
 
 =over
 
@@ -377,17 +380,11 @@ sub num_files {
 
 }
 
-=head2 $self->files()
-
-=over
-
-=item return
+=head2 $basket->files()
 
 Returns an array reference with information about all the files in the
 collection basket. Each element in the array is a hash reference; see
 file_info() for a list of keys.
-
-=back
 
 =cut
 
@@ -417,7 +414,7 @@ sub files {
 
 }
 
-=head2 $self->file_info($dataset)
+=head2 $basket->file_info($dataset)
 
 Get the file information from a dataset object.
 
@@ -486,7 +483,7 @@ sub file_info {
 
 }
 
-=head2 $self->update_basket()
+=head2 $basket->update_basket()
 
 Update the basket in the current storage format. This will either be setting a
 cookie or it means updating the collection basket in the database.

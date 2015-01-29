@@ -459,6 +459,7 @@ ui = {
         projectioninfo = 'Projectioninfo'
         deflate = '&#8211;'
         expand = '+'
+        select_proj = 'Projection'
         select_map = 'Select map'
         clear_map = 'Clear map'
         pan_map = 'Pan'

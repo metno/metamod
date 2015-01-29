@@ -3,12 +3,12 @@
 <script type="text/javascript" src="[% c.uri_for('/static/lib/OpenLayers.js') %]"></script>
 
 [% SET map_srid = search_ui_utils.selected_map() %]
-[% SET x1_id = search_ui_utils.html_id_for_map('x1') || 'xAxisMin' %]
-[% SET x2_id = search_ui_utils.html_id_for_map('x2') || 'xAxisMax' %]
-[% SET y1_id = search_ui_utils.html_id_for_map('y1') || 'yAxisMax' %]
-[% SET y2_id = search_ui_utils.html_id_for_map('y2') || 'yAxisMin' %]
+[% SET x1_id = transformMode ? 'xAxisMin' : search_ui_utils.html_id_for_map('x1') %]
+[% SET x2_id = transformMode ? 'xAxisMax' : search_ui_utils.html_id_for_map('x2') %]
+[% SET y1_id = transformMode ? 'yAxisMax' : search_ui_utils.html_id_for_map('y1') %]
+[% SET y2_id = transformMode ? 'yAxisMin' : search_ui_utils.html_id_for_map('y2') %]
 
-<label for="selected_map">[% ui.button.select_map %]</label>
+<label for="selected_map">[% transformMode ? ui.button.select_proj : ui.button.select_map %]</label>
 <select name="selected_map" id="selected_map" onchange="clearMap();loadMap(this[this.selectedIndex].value)">
 [% IF transformMode %]
     <option value="" selected="selected">(original)</option>

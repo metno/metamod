@@ -25,6 +25,7 @@ use base 'TheSchwartz::Worker';
 use strict;
 use warnings;
 
+use Data::Dumper;
 use TheSchwartz::Job;
 
 use Metamod::Queue::Job::PrepareDownload;
@@ -74,11 +75,15 @@ sub work {
     eval {
 
         my $jobid = $job->jobid();
+        #print STDERR Dumper $job->arg;
         my $locations = $job->arg->{locations};
-        my $email = $job->arg->{email};
+        my $email     = $job->arg->{email};
+        my $reproj    = $job->arg->{reproj};
 
         my $mm_job = Metamod::Queue::Job::PrepareDownload->new(recipient => $email);
-        my $success = $mm_job->prepare_download($jobid, $locations);
+        my $success = $reproj ?
+            $mm_job->prepare_download($jobid, $locations, $reproj) :
+            $mm_job->prepare_download($jobid, $locations); # sending undef confuses param validation
 
         if( !$success ){
             die $mm_job->error_msg();

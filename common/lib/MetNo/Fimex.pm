@@ -518,7 +518,7 @@ A hash reference containing the following key/values:
 =cut
 
 sub calculateAxisValues {
-    my $param = shift;
+    my $param = shift or return;
 
     my $range = max($param->{'xAxisMax'} - $param->{'xAxisMin'}, $param->{'yAxisMax'} - $param->{'yAxisMin'}) or die "Illegal min/max values";
     my $step = $range / ( ( $param->{'steps'} || 500 ) - 1 );

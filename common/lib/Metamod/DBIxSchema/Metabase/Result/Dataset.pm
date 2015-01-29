@@ -275,7 +275,7 @@ sub xmlfile {
     return $path if -r $path;
 }
 
-=head2 $ds->projectioninfo()
+=head2 $ds->projectioninfo() [DEPRECATED]
 
 Returns projectioninfo object of either self or parent
 
@@ -301,7 +301,7 @@ sub projectioninfos {
     return $self->selfprojectioninfos() || $self->parentprojectioninfos();
 }
 
-=head2 $ds->fimex_projections($config)
+=head2 $ds->fimex_projections($config) [DEPRECATED]
 
 Returns a Metamod::FimexProjections object (never null).
 
@@ -561,7 +561,7 @@ sub opendap_url {
     my $metadata = $self->metadata( ['dataref_OPENDAP'] );
     if (my $opendap = $metadata->{dataref_OPENDAP}->[0]) {
         #print STDERR "-- OPENDAP: $opendap\n";
-        return $opendap if $opendap =~ m|^http(s)?://|;
+        return $opendap if $opendap =~ m|^http(s)?://|; # filter out records containing text "URL"
     }
 }
 
