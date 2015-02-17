@@ -64,7 +64,7 @@ PG_CONNECTSTRING_SHELL =
 
 # String used in Perl DBI->connect function to connect to the
 # database:
-PG_CONNECTSTRING_PERL = host=localhost;password=admin
+PG_CONNECTSTRING_PERL = password=admin
 
 # POSTGIS scripts not actually used in init tests, but required for sanity check
 # the location of the initialization sql-script for postGIS

@@ -59,7 +59,7 @@ ok(!$config->has('NOT_THERE'), 'unsetting NOT_THERE');
 
 ok(!$config->has("SOURCE_DIRECTORY"), "not getting obsolete SOURCE_DIRECTORY");
 
-is($config->getDSN(), "dbi:Pg:dbname=metamod_unittest;host=localhost;password=admin", "getDSN");
+is($config->getDSN(), "dbi:Pg:dbname=metamod_unittest;password=admin", "getDSN");
 
 is($config->get('PSQL'), 'psql', "Variable not defined in master config file gets value from default file");
 
