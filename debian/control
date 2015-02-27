@@ -1,7 +1,7 @@
 Source: metno-metamod-2.13
 Priority: extra
 Maintainer: Geir Aalberg <geira@met.no>
-Build-Depends: debhelper (>=5), perl, make, fakeroot, cpanminus
+Build-Depends: debhelper (>=5), perl, make, fakeroot, cpanminus, libproj-dev, libgdbm-dev, libpng-dev, libnetcdf-dev, libexpat1-dev, libxml2-dev, libxslt1-dev, libssl-dev
 Standards-Version: 3.7.3
 Section: web
 
@@ -10,9 +10,11 @@ Section: web
 Priority: optional
 Architecture: amd64
 Essential: no
-Depends: apache2, postgresql-client-common, postgresql-client, libdbd-pg-perl, pdl, proj, libgeo-proj4-perl, libpdl-netcdf-perl, libconfig-tiny-perl, libimager-perl, libxml2, libxslt1.1, libxml2-dev, libxslt1-dev, libssl-dev, libexpat1, libexpat1-dev, pkg-config, libgdbm3, libgdbm-dev, libpng-dev, libnetcdf-dev
+Depends: apache2, postgresql-client-common, postgresql-client, libdbd-pg-perl, pdl, proj, libimager-perl, libxml2, libxslt1.1, libexpat1, pkg-config, libgdbm3
+# libgeo-proj4-perl, libpdl-netcdf-perl, libconfig-tiny-perl,
 Pre-Depends: perl
-Recommends: exim4 | postfix | sendmail, libxml2-utils, mailx, postgresql, postgresql-contrib, postgis, postgresql-9.1-postgis, ntp
+# replace in below with postgresql-9.3-postgis-2.1 for Ubuntu 14.4
+Recommends: exim4 | postfix | sendmail, libxml2-utils, mailx, postgresql, postgresql-contrib, postgis, postgresql-9.1-postgis, ntp, fimex
 #Suggests: metamod2-database
 Conflicts:
 Replaces:
