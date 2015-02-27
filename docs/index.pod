@@ -18,9 +18,14 @@ through FTP and HTTP interfaces.
 
 The basic principles behind METAMOD
 
+=item L<Building the software|building>
+
+How to build METAMOD from source (only for developers).
+For installation of previously built versions, skip to the next chapter.
+
 =item L<Installation|installation>
 
-How to get the METAMOD base software
+How to install the METAMOD base software package
 
 =item L<Configuration|configuration>
 
@@ -56,7 +61,7 @@ Import and upload description
 
 =item L<API documentation|api/index>
 
-Documentation for all Perl modules (METAMOD and dependencies) - I<only available locally (not SVN)>
+Documentation for METAMOD Perl modules and scripts
 
 =back
 

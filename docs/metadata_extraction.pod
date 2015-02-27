@@ -1,7 +1,5 @@
 =head1 Metadata extraction
 
-Back to L<Index|index>
-
 METAMOD supports extracting metadata from netCDF files. The metadata extraction
 is triggered in three different ways.
 

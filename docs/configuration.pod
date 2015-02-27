@@ -1,7 +1,5 @@
 =head1 METAMOD Configuration
 
-Back to L<Index|index>
-
 =head2 Introduction
 
 Each METAMOD application needs a B<configuration directory> where specific properties

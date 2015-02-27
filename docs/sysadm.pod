@@ -1,7 +1,5 @@
 =head1 System administration
 
-Back to L<Index|index>
-
 =head2 Configuration
 
 Keeping track of all necessary config variables in master_config.txt has

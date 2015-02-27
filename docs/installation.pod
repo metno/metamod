@@ -25,29 +25,18 @@ required for dynamic map search may be missing).
 If running a local database you need the PostgreSQL
 server, otherwise only the client is required.
 
-=item Apache 2.x web server
-
-With mod_proxy, mod_proxy_http and mod_rewrite installed
-
-=item libxml and libxslt library
-
-From xmlsoft.org
-
-=item Proj4 library
-
-L<http://proj.maptools.org>
-
-=item NetCDF software 3.5 or later
-
-libnetcdf, ncdump and ncgen
-
 =item FIMEX (optional, but recommended)
 
 While not stricly necessary, FIMEX is required for functionality regarding
 transformation and OPeNDAP. However, since it is not available via official Ubuntu
-repositories it is not a required dependency.
+repositories it is not a required dependency. You can find it on
+L<Launchpad|https://launchpad.net/~heiko-klein/+archive/ubuntu/fimex> (binaries) and
+in L<Subversion|https://svn.met.no/viewvc/fimex/> (source).
 
 =back
+
+The remaining dependencies will be included automatically by apt.
+A complete list can be found in L<"debianE<sol>control"|debian/control>.
 
 =head2 Installation from Debian repository
 
@@ -142,114 +131,10 @@ Installation is done using a GUI packet manager or via command line:
 
 where 2.13.0-1 is the latest version in the repository.
 
-=head2 Installation from source
+=head2 Installing dependency libraries
 
-=head3 Download the METAMOD source code
-
-Check out the METAMOD source code from Subversion into a suitable directory:
-
-  $ mkdir metamod
-  $ cd metamod
-  $ svn co https://svn.met.no/metamod/trunk
-
-A tar.gz file may also be available at a later date.
-
-=head3 Installing binary dependencies
-
-METAMOD depends on several non-Perl compiled utilities and libraries which must be installed separately, including:
-
-=over 4
-
-=item *
-
-PostgreSQL client and optionally server (preferrable 9.1 or later), as well as the DBD driver for Perl DBI
-
-=item *
-
-the GNOME LibXML2 and LibXSLT libraries
-
-=item *
-
-the Expat XML library
-
-=item *
-
-the PROJ.4 Cartographic Projections library from osgeo.org
-
-=item *
-
-the OpenSSL Library
-
-=back
-
-Installing these via Debial packages using C<apt-get> is recommended if possible.
-A complete list of the required Debian packages can be found in F<debian/control>
-under 'Depends' and 'Build-Depends'.
-
-=head2 Installing Perl dependency libraries
-
-The METAMOD Debian package already includes all necessary Perl dependencies, and pulls in
-any required binary libries automatically. All you need to do is make sure C<CATALYST_LIB>
-is unset in F<master_config.txt>.
-
-If installing from source, you must download and build the necessary Perl modules from CPAN.
-This used to be a major chore, but is now possible to do with a single command using
-the new Perl module dependency manager Carton.
-
-=head3 cpanminus
-
-First, you need to be able to install Perl modules from CPAN.
-There are several tools available for this, but we recommend using B<cpanminus>
-which can be installed using either of the following commands:
-
-  $ apt-get install cpanminus                               # for Debian systems
-  $ curl -L http://cpanmin.us | sudo perl - App::cpanminus  # from source
-
-=head3 Carton
-
-Carton can download and build the required METAMOD Perl dependency modules automatically.
-Unlike C<cpan> it will install the exact same module versions every time, avoiding upgrade
-conflicts and making sure you have the same environment as have been tested. It even bundles
-all the source tarballs into the local source repo so you don't even need online access to deploy.
-
-  $ cpanm -S Carton
-
-This should install version 1.0.12 or later. Versions below 1.0.0 are not supported (they cannot read the cpanfile.snapshot file).
-
-=head3 METAMOD dependencies
-
-You are now ready to install the Perl dependency libraries:
-
-  $ cd ~/metamod/trunk
-  $ make deployment
-
-Carton will then install the modules listed in F<cpanfile.snapshot> into F<~/metamod/trunk/local/lib>.
-No network connection is needed when using --cached as this uses the modules supplied in F<~/metamod/trunk/vendor/cache>.
-This should not generate any errors as long as you have installed all the necessary binary libraries
-as listed above.
-
-=head4 Development
-
-If you are editing METAMOD and want to add more Perl modules, add the required name and version to F<cpanfile>,
-then run
-
-  $ make deps
-  $ make bundle
-
-This will download and compile the necessary modules, and put the source into the vendor/cache directory.
-
-=head3 PERL5LIB
-
-Make sure that  C<CATALYST_LIB> is not set in F<master_config.txt>, and
-your C<PERL5LIB> environment variable is set to point to your local/lib/perl5 directory.
-This is handled automatically by C<activate> and F<init.d> scripts.
-
-=head3 Alternate installation methods
-
-As usual you could always install the required modules directly from CPAN.
-However, if you decided to install them outside your normal @INC path you need
-to specify the location in C<CATALYST_LIB> in master_config.txt, as well as in
-PERL5LIB when running from the command line (activate_env doesn't handle this special case yet).
+The METAMOD Debian package already includes all necessary Perl dependencies, and pulls in any required binary libries automatically.
+Make sure C<CATALYST_LIB> is unset in F<master_config.txt> (this is only relevant when upgrading from 2.12 and earlier).
 
 =head2 Testing METAMOD
 
@@ -360,7 +245,7 @@ Then restart PostgreSQL:
   /etc/init.d/postgresql stop
   /etc/init.d/postgresql start
 
-Alternatively, use .pgpass (FIXME)
+Alternatively, use F<.pgpass> (FIXME)
 
 =head2 Conclusion
 

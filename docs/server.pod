@@ -1,7 +1,5 @@
 =head1 Server deployment
 
-Back to L<Index|index>
-
 This part is not necessary unless you are setting up a server to run METAMOD
 as an online service.
 

@@ -125,6 +125,18 @@ In case any of these projections are missing you must either install support for
 them using data from L<spatialreference.org|http://spatialreference.org/> or remove them from
 C<SRID_ID_COLUMNS>, otherwise C<create_and_load_all.sh> will probably fail.
 
+=head3 Querystring parameters now permitted in WMS URLs
+
+Whereas METAMOD 2.12 and earlier only allowed WMS URLs of the form C<http://domain/path>,
+in 2.13 you can now use C<http://domain/path?param=value> which is needed in some cases.
+However this also means a stricter conformation to the WMS standard, which requires
+all WMS URLS to contain the query string separator I<"?"> somewhere in the string
+(at the end in most cases). This should be updated in the XML/XMD files and the database.
+
+B<Note:> While METAMOD in some cases can work around missing I<"?">s, this is by no means universal
+and old URLs (particularly when used in XSLT or for thumbnails) are not guaranteed to work.
+The command C<lsds --wms> can be helpful here.
+
 =head2 Validation of ISO 19139/19115 documents in OAI-PMH
 
 Due to a bug in libxml2 2.7.8 and earlier, validation of ISO files is not possible and has been disabled in METAMOD.

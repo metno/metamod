@@ -1,7 +1,5 @@
 =head1 Deploying a METAMOD application
 
-Back to L<Index|index>
-
 Before you can deploy a METAMOD application you must set up a configuration
 directory, see L<METAMOD Configuration|configuration>.
 
@@ -175,7 +173,7 @@ Then open L<http://localhost:8080/> in your local browser.
 These daemons are normally not used during development unless testing specific
 functionality. You may start them if needed (add path if not included in PATH).
 
-  $ upload_monitor
+  $ upload_monitor
   $ ftp_monitor
   $ prepare_download
   $ harvester.pl

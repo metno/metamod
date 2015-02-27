@@ -3,32 +3,57 @@ body {
     font-size: 10pt;
     line-height: 14pt;
     font-family: Sans, sans-serif;
-    margin: 20 20 20 260;
+    margin: 0 0 0 240;
+    padding: 0 20 40 20;
 }
 
 h1 { font-size: 24pt;  }
-h2 { font-size: 18pt; border-top: 1px solid #eeeeee; padding-top: 13px; }
-h3 { font-size: 14pt}
-h4 { font-size: 12pt}
-h5 { font-size: 10pt}
+h2 { font-size: 14pt; text-transform: uppercase; letter-spacing: 4px; border-top: 1px solid #eeeeee; padding-top: 13px; }
+h3 { font-size: 12pt; letter-spacing: 1px; margin: 18 0 6 0; }
+h4 { font-size:  9pt; font-style: italic; margin: 12 0 3 12; }
+h5 { font-size:  8pt; margin-bottom: 0; }
 
 a.u { color: #999999; text-decoration: none; }
 h1 a.u { color: #003366; }
 /*h2 a.u { color: #666666; }*/
-/*h3 a.u { color: #666666; }*/
-/*h4 a.u { color: #666666; }*/
-/*h5 a.u { color: #666666; }*/
+h3 a.u { color: #666; }
+h4 a.u { color: #333; }
+h5 a.u { color: #000; }
 
 p {
     font-family: "Bitstream Charter", Serif, serif;
     font-size: 11pt;
+    margin: 0 0 0 12;
+}
+
+#banner {
+    border-bottom: solid grey 2px;
+    padding: 6 6 6 6;
+    font-family: "DejaVu Sans", sans-serif;
+    font-size: 9pt;
+    color: white;
+    text-align: right;
+    background-color: #ddddee;
+}
+
+#banner a {
+    text-decoration: none;
+    color: #000066;
 }
 
 pre {
+    margin: 6 0 6 12;
+    padding: 4 0 4 0;
     background-color: #eeeeff;
+}
+
+pre, code {
     font-family: "DejaVu Sans Mono", monospace;
-    font-size: 11px;
-    padding: 4 4 4 4;
+    font-size: 12px;
+}
+
+dt {
+    margin: 3 0 0 12;
 }
 
 dt a {
@@ -37,7 +62,7 @@ dt a {
 
 div.indexgroup {
     position: fixed;
-    top:20;
+    top:0;
     left:0;
     width:240px;
     background-color: #ddddee;

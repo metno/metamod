@@ -1,7 +1,5 @@
 =head1 Frequently Asked Questions
 
-Back to L<Index|index>
-
 =head2 Installation issues
 
 =over 4

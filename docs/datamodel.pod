@@ -1,7 +1,5 @@
 =head1 METAMOD Datamodel
 
-Back to L<Index|index>
-
 This text describes the data-model and the data-flow within METAMOD2. It is not
 about the real data files which are often handled by other applications, i.e. thredds.
 
