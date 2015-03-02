@@ -418,7 +418,7 @@ sub split {
 # recursive function splitting a string separated by spaces, commas and/or quotes
 # returns a string if 1 element, an array if several
 sub _splitval {
-    my $_ = shift or return;
+    local $_ = shift or return;
     my @vals = ();
     s/^\s+//; # remove leading spaces
     #print STDERR " [$_]\n";
@@ -674,6 +674,7 @@ sub initLogger {
     Log::Log4perl->init_and_watch( $log_config, $reinit_period );
 
     $_logger_initialised = Log::Log4perl::get_logger('metamod::common::Metamod::Config');
+    #$_logger_initialised->info("Starting logging at " . scalar localtime); # breaks test 001_Config_InitLogger2.t
     return 1;
 
 

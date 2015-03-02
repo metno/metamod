@@ -76,7 +76,7 @@ to a scalar is so that C<DBIx::Class> interprets it as a raw SQL.
 sub fulltext_search {
     my $self = shift;
 
-    my ($_) = @_;
+    local ($_) = @_;
 
     if (/ AND | OR | NOT | [&|!()*] /x) { # allow mnemonic operators
         s/[^:]\K[*]/:*/g; # allow * wildcard w/o preceding colon
