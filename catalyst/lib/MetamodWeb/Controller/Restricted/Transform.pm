@@ -131,10 +131,13 @@ sub transform_GET {
         or $self->logger->warn("Missing bounding box in dataset $ds_id (timeseries?)");
     my ($e, $s, $w, $n) = split(/\s*,\s*/, $bounding_box) if defined $bounding_box; # ESWN
 
+    #printf STDERR "$e => $w ? %d\n", $e >= $w;
+    #printf STDERR "$n => $s ? %d\n", $n >= $s;
     my %xslparam;
     if ($e >= $w && $n >= $s) { # allow to be the same for point data
        %xslparam = ( e => $e, s => $s, w => $w, n => $n );
     } else {
+        $self->logger->warn("Bounding box coordinates in dataset $ds_id not in correct order (ESWN): $e, $s, $w, $n");
         $self->add_error_msgs($c, 'Error: bounding box coordinates not in correct order (ESWN)');
     }
 

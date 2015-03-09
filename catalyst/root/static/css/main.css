@@ -193,3 +193,7 @@ textarea.wms_info textarea.projection_info {
     padding: 8px 8px 8px 8px;
     overflow:scroll;
 }
+
+button#pan_map, button#clear_map {
+    margin-left: 12px;
+}

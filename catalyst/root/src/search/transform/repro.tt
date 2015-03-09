@@ -37,5 +37,4 @@
 <label for="yAxisMax">y axis max:</label>        <input class="transform_axes" type="text" name="yAxisMax" value="[% c.req().param('yAxisMax') %]"/>
 <label for="yAxisStep">y axis increment:</label> <input class="transform_axes" type="text" name="yAxisStep" value="[% c.req().param('yAxisStep') %]"/>
 
-<p>Reprojection and transformation performed by <a href="https://wiki.met.no/fimex/start">FIMEX</a>.
-For more information on parameters, see the <a href="https://wiki.met.no/fimex/documentation">documentation</a>.</p>
+<p>[% app.transform.repro_footer %]</p>

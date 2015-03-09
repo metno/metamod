@@ -114,8 +114,9 @@ sub wmsthumb {
         foreach ( $thumbnail ? $sxc->findnodes('/*/s:thumbnail[1]/@*') : $sxc->findnodes('/*/s:layer[1]/@*') ) {
             $layer{$_->nodeName} = $_->getValue;
         }
-        $layer{url} = $wms_url unless exists $layer{url};
-        $layer{style} = '' unless exists $layer{style};
+        $layer{style} = ''       unless exists $layer{style};
+        $layer{url}   = $wms_url unless exists $layer{url};
+        $layer{url}  .= '?'      unless $layer{url} =~ /\?/;
 
         #print STDERR "*******************************\n" . Dumper \%layer;
 

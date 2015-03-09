@@ -14,6 +14,8 @@ just as an electronic Post-It note for developers to quickly note action
 points for later.
 
 --------------------
+add Pod::Simple 3.30 to local/lib
+
 rewrite user_msgs.tt to use Catalyst::Plugin::StatusMessage instead of flash
 
 make new opendap interface not relying in fimex for non-reprojection transformations (e.g. subsetting)

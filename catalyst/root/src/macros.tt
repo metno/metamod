@@ -24,7 +24,7 @@
 
 [% MACRO button_js(name, href, text) BLOCK # javascript event trigger %]
     [% IF ui.button.$name || text -%]
-        <button type="button" name="[% name %]" onclick="[% href %]">[% text || ui.button.$name %]</button>
+        <button type="button" id="[% name %]" name="[% name %]" onclick="[% href %]">[% text || ui.button.$name %]</button>
     [% END %]
 [% END %]
 

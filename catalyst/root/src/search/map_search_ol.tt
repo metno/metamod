@@ -156,15 +156,20 @@ function drawMap(response) {
 
 }
 
+var stop = true; // stop panning
+
 function allowPan(element) {
-    var stop = !element.checked;
+    stop = ! stop;
+    //alert('Panning is now ' + ! stop);
     boxDraw.handler.stopDown = stop;
     boxDraw.handler.stopUp = stop;
     if (stop) {
         boxDraw.activate();
+        $('#pan_map').html("[% ui.button.pan_map %]");
     } else {
         // suspend drawing or you'll lose selection when panning
         boxDraw.deactivate();
+        $('#pan_map').html("[% ui.button.draw_map %]");
     }
 }
 
@@ -176,6 +181,22 @@ function showError(response) {
 </script>
 
 <div id="map_ui" [% IF transformMode %] style="display: none" [%END%]>
+
+    <div id="searchmap" style="height:540px; width:540; border: solid 1px; margin-bottom: 10px"
+         xonclick="jQuery('#search_form').attr('action','[% c.uri_for('/search/map_search') %]');"></div>
+
+    <div id="bbox_params" [%# style="display: none" %]>
+        <b>[% app.transform.x_axis %]:</b>
+        <input type="text" size="12" name="[% x1_id %]" id="[% x1_id %]" value="[% c.req().param( x1_id ) %]" /> to
+        <input type="text" size="12" name="[% y1_id %]" id="[% y1_id %]" value="[% c.req().param( y1_id ) %]" />
+        [% button_js('pan_map', "allowPan(this)") %]
+        <br/>
+
+        <b>[% app.transform.y_axis %]:</b>
+        <input type="text" size="12" name="[% x2_id %]" id="[% x2_id %]" value="[% c.req().param( x2_id ) %]" /> to
+        <input type="text" size="12" name="[% y2_id %]" id="[% y2_id %]" value="[% c.req().param( y2_id ) %]" />
+        [% button_js('clear_map', "clearMap()") %]
+    </div>
 
 [% IF transformMode %]
     <div>
@@ -192,22 +213,10 @@ function showError(response) {
             <option value="forward_sum">forward_sum</option>
         </select>
 
-        Steps: <input name="steps" value="500" size="4"/>
+        <label for="interpolation">[% app.transform.steps %]:</label>
+        <input name="steps" value="500" size="4"/>
     </div>
 [%END%]
-
-    <div id="searchmap" style="height:540px; width:540; border: solid 1px; margin-bottom: 10px"
-         xonclick="jQuery('#search_form').attr('action','[% c.uri_for('/search/map_search') %]');"></div>
-
-    <div id="bbox_params" [%# style="display: none" %]>
-        x1 <input type="text" size="9" name="[% x1_id %]" id="[% x1_id %]" value="[% c.req().param( x1_id ) %]" />
-        y1 <input type="text" size="9" name="[% y1_id %]" id="[% y1_id %]" value="[% c.req().param( y1_id ) %]" />
-        x2 <input type="text" size="9" name="[% x2_id %]" id="[% x2_id %]" value="[% c.req().param( x2_id ) %]" />
-        y2 <input type="text" size="9" name="[% y2_id %]" id="[% y2_id %]" value="[% c.req().param( y2_id ) %]" />
-        [% button_js('clear_map', "clearMap()") %]
-        <input type="checkbox" name="allow-pan" value="allow-pan" id="allowPanCheckbox" onclick="allowPan(this);" />
-        <label for="allowPanCheckbox">[% ui.button.pan_map %]</label>
-    </div>
 
 </div>
 
