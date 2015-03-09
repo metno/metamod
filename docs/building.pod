@@ -178,3 +178,14 @@ set of libraries (since cpan always pulls down the latest version).
 However, if you decided to install them outside your normal @INC path you need
 to specify the location in C<CATALYST_LIB> in master_config.txt, as well as in
 PERL5LIB when running from the command line (activate_env doesn't handle this special case yet).
+
+=head2 Testing notes (TODO)
+
+=head3 How to run unit tests from source
+
+  $ ./common/prepare_runtime_env.sh test/applic/
+  $ ./test/short_test_application.sh && make debian_package
+
+If uploading package to repo:
+
+  $ # dupload --to precise-devel --no
