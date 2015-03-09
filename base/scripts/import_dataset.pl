@@ -37,16 +37,15 @@ use strict;
 use warnings;
 use File::Spec;
 use File::Find qw();
-
 use FindBin;
-use lib ("$FindBin::Bin/../../common/lib", '.');
-
-use Metamod::DatasetImporter;
-use Metamod::Config;
 use Getopt::Long;
 use Log::Log4perl qw();
+use Log::Log4perl::CommandLine qw(:all :noinit);
 use Data::Dumper;
 use Pod::Usage;
+use lib ("$FindBin::Bin/../../common/lib", '.');
+use Metamod::DatasetImporter;
+use Metamod::Config;
 
 =head1 NAME
 
@@ -58,7 +57,7 @@ Imports an XML file or a directory of metadata XML files inthe the metadata data
 
 =head1 USAGE
 
-  import_dataset.pl [options] <file or dir>
+  import_dataset.pl <file or dir> [options]
 
 Options:
 
@@ -68,13 +67,38 @@ Options:
 
 Path to application directory or application config file.
 
+=item --verbose | -v
+
+Set loglevel to INFO
+
+=item --debug | -d
+
+Set loglevel to DEBUG
+
+=item --warn
+
+Set loglevel to WARN
+
+=item --error
+
+Set loglevel to ERROR
+
+=item --quiet | -q
+
+Set loglevel to OFF
+
 =back
+
+Note that the --config option may come before the filename/directory argument, but the loglevel
+options must come after or they will eat up the next argument.
 
 =head1 TODO
 
 Rewrite so can call Metamod::DatasetImporter directly to import file instead of via shell
 
 =cut
+
+#print STDERR Dumper \@ARGV;
 
 my $config_file_or_dir = $ENV{METAMOD_MASTER_CONFIG};
 
@@ -91,7 +115,7 @@ if ( scalar @ARGV != 1 ) { # allow multiple file names? TODO
 my $config = Metamod::Config->new($config_file_or_dir);
 
 my $logger = Log::Log4perl->get_logger('metamod.base.import_dataset');
-
+Log::Log4perl::CommandLine::handlelogoptions();
 
 my $inputfile;
 my $inputDir;
