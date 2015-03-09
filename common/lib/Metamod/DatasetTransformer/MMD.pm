@@ -147,7 +147,7 @@ sub transform {
         my $styleDoc = $self->XMLParser->parse_file($self->{mm2Xslt});
         my $stylesheet = $self->XSLTParser->parse_stylesheet($styleDoc);
         $mm2Doc = $stylesheet->transform($self->{mmdDoc});
-        print("\n\n\n$mm2Doc\n\n\n");
+        #print STDERR "\n\n\n$mm2Doc\n\n\n";
     }
 
     my $xmdDoc = $self->{xmdDoc};
@@ -247,6 +247,8 @@ This module is an implentation of L<Metamod::DatasetTransformer> to convert the 
 to the dataset (xmd) and MM2 format. MMD files may contain information from MM2 and
 Dataset, but Dataset-information may also be provided through the xmdString.
 
+The MMD format is used by the met.no Metadata Editor.
+
 =head1 METHODS
 
 For inherited options see L<Metamod::DatasetTransformer>, only differences are mentioned here.
@@ -276,7 +278,7 @@ Overwrite the default xslt file to convert from dif to the mm2 format.
 
 =head1 AUTHOR
 
-Heiko Klein, E<lt>H.Klein@met.noE<gt>
+Øystein Torget <lt>oysteint@met.noE<gt>
 
 =head1 SEE ALSO
 

@@ -305,6 +305,28 @@ sub write_to_database {
     return $success;
 }
 
+=head2 $self->_insert_metadata($ds, $dsid)
+
+Stuff metadata into the database
+
+=over
+
+=item $ds
+
+A reference to a C<Metamod::ForeignDataset> (I hope...?)
+
+=item $dsid
+
+Dataset id number
+
+=item return
+
+No defined return value. Dies on error (hopefully).
+
+=back
+
+=cut
+
 sub _insert_metadata {
     my $self = shift;
 
@@ -442,11 +464,12 @@ The C<dsid> of the dataste.
 
 =item return
 
-Always 1. Throws and exception on database error.
+Always 1. Throws exception on database error.
 
 =back
 
 =cut
+
 sub _remove_old_metadata {
     my $self = shift;
 
@@ -485,6 +508,7 @@ Returns either the current C<dsid> for the dataset or a new C<dsid> for new data
 =back
 
 =cut
+
 sub _get_dsid {
     my $self = shift;
 
@@ -533,6 +557,7 @@ Returns the C<dsid> if the parent dataset if the dataset has a parent. Returns
 =back
 
 =cut
+
 sub _get_parent_id {
     my $self = shift;
 
@@ -571,11 +596,14 @@ A reference to a C<Metamod::ForeignDataset>
 
 =item return
 
-An array where all the values are tuples of the type [ <metadata name>, <value>]
+Returns an array where all the values are tuples of the type [ <metadata name>, <value>].
+
+Dies on error (e.g. invalid metadata).
 
 =back
 
 =cut
+
 sub _transform_metadata {
     my $self = shift;
 
@@ -985,11 +1013,12 @@ sub _get_contact_id {
     #$author =~ s/\s+$//; # suggest trim trailing spaces?
     my $orgXP = '//gmd:pointOfContact/gmd:CI_ResponsibleParty[ gmd:role/gmd:CI_RoleCode[ @codeListValue="publisher" or @codeListValue="principalInvestigator" ] ]/gmd:organisationName';
     my $organization = $self->_get_text_from_doc($doc, $orgXP, $xpc);
+    my $author_as_str = $author || '-';
     my $org_as_str = $organization || '-';
 
     # TODO: get author from other places if other code-list is used
 
-    $self->logger->debug("found contact-(author,organization)=($author,$org_as_str) in sru/iso19115");
+    $self->logger->debug("found contact-(author,organization)=($author_as_str,$org_as_str) in sru/iso19115");
 
     # search for existing author/organization
     ($author, $organization) =  map {defined $_ ? uc($_) : undef} ($author, $organization);
@@ -1002,11 +1031,12 @@ SELECT id_contact
    AND $orgSQL
 SQL
     my @authorOrganization = map {defined $_ ? $_ : ()} ($author, $organization);
+    # rewrite to pushing on a stack if defined - would be a lot more understandable
     $sth_search->execute(@authorOrganization) or $self->logger->error($sth_search->errstr);
     my $contact_id;
     while (my $row = $sth_search->fetchrow_arrayref) {
         $contact_id = $row->[0]; # max one row, schema enforces uniqueness
-        $self->logger->debug("found contact_id for $author, $org_as_str: $contact_id");
+        $self->logger->debug("found contact_id for $author_as_str, $org_as_str: $contact_id");
     }
     return $contact_id if defined $contact_id;
 

@@ -69,10 +69,23 @@
 
     </xsl:template>
 
-    <!-- Since METAMOD does some tranformation of the data access URLs we only consider the THREDDS url -->
     <xsl:template match="mmd:data_access[mmd:type = 'thredds']">
         <xsl:element name="metadata">
             <xsl:attribute name="name">dataref</xsl:attribute>
+            <xsl:value-of select="mmd:resource" />
+        </xsl:element>
+    </xsl:template>
+
+    <xsl:template match="mmd:data_access[mmd:type = 'wms']">
+        <xsl:element name="metadata">
+            <xsl:attribute name="name">dataref_WMS</xsl:attribute>
+            <xsl:value-of select="mmd:resource" />
+        </xsl:element>
+    </xsl:template>
+
+    <xsl:template match="mmd:data_access[mmd:type = 'opendap']">
+        <xsl:element name="metadata">
+            <xsl:attribute name="name">dataref_OPENDAP</xsl:attribute>
             <xsl:value-of select="mmd:resource" />
         </xsl:element>
     </xsl:template>
@@ -149,8 +162,12 @@
             <xsl:value-of select="mmd:organisation" />
         </xsl:element>
 
-
     </xsl:template>
 
+    <xsl:template match="*" priority="-10">
+        <xsl:comment>UNSUPPORTED:
+            <xsl:copy-of select="."/>
+        </xsl:comment>
+    </xsl:template>
 
 </xsl:stylesheet>
