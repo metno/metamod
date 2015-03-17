@@ -94,7 +94,7 @@ sub send_simple_email {
     my $config = Metamod::Config->instance();
     my $logger = Log::Log4perl->get_logger('metamod.email');
     my $smtp = $config->has('SMTP_RELAY') ? $config->get('SMTP_RELAY') : undef;
-    $logger->debug("Using SMTP server <$smtp>");
+    $logger->info("Using SMTP server <$smtp>");
     #my $mailer = Mail::Mailer->new();
     my $mailer = $smtp ? Mail::Mailer->new('smtp', Server => $smtp) : Mail::Mailer->new();
 
@@ -105,7 +105,7 @@ sub send_simple_email {
     $mail_headers{Bcc}     = $bcc if 0 != @$bcc;
     $mail_headers{Subject} = $subject;
 
-    $logger->debug("Message from $from to " . join(',', @$to) . " regarding \"$subject\":\n$body");
+    $logger->info("Message from $from to " . join(',', @$to) . " regarding \"$subject\":\n$body");
 
     $mailer->open(\%mail_headers);
     print $mailer $body;
