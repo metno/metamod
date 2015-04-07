@@ -47,7 +47,9 @@ sub confirm_user : Path('/admin/confirm_user') : Args(1) : ActionClass('REST') {
     my $userbase_user = $c->model('Userbase::Usertable')->find($u_id);
 
     if ( !defined $userbase_user ) {
-        $c->detach( 'Root', 'error', [ 404, "No such user #$u_id exists in the database" ] )
+        #$c->detach( 'Root', 'error', [ 404, "No such user #$u_id exists in the database" ] );
+        $self->add_error_msgs( $c, "User #$u_id could not be found. Perhaps it was already rejected?" );
+        $c->res->redirect( $c->uri_for('/admin/useradmin') );
     }
 
     $c->stash( userbase_user => $userbase_user );

@@ -78,16 +78,20 @@ Use for deleting users
 
 sub deleteuser :Path('/admin/useradmin/delete') :Args(1) { # delete user
 
-    my ( $self, $c ) = @_;
+    my ( $self, $c, $u_id ) = @_;
 
     if ( $c->req->method() eq 'POST' ) {
         try {
-            my $user = $c->model('Userbase::Usertable')->find( $c->req->args->[0] );
+            my $user = $c->model('Userbase::Usertable')->find( $u_id );
             $user->delete if defined $user;
+            $self->add_info_msgs( $c, "User #$u_id has been deleted" );
         } catch {
             $c->stash( error => $_ );
         }
-    } # ignore GET requests
+    } else {
+        # block GET requests
+        $c->detach( 'Root', 'error', [ 405, "GET requests not allowed in delete" ] );
+    }
 
     $c->res->redirect( $c->uri_for('/admin/useradmin') );
 
@@ -100,8 +104,14 @@ Edit user data and roles
 =cut
 
 sub edituser :Path('/admin/useradmin') :ActionClass('REST') :Args(1) {
-    my ( $self, $c ) = @_;
-    my $user = $c->model('Userbase::Usertable')->find( $c->req->args->[0] );
+    my ( $self, $c, $u_id ) = @_;
+
+    my $user = try {
+        $c->model('Userbase::Usertable')->find( $u_id );
+    } catch {
+        $c->detach( 'Root', 'error', [ 404, "User '$u_id' not found" ] );
+    };
+
     $c->stash(
         template => 'admin/edituser.tt',
         u => $user,

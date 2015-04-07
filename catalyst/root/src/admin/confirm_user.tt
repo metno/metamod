@@ -53,7 +53,7 @@
 
 [% ELSE %]
     <p>
-    The user has already been approved or declined.
+    The user has already been approved.
     </p>
 [% END %]
 
