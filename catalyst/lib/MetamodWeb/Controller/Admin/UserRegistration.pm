@@ -47,7 +47,7 @@ sub confirm_user : Path('/admin/confirm_user') : Args(1) : ActionClass('REST') {
     my $userbase_user = $c->model('Userbase::Usertable')->find($u_id);
 
     if ( !defined $userbase_user ) {
-        die "'$u_id' does not refer to a valid user";
+        $c->detach( 'Root', 'error', [ 400, "No such user #$u_id exists in the database" ] )
     }
 
     $c->stash( userbase_user => $userbase_user );
@@ -72,7 +72,7 @@ sub confirm_user_POST {
         $self->add_info_msgs( $c, 'User has been rejected' );
         return $c->res->redirect( $c->uri_for('/admin/useradmin') );
     } elsif ($action ne 'Approve') {
-        die "'action' must be either 'Approve' or 'Reject'";
+        $c->detach( 'Root', 'error', [ 400, "'action' must be either 'Approve' or 'Reject'" ] )
     }
 
     my $random_pass = $userbase_user->reset_password();
@@ -83,7 +83,7 @@ sub confirm_user_POST {
     my $signature        = $mm_config->get('EMAIL_SIGNATURE') || '';
     my $name             = $userbase_user->u_name();
     my $username         = $userbase_user->u_loginname();
-    my $email_body       = $mm_config->get('NEW_USER_GREETING') or die "Missing user greeting";
+    my $email_body       = $mm_config->get('NEW_USER_GREETING') or die "Missing user greeting"; # defined in default_conf, should normally never die
 
     $email_body =~ s/\[NAME\]/$name/g;
     $email_body =~ s/\[USERNAME\]/$username/g;
@@ -98,7 +98,7 @@ sub confirm_user_POST {
     );
 
     $self->add_info_msgs( $c, 'User has been approved' );
-    return $c->res->redirect( $c->uri_for( '/admin/confirm_user', $u_id ) );
+    return $c->res->redirect( $c->uri_for('/admin/useradmin') );
 
 }
 

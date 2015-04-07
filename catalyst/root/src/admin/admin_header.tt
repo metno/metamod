@@ -8,3 +8,5 @@
 <body bgcolor="#f5f5dc">
 <a href="[% c.uri_for('/admin') %]">Main menu</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[% application_name %] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ([% application_id %])
 <hr />
+
+[% INCLUDE 'user_msgs.tt' %]
