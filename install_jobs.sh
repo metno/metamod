@@ -8,7 +8,8 @@ usage: $0 [-u] <config>
 This script will install the necessary services for a METAMOD application.
 
 It should not be run as sudo as is already calling sudo on relevant commands and
-root user usually does not have sudo privileges.
+root user usually does not have sudo privileges. Also, running sudo on /opt/*
+is disallowed at met.no production servers.
 
 OPTIONS:
   -h    show this message
@@ -170,7 +171,9 @@ done
 echo "Linking Apache config"
 if [ -z "$VIRTUAL_HOST" ]; then
     sudo ln -s $CONFIG_DIR/etc/httpd.conf  /etc/apache2/conf.d/$APPLICATION_ID; ordie "$LINKERRMSG"
-    echo "WARNING: Static files will not work unless you remove all links in /etc/apache2/sites-enabled!"
+    echo Disabling site "default" in Apache config
+    sudo a2dissite default
+    #echo "WARNING: Static files will not work unless you remove all links in /etc/apache2/sites-enabled!"
 else
     sudo ln -s $CONFIG_DIR/etc/httpd.conf  /etc/apache2/sites-available/$VIRTUAL_HOST; ordie "$LINKERRMSG"
     ${VIRTUAL_HOST:+"sudo a2ensite"} $VIRTUAL_HOST

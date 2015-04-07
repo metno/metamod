@@ -47,7 +47,7 @@ sub confirm_user : Path('/admin/confirm_user') : Args(1) : ActionClass('REST') {
     my $userbase_user = $c->model('Userbase::Usertable')->find($u_id);
 
     if ( !defined $userbase_user ) {
-        $c->detach( 'Root', 'error', [ 400, "No such user #$u_id exists in the database" ] )
+        $c->detach( 'Root', 'error', [ 404, "No such user #$u_id exists in the database" ] )
     }
 
     $c->stash( userbase_user => $userbase_user );

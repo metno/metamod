@@ -38,6 +38,21 @@ A: METAMOD computes some variables automatically. For a list of current values, 
 
 A: You seem to be having restricted full sudo rights. See L<deploying> for more info.
 
+=item Q: I can see METAMOD is running via Apache, but all styles and logos are gone.
+
+A: mod_rewrite is not working properly. This could mean either mod_proxy has not been enabled (see L<installation>),
+or that you are using virtualhosts in F<conf.d> without removing the default site in F<sites-enabled>.
+See the warning in the generated Apache config file:
+
+  # NOTE: use EITHER sites-available (if using virtual hostnames in DNS) OR conf.d (with path prefix).
+  # DO NOT PUT PARTIAL METAMOD CONFIGURATION IN BOTH!!!!!
+  # Note ESPECIALLY that mod_rewrite will NOT work in ANY virtualhost if defined in conf.d
+  # That means you must disable ALL files in sites-enabled (including 000-default) for custom files to work!!!
+
+To fix, either set VIRTUAL_HOST to something or delete sites-enabled/000-default, like this:
+
+  $ sudo a2dissite default
+
 =back
 
 =head3 Visualization

@@ -168,7 +168,19 @@ Split key-value pairs variables. Only works when a single variable name is given
 
 =head2 [no]color
 
-Toggles color display according to flags (default on if terminal).
+Toggles color display according to flags (default on if terminal). Values are:
+
+=over 4
+
+=item Key:
+
+green if default, else red
+
+=item Value:
+
+blue if default/generated, yellow if local, red if duplicate
+
+=back
 
 TIP: To show colored output in a pager, use C<lsconf --color|less -R>
 
