@@ -33,3 +33,6 @@ createuser -e --username=postgres --adduser --createrole --createdb --superuser 
 echo "Creating web user $PG_WEB_USER"
 createuser -e --username=postgres --no-adduser --no-createrole --no-createdb $PG_WEB_USER
 #ordie "Couldn't create user $PG_WEB_USER"
+
+# we don't care if createuser failed
+exit 0
