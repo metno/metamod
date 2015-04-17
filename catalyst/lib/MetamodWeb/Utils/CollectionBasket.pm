@@ -125,11 +125,13 @@ sub add_dataset {
 
     # default to 100 as max number of files
     my $max_files = $self->max_files();
+    #my $max_files = 0; # testing - remove later
     my $max_additional = $max_files - scalar @ds_ids;
     $self->logger->debug("Space for $max_additional more files in the basket (max $max_files)");
 
     # default to 500 MB as max size
     my $max_size = $self->max_size();
+    #my $max_size = 0; # testing - remove later
     my $current_size = $self->calculate_size();
 
     my $new_datasets = 0;
@@ -138,7 +140,7 @@ sub add_dataset {
         return;
     }
 
-    if ( $max_additional <= 0 ) {
+    if ( $max_additional <= 0 && $max_files ) {
         # basket is full, go away
         my $msg = "Could not add the file to the basket since the basket would then exceed the allowed number of files ($max_files).";
         $self->add_user_msg($msg);
@@ -172,7 +174,7 @@ sub add_dataset {
 
                         # when we reach the maximum we stop even if there might smaller files later.
                         # This probably will seem like less random behaviour.
-                        if( $file_info->{data_file_size}||0 + $current_size > $max_size ){
+                        if( $max_size and ($file_info->{data_file_size}||0) + $current_size > $max_size ){
                             my $msg = 'Could not add all files to the basket since the basket would then exceed the ';
                             $msg .= "allowed maximum size ($max_size bytes).";
                             $self->add_user_msg($msg);
