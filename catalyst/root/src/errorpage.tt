@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <title>[% status_text %]</title>
+    </head>
+    <body style="text-align: center;">
+        <h1>[% status_text %]</h1>
+        <hr/>
+        <a href="http://www.catalystframework.org/"><img src="http://wiki.catalystframework.org/wiki-static/catalyst.png"/></a>
+    </body>
+</html>
+
+
+[%
+
+# some useful configuration items:
+
+#app.search.title = "Hello, world!"
+#clickable_thumbs = 1
+#ui.button.wms_client_resultpage = ''
+#wms.client.slideshow.delay = 5000 # ms
+#wms.client.slideshow.disabled = 1
+
+%]

@@ -89,9 +89,11 @@ Standard 404 error page
 
 sub default :Path { # must come after error so won't be overridden
     my ( $self, $c ) = @_;
-    $c->response->body( "<h1>Page not found</h1>\n" );
+    $c->stash( template => 'errorpage.tt', status_text => "Page not found (404)", 'current_view' => 'None' );
+    #$c->response->body( "<h1>Page not found</h1>\n" );
     $c->response->content_type('text/html');
     $c->response->status(404);
+    $self->logger->warn("404 not found: ", $c->request->uri);
 }
 
 =head2 unauthorized

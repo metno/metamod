@@ -63,7 +63,7 @@ sub robots :Path('/robots.txt') :Args(0) {
     my ($self, $c) = @_;
 
     $c->response->content_type('text/plain');
-    $c->stash( template => 'robots.tt', 'current_view' => 'Raw' );
+    $c->stash( template => 'robots.tt', 'current_view' => 'None' );
 
 }
 

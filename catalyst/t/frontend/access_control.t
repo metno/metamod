@@ -25,7 +25,7 @@ if( !$success ){
     plan skip_all => "Failed to populate the userbase: " . $helper->errstr();
 }
 
-plan tests => 12;
+plan tests => 14;
 
 
 my $mech = Test::WWW::Mechanize::Catalyst->new( catalyst_app => 'MetamodWeb' );
@@ -52,4 +52,8 @@ $mech->content_contains( '<input type="submit" value="Login" />', 'Redirected to
 $mech->post_ok( '/login/authenticate', { username => 'test', password => 'test', return_path => '/userprofile' }, 'Login with return path' );
 
 $mech->content_contains( 'User information', 'User information page displayed after login with return path' );
+
+$mech->get_ok( '/robots.txt', 'Fetching generated robots.txt' );
+
+$mech->content_lacks( '<body>', 'No HTML in robots.txt' );
 
