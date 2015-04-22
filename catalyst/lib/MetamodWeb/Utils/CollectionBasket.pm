@@ -461,7 +461,8 @@ sub file_info {
 
     my ($dataset) = @_;
 
-    my $metadata = $dataset->metadata( [qw( data_file_location data_file_size distribution_statement dataref_HTTPServer)] );
+    my @vars = [qw( data_file_location data_file_size distribution_statement dataref_HTTPServer )];
+    my $metadata = $dataset->metadata( @vars );
 
     # now allowing for datasets w/o file info
     #return if !exists $metadata->{data_file_location} || !defined $metadata->{data_file_location}->[0];
@@ -476,7 +477,7 @@ sub file_info {
         data_file_location => $metadata->{data_file_location}->[0],
         data_file_size     => $metadata->{data_file_size}->[0],
         distribution       => $metadata->{distribution_statement}->[0],
-        HTTPServer         => $metadata->{dataref_HTTPServer}->[0],
+        HTTPServer         => $dataset->dataref_url('HTTPServer'), # $metadata->{dataref_HTTPServer}->[0],
         OPENDAP            => $dataset->opendap_url(),
     };
 

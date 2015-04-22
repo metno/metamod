@@ -558,10 +558,41 @@ Returns the OPENDAP dataref URL (if valid), else undef
 sub opendap_url {
     my $self = shift;
 
-    my $metadata = $self->metadata( ['dataref_OPENDAP'] );
-    if (my $opendap = $metadata->{dataref_OPENDAP}->[0]) {
-        #print STDERR "-- OPENDAP: $opendap\n";
-        return $opendap if $opendap =~ m|^http(s)?://|; # filter out records containing text "URL"
+    return $self->dataref_url('OPENDAP');
+
+    #my $metadata = $self->metadata( ['dataref_OPENDAP'] );
+    #my $parent = $self->parent_dataset;
+    #if ( my $opendap = $metadata->{dataref_OPENDAP}->[0] ) {
+    #    #print STDERR "-- OPENDAP: $opendap\n";
+    #    return $opendap if $opendap =~ m|^http(s)?://|; # filter out records containing text "URL"
+    #} elsif ( $parent ) {
+    #    my $base_od = $parent->metadata->{baseref_OPENDAP}->[0];
+    #    $base_od .= $self->unqualified_ds_name . '.nc' if $base_od;
+    #    return $base_od;
+    #}
+}
+
+=head2 $ds->dataref_url
+
+Returns dataref URL (if valid) of specified type, else undef
+
+TODO: lookup file extension (currently hardcoded to .nc)
+
+=cut
+
+sub dataref_url {
+    my $self = shift;
+    my $type = shift or die "Missing dataref type";
+
+    my $metadata = $self->metadata( ["dataref_$type"] );
+    my $parent = $self->parent_dataset;
+    if ( my $dataref = $metadata->{"dataref_$type"}->[0] ) {
+        #print STDERR "-- OPENDAP: $dataref\n";
+        return $dataref if $dataref =~ m|^http(s)?://|; # filter out records containing text "URL"
+    } elsif ( $parent ) {
+        my $base_od = $parent->metadata->{"baseref_$type"}->[0];
+        $base_od .= $self->unqualified_ds_name . '.nc' if $base_od; # FIXME - file extension should not be hardcoded but read from parent
+        return $base_od;
     }
 }
 

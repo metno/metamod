@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- This file must be imported into the database using the import_searchdata.pl script before use -->
 <searchdata>
 <sc id="1" idname="activity_types" type="basickey" fnc="name: Activity types" />
 <bk sc="1">Cruise</bk>
@@ -4019,5 +4020,13 @@
 <mt name="dataref_WMS" share="FALSE" def="URL to WMS service (without GetCapabilities)" />
 <mt name="dataref_HTTPServer" share="FALSE" def="URL where data file can be downloaded" />
 <mt name="dataref_FTP" share="FALSE" def="URL where data file can be downloaded via FTP" />
+<mt name="baseref" share="FALSE" def="Base URL reference to data, or short name" />
+<mt name="baseref_PROJ" share="FALSE" def="Base URL to related information on the project(s) that created this dataset" />
+<mt name="baseref_DOC" share="FALSE" def="Base URL to related information on this specific dataset" />
+<mt name="baseref_OPENDAP" share="FALSE" def="Base URL reference to OPeNDAP service" />
+<mt name="baseref_THREDDS" share="FALSE" def="Base URL reference to THREDDS dataset" />
+<mt name="baseref_WMS" share="FALSE" def="Base URL to WMS service (without GetCapabilities)" />
+<mt name="baseref_HTTPServer" share="FALSE" def="Base URL where data file can be downloaded" />
+<mt name="baseref_FTP" share="FALSE" def="Base URL where data file can be downloaded via FTP" />
 <mt name="timeseries" share="FALSE" def="List of variables to visualise in time series" /> <!-- deprecated -->
 </searchdata>
