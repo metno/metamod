@@ -271,6 +271,7 @@ app = {
         coll_title = 'File collection'
         dl_title = 'Download files in basket'
         script_label = 'Get download script'
+        script_total = ' files available for download'
         total = 'Total'
         unavail = 'Datasets shown in italic are unavailable for download as ZIP archive.'
         remove_hd = [ 'Dataset name', 'File size']
