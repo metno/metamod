@@ -125,9 +125,10 @@ sub parseMM2 {
 
 sub parseCatalog {
     my $base = URI->new(shift) or die "Missing/improper URL";
-    print STDERR "Parsing top catalog ...\n"     if $base =~ s|\.html$|\.xml|              && $opt{debug};
-    print STDERR "Parsing level 2 dataset ...\n" if $base =~ s|catalog\.html|catalog\.xml| && $opt{debug};
-    my $doc = getXML($base) or die;
+    print STDERR "Parsing top catalog ...\n"     if $base =~ s|/$|/catalog\.xml| && $opt{debug};
+    print STDERR "Parsing top catalog ...\n"     if $base =~ s|\.html$|\.xml|    && $opt{debug};
+    print STDERR "Parsing level 2 dataset ...\n" if $base =~ s|\.html|\.xml|     && $opt{debug};
+    my $doc = getXML($base) or die "Can't parse XML from $base";
     print $doc->toString(1) if $opt{full};
     my $xc = XML::LibXML::XPathContext->new($doc);
     $xc->registerNs('t', THREDDS_NS);
