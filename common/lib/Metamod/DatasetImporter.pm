@@ -439,9 +439,13 @@ sub _insert_metadata {
 
             } elsif ( $mtname eq 'datacollection_period' ) {
 
-                if ( $mdcontent =~ /(\d{4,4})-(\d{2,2})-(\d{2,2}) to (\d{4,4})-(\d{2,2})-(\d{2,2})/ ) {
-                    my $from = $1 . $2 . $3;
-                    my $to   = $4 . $5 . $6;
+                if ( my ($from, $to) = $mdcontent =~ /(.+) to (.+)/ ) {
+                    # strip dashes from dates
+                    foreach ( $from, $to ) {
+                        s/current/99991231/; # if no end date, set to a far date ahead
+                        s/(\d{4,4})-(\d{2,2})-(\d{2,2})/$1$2$3/;
+                    }
+                    #print STDERR "++++++++++++++++ $from to $to\n";
                     $sql_insert_NI->execute( $scid, $from, $to, $dsid );
                 }
 
@@ -674,8 +678,8 @@ sub _transform_metadata {
             }
         }
     }
-    if ( defined($period_from) && defined($period_to) ) {
-        my $period = $period_from . ' to ' . $period_to;
+    if ( defined $period_from ) {
+        my $period = $period_from . ' to ' . ($period_to||'current');
         my $mref = [ 'datacollection_period', $period ];
         push( @metaarray, $mref );
     }
