@@ -194,10 +194,10 @@ server {
         index index.html;
     }
 
-    location ~ $local/(.+) {
+    location $local/ {
         include /etc/nginx/proxy_params;
         #proxy_set_header X-Forwarded-For \$remote_addr;
-        proxy_pass http://127.0.0.1:$port/\$1?\$query_string;
+        proxy_pass http://127.0.0.1:$port/;
     }
 
     location /robots.txt {

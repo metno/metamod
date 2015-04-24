@@ -4,10 +4,9 @@
 	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="variable">Oceans &gt; Ocean Temperature &gt; Water Temperature &gt; HIDDEN</metadata>
 	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="variable">Oceans &gt; Salinity/Density &gt; Salinity &gt; HIDDEN</metadata>
 	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="area">Kara Sea</metadata>
-    <metadata xmlns="http://www.met.no/schema/metamod/MM2" name="area">Nordic Seas</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="area">Nordic Seas</metadata>
 	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="datacollection_period_from">2010-01-01</metadata>
-	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="history">2009-03-12
-		creation</metadata>
+	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="history">2009-03-12 creation</metadata>
 	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="datacollection_period_to">2011-01-01</metadata>
 	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="abstract">Short test abstract</metadata>
 	<metadata xmlns="http://www.met.no/schema/metamod/MM2" name="title">Test title</metadata>

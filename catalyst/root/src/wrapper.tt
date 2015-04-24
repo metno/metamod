@@ -48,17 +48,17 @@
 </div>
 
 <div id="content" class="g720">
-<div id="inner-content">
-[% IF section %]
-[% INCLUDE "${section}/header.tt" %]
-[% END %]
-<hr/>
-[% content %]
-</div>
+  <div id="inner-content">
+    [% IF section %]
+      [% INCLUDE "${section}/header.tt" %]
+      <hr/>
+    [% END %]
+    [% content %]
+  </div>
 </div>
 
 <div id="footer" class="g960">
-[% INCLUDE 'footer.tt' %]
+  [% INCLUDE 'footer.tt' %]
 </div>
 
 </div>

@@ -106,11 +106,11 @@ sub newFromFile {
     };
     if ($@) {
         $error_text = $@;
-        $logger->error('newFromFile error: ', $@);
+        $logger->error('newFromFile error in $basename: ', $@);
         croak("newFromFile error: $@");
     }
     if (! $something) {
-        $error_text = "Unknown XML metadata format";
+        $error_text = "Unknown XML metadata format in $basename";
         $logger->error('newFromFile error: ', $error_text);
         croak("newFromFile error: $error_text");
     }

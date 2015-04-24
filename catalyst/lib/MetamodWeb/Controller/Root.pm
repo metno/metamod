@@ -89,7 +89,7 @@ Standard 404 error page
 
 sub default :Path { # must come after error so won't be overridden
     my ( $self, $c ) = @_;
-    $c->stash( template => 'errorpage.tt', status_text => "Page not found (404)", 'current_view' => 'None' );
+    $c->stash( template => 'errorpage.tt', status_text => "404 Not Found", 'current_view' => 'None' );
     #$c->response->body( "<h1>Page not found</h1>\n" );
     $c->response->content_type('text/html');
     $c->response->status(404);
@@ -172,7 +172,7 @@ sub end : ActionClass('RenderView') :Does('DumpQueryLog') :Does('DeleteStash')  
 
     if ( scalar @{ $c->error } ) {
 
-        $c->stash->{title} = 'METAMOD fatal error';
+        $c->stash->{title} = '500 F&ouml;hnkrankheit';
         $c->stash->{URI} = $c->req->uri();
         $c->response->status(500);
         $c->stash->{errors}   = $c->error;
@@ -191,6 +191,19 @@ sub end : ActionClass('RenderView') :Does('DumpQueryLog') :Does('DeleteStash')  
         }
     }
 }
+
+=head2 error
+
+This always genereates an error (only for debugging)
+
+=cut
+
+sub throw_error : Path('/error') : Args(0) {
+    my ($self, $c) = @_;
+
+    die "You want errors? You got errors!";
+}
+
 
 __PACKAGE__->meta->make_immutable;
 

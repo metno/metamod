@@ -31,7 +31,10 @@ my @dataset_files = qw(
     data_provider_different_tag
     data_provider_excluded_tag
     data_provider_invalid_metadata
+    data_provider_ongoing
 );
+
+# TODO: add some testing on data_provider_ongoing to check blank datacollection_period
 
 foreach my $dataset_file (@dataset_files) {
     my $ds = Metamod::Dataset->newFromFile("$FindBin::Bin/../../data/Metamod/OAI/$dataset_file");
@@ -68,6 +71,7 @@ foreach my $dataset_file (@dataset_files) {
             identifier => 'oai:met.no:metamod/OTHER/data_provider_invalid_metadata',
             datestamp  => '2009-01-01T00:00:00Z'
         },
+        { identifier => 'oai:met.no:metamod/OTHER/data_provider_ongoing', datestamp => '2009-03-20T11:08:29Z' },
     ];
 
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: No conditions. Sets not supported" );
@@ -98,6 +102,7 @@ foreach my $dataset_file (@dataset_files) {
             identifier => 'oai:met.no:metamod/OTHER/data_provider_invalid_metadata',
             datestamp  => '2009-01-01T00:00:00Z'
         },
+        { identifier => 'oai:met.no:metamod/OTHER/data_provider_ongoing', datestamp => '2009-03-20T11:08:29Z' },
     ];
 
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: Until condition. Sets not supported" );
@@ -143,6 +148,7 @@ foreach my $dataset_file (@dataset_files) {
             datestamp  => '2009-01-01T00:00:00Z',
             status     => 'deleted'
         },
+        { identifier => 'oai:met.no:metamod/OTHER/data_provider_ongoing', datestamp => '2009-03-20T11:08:29Z' },
     ];
 
     is_deeply( $identifiers, $expected_identifiers,
@@ -193,6 +199,11 @@ foreach my $dataset_file (@dataset_files) {
             datestamp  => '2009-01-01T00:00:00Z',
             setSpec    => ['DAM']
         },
+        {
+            identifier => 'oai:met.no:metamod/OTHER/data_provider_ongoing',
+            datestamp  => '2009-03-20T11:08:29Z',
+            setSpec    => 'DAM'
+        },
     ];
 
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: No conditions. Sets supported" ) or
@@ -211,7 +222,7 @@ foreach my $dataset_file (@dataset_files) {
     is_deeply( $identifiers, $expected_identifiers, "get_identifiers: Set condition. Sets supported" ) or
     print STDERR Dumper \$identifiers, \$expected_identifiers;
 
-    BEGIN { $num_tests += 15 }
+    BEGIN { $num_tests += 15 } # ok
 
 }
 
@@ -249,6 +260,11 @@ foreach my $dataset_file (@dataset_files) {
             datestamp  => '2009-01-01T00:00:00Z',
             metadata   => '',
         },
+        {
+            identifier => 'oai:met.no:metamod/OTHER/data_provider_ongoing',
+            datestamp  => '2009-03-20T11:08:29Z',
+            metadata   => ''
+        },
     ];
 
     compare_records( $records, $expected_records, "get_records: No conditions" );
@@ -283,6 +299,11 @@ foreach my $dataset_file (@dataset_files) {
             datestamp  => '2009-01-01T00:00:00Z',
             status   => 'deleted',
         },
+        {
+            identifier => 'oai:met.no:metamod/OTHER/data_provider_ongoing',
+            datestamp  => '2009-03-20T11:08:29Z',
+            metadata   => ''
+        },
     ];
 
     compare_records( $records, $expected_records, "get_records: With validation" );
@@ -298,7 +319,7 @@ foreach my $dataset_file (@dataset_files) {
 
     compare_records( $records, $expected_records, "get_records: No records match" );
 
-    BEGIN { $num_tests += 16 }
+    BEGIN { $num_tests += 5 + ( 2*5 + 1 ) + 1 } # 2 calls to compare_records() on 5 elem array + one call to empty array
 }
 
 #
@@ -371,7 +392,7 @@ foreach my $dataset_file (@dataset_files) {
     is_deeply( $record, $expected_record, "get_record: Valid identifier and valid metadata. Sets turned on" ) or
     print STDERR Dumper \$record, \$expected_record;
 
-    BEGIN { $num_tests += 10 }
+    BEGIN { $num_tests += 10 } # ok
 
 }
 
@@ -398,6 +419,7 @@ foreach my $dataset_file (@dataset_files) {
         { identifier => 'oai:met.no:metamod/OTHER/data_provider1', datestamp => '2009-03-20T11:08:29Z' },
     ];
 
+    # First run
     my $token_id = delete $resumption_token->{token_id};
     delete $resumption_token->{expiration_date};
     my $expected_resumption_token = {
@@ -405,12 +427,13 @@ foreach my $dataset_file (@dataset_files) {
         until => '',
         set => '',
         cursor => 0,
-        complete_list_size => 4,
+        complete_list_size => 5,
     };
 
     is_deeply( $identifiers, $expected_identifiers, 'First identifiers with no conditions when resumption token is used.');
     is_deeply( $resumption_token, $expected_resumption_token, 'Resumption token without any conditions. First run');
 
+    # Second run
     ($identifiers, $resumption_token) = $dp->get_identifiers( '', '', '', '', $token_id );
     $expected_identifiers = [
         {
@@ -427,13 +450,13 @@ foreach my $dataset_file (@dataset_files) {
         until => '',
         set => '',
         cursor => 1,
-        complete_list_size => 4,
+        complete_list_size => 5,
     };
 
     is_deeply( $identifiers, $expected_identifiers, 'Second identifiers with no conditions when resumption token is used.');
     is_deeply( $resumption_token, $expected_resumption_token, 'Resumption token without any conditions. Second run');
 
-
+    # Third run
     ($identifiers, $resumption_token) = $dp->get_identifiers( '', '', '', '', $token_id );
     $expected_identifiers = [
         { identifier => 'oai:met.no:metamod/OTHER/data_provider_different_tag', datestamp => '2011-01-01T00:00:00Z' },
@@ -448,14 +471,14 @@ foreach my $dataset_file (@dataset_files) {
         until => '',
         set => '',
         cursor => 2,
-        complete_list_size => 4,
+        complete_list_size => 5,
     };
 
     is_deeply( $identifiers, $expected_identifiers, 'Third identifiers with no conditions when resumption token is used.');
     is_deeply( $resumption_token, $expected_resumption_token, 'Resumption token without any conditions. Third run');
     is_deeply( $identifiers2, $identifiers, 'Re-query with a resumption token gives the same result each time' );
 
-
+    #  Fourth run
     ($identifiers, $resumption_token) = $dp->get_identifiers( '', '', '', '', $token_id );
     $expected_identifiers = [
         {
@@ -464,18 +487,39 @@ foreach my $dataset_file (@dataset_files) {
         },
     ];
 
+    $token_id = delete $resumption_token->{token_id};
     delete $resumption_token->{expiration_date};
     $expected_resumption_token = {
         from => '',
         until => '',
         set => '',
         cursor => 3,
-        complete_list_size => 4,
-        token_id => undef,
+        complete_list_size => 5,
+        #token_id => undef,
     };
     is_deeply( $identifiers, $expected_identifiers, 'Fourth identifiers with no conditions when resumption token is used.');
     is_deeply( $resumption_token, $expected_resumption_token, 'Resumption token without any conditions. Fourth run');
 
+    #  Fifth run
+    ($identifiers, $resumption_token) = $dp->get_identifiers( '', '', '', '', $token_id );
+    $expected_identifiers = [
+        {
+            identifier => 'oai:met.no:metamod/OTHER/data_provider_ongoing',
+            datestamp  => '2009-03-20T11:08:29Z',
+        },
+    ];
+
+    delete $resumption_token->{expiration_date};
+    $expected_resumption_token = {
+        from => '',
+        until => '',
+        set => '',
+        cursor => 4,
+        complete_list_size => 5,
+        token_id => undef,
+    };
+    is_deeply( $identifiers, $expected_identifiers, 'Fifth identifiers with no conditions when resumption token is used.');
+    is_deeply( $resumption_token, $expected_resumption_token, 'Resumption token without any conditions. Fifth run');
 
     #
     # Testing resumption token with condition from condition
@@ -531,12 +575,14 @@ foreach my $dataset_file (@dataset_files) {
     is_deeply($identifiers, undef, 'Old resumption token gives no result');
     is_deeply($resumption_token, undef, 'Old resumption token gives no new resumption token');
 
-    BEGIN { $num_tests += 18 }
+    BEGIN { $num_tests += 21 } # ok
 }
 
 BEGIN { plan tests => $num_tests }
 
-
+#
+# runs 1 test per existing record + 1 final
+#
 sub compare_records {
     my ($records, $expected_records, $testname) = @_;
 

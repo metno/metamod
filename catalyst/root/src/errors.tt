@@ -1,4 +1,6 @@
 
+<h1>[% title %]</h1>
+
 [%  # used for unrecoverable errors
     app.error.fatal | eval %]
 
