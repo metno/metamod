@@ -497,7 +497,7 @@ sub _oai_record_header {
     my $ownertag = $dataset->ds_ownertag();
     if (exists($set_specs{$ownertag})) {
         my @specarr = @{$set_specs{$ownertag}};
-        $record->{setSpec} = \@specarr;
+        $record->{setSpec} = @specarr == 1 ? $specarr[0] : \@specarr;
     }
 
     # If metadata validation is turned on we will mark all datasets with invalid

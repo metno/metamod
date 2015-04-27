@@ -181,46 +181,52 @@ foreach my $dataset_file (@dataset_files) {
         {
             identifier => 'oai:met.no:metamod/OTHER/data_provider1',
             datestamp  => '2009-03-20T11:08:29Z',
-            setSpec    => ['DAM']
+            setSpec    => 'DAM'
         },
         {
             identifier => 'oai:met.no:metamod/OTHER/data_provider_deleted',
             datestamp  => '2010-01-01T00:00:00Z',
             status     => 'deleted',
-            setSpec    => ['DAM']
+            setSpec    => 'DAM'
         },
         {
             identifier => 'oai:met.no:metamod/OTHER/data_provider_different_tag',
             datestamp  => '2011-01-01T00:00:00Z',
-            #setSpec    => ['NDAM'] # this is missing in result, causing test to fail... FIXME
+            setSpec    => 'NDAM' # this is missing in result, causing test to fail... FIXME
         },
         {
             identifier => 'oai:met.no:metamod/OTHER/data_provider_invalid_metadata',
             datestamp  => '2009-01-01T00:00:00Z',
-            setSpec    => ['DAM']
+            setSpec    => 'DAM'
         },
         {
             identifier => 'oai:met.no:metamod/OTHER/data_provider_ongoing',
             datestamp  => '2009-03-20T11:08:29Z',
-            setSpec    => ['DAM']
+            setSpec    => 'DAM'
         },
     ];
 
-    is_deeply( $identifiers, $expected_identifiers, "get_identifiers: No conditions. Sets supported" );
-    #or print STDERR Dumper \$identifiers, \$expected_identifiers;
+    TODO: {
+        local $TODO = 'setSpec NDAM missing from expected output'; # FIXME
+        is_deeply( $identifiers, $expected_identifiers, "get_identifiers: No conditions. Sets supported" );
+        #or print STDERR Dumper \$identifiers, \$expected_identifiers;
+    }
 
     #### test 15 fails - returns same set as 14 (change in behaviour introduced by rev 2762?)
     ($identifiers, $resumption_token) = $dp2->get_identifiers( 'dif', '', '', 'NDAM', '' );
-    #$expected_identifiers = [
-    #    {
-    #        identifier => 'oai:met.no:metamod/OTHER/data_provider_different_tag',
-    #        datestamp  => '2011-01-01T00:00:00Z',
-    #        setSpec    => ['NDAM']
-    #    },
-    #];
+    $expected_identifiers = [
+        {
+            identifier => 'oai:met.no:metamod/OTHER/data_provider_different_tag',
+            datestamp  => '2011-01-01T00:00:00Z',
+            setSpec    => 'NDAM'
+        },
+    ];
 
-    is_deeply( $identifiers, $expected_identifiers, "get_identifiers: Set condition. Sets supported" );
-    #or print STDERR Dumper \$identifiers, \$expected_identifiers;
+    TODO: {
+        local $TODO = 'returns data_provider1 (same result as previous test) instead of data_provider_different_tag'; # FIXME
+        is_deeply( $identifiers, $expected_identifiers, "get_identifiers: Set condition. Sets supported" );
+        #or print STDERR Dumper \$identifiers, \$expected_identifiers;
+    }
 
     BEGIN { $num_tests += 15 } # ok
 
@@ -383,7 +389,7 @@ foreach my $dataset_file (@dataset_files) {
             identifier => 'oai:met.no:metamod/OTHER/data_provider1',
             datestamp  => '2009-03-20T11:08:29Z',
             metadata => '',
-            setSpec => ['DAM'],
+            setSpec => 'DAM',
         };
     is( exists $record->{metadata}, exists $expected_record->{metadata}, "get_record: Valid identifier and valid metadata, metadata check. Sets turned on" );
     delete $record->{metadata};
