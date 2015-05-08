@@ -3,8 +3,8 @@
 [% app.search.basickey_form_help | eval %]
 </p>
 
-<button type="button" onclick="jQuery( 'input.basickey_[% category.sc_id %]' ).attr('checked', 'checked')">[% ui.button.select_all %]</button>
-<button type="button" onclick="jQuery( 'input.basickey_[% category.sc_id %]' ).attr('checked', '')">[% ui.button.clear_all %]</button>
+<button type="button" onclick="jQuery( 'input.basickey_[% category.sc_id %]' ).prop('checked', true)">[% ui.button.select_all %]</button>
+<button type="button" onclick="jQuery( 'input.basickey_[% category.sc_id %]' ).prop('checked', false)">[% ui.button.clear_all %]</button>
 <br />
 
 [% FOREACH basickey IN search_ui_utils.basickeys( category.sc_id ) %]

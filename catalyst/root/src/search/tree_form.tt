@@ -10,8 +10,8 @@ function toggleTree( hkId ){
 
 <p class="help">[% app.search.tree_form_help | eval %]</p>
 
-<button type="button" onclick="jQuery( 'input.topictree_level1' ).attr('checked', 'checked')">[% ui.button.select_all %]</button>
-<button type="button" onclick="jQuery( 'input.topictree' ).attr('checked', '')">[% ui.button.clear_all %]</button>
+<button type="button" onclick="jQuery( 'input.topictree_level1' ).prop('checked', true)">[% ui.button.select_all %]</button>
+<button type="button" onclick="jQuery( 'input.topictree' ).prop('checked', false)">[% ui.button.clear_all %]</button>
 <br />
 
 <ul class="topics_tree topics_tree_level1">
@@ -21,7 +21,10 @@ function toggleTree( hkId ){
         <span class="toggle_indicator" style="font-family: monospace;">+</span>
         <span class="toggle_indicator" style="font-family: monospace; display: none">-</span>
     </span>
-    <input type="checkbox" class="topictree topictree_level1" name="[% search_ui_utils.html_id_for_hk_topic( root.hk_id ) %]" id="[% search_ui_utils.html_id_for_hk_topic( root.hk_id ) %]" [% root.selected ? 'checked="checked"' : '' %] />
+    <input type="checkbox" class="topictree topictree_level1"
+           name="[% search_ui_utils.html_id_for_hk_topic( root.hk_id ) %]"
+           id="[% search_ui_utils.html_id_for_hk_topic( root.hk_id ) %]"
+           [% root.selected ? 'checked="checked"' : '' %] />
     <label>[% root.name %]</label>
     <ul class="topics_tree topics_tree_level2" id="topics_tree_[% root.hk_id %]" >
     [% FOREACH level2_tree IN root.subtrees %]
@@ -30,7 +33,10 @@ function toggleTree( hkId ){
             <span class="toggle_indicator" style="font-family: monospace;">+</span>
             <span class="toggle_indicator" style="font-family: monospace; display: none">-</span>
         </span>
-        <input type="checkbox" class="topictree" name="[% search_ui_utils.html_id_for_hk_topic( level2_tree.hk_id ) %]" id="[% search_ui_utils.html_id_for_hk_topic( level2_tree.hk_id ) %]" [% level2_tree.selected ? 'checked="checked"' : '' %] />
+        <input type="checkbox" class="topictree"
+               name="[% search_ui_utils.html_id_for_hk_topic( level2_tree.hk_id ) %]"
+               id="[% search_ui_utils.html_id_for_hk_topic( level2_tree.hk_id ) %]"
+               [% level2_tree.selected ? 'checked="checked"' : '' %] />
         <label>[% level2_tree.name %]</label>
         <ul class="topics_tree topics_tree_level3" id="topics_tree_[% level2_tree.hk_id %]">
         [% FOREACH level3_tree IN level2_tree.subtrees %]
@@ -43,14 +49,20 @@ function toggleTree( hkId ){
             [% ELSE %]
                 <span style="font-family: monospace;">&nbsp;</span>
             [% END %]
-            <input type="checkbox" class="topictree" name="[% search_ui_utils.html_id_for_hk_topic( level3_tree.hk_id ) %]" id="[% search_ui_utils.html_id_for_hk_topic( level3_tree.hk_id ) %]" [% level3_tree.selected ? 'checked="checked"' : '' %] />
+            <input type="checkbox" class="topictree"
+                   name="[% search_ui_utils.html_id_for_hk_topic( level3_tree.hk_id ) %]"
+                   id="[% search_ui_utils.html_id_for_hk_topic( level3_tree.hk_id ) %]"
+                   [% level3_tree.selected ? 'checked="checked"' : '' %] />
             <label>[% level3_tree.name %]</label>
             [% IF level3_tree.subtrees.size() != 0 %]
                 <ul class="topics_tree topics_tree_level4" id="topics_tree_[% level3_tree.hk_id %]">
                 [% FOREACH level4_tree IN level3_tree.subtrees %]
                     <li class="topics_tree">
                     <span style="font-family: monospace;">&nbsp;</span>
-                    <input type="checkbox" class="topictree" name="[% search_ui_utils.html_id_for_bk_topic( level4_tree.bk_id ) %]" id="[% search_ui_utils.html_id_for_bk_topic( level4_tree.bk_id ) %]" [% level4_tree.selected ? 'checked="checked"' : '' %] />
+                    <input type="checkbox" class="topictree"
+                           name="[% search_ui_utils.html_id_for_bk_topic( level4_tree.bk_id ) %]"
+                           id="[% search_ui_utils.html_id_for_bk_topic( level4_tree.bk_id ) %]"
+                           [% level4_tree.selected ? 'checked="checked"' : '' %] />
                     <label>[% level4_tree.name %]</label>
                     </li>
                 [% END %]
