@@ -28,6 +28,7 @@ use Log::Log4perl;
 use Moose;
 use Try::Tiny;
 use Carp;
+use Data::Dumper;
 
 use Metamod::Dataset;
 use Metamod::DatasetTransformer::ToISO19115;
@@ -141,6 +142,8 @@ sub _build__unshared_metadatatypes {
     while ( my @row = $stm->fetchrow_array ) {
         $rest_metadatatypes{ $row[0] } = 1;
     }
+
+    $rest_metadatatypes{ 'dataset_name' } = 1; # hardcoded, should never be set in MM2
 
     return \%rest_metadatatypes;
 
@@ -683,6 +686,11 @@ sub _transform_metadata {
         my $mref = [ 'datacollection_period', $period ];
         push( @metaarray, $mref );
     }
+
+    my $names = $info{name};
+    $names =~ s|/| |g;
+    $names =~ s|[_]||g;
+    push( @metaarray, [ 'dataset_name', $names] ); # push ds_name to md for text search availability
 
     return @metaarray;
 

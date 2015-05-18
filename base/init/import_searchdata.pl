@@ -44,7 +44,7 @@ use File::Spec;
 use File::Basename;
 use XML::Simple qw(:strict);
 use mmTtime;
-# use Data::Dumper;
+use Data::Dumper;
 use DBI;
 use Getopt::Long;
 use Pod::Usage;
@@ -145,7 +145,11 @@ sub update_database {
                                 mt => "name"
                               },
                    ForceArray => 1);
-#   print Dumper($xmlref);
+   $xmlref->{mt}->{dataset_name} = {
+      share => 'FALSE',
+      def => 'Dataset name (automatically included)',
+   };
+   #print Dumper($xmlref);
 #   return;
 #
    my @utctime = gmtime(mmTtime::ttime());

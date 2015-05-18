@@ -194,10 +194,10 @@ sub metadata_search_params {
         my @fulltext_conds = ();
         foreach my $term (@$termlist) {
             my $condition = {
-                -or => {
+                #-or => {
                     'md_id.md_content_vector' => $self->fulltext_search($term),
-                    'me.ds_name'              => { LIKE => '%' . $term . '%' } # FIXME - remove wildcards in user input
-                }
+                    #'me.ds_name'              => { LIKE => '%' . $term . '%' } # FIXME - remove wildcards in user input
+                #}
             };
             push @fulltext_conds, $condition;
         }
@@ -252,6 +252,7 @@ sub metadata_search_params {
             order_by => 'me.ds_name',
     );
 
+    print STDERR Dumper( \%search_cond, \%search_attrs );
     return ( \%search_cond, \%search_attrs );
 }
 
