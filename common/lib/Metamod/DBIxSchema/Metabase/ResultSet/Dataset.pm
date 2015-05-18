@@ -252,7 +252,7 @@ sub metadata_search_params {
             order_by => 'me.ds_name',
     );
 
-    print STDERR Dumper( \%search_cond, \%search_attrs );
+    #print STDERR Dumper( \%search_cond, \%search_attrs );
     return ( \%search_cond, \%search_attrs );
 }
 
