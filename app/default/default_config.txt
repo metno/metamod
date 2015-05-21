@@ -263,6 +263,8 @@ LONLAT_SRID = 4035
 # locate your fimex program for reprojection of data
 FIMEX_PROGRAM = /usr/bin/fimex
 FIMEX_SCHEMAS = /usr/share/fimex
+# default tempdir determined by system
+#FIMEX_TEMPDIR = /some/other/tmp
 
 # ============ WMS configuration =======================
 

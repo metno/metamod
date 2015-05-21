@@ -194,6 +194,8 @@ sub transform_POST {
         program => $fimexpath,
     );
 
+    $fiParams{outputDirectory} = $config->get('FIMEX_TEMPDIR') if $config->has('FIMEX_TEMPDIR');
+
     my $vars = $p->{vars};
     $fiParams{selectVariables} = ref $vars ? $vars : [ $vars ] if $vars; # listify if single, skip if empty
 
