@@ -206,7 +206,7 @@ sub prepare_download {
         my $msg = "Adding $local_file to archive";
         $msg .= " as $basename" if $basename; # blank if using transform
         $self->logger->debug($msg);
-        $zip->addFile( $local_file, $basename ) && unlink $local_file;
+        $zip->addFile( $local_file, $basename );
     }
 
     # generate zipfile
