@@ -206,7 +206,7 @@ sub prepare_download {
         my $msg = "Adding $local_file to archive";
         $msg .= " as $basename" if $basename; # blank if using transform
         $self->logger->debug($msg);
-        $zip->addFile( $local_file, $basename );
+        $zip->addFile( $local_file, $basename ) && unlink $local_file;
     }
 
     # generate zipfile
@@ -262,8 +262,9 @@ sub transform_file {
     my ($self, $file, $reproj, $dir) = @_;
     $self->logger->debug("Transforming file $file ...");
     my ($basename) = $file =~ m|([^/]+)$|;
+    my $config = $self->config;
 
-    my $fimexpath = $self->config->get('FIMEX_PROGRAM'); # should be moved to constructor - FIXME
+    my $fimexpath = $config->get('FIMEX_PROGRAM'); # should be moved to constructor - FIXME
     unless ( $fimexpath ) {
         $self->report_error( "Not available without FIMEX installed" );
         return;
@@ -274,6 +275,8 @@ sub transform_file {
         dapURL => $file, # should be inputFile for local files, but work identically
         program => $fimexpath,
     );
+
+    $fiParams{outputDirectory} = $config->get('FIMEX_TEMPDIR') if $config->has('FIMEX_TEMPDIR');
 
     my $fimex;
     eval {

@@ -331,11 +331,13 @@ sub validate_transform : Private {
 
 sub _fimextime {
     # convert timestamp into udunits as in https://projects.met.no/fimex/doc/classMetNoFimex_1_1TimeSpec.html
+    # should rather use DateTime::Format::ISO8601 - FIXME
     my $time = shift;
     my ($yy, $mm, $dd, $rest) = $time =~ /^(\d+)-(\d+)-(\d+)[ T]?(.*)/ or die "Invalid time format";
-    my ($h, $m, $s)        = $rest =~ /^(\d+):(\d+):(\d+(\.\d+)?)/;
-    return $rest ? "$yy-$mm-$dd $h:$m:$s" : "$yy-$mm-$dd 00:00:00";
-
+    my ($h, $m, $s)           = $rest =~ /^(\d+):(\d+):?(\d+(\.\d+)?)/;
+    #print STDERR "*REST* ", Dumper [ $rest, $h, $m, $s ];
+    no warnings 'uninitialized';
+    return sprintf "%.2d-%.2d-%.2d %.2d:%.2d:%.2d", $yy, $mm, $dd, $h, $m, $s;
 }
 
 __PACKAGE__->meta->make_immutable;
