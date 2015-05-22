@@ -530,7 +530,7 @@ sub calculateAxisValues {
 
 =head2 projectFile
 
-reproject a file using fimex
+Reproject a file using fimex. Dies on error after deleting generated files
 
 =over 4
 
@@ -612,8 +612,10 @@ sub projectFile {
         if ( system($command) != 0 ) { # can't use array since we need redirection of STDERR
             open(FILE, $errorfile) or die "Can't open file $errorfile";
             my $errmsg = do {local $/; <FILE> };
+            close(FILE) && unlink( $errorfile, $p{'output.file'} );
             die "$errmsg\n$command";
         }
+        unlink $errorfile;
     }
     #print STDERR "++++++++++++++++++ \n$command\n";
     return $command; # usually not used, just for debugging

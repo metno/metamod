@@ -240,6 +240,7 @@ sub transform_POST {
 
     my $cmd = eval { $fimex->doWork() };
     if ($@) {
+        # MetNo::Fimex now deletes generated files on error
         $self->logger->warn("FIMEX runtime error: $@");
         $c->detach( 'Root', 'error', [ 502, "FIMEX runtime error: $@"] );
     }
@@ -248,13 +249,12 @@ sub transform_POST {
 
     my $ncfile = $fimex->outputPath;
 
-    $c->detach( 'Root', 'error', [ 502, "Missing output file"] ) unless -s $ncfile;
-
-    #print STDERR "*************** $ncfile\n";
-
-    $c->serve_static_file($ncfile);
-
-    unlink $ncfile;
+    if (-s $ncfile) {
+        $c->serve_static_file($ncfile);
+        unlink $ncfile;
+    } else {
+        $c->detach( 'Root', 'error', [ 502, "Missing output file"] );
+    }
 
 }
 
