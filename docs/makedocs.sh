@@ -3,7 +3,7 @@
 while getopts ":av" opt; do
   case $opt in
     a)
-      echo "Building all docs" >&2
+      echo "Rebuilding complete docs" >&2
       all=1
       ;;
     v)
