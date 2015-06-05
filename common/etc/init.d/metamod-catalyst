@@ -59,9 +59,9 @@ fi
 # Set this if you have more than one instance of the app and you don't want
 # them to step on each other's pidfile.
 PIDSUFFIX=[==APPLICATION_ID==]
-PIDDIR=[==WEBRUN_DIRECTORY==]
 # must put PIDs where they will be deleted during reboot - FIXME
-#PIDDIR=/var/run
+#PIDDIR=[==WEBRUN_DIRECTORY==]
+PIDDIR=/var/run
 PIDFILE=$PIDDIR/$UNIXNAME${PIDSUFFIX:+"-$PIDSUFFIX"}.pid
 
 if [ -d "[==CONFIG_DIR==]" ]; then
@@ -105,9 +105,11 @@ _start() {
     start-stop-daemon --start --verbose --pidfile $PIDFILE -m --chdir $APPDIR \
         ${USER:+"--chuid"} $USER ${GROUP:+"--group"} $GROUP --background \
         --startas $BINDIR/${UNIXNAME}_server.pl -- --port $port \
+        # --config should not be necessary since METAMOD_MASTER_CONFIG is set in /etc/default
         --config [==CONFIG_DIR==] \
         --min_servers=2 --max_servers=5 --min_spare_servers=1 --max_spare_servers=3
-    # --config should not be necessary since METAMOD_MASTER_CONFIG is set in /etc/default
+        # should drop -m from ssd and instead daemonize starman:
+        # --pid $PIDFILE --daemonize
 
     for i in 1 2 3 4 5 ; do
         sleep 1
