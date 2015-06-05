@@ -266,6 +266,9 @@ FIMEX_SCHEMAS = /usr/share/fimex
 # default tempdir determined by system
 #FIMEX_TEMPDIR = /some/other/tmp
 
+# settings vars which can safely be exposed to monitoring scripts
+EXPOSE_CONFIG_SETTINGS = VERSION APPLICATION_ID SERVER CATALYST_PORT VIRTUAL_HOST BASE_PART_OF_EXTERNAL_URL LOCAL_URL CONFIG_DIR WEBRUN_DIRECTORY DATABASE_NAME USERBASE_NAME FIMEX_PROGRAM
+
 # ============ WMS configuration =======================
 
 # urls to WMS background maps

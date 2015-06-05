@@ -53,6 +53,33 @@ sub version :Path('/version') :Args(0) {
     $c->serve_static_file( "$dir/VERSION" );
 }
 
+
+=head2 settings
+
+Displays (some) settings information to aid external monitoring (nothing very secret)
+
+=cut
+
+sub settings :Path('/settings') :Args {
+    my ($self, $c, $key) = @_;
+    my $r = $c->response;
+
+    $r->content_type('text/plain');
+
+    my $config = $c->stash->{mm_config};
+    my $vars = $config->split('EXPOSE_CONFIG_SETTINGS');
+    if ($key) {
+        $c->detach( 'Root', 'error', [404, "Key $key not found"] ) unless $key ~~ @$vars;
+        $r->write( $config->has($key) ? $config->get($key) : '-' );
+    } else {
+        for (@$vars) {
+            $r->write( sprintf "%20s : %-20s\n", $_, $config->has($_) ? $config->get($_) : '-' );
+        }
+    }
+    $r->body('');
+}
+
+
 =head2 robots
 
 Output generated robots.txt
