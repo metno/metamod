@@ -7,7 +7,7 @@
 <table cellspacing="5" border="0">
     <tr>
         <td>
-            [% INCLUDE 'help_text.tt' %]
+            [% INCLUDE 'search/help_text.tt' %]
         </td>
     </tr>
 </table>
