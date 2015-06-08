@@ -27,9 +27,9 @@ system_log="$LOG4ALL_SYSTEM_LOG"
 COMMON_LIB=$SCRIPT_PATH/lib
 export PERL5LIB="$PERL5LIB:$CATALYST_LIB:$COMMON_LIB"
 
-PIDDIR="/var/run"
 #PIDDIR="$webrun_directory"
-# PIDfiles should be moved to /var/run ASAP - FIXME
+# PIDfiles should be moved to /var/run ASAP - FIXME - problems with writing to /var/run as non-root
+PIDDIR="/var/run/metamod"
 upload_monitor_pid=$PIDDIR/upload_monitor.pid
 upload_monitor_script=$SCRIPT_PATH/../upload/scripts/upload_monitor.pl
 ftp_monitor_pid=$PIDDIR/ftp_monitor.pid
