@@ -12,7 +12,7 @@ then
     rm $SHELL_CONF
 else
     rm $SHELL_CONF
-    echo "Missing config for $0" >2
+    echo "Missing config for $0" >&2
     exit 1
 fi
 
@@ -22,20 +22,23 @@ system_log="$LOG4ALL_SYSTEM_LOG"
 #echo "METAMOD_MASTER_CONFIG=$METAMOD_MASTER_CONFIG"
 #echo "CONFIG=$CONFIG"
 #echo "system_log = $system_log"
+#echo "SCRIPT_PATH=$SCRIPT_PATH"
 
 COMMON_LIB=$SCRIPT_PATH/lib
 export PERL5LIB="$PERL5LIB:$CATALYST_LIB:$COMMON_LIB"
 
+PIDDIR="/var/run"
+#PIDDIR="$webrun_directory"
 # PIDfiles should be moved to /var/run ASAP - FIXME
-upload_monitor_pid=$webrun_directory/upload_monitor.pid
+upload_monitor_pid=$PIDDIR/upload_monitor.pid
 upload_monitor_script=$SCRIPT_PATH/../upload/scripts/upload_monitor.pl
-ftp_monitor_pid=$webrun_directory/ftp_monitor.pid
+ftp_monitor_pid=$PIDDIR/ftp_monitor.pid
 ftp_monitor_script=$SCRIPT_PATH/../upload/scripts/ftp_monitor.pl
-prepare_download_pid=$webrun_directory/prepare_download.pid
+prepare_download_pid=$PIDDIR/prepare_download.pid
 prepare_download_script=$SCRIPT_PATH/scripts/prepare_download.pl
-harvester_pid=$webrun_directory/harvester.pid
+harvester_pid=$PIDDIR/harvester.pid
 harvester_script=$SCRIPT_PATH/../harvest/scripts/harvester.pl
-create_thredds_catalogs_pid=$webrun_directory/create_thredds_catalogs.pid
+create_thredds_catalogs_pid=$PIDDIR/create_thredds_catalogs.pid
 create_thredds_catalogs_script=$SCRIPT_PATH/../thredds/scripts/create_thredds_catalogs.pl
 
 . /lib/lsb/init-functions
@@ -43,6 +46,7 @@ create_thredds_catalogs_script=$SCRIPT_PATH/../thredds/scripts/create_thredds_ca
 running() {
    local pidfile
    pidfile="$@"
+   #echo "Testing picfile $pidfile..."
     # No pidfile, probably no daemon present
     #
     if [ ! -f $pidfile ]
@@ -68,6 +72,7 @@ running() {
 }
 
 start() {
+   echo "Starting services " ${METAMODUPLOAD_DIRECTORY:+"upload_monitor ftp_monitor"} ${METAMODBASE_DIRECTORY:+"prepare_download "} ${METAMODHARVEST_DIRECTORY:+"harvester "} ${METAMODTHREDDS_DIRECTORY:+"create_thredds_catalogs "}
 
    if [ ! -f $system_log ]; then
       # create world writeable logfile
@@ -93,7 +98,10 @@ start() {
       else
          echo "upload_monitor already running"
       fi
+   else
+      echo "upload_monitor disabled"
    fi
+
    if [ "$METAMODUPLOAD_DIRECTORY" != "" -a "$EXTERNAL_REPOSITORY" != "true" -a -r $ftp_monitor_script ]; then
       if ! running $ftp_monitor_pid; then
          work_directory=$webrun_directory/upl/work
@@ -112,7 +120,10 @@ start() {
       else
          echo "ftp_monitor already running"
       fi
+   else
+      echo "ftp_monitor disabled"
    fi
+
    if [ "$METAMODBASE_DIRECTORY" != "" -a -r $prepare_download_script ]; then
       if ! running $prepare_download_pid; then
          #start_daemon -n 10 -p $prepare_download_pid $prepare_download_script -log $system_log -pid $prepare_download_pid $2/master_config.txt
@@ -124,7 +135,10 @@ start() {
       else
          echo "prepare_download already running"
       fi
+   else
+      echo "prepare_download disabled"
    fi
+
    if [ "$METAMODHARVEST_DIRECTORY" != "" -a -r $harvester_script ]; then
       if ! running $harvester_pid; then
          start_daemon -n 10 -p $harvester_pid $harvester_script -l $system_log -p $harvester_pid ${CONFIG:+"--config"} $CONFIG
@@ -135,7 +149,10 @@ start() {
       else
          echo "harvester already running"
       fi
+   else
+      echo "harvester disabled"
    fi
+
    if [ "$METAMODTHREDDS_DIRECTORY" != "" -a -r $create_thredds_catalogs_script ]; then
       if ! running $create_thredds_catalogs_pid; then
          start_daemon -n 10 -p $create_thredds_catalogs_pid $create_thredds_catalogs_script -l $system_log -p $create_thredds_catalogs_pid ${CONFIG:+"--config"} $CONFIG
@@ -146,10 +163,13 @@ start() {
       else
          echo "create_thredds_catalogs already running"
       fi
+   else
+      echo "create_thredds_catalogs disabled"
    fi
 }
 
 stop() {
+   echo "Stopping services " ${METAMODUPLOAD_DIRECTORY:+"upload_monitor ftp_monitor"} ${METAMODBASE_DIRECTORY:+"prepare_download "} ${METAMODHARVEST_DIRECTORY:+"harvester "} ${METAMODTHREDDS_DIRECTORY:+"create_thredds_catalogs "}
    if [ "$METAMODUPLOAD_DIRECTORY" != "" -a -r $upload_monitor_script ]; then
       killproc -p $upload_monitor_pid $upload_monitor_script SIGTERM
    fi
@@ -173,7 +193,9 @@ restart() {
 }
 
 status() {
+   #echo "Checking status..."
    retval=0
+
    if [ "$METAMODUPLOAD_DIRECTORY" != "" -a -r $upload_monitor_script ]; then
       if running $upload_monitor_pid; then
          echo "upload_monitor is running (pid `cat $upload_monitor_pid`)"
@@ -181,7 +203,10 @@ status() {
          echo "upload_monitor not running"
          let retval+=1
       fi
+   else
+      echo "upload_monitor disabled"
    fi
+
    if [ "$METAMODUPLOAD_DIRECTORY" != "" -a -r $ftp_monitor_script ]; then
       if running $ftp_monitor_pid; then
          echo "ftp_monitor is running (pid `cat $ftp_monitor_pid`)"
@@ -189,7 +214,10 @@ status() {
          echo "ftp_monitor not running"
          let retval+=2
       fi
+   else
+      echo "ftp_monitor disabled"
    fi
+
    if [ "$METAMODBASE_DIRECTORY" != "" -a -r $prepare_download_script ]; then
       if running $prepare_download_pid; then
          echo "prepare_download is running (pid `cat $prepare_download_pid`)"
@@ -197,7 +225,10 @@ status() {
          echo "prepare_download not running"
          let retval+=4
       fi
+   else
+      echo "prepare_download disabled"
    fi
+
    if [ "$METAMODHARVEST_DIRECTORY" != "" -a -r $harvester_script ]; then
       if running $harvester_pid; then
          echo "harvester is running (pid `cat $harvester_pid`)"
@@ -205,7 +236,10 @@ status() {
          echo "harvester not running"
          let retval+=8
       fi
+   else
+      echo "harvester disabled"
    fi
+
    if [ "$METAMODTHREDDS_DIRECTORY" != "" -a -r $create_thredds_catalogs_script ]; then
       if running $create_thredds_catalogs_pid; then
          echo "create_thredds_catalogs is running (pid `cat $create_thredds_catalogs_pid`)"
@@ -213,7 +247,11 @@ status() {
          echo "create_thredds_catalogs not running"
          let retval+=16
       fi
+   else
+      echo "create_thredds_catalogs disabled"
    fi
+
+   #echo "Retval = $retval"
    if [ $retval -ne 0 ]; then
       exit 3
    fi

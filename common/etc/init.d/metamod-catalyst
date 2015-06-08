@@ -65,9 +65,10 @@ PIDDIR=/var/run
 PIDFILE=$PIDDIR/$UNIXNAME${PIDSUFFIX:+"-$PIDSUFFIX"}.pid
 
 if [ -d "[==CONFIG_DIR==]" ]; then
-    echo "Using config in [==CONFIG_DIR==]"
+    #echo "Using config in [==CONFIG_DIR==]"
+    :
 else
-    echo "Missing config directory"
+    echo "Missing config directory" >&2
     exit 1
 fi
 
