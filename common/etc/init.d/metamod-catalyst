@@ -61,8 +61,8 @@ fi
 PIDSUFFIX=[==APPLICATION_ID==]
 # must put PIDs where they will be deleted during reboot - FIXME
 #PIDDIR=[==WEBRUN_DIRECTORY==]
-PIDDIR=/var/run/metamod
-PIDFILE=$PIDDIR/$UNIXNAME${PIDSUFFIX:+"-$PIDSUFFIX"}.pid
+PIDDIR=/var/run/metamod${PIDSUFFIX:+"-$PIDSUFFIX"}
+PIDFILE=$PIDDIR/$UNIXNAME.pid
 
 if [ -d "[==CONFIG_DIR==]" ]; then
     #echo "Using config in [==CONFIG_DIR==]"

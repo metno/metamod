@@ -196,8 +196,8 @@ if [ $APPLICATION_USER ]; then
     sudo mv /tmp/metamodServices-$APPLICATION_ID /etc/init.d/; ordie "$LINKERRMSG"
     sudo chmod +x /etc/init.d/metamodServices-$APPLICATION_ID; ordie "$LINKERRMSG"
     sudo ln -s /etc/init.d/metamodServices-$APPLICATION_ID /etc/rc2.d/S99metamodServices-$APPLICATION_ID; ordie "$LINKERRMSG"
-    sudo mkdir /var/run/metamod
-    sudo chown "$APPLICATION_USER" /var/run/metamod
+    sudo mkdir -p "/var/run/metamod-$APPLICATION_ID"
+    sudo chown "$APPLICATION_USER" "/var/run/metamod-$APPLICATION_ID"
 fi
 
 # TODO: include prepare_runtime_env.sh ??
