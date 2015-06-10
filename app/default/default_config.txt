@@ -85,6 +85,9 @@ WEBRUN_DIRECTORY = [==CONFIG_DIR==]/webrun
 # for more info, and don't forget to test which method works for you.
 #SMTP_RELAY = smtp.example.com
 
+# Directory path for local CheckMK scripts (unset to disable CheckMK)
+CHECKMK_SCRIPT_DIR = /usr/lib/check_mk_agent/local
+
 # ============== Logging configuration ==================
 
 LOG4PERL_CONFIG = [==CONFIG_DIR==]/log4perl_config.ini

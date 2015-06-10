@@ -42,6 +42,7 @@ use FindBin qw($Bin);
 use lib "$Bin/../../common/lib", , "$Bin/../lib";
 use Metamod::Config;
 use Getopt::Long;
+#use Pod::Usage; # rewrite - FIXME
 
 my ($opt_p, $config_file_or_dir, $opt_nginx);
 GetOptions('p' => \$opt_p, # print to stdout
@@ -236,8 +237,8 @@ if ($conf_file && !$opt_p) {
     print $conf_text;
 }
 
-sub usage {
-    print STDERR "Usage: $0 [-p] [--config <config file or dir>]\n";
+sub usage { # rewrite to use pod2usage - FIXME
+    print STDERR "Usage: $0 [-p] [--nginx] [--config <config file or dir>]\n";
     exit (1);
 }
 
@@ -257,7 +258,7 @@ $target/etc/nginx.conf for nginx, or stdout if using -p.
 
 =head2 Running script
 
- ./common/scripts/gen_httpd_conf.pl [-p] [--nginx] <application_directory>
+ ./common/scripts/gen_httpd_conf.pl [-p] [--nginx] [--config <config file or dir>]
 
 =head1 OPTIONS
 
@@ -269,10 +270,9 @@ $target/etc/nginx.conf for nginx, or stdout if using -p.
 
 Prints output to stdout regardless of setting in master_config.
 
-=item application_directory
+=item --config
 
-'application_directory' is the name of a directory containing the application
-specific files. Inside this directory, there must be a master_config.txt file.
+Directory containing master_config.txt and where to write generated ./etc files.
 
 =back
 

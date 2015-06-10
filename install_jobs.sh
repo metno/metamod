@@ -140,6 +140,9 @@ ordie "Can't generate httpd config - use -u option if insufficient sudo rights"
 psudo perl "$SCRIPT_PATH/scripts/gen_initd_script.pl" ${CONFIG:+"--config"} $CONFIG
 ordie "Can't generate init.d scripts - use -u option if insufficient sudo rights"
 
+psudo perl "$SCRIPT_PATH/scripts/gen_checkmk_script.pl" ${CONFIG:+"--config"} $CONFIG
+ordie "Can't generate checkmk script - use -u option if insufficient sudo rights"
+
 # link files to /etc
 
 #LINKERRMSG=$(cat <<EOT
@@ -185,6 +188,12 @@ sudo ln -s $CONFIG_DIR/etc/default/$CATALYST_APP /etc/default/$CATALYST_APP; ord
 sudo ln -s $CONFIG_DIR/etc/init.d/$CATALYST_APP /etc/init.d/$CATALYST_APP; ordie "$LINKERRMSG"
 # start Catalyst at boot
 sudo ln -s /etc/init.d/$CATALYST_APP /etc/rc2.d/S92$CATALYST_APP; ordie "$LINKERRMSG"
+
+# install CheckMK script (cannot be symlinked due to permissions)
+if [ -d "$CHECKMK_SCRIPT_DIR" ]; then
+    sudo cp $CONFIG_DIR/etc/checkmk-services $CHECKMK_SCRIPT_DIR/$APPLICATION_ID-services
+    ordie "Can't install CheckMK script into $CHECKMK_SCRIPT_DIR"
+fi
 
 # install metamodInit.sh job [code copied from Egil]
 if [ $APPLICATION_USER ]; then

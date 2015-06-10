@@ -10,7 +10,7 @@ Section: web
 Priority: optional
 Architecture: amd64
 Essential: no
-Depends: apache2, postgresql-client-common, postgresql-client, libdbd-pg-perl, pdl, proj, libimager-perl, libxml2, libxslt1.1, libexpat1, pkg-config, libgdbm3
+Depends: apache2, postgresql-client-common, postgresql-client, libdbd-pg-perl, pdl, proj, libimager-perl, libxml2, libxslt1.1, libexpat1, pkg-config, libgdbm3, libxml2-utils, xinetd, check_mk_agent, curl
 # libgeo-proj4-perl, libpdl-netcdf-perl, libconfig-tiny-perl,
 Pre-Depends: perl
 # replace in below with postgresql-9.3-postgis-2.1 for Ubuntu 14.4
