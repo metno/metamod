@@ -174,9 +174,9 @@ $funcdefs
 check_catalyst_process catalyst-$var{APPLICATION_ID}
 check_daemons metamodServices-$var{APPLICATION_ID}
 check_http_responses $var{CATALYST_PORT} $var{LOCAL_URL}
-count_files $var{UPLOAD_DIRECTORY}
-count_files $var{UPLOAD_FTP_DIRECTORY}
-count_files $var{OPENDAP_DIRECTORY}
+count_files upload $var{UPLOAD_DIRECTORY}
+count_files ftp $var{UPLOAD_FTP_DIRECTORY}
+count_files opendap $var{OPENDAP_DIRECTORY}
 
 EOT
 
