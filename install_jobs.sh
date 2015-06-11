@@ -196,6 +196,7 @@ if [ -d "$CHECKMK_SCRIPT_DIR" ]; then
 fi
 
 # install metamodInit.sh job [code copied from Egil]
+# [the problem with calling metamodInit.sh instead of a script in /etc is that once you remove the package you can no longer stop the daemons]
 if [ $APPLICATION_USER ]; then
 	cat > /tmp/metamodServices-$APPLICATION_ID <<- EOT
 		#! /bin/sh
