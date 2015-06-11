@@ -190,6 +190,8 @@ if ($opt_p) {
     open FH, ">$conf_file" or die "Cannot open $conf_file for writing";
     print STDERR "Writing proxy config to $conf_file\n";
     print FH $mainbody;
+    close FH;
+    chmod 0700, $conf_file;
 }
 
 sub usage { # rewrite to use pod2usage - FIXME
