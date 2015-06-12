@@ -511,7 +511,7 @@ sub _oai_record_header {
         } catch {
             $record->{status} = 'deleted';
             $self->logger->error("Document is not valid $format: $_");
-            $self->logger->debug($xml) if defined $xml;
+            #$self->logger->debug($xml) if defined $xml;
         };
     }
 
@@ -563,7 +563,7 @@ sub _get_metadata {
 
     my $converted = $convert_func->($ds);
     my $dom = $converted->getMETA_DOC();
-    $self->logger->debug( "DataProvider::_get_metadata( ", $dataset->ds_id(), ", $format ) ", substr( $dom->toString(2), 0, 130 ), '...' );
+    #$self->logger->debug( "DataProvider::_get_metadata( ", $dataset->ds_id(), ", $format ) ", substr( $dom->toString(2), 0, 130 ), '...' );
 
     return $dom;
 }

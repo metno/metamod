@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 use Moose;
 use namespace::autoclean;
 
-use Data::Dump qw(dump);
+use Data::Dumper;
 use HTTP::OAI;
 use HTTP::OAI::Metadata::OAI_DC;
 use HTTP::OAI::Repository qw( validate_request );
@@ -370,7 +370,8 @@ sub _oai_header {
     $header->status( $record->{status} ) if exists $record->{status};
 
     if ( exists $record->{setSpec} ) {
-        foreach my $set_spec (@{$record->{setSpec}}) {
+        my $spec = $record->{setSpec};
+        foreach my $set_spec ( ref $spec ? @{$spec} : ($spec) ) {
             $header->setSpec( $set_spec );
         }
     }

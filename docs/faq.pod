@@ -51,7 +51,7 @@ See the warning in the generated Apache config file:
 
 To fix, either set VIRTUAL_HOST to something or delete sites-enabled/000-default, like this:
 
-  $ sudo a2dissite default
+  $ sudo a2dissite default
 
 =back
 
@@ -79,7 +79,8 @@ layer. Check that you have a background map available in the specified projectio
 
 =item Q: I'm getting the following error in the log:
 
-    ERROR: no coordinate-systems with projection found, maybe you should try coordinate interpolation in CDMInterpolator.cc at line 488
+    ERROR: no coordinate-systems with projection found, maybe you should try coordinate
+    interpolation in CDMInterpolator.cc at line 488
     exception occured: CDMException: no coordinate-systems found
 
 A: Your FIMEX version is out of date. Use 0.41 or later which supports selectVariables.
@@ -97,7 +98,8 @@ A: Your FIMEX version is out of date. Use 0.41 or later which supports selectVar
 
 A: Check that the projections specified in SRID_ID_COLUMNS are available in the database:
 
-  test_metadata=# select auth_srid from spatial_ref_sys where auth_name='EPSG' and auth_srid in(93995, 93031, 3995, 3031, 4326);
+  test_metadata=# select auth_srid from spatial_ref_sys where auth_name='EPSG'
+  test_metadata=# and auth_srid in(93995, 93031, 3995, 3031, 4326);
    auth_srid
   -----------
         4326
