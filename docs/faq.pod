@@ -55,6 +55,19 @@ To fix, either set VIRTUAL_HOST to something or delete sites-enabled/000-default
 
 =back
 
+=head3 Dataset import
+
+=over 4
+
+=item Q: C<import_dataset.pl> gives the following error:
+
+  DBD::Pg::st execute failed: ERROR:  insert or update on table "metadata" violates foreign key constraint "metadata_mt_name_fkey"
+  DETAIL:  Key (mt_name)=(dataset_name) is not present in table "metadatatype".
+
+A: You need to run C<import_searchdata.pl> to update the metatada types. No need to change F<searchdata.xml>.
+
+=back
+
 =head3 Visualization
 
 =over 4
