@@ -127,7 +127,7 @@ function check_http_responses {
     # testing OAI-PMH
     set_status OK
     RECORDS=0
-    DELAY=`curl -o $TEMPFILE -s -w %{time_total} http://localhost:$PORT/oai\?verb=ListRecords\&metadataPrefix=dif`
+    DELAY=`curl -o $TEMPFILE -s -w %{time_total} http://localhost:$PORT/oai\?verb=ListIdentifiers\&metadataPrefix=dif`
     if [ $? -ne 0 ]; then
         set_status CRIT
         TEXT="OAI-PMH service not responding"
