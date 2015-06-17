@@ -29,12 +29,15 @@ use HTTP::OAI::Metadata::OAI_DC;
 use HTTP::OAI::Repository qw( validate_request );
 use XML::SAX::Writer;
 use DateTime;
+use Log::Log4perl qw(get_logger);
 
 use Metamod::Config;
 use Metamod::OAI::DataProvider;
 use Metamod::OAI::SetDescription;
 
 BEGIN { extends 'MetamodWeb::BaseController::Base'; }
+
+has 'logger' => ( is => 'ro', default => sub { Log::Log4perl::get_logger('metamod::oai'); } );
 
 =head1 NAME
 

@@ -75,7 +75,7 @@ has 'config' => ( is => 'ro', isa => 'Metamod::Config', default => sub { Metamod
 
 has 'model' => ( is => 'ro', lazy => 1, builder => '_init_model' );
 
-has 'logger' => ( is => 'ro', default => sub { get_logger(__PACKAGE__) } );
+has 'logger' => ( is => 'ro', default => sub { get_logger('metamod::oai') } );
 
 has 'metadata_formats' => ( is => 'ro', isa => 'HashRef', lazy => 1, builder => '_init_formats' );
 
@@ -510,7 +510,7 @@ sub _oai_record_header {
             $self->_validate_metadata($format, $xml_dom, $dataset);
         } catch {
             $record->{status} = 'deleted';
-            $self->logger->error("Document is not valid $format: $_");
+            $self->logger->warn("Document is not valid $format: $_");
             #$self->logger->debug($xml) if defined $xml;
         };
     }
