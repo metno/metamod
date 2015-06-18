@@ -75,7 +75,7 @@ function get_status {
 }
 
 function check_catalyst_process {
-    get_status $1
+    get_status catalyst-$APPLICATION_ID
 
     if [[ $TEXT =~ Catalyst[[:space:]]is[[:space:]]running[[:space:]]on[[:space:]]PID[[:space:]]([0-9]+) ]]
     then
@@ -91,14 +91,12 @@ function check_catalyst_process {
 
 
 function check_daemons {
-    get_status $1
+    get_status metamodServices-$APPLICATION_ID
     DAEMONS=`perl -E "@d = '$TEXT' =~ /(\w+) is running/g; say scalar @d"`
     echo $EXIT Service_$1 daemons=$DAEMONS $EXIT_TEXT - $TEXT
 }
 
 function check_http_responses {
-    PORT=$1
-    LOCAL_URL=$2
     TEMPFILE="/tmp/$(basename $0).$$.tmp"
 
     # testing directly against Catalyst
@@ -116,7 +114,7 @@ function check_http_responses {
 
     # testing via Apache proxy
     set_status OK
-    HTTP_CODE=`curl -o $TEMPFILE -s -w %{http_code} http://localhost$LOCAL_URL/settings/VERSION`
+    HTTP_CODE=`curl -o $TEMPFILE -s -w %{http_code} $EXTERNAL_URL/settings/VERSION`
     if [ $? -ne 0 -o "$HTTP_CODE" -ge "400" ]; then
         set_status CRIT
     elif [ "$HTTP_CODE" -ge "300" ]; then
@@ -155,7 +153,8 @@ function count_files {
 }
 EOT
 
-my %var =  map { $_ => $config->get($_) } qw(APPLICATION_ID CATALYST_PORT LOCAL_URL UPLOAD_DIRECTORY UPLOAD_FTP_DIRECTORY OPENDAP_DIRECTORY);
+my %var =  map { $_ => $config->get($_) } qw(APPLICATION_ID CATALYST_PORT BASE_PART_OF_EXTERNAL_URL LOCAL_URL
+                                             UPLOAD_DIRECTORY UPLOAD_FTP_DIRECTORY OPENDAP_DIRECTORY);
 
 my $mainbody = <<"EOT";
 #!/bin/bash
@@ -169,14 +168,18 @@ my $mainbody = <<"EOT";
 # Copy this file as root to /usr/lib/check_mk_agent/local/$var{APPLICATION_ID}-services
 # (symlinks don't seem to be supported)
 
+APPLICATION_ID=$var{APPLICATION_ID}
+EXTERNAL_URL="$var{BASE_PART_OF_EXTERNAL_URL}$var{LOCAL_URL}"
+PORT=$var{CATALYST_PORT}
+
 $funcdefs
 #
 # execute checks
 #
 
-check_catalyst_process catalyst-$var{APPLICATION_ID}
-check_daemons metamodServices-$var{APPLICATION_ID}
-check_http_responses $var{CATALYST_PORT} $var{LOCAL_URL}
+check_catalyst_process
+check_daemons
+check_http_responses
 count_files upload $var{UPLOAD_DIRECTORY}
 count_files ftp $var{UPLOAD_FTP_DIRECTORY}
 count_files opendap $var{OPENDAP_DIRECTORY}
