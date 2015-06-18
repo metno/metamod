@@ -142,6 +142,9 @@ function check_http_responses {
         fi
     fi
     echo "$EXIT OAI-PMH_status records=$RECORDS|time=$DELAY;1;5 $EXIT_TEXT - $TEXT"
+
+    # cleaning up so Martin won't kick your butt
+    rm $TEMPFILE
 }
 
 function count_files {
