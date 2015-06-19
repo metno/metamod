@@ -75,7 +75,8 @@ function get_status {
 }
 
 function check_catalyst_process {
-    get_status catalyst-$APPLICATION_ID
+    service="catalyst-$APPLICATION_ID"
+    get_status $service
 
     if [[ $TEXT =~ Catalyst[[:space:]]is[[:space:]]running[[:space:]]on[[:space:]]PID[[:space:]]([0-9]+) ]]
     then
@@ -86,14 +87,15 @@ function check_catalyst_process {
         PERFDATA='workers=0'
    fi
 
-    echo $EXIT Service_$1 $PERFDATA $EXIT_TEXT - $TEXT
+    echo $EXIT Service_$service $PERFDATA $EXIT_TEXT - $TEXT
 }
 
 
 function check_daemons {
-    get_status metamodServices-$APPLICATION_ID
+    service="metamodServices-$APPLICATION_ID"
+    get_status $service
     DAEMONS=`perl -E "@d = '$TEXT' =~ /(\w+) is running/g; say scalar @d"`
-    echo $EXIT Service_$1 daemons=$DAEMONS $EXIT_TEXT - $TEXT
+    echo $EXIT Service_$service daemons=$DAEMONS $EXIT_TEXT - $TEXT
 }
 
 function check_http_responses {
@@ -109,7 +111,7 @@ function check_http_responses {
         #TEXT="Version `cat $TEMPFILE`"
         TEXT="Response time: $DELAY sec"
     fi
-    echo "$EXIT Catalyst_response_time time=$DELAY;0.1;1 $EXIT_TEXT - $TEXT"
+    echo "$EXIT Catalyst_response_time_$APPLICATION_ID time=$DELAY;0.1;1 $EXIT_TEXT - $TEXT"
 
 
     # testing via Apache proxy
@@ -120,36 +122,38 @@ function check_http_responses {
     elif [ "$HTTP_CODE" -ge "300" ]; then
         set_status WARN
     fi
-    echo "$EXIT Apache_HTTP_status code=$HTTP_CODE $EXIT_TEXT - HTTP Status $HTTP_CODE"
+    echo "$EXIT Apache_HTTP_status_$APPLICATION_ID code=$HTTP_CODE $EXIT_TEXT - HTTP Status $HTTP_CODE"
 
     # testing OAI-PMH
     set_status OK
     RECORDS=0
-    DELAY=`curl -o $TEMPFILE -s -w %{time_total} http://localhost:$PORT/oai\?verb=ListIdentifiers\&metadataPrefix=dif`
+    PERIOD=`date -d "-30 days" -I`
+    DELAY=`curl -o $TEMPFILE -s -w %{time_total} http://localhost:$PORT/oai\?verb=ListIdentifiers\&metadataPrefix=dif\&from=$PERIOD`
     if [ $? -ne 0 ]; then
         set_status CRIT
         TEXT="OAI-PMH service not responding"
     else
-        xmllint --noout $TEMPFILE 2>/dev/null
+        xmllint --format $TEMPFILE >$TEMPFILE.2 2>/dev/null
         if [ $? -ne 0 ]; then
             set_status CRIT
             TEXT="Cannot parse XML"
         else
-            RECORDS=`grep -c '<record>' $TEMPFILE`
+            # count identifier tags
+            RECORDS=`grep -c '<identifier>' $TEMPFILE.2`
             TEXT="Returned $RECORDS records in $DELAY sec"
         fi
     fi
-    echo "$EXIT OAI-PMH_status records=$RECORDS|time=$DELAY;1;5 $EXIT_TEXT - $TEXT"
+    echo "$EXIT OAI-PMH_status_$APPLICATION_ID records=$RECORDS|time=$DELAY;1;5 $EXIT_TEXT - $TEXT"
 
     # cleaning up so Martin won't kick your butt
-    rm $TEMPFILE
+    rm $TEMPFILE $TEMPFILE.2
 }
 
 function count_files {
     set_status OK
     FILES=`find $2 -type f | wc -l`
     [ $? -ne 0 ] && set_status CRIT && FILES="?"
-    echo "$EXIT Files_in_$1_dir files=$FILES $EXIT_TEXT - Found $FILES files"
+    echo "$EXIT Files_in_$1_dir_$APPLICATION_ID files=$FILES $EXIT_TEXT - Found $FILES files"
 }
 EOT
 
@@ -182,7 +186,8 @@ check_daemons
 check_http_responses
 count_files upload $var{UPLOAD_DIRECTORY}
 count_files ftp $var{UPLOAD_FTP_DIRECTORY}
-count_files opendap $var{OPENDAP_DIRECTORY}
+# OPENDAP disabled as contains too many files
+#count_files opendap $var{OPENDAP_DIRECTORY}
 
 EOT
 
