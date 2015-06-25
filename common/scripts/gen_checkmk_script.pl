@@ -125,6 +125,7 @@ function check_http_responses {
     echo "$EXIT Apache_HTTP_status_$APPLICATION_ID code=$HTTP_CODE $EXIT_TEXT - HTTP Status $HTTP_CODE"
 
     # testing OAI-PMH
+    # we could possible change this to oai?verb=ListSets to decrease load
     set_status OK
     RECORDS=0
     PERIOD=`date -d "-30 days" -I`
