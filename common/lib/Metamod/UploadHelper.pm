@@ -594,7 +594,7 @@ sub process_files { # rewrite this 800-line monster into small, more manageable 
                 }
             }
         }
-        if ( $filetype ne 'nc3' ) { # something unexpected must have happened
+        if ( $filetype ne 'nc3' and $filetype ne 'nc4' ) { # something unexpected must have happened
             $self->syserrorm( "SYSUSER", "file_not_netcdf", $uploadname, "process_files",
                 "File: $expfile\nBadfile: $expandedfile\nFiletype: $filetype" );
             $not_accepted{$expandedfile} = 1;

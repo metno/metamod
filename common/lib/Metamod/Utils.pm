@@ -56,6 +56,7 @@ my %magicNumber = (
     'pkzip' => [[0, pack("C4", 0x50, 0x4b, 0x03, 0x04)]], # PK..
     'tar' => [[257, "ustar"]],
     'nc3' => [[0, "CDF\1"], [0, "CDF\2"]],
+    'nc4' => [[1, "HDF"]],
 );
 
 sub getFiletype {
@@ -83,7 +84,8 @@ sub getFiletype {
 }
 
 sub isNetcdf {
-    return getFiletype(@_) eq 'nc3';
+    my $filetype = getFiletype(@_);
+    return $filetype eq 'nc3' or $filetype eq 'nc4' ;
 }
 
 sub trim {
@@ -306,7 +308,7 @@ It will die if the file is not readable.
 
 =item getFiletype($file)
 
-get the filetype of a file. Supported files are: nc3, gzip, gzip-compressed, bzip2, pkzip,
+get the filetype of a file. Supported files are: nc3, nc4, gzip, gzip-compressed, bzip2, pkzip,
 ascii and tar
 
 ascii detection works with perls -T option

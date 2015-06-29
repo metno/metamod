@@ -385,8 +385,8 @@ sub process_files {
                 push( @temporary_files_to_remove, $newpath );
                 $filetype = getFiletype($newpath);
             }
-            if ( $filetype ne 'nc3' ) {    # Not netCDF 3 file
-                &syserror( "SYSUSER", "file_is_not_netcdf3", "", "process_files",
+            if ( ! ($filetype eq 'nc3' or $filetype eq 'nc4') ) {    # Not netCDF file
+                &syserror( "SYSUSER", "file_is_not_netcdf", "", "process_files",
                     "File: $filepath\nDataset: $dataset_name" );
                 die "File $filepath is not a netCDF file!";
             }
