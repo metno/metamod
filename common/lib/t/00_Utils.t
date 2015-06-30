@@ -33,7 +33,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../";
 
-use Test::More tests => 16;
+use Test::More tests => 17;
 
 BEGIN {use_ok('Metamod::Utils', qw(findFiles isNetcdf trim getFiletype remove_cr_from_file));}
 
@@ -57,7 +57,8 @@ my $var = '.t';
 my @execFiles = findFiles($FindBin::Bin, eval 'sub {$_[0] =~ /\Q$var\E$/o;}', sub {-x _});
 is(scalar @execFiles, 1, "00_Utils.t only executable .t - file");
 
-ok(isNetcdf($DataDir."test.nc"), "test.nc is netcdf");
+ok(isNetcdf($DataDir."test.nc"), "test.nc is netcdf 3");
+ok(isNetcdf($DataDir."test.nc4"), "test.nc4 is netcdf 4");
 ok(!isNetcdf($FindBin::Bin."/00_Utils.t"), "00_Utils.t is no netcdf");
 
 ok(getFiletype($DataDir."test.nc") eq "nc3", "test.nc filetype is nc3");

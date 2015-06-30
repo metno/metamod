@@ -85,7 +85,7 @@ sub getFiletype {
 
 sub isNetcdf {
     my $filetype = getFiletype(@_);
-    return $filetype eq 'nc3' or $filetype eq 'nc4' ;
+    return $filetype eq 'nc3' || $filetype eq 'nc4';
 }
 
 sub trim {
