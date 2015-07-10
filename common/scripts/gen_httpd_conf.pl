@@ -119,6 +119,10 @@ ProxyPass           $local/docs     !
 ProxyPass           $local/         http://127.0.0.1:$port/     retry=5
 ProxyPassReverse    $local/         http://127.0.0.1:$port/
 
+# generated arachnid control
+ProxyPass           /robots.txt     http://127.0.0.1:$port/robots.txt        retry=5
+ProxyPassReverse    /robots.txt     http://127.0.0.1:$port/robots.txt
+
 # broken - generates infinite redirect loop
 #Redirect seeother   $local          $base$local/
 
@@ -151,9 +155,6 @@ Alias               $local/upl/uerr     $webrun/upl/uerr
 
 # as well as system documentation
 Alias               $local/docs         $installation_dir/docs/html
-
-# generated arachnid control
-Alias               /robots.txt         $local/robots.txt
 
 <Directory $installation_dir/docs/html>
     Options Indexes FollowSymLinks MultiViews

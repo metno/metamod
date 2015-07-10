@@ -61,9 +61,15 @@ declare -A NAGIOS=(
     ["UNKNOWN"]=3
 )
 
+FINAL=0
+
 function set_status {
     EXIT=${NAGIOS[$1]}
     EXIT_TEXT=$1
+    if [[ $EXIT > $FINAL ]]
+    then
+        FINAL=$EXIT
+    fi
 }
 
 function get_status {
@@ -85,7 +91,7 @@ function check_catalyst_process {
         PERFDATA="workers=$CHILDREN"
     else
         PERFDATA='workers=0'
-   fi
+    fi
 
     echo $EXIT Service_$service $PERFDATA $EXIT_TEXT - $TEXT
 }
@@ -103,7 +109,7 @@ function check_http_responses {
 
     # testing directly against Catalyst
     set_status OK
-    DELAY=`curl -o $TEMPFILE -s -w %{time_total} http://localhost:$PORT/settings/VERSION`
+    DELAY=`curl -o $TEMPFILE -s -w %{time_total} http://localhost:$CATALYST_PORT/settings/VERSION`
     if [ $? -ne 0 ]; then
         set_status CRIT
         TEXT="Catalyst not responding"
@@ -116,7 +122,7 @@ function check_http_responses {
 
     # testing via Apache proxy
     set_status OK
-    HTTP_CODE=`curl -o $TEMPFILE -s -w %{http_code} $EXTERNAL_URL/settings/VERSION`
+    HTTP_CODE=`curl -o $TEMPFILE -s -w %{http_code} $BASE_PART_OF_EXTERNAL_URL$LOCAL_URL/settings/VERSION`
     if [ $? -ne 0 -o "$HTTP_CODE" -ge "400" ]; then
         set_status CRIT
     elif [ "$HTTP_CODE" -ge "300" ]; then
@@ -124,12 +130,26 @@ function check_http_responses {
     fi
     echo "$EXIT Apache_HTTP_status_$APPLICATION_ID code=$HTTP_CODE $EXIT_TEXT - HTTP Status $HTTP_CODE"
 
+
+    # testing robots.txt (via Apache)
+    set_status OK
+    HTTP_CODE=`curl -o $TEMPFILE -s -w %{http_code} $BASE_PART_OF_EXTERNAL_URL/robots.txt`
+    if [ $? -ne 0 -o "$HTTP_CODE" -ge "400" ]; then
+        set_status CRIT
+    elif [ "$HTTP_CODE" -ge "300" ]; then
+        set_status WARN
+    else
+        grep -q "Disallow: $LOCAL_URL/search" $TEMPFILE || set_status CRIT
+    fi
+    echo "$EXIT Apache_robots.txt_$APPLICATION_ID code=$HTTP_CODE $EXIT_TEXT - HTTP Status $HTTP_CODE"
+
+
     # testing OAI-PMH
     # we could possible change this to oai?verb=ListSets to decrease load
     set_status OK
     RECORDS=0
     PERIOD=`date -d "-30 days" -I`
-    DELAY=`curl -o $TEMPFILE -s -w %{time_total} http://localhost:$PORT/oai\?verb=ListIdentifiers\&metadataPrefix=dif\&from=$PERIOD`
+    DELAY=`curl -o $TEMPFILE -s -w %{time_total} http://localhost:$CATALYST_PORT/oai\?verb=ListIdentifiers\&metadataPrefix=dif\&from=$PERIOD`
     if [ $? -ne 0 ]; then
         set_status CRIT
         TEXT="OAI-PMH service not responding"
@@ -161,6 +181,8 @@ EOT
 my %var =  map { $_ => $config->get($_) } qw(APPLICATION_ID CATALYST_PORT BASE_PART_OF_EXTERNAL_URL LOCAL_URL
                                              UPLOAD_DIRECTORY UPLOAD_FTP_DIRECTORY OPENDAP_DIRECTORY);
 
+my $envdefs = join '', map "$_=\"$var{$_}\"\n", keys %var;
+
 my $mainbody = <<"EOT";
 #!/bin/bash
 #
@@ -173,10 +195,7 @@ my $mainbody = <<"EOT";
 # Copy this file as root to /usr/lib/check_mk_agent/local/$var{APPLICATION_ID}-services
 # (symlinks don't seem to be supported)
 
-APPLICATION_ID=$var{APPLICATION_ID}
-EXTERNAL_URL="$var{BASE_PART_OF_EXTERNAL_URL}$var{LOCAL_URL}"
-PORT=$var{CATALYST_PORT}
-
+$envdefs
 $funcdefs
 #
 # execute checks
@@ -190,6 +209,7 @@ count_files ftp $var{UPLOAD_FTP_DIRECTORY}
 # OPENDAP disabled as contains too many files
 #count_files opendap $var{OPENDAP_DIRECTORY}
 
+exit \$FINAL
 EOT
 
 my $etc_dir    = $config->get('CONFIG_DIR') . "/etc";
