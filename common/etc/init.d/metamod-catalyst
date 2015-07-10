@@ -106,9 +106,9 @@ _start() {
     start-stop-daemon --start --verbose --pidfile $PIDFILE -m --chdir $APPDIR \
         ${USER:+"--chuid"} $USER ${GROUP:+"--group"} $GROUP --background \
         --startas $BINDIR/${UNIXNAME}_server.pl -- --port $port \
-        # --config should not be necessary since METAMOD_MASTER_CONFIG is set in /etc/default
         --config [==CONFIG_DIR==] \
         --min_servers=2 --max_servers=5 --min_spare_servers=1 --max_spare_servers=3
+        # --config should not be necessary since METAMOD_MASTER_CONFIG is set in /etc/default
         # should drop -m from ssd and instead daemonize starman:
         # --pid $PIDFILE --daemonize
 
