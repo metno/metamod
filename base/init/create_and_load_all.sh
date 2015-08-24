@@ -52,24 +52,24 @@ rm $SHELL_CONF
 # we should better let jenkins take care of the logs so they will be stored for each build
 OUTPUT="$WEBRUN_DIRECTORY/create_and_load_all.out"
 echo "Writing output to $OUTPUT"
-exec >$OUTPUT 2>&1
+exec 3>&1 4>&2 >$OUTPUT 2>&1
 echo "------------ Reinitialize the database, create dynamic tables:"
 # createdb must be run and not sourced otherwise paths will be screwed up
-$SCRIPT_PATH/createdb.sh $CONFIG
-if [ $? -ne 0 ]; then
+if ! $SCRIPT_PATH/createdb.sh $CONFIG
+then
     # doesn't seem to work...
-    echo "createdb error $?"
-    exit $?
+    echo "createdb failed! Check log for details" >&4
+    exit 1
 fi
 
 echo ""
 echo "------------ Importing searchdata:"
 #PERL5LIB=$PERL5LIB:/opt/metno-perl-webdev-ver1/lib/perl5
 
-$SCRIPT_PATH/import_searchdata.pl ${CONFIG:+"--config"} $CONFIG
-if [ $? -ne 0 ]; then
-    echo "import_searchdata error $?"
-    exit $?
+if ! $SCRIPT_PATH/import_searchdata.pl ${CONFIG:+"--config"} $CONFIG
+then
+    echo "import_searchdata failed! Check log for details" >&4
+    exit 1
 fi
 
 echo "------------ Importing datasets:"
