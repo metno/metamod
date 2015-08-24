@@ -89,6 +89,7 @@ $dbh->{RaiseError} = 1;
 #  Evaluate block to catch runtime errors
 #  (including "die()")
 #
+my $exitcode = 0;
 eval {
    &update_database;
 };
@@ -98,6 +99,7 @@ eval {
 #
 if ($@) {
    warn $@;
+   $exitcode = 2;
    $dbh->rollback or die $dbh->errstr;
    my @utctime = gmtime(mmTtime::ttime());
    my $year = 1900 + $utctime[5];
@@ -116,6 +118,7 @@ open (LOG,">> create_and_load_all.out");
 foreach my $line (@logarr) {
    print LOG $line . "\n";
 }
+exit $exitcode;
 
 # ------------------------------------------------------------------
 sub update_database {
