@@ -33,6 +33,7 @@ requires 'HTTP::DAV', 0.46;
 requires 'JSON::Any', 1.29;
 requires 'local::lib', '1.008010';
 requires 'Log::Log4perl::CommandLine', 0.07;
+requires 'Module::Pluggable', 5.2;
 requires 'Moose', 2.0604;
 requires 'PDL';
 requires 'PDL::NetCDF';
