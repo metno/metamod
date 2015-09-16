@@ -26,6 +26,7 @@ use namespace::autoclean;
 use strict;
 use warnings;
 
+use XML::LibXML;
 #use base 'XML::LibXML::Document';
 our @ISA = ('XML::LibXML::Document');
 

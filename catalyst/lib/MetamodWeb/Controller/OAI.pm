@@ -39,6 +39,8 @@ BEGIN { extends 'MetamodWeb::BaseController::Base'; }
 
 has 'logger' => ( is => 'ro', default => sub { Log::Log4perl::get_logger('metamod::oai'); } );
 
+has 'debug' => ( is => 'rw' );
+
 =head1 NAME
 
 MetamodWeb::Controller::OAI - Controller that implements a OAI-PMH server.
@@ -69,6 +71,7 @@ sub oai : Path('/oai') : Args {
     my ( $self, $c ) = @_;
 
     my $params = $c->req->params();
+    $self->debug( delete $params->{debug} );
     my @errors = validate_request(%$params);
     my $config = Metamod::Config->instance(); # move to Moose attr
     $self->logger->info("OAI ", $params->{verb}, " request started ", DateTime->now);
@@ -273,7 +276,7 @@ sub _get_record {
 sub _list_records {
     my ( $self, $c ) = @_;
 
-    my $dataprovider = Metamod::OAI::DataProvider->new( model => $c->model('Metabase') );
+    my $dataprovider = Metamod::OAI::DataProvider->new( model => $c->model('Metabase'), debug => $self->debug );
     my $params = $c->req->params();
 
     my $metadata_prefix = $params->{metadataPrefix};
@@ -353,7 +356,7 @@ sub _oai_record {
     my $header = $self->_oai_header($record);
     $r->header($header);
 
-    if ( !exists $record->{status} ) {
+    if ( !exists $record->{status} || $record->{status} ne 'deleted' ) {
         my $metadata = HTTP::OAI::Metadata->new( dom => $record->{metadata} );
         $r->metadata($metadata);
     }

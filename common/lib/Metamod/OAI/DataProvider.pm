@@ -87,6 +87,8 @@ has 'resumption_token_dir' => ( is => 'ro', lazy => 1, builder => '_init_resumpt
 
 has 'max_records' => ( is => 'ro', lazy => 1, default => sub { $_[0]->config->get('PMH_MAXRECORDS') || '1000' } );
 
+has 'debug' => ( is => 'ro' );
+
 sub _init_model {
     my $self = shift;
 
@@ -436,10 +438,11 @@ sub _oai_record {
 
     # status is only set when the record is marked as deleted. For deleted datasets
     # we do not include metadata
-    if( !exists $record->{status} ){
+    if( !exists $record->{status} || $record->{status} ne 'deleted'){
         try {
             my $xml_dom = $self->_get_metadata( $dataset, $format );
             $record->{metadata} = $xml_dom;
+            #delete $record->{status};
         } catch {
             $self->logger->error("This should never have occured: $_");
         };
@@ -502,14 +505,15 @@ sub _oai_record_header {
 
     # If metadata validation is turned on we will mark all datasets with invalid
     # metadata as deleted.
-    if( $self->config->is('PMH_VALIDATION') && $dataset->ds_status() != 0 ) {
-        my $xml;
+    if( $self->config->is('PMH_VALIDATION') && ( $dataset->ds_status() != 0 ) ) {
+        my ($xml, $xml_dom);
         try {
-            my $xml_dom = $self->_get_metadata( $dataset, $format );
+            $xml_dom = $self->_get_metadata( $dataset, $format );
             $xml = $xml_dom->toString(1) or die "Missing DOM... file unparsable?";
             $self->_validate_metadata($format, $xml_dom, $dataset);
         } catch {
-            $record->{status} = 'deleted';
+            $record->{status} = $self->debug ? $_ : 'deleted';
+            #$record->{error} = $_;
             $self->logger->warn("Document is not valid $format: $_");
             #$self->logger->debug($xml) if defined $xml;
         };
