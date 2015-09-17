@@ -357,6 +357,7 @@ sub get_identifiers {
 
         my $oai_id = $dataset->oai_info()->first()->get_column('oai_identifier');
         my $record_header = $self->_oai_record_header( $oai_id, $dataset, $format );
+        delete $record_header->{metadata}; # removed any cached XML after validation
         push @identifiers, $record_header;
     }
 
@@ -436,17 +437,18 @@ sub _oai_record {
 
     my $record = $self->_oai_record_header( $identifier, $dataset, $format );
 
-    # status is only set when the record is marked as deleted. For deleted datasets
-    # we do not include metadata
-    if( !exists $record->{status} || $record->{status} ne 'deleted'){
-        try {
-            my $xml_dom = $self->_get_metadata( $dataset, $format );
-            $record->{metadata} = $xml_dom;
-            #delete $record->{status};
-        } catch {
-            $self->logger->error("This should never have occured: $_");
-        };
-    }
+    # status is only set when the record is marked as deleted or validation debugging
+    # For deleted datasets we do not include metadata
+    return $record if exists $record->{status} && $record->{status} eq 'deleted';
+
+    return $record if exists $record->{metadata}; # already fetched during validation step
+
+    try {
+        my $xml_dom = $self->_get_metadata( $dataset, $format );
+        $record->{metadata} = $xml_dom;
+    } catch {
+        $self->logger->error("This should never have occured: $_");
+    };
 
     return $record;
 
@@ -503,17 +505,18 @@ sub _oai_record_header {
         $record->{setSpec} = @specarr == 1 ? $specarr[0] : \@specarr;
     }
 
-    # If metadata validation is turned on we will mark all datasets with invalid
-    # metadata as deleted.
+    # If metadata validation is turned on we will mark all datasets with invalid metadata as deleted.
+    # FIXME - move to _oai_record() which already does _get_metadata() ???
     if( $self->config->is('PMH_VALIDATION') && ( $dataset->ds_status() != 0 ) ) {
         my ($xml, $xml_dom);
         try {
             $xml_dom = $self->_get_metadata( $dataset, $format );
+            $record->{metadata} = $xml_dom; # cache so don't have to fetch again in _oai_record()
             $xml = $xml_dom->toString(1) or die "Missing DOM... file unparsable?";
             $self->_validate_metadata($format, $xml_dom, $dataset);
         } catch {
             $record->{status} = $self->debug ? $_ : 'deleted';
-            #$record->{error} = $_;
+            delete $record->{metadata} unless $self->debug; # remove invalid XML unless debugging
             $self->logger->warn("Document is not valid $format: $_");
             #$self->logger->debug($xml) if defined $xml;
         };
