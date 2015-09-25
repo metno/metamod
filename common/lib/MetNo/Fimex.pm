@@ -57,14 +57,18 @@ To debug, set $MetNo::Fimex::DEBUG to 1 before calling projectFile.
 
 =cut
 
+# Metaclass definition must come before Moose is used.
+use metaclass (
+    metaclass => 'Moose::Meta::Class',
+    error_class => 'Moose::Error::Croak',
+);
+use Moose;
+
 our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", @r };
 
 our $DEBUG = 0;
 
-use strict;
-use warnings;
 use Params::Validate qw();
-use Moose;
 use Geo::Proj4;
 use LWP::Simple qw();
 use LWP::UserAgent;
@@ -74,8 +78,6 @@ use File::Temp qw();
 use List::Util qw(max);
 use Data::Dumper;
 use Carp;
-
-__PACKAGE__->meta->error_class('Moose::Error::Croak');
 
 =head1 METHODS
 
