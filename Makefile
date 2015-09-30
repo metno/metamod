@@ -4,6 +4,8 @@
 
 PACKAGENAME = metno-metamod-2.14
 
+OSVERSION := $(shell lsb_release -rs)
+
 DEBIANDIR = $(CURDIR)/debian/$(PACKAGENAME)
 
 DESTDIR = $(DEBIANDIR)/opt/$(PACKAGENAME)
@@ -25,14 +27,16 @@ apidocs:
 # ok, the last one is a hack... write perl script later
 
 # needs to maintain different snapshot files per OS version - FIXME
-deps:
+cpanfile.snapshot:
+	ln -s cpanfile.snapshot.$(OSVERSION) cpanfile.snapshot
+
+deps: cpanfile.snapshot
 	carton install
 
-bundle:
+bundle: cpanfile.snapshot
 	carton bundle --no-fatpack
 
-# needs to maintain different snapshot files per OS version - FIXME
-deployment:
+deployment: cpanfile.snapshot
 	carton install --deployment --cached
 
 # Build the actual debian package
