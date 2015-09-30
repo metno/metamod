@@ -28,12 +28,7 @@ else
 fi
 
 SRUSCHEMA="$SCRIPT_PATH/sruSchema.sql"
-
-# tsearch removed from Postgresql 8.3 onwards, won't work under 9.1
-#check "PG_TSEARCH2_SCRIPT" 1
-check "PG_POSTGIS_SCRIPT" 1
-check "PG_POSTGIS_SYSREF_SCRIPT" 1
-check "SRUSCHEMA" 1
+check "SRUSCHEMA" exists
 
 # create DB
 $DROPDB -e -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $DBNAME
@@ -42,6 +37,21 @@ $CREATEDB -e -E UTF-8 -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $DBNAME
 ordie "Can't create database $DBNAME"
 echo "----------------- Database $DBNAME created ------------------"
 
+# check PG version running on server
+PGVERSION=`echo "select version()" | $PSQL -A $DBNAME -U $PG_ADMIN_USER | perl -n -e 'print "$1_$2\n" if /PostgreSQL (\d+)\.(\d+)/'`
+
+# check script locations set for current PG version
+# tsearch removed from Postgresql 8.3 onwards, won't work under 9.1
+#check "PG_TSEARCH2_SCRIPT_$PGVERSION" exists
+check "PG_POSTGIS_SCRIPT_$PGVERSION" exists
+check "PG_POSTGIS_SYSREF_SCRIPT_$PGVERSION" exists
+
+# set indirect variables accordingly
+PG_TSEARCH2_SCRIPT="PG_TSEARCH2_SCRIPT_$PGVERSION"
+PG_CRYPTO_SCRIPT="PG_CRYPTO_SCRIPT_$PGVERSION"
+PG_POSTGIS_SCRIPT="PG_POSTGIS_SCRIPT_$PGVERSION"
+PG_POSTGIS_SYSREF_SCRIPT="PG_POSTGIS_SYSREF_SCRIPT_$PGVERSION"
+
 echo "----------------- Allow PLSQL ------------------"
 $PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<'EOF'
 -- allow plpgsql
@@ -49,16 +59,16 @@ CREATE TRUSTED LANGUAGE plpgsql;
 EOF
 
 # install additional features
-if [ "$PG_TSEARCH2_SCRIPT" ]
+if [ "${!PG_TSEARCH2_SCRIPT}" ]
 then
     echo "----------- Trying to install Fulltext-search: tsearch2.sql --"
-    $PSQL -q -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $PG_TSEARCH2_SCRIPT
+    $PSQL -q -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < ${!PG_TSEARCH2_SCRIPT}
     echo "----------------- Database Fulltext-search prepared ---------"
 fi
 echo "----------- Trying to install PostGIS ---------------------"
-$PSQL -q -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $PG_POSTGIS_SCRIPT
+$PSQL -q -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < ${!PG_POSTGIS_SCRIPT}
 echo "----------- Trying to install PostGIS Coordinate systems ---------------------"
-$PSQL -q -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < $PG_POSTGIS_SYSREF_SCRIPT
+$PSQL -q -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME < ${!PG_POSTGIS_SYSREF_SCRIPT}
 echo "----------- Trying to install PostGIS Additional Coordinate systems ---------------------"
 # this may be blank
 $PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $DBNAME <<EOT

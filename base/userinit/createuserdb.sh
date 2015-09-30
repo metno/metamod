@@ -25,13 +25,21 @@ fi
 
 check "USERBASE_NAME"
 
+# check script locations set for current PG version
+# crypto removed from Postgresql 8.3 onwards, won't work under 9.1
+#check "PG_CRYPTO_SCRIPT_$PGVERSION" exists
+
 $DROPDB -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $USERBASE_NAME
 $CREATEDB -E UTF-8 -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $USERBASE_NAME
 echo "----------------- Database $USERBASE_NAME created ------------------"
 
-if [ "$PG_CRYPTO_SCRIPT" ]
+# check PG version running on server
+PGVERSION=`echo "select version()" | $PSQL -A $USERBASE_NAME -U $PG_ADMIN_USER | perl -n -e 'print "$1_$2\n" if /PostgreSQL (\d+)\.(\d+)/'`
+PG_CRYPTO_SCRIPT="PG_CRYPTO_SCRIPT_$PGVERSION"
+
+if [ "${!PG_CRYPTO_SCRIPT}" ]
 then
-    $PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $USERBASE_NAME < $PG_CRYPTO_SCRIPT
+    $PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $USERBASE_NAME < ${!PG_CRYPTO_SCRIPT}
 else
     $PSQL -a -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL -d $USERBASE_NAME <<EOF
 CREATE EXTENSION pgcrypto;

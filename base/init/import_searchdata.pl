@@ -32,6 +32,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =end LICENSE
 
+------------ Importing searchdata:
+DBD::Pg::st execute failed: ERROR:  insert or update on table "hierarchicalkey" violates foreign key constraint "hierarchicalkey_sc_id_fkey"
+DETAIL:  Key (sc_id)=(4) is not present in table "searchcategory". at /home/geira/metamod/trunk/base/init/import_searchdata.pl line 357.
+DBD::Pg::st execute failed: ERROR:  insert or update on table "hierarchicalkey" violates foreign key constraint "hierarchicalkey_sc_id_fkey"
+DETAIL:  Key (sc_id)=(4) is not present in table "searchcategory". at /home/geira/metamod/trunk/base/init/import_searchdata.pl line 357.
+
 =cut
 
 use strict;
@@ -106,17 +112,20 @@ if ($@) {
    my $mon = $utctime[4]; # 0-11
    my $mday = $utctime[3]; # 1-31
    my $datestamp = sprintf('%04d-%02d-%02d',$year,$mon+1,$mday);
-   @logarr = ("========= $datestamp: Load static searchdata failed. =========",
-              "          Database rolled back",
-              "          " . $@);
+   push @logarr, "========= $datestamp: Load static searchdata failed. Database rolled back =========\n$@";
 } else {
    $dbh->commit or die $dbh->errstr;
    $dbh->disconnect or warn $dbh->errstr;
    push (@logarr,"========= Load static searchdata finished");
 }
-open (LOG,">> create_and_load_all.out");
+
+# Redicting here does not work. create_and_load_all.sh is already capturing stdout/stderr
+# into a file with the same name in webrun, whereas this opens the file in the config directory!
+# Better to print as normal and let create_and_load_all handle all logging
+#open (LOG,">> create_and_load_all.out");
 foreach my $line (@logarr) {
-   print LOG $line . "\n";
+   #print LOG $line . "\n";
+   print $line . "\n";
 }
 exit $exitcode;
 
@@ -300,9 +309,9 @@ sub update_database {
                my @result = $sql_getkey_BK->fetchrow_array;
                my $bkid = $result[0];
                $sql_getkey_BK->finish();
+               push (@logarr,"Adding to BK: $bkid,$scid,$name");
                $sql_insert_BK->execute($bkid,$scid,$name);
                $searchdata{"BK:" . $scid . ":" . $name} = $bkid;
-#               push (@logarr,"Added to BK: $bkid,$scid,$name");
             }
          }
       } elsif ($key1 eq "mt") {
@@ -357,9 +366,9 @@ sub hkloop {
          my @result = $sql_getkey_HK->fetchrow_array;
          $hkid = $result[0];
          $sql_getkey_HK->finish();
+         push (@logarr,"Adding to HK: $hkid,$hkparent,$scid,$level,$name");
          $sql_insert_HK->execute($hkid,$hkparent,$scid,$level,$name);
          $searchdata{$hashkey} = $hkid;
-#         push (@logarr,"Added to HK: $hkid,$hkparent,$scid,$level,$name");
       } else {
          $hkid = $searchdata{$hashkey};
       }

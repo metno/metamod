@@ -40,10 +40,15 @@ With mod_proxy, mod_proxy_http and mod_rewrite installed
 =item FIMEX (optional, but recommended)
 
 While not stricly necessary, FIMEX is required for functionality regarding
-transformation and OPeNDAP. However, since it is not available via official Ubuntu
+transformation and OPeNDAP, as well as running the unit tests.
+However, since it is not available via official Ubuntu
 repositories it is not a required dependency. You can find it on
 L<Launchpad|https://launchpad.net/~heiko-klein/+archive/ubuntu/fimex> (binaries) and
 in L<Subversion|https://svn.met.no/viewvc/fimex/> (source).
+
+  $ sudo add-apt-repository ppa:heiko-klein/fimex
+  $ sudo apt-get update
+  $ sudo apt-get install fimex-bin
 
 =back
 
@@ -189,6 +194,8 @@ PERL5LIB when running from the command line (activate_env doesn't handle this sp
 =head2 Testing notes (TODO)
 
 =head3 How to run unit tests from source
+
+First, change Postgres authorization settings as described in "Authentication" in L<installation>. Then:
 
   $ ./common/prepare_runtime_env.sh test/applic/
   $ ./test/short_test_application.sh && make debian_package

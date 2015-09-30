@@ -143,44 +143,46 @@ PG_CONNECTSTRING_SHELL =
 #PG_CONNECTSTRING_PERL = ;host=[==PG_HOST==];port=[==PG_PORT==]
 PG_CONNECTSTRING_PERL =
 
-# Directory for PostgreSQL contrib libs
-# i.e. tsearch2.sql, pgcrypto.sql and lwpostgis.sql
+# PostgreSQL additions
+#
+# These are now defined explicitly for each version of PSQL. As long as you are running the same
+# version on the client (metamod instance) and the dbserver there is no need to configure anyting.
+# However if they are different you must copy the relevant files to the client and reconfigure
+# the relevant directives for the server version accordingly:
+#
+# PG_CONTRIB_x_x: Directory for PostgreSQL contrib libs (i.e. tsearch2.sql, pgcrypto.sql and (lw)postgis.sql)
+# PG_TSEARCH2_SCRIPT_x_x: the location of the initialization sql-script for the full-text facilities (builtin from 9.0+)
+# PG_CRYPTO_SCRIPT_x_x: the location of the cryptographic module (builtin from 9.0+)
+# PG_POSTGIS_SCRIPT_x_x: the location of the initialization sql-script for postGIS
+# PG_POSTGIS_SYSREF_SCRIPT_x_x: the Coordinate System References
+
 # For Hardy:
-#PG_CONTRIB = /usr/share/postgresql/8.3/contrib
+PG_CONTRIB_8_3 = /usr/share/postgresql/8.3/contrib
+PG_TSEARCH2_SCRIPT_8_3 = [==PG_CONTRIB_8_3==]/tsearch2.sql
+PG_CRYPTO_SCRIPT_8_3 = [==PG_CONTRIB_8_3==]/pgcrypto.sql
+PG_POSTGIS_SCRIPT_8_3 = /usr/share/postgresql-8.3-postgis/lwpostgis.sql
+PG_POSTGIS_SYSREF_SCRIPT_8_3 = /usr/share/postgresql-8.3-postgis/spatial_ref_sys.sql
+
 # For Lucid:
-#PG_CONTRIB = /usr/share/postgresql/8.4/contrib
+PG_CONTRIB_8_4 = /usr/share/postgresql/8.4/contrib
+PG_TSEARCH2_SCRIPT_8_4 = [==PG_CONTRIB_8_4==]/tsearch2.sql
+PG_CRYPTO_SCRIPT_8_4 = [==PG_CONTRIB_8_4==]/pgcrypto.sql
+PG_POSTGIS_SCRIPT_8_4 = [==PG_CONTRIB_8_4==]/postgis.sql
+PG_POSTGIS_SYSREF_SCRIPT_8_4 = [==PG_CONTRIB_8_4==]/postgis-2.0/spatial_ref_sys.sql
+
 # For Precise:
-#PG_CONTRIB = /usr/share/postgresql/9.1/contrib
+PG_CONTRIB_9_1 = /usr/share/postgresql/9.1/contrib
+PG_TSEARCH2_SCRIPT_9_1 =
+PG_CRYPTO_SCRIPT_9_1 =
+PG_POSTGIS_SCRIPT_9_1 = [==PG_CONTRIB_9_1==]/postgis-1.5/postgis.sql
+PG_POSTGIS_SYSREF_SCRIPT_9_1 = [==PG_CONTRIB_9_1==]/postgis-1.5/spatial_ref_sys.sql
 
-# the location of the initialization sql-script for the full-text facilities
-# For Hardy and Lucid:
-#PG_TSEARCH2_SCRIPT = [==PG_CONTRIB==]/tsearch2.sql
-# For Precise it no longer exists and must be blank:
-#PG_TSEARCH2_SCRIPT =
-
-# the location of the initialization sql-script for postGIS
-# For Hardy:
-#PG_CRYPTO_SCRIPT = [==PG_CONTRIB==]/pgcrypto.sql
-# For Lucid:--1.0
-#PG_CRYPTO_SCRIPT = [==PG_CONTRIB==]/pgcrypto.sql
-# For Precise: (leave blank since it is installed differently)
-#PG_CRYPTO_SCRIPT =
-
-# the location of the initialization sql-script for postGIS
-# For Hardy:
-#PG_POSTGIS_SCRIPT = /usr/share/postgresql-8.3-postgis/lwpostgis.sql
-# For Lucid:
-#PG_POSTGIS_SCRIPT = [==PG_CONTRIB==]/postgis.sql
-# For Precise:
-#PG_POSTGIS_SCRIPT = [==PG_CONTRIB==]/postgis-1.5/postgis.sql
-
-# the Coordinate System References
-# For Hardy:
-#PG_POSTGIS_SYSREF_SCRIPT = /usr/share/postgresql-8.3-postgis/spatial_ref_sys.sql
-# For Lucid:
-#PG_POSTGIS_SYSREF_SCRIPT = [==PG_CONTRIB==]/postgis-2.0/spatial_ref_sys.sql
-# For Precise:
-#PG_POSTGIS_SYSREF_SCRIPT = [==PG_CONTRIB==]/postgis-1.5/spatial_ref_sys.sql
+# For Trusty:
+PG_CONTRIB_9_3 = /usr/share/postgresql/9.3/contrib
+PG_TSEARCH2_SCRIPT_9_3 =
+PG_CRYPTO_SCRIPT_9_3 =
+PG_POSTGIS_SCRIPT_9_3 = [==PG_CONTRIB_9_3==]/postgis-2.1/postgis.sql
+PG_POSTGIS_SYSREF_SCRIPT_9_3 = [==PG_CONTRIB_9_3==]/postgis-2.1/spatial_ref_sys.sql
 
 # additional coordinate systems, retrieve from e.g. : http://spatialreference.org
 PG_POSTGIS_ADDITIONAL_SYSREF =
