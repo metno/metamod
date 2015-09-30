@@ -1,11 +1,11 @@
-Source: metno-metamod-2.13
+Source: metno-metamod-2.14
 Priority: extra
 Maintainer: Geir Aalberg <geira@met.no>
 Build-Depends: debhelper (>=5), perl, make, fakeroot, cpanminus, libproj-dev, libgdbm-dev, libpng-dev, libnetcdf-dev, libexpat1-dev, libxml2-dev, libxslt1-dev, libssl-dev
 Standards-Version: 3.7.3
 Section: web
 
-Package: metno-metamod-2.13
+Package: metno-metamod-2.14
 Section: web
 Priority: optional
 Architecture: amd64
@@ -20,3 +20,4 @@ Conflicts:
 Replaces:
 Provides: metamod-2
 Description: portal solution providing Discovery, Access and Retrieve functionality for scientific datasets
+

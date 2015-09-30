@@ -2,7 +2,7 @@
 # Makefile that is used when generating the Debian package
 #
 
-PACKAGENAME = metno-metamod-2.13
+PACKAGENAME = metno-metamod-2.14
 
 DEBIANDIR = $(CURDIR)/debian/$(PACKAGENAME)
 
@@ -24,12 +24,14 @@ apidocs:
 	cp docs/apidocs.css docs/html/api/_blkbluw.css
 # ok, the last one is a hack... write perl script later
 
+# needs to maintain different snapshot files per OS version - FIXME
 deps:
 	carton install
 
 bundle:
 	carton bundle --no-fatpack
 
+# needs to maintain different snapshot files per OS version - FIXME
 deployment:
 	carton install --deployment --cached
 

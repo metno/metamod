@@ -51,6 +51,12 @@ download and install packages manually as described below.>
 Add the corresponding lines to your /etc/apt/sources.list depending on your
 version of Ubuntu:
 
+B<FIXME: add to sources.list.d via script!!!>
+
+  # for trusty
+  deb http://repo.met.no/met.no trusty main contrib
+  deb-src http://repo.met.no/met.no trusty main contrib
+  
   # for precise
   deb http://repo.met.no/met.no precise main contrib
   deb-src http://repo.met.no/met.no precise main contrib
@@ -65,6 +71,10 @@ version of Ubuntu:
 
 If you want to run development versions (recommended), also add:
 
+  # for trusty
+  deb http://repo.met.no/devel trusty main contrib
+  deb-src http://repo.met.no/devel trusty main contrib
+
   # for precise
   deb http://repo.met.no/devel precise main contrib
   deb-src http://repo.met.no/devel precise main contrib
@@ -76,6 +86,10 @@ If you want to run development versions (recommended), also add:
   # for hardy
   deb http://repo.met.no/devel hardy main contrib
   deb-src http://repo.met.no/devel hardy main contrib
+
+You also need to import the PGP key for repo.met.no to verify it:
+
+  sudo apt-key adv --keyserver pgp.mit.edu --recv-keys ED4352662E4634B5
 
 =head3 Installing METAMOD via apt
 
