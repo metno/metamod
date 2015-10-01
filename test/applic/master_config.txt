@@ -77,18 +77,6 @@ PG_WEB_USER = webuser
 # I.e. PostgreSQL server running on same machine as web server.
 PG_WEB_USER_PASSWORD =
 
-# Directory for PostgreSQL contrib libs
-#PG_CONTRIB = /usr/share/postgresql/9.1/contrib
-
-# the location of the initialization sql-script for the full-text facilities
-#PG_TSEARCH2_SCRIPT = [==PG_CONTRIB==]/tsearch2.sql
-
-# the location of the initialization sql-script for postGIS
-#PG_POSTGIS_SCRIPT = /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
-# the Coordinate System References
-#PG_POSTGIS_SYSREF_SCRIPT = /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
-
-
 # PG_CONNECTSTRING_* are strings used to indicate hostname and port for
 # connecting to the PostgreSQL database. They are found in various
 # commands and script functions. These strings should be empty if hostname and

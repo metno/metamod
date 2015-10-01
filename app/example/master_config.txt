@@ -110,24 +110,12 @@ PG_CONNECTSTRING_SHELL =
 PG_CONNECTSTRING_PERL =
 
 # Directory for PostgreSQL contrib libs (e.g. tsearch2.sql, pgcrypto.sql and lwpostgis.sql)
-# Note that installing the Debian packet for this will also pull in PostgreSQL server.
-# For this reason these packets are not required dependencies of Metamod, but must
-# be installed manually, e.g. from source
-#
-# For Hardy:
-#PG_CONTRIB = /usr/share/postgresql/8.3/contrib
-# For Lucid:
-#PG_CONTRIB = /usr/share/postgresql/8.4/contrib
-# For Precise
-PG_CONTRIB = /usr/share/postgresql/9.1/contrib
-
-# the location of the initialization sql-script for the full-text facilities
-# NOTE: no longer exists in PostgreSQL 9.x
-#PG_TSEARCH2_SCRIPT = [==PG_CONTRIB==]/tsearch2.sql
+# *** Only set this if you have not installed locally the same version of PSQL as on the DB server
+#PG_CONTRIB = /usr/share/postgresql/9.1/contrib
 
 # the location of the initialization sql-script for postGIS
-#PG_POSTGIS_SCRIPT = /usr/share/postgresql-8.3-postgis/lwpostgis.sql
-PG_POSTGIS_SCRIPT = [==PG_CONTRIB==]/contrib/postgis.sql
+# *** Only set this if you have not installed locally the same version of PSQL as on the DB server
+#PG_POSTGIS_SCRIPT = [==PG_CONTRIB==]/contrib/postgis.sql
 
 # the Coordinate System References
 #PG_POSTGIS_SYSREF_SCRIPT = /usr/share/postgresql-8.3-postgis/spatial_ref_sys.sql

@@ -1,0 +1,17 @@
+# make some defaults explicit to document the decision
+--indent-columns=4
+--cuddled-else
+--indent-block-comments
+--paren-tightness=1
+--square-bracket-tightness=1
+--brace-tightness=1
+--block-brace-tightness=0
+-nbl
+-nsbl
+--static-block-comments
+
+# deviations from the default
+--maximum-line-length=120
+--continuation-indentation=4
+--opening-brace-always-on-right
+--closing-token-indentation=0

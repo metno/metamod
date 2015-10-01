@@ -81,11 +81,13 @@ sub check {
     ok( -d $conf->config_dir, 'config directory found');
     ok( -w $$vars{WEBRUN_DIRECTORY}, "WEBRUN_DIRECTORY is writable: $$vars{WEBRUN_DIRECTORY}" );
     ok( -w $$vars{UPLOAD_DIRECTORY}, "UPLOAD_DIRECTORY is writable: $$vars{UPLOAD_DIRECTORY}" );
-    ok( -d $$vars{CATALYST_LIB}, "CATALYST_LIB found: $$vars{CATALYST_LIB}" );
+    ok( -d $$vars{CATALYST_LIB},     "CATALYST_LIB found: $$vars{CATALYST_LIB}" );
     ok( -d $$vars{INSTALLATION_DIR}, "INSTALLATION_DIR found: $$vars{INSTALLATION_DIR}"  );
-    ok( -e $$vars{PG_POSTGIS_SYSREF_SCRIPT}, 'PG_POSTGIS_SYSREF_SCRIPT found' );
-    ok( -e $$vars{PG_POSTGIS_SCRIPT}, 'PG_POSTGIS_SCRIPT found' );
-    ok( -x $$vars{FIMEX_PROGRAM} || !defined($$vars{FIMEX_PROGRAM}), "FIMEX_PROGRAM executable: $$vars{FIMEX_PROGRAM}"  );
+
+    # PostGIS file locations now defined per PG version; normally not set unless different between server and client
+    ok( -e $$vars{PG_POSTGIS_SYSREF_SCRIPT} || !defined($$vars{PG_POSTGIS_SYSREF_SCRIPT}), 'PG_POSTGIS_SYSREF_SCRIPT found' );
+    ok( -e $$vars{PG_POSTGIS_SCRIPT}        || !defined($$vars{PG_POSTGIS_SCRIPT}),        'PG_POSTGIS_SCRIPT found' );
+    ok( -x $$vars{FIMEX_PROGRAM}            || !defined($$vars{FIMEX_PROGRAM}),            "FIMEX_PROGRAM executable: $$vars{FIMEX_PROGRAM}"  );
 
     # required directives
     ok( $$vars{SERVER},         'SERVER is set' );
