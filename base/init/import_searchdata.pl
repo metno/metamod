@@ -93,7 +93,7 @@ eval { &update_database; };
 if ($@) {
     warn $@;
     $exitcode = 2;
-    #$dbh->rollback or die $dbh->errstr;
+    $dbh->rollback or die $dbh->errstr;
     my @utctime   = gmtime( mmTtime::ttime() );
     my $year      = 1900 + $utctime[5];
     my $mon       = $utctime[4];                                           # 0-11
