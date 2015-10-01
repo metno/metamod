@@ -55,8 +55,10 @@ echo "Writing output to $OUTPUT"
 exec 3>&1 4>&2 >$OUTPUT 2>&1
 echo "------------ Reinitialize the database, create dynamic tables:"
 # createdb must be run and not sourced otherwise paths will be screwed up
-if ! $SCRIPT_PATH/createdb.sh $CONFIG
+if $SCRIPT_PATH/createdb.sh $CONFIG
 then
+    echo "createdb OK - exit $?" >&4
+else
     # doesn't seem to work...
     echo "createdb failed! Check log for details" >&4
     exit 1

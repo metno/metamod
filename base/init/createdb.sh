@@ -34,7 +34,7 @@ check "SRUSCHEMA" exists
 $DROPDB -e -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $DBNAME
 #ordie "Can't drop database $DBNAME" # may not exist
 $CREATEDB -e -E UTF-8 -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL $DBNAME
-ordie "Can't create database $DBNAME"
+ordie "Can't create database $DBNAME... exiting with code $?"
 echo "----------------- Database $DBNAME created ------------------"
 
 # check PG version running on server

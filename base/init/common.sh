@@ -27,10 +27,11 @@ check () {
 }
 
 ordie () {
-    if [ $? != 0 ]
+    error=$?
+    if [ $error != 0 ]
     then
         echo "$*" 1>&2
-        exit $?
+        exit $error
     fi
 }
 
