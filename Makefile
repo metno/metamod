@@ -18,6 +18,11 @@ VERSION: debian/changelog
 
 LIBDEPS="local/lib/perl5:local/lib/perl5/x86_64-linux-gnu-thread-multi"
 
+.PHONY: test
+# so "make test" is not dependent of the "test" directory
+test:
+	PERL5LIB="local/lib/perl5:local/lib/perl5/x86_64-linux-gnu-thread-multi" ./run_automatic_tests.pl
+
 apidocs:
 	mkdir -p docs/html/api
 	perl -MPod::Simple::HTMLBatch -e Pod::Simple::HTMLBatch::go \

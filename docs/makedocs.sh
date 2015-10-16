@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# go to docs dir
+cd "$( dirname "${BASH_SOURCE[0]}" )"
+
 while getopts ":av" opt; do
   case $opt in
     a)

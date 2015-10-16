@@ -20,7 +20,7 @@ use Metamod::Test::Setup;
 my $num_tests = 0;
 
 my $config_file = "$FindBin::Bin/../../master_config.txt";
-die "Missing config file" unless -r -f config_file;
+die "Missing config file" unless -r -f $config_file;
 my $test_setup  = Metamod::Test::Setup->new( master_config_file => $config_file );
 my $config      = $test_setup->mm_config();
 my $metabase    = $test_setup->metabase();
