@@ -49,7 +49,7 @@ SELECT pg_catalog.setval('usertable_u_id_seq', 2, true);
 --
 
 COPY usertable (u_id, a_id, u_name, u_loginname, u_email, u_password, u_institution, u_telephone) FROM stdin;
-1	EXAMPLE	tester	metamod1	metamod@met.no	\N	met.no	\N
+2	EXAMPLE	tester	metamod1	metamod@met.no	\N	met.no	\N
 \.
 
 --

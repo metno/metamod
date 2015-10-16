@@ -98,8 +98,9 @@ has 'errstr' => ( is => 'rw', isa => 'Str' );
 sub _build_mm_config {
     my $self = shift;
 
-    confess "Missing config file: " . $self->master_config_file unless -f -s -r $self->master_config_file; 
-    my $path = File::Spec->catfile( $self->master_config_file ) or die " Why cat?";
+    my $conf = $self->master_config_file or die "Master config not specified!";
+    confess "Missing config file: " . $conf unless -f -s -r $conf;
+    my $path = File::Spec->catfile( $conf ) or die "No has cheezburger"; # Why cat when only one param?
     my $config = Metamod::Config->new($path);
     get_logger()->info("Metamod::Test::Setup using $path");
     return $config;
