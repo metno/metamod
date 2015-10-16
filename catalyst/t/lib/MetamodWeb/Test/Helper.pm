@@ -17,7 +17,7 @@ extends 'Metamod::Test::Setup';
 has 'master_config_file' => ( is => 'ro', default => 'master_config_test.txt' );
 #has 'master_config_file' => ( is => 'ro' ); # the default is seriously obsolete and cannot be used as is
 
-has 'master_config_dir' => ( is => 'ro', builder => '_build_master_config_dir' );
+has 'master_config_dir' => ( is => 'ro', lazy => 1, builder => '_build_master_config_dir' );
 
 sub _build_master_config_dir {
     my $self = shift;
@@ -31,10 +31,10 @@ sub _build_catalyst_root {
     my $self = shift;
 
     if ( $FindBin::Bin =~ /^(.* \/ catalyst) \/ t (\/)? .* /x ) {
-        print STDERR "Catalyst dir = '$1'\n";
+        #print STDERR "Catalyst dir = '$1'\n";
         return $1;
     } else {
-        die "Could not determine the path to the catalyst directroy from the test script path: $FindBin::Bin";
+        die "Could not determine the path to the catalyst directory from the test script path: $FindBin::Bin";
     }
 
 }
