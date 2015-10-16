@@ -73,7 +73,7 @@ use warnings;
 # to read config in order to configure dependencies.
 # See http://perldoc.perl.org/index-modules-A.html for list
 #
-use Carp;
+use Carp qw(croak cluck confess);
 use Cwd qw();
 use Data::Dumper;
 use Exporter;
@@ -151,7 +151,7 @@ sub new {
 
     # check file is readable
     if ((! -f $config_file) and (! -r $config_file)) {
-        die "Cannot read config-file: $config_file";
+        confess "Cannot read config-file: $config_file";
     }
 
     $config_file = _normalizeFile($config_file);

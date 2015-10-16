@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 use strict;
 use warnings;
+use Carp;
 
 use DBIx::Class::QueryLog;
 use DBIx::Class::QueryLog::Analyzer;
@@ -97,7 +98,8 @@ has 'errstr' => ( is => 'rw', isa => 'Str' );
 sub _build_mm_config {
     my $self = shift;
 
-    my $path = File::Spec->catfile( $self->master_config_file );
+    confess "Missing config file: " . $self->master_config_file unless -f -s -r $self->master_config_file; 
+    my $path = File::Spec->catfile( $self->master_config_file ) or die " Why cat?";
     my $config = Metamod::Config->new($path);
     get_logger()->info("Metamod::Test::Setup using $path");
     return $config;
@@ -117,12 +119,12 @@ sub _build_import_dataset_path {
 sub _build_metabase {
     my $self = shift;
 
-    my $mm_config = $self->mm_config();
+    my $conf = $self->mm_config();
 
     my $metabase = Metamod::DBIxSchema::Metabase->connect(
-        $mm_config->getDSN(),
-        $mm_config->get('PG_ADMIN_USER'),
-        $mm_config->get('PG_ADMIN_USER_PASSWORD')
+        $conf->getDSN(),
+        $conf->get('PG_ADMIN_USER'),
+        $conf->has('PG_ADMIN_USER_PASSWORD') ? $conf->get('PG_ADMIN_USER_PASSWORD') : ''
     );
 
     my $query_log = DBIx::Class::QueryLog->new;
@@ -143,7 +145,7 @@ sub _build_userbase {
     my $userbase = Metamod::DBIxSchema::Userbase->connect(
         $conf->getDSN_Userbase(),
         $conf->get('PG_ADMIN_USER'),
-        $conf->get('PG_ADMIN_USER_PASSWORD')
+        $conf->has('PG_ADMIN_USER_PASSWORD') ? $conf->get('PG_ADMIN_USER_PASSWORD') : ''
     );
 
     my $query_log = DBIx::Class::QueryLog->new;

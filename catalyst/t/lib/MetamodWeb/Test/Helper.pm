@@ -2,6 +2,7 @@ package MetamodWeb::Test::Helper;
 
 use strict;
 use warnings;
+use Carp;
 
 use FindBin;
 use Log::Log4perl qw(get_logger);
@@ -30,6 +31,7 @@ sub _build_catalyst_root {
     my $self = shift;
 
     if ( $FindBin::Bin =~ /^(.* \/ catalyst) \/ t (\/)? .* /x ) {
+        print STDERR "Catalyst dir = '$1'\n";
         return $1;
     } else {
         die "Could not determine the path to the catalyst directroy from the test script path: $FindBin::Bin";
@@ -44,11 +46,9 @@ sub _build_mm_config {
     my $self = shift;
 
     my $path = File::Spec->catfile( $self->master_config_dir, $self->master_config_file );
+    die "Can't find master_config in $path" unless -s $path;
     return Metamod::Config->new($path);
-
 }
-
-
 
 sub BUILD {
     my $self = shift;

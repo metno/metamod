@@ -64,7 +64,7 @@ sub newfiles : Path("/upload/newfiles") :Args(0) {
             $data = "Query did not contain a $pname value";
             last;
         }
-        #printf STDERR " ¤ %s is %s\n", $pname, $pval;
+        #printf STDERR " # %s is %s\n", $pname, $pval;
         push @params, $pval;
     }
 
