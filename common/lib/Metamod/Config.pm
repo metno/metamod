@@ -79,7 +79,6 @@ use Data::Dumper;
 use Exporter;
 use File::Basename;
 use File::Spec qw();
-use FindBin;
 
 our %EXPORT_TAGS = ( init_logger => [] ); # hack for old scipts using Metamod::Config qw(:init_logger)
 
@@ -732,11 +731,9 @@ sub installation_dir {
     my $self = shift;
 
     my $tries_counter = 0;
-    my $curr_dir = $FindBin::Bin; # not working under init.d - thinks Bin is in config dir
-    #printf STDERR "FindBin::Bin thinks Metamod::Config is installed in %s, but is actually in %s\n", $curr_dir, ABS_PATH;
 
     my ($volume,$directories,$file) = File::Spec->splitpath( ABS_PATH );
-    $curr_dir = $directories;
+    my $curr_dir = $directories;
 
     while( !(-d File::Spec->catdir( $curr_dir, 'common'))){
 

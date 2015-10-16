@@ -88,7 +88,7 @@ The error message from the previous error
 =cut
 
 has 'master_config_file' => ( is => 'ro', required => 1 );
-has 'mm_config' => ( is => 'ro', builder => '_build_mm_config' );
+has 'mm_config' => ( is => 'ro', lazy => 1, builder => '_build_mm_config' );
 has 'dataset_dir' => ( is => 'ro' );
 has 'import_dataset_path' => ( is => 'ro', lazy => 1, builder => '_build_import_dataset_path' );
 has 'metabase' => ( is => 'rw', lazy => 1, builder => '_build_metabase' );
@@ -98,7 +98,7 @@ has 'errstr' => ( is => 'rw', isa => 'Str' );
 sub _build_mm_config {
     my $self = shift;
 
-    my $conf = $self->master_config_file or die "Master config not specified!";
+    my $conf = $self->master_config_file or confess "Master config not specified!";
     confess "Missing config file: " . $conf unless -f -s -r $conf;
     my $path = File::Spec->catfile( $conf ) or die "No has cheezburger"; # Why cat when only one param?
     my $config = Metamod::Config->new($path);
