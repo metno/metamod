@@ -43,7 +43,7 @@
         <xsl:with-param name="role" select="'Technical Contact'"/>
       </xsl:call-template>
 
-      <xsl:comment>start of variables</xsl:comment>
+      <xsl:comment>start of variables for Parameters (mandatory)</xsl:comment>
       <xsl:apply-templates select="key('mm2', 'variable')"/>
       <xsl:comment>end of variables</xsl:comment>
 
@@ -154,7 +154,7 @@
         <Subtype><xsl:value-of select="$topicurl/@subtype"/></Subtype>
       </URL_Content_Type>
       <URL><xsl:value-of select="current()"/></URL>
-       <Description><xsl:value-of select="$topicurl/@desc"/></Description>
+      <Description><xsl:value-of select="$topicurl/@desc"/></Description>
     </Related_URL>
   </xsl:template>
 

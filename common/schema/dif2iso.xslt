@@ -496,6 +496,9 @@ l#MD_KeywordTypeCode" codeListValue="theme">theme</gmd:MD_KeywordTypeCode>
                   <xsl:when test="translate(translate(./child::text(), $uc, $lc), '/', '') = 'utilitiescommunications'">
                     <xsl:text>utilitiesCommunication</xsl:text>
                   </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:comment>Unknown ISO_Topic_Category: '<xsl:value-of select="."/>'</xsl:comment>
+                  </xsl:otherwise>
                 </xsl:choose>
               </gmd:MD_TopicCategoryCode>
             </gmd:topicCategory>
@@ -533,81 +536,111 @@ l#MD_KeywordTypeCode" codeListValue="theme">theme</gmd:MD_KeywordTypeCode>
           </xsl:for-each>
         </gmd:MD_DataIdentification>
       </gmd:identificationInfo>
-      <xsl:if test="/dif:DIF/dif:Related_URL[normalize-space(dif:URL_Content_Type/dif:Type) = normalize-space('VIEW RELATED INFORMATION')]/dif:URL">
+
+
+      <xsl:if test="/dif:DIF/dif:Related_URL">
         <gmd:distributionInfo>
           <gmd:MD_Distribution>
             <gmd:transferOptions>
               <gmd:MD_DigitalTransferOptions>
-                <gmd:onLine>
-                  <gmd:CI_OnlineResource>
-                    <gmd:linkage>
-                      <gmd:URL>
-                        <xsl:copy-of select="/dif:DIF/dif:Related_URL[normalize-space(dif:URL_Content_Type/dif:Type) = normalize-space('VIEW RELATED INFORMATION')]/dif:URL/child::text()"/>
-                      </gmd:URL>
-                    </gmd:linkage>
-                  </gmd:CI_OnlineResource>
-                </gmd:onLine>
+                <xsl:for-each select="/dif:DIF/dif:Related_URL">
+                  <gmd:onLine>
+                    <gmd:CI_OnlineResource>
+                      <gmd:linkage>
+                        <gmd:URL><xsl:value-of select="./dif:URL"/></gmd:URL>
+                      </gmd:linkage>
+                      <gmd:protocol>
+                        <gco:CharacterString>WWW:LINK-1.0-http--link</gco:CharacterString>
+                      </gmd:protocol>
+                      <gmd:name>
+                        <gco:CharacterString><xsl:value-of select="./dif:Description"/></gco:CharacterString>
+                      </gmd:name>
+                      <gmd:function>
+                        <xsl:choose>
+                          <xsl:when test="normalize-space(./dif:URL_Content_Type/dif:Type) = 'GET DATA'">
+                            <gmd:CI_OnLineFunctionCode
+                               codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                               codeListValue="download">download</gmd:CI_OnLineFunctionCode>
+                          </xsl:when>
+                          <xsl:when test="normalize-space(./dif:URL_Content_Type/dif:Type) = 'GET SERVICE'">
+                            <gmd:CI_OnLineFunctionCode
+                               codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                               codeListValue="download">download</gmd:CI_OnLineFunctionCode>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <gmd:CI_OnLineFunctionCode
+                               codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                               codeListValue="information">information</gmd:CI_OnLineFunctionCode>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </gmd:function>
+                    </gmd:CI_OnlineResource>
+                  </gmd:onLine>
+                </xsl:for-each>
               </gmd:MD_DigitalTransferOptions>
             </gmd:transferOptions>
           </gmd:MD_Distribution>
         </gmd:distributionInfo>
-        <gmd:dataQualityInfo>
-          <gmd:DQ_DataQuality>
-            <gmd:scope>
-              <gmd:DQ_Scope>
-                <gmd:level>
-                  <gmd:MD_ScopeCode codeList="http://www.wmo.int/pages/prog/wis/2010/metadata/version_1-2/WMOCodelists.xml#MD_ScopeCode" codeListValue="dataset"/>
-                </gmd:level>
-              </gmd:DQ_Scope>
-            </gmd:scope>
-            <gmd:report>
-              <gmd:DQ_DomainConsistency>
-                <gmd:result>
-                  <gmd:DQ_ConformanceResult>
-                    <gmd:specification>
-                      <gmd:CI_Citation>
-                        <gmd:title>
-                          <gco:CharacterString>Metamod dataset import conformance rules</gco:CharacterString>
-                        </gmd:title>
-                        <gmd:date>
-                          <gmd:CI_Date>
-                            <gmd:date>
-                              <gco:Date><xsl:value-of select="substring($DATASET_TIMESTAMP,1,10)"/></gco:Date>
-                            </gmd:date>
-                            <gmd:dateType>
-                              <gmd:CI_DateTypeCode codeList="http://www.wmo.int/pages/prog/wis/2010/metadata/version_1-2/WMOCodelists.xml#CI_DateTypeCode" codeListValue="publication"/>
-                            </gmd:dateType>
-                          </gmd:CI_Date>
-                        </gmd:date>
-                      </gmd:CI_Citation>
-                    </gmd:specification>
-                    <gmd:explanation>
-                      <gco:CharacterString>The dataset managed to pass a basic upload and metadata-extraction/conversion test within Metamod2</gco:CharacterString>
-                    </gmd:explanation>
-                    <gmd:pass>
-                      <gco:Boolean>true</gco:Boolean>
-                    </gmd:pass>
-                  </gmd:DQ_ConformanceResult>
-                </gmd:result>
-              </gmd:DQ_DomainConsistency>
-            </gmd:report>
-            <gmd:lineage>
-              <gmd:LI_Lineage>
-                <gmd:statement>
-                  <gco:CharacterString>Data content layout controlled by Metamod</gco:CharacterString>
-                </gmd:statement>
-                <gmd:processStep>
-                  <gmd:LI_ProcessStep>
-                    <gmd:description>
-                      <gco:CharacterString>This metadata record was created automatically on a "best effort" basis by Metamod2. The current metadata record is therefore provided more for information than for reference.</gco:CharacterString>
-                    </gmd:description>
-                  </gmd:LI_ProcessStep>
-                </gmd:processStep>
-              </gmd:LI_Lineage>
-            </gmd:lineage>
-          </gmd:DQ_DataQuality>
-        </gmd:dataQualityInfo>
       </xsl:if>
+
+      <gmd:dataQualityInfo>
+        <gmd:DQ_DataQuality>
+          <gmd:scope>
+            <gmd:DQ_Scope>
+              <gmd:level>
+                <gmd:MD_ScopeCode codeList="http://www.wmo.int/pages/prog/wis/2010/metadata/version_1-2/WMOCodelists.xml#MD_ScopeCode" codeListValue="dataset"/>
+              </gmd:level>
+            </gmd:DQ_Scope>
+          </gmd:scope>
+          <gmd:report>
+            <gmd:DQ_DomainConsistency>
+              <gmd:result>
+                <gmd:DQ_ConformanceResult>
+                  <gmd:specification>
+                    <gmd:CI_Citation>
+                      <gmd:title>
+                        <gco:CharacterString>Metamod dataset import conformance rules</gco:CharacterString>
+                      </gmd:title>
+                      <gmd:date>
+                        <gmd:CI_Date>
+                          <gmd:date>
+                            <gco:Date><xsl:value-of select="substring($DATASET_TIMESTAMP,1,10)"/></gco:Date>
+                          </gmd:date>
+                          <gmd:dateType>
+                            <gmd:CI_DateTypeCode codeList="http://www.wmo.int/pages/prog/wis/2010/metadata/version_1-2/WMOCodelists.xml#CI_DateTypeCode" codeListValue="publication"/>
+                          </gmd:dateType>
+                        </gmd:CI_Date>
+                      </gmd:date>
+                    </gmd:CI_Citation>
+                  </gmd:specification>
+                  <gmd:explanation>
+                    <gco:CharacterString>The dataset managed to pass a basic upload and metadata-extraction/conversion test within Metamod2</gco:CharacterString>
+                  </gmd:explanation>
+                  <gmd:pass>
+                    <gco:Boolean>true</gco:Boolean>
+                  </gmd:pass>
+                </gmd:DQ_ConformanceResult>
+              </gmd:result>
+            </gmd:DQ_DomainConsistency>
+          </gmd:report>
+          <gmd:lineage>
+            <gmd:LI_Lineage>
+              <gmd:statement>
+                <gco:CharacterString>Data content layout controlled by Metamod</gco:CharacterString>
+              </gmd:statement>
+              <gmd:processStep>
+                <gmd:LI_ProcessStep>
+                  <gmd:description>
+                    <gco:CharacterString>This metadata record was created automatically on a "best effort" basis by Metamod2. The current metadata record is therefore provided more for information than for reference.</gco:CharacterString>
+                  </gmd:description>
+                </gmd:LI_ProcessStep>
+              </gmd:processStep>
+            </gmd:LI_Lineage>
+          </gmd:lineage>
+        </gmd:DQ_DataQuality>
+      </gmd:dataQualityInfo>
+
     </gmd:MD_Metadata>
   </xsl:template>
+
 </xsl:stylesheet>
