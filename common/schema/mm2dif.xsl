@@ -407,11 +407,11 @@ Blindern</Address>
     <topic:project name="WARPS"/>
   </topic:project>
 
-  <topic:url name="dataref" type="GET DATA" subtype="THREDDS CATALOG" desc="Access to THREDDS catalog"/>
+  <topic:url name="dataref" type="VIEW RELATED INFORMATION" subtype="" desc="Access to data catalog"/>
   <topic:url name="dataref_DOC" type="VIEW RELATED INFORMATION" subtype="" desc="Access to further documentation"/>
   <topic:url name="dataref_PROJ" type="VIEW PROJECT HOME PAGE" subtype="" desc="Access to project description page"/>
   <topic:url name="dataref_OPENDAP" type="GET DATA" subtype="OPENDAP DATA (DODS)" desc="Access to OPeNDAP service"/>
-  <topic:url name="dataref_HTTPServer" type="GET DATA" subtype="THREDDS DATA" desc="Access to data files"/>
+  <topic:url name="dataref_HTTPServer" type="GET DATA" subtype="ON-LINE ARCHIVE" desc="Access to data files"/>
   <topic:url name="dataref_WMS" type="GET SERVICE" subtype="GET WEB MAP SERVICE (WMS)" desc="Access to WMS service"/>
 
 </xsl:stylesheet>
