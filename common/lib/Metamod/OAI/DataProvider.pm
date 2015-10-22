@@ -744,11 +744,17 @@ sub _validate_metadata {
 
     # consider using specific DIF schema version based on /DIF/Metadata_Version if not backwards compatible
 
-    my $schema_for_format = $self->config->split('PMH_VALIDATION_SCHEMAS');
+    my %schema_for_format = (
+#        dif      => '/schema/dif_v9.8.2.xsd',
+        dif      => '/schema/dif.xsd', # always use latest version
+        oai_dc   => '/schema/oai_dc.xsd', # doesn't seem to have been updated since 2002
+        iso19115 => '/schema/iso19139/gmd/gmd.xsd',
+        iso19139 => '/schema/iso19139/gmd/gmd.xsd',
+    );
 
-    return 1 if !exists $schema_for_format->{$format};
+    return 1 if !exists $schema_for_format{$format};
 
-    my $schema = $schema_for_format->{$format};
+    my $schema = File::Spec->catfile( $self->config->get('INSTALLATION_DIR'), 'common', $schema_for_format{$format} );
 
     my $ext_validators = $self->config->split('PMH_LOCAL_VALIDATION');
     my $ds_name = $dataset->ds_name();
@@ -769,7 +775,7 @@ sub _validate_metadata {
             };
             if ($exit != 0) {
                 $self->logger->error($shell_err);
-                die "External validator failed with $shell_err";
+                die "External validator failed";
             }
 
         } else { # use ordinary schema

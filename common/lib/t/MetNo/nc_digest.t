@@ -50,10 +50,7 @@ close $DIGEST;
     unlink $out_file;
     digest( $digest_file, 'DAM', $out_file );
 
-    TODO: {
-        local $TODO = "Files have identical content, but the variables are in different order";
-        compare_ok( $baseline_file, $out_file, 'Parsing NC file' );
-    }
+    compare_ok( $baseline_file, $out_file, 'Parsing NC file' );
 
     #print STDERR "Compared files:\n  $baseline_file\n  $out_file:\n";
 

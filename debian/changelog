@@ -1,4 +1,4 @@
-metno-metamod-2.13 (2.13.14-6) stable; urgency=low
+metno-metamod-2.13 (2.13.14-5) stable; urgency=low
 
   * dynamic search map using WMS
   * improved support for background maps in different projections
@@ -26,7 +26,7 @@ metno-metamod-2.13 (2.13.14-6) stable; urgency=low
   	new config WMS_GET_CAPABILITIES, downloads external files to basket ZIP archive, ftp upload fix, various
   	transformation/map search changes, user admin improved, allowing import of ongoing dataset collections
   * v14: indexing dataset name in text search, generates nginx config and CheckMK scripts
-        (Note: must run import_searchdata.pl before reimporting data), improved OAI-PMH validation
+        (Note: must run import_searchdata.pl before reimporting data)
 
  -- Geir Aalberg <geira@met.no>  Mon, 03 Jun 2013 11:32:06 +0200
 

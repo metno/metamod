@@ -81,10 +81,7 @@ my $importer = Metamod::DatasetImporter->new();
         'Metadata for inserted ok: variable'
     );
 
-    TODO: {
-        local $TODO = "Number order has been changed after reordering of searchdata sequence";
-        test_basickey( $metabase, 1, [ 451, 805, 988, 1616, 1623 ], 'Connection between dataset and basickey');
-    }
+    test_basickey( $metabase, 1, [ 451, 805, 988, 1616, 1623 ], 'Connection between dataset and basickey');
 
     test_numberitem( $metabase, 1, [ { sc_id => 8, ni_from => '20100101', ni_to => '20110101', ds_id => 1 } ], 'Datacollection period in numberitem' );
 

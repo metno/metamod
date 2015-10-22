@@ -150,7 +150,7 @@ To enable this under Precise you need to compile 2.9.1 from source and install i
 
 After this is done you can add an external validation script in master_config:
 
-  PMH_LOCAL_VALIDATION =
+PMH_LOCAL_VALIDATION =
     iso19115  '/opt/local/bin/xmllint --noout --schema [SCHEMA] [FILE]'
     iso19139  '/opt/local/bin/xmllint --noout --schema [SCHEMA] [FILE]'
 
