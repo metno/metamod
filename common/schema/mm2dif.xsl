@@ -43,7 +43,7 @@
         <xsl:with-param name="role" select="'Technical Contact'"/>
       </xsl:call-template>
 
-      <xsl:comment>start of variables</xsl:comment>
+      <xsl:comment>start of variables for Parameters (mandatory)</xsl:comment>
       <xsl:apply-templates select="key('mm2', 'variable')"/>
       <xsl:comment>end of variables</xsl:comment>
 
@@ -97,6 +97,8 @@
       <Use_Constraints>Not Available</Use_Constraints>
       <Data_Set_Language>Not Available</Data_Set_Language>
 
+      <Originating_Center jif:default="Not Available"><xsl:value-of select="key('mm2', 'institution')"/></Originating_Center>
+
       <Data_Center>
         <Data_Center_Name>
           <Short_Name>NO/MET</Short_Name>
@@ -110,24 +112,14 @@
 
       <Reference><xsl:value-of select="key('mm2', 'references')"/></Reference>
       <Summary><Abstract jif:default="Not Available"><xsl:value-of select="key('mm2', 'abstract')"/></Abstract></Summary>
-      <Related_URL>
-        <URL_Content_Type>
-          <Type>VIEW RELATED INFORMATION</Type>
-        </URL_Content_Type>
-        <URL><xsl:value-of select="key('mm2', 'dataref')"/></URL>
-      </Related_URL>
-      <Related_URL>
-        <URL_Content_Type>
-          <Type>VIEW RELATED INFORMATION</Type>
-        </URL_Content_Type>
-        <URL><xsl:value-of select="key('mm2', 'dataref_DOC')"/></URL>
-      </Related_URL>
-      <Related_URL>
-        <URL_Content_Type>
-          <Type>VIEW RELATED INFORMATION</Type>
-        </URL_Content_Type>
-        <URL><xsl:value-of select="key('mm2', 'dataref_PROJ')"/></URL>
-      </Related_URL>
+
+      <xsl:apply-templates select="key('mm2', 'dataref')"/>
+      <xsl:apply-templates select="key('mm2', 'dataref_DOC')"/>
+      <xsl:apply-templates select="key('mm2', 'dataref_PROJ')"/>
+      <xsl:apply-templates select="key('mm2', 'dataref_OPENDAP')"/>
+      <xsl:apply-templates select="key('mm2', 'dataref_HTTPServer')"/>
+      <xsl:apply-templates select="key('mm2', 'dataref_WMS')"/>
+
       <xsl:apply-templates select="key('mm2', 'gtsFileIdentifier')"/>
       <xsl:apply-templates select="key('mm2', 'gtsInstancePattern')"/>
 
@@ -153,25 +145,38 @@
     </DIF>
   </xsl:template>
 
+  <!-- dataref_* -->
+  <xsl:template match="*[starts-with(@name, 'dataref')]">
+    <xsl:variable name="topicurl" select="document('')/*/topic:url[@name = current()/@name]"/>
+    <Related_URL>
+      <URL_Content_Type>
+        <Type><xsl:value-of select="$topicurl/@type"/></Type>
+        <Subtype><xsl:value-of select="$topicurl/@subtype"/></Subtype>
+      </URL_Content_Type>
+      <URL><xsl:value-of select="current()"/></URL>
+      <Description><xsl:value-of select="$topicurl/@desc"/></Description>
+    </Related_URL>
+  </xsl:template>
+
   <!-- gts-linkage -->
   <xsl:template match="*[@name='gtsInstancePattern']">
-      <Related_URL>
-        <URL_Content_Type>
-          <Type>GTSInstancePattern</Type>
-        </URL_Content_Type>
-        <URL><xsl:value-of select="current()"/></URL>
-        <Description>Instance pattern connecting to Global Telecommunication System (GTS)</Description>
-      </Related_URL>
+    <Related_URL>
+      <URL_Content_Type>
+        <Type>GTSInstancePattern</Type> <!--not sure this is a legal type according to GCMD-->
+      </URL_Content_Type>
+      <URL><xsl:value-of select="current()"/></URL>
+      <Description>Instance pattern connecting to Global Telecommunication System (GTS)</Description>
+    </Related_URL>
   </xsl:template>
 
   <xsl:template match="*[@name='gtsFileIdentifier']">
-      <Related_URL>
-        <URL_Content_Type>
-          <Type>GTSFileIdentifier</Type>
-        </URL_Content_Type>
-        <URL><xsl:value-of select="current()"/></URL>
-        <Description>File-Identifier connecting to Global Telecommunication System (GTS)</Description>
-      </Related_URL>
+    <Related_URL>
+      <URL_Content_Type>
+        <Type>GTSFileIdentifier</Type> <!--not sure this is a legal type according to GCMD-->
+      </URL_Content_Type>
+      <URL><xsl:value-of select="current()"/></URL>
+      <Description>File-Identifier connecting to Global Telecommunication System (GTS)</Description>
+    </Related_URL>
   </xsl:template>
 
   <!-- variables -->
@@ -401,5 +406,12 @@ Blindern</Address>
     <topic:project name="SUMO on Spitsbergen 2009"/>
     <topic:project name="WARPS"/>
   </topic:project>
+
+  <topic:url name="dataref" type="VIEW RELATED INFORMATION" subtype="" desc="Access to data catalog"/>
+  <topic:url name="dataref_DOC" type="VIEW RELATED INFORMATION" subtype="" desc="Access to further documentation"/>
+  <topic:url name="dataref_PROJ" type="VIEW PROJECT HOME PAGE" subtype="" desc="Access to project description page"/>
+  <topic:url name="dataref_OPENDAP" type="GET DATA" subtype="OPENDAP DATA (DODS)" desc="Access to OPeNDAP service"/>
+  <topic:url name="dataref_HTTPServer" type="GET DATA" subtype="ON-LINE ARCHIVE" desc="Access to data files"/>
+  <topic:url name="dataref_WMS" type="GET SERVICE" subtype="GET WEB MAP SERVICE (WMS)" desc="Access to WMS service"/>
 
 </xsl:stylesheet>
