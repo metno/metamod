@@ -39,7 +39,7 @@ our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", 
 use strict;
 use Data::Dumper;
 use warnings;
-use encoding 'utf-8';
+#use encoding 'utf-8';
 use 5.6.0;
 use strict;
 use warnings;

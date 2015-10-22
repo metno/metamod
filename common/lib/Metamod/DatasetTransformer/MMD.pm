@@ -38,7 +38,7 @@ use base qw(Metamod::DatasetTransformer);
 
 use strict;
 use warnings;
-use encoding 'utf-8';
+#use encoding 'utf-8';
 use UNIVERSAL;
 use Carp qw();
 use mmTtime;

@@ -7,6 +7,7 @@ use base 'Metamod::SubscriptionHandler';
 use strict;
 use warnings;
 
+use Data::Dumper;
 use Mail::Mailer;
 use Params::Validate qw( :all );
 
@@ -78,6 +79,7 @@ sub _send_email {
     my $self = shift;
 
     my ( $email_header, $email_body ) = @_;
+    #print STDERR Dumper $email_header, $email_body;
     my $mail_type = $self->_get_mail_type();
 
     my $mailer = Mail::Mailer->new( $mail_type );
