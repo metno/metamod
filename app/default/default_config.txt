@@ -564,6 +564,15 @@ PMH_EXPORT_TAGS = [==DATASET_TAGS==]
 PMH_VALIDATION = on
 # please change this to true/false or 1/0 - FIXME
 
+# Change this to custom path if you want to use custom schemas for validation
+PMH_VALIDATION_SCHEMAS =
+    dif         [==INSTALLATION_DIR==]/common/schema/dif.xsd
+    oai_dc      [==INSTALLATION_DIR==]/common/schema/oai_dc.xsd
+    iso19115    [==INSTALLATION_DIR==]/common/schema/iso19139/gmd/gmd.xsd
+    iso19139    [==INSTALLATION_DIR==]/common/schema/iso19139/gmd/gmd.xsd
+# Always use the latest DIF version
+# OAI_DC doesn't seem to have been updated since 2002
+
 # Custom local validator commands to run for specific data formats in OAI-PMH
 # (needed for ISO 19139 docs which require locally compiled version of libxml2 in precise)
 #PMH_LOCAL_VALIDATION =
