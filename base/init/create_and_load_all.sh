@@ -80,7 +80,8 @@ $IMPORTDIRS
 EOF
 if [ $IMP != "noimport" ]; then
     for dir in `cat t_1`; do
-        $SCRIPT_PATH/../scripts/import_dataset.pl ${CONFIG:+"--config"} $CONFIG $dir
+        echo " Importing $dir"
+        $SCRIPT_PATH/../scripts/import_dataset.pl --verbose ${CONFIG:+"--config"} $CONFIG $dir
     done
 fi
 rm t_1

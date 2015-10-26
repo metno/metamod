@@ -200,7 +200,7 @@ sub update_database {
         my $key1 = "HKBK:" . join( ":", @row );
         $searchdata{$key1} = 1;
     }
-    
+
     #  Prepare SQL statements for repeated use.
     #  Use "?" as placeholders in the SQL statements:
     $sql_insert_SC =
@@ -219,21 +219,22 @@ sub update_database {
     #
     #foreach my $key1 ( keys %$xmlref ) { # FIXME *** this will fail randomly if sc is not processed first! ***
     # ERROR - keys are returned in random order, so no guarantee that sc is processed before hk
-    foreach my $key1 ( qw(sc bk hkhead mt) ) {
+    foreach my $key1 ( qw(mt sc hkhead bk) ) {
 
         my $ref1 = $xmlref->{$key1} or next; # skip if key not used in xml
-        print STDERR "Processing <$key1> entries...\n";        
+        print STDERR "Processing <$key1> entries...\n";
         if ( $key1 eq "sc" ) {
-            
+
             # Check if reference is a HASH
             if ( ref($ref1) ne "HASH" ) {
                 die "$0: XML hash: Top level value (key 'sc') is not a hash reference\n";
             }
-            
+
             # Loop through all SearchCategories in the XML file:
             foreach my $key2 ( keys %$ref1 ) {
+                print STDERR "- SC SearchCategory: $key2\n";
                 my $ref2 = $ref1->{$key2};
-                
+
                 # Execute prepared SQL statement
                 # Each argument below replaces a "?" placeholder in the $sqlstatement:
                 if ( ref($ref2) ne "HASH" ) {
@@ -249,16 +250,17 @@ sub update_database {
                 }
             }
         } elsif ( $key1 eq "hkhead" ) {
-            
+
             # Check if reference is a HASH
             if ( ref($ref1) ne "HASH" ) {
                 die "$0: XML hash: Top level value (key 'hkhead') is not a hash reference\n";
             }
-            
+
             # Loop through a given level of tags
             foreach my $scid ( keys %$ref1 ) {
+                print STDERR "- HK SearchCategory: $scid\n";
                 my $ref2 = $ref1->{$scid};
-                
+
                 # Check if reference is a HASH
                 if ( ref($ref2) ne "HASH" ) {
                     die "$0: XML hash: 'hkhead' element is not a hash reference\n";
@@ -268,7 +270,7 @@ sub update_database {
                 }
                 my $ref3  = $ref2->{'hk'};
                 my $level = 1;
-                
+
                 # Subroutine call: hkloop
                 &hkloop( $level, $ref3, $scid, 0 );
             }
@@ -278,9 +280,12 @@ sub update_database {
             if ( ref($ref1) ne "ARRAY" ) {
                 die "$0: XML hash: Top level value (key 'bk') is not an array reference\n";
             }
-            
+
             # Loop through all 'bk' elements at the top XML level
             foreach my $ref2 (@$ref1) {
+                local $Data::Dumper::Terse = 1;
+                local $Data::Dumper::Indent  = 0;
+                printf STDERR "- BK: %s\n", Dumper $ref2;
                 if ( ref($ref2) ne "HASH" ) {
                     die "$0: XML hash: Error in 'bk' element at the top XML level\n";
                 }
@@ -297,7 +302,7 @@ sub update_database {
                     $searchdata{ "BK:" . $scid . ":" . $name } = $bkid;
                 }
             }
-            
+
         } elsif ( $key1 eq "mt" ) {
 
             if ( ref($ref1) ne "HASH" ) {
@@ -306,6 +311,7 @@ sub update_database {
 
             # Loop through all 'mt' elements at the top XML level
             foreach my $name ( keys %$ref1 ) {
+                print STDERR "- MT: $name\n";
                 my $ref2 = $ref1->{$name};
                 if ( ref($ref2) ne "HASH" || !exists( $ref2->{'def'} ) ) {
                     die "$0: XML hash: Error in 'mt' element\n";
@@ -320,7 +326,7 @@ sub update_database {
                     # print(STDERR "Added to MT: $name,$share,$def\n");
                 }
             }
-            
+
         }
     }
 }
@@ -333,11 +339,12 @@ sub update_database {
 sub hkloop {
     my ( $level, $ref1, $scid, $hkparent ) = @_;
     $ancestors[$level] = $hkparent;
-    
+
     # Loop through all 'hk' tags at the current level
     foreach my $name ( keys %$ref1 ) {
+        print STDERR "- HK tag: $name\n";
         my $ref2 = $ref1->{$name};
-        
+
         # Get primary key for HK ($hkid):
         my $hkid;
         my $hashkey = "HK:" . $scid . ":" . $hkparent . ":" . $name;
@@ -352,23 +359,24 @@ sub hkloop {
         } else {
             $hkid = $searchdata{$hashkey};
         }
-        
+
         #  The next level in the XML hash is either a reference to a set
         #  of 'hk' nodes (one level below current node), a reference to a
         #  set of 'bk' nodes or both:
         foreach my $key1 ( keys %$ref2 ) {
+            print STDERR "- HK/BK: $key1\n";
             my $ref3 = $ref2->{$key1};
-            
+
             if ( $key1 eq "hk" ) {
-                
+
                 # Recursive call to hkloop:
                 &hkloop( $level + 1, $ref3, $scid, $hkid );
-                
+
             } elsif ( $key1 eq "bk" ) {
-                
+
                 # Loop through all 'bk' elements within a 'hk' element:
                 foreach my $ref4 (@$ref3) {
-                    
+
                     if ( ref($ref4) ne "HASH" ) {
                         die "$0: XML hash: Error in 'bk' element within a 'hk' element\n";
                     }
@@ -377,7 +385,7 @@ sub hkloop {
                     my $name    = $ref4->{'content'};
                     my $scid    = $ref4->{'sc'};
                     my $hashkey = "BK:" . $scid . ":" . $name;
-                    
+
                     if ( !exists( $searchdata{$hashkey} ) ) {
                         $sql_getkey_BK->execute();
                         my @result = $sql_getkey_BK->fetchrow_array;
@@ -389,14 +397,14 @@ sub hkloop {
                     } else {
                         $bkid = $searchdata{$hashkey};
                     }
-                    
+
                     if ( !exists( $searchdata{ "HKBK:" . $hkid . ":" . $bkid } ) ) {
                         # Add to HK_represent_BK relationship:
                         $sql_insert_HKBK->execute( $hkid, $bkid );
                         $searchdata{ "HKBK:" . $hkid . ":" . $bkid } = 1;
                         # print(STDERR "Added to HKBK: $hkid,$bkid\n");
                     }
-                    
+
                     for ( my $lev = $level ; $lev > 1 ; $lev-- ) {
                         my $hkid1 = $ancestors[$lev];
                         if ( !exists( $searchdata{ "HKBK:" . $hkid1 . ":" . $bkid } ) ) {
@@ -406,7 +414,7 @@ sub hkloop {
                             # print(STDERR "Added to HKBK: $hkid1,$bkid\n");
                         }
                     }
-                    
+
                 }
             }
         }

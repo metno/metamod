@@ -101,8 +101,10 @@ Rewrite so can call Metamod::DatasetImporter directly to import file instead of 
 #print STDERR Dumper \@ARGV;
 
 my $config_file_or_dir = $ENV{METAMOD_MASTER_CONFIG};
+my $verbose = 0;
 
-GetOptions('config=s' => \$config_file_or_dir); # don't fail in case set in ENV
+GetOptions('config=s' => \$config_file_or_dir, # don't fail in case set in ENV
+           'verbose|v'  => \$verbose);
 
 if(!Metamod::Config->config_found($config_file_or_dir)){
     pod2usage(1);
@@ -129,20 +131,14 @@ else {
     die "Unknown inputfile or inputdir: $ARGV[0]\n";
 }
 
-#
 if ( defined($inputfile) ) {
 
-    #
-    #  Evaluate block to catch runtime errors
-    #  (including "die()")
-    #
+    #  Evaluate block to catch runtime errors (including "die()")
     my $dbh = $config->getDBH();
     eval { update_database($inputfile); };
 
-    #
     #  Check error string returned from eval
     #  If not empty, an error has occured
-    #
     if ($@) {
         print STDERR "Error while importing $inputfile : $@\n";
         $logger->error("$inputfile (single file) database error: $@");
@@ -209,6 +205,7 @@ sub process_directories {
 # ------------------------------------------------------------------
 sub update_database {
     my ($inputBaseFile) = @_;
+    printf STDERR "Importing %s\n", $inputBaseFile if $verbose;
 
     my $importer = Metamod::DatasetImporter->new();
     $importer->write_to_database($inputBaseFile); # dies on failure

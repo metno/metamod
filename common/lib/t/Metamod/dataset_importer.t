@@ -9,6 +9,7 @@ use lib "$FindBin::Bin/../..";
 use lib "$FindBin::Bin";
 
 use Test::More;
+use Data::Dumper;
 
 my $config_file;
 
@@ -81,7 +82,7 @@ my $importer = Metamod::DatasetImporter->new();
         'Metadata for inserted ok: variable'
     );
 
-    test_basickey( $metabase, 1, [ 451, 805, 988, 1616, 1623 ], 'Connection between dataset and basickey');
+    test_basickey( $metabase, 1, [ 451, 805, 988, 1616, 1623 ], 'Connection between dataset and basickey'); # FIXME
 
     test_numberitem( $metabase, 1, [ { sc_id => 8, ni_from => '20100101', ni_to => '20110101', ds_id => 1 } ], 'Datacollection period in numberitem' );
 
@@ -372,6 +373,7 @@ SKIP: {
         my @basickeys = $ds->bk_describes_ds()->all();
         my @bkids = map { $_->get_column('bk_id') } @basickeys;
 
+        #print Dumper \@bkids, $expected_bkids;
         is_deeply( \@bkids, $expected_bkids, $test_name );
 
     }
@@ -392,6 +394,7 @@ SKIP: {
             push @numberitems, { $ni->get_columns() };
         }
 
+        #print Dumper \@numberitems, $expected_numberitems;
         is_deeply( \@numberitems, $expected_numberitems, $test_name );
 
     }

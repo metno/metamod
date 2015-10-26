@@ -42,8 +42,13 @@ ok "create_and_load_all"
 $BASE_DIR/base/userinit/run_createuserdb.sh
 ok "run_createuserdb"
 
+$BASE_DIR/base/scripts/lsds -o ''
+
 $BASE_DIR/upload/scripts/userbase_add_datasets.pl --operator < $SCRIPT_PATH/directories
 ok "userbase_add_datasets"
+
+#pg_dump -U admin metamod_unittest > $SCRIPT_PATH/metabase.dump
+#pg_dump -U admin metamod_unittest_userbase > $SCRIPT_PATH/userbase.dump
 
 # Run the automatic test suite
 # might add --smolder if we feel like continued use
