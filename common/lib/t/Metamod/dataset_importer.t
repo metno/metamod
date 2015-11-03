@@ -364,7 +364,7 @@ SKIP: {
 
         #my @basickeys = $ds->bk_describes_ds()->all();
         #my @bkids = map { $_->get_column('bk_id') } @basickeys;
-        my @bkids = $ds->bk_describes_ds()->get_column('bk_id')->all();
+        my @bkids = sort $ds->bk_describes_ds()->get_column('bk_id')->all();
 
         is_deeply( \@bkids, $expected_bkids, $test_name );
 
@@ -427,7 +427,7 @@ sub test_dataset_location {
 }
 
 sub bk {
-    my @ids = $metabase->resultset('Basickey')->search( { bk_name => { IN => \@_ } } )->get_column('bk_id')->all;
+    my @ids = sort $metabase->resultset('Basickey')->search( { bk_name => { IN => \@_ } } )->get_column('bk_id')->all;
     return \@ids;
 }
 
