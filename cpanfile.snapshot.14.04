@@ -414,7 +414,6 @@ DISTRIBUTIONS
       DBD::SQLite 0
       DBIx::Class 0.08114
       ExtUtils::MakeMaker 6.59
-      Hash::Merge 0
       List::MoreUtils 0
       Module::Runtime 0.012
       Moose 1.12
@@ -963,14 +962,6 @@ DISTRIBUTIONS
       Module::Build 0.38
       URI::Escape 0
       perl 5.008001
-  Cpanel-JSON-XS-3.0115
-    pathname: R/RU/RURBAN/Cpanel-JSON-XS-3.0115.tar.gz
-    provides:
-      Cpanel::JSON::XS 3.0115
-    requirements:
-      ExtUtils::MakeMaker 0
-      Pod::Text 2.08
-      Pod::Usage 1.33
   DBD-SQLite-1.48
     pathname: I/IS/ISHIGAKI/DBD-SQLite-1.48.tar.gz
     provides:
@@ -3276,10 +3267,10 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       HTTP::Headers 6
       perl 5.008001
-  HTTP-OAI-4.03
-    pathname: T/TI/TIMBRODY/HTTP-OAI-4.03.tar.gz
+  HTTP-OAI-3.28
+    pathname: T/TI/TIMBRODY/HTTP-OAI-3.28.tar.gz
     provides:
-      HTTP::OAI 4.03
+      HTTP::OAI 3.28
       HTTP::OAI::Debug undef
       HTTP::OAI::Encapsulation undef
       HTTP::OAI::Encapsulation::DOM undef
@@ -3288,12 +3279,12 @@ DISTRIBUTIONS
       HTTP::OAI::GetRecord undef
       HTTP::OAI::Harvester undef
       HTTP::OAI::Header undef
+      HTTP::OAI::Headers undef
       HTTP::OAI::Identify undef
       HTTP::OAI::ListIdentifiers undef
       HTTP::OAI::ListMetadataFormats undef
       HTTP::OAI::ListRecords undef
       HTTP::OAI::ListSets undef
-      HTTP::OAI::MemberMixin undef
       HTTP::OAI::Metadata undef
       HTTP::OAI::Metadata::METS undef
       HTTP::OAI::Metadata::OAI_DC undef
@@ -3305,14 +3296,9 @@ DISTRIBUTIONS
       HTTP::OAI::Repository undef
       HTTP::OAI::Response undef
       HTTP::OAI::ResumptionToken undef
-      HTTP::OAI::SAX::Base undef
-      HTTP::OAI::SAX::Driver undef
-      HTTP::OAI::SAX::Text undef
-      HTTP::OAI::SAX::Trace undef
       HTTP::OAI::SAXHandler undef
       HTTP::OAI::Set undef
       HTTP::OAI::UserAgent undef
-      HTTP::OAI::Verb undef
       XML::SAX::Debug undef
     requirements:
       CGI 0
@@ -3467,7 +3453,7 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 0
       File::Spec 0.8
-      Module::Build 0.28
+      Module::Build 0.42
       Test::More 0.80
   Imager-1.003
     pathname: T/TO/TONYC/Imager-1.003.tar.gz
@@ -3548,7 +3534,6 @@ DISTRIBUTIONS
       JSON::MaybeXS 1.003005
     requirements:
       Carp 0
-      Cpanel::JSON::XS 2.3310
       ExtUtils::CBuilder 0.27
       ExtUtils::MakeMaker 0
       File::Spec 0

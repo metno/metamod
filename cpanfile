@@ -28,7 +28,7 @@ requires 'Devel::Cover', 1.00;
 requires 'Filesys::DfPortable', 0.85;
 requires 'Geo::Proj4', 1.04;
 requires 'HTML::FormHandler::Model::DBIC', 0.14;
-requires 'HTTP::OAI', 3.27;
+requires 'HTTP::OAI', '==3.28'; # newer versions fails to build on linux
 requires 'HTTP::DAV', 0.46;
 requires 'Imager', 0.97;
 requires 'JSON::Any', 1.29;
