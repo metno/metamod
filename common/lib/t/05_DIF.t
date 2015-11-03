@@ -29,7 +29,7 @@
 #----------------------------------------------------------------------------
 use strict;
 use warnings;
-use encoding 'utf-8';
+#use encoding 'utf-8';
 use Data::Dumper qw(Dumper);
 
 use FindBin;

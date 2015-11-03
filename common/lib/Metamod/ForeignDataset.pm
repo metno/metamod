@@ -39,8 +39,8 @@ our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", 
 use strict;
 use Data::Dumper;
 use warnings;
-use encoding 'utf-8';
-use 5.6.0;
+#use encoding 'utf-8'; # deprecated
+use v5.14;
 use strict;
 use warnings;
 use Encode;
@@ -95,13 +95,13 @@ default datasets consisting of meta-metadata (dataset.xmd files) and metadata (f
 strings. The metadata-file is not modified, except for content-invariant changes through the xml-parser/writer.
 
 XML::LibXML requires properly encoded utf-8 strings as input, with
-perl utf8-flag switched on. Please make sure to provide such data by:
+B<[WRONG]> perl utf8-flag switched on B<[WRONG]>. Please make sure to provide such data by:
 
 =over 4
 
-=item use Encode; and decode all data with decode('charset', $string);
+=item B<[WRONG]> use Encode; and decode all data with decode('charset', $string); B<[WRONG]>
 
-=item use encoding 'utf-8'; To set non-binary input-files annd all literals ('name') to utf8
+=item B<[WRONG]> use encoding 'utf-8'; To set non-binary input-files annd all literals ('name') to utf8 B<[WRONG]>
 
 =back
 
@@ -133,6 +133,7 @@ These methods need to be implemented by the extending modules.
 
 sub _decode {
     my ($self, $string) = @_;
+    return $string; # explicit decoding should be more harmful than good in modern perls
     if (!Encode::is_utf8($string)) {
         $logger->debug("String not properly encoded, assuming utf8: $string");
         eval {$string = Encode::decode('utf8', $string, Encode::FB_CROAK);};

@@ -86,7 +86,7 @@ sub getTargetDir {
 }
 
 use lib ('../../common/lib', getTargetDir('lib'), getTargetDir('scripts'), '.');
-use encoding 'utf-8';
+#use encoding 'utf-8';
 use Metamod::Config qw( :init_logger );
 use MetNo::NcDigest qw( digest );
 

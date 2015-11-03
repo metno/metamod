@@ -29,7 +29,7 @@
 #----------------------------------------------------------------------------
 use strict;
 use warnings;
-use encoding 'iso8859-1';
+#use encoding 'iso8859-1';
 use Encode qw(decode encode);
 
 use FindBin;

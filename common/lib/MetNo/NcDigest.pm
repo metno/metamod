@@ -416,7 +416,7 @@ use Cwd;
 use File::Spec;
 use XML::Simple qw(:strict);
 use Metamod::Dataset;
-use encoding 'utf-8';
+#use encoding 'utf-8';
 use MetNo::NcFind;
 
 # use Data::Dump qw(dump);

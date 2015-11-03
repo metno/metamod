@@ -33,7 +33,7 @@ our $VERSION = do { my @r = (q$LastChangedRevision$ =~ /\d+/g); sprintf "0.%d", 
 
 use strict;
 use warnings;
-use encoding 'utf-8';
+#use encoding 'utf-8';
 use Carp qw();
 use Metamod::Config;
 use Log::Log4perl;
