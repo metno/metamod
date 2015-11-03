@@ -42,7 +42,7 @@ my $handler = Metamod::SubscriptionHandler::EmailToFile->new();
 my $dataset_file = "$FindBin::Bin/../../data/Metamod/SubscriptionHandler/itp04_itp4grd0013";
 my $ds = Metamod::Dataset->newFromFile( $dataset_file );
 
-{
+TODO: {
     local $TODO = "Impossible to test in perl 5.18 because of random hash ordering";
 
     my $subscriptions1 = [ # FIXME must be customizable

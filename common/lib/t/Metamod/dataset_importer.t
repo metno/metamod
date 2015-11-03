@@ -67,21 +67,14 @@ my $importer = Metamod::DatasetImporter->new();
         'Metadata for inserted ok: datacollection_period'
     );
 
-    test_metadata( $metabase, 1, 'area', [ 'Kara Sea', 'Nordic Seas' ], 'Metadata for inserted ok: area' );
+    my @seas = ( 'Kara Sea', 'Nordic Seas' );
+    test_metadata( $metabase, 1, 'area', \@seas, 'Metadata for inserted ok: area' );
 
-    test_metadata(
-        $metabase,
-        1,
-        'variable',
-        [
-            'Oceans > Ocean Temperature > Water Temperature > HIDDEN',
-            'Oceans > Salinity/Density > Salinity > HIDDEN',
-            'sea_water_pressure',
-        ],
-        'Metadata for inserted ok: variable'
-    );
+    my @keys = ( 'Oceans > Ocean Temperature > Water Temperature > HIDDEN', 'Oceans > Salinity/Density > Salinity > HIDDEN', 'sea_water_pressure' );
+    test_metadata( $metabase, 1, 'variable', \@keys, 'Metadata for inserted ok: variable' );
 
-    test_basickey( $metabase, 1, [ 451, 805, 988, 1616, 1623 ], 'Connection between dataset and basickey');
+    test_basickey( $metabase, 1, bk(@keys, @seas), 'Connection between dataset and basickey');
+    #test_basickey( $metabase, 1, [ 451, 805, 988, 1616, 1623 ], 'Connection between dataset and basickey');
 
     test_numberitem( $metabase, 1, [ { sc_id => 8, ni_from => '20100101', ni_to => '20110101', ds_id => 1 } ], 'Datacollection period in numberitem' );
 
@@ -369,8 +362,9 @@ sub test_basickey {
 SKIP: {
         skip "Dataset with id '$ds_id' not found in database", 1 if !defined $ds;
 
-        my @basickeys = $ds->bk_describes_ds()->all();
-        my @bkids = map { $_->get_column('bk_id') } @basickeys;
+        #my @basickeys = $ds->bk_describes_ds()->all();
+        #my @bkids = map { $_->get_column('bk_id') } @basickeys;
+        my @bkids = $ds->bk_describes_ds()->get_column('bk_id')->all();
 
         is_deeply( \@bkids, $expected_bkids, $test_name );
 
@@ -431,3 +425,9 @@ sub test_dataset_location {
     is_deeply( $dl_rows, $expected_locations, $test_name );
 
 }
+
+sub bk {
+    my @ids = $metabase->resultset('Basickey')->search( { bk_name => { IN => \@_ } } )->get_column('bk_id')->all;
+    return \@ids;
+}
+
