@@ -38,17 +38,20 @@ test_metadata_search( {}, 2, [qw( TEST/dataset4 )], 'No search criteria. Second 
 
 test_metadata_search( {}, 3, [], 'No search criteria. Non existant third page' );
 
-test_metadata_search( { basickey => [ [1616] ] }, 1, [qw( TEST/dataset2 )], 'Search for single basic key' );
+test_metadata_search( { basickey => [ bk('Kara Sea') ] }, 1, [qw( TEST/dataset2 )], 'Search for single basic key' );
+#test_metadata_search( { basickey => [ [1616] ] }, 1, [qw( TEST/dataset2 )], 'Search for single basic key' );
 
 test_metadata_search(
-    { basickey => [ [ 1616, 1619, 1613 ] ] },
+    { basickey => [ bk('Kara Sea', 'Barents Sea', 'Fram Strait') ] },
+    #{ basickey => [ [ 1616, 1619, 1613 ] ] },
     1,
     [qw( TEST/dataset1 TEST/dataset2 TEST/dataset3 )],
     'Search for several basic keys in same category'
 );
 
 test_metadata_search(
-    { basickey => [ [ 1616, 1619, 1613 ], [1605] ] },
+    { basickey => [ bk('Kara Sea', 'Barents Sea', 'Fram Strait'), bk('Model run') ] },
+    #{ basickey => [ [ 1616, 1619, 1613 ], [1605] ] },
     1,
     [qw( TEST/dataset1 TEST/dataset3 )],
     'Search for several basic keys across categories'
@@ -91,7 +94,8 @@ test_metadata_search(
 test_metadata_search(
     {
         dates => { 8 => { from => '20100205', to => '20100801', } },
-        basickey => [ [1616] ],
+        basickey => [ bk('Kara Sea') ],
+        #basickey => [ [1616] ],
     },
     1,
     [qw( TEST/dataset2 )],
@@ -119,7 +123,8 @@ test_metadata_search(
 
 test_metadata_search(
     {
-        basickey => [ [1613] ],
+        basickey => [ bk('Fram Strait') ],
+        #basickey => [ [1613] ],
         freetext => ['Model'],
     },
     1,
@@ -177,17 +182,22 @@ test_metadata_search(
     );
 }
 
-test_metadata_search( { topics => { bk_ids => [ 10222 ] } }, 1, [], 'Search for topic bk_ids without any matches' );
+my @std_names = qw(sea_surface_temperature lwe_thickness_of_surface_snow_amount);
+my @keywords = ('Cryosphere > Sea Ice > Sea Ice Concentration', 'Oceans > Sea Ice > Sea Ice Concentration');
 
-test_metadata_search( { topics => { hk_ids => [ 23211 ] } }, 1, [], 'Search for topic hk_ids without any matches' );
+test_metadata_search( { topics => { bk_ids => [ 10222 ] } }, 1, [], 'Search for topic bk_ids without any matches' ); # safe
 
-test_metadata_search( { topics => { bk_ids => [ 809, 56 ] } }, 1, [ qw( TEST/dataset1 TEST/dataset2 )], 'Search for topic bk_ids with mathces' );
+test_metadata_search( { topics => { hk_ids => [ 23211 ] } }, 1, [], 'Search for topic hk_ids without any matches' ); # safe
 
-test_metadata_search( { topics => { hk_ids => [ 62, 720 ] } }, 1, [ qw( TEST/dataset1 TEST/dataset3 ) ], 'Search for topic hk_ids with mathces' );
+test_metadata_search( { topics => { bk_ids => bk(@std_names) } }, 1, [ qw( TEST/dataset1 TEST/dataset2 )], 'Search for topic bk_ids with mathces' );
+#test_metadata_search( { topics => { bk_ids => [ 809, 56 ] } }, 1, [ qw( TEST/dataset1 TEST/dataset2 )], 'Search for topic bk_ids with mathces' );
 
-test_metadata_search( { topics => { bk_ids => [ 809, 56 ], hk_ids => [ 720 ] } }, 1, [qw( TEST/dataset1 TEST/dataset2 TEST/dataset3 )], 'Search for both topic bk_ids and hk_ids' );
+test_metadata_search( { topics => { hk_ids => hk(@keywords) } }, 1, [ qw( TEST/dataset1 TEST/dataset3 ) ], 'Search for topic hk_ids with matches' );
+#test_metadata_search( { topics => { hk_ids => [ 62, 720 ] } }, 1, [ qw( TEST/dataset1 TEST/dataset3 ) ], 'Search for topic hk_ids with mathces' );
 
-test_metadata_search( { topics => { bk_ids => [809, 56], hk_ids => [62, 720] }, freetext => [ 'dataset1' ] }, 1, [qw( TEST/dataset1 )], 'Search for both topic bk_ids and hk_id and freetext' );
+test_metadata_search( { topics => { bk_ids => bk(@std_names), hk_ids => hk($keywords[1]) } }, 1, [qw( TEST/dataset1 TEST/dataset2 TEST/dataset3 )], 'Search for both topic bk_ids and hk_ids' );
+
+test_metadata_search( { topics => { bk_ids => bk(@std_names), hk_ids => hk(@keywords) }, freetext => [ 'dataset1' ] }, 1, [qw( TEST/dataset1 )], 'Search for both topic bk_ids and hk_id and freetext' );
 
 sub test_metadata_search {
     my ( $search_criteria, $curr_page, $expected_names, $test_name ) = @_;
@@ -213,4 +223,14 @@ sub test_metadata_search {
 
     is_deeply( \@actual_names, $expected_names, "$test_name: Dataset names" )
     or diag(join ',', @actual_names);
+}
+
+sub bk {
+    my @ids = $metabase->resultset('Basickey')->search( { bk_name => { IN => \@_ } } )->get_column('bk_id')->all;
+    return \@ids;
+}
+
+sub hk {
+    my @ids = $metabase->resultset('Hierarchicalkey')->search( { hk_name => { IN => \@_ } } )->get_column('hk_id')->all;
+    return \@ids;
 }

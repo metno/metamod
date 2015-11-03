@@ -45,6 +45,9 @@ ok "run_createuserdb"
 $BASE_DIR/upload/scripts/userbase_add_datasets.pl --operator < $SCRIPT_PATH/directories
 ok "userbase_add_datasets"
 
+#pg_dump -U admin metamod_unittest > $SCRIPT_PATH/metabase.dump
+#pg_dump -U admin metamod_unittest_userbase > $SCRIPT_PATH/userbase.dump
+
 # Run the automatic test suite
 # might add --smolder if we feel like continued use
 #PERL5LIB=`pwd`/local/lib/perl5 perl $BASE_DIR/run_automatic_tests.pl --no-pod --jenkins
