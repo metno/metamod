@@ -408,7 +408,6 @@ DISTRIBUTIONS
     requirements:
       Carp::Clan 0
       Catalyst::Component::InstancePerContext 0
-      Catalyst::Devel 1.0
       Catalyst::Runtime 5.80005
       CatalystX::Component::Traits 0.14
       DBD::SQLite 0
@@ -569,10 +568,10 @@ DISTRIBUTIONS
       MooseX::Types 0
       Test::More 0
       namespace::autoclean 0
-  Catalyst-Runtime-5.90101
-    pathname: J/JJ/JJNAPIORK/Catalyst-Runtime-5.90101.tar.gz
+  Catalyst-Runtime-5.90102
+    pathname: J/JJ/JJNAPIORK/Catalyst-Runtime-5.90102.tar.gz
     provides:
-      Catalyst 5.90101
+      Catalyst 5.90102
       Catalyst::Action undef
       Catalyst::ActionChain undef
       Catalyst::ActionContainer undef
@@ -609,7 +608,7 @@ DISTRIBUTIONS
       Catalyst::Request::Upload undef
       Catalyst::Response undef
       Catalyst::Response::Writer undef
-      Catalyst::Runtime 5.90101
+      Catalyst::Runtime 5.90102
       Catalyst::Script::CGI undef
       Catalyst::Script::Create undef
       Catalyst::Script::FastCGI undef
@@ -962,6 +961,14 @@ DISTRIBUTIONS
       Module::Build 0.38
       URI::Escape 0
       perl 5.008001
+  Cpanel-JSON-XS-3.0115
+    pathname: R/RU/RURBAN/Cpanel-JSON-XS-3.0115.tar.gz
+    provides:
+      Cpanel::JSON::XS 3.0115
+    requirements:
+      ExtUtils::MakeMaker 0
+      Pod::Text 2.08
+      Pod::Usage 1.33
   DBD-SQLite-1.48
     pathname: I/IS/ISHIGAKI/DBD-SQLite-1.48.tar.gz
     provides:
@@ -2771,13 +2778,8 @@ DISTRIBUTIONS
     requirements:
       Carp 0
       Class::Load 0
-      Data::Dumper 0
-      Exporter 0
       File::Find 0
-      File::Path 0
       File::Spec 0
-      File::Temp 0
-      FindBin 0
       List::MoreUtils 0
       Module::Build 0.3601
       Module::Pluggable::Object 0
@@ -2785,11 +2787,7 @@ DISTRIBUTIONS
       Moose::Util::TypeConstraints 0
       MooseX::Params::Validate 0
       MooseX::SemiAffordanceAccessor 0
-      Test::Exception 0
-      Test::More 0
       Time::HiRes 0
-      base 0
-      lib 0
       namespace::autoclean 0
       strict 0
       warnings 0
@@ -5822,7 +5820,6 @@ DISTRIBUTIONS
     requirements:
       Capture::Tiny 0.24
       Data::Dumper 2.126
-      ExtUtils::MakeMaker 0
       Test::More 0
       Text::Diff 0.35
   Test-Exception-0.40
@@ -6113,7 +6110,6 @@ DISTRIBUTIONS
     provides:
       Text::Glob 0.09
     requirements:
-      Module::Build 0.36
       Test::More 0
   Text-SimpleTable-2.03
     pathname: M/MR/MRAMBERG/Text-SimpleTable-2.03.tar.gz
