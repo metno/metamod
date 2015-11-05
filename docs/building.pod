@@ -119,26 +119,7 @@ When installing from source, you must build the necessary Perl modules from CPAN
 This used to be a major chore, but is now possible to do with a single command using
 the new Perl module dependency manager Carton. You don't even need to download
 the tarballs from CPAN as they are already included in the Subversion repo.
-
-=head3 cpanminus
-
-First, you need to be able to install Perl modules from CPAN.
-There are several tools available for this, but we recommend using B<cpanminus>
-which can be installed using either of the following commands:
-
-  $ apt-get install cpanminus                               # for Debian systems
-  $ curl -L http://cpanmin.us | sudo perl - App::cpanminus  # from source
-
-=head3 Carton
-
-Carton can download and build the required METAMOD Perl dependency modules automatically.
-Unlike the C<cpan> script it will install the exact same module versions every time, avoiding upgrade
-conflicts and making sure you have the same environment as have been tested. It even bundles
-all the source tarballs into the local source repo so you don't even need online access to deploy.
-
-  $ cpanm -S Carton
-
-This should install version 1.0.12 or later. Versions below 1.0.0 are not supported (they cannot read the cpanfile.snapshot file).
+From 2.14 Carton is even bundled with METAMOD in the F<vendor/bin> directory.
 
 =head3 METAMOD dependencies
 
@@ -146,21 +127,21 @@ You are now ready to build the Perl dependency libraries. There are two differen
 possible ways, one for unit testing, packaging and deployment when you want an identical
 environment, and another for development (usually only done when updating modules).
 
-=head4 Building for unit testing/deployment
+=head4 Building for unit testing and normal development
 
   $ cd ~/metamod/trunk
-  $ make deployment  # for testing/servers
+  $ make deployment
 
-Carton will then install the modules listed in F<cpanfile.snapshot> 
+Carton will then install the modules listed in F<cpanfile.snapshot>
 (actually one file per OS version) into F<~/metamod/trunk/local/lib>.
-No network connection is needed when using C<make deployment> as this uses 
+No network connection is needed when using C<make deployment> as this uses
 the modules supplied in F<~/metamod/trunk/vendor/cache>.
-This should not generate any errors as long as you have installed all the 
+This should not generate any errors as long as you have installed all the
 necessary binary libraries as listed above.
 
 =head4 Adding new dependencies
 
-If you are a METAMOD developer and want to add more Perl modules, add the 
+If you are a METAMOD developer and want to add more Perl modules, add the
 required name and version to F<cpanfile>,
 then run:
 
@@ -168,13 +149,24 @@ then run:
   $ make bundle
   $ svn ci
 
-This will first download and compile the necessary modules, and put the source
-tarballs into the vendor/cache directory to simplify building later.
-The version numbers in the snapshot file (for your OS version) will be updated.
+This will first download and compile the newly added modules, and put the source
+tarballs into the vendor/cache directory to simplify building later, as well as
+updating the snapshot file. This must be done for every OS version you want to support.
+
+=head4 Updating all dependencies to the latest version
+
+If you want to update every module to the latest version (or a hardcoded version in cpanfile),
+delete the F<local> directory and run the previous commands again.
+Then all version numbers in the snapshot file (for your OS version) will be updated.
+This should be done only in the beginning of a new METAMOD major version (2.x).
 
 =head4 Running programs with Carton
 
-  ~/metamod/trunk$ carton exec perl catalyst/script/metamodweb_server.pl --config <dir>
+It is possible to run scripts using Carton so you don't have to set PERL5LIB:
+
+  ~/metamod/trunk$ vendor/bin/carton exec perl catalyst/script/metamodweb_server.pl --config <dir>
+
+This is however not necessary when using C<virtualenv.pl>.
 
 =head3 PERL5LIB
 

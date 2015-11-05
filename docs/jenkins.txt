@@ -14,9 +14,6 @@ deb-src http://repo.met.no/devel precise main contrib partner
   libpng-dev libnetcdf-dev postgresql postgresql-contrib postgis postgresql-9.1-postgis \
   fimex
 
-  # apt-get install make cpanminus
-  # cpanm Carton
-
 
 Jenkins must be set up with the following envvars:
 
@@ -28,10 +25,7 @@ Make sure to avoid quotes and trailing slashes which may cause problems.
 
 
 cd $WORKSPACE/metamod
-carton install --cached --deployment
-
-
-
+make deployment
 
 
 
