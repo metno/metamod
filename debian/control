@@ -10,7 +10,7 @@ Section: web
 Priority: optional
 Architecture: amd64
 Essential: no
-Depends: apache2, postgresql-client-common, postgresql-client, libdbd-pg-perl, pdl, proj, libimager-perl, libxml2, libxslt1.1, libexpat1, pkg-config, libgdbm3, libxml2-utils, xinetd, check-mk-agent, curl, libidn11, libidn11-dev, libpdl-netcdf-perl
+Depends: apache2, postgresql-client-common, postgresql-client, libdbd-pg-perl, pdl, proj | libproj0, libimager-perl, libxml2, libxslt1.1, libexpat1, pkg-config, libgdbm3, libxml2-utils, xinetd, check-mk-agent, curl, libidn11, libidn11-dev, libpdl-netcdf-perl
 # libgeo-proj4-perl, libpdl-netcdf-perl, libconfig-tiny-perl,
 Pre-Depends: perl
 Recommends: exim4 | postfix | sendmail, bsd-mailx, libxml2-utils, postgresql, postgresql-contrib, postgis, postgresql-9.1-postgis | postgresql-9.3-postgis-2.1, ntp, fimex

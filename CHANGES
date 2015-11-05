@@ -3,11 +3,15 @@
   METAMOD CHANGELOG
 ============================
 
-2.13   Mon Jun 3 2013 
+2.14   Thu, 22 Oct 2015
+  * ported to Ubuntu 14.04 (Trusty Tahr) and PostgreSQL 9.3
+  * automatic detection of PSQL version during installation
+
+2.13   Mon Jun 3 2013
   * dynamic search map using WMS
   * improved support for background maps in different projections
   * automatic building and installation of Perl dependencies using Carton
-  * support for Ubuntu 12.4 Precise Pangolin and PostgreSQL 9.1
+  * support for Ubuntu 12.04 Precise Pangolin and PostgreSQL 9.1
   * fix for old GetLegendGraphics bug to work with new version of THREDDS
   * upgraded to latest Catalyst version (5.9)
   * support for boolean operators, phrases and wildcards in text search
@@ -16,6 +20,10 @@
   * WMS search map thumbnails
   * support for custom validators in OAI-PMH
   * support for two-dimensional arrays in timeseries plots and ascii/json download
+  * WMS slideshow, frame stepping controls
+  * template texts fully customizable per site
+  * download external files, generates client file download scripts in various languages
+  * support for nGinX and CheckMK
 
 2.12   Mon Jan 14 2013
   * projection selector and timeslider in wms client
