@@ -36,13 +36,13 @@ cpanfile.snapshot:
 	ln -s cpanfile.snapshot.$(OSVERSION) cpanfile.snapshot
 
 deps: cpanfile.snapshot
-	carton install
+	vendor/bin/carton install
 
 bundle: cpanfile.snapshot
-	carton bundle --no-fatpack
+	vendor/bin/carton bundle --no-fatpack
 
 deployment: cpanfile.snapshot
-	carton install --deployment --cached
+	vendor/bin/carton install --deployment --cached
 
 # Build the actual debian package
 # It is a requirement that this should not produce any svn diffs
