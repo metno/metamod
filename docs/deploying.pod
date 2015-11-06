@@ -103,7 +103,7 @@ C<create_and_load_all.out> file in the directory where you are running the comma
 
 The next SQL database initialization script will create the User database.
 
-  $ base/init/run_createuserdb.sh
+  $ base/userinit/run_createuserdb.sh
 
 Note that I<this script must only be used during setup of a completely new
 METAMOD cluster>. If a User database already exists, all data in the database

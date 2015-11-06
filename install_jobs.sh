@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: include prepare_runtime_env.sh at start of script??
+
 usage()
 {
     cat << EOF
@@ -172,14 +174,20 @@ do
 done
 
 echo "Linking Apache config"
-if [ -z "$VIRTUAL_HOST" ]; then
+if [ -n "$VIRTUAL_HOST" ]; then
+    sudo ln -s $CONFIG_DIR/etc/httpd.conf  /etc/apache2/sites-available/$VIRTUAL_HOST; ordie "$LINKERRMSG"
+    ${VIRTUAL_HOST:+"sudo a2ensite"} $VIRTUAL_HOST
+else if [ -d "/etc/apache2/conf-available" ]; then
+    # Apache 2.4+
+    sudo ln -s $CONFIG_DIR/etc/httpd.conf  /etc/apache2/conf-available/$APPLICATION_ID.conf; ordie "$LINKERRMSG"
+    sudo a2enconf $APPLICATION_ID.conf
+    sudo a2dissite 000-default
+else
+    # Apache 2.2 or earlier
     sudo ln -s $CONFIG_DIR/etc/httpd.conf  /etc/apache2/conf.d/$APPLICATION_ID; ordie "$LINKERRMSG"
     echo Disabling site "default" in Apache config
     sudo a2dissite default
     #echo "WARNING: Static files will not work unless you remove all links in /etc/apache2/sites-enabled!"
-else
-    sudo ln -s $CONFIG_DIR/etc/httpd.conf  /etc/apache2/sites-available/$VIRTUAL_HOST; ordie "$LINKERRMSG"
-    ${VIRTUAL_HOST:+"sudo a2ensite"} $VIRTUAL_HOST
 fi
 
 # install catalyst job
@@ -210,4 +218,3 @@ if [ $APPLICATION_USER ]; then
     sudo chown "$APPLICATION_USER" "/var/run/metamod-$APPLICATION_ID"
 fi
 
-# TODO: include prepare_runtime_env.sh ??
