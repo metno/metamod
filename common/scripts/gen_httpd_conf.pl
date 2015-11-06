@@ -134,8 +134,9 @@ $old_redirect
     # using mod_rewrite to enable custom static files
     RewriteEngine  on
     #RewriteOptions Inherit
-    RewriteLog "/var/log/apache2/error.log"
-    RewriteLogLevel 6
+    # RewriteLog not available on Apache 2.4+
+    #RewriteLog "/var/log/apache2/error.log"
+    #RewriteLogLevel 6
     #LogLevel debug
 
     # redefine to first look for static files in application directory
