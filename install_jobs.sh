@@ -177,7 +177,7 @@ echo "Linking Apache config"
 if [ -n "$VIRTUAL_HOST" ]; then
     sudo ln -s $CONFIG_DIR/etc/httpd.conf  /etc/apache2/sites-available/$VIRTUAL_HOST; ordie "$LINKERRMSG"
     ${VIRTUAL_HOST:+"sudo a2ensite"} $VIRTUAL_HOST
-else if [ -d "/etc/apache2/conf-available" ]; then
+elif [ -d "/etc/apache2/conf-available" ]; then
     # Apache 2.4+
     sudo ln -s $CONFIG_DIR/etc/httpd.conf  /etc/apache2/conf-available/$APPLICATION_ID.conf; ordie "$LINKERRMSG"
     sudo a2enconf $APPLICATION_ID.conf
