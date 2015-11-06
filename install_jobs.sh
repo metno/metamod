@@ -165,7 +165,9 @@ EOT
 )
 
 # remove symlinks to avoid conflict when overwriting
-for f in /etc/default/$CATALYST_APP /etc/init.d/$CATALYST_APP /etc/init.d/metamodServices-$APPLICATION_ID /etc/rc2.d/S92$CATALYST_APP /etc/rc2.d/S99metamodServices-$APPLICATION_ID /etc/apache2/conf.d/$APPLICATION_ID
+for f in /etc/default/$CATALYST_APP /etc/init.d/$CATALYST_APP \
+/etc/init.d/metamodServices-$APPLICATION_ID /etc/rc2.d/S92$CATALYST_APP \
+/etc/rc2.d/S99metamodServices-$APPLICATION_ID /etc/apache2/conf.d/$APPLICATION_ID /etc/apache2/conf-available/$APPLICATION_ID.conf
 do
     if [ -L $f ]
     then

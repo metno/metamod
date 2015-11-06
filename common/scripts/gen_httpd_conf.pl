@@ -110,6 +110,7 @@ my $config_apache = <<EOT;
 <Proxy *>
     Order deny,allow
     Allow from all
+    Require all granted
 </Proxy>
 
 ProxyPass           $local/static   !
@@ -162,11 +163,22 @@ Alias               $local/docs         $installation_dir/docs/html
     AddDefaultCharset UTF-8
     #AllowOverride None
     Order allow,deny
+    Allow from all
+    Require all granted
+</Directory>
+
+<Directory $installation_dir/catalyst/root/static>
+    Options Indexes FollowSymLinks MultiViews
+    AddDefaultCharset UTF-8
+    #AllowOverride None
+    Order allow,deny
     allow from all
+    Require all granted
 </Directory>
 
 EOT
 
+# nginx not tested under ubuntu 14.04
 my $config_nginx = <<EOT;
 
 server {
