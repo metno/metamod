@@ -1009,6 +1009,14 @@ DISTRIBUTIONS
       Convert::UU 0.5201
     requirements:
       ExtUtils::MakeMaker 0
+  Cpanel-JSON-XS-3.0115
+    pathname: R/RU/RURBAN/Cpanel-JSON-XS-3.0115.tar.gz
+    provides:
+      Cpanel::JSON::XS 3.0115
+    requirements:
+      ExtUtils::MakeMaker 0
+      Pod::Text 2.08
+      Pod::Usage 1.33
   DBD-SQLite-1.37
     pathname: A/AD/ADAMK/DBD-SQLite-1.37.tar.gz
     provides:
