@@ -28,7 +28,7 @@ use Data::Dumper;
 
 use MetamodWeb::Utils::UI::Search;
 use MetamodWeb::Utils::UI::WMS;
-use MetamodWeb::Utils::SearchUtils;
+use Metamod::SearchUtils;
 use MetamodWeb::Utils::Exception qw(error_from_exception);
 use Metamod::WMS;
 use Try::Tiny;
@@ -206,7 +206,7 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
 
     my $datasets_per_page = $c->req->params->{ datasets_per_page } || 10;
 
-    my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $c, config => $c->stash->{ mm_config } } );
+    my $search_utils = Metamod::SearchUtils->new( { config => $c->stash->{ mm_config } } );
     my $search_criteria = $search_utils->selected_criteria( $c->req->params() );
     my $ownertags = $search_utils->get_ownertags();
     my $search_params = {
@@ -215,6 +215,7 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
             rows_per_page => $datasets_per_page,
             search_criteria => $search_criteria,
     };
+    #print STDERR Dumper $search_params;
     my $datasets = try {
         $dataset->metadata_search($search_params);
     } catch {
@@ -259,7 +260,7 @@ sub two_way_table : Path( "/search/two_way_table" ) : Args(0) {
 
     my $dataset = $c->model('Metabase::Dataset');
 
-    my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $c, config => $c->stash->{ mm_config } } );
+    my $search_utils = Metamod::SearchUtils->new( { config => $c->stash->{ mm_config } } );
     my $search_criteria = $search_utils->selected_criteria( $c->req->params() );
     my $owner_tags = $search_utils->get_ownertags();
     my $vertical_mt_name = $c->req->param('vertical_mt_name') || $c->stash->{ search_ui_utils }->default_vertical_mt_name();

@@ -53,6 +53,8 @@ To fix, either set VIRTUAL_HOST to something or delete sites-enabled/000-default
 
   $ sudo a2dissite default
 
+B<Note:> Apache 2.4 has complicated things even further. See docs on upgrading to 2.14.
+
 =back
 
 =head3 Dataset import
@@ -153,3 +155,16 @@ you won't be able to start new processes, instead you must rely on external moni
 like Nagios.
 
 =back
+
+=head3 Visualization
+
+=over 4
+
+=item Q: The slideshow feature seems to bring down my WMS server! Can it be disabled?
+
+A: Yes. Add the following to your F<custom.tt>:
+
+  wms.client.slideshow.disabled = 1 
+
+=back
+

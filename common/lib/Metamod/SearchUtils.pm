@@ -1,4 +1,4 @@
-package MetamodWeb::Utils::SearchUtils;
+package Metamod::SearchUtils;
 
 =begin LICENSE
 
@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 =head1 NAME
 
-MetamodWeb::Utils::SearchUtils - Utilities for search.
+Metamod::SearchUtils - Utilities for constructing search arguments
 
 =head1 SYNOPSIS
 
@@ -39,25 +39,13 @@ Blah blah blah FIXME
 use Moose;
 use namespace::autoclean;
 use Data::Dumper;
-
+use List::Flatten;
 use warnings;
 
 #
 # A Metamod::Config object containing the configuration for the application
 #
 has 'config' => ( is => 'ro', isa => 'Metamod::Config', required => 1 );
-
-#
-# A Catalyst context object.
-#
-has 'c' => (
-    is       => 'ro',
-    required => 1,
-    handles  => {
-        meta_db => [ model => 'Metabase' ],
-        user_db => [ model => 'Userbase' ],
-    }
-);
 
 =head2 $self->selected_criteria($parameters)
 
@@ -67,7 +55,7 @@ Transforms the request parameters into a hash reference for all the search crite
 
 =item $parameters
 
-A reference to a hash reference of HTTP request parameters.
+A reference to a hash reference of parameters (CGI query or command line)
 
 =item return
 
@@ -104,12 +92,12 @@ sub selected_criteria {
     my @topic_bks = ();
     while( my ( $key, $value) = each %$parameters ){
 
-        if( $key =~ /^bk_id_(\d+)_(\d+)$/ ){
+        if ( $key =~ /^bk_id_(\d+)_(\d+)$/ ) {
             push @{ $bk_ids{ $1 } }, $2;
-        } elsif( $key =~ /^date_(to|from)_(\d+)$/) {
+        } elsif ( $key =~ /^date_(to|from)_?(\d+)?$/ ) {
 
             my $datetype = $1;
-            my $category_id = $2;
+            my $category_id = $2 || 8; # currently hardcoded in Datasetimporter.pm
             if( $value ){
 
                 my $total_length = 8;
@@ -125,16 +113,22 @@ sub selected_criteria {
             }
 
 
-        }elsif( $key =~ /^freetext_(\d+)$/ ){
-            push @freetext, $value if $value;
-        }elsif( $key =~ /^map_coord_(\w\d)$/ ){
+        } elsif ( $key =~ /^freetext_?(\d*)$/ ) {
+            push @freetext, flat $value if $value;
+        } elsif ( $key =~ /^map_coord_(\w\d)$/ ) {
             $coords{$1} = $value;
-        }elsif( $key =~ /^selected_map$/ ){
+        } elsif ( $key =~ /^selected_map$/ ) {
             $coords{srid} = $value;
-        }elsif( $key =~ /^hk_id_(\d+)$/ ){
+        } elsif ( $key =~ /^hk_id_(\d+)$/ ) {
             push @topic_hks, $1;
-        }elsif( $key =~ /^bk_id_topic_(\d+)$/ ){
+        } elsif ( $key =~ /^bk_id_topic_(\d+)$/ ) {
             push @topic_bks, $1;
+        }
+        # remaining cases are experimental
+        elsif ( $key =~ /^hk$/ ) {
+            push @topic_hks, ref $value ? @$value : split ',', $value; # allow both hk=x&hk=y and hk=x,y
+        } elsif ( $key =~ /^basickey$/ ) {
+            push @topic_bks, ref $value ? @$value : split ',', $value; # allow both bk=x&bk=y and bk=x,y;
         }
     }
 
@@ -230,7 +224,7 @@ sub freely_available {
     my $self = shift;
 
     my ($file) = @_;
-    
+
     #print STDERR "++++++++++++" . Dumper \$file;
 
     if(!exists $file->{distribution_statement}){

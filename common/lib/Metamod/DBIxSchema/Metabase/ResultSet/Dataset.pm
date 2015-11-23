@@ -127,6 +127,7 @@ requires a slightly different structure.
       topics => { bk_ids => [ 1, 2, 3 ], hk_ids => [ 10, 20, 30 ] },
   }
 
+(The sc_id '8' under dates can theoretically have other values, but are currently hardcoded several places in the code and not likely to change.)
 
 =item return
 

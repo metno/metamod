@@ -39,9 +39,11 @@ use warnings;
 use FindBin;
 use lib ("$FindBin::Bin/../../common/lib", '.');
 
+use Metamod::Config;
 use Metamod::DBIxSchema::Metabase;
 #use Metamod::DBIxSchema::Userbase;
-use Metamod::Config;
+use Metamod::SearchUtils;
+
 use Getopt::Long;
 use Log::Log4perl qw(:levels);
 #use Log::Log4perl::CommandLine qw(:all :noinit);
@@ -116,14 +118,16 @@ Turn ANSI color output on/off
 
 Show ds_id numbers
 
-=head2 -p | --params key=value
+=head2 Search parameters
 
-Search parameter for finding datasets (same as web interface... more or less).
+Free text search parameter, including booleans:
 
-May be repeated as many times as desired, however each parameter can only be specified once. E.g.
+  --freetext=glacier
+  --freetext='ice AND arctic'
 
-  --param freetext=ice --param date_from=20120101 # legal (except date_from is not yet implemented)
-  --param freetext=ice --param freetext=sea # not legal
+Datacollection period:
+
+  --date_from=1957 --date_to=1958
 
 =head2 -o|--ownertag tag
 
@@ -155,8 +159,9 @@ ds_id or ds_name (assuming the former if numeric)
   $ lsds  828 829 830 831
   $ lsds --full NORMAP/metno-sstana05-V2
   $ lsds -m dataref_OPENDAP
-  $ lsds -p freetext=ice_conc
-  $ lsds -c -p 'freetext=ice AND arctic'
+  $ lsds --freetext=ice_conc
+  $ lsds --freetext='ice AND arctic'
+  $ lsds --freetext='ice' --freetext='arctic'
   $ lsds --wms
   $ lsds --projectioninfo
   $ lsds --xmlfile
@@ -166,11 +171,12 @@ ds_id or ds_name (assuming the former if numeric)
 
 local $Data::Dumper::Terse = 1;
 
-my ($config, $logger, %opt, $search_criteria);
+my ($config, $logger, %opt);
 
 BEGIN { # run compile time to avoid nasty "You must call new() once before you can call instance()" bug
 
-    GetOptions(\%opt, 'help', 'config=s', 'count|c', 'all_levels', 'f|full!', 'params|p=s%',
+    GetOptions(\%opt, 'help', 'config=s', 'count|c', 'all_levels', 'f|full!',
+               'freetext=s@', 'date_from=s', 'date_to=s',  #'basickey=s@', 'bk=s@', 'hk=s@',
                'metadata=s@', 'ownertag=s@', 'wms', 'projectioninfo', 'xmlfile', 'color|x!', 'id!') or pod2usage(2);
 
     my $config_file_or_dir = $opt{config} || $ENV{METAMOD_MASTER_CONFIG};
@@ -188,7 +194,7 @@ if (defined $color) {
 $logger = Log::Log4perl->get_logger('metamod.tools');
 Log::Log4perl::CommandLine::handlelogoptions();
 #printf STDERR "loglevel=%d %d\n", $logger->level, $logger->is_info;
-#print STDERR Dumper \%opt, \@ARGV;
+print STDERR Dumper \%opt, \@ARGV;
 
 
 my $ownertags = ( defined $opt{ownertag} ? $opt{ownertag} : $config->split('DATASET_TAGS') ) || []; # allow setting to blank, i.e. all tags
@@ -209,20 +215,27 @@ $opt{full} = (@ARGV == 1) unless defined $opt{full} || @$metadata; # default to 
 
 my $db =_build_metabase();
 my $rs = $db->resultset('Dataset');
+my $search_utils = Metamod::SearchUtils->new( { config => $config } );
+#my $search_criteria = {};
+#my $search_criteria = $search_utils->selected_criteria( $opt{params} );
 
-$search_criteria = {};
-my $params = $opt{params};
-foreach (keys %$params) {
-
-    if (/^freetext$/) {
-        $$search_criteria{$_} = [ $$params{$_} ];
-    } elsif (/^date_from$/) {
-        # dates => { 8 => { from => '20100205', to => '20100801', } },
-    } else {
-        #$$search_criteria{$_} = [ $opt{params}->{$_} ]; # not working
-    }
+my %params;
+for (qw( freetext date_from date_to bk hk )) {
+    $params{$_} = $opt{$_} if exists $opt{$_};
 }
-#print STDERR 'search_criteria = ', Dumper $search_criteria;
+my $search_criteria = $search_utils->selected_criteria( \%params );
+#my $params = $opt{params};
+#foreach (keys %$params) {
+#
+#    if (/^freetext$/) {
+#        $$search_criteria{$_} = [ $$params{$_} ];
+#    } elsif (/^date_from$/) {
+#        $$search_criteria{dates} = { 8 => { from => '1957', to => '1958'} }
+#    } else {
+#        #$$search_criteria{$_} = [ split ',', $params->{$_} ];
+#    }
+#}
+print STDERR 'search_criteria = ', Dumper $search_criteria;
 
 my $search_params = {
         ownertags => $ownertags,

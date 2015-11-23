@@ -45,7 +45,7 @@ use warnings;
 
 use Metamod::Config;
 use Metamod::Utils;
-use MetamodWeb::Utils::SearchUtils;
+use Metamod::SearchUtils;
 
 #
 # A Metamod::Config object containing the configuration for the application
@@ -229,7 +229,7 @@ sub add_dataset {
 sub _metadata_search_params {
     my $self = shift;
 
-    my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $self->c, config => $self->config } );
+    my $search_utils = Metamod::SearchUtils->new( { config => $self->config } );
     my $search_criteria = $search_utils->selected_criteria( $self->c->req->params() );
     my $ownertags = $search_utils->get_ownertags();
     my $dataset_rs = $self->meta_db->resultset('Dataset');
@@ -264,7 +264,7 @@ sub find_data_locations {
 
     #print STDERR "*********" . Dumper \$files;
     my @dataset_locations;
-    my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $self->c, config => $self->config } );
+    my $search_utils = Metamod::SearchUtils->new( { config => $self->config } );
 
     for (@$files) {
         next unless $search_utils->freely_available($_);

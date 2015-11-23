@@ -60,7 +60,7 @@ primarily intended for search engines.
 sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
 
-    my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $c, config => $c->stash->{ mm_config } } );
+    my $search_utils = Metamod::SearchUtils->new( { config => $c->stash->{ mm_config } } );
     my $ownertags = $search_utils->get_ownertags();
     my @level1_datasets = $c->model('Metabase::Dataset')->level1_datasets( $ownertags )->all();
     $c->stash( template => 'dataset/level1_datasets.tt', datasets => \@level1_datasets );

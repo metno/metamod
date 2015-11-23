@@ -33,6 +33,7 @@ requires 'HTTP::OAI', '==3.28'; # newer versions fails to build on linux
 requires 'HTTP::DAV', 0.46;
 requires 'Imager', 0.97;
 requires 'JSON::Any', 1.29;
+requires 'List::Flatten';
 requires 'local::lib', '1.008010';
 requires 'Log::Log4perl::CommandLine', 0.07;
 requires 'Module::Pluggable', 5.2;

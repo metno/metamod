@@ -76,7 +76,7 @@ sub _build_current_search_attrs {
 sub _current_search_params {
     my $self = shift;
 
-    my $search_utils = MetamodWeb::Utils::SearchUtils->new( { c => $self->c, config => $self->config } );
+    my $search_utils = Metamod::SearchUtils->new( { config => $self->config } );
     my $search_criteria = $search_utils->selected_criteria( $self->c->req->params() );
     my $ownertags = $search_utils->get_ownertags();
     my $dataset_rs = $self->meta_db->resultset('Dataset');

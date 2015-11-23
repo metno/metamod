@@ -3790,6 +3790,12 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 0
       perl 5.006002
+  List-Flatten-0.01
+    pathname: O/OB/OBRADOVIC/List-Flatten-0.01.tar.gz
+    provides:
+      List::Flatten 0.01
+    requirements:
+      Test::More 0
   List-MoreUtils-0.33
     pathname: A/AD/ADAMK/List-MoreUtils-0.33.tar.gz
     provides:

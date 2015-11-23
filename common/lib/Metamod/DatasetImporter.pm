@@ -343,7 +343,7 @@ sub _insert_metadata {
     #  and SearchCategory
     #
 
-    # FIXME - should be read from searchdata.xml, but keys are in plural there... HOWTOFIX? (plural keys fixed by Egil in 2.13.13)
+    # FIXME - should be read from searchdata.xml instead of hardcoded, but keys are in plural there and need to be converted to singular - FIXME
     my %searchcategories = (
         variable              => 3,
         area                  => 2,
@@ -354,8 +354,8 @@ sub _insert_metadata {
         project_name          => 14,
     );
 
-    # Add to the above hardcoded key - value pairs by reading from the searchcategory database table:
-
+    # Add plural versions to the above hardcoded key/value pairs by reading from the searchcategory database table
+    # (FIXME: how to convert to singular?)
     my $sql_searchcategories = $dbh->prepare_cached("SELECT sc_id, sc_idname FROM searchcategory " .
         "WHERE sc_type = 'basickey' or sc_type = 'date_interval'");
     $sql_searchcategories->execute();
@@ -363,6 +363,9 @@ sub _insert_metadata {
         my $key = $self->clean_content($row[1]);
         $searchcategories{$key} = $row[0];
     }
+    # NOTE:
+    # Current situation is that we have hardcoded singular searchcategory names and only the plural versions are dynamic.
+    # This is not desirable since it is currently impossible to use other sc_id/name combinations than the hardcoded list.
 
     #  Prepare SQL statements for repeated use.
     my $sql_getkey_MD = $dbh->prepare_cached("SELECT nextval('Metadata_MD_id_seq')");
