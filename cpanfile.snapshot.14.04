@@ -3556,6 +3556,12 @@ DISTRIBUTIONS
       perl 5.006
       strict 0
       warnings 0
+  List-Flatten-0.01
+    pathname: O/OB/OBRADOVIC/List-Flatten-0.01.tar.gz
+    provides:
+      List::Flatten 0.01
+    requirements:
+      Test::More 0
   List-MoreUtils-0.413
     pathname: R/RE/REHSACK/List-MoreUtils-0.413.tar.gz
     provides:
