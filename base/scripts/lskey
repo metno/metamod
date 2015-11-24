@@ -1,0 +1,337 @@
+#!/usr/bin/perl -w
+
+=begin LICENSE
+
+METAMOD - Web portal for metadata search and upload
+
+Copyright (C) 2015 met.no
+
+Contact information:
+Norwegian Meteorological Institute
+Box 43 Blindern
+0313 OSLO
+NORWAY
+email: geira@met.no
+
+This file is part of METAMOD
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+METAMOD is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with METAMOD; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+=end LICENSE
+
+=cut
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib ("$FindBin::Bin/../../common/lib", '.');
+
+use Metamod::Config;
+use Metamod::DBIxSchema::Metabase;
+
+use Getopt::Long;
+use Log::Log4perl qw(:levels);
+#use Log::Log4perl::CommandLine qw(:all :noinit);
+use Log::Log4perl::CommandLine ':all',
+':loginit' => q(
+    log4perl.logger = WARN,  screen
+    log4perl.appender.screen=Log::Log4perl::Appender::Screen
+    log4perl.appender.screen.layout=Log::Log4perl::Layout::PatternLayout
+    log4perl.appender.screen.layout.ConversionPattern=[%-5p] %c %m%n
+);
+use Data::Dumper;
+use Pod::Usage;
+use Try::Tiny;
+use Term::ANSIColor;
+
+=head1 NAME
+
+B<lskey> - lists search categories, search for basic/hierarchical keys
+
+=head1 DESCRIPTION
+
+Utility for looking up keys in metadata db.
+
+=head1 USAGE
+
+  lskey -sc | -bk | -hk [ -r ] [ id | value [ id | value ... ] ]
+
+=head1 OPTIONS
+
+=head2 -bk | --basickeys
+
+Search for hierarchical keys by id/name (shows id, searchcategory, name)
+
+=head2 -hk | --hierarchicalkeys
+
+Search for hierarchical keys by id/name (shows id, parent, searchcategory, name)
+
+=head2 -sc | --searchcategories
+
+List all searchcategories (id, name, type)
+
+=head2 -r | --recursive
+
+List all children of hierarchical keys
+
+=head2 -a | --all
+
+Include HIDDEN basickeys
+
+=head2 --corresponding
+
+List basickeys corresponding to given hierarchical key id, and vice versa
+
+=head2 --config dir
+
+Path to master_config directory
+
+=head2 -h|--help
+
+Show manual page
+
+=head1 PARAMETERS
+
+Ids and/or names of keys (wildcards assumed for names, which are case insensitive)
+
+=head1 EXAMPLES
+
+  $ lskey -bk 1616 1620
+    1616 areas                Kara Sea
+    1620 areas                Chukchi Sea
+  $ lskey -bk space
+    1604 activity_types       Space borne instrument
+  $ lskey -bk albedo
+      52 variables            surface_albedo
+      53 variables            surface_albedo_assuming_deep_snow
+     227 variables            planetary_albedo
+     228 variables            soil_albedo
+     229 variables            surface_albedo_assuming_no_snow
+  $ lskey -bk -a Smog
+    1582 variables            Atmosphere > Air Quality > Smog > HIDDEN
+  $ lskey -bk -cor 34
+      51 variables            Cryosphere > Snow/Ice > Albedo > HIDDEN
+      52 variables            surface_albedo
+      53 variables            surface_albedo_assuming_deep_snow
+
+  $ lskey -hk
+       1        0  1 topics_and_variables      Cryosphere
+      73        0  1 topics_and_variables      Climate Indicators
+      ...
+     740        0  1 topics_and_variables      Atmosphere
+  $ lskey -hk -r | wc -l
+  957
+  $ lskey -hk Smog
+     940      933  3 topics_and_variables      Atmosphere > Air Quality > Smog
+  $ lskey -hk 933
+     933      740  2 topics_and_variables      Atmosphere > Air Quality
+  $ lskey -hk -r 933
+     933      740  2 topics_and_variables      Atmosphere > Air Quality
+     934      933  3 topics_and_variables      Atmosphere > Air Quality > Lead
+     935      933  3 topics_and_variables      Atmosphere > Air Quality > Sulfur Oxides
+     936      933  3 topics_and_variables      Atmosphere > Air Quality > Tropospheric Ozone
+     937      933  3 topics_and_variables      Atmosphere > Air Quality > Particulates
+     938      933  3 topics_and_variables      Atmosphere > Air Quality > Emissions
+     939      933  3 topics_and_variables      Atmosphere > Air Quality > Visibility
+     940      933  3 topics_and_variables      Atmosphere > Air Quality > Smog
+     941      933  3 topics_and_variables      Atmosphere > Air Quality > Nitrogen Oxides
+     942      933  3 topics_and_variables      Atmosphere > Air Quality > Carbon Monoxide
+     943      933  3 topics_and_variables      Atmosphere > Air Quality > Turbidity
+     944      933  3 topics_and_variables      Atmosphere > Air Quality > Volatile Organic Compounds
+  $ lskey -hk -cor 53
+      34       24  3 topics_and_variables      Cryosphere > Snow/Ice > Albedo
+      24        1  2 topics_and_variables      Cryosphere > Snow/Ice
+       1        0  1 topics_and_variables      Cryosphere
+     317      303  3 topics_and_variables      Hydrosphere > Snow/Ice > Albedo
+     303      248  2 topics_and_variables      Hydrosphere > Snow/Ice
+     248        0  1 topics_and_variables      Hydrosphere
+
+  $ lskey -sc
+       1 activity_types                       basickey
+       2 areas                                basickey
+       3 variables                            basickey
+       4 topics_and_variables                 tree
+       7 institutions                         basickey
+       8 datacollection_period                date_interval
+       9 map_search                           map_search
+      10 operational_status                   basickey
+      11 fulltext                             fulltext
+
+=cut
+
+#=head2 -x | --color
+#
+#Turn ANSI color output on/off
+
+local $Data::Dumper::Terse = 1;
+
+my ($config, $logger, %opt, @types);
+
+BEGIN { # run compile time to avoid nasty "You must call new() once before you can call instance()" bug
+
+    @types = ('searchcategories|sc', 'basickeys|bk', 'hierarchicalkeys|hk');
+    GetOptions(\%opt, 'help|h', 'config=s', 'color|x!', @types, 'recursive', 'all', 'corresponding') or pod2usage(2);
+    pod2usage(2) if grep( $opt{$_}, @types ) > 1; # only 1 type param allowed
+
+    my $config_file_or_dir = $opt{config} || $ENV{METAMOD_MASTER_CONFIG};
+    if($opt{help} or ! Metamod::Config->config_found($config_file_or_dir)){
+        pod2usage(1);
+    }
+    $config = Metamod::Config->new($config_file_or_dir, { nolog => 1 });
+}
+
+# colors not implemented yet
+my $color = defined $opt{color} ? $opt{color} : -t STDOUT; # use IO::Interactive::Tiny instead - FIXME
+if (defined $color) {
+    $ENV{ANSI_COLORS_DISABLED} = 1 unless $color;
+}
+
+$logger = Log::Log4perl->get_logger('metamod.tools');
+Log::Log4perl::CommandLine::handlelogoptions();
+
+# run operations
+#
+my $db =_build_metabase();
+
+if ($opt{corresponding}) {
+    #code
+}
+
+list_scs() if ($opt{searchcategories});
+list_bks(@ARGV) if ($opt{basickeys});
+list_hks(0, @ARGV) if ($opt{hierarchicalkeys});
+
+exit 0;
+
+############################################
+
+# list all or given basickeys
+#
+sub list_bks {
+    my $rs = $db->resultset('Basickey');
+    if (@_) {
+        foreach my $k (@_) {
+            try {
+                if ($k =~ /^\d+$/) { # bk_id or hk_id
+                    if ($opt{corresponding}) {
+                        my $rs = $db->resultset('HkRepresentsBk');
+                        show_bk($_->bk_id) for ( $rs->search({ hk_id => $k }) ); # TODO: filter out HIDDEN
+                    } else {
+                        show_bk( $rs->find($k) );
+                    }
+                } else { # name
+                    show_bk($_) for ( $rs->search({
+                        'LOWER(bk_name)' => { like => lc("%$k%") },
+                        'bk_name' => $opt{all} ? { '!=' => '' } : { -not_like => '% HIDDEN' } }) );
+                }
+            } catch {
+                print STDERR "Key not found: $k\n$_\n";
+                exit 1;
+            }
+        }
+    } else {
+        my $result = $rs->search( { 'bk_name' => { -not_like => '% HIDDEN' } } ); # this might die, if so then just abort
+        while (my $rec = $result->next) {
+            show_bk($rec);
+        }
+    }
+}
+
+# print a basickey record
+#
+sub show_bk {
+    my $rec = shift or die "No such key";
+    my $sc = $rec->sc_id;
+    printf "%8d %-20s %-60s\n", $rec->bk_id, $sc->sc_idname, $rec->bk_name;
+}
+
+# list all or given hierarchical keys
+#
+sub list_hks {
+    my $parent = shift;
+    #print ">> $parent\n";
+    my $rs = $db->resultset('Hierarchicalkey');
+    if (@_ && !$parent) {
+        foreach my $k (@_) {
+            try {
+                if ($k =~ /^\d+$/) { # bk_id or hk_id
+                    if ($opt{corresponding}) {
+                        my $rs = $db->resultset('HkRepresentsBk');
+                        show_hk($_->hk_id) for ( $rs->search({ bk_id => $k }) );
+                    } else {
+                        show_hk( $rs->find($k), $opt{recursive} );
+                    }
+                } else { # name
+                    show_hk( $_, $opt{recursive} ) for ( $rs->search( { 'LOWER(hk_name)' => { like => lc("%$k%") } } ) );
+                }
+            } catch {
+                print STDERR "Key not found: $k\n";
+                exit 1;
+            }
+        }
+    } else {
+        my $result = $rs->search( $opt{recursive} ? {} : { hk_parent => $parent } ); # this might die, if so then just abort
+        while (my $rec = $result->next) {
+            show_hk($rec, undef); # never recurse when listing all keys
+        }
+    }
+}
+
+# print a hierarchical key record
+#
+sub show_hk {
+    my $hk = shift or die "No such key";
+    my $children = shift;
+    my $sc = $hk->sc_id;
+    printf "%8d %8d %2d %-25s %-60s\n", $hk->hk_id, $hk->hk_parent, $hk->hk_level, $sc->sc_idname, $hk->hk_name;
+    list_hks($hk->hk_id) if $children;
+}
+
+# list search categories
+#
+sub list_scs {
+    my $rs = $db->resultset('Searchcategory');
+    my $result = $rs->search( undef, {order_by => 'sc_id'} ); # this might die, if so then just abort
+    while (my $sc = $result->next) {
+        printf "%8d %-36s %-30s\n", $sc->sc_id, $sc->sc_idname, $sc->sc_type;
+    }
+}
+
+# prepare db
+#
+sub _build_metabase {
+    my $metabase = Metamod::DBIxSchema::Metabase->connect(
+        $config->getDSN(),
+        $config->get('PG_ADMIN_USER'),
+        $config->has('PG_ADMIN_USER_PASSWORD') ? $config->get('PG_ADMIN_USER_PASSWORD') : '',
+    ) or die "No connect";
+    return $metabase;
+}
+
+=head1 AUTHOR
+
+Geir Aalberg, E<lt>geira@met.noE<gt>
+
+=head1 LICENSE
+
+Copyright (C) 2015 The Norwegian Meteorological Institute.
+
+METAMOD is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+=cut
