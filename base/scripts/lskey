@@ -35,6 +35,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 use strict;
 use warnings;
+use v5.14;
 
 use FindBin;
 use lib ("$FindBin::Bin/../../common/lib", '.');
@@ -42,7 +43,7 @@ use lib ("$FindBin::Bin/../../common/lib", '.');
 use Metamod::Config;
 use Metamod::DBIxSchema::Metabase;
 
-use Getopt::Long;
+use Getopt::Long 'GetOptionsFromArray';
 use Log::Log4perl qw(:levels);
 #use Log::Log4perl::CommandLine qw(:all :noinit);
 use Log::Log4perl::CommandLine ':all',
@@ -67,7 +68,9 @@ Utility for looking up keys in metadata db.
 
 =head1 USAGE
 
-  lskey -sc | -bk | -hk [ -r ] [ id | value [ id | value ... ] ]
+  lskey -sc
+  lskey -bk [ -a ] [ -cat sc_id ] [ id | value [ id | value ... ] ]
+  lskey -hk [ -r ] [ id | value [ id | value ... ] ]
 
 =head1 OPTIONS
 
@@ -86,6 +89,10 @@ List all searchcategories (id, name, type)
 =head2 -r | --recursive
 
 List all children of hierarchical keys
+
+=head2 --category
+
+Limit search to basickeys of given searchcategory id
 
 =head2 -a | --all
 
@@ -126,6 +133,9 @@ Ids and/or names of keys (wildcards assumed for names, which are case insensitiv
       51 variables            Cryosphere > Snow/Ice > Albedo > HIDDEN
       52 variables            surface_albedo
       53 variables            surface_albedo_assuming_deep_snow
+  $ lskey --bk -cat 7
+    1629 institutions         IXI International Example Institute
+    1630 institutions         ASI Another Similar Institute
 
   $ lskey -hk
        1        0  1 topics_and_variables      Cryosphere
@@ -180,18 +190,21 @@ local $Data::Dumper::Terse = 1;
 
 my ($config, $logger, %opt, @types);
 
-BEGIN { # run compile time to avoid nasty "You must call new() once before you can call instance()" bug
+#BEGIN { # run compile time to avoid nasty "You must call new() once before you can call instance()" bug
 
     @types = ('searchcategories|sc', 'basickeys|bk', 'hierarchicalkeys|hk');
-    GetOptions(\%opt, 'help|h', 'config=s', 'color|x!', @types, 'recursive', 'all', 'corresponding') or pod2usage(2);
-    pod2usage(2) if grep( $opt{$_}, @types ) > 1; # only 1 type param allowed
+    GetOptions(\%opt, 'help|h', 'config=s', 'color|x!', @types, 'recursive', 'all', 'corresponding', 'category=i') or pod2usage(2);
+    my @longnames = grep s/\|\w+$//, @types; # strip out short forms
+    #print STDERR Dumper \%opt, \@longnames;
+    pod2usage(2) if grep( $opt{$_}, @longnames ) != 1; # exactly 1 type param allowed
 
     my $config_file_or_dir = $opt{config} || $ENV{METAMOD_MASTER_CONFIG};
     if($opt{help} or ! Metamod::Config->config_found($config_file_or_dir)){
         pod2usage(1);
     }
     $config = Metamod::Config->new($config_file_or_dir, { nolog => 1 });
-}
+
+#}
 
 # colors not implemented yet
 my $color = defined $opt{color} ? $opt{color} : -t STDOUT; # use IO::Interactive::Tiny instead - FIXME
@@ -213,6 +226,7 @@ if ($opt{corresponding}) {
 list_scs() if ($opt{searchcategories});
 list_bks(@ARGV) if ($opt{basickeys});
 list_hks(0, @ARGV) if ($opt{hierarchicalkeys});
+# pod2usage(2) if none...
 
 exit 0;
 
@@ -243,7 +257,9 @@ sub list_bks {
             }
         }
     } else {
-        my $result = $rs->search( { 'bk_name' => { -not_like => '% HIDDEN' } } ); # this might die, if so then just abort
+        my $searchparams = { 'bk_name' => { -not_like => '% HIDDEN' } };
+        $searchparams->{ sc_id } = $opt{category} if $opt{category};
+        my $result = $rs->search( $searchparams ); # this might die, if so then just abort
         while (my $rec = $result->next) {
             show_bk($rec);
         }
