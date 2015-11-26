@@ -68,7 +68,7 @@ Utility for looking up keys in metadata db.
 
 =head1 USAGE
 
-  lskey -sc
+  lskey -sc [ -a ]
   lskey -bk [ -a ] [ -cat sc_id ] [ id | value [ id | value ... ] ]
   lskey -hk [ -r ] [ id | value [ id | value ... ] ]
 
@@ -96,7 +96,7 @@ Limit search to basickeys of given searchcategory id
 
 =head2 -a | --all
 
-Include HIDDEN basickeys
+Include HIDDEN basickeys or searchcategories (not listed in SEARCH_CATEGORY_SEQUENCE in config)
 
 =head2 --corresponding
 
@@ -170,6 +170,14 @@ Ids and/or names of keys (wildcards assumed for names, which are case insensitiv
      248        0  1 topics_and_variables      Hydrosphere
 
   $ lskey -sc
+       1 activity_types                       basickey
+       2 areas                                basickey
+       4 topics_and_variables                 tree
+       7 institutions                         basickey
+       8 datacollection_period                date_interval
+       9 map_search                           map_search
+      11 fulltext                             fulltext
+  $ lskey -sc --all
        1 activity_types                       basickey
        2 areas                                basickey
        3 variables                            basickey
@@ -319,8 +327,11 @@ sub show_hk {
 # list search categories
 #
 sub list_scs {
+    my @cat_sequence = split ',', $config->get('SEARCH_CATEGORY_SEQUENCE');
     my $rs = $db->resultset('Searchcategory');
-    my $result = $rs->search( undef, {order_by => 'sc_id'} ); # this might die, if so then just abort
+    my $result = $rs->search(
+        $opt{all} ? {} : { sc_idname => { -IN => \@cat_sequence } }, # don't filter if --all
+        {order_by => 'sc_id'} ); # this might die, if so then just abort
     while (my $sc = $result->next) {
         printf "%8d %-36s %-30s\n", $sc->sc_id, $sc->sc_idname, $sc->sc_type;
     }

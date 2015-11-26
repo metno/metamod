@@ -47,11 +47,15 @@ use warnings;
 #
 has 'config' => ( is => 'ro', isa => 'Metamod::Config', required => 1 );
 
-=head2 $self->selected_criteria($parameters)
+=head2 $self->selected_criteria($search_categories, $parameters)
 
 Transforms the request parameters into a hash reference for all the search criteria.
 
 =over
+
+=item $search_categories
+
+A hash containg the searchcategory table entries (normally stored in the stash)
 
 =item $parameters
 
@@ -80,6 +84,10 @@ the internal has is a list of hk ids and bk ids.
 
 sub selected_criteria {
     my $self = shift;
+    my $search_categories = shift or die "Missing searchcategory hash";
+    my %sc_index;
+    $sc_index{$_->{sc_idname}} = $_ foreach @$search_categories;
+    #print STDERR 'search_categories = ', Dumper \%sc_index;
 
     my ($parameters) = @_;
 
@@ -92,12 +100,16 @@ sub selected_criteria {
     my @topic_bks = ();
     while( my ( $key, $value) = each %$parameters ){
 
+        #print STDERR '<<<', Dumper $key, $value;
+        my @values = ref $value ? map split(','), @$value : [ split ',', $value ];
+        #print STDERR '>>>', Dumper $key, \@values;
+
         if ( $key =~ /^bk_id_(\d+)_(\d+)$/ ) {
             push @{ $bk_ids{ $1 } }, $2;
         } elsif ( $key =~ /^date_(to|from)_?(\d+)?$/ ) {
 
             my $datetype = $1;
-            my $category_id = $2 || 8; # currently hardcoded in Datasetimporter.pm
+            my $category_id = $2 || $sc_index{datacollection_period}->{sc_id} || 8; # currently hardcoded in Datasetimporter.pm
             if( $value ){
 
                 my $total_length = 8;
@@ -112,7 +124,6 @@ sub selected_criteria {
 
             }
 
-
         } elsif ( $key =~ /^freetext_?(\d*)$/ ) {
             push @freetext, flat $value if $value;
         } elsif ( $key =~ /^map_coord_(\w\d)$/ ) {
@@ -124,12 +135,30 @@ sub selected_criteria {
         } elsif ( $key =~ /^bk_id_topic_(\d+)$/ ) {
             push @topic_bks, $1;
         }
-        # remaining cases are experimental
-        elsif ( $key =~ /^hk$/ ) {
-            push @topic_hks, ref $value ? @$value : split ',', $value; # allow both hk=x&hk=y and hk=x,y
-        } elsif ( $key =~ /^basickey$/ ) {
-            push @topic_bks, ref $value ? @$value : split ',', $value; # allow both bk=x&bk=y and bk=x,y;
+        # remaining cases are experimental in 2.14
+        elsif ( my $sc = $sc_index{$key} ) {
+
+            # check sc_type from searchcategory table
+            if ($sc->{sc_type} eq 'basickey') {
+                push @{ $bk_ids{ $sc->{sc_id} } }, @values;
+            } elsif ($sc->{sc_type} eq 'tree') {
+                push @topic_hks, @values;
+            } elsif ($sc->{sc_type} eq 'map_search') {
+                die "Only one parameter $key allowed" if ref $value;
+                my @cnames = qw(x1 y1 x2 y2 srid);
+                @coords{@cnames} = @values;
+            } elsif ($sc->{sc_type} eq 'fulltext') {
+                push @freetext, flat $value if $value;
+            } elsif ($sc->{sc_type} eq 'date_interval') {
+                die "date_interval parameter not implemented - use date_from/to instead"; # TODO - FIXME
+            }
+
+        } elsif ( $key eq 'hk' ) { # not sure if we should allow these 'direct' calls
+            push @topic_hks, @values; # allow both hk=x&hk=y and hk=x,y
+        } elsif ( $key eq 'bk' ) {
+            push @topic_bks, @values; # allow both bk=x&bk=y and bk=x,y;
         }
+        # possible other cases, e.g. lsds arguments - ignore these
     }
 
     if( %bk_ids ){
@@ -148,6 +177,7 @@ sub selected_criteria {
         $criteria{ topics } = { hk_ids => \@topic_hks, bk_ids => \@topic_bks };
     }
 
+    #print STDERR 'search_criteria = ', Dumper \%criteria;
     return \%criteria;
 }
 

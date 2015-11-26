@@ -207,7 +207,9 @@ sub perform_search : Chained("/") :PathPart( 'search/page' ) :CaptureArgs(1) {
     my $datasets_per_page = $c->req->params->{ datasets_per_page } || 10;
 
     my $search_utils = Metamod::SearchUtils->new( { config => $c->stash->{ mm_config } } );
-    my $search_criteria = $search_utils->selected_criteria( $c->req->params() );
+    my $search_criteria = $search_utils->selected_criteria(
+        $c->stash->{search_ui_utils}->search_categories(),
+        $c->req->params() );
     my $ownertags = $search_utils->get_ownertags();
     my $search_params = {
             curr_page => $curr_page,
@@ -261,7 +263,9 @@ sub two_way_table : Path( "/search/two_way_table" ) : Args(0) {
     my $dataset = $c->model('Metabase::Dataset');
 
     my $search_utils = Metamod::SearchUtils->new( { config => $c->stash->{ mm_config } } );
-    my $search_criteria = $search_utils->selected_criteria( $c->req->params() );
+    my $search_criteria = $search_utils->selected_criteria(
+        $c->stash->{search_ui_utils}->search_categories(),
+        $c->req->params() );
     my $owner_tags = $search_utils->get_ownertags();
     my $vertical_mt_name = $c->req->param('vertical_mt_name') || $c->stash->{ search_ui_utils }->default_vertical_mt_name();
     my $horisontal_mt_name = $c->req->param('horisontal_mt_name') || $c->stash->{ search_ui_utils }->default_horisontal_mt_name();;

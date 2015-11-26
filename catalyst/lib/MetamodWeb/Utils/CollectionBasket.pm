@@ -230,7 +230,9 @@ sub _metadata_search_params {
     my $self = shift;
 
     my $search_utils = Metamod::SearchUtils->new( { config => $self->config } );
-    my $search_criteria = $search_utils->selected_criteria( $self->c->req->params() );
+    my $search_criteria = $search_utils->selected_criteria(
+        $self->c->stash->{search_ui_utils}->search_categories(),
+        $self->c->req->params() );
     my $ownertags = $search_utils->get_ownertags();
     my $dataset_rs = $self->meta_db->resultset('Dataset');
     my ($conds, $attrs ) = $dataset_rs->metadata_search_params( { ownertags => $ownertags,

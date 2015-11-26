@@ -43,6 +43,7 @@ use Metamod::Config;
 use Metamod::DBIxSchema::Metabase;
 #use Metamod::DBIxSchema::Userbase;
 use Metamod::SearchUtils;
+use DBIx::Class::ResultClass::HashRefInflator;
 
 use Getopt::Long;
 use Log::Log4perl qw(:levels);
@@ -75,17 +76,21 @@ Work in progress...
 
 =head1 OPTIONS
 
-=head2 -q|--quiet
+=head2 -h|--help
 
-=head2 --fatal
+Show manual page
 
-=head2 --error
+=head2 -q|--quiet, --off (max32)
 
-=head2 --warn
+=head2 --fatal (5)
 
-=head2 -v|--verbose
+=head2 --error (4)
 
-=head2 -d|--debug
+=head2 --warn (3)
+
+=head2 --info, -v|--verbose (2)
+
+=head2 -d|--debug (3... should be 1?)
 
 Controls Log4perl loglevel
 
@@ -118,16 +123,39 @@ Turn ANSI color output on/off
 
 Show ds_id numbers
 
-=head2 Search parameters
+=head2 --freetext
 
 Free text search parameter, including booleans:
 
   --freetext=glacier
   --freetext='ice AND arctic'
 
-Datacollection period:
+This should probably be called fulltext, but conflicts with --full parameter.
+
+=head2 --date_from, --date_to
+
+Search by datacollection period:
 
   --date_from=1957 --date_to=1958
+
+=head2 --activity_types, --areas, --variables, --institutions, --operational_status
+
+Search by basickey. Repeat for multiple values or use comma separated list. These forms are equivalent:
+
+  --areas=1610 --areas=1615
+  --areas=1610,1615
+
+=head2 --topics_and_variables
+
+Search by hierarchical key
+
+  $ lsds --topic=406
+
+=head2 --map_search
+
+Search by map coordinates. The order is x1,y1,x2,y2,SRID:
+
+  --map_search=9.4,81,27.817,73.74,4326
 
 =head2 -o|--ownertag tag
 
@@ -156,12 +184,20 @@ ds_id or ds_name (assuming the former if numeric)
 
 =head1 EXAMPLES
 
-  $ lsds  828 829 830 831
+  $ lsds 828 829 830 831
   $ lsds --full NORMAP/metno-sstana05-V2
   $ lsds -m dataref_OPENDAP
-  $ lsds --freetext=ice_conc
+
+$ lsds --areas=1620
+$ lsds --topic=406
+$ lsds --activity_types=1605
+$ lsds --date_from=2015-11-11
+$ lsds --map_search=9.4,81,27.817,73.74,4326
+
+  $ lsds --freetext=ice
   $ lsds --freetext='ice AND arctic'
   $ lsds --freetext='ice' --freetext='arctic'
+
   $ lsds --wms
   $ lsds --projectioninfo
   $ lsds --xmlfile
@@ -171,12 +207,13 @@ ds_id or ds_name (assuming the former if numeric)
 
 local $Data::Dumper::Terse = 1;
 
-my ($config, $logger, %opt);
+my ($config, $logger, %opt, $ua);
 
 BEGIN { # run compile time to avoid nasty "You must call new() once before you can call instance()" bug
 
-    GetOptions(\%opt, 'help', 'config=s', 'count|c', 'all_levels', 'f|full!',
-               'freetext=s@', 'date_from=s', 'date_to=s',  #'basickey=s@', 'bk=s@', 'hk=s@',
+    GetOptions(\%opt, 'help|h!', 'config=s', 'count|c', 'all_levels', 'f|full!',
+               'date_from=s', 'date_to=s', 'map_search=s', 'freetext=s@', 'variables=s@',
+               'activity_types=s@', 'topics_and_variables=s@', 'areas=s@', 'operational_status=s@', # TODO: read from searchcategories instead of hardcoded
                'metadata=s@', 'ownertag=s@', 'wms', 'projectioninfo', 'xmlfile', 'color|x!', 'id!') or pod2usage(2);
 
     my $config_file_or_dir = $opt{config} || $ENV{METAMOD_MASTER_CONFIG};
@@ -191,11 +228,11 @@ if (defined $color) {
     $ENV{ANSI_COLORS_DISABLED} = 1 unless $color;
 }
 
+# parse loglevel options
 $logger = Log::Log4perl->get_logger('metamod.tools');
 Log::Log4perl::CommandLine::handlelogoptions();
 #printf STDERR "loglevel=%d %d\n", $logger->level, $logger->is_info;
-print STDERR Dumper \%opt, \@ARGV;
-
+#print STDERR Dumper \%opt, \@ARGV;
 
 my $ownertags = ( defined $opt{ownertag} ? $opt{ownertag} : $config->split('DATASET_TAGS') ) || []; # allow setting to blank, i.e. all tags
 $ownertags = [ $ownertags ] unless ref $ownertags;
@@ -213,30 +250,21 @@ $opt{full} = (@ARGV == 1) unless defined $opt{full} || @$metadata; # default to 
 
 #print STDERR 'params = ', Dumper $opt{params};
 
+# setup database stuff
+#
 my $db =_build_metabase();
+
+# get search categories list
+my $sc_rs = $db->resultset('Searchcategory');
+# faking MetamodWeb::Utils::UI::Search::search_categories here, getting results as array instead of DBIx::Class objects
+my @cats = $sc_rs->search( {}, { result_class => 'DBIx::Class::ResultClass::HashRefInflator' })->all;
+#print STDERR Dumper \@cats;
+
+# prepare dataset search
 my $rs = $db->resultset('Dataset');
 my $search_utils = Metamod::SearchUtils->new( { config => $config } );
-#my $search_criteria = {};
-#my $search_criteria = $search_utils->selected_criteria( $opt{params} );
-
-my %params;
-for (qw( freetext date_from date_to bk hk )) {
-    $params{$_} = $opt{$_} if exists $opt{$_};
-}
-my $search_criteria = $search_utils->selected_criteria( \%params );
-#my $params = $opt{params};
-#foreach (keys %$params) {
-#
-#    if (/^freetext$/) {
-#        $$search_criteria{$_} = [ $$params{$_} ];
-#    } elsif (/^date_from$/) {
-#        $$search_criteria{dates} = { 8 => { from => '1957', to => '1958'} }
-#    } else {
-#        #$$search_criteria{$_} = [ split ',', $params->{$_} ];
-#    }
-#}
-print STDERR 'search_criteria = ', Dumper $search_criteria;
-
+my $search_criteria = $search_utils->selected_criteria( \@cats, \%opt );
+print STDERR 'search_criteria = ', Dumper $search_criteria if $logger->is_info;
 my $search_params = {
         ownertags => $ownertags,
         search_criteria => $search_criteria,
@@ -244,9 +272,13 @@ my $search_params = {
         all_levels => $opt{all_levels}||0,
 };
 
-my $ua = LWP::UserAgent->new;
-$ua->timeout(10);
-#$ua->env_proxy;
+# prepare for getting Capabilities from WMS servers
+#
+if ($opt{wms}) {
+    $ua = LWP::UserAgent->new;
+    $ua->timeout(10);
+    #$ua->env_proxy;
+}
 
 if (@ARGV) {
 
@@ -264,7 +296,6 @@ if (@ARGV) {
     }
 
 } else {
-    #$rs->search();
     my $result = $rs->metadata_search($search_params); # this might die, if so then just abort
 
     if ( $opt{count} ) {
