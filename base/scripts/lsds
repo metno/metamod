@@ -134,7 +134,7 @@ This should probably be called fulltext, but conflicts with --full parameter.
 
 =head2 --date_from, --date_to
 
-Search by datacollection period:
+Search by datacollection period in YYYY-MM-DD format (may be shortened):
 
   --date_from=1957 --date_to=1958
 
@@ -358,7 +358,7 @@ sub listds {
         }
 
         my $md = $ds->metadata($metadata);
-        foreach my $k (keys %$md) {
+        foreach my $k (sort keys %$md) {
             foreach ( @{ $md->{$k} } ) {
                 if ($list) {
                     printf "  %s: $_\n", colored($k, 'bold yellow');

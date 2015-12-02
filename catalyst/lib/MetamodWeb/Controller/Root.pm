@@ -21,13 +21,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 =cut
 
 use Moose;
-use Metamod::Config;
 use namespace::autoclean;
+
 use HTTP::Status qw(status_message);
 
-use Data::Dump qw( dump );
-
+use Metamod::Config;
 use MetamodWeb::Utils::UI::Common;
+use Data::Dump qw( dump );
 
 # By extending from ActionRole we can apply action roles to actions.
 BEGIN { extends 'Catalyst::Controller::ActionRole', 'MetamodWeb::BaseController::Base' }
@@ -36,7 +36,8 @@ BEGIN { extends 'Catalyst::Controller::ActionRole', 'MetamodWeb::BaseController:
 # Sets the actions in this controller to be registered with no prefix
 # so they function identically to actions created in MyApp.pm
 #
-__PACKAGE__->config(namespace => '' );
+
+__PACKAGE__->config(namespace => '');
 
 =head1 NAME
 
@@ -89,6 +90,7 @@ Standard 404 error page
 
 sub default :Path { # must come after error so won't be overridden
     my ( $self, $c ) = @_;
+    #return if $c->debug; # Couldn't render template "default.tt: file error - default.tt: not found"
     $c->stash( template => 'errorpage.tt', status_text => "404 Not Found", 'current_view' => 'None' );
     #$c->response->body( "<h1>Page not found</h1>\n" );
     $c->response->content_type('text/html');

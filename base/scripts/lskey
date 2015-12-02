@@ -70,7 +70,7 @@ Utility for looking up keys in metadata db.
 
   lskey -sc [ -a ]
   lskey -bk [ -a ] [ -cat sc_id ] [ id | value [ id | value ... ] ]
-  lskey -hk [ -r ] [ id | value [ id | value ... ] ]
+  lskey -hk [ -a ] [ id | value [ id | value ... ] ]
 
 =head1 OPTIONS
 
@@ -86,17 +86,27 @@ Search for hierarchical keys by id/name (shows id, parent, searchcategory, name)
 
 List all searchcategories (id, name, type)
 
-=head2 -r | --recursive
-
-List all children of hierarchical keys
-
 =head2 --category
 
 Limit search to basickeys of given searchcategory id
 
 =head2 -a | --all
 
-Include HIDDEN basickeys or searchcategories (not listed in SEARCH_CATEGORY_SEQUENCE in config)
+=over 4
+
+=item Searchcategories:
+
+Include searchcategories not listed in SEARCH_CATEGORY_SEQUENCE in config
+
+=item Basickeys:
+
+Include HIDDEN basickeys
+
+=item Hierarchical keys
+
+List all children. not only top level
+
+=back
 
 =head2 --corresponding
 
@@ -201,7 +211,7 @@ my ($config, $logger, %opt, @types);
 #BEGIN { # run compile time to avoid nasty "You must call new() once before you can call instance()" bug
 
     @types = ('searchcategories|sc', 'basickeys|bk', 'hierarchicalkeys|hk');
-    GetOptions(\%opt, 'help|h', 'config=s', 'color|x!', @types, 'recursive', 'all', 'corresponding', 'category=i') or pod2usage(2);
+    GetOptions(\%opt, 'help|h', 'config=s', 'color|x!', @types, 'all', 'corresponding', 'category=i') or pod2usage(2);
     my @longnames = grep s/\|\w+$//, @types; # strip out short forms
     #print STDERR Dumper \%opt, \@longnames;
     pod2usage(2) if grep( $opt{$_}, @longnames ) != 1; # exactly 1 type param allowed
@@ -230,6 +240,8 @@ my $db =_build_metabase();
 if ($opt{corresponding}) {
     #code
 }
+
+# TODO: search by sc_name instead of -bk
 
 list_scs() if ($opt{searchcategories});
 list_bks(@ARGV) if ($opt{basickeys});
@@ -296,10 +308,10 @@ sub list_hks {
                         my $rs = $db->resultset('HkRepresentsBk');
                         show_hk($_->hk_id) for ( $rs->search({ bk_id => $k }) );
                     } else {
-                        show_hk( $rs->find($k), $opt{recursive} );
+                        show_hk( $rs->find($k), $opt{all} );
                     }
                 } else { # name
-                    show_hk( $_, $opt{recursive} ) for ( $rs->search( { 'LOWER(hk_name)' => { like => lc("%$k%") } } ) );
+                    show_hk( $_, $opt{all} ) for ( $rs->search( { 'LOWER(hk_name)' => { like => lc("%$k%") } } ) );
                 }
             } catch {
                 print STDERR "Key not found: $k\n";
@@ -307,7 +319,7 @@ sub list_hks {
             }
         }
     } else {
-        my $result = $rs->search( $opt{recursive} ? {} : { hk_parent => $parent } ); # this might die, if so then just abort
+        my $result = $rs->search( $opt{all} ? {} : { hk_parent => $parent } ); # this might die, if so then just abort
         while (my $rec = $result->next) {
             show_hk($rec, undef); # never recurse when listing all keys
         }

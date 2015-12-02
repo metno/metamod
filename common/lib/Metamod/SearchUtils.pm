@@ -101,7 +101,7 @@ sub selected_criteria {
     while( my ( $key, $value) = each %$parameters ){
 
         #print STDERR '<<<', Dumper $key, $value;
-        my @values = ref $value ? map split(','), @$value : [ split ',', $value ];
+        my @values = ref $value ? map split(','), @$value : split ',', $value;
         #print STDERR '>>>', Dumper $key, \@values;
 
         if ( $key =~ /^bk_id_(\d+)_(\d+)$/ ) {
@@ -157,6 +157,8 @@ sub selected_criteria {
             push @topic_hks, @values; # allow both hk=x&hk=y and hk=x,y
         } elsif ( $key eq 'bk' ) {
             push @topic_bks, @values; # allow both bk=x&bk=y and bk=x,y;
+        } elsif ( grep /^$key$/, qw(ds_id ds_parent ds_status) ) {
+            $criteria{ $key } = $value;
         }
         # possible other cases, e.g. lsds arguments - ignore these
     }
