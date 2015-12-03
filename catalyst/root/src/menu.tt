@@ -25,6 +25,10 @@
 
 <div class="menu-item"><a href="[% c.uri_for( '/subscription' )%]">[% app.menu.sub %]</a></div>
 
+[% IF app.menu.api %]
+    <div class="menu-item"><a href="[% c.uri_for( '/static/swagger-io/index.html' )%]">[% app.menu.api %]</a></div>
+[% END %]
+
 [%
     redirect_params = {
         return_path => '/' _ c.req.path(),

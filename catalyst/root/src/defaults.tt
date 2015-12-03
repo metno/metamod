@@ -42,6 +42,7 @@ app = {
         search = 'Metadata search'
         upload = 'File upload'
         sub = 'Subscription'
+        api = 'Search API'
         profile = 'User profile'
         login = 'Login'
         logout = 'Logout'

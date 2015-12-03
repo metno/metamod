@@ -257,8 +257,8 @@ Used only for debugging.
 
 =cut
 
-sub qtips :Path("/qtips") :Args(0) {
-    my ( $self, $c ) = @_;
+sub qtips :Path("/qtips") :Args {
+    my ( $self, $c, @path ) = @_;
 
     my $dom = new MetamodWeb::Utils::XML::Generator;
     my (@params, %attr);
@@ -280,8 +280,15 @@ sub qtips :Path("/qtips") :Args(0) {
     }
     #print STDERR $c->request->query_keywords || '-' . "\n";
 
+    my @pathparts = map $dom->tag('arg', $_), @path;
+    my @headers = $c->request->headers->header_field_names;
+
     $dom->setDocumentElement(
-        $dom->tag('request', \%attr, \@params )
+        $dom->tag('request', \%attr, [
+            $dom->tag('path', [ map $dom->tag('arg', $_), @path ]),
+            $dom->tag('query', \@params),
+            $dom->tag('headers', [ map $dom->tag( $_, $c->request->headers->header($_) ), @headers ]),
+        ])
     );
 
     $c->response->content_type('text/xml');

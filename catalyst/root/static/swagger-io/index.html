@@ -33,7 +33,9 @@
       if (url && url.length > 1) {
         url = decodeURIComponent(url[1]);
       } else {
-        url = "/api-docs";
+        var basepath = window.location.href.substr(0, window.location.href.indexOf('/static/swagger'));
+        url = basepath + '/api-docs';
+        //url = "/api-docs";
       }
 
       // Pre load translate...

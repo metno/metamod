@@ -57,6 +57,13 @@ sub auto :Private {
     # faking MetamodWeb::Utils::UI::Search::search_categories here, getting results as array instead of DBIx::Class objects
     my @cats = $c->model('Metabase::Searchcategory')->search( {}, { result_class => 'DBIx::Class::ResultClass::HashRefInflator' })->all;
     $c->stash( searchcategories => \@cats );
+    my $conf = $c->stash->{mm_config};
+    if ($c->request->headers->header('x-forwarded-for')) {
+        $c->stash( basepath => $conf->get('BASE_PART_OF_EXTERNAL_URL').$conf->get('LOCAL_URL') );
+    } else {
+        $c->stash( basepath => $c->request->base->as_string );
+    }
+
 }
 
 # TODO: expand sc_fnc
@@ -211,6 +218,7 @@ sub api_docs :Path('/api-docs') :Args(0) {
     push @res, { "path" => $_, "description" => $apis{$_} } for keys %apis;
     $swag->{apis} = \@res;
 
+    print STDERR Dumper $c->request;
     $c->response->content_type('application/json');
     $c->response->body( $j->encode( $swag ) );
 }
@@ -227,7 +235,7 @@ sub api_docs_dataset :Path('/api-docs/dataset') :Args(0) {
     my $swag = {
         "apiVersion" => "v0",
         "swaggerVersion" => "1.2",
-        "basePath" => "http://localhost:3000",
+        "basePath" => $c->stash->{basepath},
         "resourcePath" => "/dataset",
         "produces" => ["application/xml"],
         "apis" => [
@@ -290,7 +298,7 @@ sub api_docs_api :Path('/api-docs/api') :Args(0) {
     my $swag = {
         "apiVersion" => "v0",
         "swaggerVersion" => "1.2",
-        "basePath" => "http://localhost:3000",
+        "basePath" => $c->stash->{basepath},
         "resourcePath" => "/api",
         "produces" => ["application/json"],
         "apis" => []
