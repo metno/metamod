@@ -53,6 +53,8 @@ my $mmVersion = "$Bin/../VERSION";
 my $changeLog = "$Bin/changelog";
 
 my $build = $ENV{BUILD_NUMBER} || '?';
+my $revision = `svnversion` || '?';
+chomp $revision;
 my $date =  $ENV{BUILD_ID} || strftime("%Y-%m-%d", localtime);
 
 
@@ -67,6 +69,8 @@ while (defined (my $line = <$ch>)) {
     }
 }
 close $ch;
+
+print "Revision is $revision\n" if $verbose;
 print "Version is ", $chMinorVersion || $chMajorVersion, "\n" if $verbose;
 die "no changelog version" unless $chMajorVersion;
 
@@ -74,11 +78,12 @@ die "no changelog version" unless $chMajorVersion;
 my ($mmMajorVersion, $mmMinorVersion, $out);
 open (my $mh, $mmVersion) or die "Cannot read $mmVersion: $!";
 while (defined (my $line = <$mh>)) {
-    if ($line =~ /version (\d+\.\w+)(\.[^, ]+)(, build )?(\d+|\?) of METAMOD/) {
+    if ($line =~ /version (\d+\.\w+)(\.[^, ]+)(, revision )?(\S+)?(, build )?(\d+|\?) of METAMOD/) {
         $mmMajorVersion = $1;
         $mmMinorVersion = "$1$2";
+        print "VERSION is ", $mmMinorVersion || $mmMajorVersion, "\n" if $verbose;
         if ($update) {
-            $out = "This is version $chMinorVersion, build $build of METAMOD released $date\n";
+            $out = "This is version $chMinorVersion, revision $revision, build $build of METAMOD released $date\n";
         } else {
             last;
         }
@@ -87,7 +92,6 @@ while (defined (my $line = <$mh>)) {
     }
 }
 close $mh;
-print "VERSION is ", $mmMinorVersion || $mmMajorVersion, "\n" if $verbose;
 die "no VERSION version" unless $mmMajorVersion;
 
 if ($update) {

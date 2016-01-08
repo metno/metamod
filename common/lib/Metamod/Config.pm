@@ -523,6 +523,7 @@ sub _readConfig {
 
     my $ver = $self->version();
     $conf{'VERSION'}   = $ver->{number};
+    $conf{'REVISION'}  = $ver->{revision};
     $conf{'BUILD'}     = $ver->{build};
     $conf{'BUILDDATE'} = $ver->{date};
 
@@ -924,9 +925,9 @@ sub version {
     my $top = <$file>;
     chomp $top;
     close $file;
-    $top =~ /^This is version ([0-9.\-]+(~\w+)?)(, build )?(\d+|\?) of METAMOD released ([0-9\-]+)/;
-    die "Format error in VERSION file:\n  '$top'" unless $1 && $5;
-    my $ver = { number => $1, build => $4, date => $5 };
+    $top =~ /^This is version ([0-9.\-]+(~\w+)?)(, revision )?(\S+)?(, build )?(\d+|\?) of METAMOD released ([0-9\-]+)/;
+    die "Format error in VERSION file:\n  '$top'" unless $1 && $6;
+    my $ver = { number => $1, revision => $4, build => $5, date => $6 };
     #print STDERR Dumper $ver;
     return $ver;
 }
