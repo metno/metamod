@@ -4,6 +4,7 @@
 
 mm_logo = c.uri_for('/static/images/metamod_logo.png')
 version = mm_config.get('VERSION')
+revision = mm_config.get('REVISION')
 build = mm_config.get('BUILD')
 builddate = mm_config.get('BUILDDATE')
 thumbsize = 64
@@ -31,7 +32,7 @@ app = {
 
         # HTML code for a footer across the bottom of applications:
         footer_html = '<div id="page-footer">
-            <a href="https://wiki.met.no/metamod/start">METAMOD</a> ' _ version _ ', build ' _ build _ ' &#169; ' _ builddate _
+            <a href="https://wiki.met.no/metamod/start">METAMOD</a> ' _ version _ ', revision ' _ revision _ ', build ' _ build _ ' &#169; ' _ builddate _
             ' <a href="http://met.no/">The Norwegian Meteorological Institute</a>
         </div>'
     }

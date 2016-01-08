@@ -1,6 +1,7 @@
-metno-metamod-2.14 (2.14.1-0) UNRELEASED; urgency=medium
+metno-metamod-2.14 (2.14.1-1) unstable; urgency=low
 
   * port to ubuntu 14.04 LTS
+  * experimental search API with Swagger integration
 
  -- geira <geira@pc2738>  Thu, 22 Oct 2015 18:15:50 +0200
 

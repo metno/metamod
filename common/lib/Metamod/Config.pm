@@ -925,9 +925,9 @@ sub version {
     my $top = <$file>;
     chomp $top;
     close $file;
-    $top =~ /^This is version ([0-9.\-]+(~\w+)?)(, revision )?(\S+)?(, build )?(\d+|\?) of METAMOD released ([0-9\-]+)/;
-    die "Format error in VERSION file:\n  '$top'" unless $1 && $6;
-    my $ver = { number => $1, revision => $4, build => $5, date => $6 };
+    $top =~ /^This is version ([0-9.\-]+(~\w+)?)(, revision (\S+))?(, build (\d+|\?))? of METAMOD released ([0-9\-]+)/;
+    die "Format error in VERSION file:\n  '$top'" unless $1 && $7;
+    my $ver = { number => $1, revision => $4, build => $6, date => $7 };
     #print STDERR Dumper $ver;
     return $ver;
 }
