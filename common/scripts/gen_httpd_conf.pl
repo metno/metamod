@@ -140,6 +140,11 @@ $old_redirect
     #RewriteLogLevel 6
     #LogLevel debug
 
+    # block misbehaving chinese spiders from taking down the site
+    RewriteCond %{HTTP_USER_AGENT} ^Baiduspider [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} ^Sogou
+    RewriteRule ^.*$ - [F]
+
     # redefine to first look for static files in application directory
     Alias               $local/static      $paths{custom}/static
 
