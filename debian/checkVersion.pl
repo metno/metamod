@@ -53,7 +53,7 @@ my $mmVersion = "$Bin/../VERSION";
 my $changeLog = "$Bin/changelog";
 
 my $build = $ENV{BUILD_NUMBER} || '?';
-my $revision = `svnversion` || '?';
+my $revision = $ENV{SVN_REVISION} || `svnversion` || '?';
 chomp $revision;
 my $date =  $ENV{BUILD_ID} || strftime("%Y-%m-%d", localtime);
 
