@@ -38,7 +38,8 @@ ordie "Can't create database $DBNAME... exiting with code $?"
 echo "----------------- Database $DBNAME created ------------------"
 
 # check PG version running on server
-PGVERSION=`echo "select version()" | $PSQL -A $DBNAME -U $PG_ADMIN_USER | perl -n -e 'print "$1_$2\n" if /PostgreSQL (\d+)\.(\d+)/'`
+PGVERSION=`echo "select version()" | $PSQL -d $DBNAME -U $PG_ADMIN_USER $PG_CONNECTSTRING_SHELL| perl -n -e 'print "$1_$2\n" if /PostgreSQL (\d+)\.(\d+)/'`
+check "PGVERSION"
 
 # check script locations set for current PG version
 # tsearch removed from Postgresql 8.3 onwards, won't work under 9.1
